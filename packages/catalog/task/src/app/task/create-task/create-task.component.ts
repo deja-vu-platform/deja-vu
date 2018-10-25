@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -29,7 +29,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-task.component.html',
   styleUrls: ['./create-task.component.css']
 })
-export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
+export class CreateTaskComponent implements OnInit, OnExec, OnExecAbort,
+  OnExecCommit {
   @Input() id;
   @Input() assignerId;
   @Input() showOptionToInputAssignee = true;
@@ -75,14 +76,14 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   outputSelectedAssignee(selectedAssignee: string) {
     this.selectedAssignee.emit(selectedAssignee);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateTaskResponse>('/graphql', {
       query: `mutation CreateTask($input: CreateTaskInput!) {
         createTask(input: $input) {
@@ -106,7 +107,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newTaskSaved = true;
     window.setTimeout(() => {
       this.newTaskSaved = false;
@@ -118,7 +119,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newTaskError = reason.message;
   }
 }

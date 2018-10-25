@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 
@@ -45,7 +45,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   ]
 })
 export class ChangePasswordComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -90,10 +90,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation ChangePassword($input: ChangePasswordInput!) {
           changePassword(input: $input)
@@ -113,7 +113,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newPasswordSaved = true;
     window.setTimeout(() => {
       this.newPasswordSaved = false;
@@ -125,7 +125,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newPasswordSavedError = reason.message;
   }
 

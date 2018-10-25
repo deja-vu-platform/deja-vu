@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExec,
   RunService
 } from 'dv-core';
 
@@ -34,7 +34,7 @@ interface FollowUnfollowRes {
   styleUrls: ['./follow-unfollow.component.css']
 })
 export class FollowUnfollowComponent implements
-  OnInit, OnChanges, OnRun {
+  OnInit, OnChanges, OnExec {
   @Input() followerId: string;
   @Input() publisherId: string;
 
@@ -89,15 +89,15 @@ export class FollowUnfollowComponent implements
 
   follow() {
     this.queryString = followQuery;
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   unfollow() {
     this.queryString = unfollowQuery;
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<FollowUnfollowRes>(this.apiPath, {
       query: this.queryString,
       variables: {

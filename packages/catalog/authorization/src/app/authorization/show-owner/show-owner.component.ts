@@ -3,8 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';

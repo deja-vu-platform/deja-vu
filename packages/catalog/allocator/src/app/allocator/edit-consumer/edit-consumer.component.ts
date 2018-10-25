@@ -10,8 +10,8 @@ import {
 import {
   GatewayService,
   GatewayServiceFactory,
-  OnAfterExecAbort,
-  OnAfterExecCommit,
+  OnExecAbort,
+  OnExecCommit,
   OnExec,
   RunService
 } from 'dv-core';
@@ -37,8 +37,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './edit-consumer.component.html',
   styleUrls: ['./edit-consumer.component.css']
 })
-export class EditConsumerComponent implements OnAfterExecAbort,
-  OnAfterExecCommit, OnChanges, OnInit, OnExec {
+export class EditConsumerComponent implements OnExecAbort,
+  OnExecCommit, OnChanges, OnInit, OnExec {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Input() buttonLabel = 'Save';
@@ -147,7 +147,7 @@ export class EditConsumerComponent implements OnAfterExecAbort,
     }
   }
 
-  dvOnAfterExecCommit() {
+  dvOnExecCommit() {
     this.editConsumerSaved = true;
     window.setTimeout(() => {
       this.editConsumerSaved = false;
@@ -160,7 +160,7 @@ export class EditConsumerComponent implements OnAfterExecAbort,
     }
   }
 
-  dvOnAfterExecAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.editConsumerError = reason.message;
   }
 }

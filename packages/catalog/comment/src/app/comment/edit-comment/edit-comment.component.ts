@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -48,7 +48,7 @@ interface EditCommentRes {
   ]
 })
 export class EditCommentComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit, OnChanges {
+  OnInit, OnExec, OnExecAbort, OnExecCommit, OnChanges {
   @Input() id: string;
   @Input() authorId: string;
 
@@ -120,10 +120,10 @@ export class EditCommentComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<boolean> {
+  async dvOnExec(): Promise<boolean> {
     const res = await this.gs.post<EditCommentRes>(this.apiPath, {
       query: `mutation EditComment($input: EditCommentInput!) {
             editComment(input: $input)
@@ -146,7 +146,7 @@ export class EditCommentComponent implements
     return res.data.editComment;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.editCommentSaved = true;
     this.editCommentError = '';
     window.setTimeout(() => {
@@ -159,7 +159,7 @@ export class EditCommentComponent implements
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.editCommentError = reason.message;
   }
 }

@@ -10,8 +10,8 @@ import {
 import {
   GatewayService,
   GatewayServiceFactory,
-  OnAfterExecAbort,
-  OnAfterExecCommit,
+  OnExecAbort,
+  OnExecCommit,
   OnExec,
   RunService
 } from 'dv-core';
@@ -38,7 +38,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-object.component.css']
 })
 export class CreateObjectComponent
-implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string | undefined;
   savedInitialValue: ValueMap;
   @Input() set initialValue(value: ValueMap) {
@@ -142,7 +142,7 @@ implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
     this.object.emit(input);
   }
 
-  dvOnAfterExecCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit && this.save) {
       this.newObjectSaved = true;
       window.setTimeout(() => {
@@ -156,7 +156,7 @@ implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
     }
   }
 
-  dvOnAfterExecAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newObjectError = reason.message;
     }

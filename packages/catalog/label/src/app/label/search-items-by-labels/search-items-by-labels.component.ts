@@ -88,7 +88,7 @@ export class SearchItemsByLabelsComponent
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   async dvOnRun(): Promise<void> {

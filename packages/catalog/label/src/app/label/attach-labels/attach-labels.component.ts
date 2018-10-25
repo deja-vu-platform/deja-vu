@@ -5,8 +5,8 @@ import {
 import { MatChipInputEvent } from '@angular/material';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
-  OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
+  OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -27,7 +27,7 @@ interface AddLabelsToItemRes {
   styleUrls: ['./attach-labels.component.css']
 })
 export class AttachLabelsComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnExec, OnExecAbort, OnExecCommit {
   @Input() itemId: string;
   @Input() labels: Label[] | undefined;
 
@@ -65,7 +65,7 @@ export class AttachLabelsComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   add(event: MatChipInputEvent): void {
@@ -91,7 +91,7 @@ export class AttachLabelsComponent implements
     }
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<AddLabelsToItemRes>(this.apiPath, {
       query: `mutation AttachLabelsToItem($input: AddLabelsToItemInput!) {
             addLabelsToItem(input: $input)
@@ -111,7 +111,7 @@ export class AttachLabelsComponent implements
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
     this.labels = [];
@@ -120,7 +120,7 @@ export class AttachLabelsComponent implements
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.labelsAttachedError = reason.message;
   }
 }

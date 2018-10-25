@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -39,7 +39,7 @@ const LONGITUDE_LIMIT = 180;
   ]
 })
 export class CreateMarkerComponent implements
-  OnInit, OnChanges, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnChanges, OnExec, OnExecAbort, OnExecCommit {
   @Input() id: string | undefined;
   @Input() mapId: string;
 
@@ -95,12 +95,12 @@ export class CreateMarkerComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   ngOnChanges() { }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{
       data: any, errors: { message: string }[]
     }>('/graphql', {
@@ -139,7 +139,7 @@ export class CreateMarkerComponent implements
     });
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newMarkerSaved = true;
     this.newMarkerError = '';
     window.setTimeout(() => {
@@ -152,7 +152,7 @@ export class CreateMarkerComponent implements
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newMarkerError = reason.message;
   }
 }

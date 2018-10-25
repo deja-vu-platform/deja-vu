@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
-import { RunService, OnAfterExecCommit, OnAfterExecAbort } from '../run.service';
+import { RunService, OnExecCommit, OnExecAbort } from '../run.service';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -10,7 +10,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './status.component.html'
 })
 export class StatusComponent
-implements OnInit, OnAfterExecCommit, OnAfterExecAbort {
+implements OnInit, OnExecCommit, OnExecAbort {
   @Input() savedText = 'Saved';
   saved = false;
   error: string = '';
@@ -21,7 +21,7 @@ implements OnInit, OnAfterExecCommit, OnAfterExecAbort {
     this.rs.register(this.elem, this);
   }
 
-  dvOnAfterExecCommit() {
+  dvOnExecCommit() {
     this.saved = true;
     this.error = '';
     window.setTimeout(() => {
@@ -29,7 +29,7 @@ implements OnInit, OnAfterExecCommit, OnAfterExecAbort {
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnAfterExecAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.error = reason.message;
   }
 }

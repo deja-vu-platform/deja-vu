@@ -3,8 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -21,7 +20,7 @@ interface CanEditRes {
   templateUrl: './can-edit.component.html',
   styleUrls: ['./can-edit.component.css']
 })
-export class CanEditComponent implements OnInit, OnChanges {
+export class CanEditComponent implements OnInit, OnChanges, OnExec {
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canEdit = new EventEmitter<boolean>();
@@ -68,7 +67,7 @@ export class CanEditComponent implements OnInit, OnChanges {
     });
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.load();
   }
 }

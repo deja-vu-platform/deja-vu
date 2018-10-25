@@ -3,8 +3,8 @@ import {
   Inject, Input, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -21,7 +21,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./add-viewer.component.css']
 })
 export class AddViewerComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string;
   @Input() viewerId: string;
   @Input()
@@ -50,10 +50,10 @@ export class AddViewerComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.gs
       .post(this.apiPath, {
         query: `
@@ -71,14 +71,14 @@ export class AddViewerComponent implements
       .toPromise();
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.viewerAddedSuccess = true;
     window.setTimeout(() => {
       this.viewerAddedSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.viewerAddedErrorText = reason.message;
   }
 }

@@ -6,7 +6,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { OnAfterCommit, RunService } from 'dv-core';
+import { OnExecCommit, RunService } from 'dv-core';
 
 import { startWith } from 'rxjs/operators';
 import {
@@ -39,7 +39,7 @@ import * as _ from 'lodash';
   ]
 })
 export class InputItemCountsComponent
-  implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
+  implements OnInit, ControlValueAccessor, Validator, OnExecCommit {
   itemsControl = new FormControl(0, [Validators.required]);
   @Output() itemCounts = new EventEmitter<ItemCount[]>();
 
@@ -85,7 +85,7 @@ export class InputItemCountsComponent
     return this.itemsControl.errors;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.reset();
   }
 

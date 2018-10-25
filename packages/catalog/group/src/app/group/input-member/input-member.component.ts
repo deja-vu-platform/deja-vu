@@ -8,7 +8,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { OnAfterCommit, RunService } from 'dv-core';
+import { OnExecCommit, RunService } from 'dv-core';
 
 
 import { startWith } from 'rxjs/operators';
@@ -31,7 +31,7 @@ import { startWith } from 'rxjs/operators';
   ]
 })
 export class InputMemberComponent
-implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
+implements OnInit, ControlValueAccessor, Validator, OnExecCommit {
   memberIdControl = new FormControl('', [Validators.required]);
   @Output() memberId = new EventEmitter<string>();
 
@@ -69,7 +69,7 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   }
 
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.reset();
   }
 

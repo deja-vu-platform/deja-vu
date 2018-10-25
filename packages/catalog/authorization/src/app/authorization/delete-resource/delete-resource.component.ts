@@ -2,7 +2,7 @@ import {
   Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -15,7 +15,7 @@ import { API_PATH } from '../authorization.config';
   templateUrl: './delete-resource.component.html',
   styleUrls: ['./delete-resource.component.css']
 })
-export class DeleteResourceComponent implements OnInit, OnRun {
+export class DeleteResourceComponent implements OnInit, OnExec {
   @Input() id;
 
   private gs: GatewayService;
@@ -30,10 +30,10 @@ export class DeleteResourceComponent implements OnInit, OnRun {
   }
 
   deleteEvent() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.gs
       .post(this.apiPath, {
         query: `mutation {

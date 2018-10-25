@@ -7,8 +7,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 
@@ -31,7 +31,7 @@ interface ValidatePasskeyRes {
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent
-  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   // Presentation inputs
   @Input() inputLabel = 'Passkey Code';
   @Input() buttonLabel = 'Validate';
@@ -67,10 +67,10 @@ export class SignInComponent
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<ValidatePasskeyRes>(this.apiPath, {
       query: `mutation {
         validatePasskey(code: "${this.passkeyControl.value}") {
@@ -92,7 +92,7 @@ export class SignInComponent
     this.passkey.emit(passkey);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.passkeyValidated = true;
     window.setTimeout(() => {
       this.passkeyValidated = false;
@@ -104,7 +104,7 @@ export class SignInComponent
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.passkeyValidatedError = reason.message;
   }
 }

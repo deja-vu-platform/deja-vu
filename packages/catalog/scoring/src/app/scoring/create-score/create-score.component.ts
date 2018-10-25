@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -29,7 +29,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-score.component.css']
 })
 export class CreateScoreComponent
-    implements OnInit, OnRun, OnAfterCommit, OnAfterAbort  {
+    implements OnInit, OnExec, OnExecCommit, OnExecAbort  {
   @Input() id: string | undefined;
   @Input() targetId: string;
   @Input() showOptionToInputValue = true;
@@ -71,10 +71,10 @@ export class CreateScoreComponent
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const newScore: Score = {
       id: this.id,
       value: this.valueControl.value,
@@ -109,7 +109,7 @@ export class CreateScoreComponent
     this.score.emit(newScore);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit && this.save) {
       this.newScoreSaved = true;
       this.newScoreError = '';
@@ -124,7 +124,7 @@ export class CreateScoreComponent
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newScoreError = reason.message;
     }

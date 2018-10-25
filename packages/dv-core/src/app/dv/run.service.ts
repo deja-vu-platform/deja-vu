@@ -10,14 +10,14 @@ export interface OnExec {
   dvOnExec: () => Promise<any> | any;
 }
 
-export interface OnAfterExecCommit {
+export interface OnExecCommit {
   // res is the value the promise returned in `dvOnExec` resolved to
-  dvOnAfterExecCommit: (res?: any) => void;
+  dvOnExecCommit: (res?: any) => void;
 }
 
-export interface OnAfterExecAbort {
+export interface OnExecAbort {
   // reason is the error that caused the abort
-  dvOnAfterExecAbort: (reason: Error) => void;
+  dvOnExecAbort: (reason: Error) => void;
 }
 
 interface ActionInfo {
@@ -84,10 +84,10 @@ export class RunService {
       execResultMap = await this.callDvOnExec(targetAction, execId);
     } catch (error) {
       console.error(`Got error on exec ${execId}: ${error.message}`);
-      this.callDvOnAfterExecAbort(targetAction, error);
+      this.callDvOnExecAbort(targetAction, error);
     }
     if (execResultMap) { // no error
-      this.callDvOnAfterExecCommit(targetAction, execResultMap);
+      this.callDvOnExecCommit(targetAction, execResultMap);
     }
   }
 
@@ -122,24 +122,24 @@ export class RunService {
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnAfterExecCommit(node, execResultMap: ExecResultMap): void {
+  private callDvOnExecCommit(node, execResultMap: ExecResultMap): void {
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action.dvOnExec) {
         actionInfo.node.removeAttribute(EXEC_ID_ATTR);
       }
-      if (actionInfo.action.dvOnAfterExecCommit) {
-        actionInfo.action.dvOnAfterExecCommit(execResultMap[actionId]);
+      if (actionInfo.action.dvOnExecCommit) {
+        actionInfo.action.dvOnExecCommit(execResultMap[actionId]);
       }
     });
   }
 
-  private callDvOnAfterExecAbort(node, reason): void {
+  private callDvOnExecAbort(node, reason): void {
     this.walkActions(node, (actionInfo) => {
       if (actionInfo.action.dvOnExec) {
         actionInfo.node.removeAttribute(EXEC_ID_ATTR);
       }
-      if (actionInfo.action.dvOnAfterExecAbort) {
-        actionInfo.action.dvOnAfterExecAbort(reason);
+      if (actionInfo.action.dvOnExecAbort) {
+        actionInfo.action.dvOnExecAbort(reason);
       }
     });
   }

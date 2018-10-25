@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -48,7 +48,7 @@ interface LoadMessageRes {
   ]
 })
 export class EditMessageComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit, OnChanges {
+  OnInit, OnExec, OnExecAbort, OnExecCommit, OnChanges {
   @Input() id: string;
   @Input() publisherId: string;
 
@@ -119,10 +119,10 @@ export class EditMessageComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<Boolean> {
+  async dvOnExec(): Promise<Boolean> {
     const res = await this.gs.post<EditMessageRes>(this.apiPath, {
       query: `mutation EditMessage($input: EditMessageInput!) {
             editMessage(input: $input)
@@ -145,7 +145,7 @@ export class EditMessageComponent implements
     return res.data.editMessage;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.editMessageSaved = true;
     this.editMessageError = '';
     window.setTimeout(() => {
@@ -158,7 +158,7 @@ export class EditMessageComponent implements
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.editMessageError = reason.message;
   }
 }

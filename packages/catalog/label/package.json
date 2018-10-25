@@ -24,6 +24,7 @@
   },
   "private": true,
   "dependencies": {
+    "dv-core": "file:../../dv-core/pkg",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
@@ -36,15 +37,15 @@
     "@angular/core": "^5.2.0",
     "@angular/forms": "^5.2.0",
     "@angular/http": "^5.2.0",
-    "@angular/material": "^5.2.1",
     "@angular/language-service": "^5.2.0",
+    "@angular/material": "^5.2.1",
     "@angular/material-moment-adapter": "^5.2.1",
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@types/mongodb": "~3.0.7",
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
+    "@types/mongodb": "~3.0.7",
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
@@ -52,7 +53,6 @@
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
-    "dv-core": "file:../../dv-core/pkg",
     "dv-gateway": "file:../../dv-gateway",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",

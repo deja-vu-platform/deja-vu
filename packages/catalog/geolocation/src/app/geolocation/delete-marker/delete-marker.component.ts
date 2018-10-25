@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -15,7 +15,7 @@ const DELETED_MSG_TIMEOUT = 3000;
   styleUrls: ['./delete-marker.component.css']
 })
 export class DeleteMarkerComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnExec, OnExecAbort, OnExecCommit {
   @Input() id: string;
   @Input() markerDeletedText = 'Marker deleted';
   @Input() buttonLabel = 'Delete Marker';
@@ -35,10 +35,10 @@ export class DeleteMarkerComponent implements
   }
 
   deleteMarker() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{
       data: { deleteMarker: { id: string } }, errors: { message: string }[]
     }>('/graphql', {
@@ -54,7 +54,7 @@ export class DeleteMarkerComponent implements
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.markerDeleted = true;
     this.markerDeletedError = '';
     window.setTimeout(() => {
@@ -62,7 +62,7 @@ export class DeleteMarkerComponent implements
     }, DELETED_MSG_TIMEOUT);
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.markerDeletedError = reason.message;
   }
 }

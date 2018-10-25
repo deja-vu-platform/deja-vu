@@ -7,7 +7,12 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, RunService
+  GatewayService,
+  GatewayServiceFactory,
+  OnExec,
+  OnExecAbort,
+  OnExecCommit,
+  RunService
 } from 'dv-core';
 
 import { map } from 'rxjs/operators';
@@ -23,7 +28,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './update-task.component.html',
   styleUrls: ['./update-task.component.css']
 })
-export class UpdateTaskComponent implements OnInit, OnChanges {
+export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
+  OnExecAbort, OnExecCommit {
   @Input() id;
 
   // Presentation inputs
@@ -84,10 +90,10 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
 
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<string> {
+  async dvOnExec(): Promise<string> {
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation UpdateTask($input: UpdateTaskInput!) {
         updateTask(input: $input) {
@@ -107,7 +113,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
     return res.data.updateTask.id;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.taskSaved = true;
     window.setTimeout(() => {
       this.taskSaved = false;
@@ -119,7 +125,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.taskError = reason.message;
   }
 }

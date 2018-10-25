@@ -7,7 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterExecAbort, OnAfterExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -25,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-event.component.css']
 })
 export class CreateEventComponent
-implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
 
@@ -89,7 +89,7 @@ implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
      .toPromise();
   }
 
-  dvOnAfterExecCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit) {
       this.createEventSaved = true;
       window.setTimeout(() => {
@@ -103,7 +103,7 @@ implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
     }
   }
 
-  dvOnAfterExecAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit) {
       this.createEventError = reason.message;
     }

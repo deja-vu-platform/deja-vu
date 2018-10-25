@@ -6,7 +6,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { OnAfterCommit, RunService } from 'dv-core';
+import { OnExecCommit, RunService } from 'dv-core';
 
 import { startWith } from 'rxjs/operators';
 
@@ -31,7 +31,7 @@ import * as _ from 'lodash';
   ]
 })
 export class InputMoneyComponent
-  implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
+  implements OnInit, ControlValueAccessor, Validator, OnExecCommit {
   moneyControl = new FormControl(0, [Validators.required]);
   @Output() money = new EventEmitter<number>();
 
@@ -73,7 +73,7 @@ export class InputMoneyComponent
     return this.moneyControl.errors;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.reset();
   }
 

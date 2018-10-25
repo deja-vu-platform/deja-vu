@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Input, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExecCommit, OnExec, RunService
 } from 'dv-core';
 import * as _ from 'lodash';
 
@@ -12,7 +12,7 @@ import * as _ from 'lodash';
   templateUrl: './delete-event.component.html',
   styleUrls: ['./delete-event.component.css']
 })
-export class DeleteEventComponent implements OnInit, OnExec, OnAfterExecCommit {
+export class DeleteEventComponent implements OnInit, OnExec, OnExecCommit {
   @Input() id;
   // Optional list of events to delete itself from after commit
   @Input() events: Event[];
@@ -37,7 +37,7 @@ export class DeleteEventComponent implements OnInit, OnExec, OnAfterExecCommit {
       .toPromise();
   }
 
-  dvOnAfterExecCommit() {
+  dvOnExecCommit() {
     _.remove(this.events, {id: this.id});
   }
 
