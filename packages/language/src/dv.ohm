@@ -4,20 +4,25 @@ Action {
     | VoidElement -- void
 
   // Normal Element
-  NormalElement = StartTag Content EndTag
+  NormalElement = StartTag Content* EndTag
   StartTag = "<" ElementName Attribute* ">"
   EndTag = "</" ElementName ">"
 
   // Void Element
   VoidElement = "<" ElementName Attribute* "/>"
 
-  Attribute = AttributeName "=" AttributeValue
+  Attribute = AttributeName "=" Expr
 
-  Content = (Text | Element)*
+  Content
+    = Text -- text
+    | Element -- element
   Text = (~"<" ~">" any)+
-  ElementName = ActionNameMaybeAlias | name
-  AttributeName = output | name
-  AttributeValue = Expr
+  ElementName
+   = ActionNameMaybeAlias -- action
+   | name -- html
+  AttributeName
+    = output -- output
+    | name -- name
   ActionNameMaybeAlias = actionName ("as" name)?
   actionName = name "." name
 
@@ -29,20 +34,22 @@ Action {
   Expr
     = UnExpr -- un
     | BinExpr -- bin
+    | MemberExpr -- member
     | Literal -- literal
-    | name -- symbol
+    | name -- name
     | input -- input
     | Element -- element
+
+  UnExpr
+    = "not" Expr -- not
 
   BinExpr
     = Expr "+" Expr -- plus
     | Expr "-" Expr -- minus
     | Expr "and" Expr -- and
     | Expr "or" Expr -- or
-    | Expr "." Expr -- dot
 
-  UnExpr
-    = "not" Expr -- not
+  MemberExpr = (name | input) ("." name)+
 
   Literal
     = number -- number

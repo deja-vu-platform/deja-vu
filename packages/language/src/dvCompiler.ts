@@ -95,7 +95,8 @@ export class DvCompiler {
       this.projectDir, dvConfig.actions.app);
     for (const actionFilePath of htmlFilesToParse) {
       const actionContents = readFileSync(actionFilePath, 'utf8');
-      this.actionCompiler.compile(actionContents, this.symbolTable);
+      this.actionCompiler.compile(
+        dvConfig.name, actionContents, this.symbolTable);
     }
   }
 }

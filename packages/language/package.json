@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.9",
-    "@types/lodash": "^4.14.96",
+    "@types/lodash": "^4.14.117",
     "@types/node": "^9.3.0",
     "jasmine": "^3.2.0",
     "jasmine-ts": "^0.3.0",

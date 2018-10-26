@@ -2,6 +2,7 @@ import { ActionCompiler } from './actionCompiler';
 
 describe('ActionCompiler', () => {
   let actionCompiler: ActionCompiler;
+  const appName = 'app';
 
   beforeEach(() => {
     actionCompiler = new ActionCompiler();
@@ -25,7 +26,7 @@ describe('ActionCompiler', () => {
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 
   it('should compile action with actions', () => {
@@ -67,7 +68,7 @@ describe('ActionCompiler', () => {
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 
   it('should compile action with inputs', () => {
@@ -82,8 +83,7 @@ describe('ActionCompiler', () => {
               <property.choose-object
                 chooseObjectSelectPlaceholder="Champion"
                 initialObjectId=allocator.edit-consumer.currentConsumerId />
-              </property-choose-object>
-              <allocator-edit-consumer hidden=true
+              <allocator.edit-consumer hidden=true
                 resourceId=$groupMeeting.id
                 allocationId=$groupMeeting.seriesId
                 newConsumerId=property.choose-object.selectedObjectId />
@@ -97,10 +97,11 @@ describe('ActionCompiler', () => {
                 allocationId=$groupMeeting.seriesId
                 hidden=true />
             </dv.tx>
+          </div>
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 
   it('should compile action with outputs', () => {
@@ -109,7 +110,7 @@ describe('ActionCompiler', () => {
         <property.show-objects hidden=true />
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 
   it('should compile action with action input', () => {
@@ -130,15 +131,16 @@ describe('ActionCompiler', () => {
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 
   it('should compile action with an alias', () => {
     const action = `
-      <dv.action name="action-with-alias" objects$=prop.show-objects.objects>
+      <dv.action name="action-with-alias"
+        objects$=property.show-objects.objects>
         <property.show-objects as prop hidden=true />
       </dv.action>
     `;
-    actionCompiler.compile(action, {});
+    actionCompiler.compile(appName, action, {});
   });
 });

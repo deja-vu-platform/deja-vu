@@ -1,8 +1,10 @@
 
+
+
 export interface ClicheStEntry {
   kind: 'cliche';
   symbolTable?: SymbolTable<ActionStEntry>;
-  clicheName: string;
+  clicheName?: string;
 }
 
 export interface AppStEntry {
@@ -12,7 +14,7 @@ export interface AppStEntry {
 
 export interface ActionStEntry {
   kind: 'action';
-  symbolTable?: SymbolTable<OutputStEntry>;
+  symbolTable?: ActionSymbolTable;
 }
 
 export interface OutputStEntry {
@@ -23,7 +25,18 @@ export interface InputStEntry {
   kind: 'input';
 }
 
-export interface SymbolTable<T = AppStEntry | ClicheStEntry | InputStEntry> {
+export type StEntry = ClicheStEntry | AppStEntry | ActionStEntry |
+  OutputStEntry | InputStEntry;
+
+/**
+ * Each action has its own symbol table to keep track of the symbols that can
+ * appear in attribute exprs.
+ */
+export type ActionSymbolTable = SymbolTable<
+  OutputStEntry | ActionStEntry | InputStEntry | ClicheStEntry>;
+
+
+export interface SymbolTable<T = AppStEntry | ClicheStEntry> {
   [symbol: string]: T;
 }
 
