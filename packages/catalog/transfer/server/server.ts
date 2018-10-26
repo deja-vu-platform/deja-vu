@@ -178,11 +178,10 @@ function getResolvers<Balance>(
         };
         const updateId = _.get(context, 'reqId', uuid());
 
-        await transfers.insertOne({...transfer, pending: updateId });
         try {
           await addToBalance<Balance>(
             input.accountId, input.amount, transfer,
-            updateId, context.reqType,
+            updateId, context.reqType, true,
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
@@ -204,7 +203,6 @@ function getResolvers<Balance>(
         };
         transfer.fromId = input.fromId;
 
-        await transfers.insertOne({...transfer, pending: updateId });
         try {
           /*
            * It is important that we apply the update to the source account
@@ -213,7 +211,7 @@ function getResolvers<Balance>(
            */
           await addToBalance<Balance>(
             input.fromId, negateBalanceFn(input.amount), transfer,
-            updateId, context.reqType,
+            updateId, context.reqType, true,
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
@@ -230,7 +228,7 @@ function getResolvers<Balance>(
         * data
         */
        await addToBalance<Balance>(
-         input.toId, input.amount, transfer, updateId, context.reqType,
+         input.toId, input.amount, transfer, updateId, context.reqType, false,
          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
        return transfer;
@@ -363,6 +361,7 @@ function abortTransferUpdate(updateId: string) {
  * @param transfer the transfer object to add to the log
  * @param updateId the id of the update
  * @param action the action to perform
+ * @param onCommitAddTransferToLog whether to add the transfer to the log or not
  * @param accountHasFundsFn fn that returns true if the account has funds
  * @param newBalanceFn fn to compute the new account balance
  * @param zeroBalanceFn fn to retrieve the 0 balance. This will be used as
@@ -374,6 +373,7 @@ function abortTransferUpdate(updateId: string) {
 async function addToBalance<Balance>(
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
   updateId: string, action: 'vote' | 'commit' | 'abort' | undefined,
+  onCommitAddTransferToLog: boolean,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
   zeroBalanceFn: ZeroBalanceFn<Balance>,
@@ -405,6 +405,10 @@ async function addToBalance<Balance>(
           voteAccountUpdate<Balance>(
             accountId, amount, transfer, updateId,
             accountHasFundsFn, zeroBalanceFn);
+
+        if (onCommitAddTransferToLog) {
+          await transfers.insertOne(transfer);
+        }
         const newBalance = newBalanceFn(account.balance, amount);
         await commitAccountUpdate<Balance>(
           account, newBalance, isZeroBalanceFn);
@@ -425,6 +429,9 @@ async function addToBalance<Balance>(
         throw new Error('An internal error has occurred');
       }
 
+      if (onCommitAddTransferToLog) {
+        await transfers.insertOne(transfer);
+      }
       const newCommitBalance = newBalanceFn(commitAccount.balance, amount);
       await commitAccountUpdate<Balance>(
         commitAccount, newCommitBalance, isZeroBalanceFn);
