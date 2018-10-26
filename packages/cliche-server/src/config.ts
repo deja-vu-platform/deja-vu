@@ -31,7 +31,7 @@ function getDefaultConfig(name: string): Config {
 
 function getConfigArg(argv) {
   try {
-    const configArg: Config = JSON5.parse(JSON5.parse(argv.config));
+    const configArg: Config = JSON5.parse(argv.config);
 
     return configArg;
   } catch (e) {

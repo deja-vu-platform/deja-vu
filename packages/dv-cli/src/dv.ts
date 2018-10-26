@@ -142,7 +142,7 @@ export function startServerCmd(
   const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
   const config = JSON.stringify(_.get(dvConfig, configKey));
-  return `${cmd} ${script} ${eoc} --config '${config}'` +
+  return `${cmd} ${script} ${eoc} --config ${config}` +
     (asFlagValue ? ` --as ${asFlagValue}` : '');
 }
 
