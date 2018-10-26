@@ -182,23 +182,13 @@ export class ActionHelper {
       } else {
         // need to figure out if we have one from the context
         if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
-          console.log(
-              `include: We have one from the context for ` +
-              JSON.stringify(includeActionTag));
           const unparsedParentActionExpr = _
             .get(includeActionTag.context, `[${actionExpr}]`);
           const parentActionExpr = this.ParseActionExpr(
             unparsedParentActionExpr);
-          console.log(
-              `Using parent Expr ${unparsedParentActionExpr} ` +
-              `and context ${JSON.stringify(includeActionTag.context)}`);
           actionInput = this.GetActionInput(
             parentActionExpr, includeActionTag.context);
-          console.log(`Got back ${JSON.stringify(actionInput)}`);
         } else {
-          console.log(
-              `include: We don't have one from the context for ` +
-              JSON.stringify(includeActionTag));
           actionInput = this.GetActionInput(
             actionExpr, _.get(includeActionTag, 'inputs'));
         }
@@ -323,26 +313,12 @@ export class ActionHelper {
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
     const usedActions = new Set<string>(_.keys(appActionTable));
-    const seenActions = new Set<string>();
     const saveUsedActions = (
       actionAst: ActionAst | undefined, debugPath: string[]): void => {
-      console.log(`Looking at AST ${JSON.stringify(actionAst)}`);
       _.each(actionAst, (action: ActionTag) => {
-        console.log(`Looking at action ${JSON.stringify(action)}`);
         const thisDebugPath = debugPath.slice();
         thisDebugPath.push(action.fqtag);
         usedActions.add(action.tag);
-        /*
-        if (!ActionHelper.IsDvAction(action)) {
-          if (seenActions.has(action.tag)) {
-            return;
-          }
-          seenActions.add(action.tag);
-        }
-        if (ActionHelper.IsDvIncludeAction(action) ||
-            !ActionHelper.IsDvAction(action)) {
-          usedActions.add(action.tag);
-        }*/
 
         try {
           const actionContent = this.getContent(action, allActionsTable);
@@ -440,7 +416,6 @@ export class ActionHelper {
     actionPath: ActionPath, actionAst: ActionAst | undefined)
     : ActionTagPath[] {
     // actionPath.length is always >= 1
-    console.log(`Looking at action path ${actionPath}`);
 
     if (_.isEmpty(actionAst)) {
       return [];
@@ -493,8 +468,6 @@ export class ActionHelper {
         ret = [ childActionTag ];
       }
     } else if (ActionHelper.IsDvTxAction(actionTag)) {
-      console.log(
-          `Getting content for a dv-tx, returning ${actionTag.content}`);
       ret = actionTag.content;
     } else {
       /**
@@ -504,14 +477,6 @@ export class ActionHelper {
        * value with the action input. (If otherwise, we'd loose the information)
        */
       const childContext: InputMap | undefined = actionTag.inputs;
-      if (_.isEmpty(actionTag.inputs))  {
-        console.log(
-            `inputs of ${JSON.stringify(actionTag)} is empty so nothing to ` +
-            `override`);
-      } else {
-        console.log(
-            `will try with ${JSON.stringify(actionTag)}` );
-      }
       _.each(actionTag.inputs, (inputValue: string, inputName: string) => {
         /**
          * If one of the inputs has a variable as a value and we have that
@@ -552,16 +517,10 @@ export class ActionHelper {
     // <!-- Routed components go here -->
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
-    console.log(`Checking ${JSON.stringify(contentTags)} for a router outlet`);
     if (_.includes(contentTags, 'router-outlet')) {
       const routeActions: ActionTag[] = this.getRouteActions(actionTable);
       ret = _.concat(ret, routeActions);
-      console.log(`Added ${routeActions} `);
     }
-
-    console.log(
-        `Returning content ${JSON.stringify(ret)} for ` +
-        JSON.stringify(actionTag));
 
     return ret;
   }
