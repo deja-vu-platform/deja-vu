@@ -139,7 +139,8 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
       },
 
       createObjects: async (root, { input }, context: Context) => {
-        const objDocs: ObjectDoc[] = _.map(input, createObjectFromInput);
+        const objDocs: ObjectDoc[] = _.map(
+          input, (i) => createObjectFromInput(config, i));
         const reqIdPendingFilter = { '_pending.reqId': context.reqId };
         switch (context.reqType) {
           case 'vote':
