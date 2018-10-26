@@ -124,7 +124,6 @@ export class ClicheServer {
 
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
-
     app.listen(this._config.wsPort, () => {
       console.log(`Running ${this._name} with config 
         ${JSON.stringify(this._config)}`);

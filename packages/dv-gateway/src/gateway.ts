@@ -1,6 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as minimist from 'minimist';
+import * as RJSON from 'relaxed-json';
 
 import { readFileSync } from 'fs';
 import * as path from 'path';
@@ -30,7 +31,7 @@ function getFromArgs<T>(args, flag: string): T {
   if (!filePath) {
     throw new Error(`No ${flag} given!`);
   }
-  const ret: T = JSON.parse(readFileSync(filePath, 'utf8'));
+  const ret: T = <T>RJSON.parse(readFileSync(filePath, 'utf8'));
   console.log(`Using ${flag} ${stringify(ret)}`);
 
   return ret;

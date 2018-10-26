@@ -54,7 +54,8 @@ program
       });
 
       console.log('Add start and watch scripts to package.json');
-      const name: string = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
+      const config = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+      const name: string = config.name;
       updatePackage(pkg => {
         pkg.scripts[`dv-build-${name}`] = buildFeCmd(false) + ' && ' +
           buildServerCmd(false, 'server');
@@ -62,9 +63,9 @@ program
           buildFeCmd(true), buildServerCmd(true, 'server'));
 
         pkg.scripts[`dv-start-${name}`] = startServerCmd(
-          false, SERVER_DIST_FOLDER, 'config');
+          false, SERVER_DIST_FOLDER, 'config', config);
         pkg.scripts[`dv-start-watch-${name}`] = startServerCmd(
-          true, SERVER_DIST_FOLDER, 'config');
+          true, SERVER_DIST_FOLDER, 'config', config);
 
         return pkg;
       });

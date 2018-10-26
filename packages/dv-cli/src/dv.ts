@@ -137,12 +137,12 @@ export function startGatewayCmd(configFilePath: string): string {
 
 export function startServerCmd(
   watch: boolean, serverDistFolder: string, configKey: string,
-  asFlagValue?: string): string {
+  dvConfig: DvConfig, asFlagValue?: string): string {
   const cmd = watch ? `nodemon -w ${serverDistFolder}` : 'node';
   const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
-
-  return `${cmd} ${script} ${eoc} --config '\`dv get ${configKey}\`'` +
+  const config = JSON.stringify(_.get(dvConfig, configKey));
+  return `${cmd} ${script} ${eoc} --config '${config}'` +
     (asFlagValue ? ` --as ${asFlagValue}` : '');
 }
 
@@ -163,24 +163,26 @@ function buildCmd(cmd: string, projectFolder?: string): string {
   return projectFolder ? `(cd ${projectFolder}; ${cmd})` : cmd;
 }
 
-function startServerCmdOfCliche() {
-  return startServerCmd(false, path.join('dist', 'server'), 'config');
+function startServerCmdOfCliche(dvConfig: DvConfig) {
+  return startServerCmd(false, path.join('dist', 'server'), 'config', dvConfig);
 }
 
-function startServerCmdOfUsedCliche(cliche: string | undefined, alias: string)
-  : string {
+function startServerCmdOfUsedCliche(
+  cliche: string | undefined, alias: string, dvConfig: DvConfig): string {
   const clicheFolder = (cliche === undefined) ? alias : cliche;
   const serverDistFolder = path
     .join('node_modules', clicheFolder, 'server');
   const configKey = `usedCliches.${alias}.config`;
   const asFlagValue = (alias !== cliche) ? alias : undefined;
 
-  return startServerCmd(false, serverDistFolder, configKey, asFlagValue);
+  return startServerCmd(false, serverDistFolder, configKey, dvConfig,
+    asFlagValue);
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {
-  let cmdStr = '';
+  let cmdStr = ``;
   for (const cmd of cmds) {
+    console.log('cmd here', cmd);
     cmdStr += ` \"${cmd}\"`;
   }
   return `concurrently ${cmdStr}`;
@@ -295,11 +297,11 @@ program
         actionTable(config, _.get(config.actions, 'app')));
       const startServerOfCurrentProjectCmd =
         (existsSync(path.join('dist', 'server'))) ?
-        [ startServerCmdOfCliche() ] : [];
+          [startServerCmdOfCliche(config)] : [];
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
-        .map(e => startServerCmdOfUsedCliche(e[1].name, e[0]))
+        .map(e => startServerCmdOfUsedCliche(e[1].name, e[0], config))
         .concat(startServerOfCurrentProjectCmd)
         .value();
 

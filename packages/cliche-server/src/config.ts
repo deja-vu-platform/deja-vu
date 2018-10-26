@@ -1,9 +1,11 @@
+import * as JSON5 from 'json5';
+
 export interface Config {
   wsPort: number;
-  dbHost: string;
-  dbPort: number;
-  dbName: string;
-  reinitDbOnStartup: boolean;
+  dbHost?: string;
+  dbPort?: number;
+  dbName?: string;
+  reinitDbOnStartup?: boolean;
   [extraProperties: string]: any;
 }
 
@@ -14,7 +16,7 @@ export interface Config {
  * @return      the resulting config
  */
 export function getConfig(name: string, argv): Config {
-  return {...getDefaultConfig(name), ...getConfigArg(argv)};
+  return { ...getDefaultConfig(name), ...getConfigArg(argv) };
 }
 
 function getDefaultConfig(name: string): Config {
@@ -28,9 +30,9 @@ function getDefaultConfig(name: string): Config {
 }
 
 function getConfigArg(argv) {
-  let configArg;
   try {
-    configArg = JSON.parse(argv.config);
+    const configArg: Config = JSON5.parse(JSON5.parse(argv.config));
+
     return configArg;
   } catch (e) {
     throw new Error(`Couldn't parse config ${argv.config}`);
