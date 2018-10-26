@@ -23,7 +23,8 @@ export type GetDynamicTypeDefsFn = (config: Config) => string[];
 export class ClicheServerBuilder {
   private readonly _name: string;
   private _schemaPath: string = path.join(
-    path.dirname(callsite()[1].getFileName()), 'schema.graphql');
+    path.dirname(callsite()[1]
+      .getFileName()), 'schema.graphql');
   private _config: Config;
   private _initDbCallback?: InitDbCallbackFn;
   private _initResolvers?: InitResolversFn;
@@ -50,7 +51,8 @@ export class ClicheServerBuilder {
    * @return        this builder
    */
   config(config): ClicheServerBuilder {
-    this._config = {...this._config, ...config};
+    this._config = { ...this._config, ...config };
+
     return this;
   }
 
@@ -62,6 +64,7 @@ export class ClicheServerBuilder {
    */
   initDb(callback: InitDbCallbackFn): ClicheServerBuilder {
     this._initDbCallback = callback;
+
     return this;
   }
 
@@ -72,6 +75,7 @@ export class ClicheServerBuilder {
    */
   resolvers(initResolvers: InitResolversFn): ClicheServerBuilder {
     this._initResolvers = initResolvers;
+
     return this;
   }
 
@@ -83,6 +87,7 @@ export class ClicheServerBuilder {
    */
   schemaPath(schemaPath: string): ClicheServerBuilder {
     this._schemaPath = schemaPath;
+
     return this;
   }
 
@@ -97,6 +102,7 @@ export class ClicheServerBuilder {
   dynamicTypeDefs(
     getDynamicTypeDefsFn: GetDynamicTypeDefsFn): ClicheServerBuilder {
     this._getDynamicTypeDefsFn = getDynamicTypeDefsFn;
+
     return this;
   }
 

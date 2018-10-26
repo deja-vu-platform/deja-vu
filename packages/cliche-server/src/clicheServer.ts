@@ -1,8 +1,8 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import * as mongodb from 'mongodb';
 import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
+import * as mongodb from 'mongodb';
 
 import { Config } from './config';
 
@@ -14,12 +14,15 @@ const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 /**
  * The error message to include when there is a concurrent update in the server.
  */
-export const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
+export const CONCURRENT_UPDATE_ERROR =
+  'An error has occured. Please try again later';
 
 /**
  * The type of the function to be called after connecting to the db.
  */
-export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => Promise<any>);
+export type InitDbCallbackFn = (
+  (db: mongodb.Db, config: Config) => Promise<any>
+);
 
 /**
  * The type of the function to be called to generate the resolvers.
@@ -125,7 +128,7 @@ export class ClicheServer {
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
     app.listen(this._config.wsPort, () => {
-      console.log(`Running ${this._name} with config 
+      console.log(`Running ${this._name} with config
         ${JSON.stringify(this._config)}`);
     });
   }
@@ -136,7 +139,7 @@ export class ClicheServer {
   async start(): Promise<void> {
     // TODO: make connecting to mongo optional since there will be cliches that
     // don't require a db, e.g. email cliche
-    const mongoServer: string = `${this._config.dbHost}:${this._config.dbPort}`;
+    const mongoServer = `${this._config.dbHost}:${this._config.dbPort}`;
     console.log(`Connecting to mongo server ${mongoServer}`);
     const client: mongodb.MongoClient = await mongodb.MongoClient.connect(
       `mongodb://${mongoServer}`);
@@ -161,4 +164,4 @@ export class ClicheServer {
       this.startApp(schema);
     }
   }
-} 
+}

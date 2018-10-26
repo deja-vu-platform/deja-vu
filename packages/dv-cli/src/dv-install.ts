@@ -21,7 +21,7 @@ program
     console.log(opts);
     console.log(`Packaging cliché ${name} from ${loc}`);
     npm(['run', `dv-package-${name}`], loc);
-    
+
     console.log(`Installing cliché ${name} from ${loc}`);
     npm([
       'install', path.join(loc, NG_PACKAGR.configFileContents.dest), '--save']);
@@ -34,8 +34,8 @@ program
     };
 
     updateDvConfig((dvConfig: DvConfig) => {
-      if (dvConfig.usedCliches == undefined ||
-          _.isEmpty(dvConfig.usedCliches)) {
+      if (dvConfig.usedCliches === undefined ||
+        _.isEmpty(dvConfig.usedCliches)) {
         usedCliche.config = { wsPort: 3002 };
         dvConfig.usedCliches = { [usedCliche.name]: usedCliche };
       } else {

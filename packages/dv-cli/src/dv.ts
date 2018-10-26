@@ -182,7 +182,6 @@ function startServerCmdOfUsedCliche(
 export function concurrentlyCmd(...cmds: string[]): string {
   let cmdStr = ``;
   for (const cmd of cmds) {
-    console.log('cmd here', cmd);
     cmdStr += ` \"${cmd}\"`;
   }
   return `concurrently ${cmdStr}`;

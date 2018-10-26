@@ -12,4 +12,3 @@ program
     console.log(JSON.stringify(_.get(dvConfig, key)));
   })
   .parse(process.argv);
- 

@@ -24,7 +24,7 @@ program
   .command('action <name>', 'create a new action')
   .command('server', 'create a new server')
   .action(cmd => {
-    if (cmd == 'server') {
+    if (cmd === 'server') {
       console.log('Installing server packages');
       npm([
         'install', 'minimist', 'express', 'body-parser', 'mongodb',

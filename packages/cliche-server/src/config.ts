@@ -26,7 +26,7 @@ function getDefaultConfig(name: string): Config {
     wsPort: 3000,
     dbName: `${name}-db`,
     reinitDbOnStartup: true
-  }
+  };
 }
 
 function getConfigArg(argv) {

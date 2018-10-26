@@ -7,6 +7,7 @@ export class Validation {
     if (!doc) {
       throw new Error(`${type} ${id} not found`);
     }
+
     return doc;
   }
 }
