@@ -71,43 +71,32 @@ describe('ActionCompiler', () => {
     actionCompiler.compile(appName, action, {});
   });
 
-  it('should compile action with inputs', () => {
+  it('should compile action accessing member of output', () => {
     const action = `
       <dv.action name="show-group-meeting">
-        <div class="row">
-          <div class="col-md-6">
-            <event.show-event event=$groupMeeting />
-          </div>
-          <div class="col-md-4">
-            <dv.tx>
-              <property.choose-object
-                chooseObjectSelectPlaceholder="Champion"
-                initialObjectId=allocator.edit-consumer.currentConsumerId />
-              <allocator.edit-consumer hidden=true
-                resourceId=$groupMeeting.id
-                allocationId=$groupMeeting.seriesId
-                newConsumerId=property.choose-object.selectedObjectId />
-            </dv.tx>
-          </div>
-          <div class="col-md-2">
-            <dv.tx>
-              <event.delete-event id=$groupMeeting.id events=$groupMeetings />
-              <allocator.delete-resource
-                resourceId=$groupMeeting.id
-                allocationId=$groupMeeting.seriesId
-                hidden=true />
-            </dv.tx>
-          </div>
-        </div>
+        <property.choose-object
+          chooseObjectSelectPlaceholder="Champion"
+          initialObjectId=allocator.edit-consumer.currentConsumer.id />
+        <allocator.edit-consumer hidden=true />
       </dv.action>
     `;
     actionCompiler.compile(appName, action, {});
   });
 
-  it('should compile action with outputs', () => {
+  /* TODO
+  it('should compile action with output', () => {
     const action = `
       <dv.action name="action-with-outputs" objects$=property.show-objects.objects>
         <property.show-objects hidden=true />
+      </dv.action>
+    `;
+    actionCompiler.compile(appName, action, {});
+  }); */
+
+  it('should compile action with input', () => {
+    const action = `
+      <dv.action name="action-with-input">
+        <property.show-objects hidden=true object=$supply />
       </dv.action>
     `;
     actionCompiler.compile(appName, action, {});
@@ -136,9 +125,9 @@ describe('ActionCompiler', () => {
 
   it('should compile action with an alias', () => {
     const action = `
-      <dv.action name="action-with-alias"
-        objects$=property.show-objects.objects>
+      <dv.action name="action-with-alias">
         <property.show-objects as prop hidden=true />
+        <foo.show stuff=prop.objects />
       </dv.action>
     `;
     actionCompiler.compile(appName, action, {});

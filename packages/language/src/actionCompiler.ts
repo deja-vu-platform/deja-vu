@@ -1,9 +1,12 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+
+import * as assert from 'assert';
+
 import * as path from 'path';
 
 import {
-  ActionSymbolTable, ClicheStEntry,
-  StEntry, SymbolTable
+  ActionStEntry, ActionSymbolTable, ClicheStEntry, InputStEntry, EntryKind,
+  OutputStEntry, pretty, StEntry, SymbolTable, ActionSymbolTableStEntry
 } from './symbolTable';
 
 import * as _ from 'lodash';
@@ -13,11 +16,37 @@ const ohm = require('ohm-js');
 const DV_ACTION = 'dv.action';
 const DV_ACTION_NAME_ATTR = 'name';
 
+
 export class ActionCompiler {
   private readonly grammar;
   private readonly semantics;
 
-  private static GetActionName() {
+  private static FilterKind(kind: EntryKind, symbolTable: ActionSymbolTable)
+    : ActionSymbolTableStEntry[] {
+    return _
+      .chain(symbolTable)
+      .values()
+      .map((e) => { console.log(pretty(e)); return e;})
+      .filter((entry) => entry.kind === kind)
+      .value();
+  }
+
+  private static GetNgFieldsFromEntries(
+    entries: InputStEntry[] | OutputStEntry[]): string[] {
+    return _.map(
+      entries,
+      (entry: InputStEntry | OutputStEntry): string =>
+        entry.kind === 'input' ? entry.ngInputField : entry.ngOutputField);
+  }
+
+  private static GetNgFields(
+    kind: 'input' | 'output', symbolTable: ActionSymbolTable): string[] {
+    return ActionCompiler.GetNgFieldsFromEntries(
+      <InputStEntry[] | OutputStEntry[]> ActionCompiler
+        .FilterKind(kind, symbolTable));
+  }
+
+  private static GetActionNameOperation() {
     const invalidActionNameValue = 'the value of the action name should be text';
     const err = (_expr) => { throw new Error(invalidActionNameValue); };
     return {
@@ -39,7 +68,7 @@ export class ActionCompiler {
       },
       ElementName_action: (actionNameMaybeAlias): string | null =>
         actionNameMaybeAlias.getActionName(),
-      ActionNameMaybeAlias: (actionName, _as, _alias): string | null =>
+      ActionNameMaybeAlias: (actionName, _maybeAlias): string | null =>
         actionName.sourceString,
       Attribute: (name, _eq, expr): string | null => {
         if (name.sourceString === DV_ACTION_NAME_ATTR) {
@@ -61,41 +90,95 @@ export class ActionCompiler {
     };
   }
 
-  private static SaveSymbolsOperation(symbolTable: ActionSymbolTable) {
+  private static SaveUsedActionsOperation(symbolTable: ActionSymbolTable) {
     return {
-      Element: (element) => element.saveSymbols(),
+      Element: (element) => element.saveUsedActions(),
       NormalElement: (startTag, content, _endTag) => {
-        startTag.saveSymbols();
-        content.saveSymbols();
+        startTag.saveUsedActions();
+        content.saveUsedActions();
       },
       VoidElement: (_open, elementName, _attributes, _close) =>
-        elementName.saveSymbols(),
+        elementName.saveUsedActions(),
       StartTag: (_open, elementName, _attributes, _close) =>
-        elementName.saveSymbols(),
+        elementName.saveUsedActions(),
       ElementName_action: (actionNameMaybeAlias) =>
-        actionNameMaybeAlias.saveSymbols(),
+        actionNameMaybeAlias.saveUsedActions(),
       ElementName_html: (_name) => { }, Content_text: (_text) => { },
-      Content_element: (element) => element.saveSymbols(),
-      ActionNameMaybeAlias: (actionName, _as, maybeAlias) => {
-        const alias = maybeAlias[0];
-        if (alias !== undefined) {
-          symbolTable[alias.sourceString] = { kind: 'action' };
+      Content_element: (element) => element.saveUsedActions(),
+      ActionNameMaybeAlias: (actionNameNode, maybeAliasNode) => {
+        const maybeAlias = maybeAliasNode.saveUsedActions();
+        if (!_.isEmpty(maybeAlias)) {
+          const [ clicheName, actionName ] = _
+            .split(actionNameNode.sourceString, '.');
+          symbolTable[maybeAlias] = {
+            kind: 'action',
+            of: clicheName,
+            actionName: actionName
+          };
         } else {
-          actionName.saveSymbols();
+          actionNameNode.saveUsedActions();
         }
       },
+      Alias: (_as, alias) => alias.sourceString,
       actionName: (clicheAliasNode, _dot, actionNameNode) => {
         const clicheAlias = clicheAliasNode.sourceString;
         const actionName = actionNameNode.sourceString;
         if (!_.has(symbolTable, clicheAlias)) {
           symbolTable[clicheAlias] = { kind: 'cliche' };
         }
-        if (!_.has(symbolTable[clicheAlias], 'symbolTable')) {
-          (<ClicheStEntry> symbolTable[clicheAlias]).symbolTable = {};
-        }
-        (<ClicheStEntry> symbolTable[clicheAlias])
-          .symbolTable[actionName] = { kind: 'action' };
+        const clicheEntry = <ClicheStEntry> symbolTable[clicheAlias];
+        _.set(clicheEntry, `symbolTable.${actionName}`, {
+          kind: 'action',
+          of: clicheAlias,
+          actionName: actionName
+        });
       }
+    };
+  }
+
+  private static SaveInputsOperation(symbolTable: ActionSymbolTable) {
+    const recurse = (expr) => expr.saveInputs();
+    const binOpRecurse = (leftExpr, _op, rightExpr) => {
+      leftExpr.saveInputs();
+      rightExpr.saveInputs();
+    };
+
+    return {
+      Element: (element) => element.saveInputs(),
+      NormalElement: (startTag, content, _endTag) => {
+        startTag.saveInputs();
+        content.saveInputs();
+      },
+      VoidElement: (_open, _elementName, attributes, _close) =>
+        attributes.saveInputs(),
+      StartTag: (_open, _elementName, attributes, _close) =>
+        attributes.saveInputs(),
+      Attribute: (_attributeName, _eq, expr) => expr.saveInputs(),
+
+      Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
+      Expr_literal: recurse,
+      Expr_name: (_name) =>  {},
+      Expr_input: (inputNode) => {
+        const input = inputNode.sourceString;
+        symbolTable[input] = { kind: 'input' };
+      },
+      Expr_element: (element) => {}, // TODO
+
+      UnExpr_not: (_not, expr) => expr.saveInputs(),
+      BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
+      BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+
+      MemberExpr: binOpRecurse,
+
+      Literal_number: (number) => {},
+      Literal_text: (_openQuote, _text, _closeQuote) => {},
+      Literal_true: (_true) => {}, Literal_false: (_false) => {},
+      Literal_obj: (_openCb, propAssignments, _closeCb) =>
+        propAssignments.saveInputs(),
+      Literal_array: (_openSb, exprs, _closeSb) => exprs.saveInputs(),
+      Content_element: (element) => element.saveInputs(),
+      Content_text: (_text) => {},
+      name: (_letter, _rest)  => {}
     };
   }
 
@@ -153,7 +236,9 @@ export class ActionCompiler {
         }
         const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
         if (!_.has(symbolTable, clicheOrActionAlias)) {
-          throw new Error(`${clicheOrActionAlias} not found`);
+          throw new Error(
+            `${clicheOrActionAlias} not found in ` +
+            `symbol table ${pretty(symbolTable)}`);
         }
         const stEntry: StEntry = symbolTable[clicheOrActionAlias];
         switch (stEntry.kind) {
@@ -161,16 +246,16 @@ export class ActionCompiler {
             const clicheName = clicheOrActionAlias;
             const [ actionName, output ] = rest;
             if (!_.has(stEntry, `symbolTable.${actionName}`)) {
-              throw new Error(`${clicheName}.${actionName} not found`);
+              throw new Error(
+                `${clicheName}.${actionName} not found in ` +
+              `symbol table ${pretty(symbolTable)}`);
             }
             _.set(
               stEntry.symbolTable[actionName], `symbolTable.${output}`,
               { kind: 'output' });
             break;
           case 'action':
-            _.set(
-              stEntry.symbolTable[actionName], `symbolTable.${output}`,
-              { kind: 'output' });
+            _.set(stEntry, `symbolTable.${rest[0]}`, { kind: 'output' });
             break;
           default:
             // nothing
@@ -193,22 +278,196 @@ export class ActionCompiler {
     return _.startsWith(name, '$');
   }
 
-  private static ToNgTemplateOperation(symbolTable: SymbolTable) {
-    // only look at actions. for exprs that are not text you do
-    // [attr]="${expr.ToNgTemplateOperation()}"
-    // everything stays the same (replace and for && and or for ||)
-    // until you find a input -> replace the $ with input
-    // with the dot you have to:
-    // if the left st entry is an input -> let the dot be
-    // if the left st entry is a cliche or actionAlias => it is an output =>
-    // replace the whole thing with its "output name"
+  private static ToNgTemplateOperation(symbolTable: ActionSymbolTable) {
+    const tagTransform = (open, elementName, attrs, close): string => {
+      const transformedElementName = elementName.toNgTemplate();
+      const transformedActionName = _.split(transformedElementName, ' ', 1)[0];
+      const tagIsNgComponent = ActionCompiler.IsNgComponent(transformedActionName);
+      let attrsString;
+      if (tagIsNgComponent && transformedActionName !== 'dv-action') {
+        const maybeAlias: string[] | null = transformedElementName
+          .match(/dvAlias="(.*)"/);
+        const alias = (maybeAlias !== null) ? maybeAlias[1] : undefined;
 
-    // Also, you need to see if someone is using your output, if
-    // so you do (outputName)="foo=$event" -> this means we need to record the
-    // used outputs in the symbol table
-    return {
-      Element: (element) => { return; }
+        const actionEntry: ActionStEntry | undefined = ActionCompiler
+          .GetStEntryForNgComponent(transformedActionName, symbolTable, alias);
+        if (actionEntry === undefined) {
+          assert.fail(
+            `No entries for ${transformedActionName}, alias ${alias}` +
+            ` symbol table ${pretty(symbolTable)}`);
+        }
+
+        const outputs = _
+          .map(actionEntry.symbolTable,
+            (outputEntry: OutputStEntry, outputKey: string) => {
+              assert.ok(
+                actionEntry.of !== undefined,
+                `Expected entry ${pretty(actionEntry)} to have an "of"`);
+              assert.ok(
+                actionEntry.actionName !== undefined,
+                `Expected entry ${pretty(actionEntry)} to have an "actionName"`);
+              const ngOutputField = ActionCompiler.OutputToNgField(
+                actionEntry.of, actionEntry.actionName, outputKey, alias);
+/*
+              assert.ok(
+                _.has(entry, `symbolTable.${outputKey}`),
+                `Didn't find ${outputKey} in ${pretty(entry)}`);
+              const outputEntry = entry.symbolTable[outputKey];
+              assert.ok(outputEntry.kind === 'output');
+              (<OutputStEntry> outputEntry).ngOutputField = ngOutputField;
+               */
+              outputEntry.ngOutputField = ngOutputField;
+
+              return `(${outputKey})="${ngOutputField}=$event"`;
+            });
+
+        attrsString = _
+          .join(_.concat(attrs.toNgTemplate(), outputs), ' ');
+      } else {
+        attrsString = attrs.sourceString;
+      }
+
+      return open.sourceString +
+        transformedElementName + ' ' +
+        attrsString +
+        close.sourceString;
     };
+    const recurse = (expr) => expr.toNgTemplate();
+    const binOpRecurse = (leftExpr, op, rightExpr) =>
+      `${leftExpr.toNgTemplate()} ${op} ${rightExpr.saveUsedOutputs()}`;
+
+    return {
+      Element: (element): string => element.toNgTemplate(),
+      NormalElement: (startTag, contentNode, endTag): string => {
+        const startTagNg = startTag.toNgTemplate();
+        const content = _.join(contentNode.toNgTemplate(), ' ');
+        if (_.startsWith(startTagNg, '<dv-action')) {
+          return content;
+        }
+        return startTagNg + content + endTag.toNgTemplate();
+      },
+      StartTag: tagTransform,
+      EndTag: (open, elementName, close): string =>
+        open.sourceString + elementName.toNgTemplate() + close.sourceString,
+      VoidElement: tagTransform,
+      Attribute: (attributeNameNode, eq, expr) => {
+        // If we got to this point we know that this is an attribute of an
+        // action => with the exception of the html class attribute, the attr
+        // should be converted to an ng input
+        const attributeName = attributeNameNode.sourceString;
+        const newAttributeName = (attributeName === 'class') ?
+          attributeName : `[${attributeName}]`;
+
+        return `${newAttributeName}${eq.sourceString}"${expr.toNgTemplate()}"`;
+      },
+      Content_text: (text) => text.sourceString,
+      Content_element: (element) => element.toNgTemplate(),
+      ElementName_action: (actionNameMaybeAlias) =>
+        actionNameMaybeAlias.toNgTemplate(),
+      ElementName_html: (name) => name.sourceString,
+      ActionNameMaybeAlias: (actionName, maybeAliasNode) => {
+        const maybeAlias = maybeAliasNode.toNgTemplate();
+        const dvAlias: string | undefined =
+          (!_.isEmpty(maybeAlias)) ? `dvAlias="${maybeAlias}"` : '';
+        const transformedActionName = _
+          .replace(actionName.sourceString, '.', '-');
+
+        return `${transformedActionName} ${dvAlias}`;
+      },
+      Alias: (_as, alias) => alias.sourceString,
+      Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
+      Expr_literal: recurse,
+      Expr_name: (name) => name.sourceString,
+      Expr_input: (input) => {
+        const inputEntry = symbolTable[input.sourceString];
+        assert.ok(
+          inputEntry !== undefined,
+          `Didn't find input ${input.sourceString} in ${pretty(symbolTable)}`);
+        assert.ok(
+          inputEntry.kind === 'input', `Unexpected entry kind ${inputEntry.kind}`);
+        const ngInputField = ActionCompiler.InputToNgField(input.sourceString);
+        (<InputStEntry> inputEntry).ngInputField = ngInputField;
+
+        return ngInputField;
+      },
+      Expr_element: (element) => {}, // TODO
+      UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
+      BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
+      BinExpr_and: (leftExpr, and, rightExpr) =>
+        `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
+      BinExpr_or: (leftExpr, and, rightExpr) =>
+        `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
+      MemberExpr: (nameOrInputNode, dot, namesNode) => {
+        const nameOrInput = nameOrInputNode.sourceString;
+        const names = namesNode.sourceString;
+        const fullMemberAccess = nameOrInput + names;
+        if (ActionCompiler.IsInput(nameOrInput)) {
+          return `${nameOrInputNode.toNgTemplate()}${names}`;
+        }
+        const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+        const stEntry: StEntry = symbolTable[clicheOrActionAlias];
+        let clicheName: string, actionName: string, output: string;
+        let alias: string | undefined;
+        let memberAccesses: string[];
+        switch (stEntry.kind) {
+          case 'cliche':
+            clicheName = clicheOrActionAlias;
+            [ actionName, output, ...memberAccesses ] = rest;
+            break;
+          case 'action':
+            clicheName = stEntry.of;
+            actionName = stEntry.actionName;
+            alias = clicheOrActionAlias;
+            [ output, ...memberAccesses ] = rest;
+            break;
+          default:
+            throw new Error(`Unexpected entry ${stEntry.kind}`);
+        }
+
+        const outputField = ActionCompiler.OutputToNgField(
+          clicheName, actionName, output, alias);
+
+        const memberAccessStr = _.isEmpty(memberAccesses) ?
+          '' : `.${_.join(memberAccesses, '.')}`;
+        return `${outputField}${memberAccessStr}`;
+      },
+
+      Literal_number: (number) => `${number.sourceString}`,
+      Literal_text: (_openQuote, text, _closeQuote) =>
+        '\'' + text.sourceString + '\'',
+      Literal_true: (trueNode) => `${trueNode.sourceString}`,
+      Literal_false: (falseNode) => `${falseNode.sourceString}`,
+      Literal_obj: (openCb, propAssignments, closeCb) =>
+        openCb.sourceString + propAssignments.toNgTemplate() +
+        closeCb.sourceString,
+      Literal_array: (openSb, exprs, closeSb) =>
+        openSb.sourceString + exprs.saveUsedOutputs() + closeSb.sourceString,
+    };
+  }
+
+  private static InputToNgField(input: string) {
+    return `__ngInput__${input.substr(1)}`;
+  }
+
+  private static IsNgComponent(name: string): boolean {
+    return _.includes(name, '-');
+  }
+
+  private static GetStEntryForNgComponent(
+    ngComponentName: string, symbolTable: ActionSymbolTable, alias?: string)
+    : ActionStEntry | undefined {
+    const [ clicheName, actionName ] = _.split(ngComponentName, /-(.+)/ );
+    const stPath = (alias === undefined) ?
+      `${clicheName}.symbolTable.${actionName}` : alias;
+
+    return <ActionStEntry | undefined> _.get(symbolTable, stPath);
+  }
+
+  private static OutputToNgField(
+    clicheName: string, actionName: string, output: string, alias?: string) {
+    const aliasStr = (alias === undefined) ? '' : `_${alias}`;
+
+    return `__ngOutput__${clicheName}_${actionName}_${output}${aliasStr}`;
   }
 
   constructor() {
@@ -221,14 +480,17 @@ export class ActionCompiler {
     const thisActionSymbolTable: ActionSymbolTable = {};
     this.semantics
       .addOperation(
-        'getActionName', ActionCompiler.GetActionName())
+        'getActionName', ActionCompiler.GetActionNameOperation())
       .addOperation(
-        'saveSymbols', ActionCompiler
-          .SaveSymbolsOperation(thisActionSymbolTable))
+        'saveUsedActions', ActionCompiler
+          .SaveUsedActionsOperation(thisActionSymbolTable))
       .addOperation('saveUsedOutputs', ActionCompiler
-          .SaveUsedOutputsOperation(thisActionSymbolTable))
+        .SaveUsedOutputsOperation(thisActionSymbolTable))
+      .addOperation('saveInputs', ActionCompiler
+        .SaveInputsOperation(thisActionSymbolTable))
       .addOperation(
-        'toNgTemplate', ActionCompiler.ToNgTemplateOperation(symbolTable));
+        'toNgTemplate', ActionCompiler
+          .ToNgTemplateOperation(thisActionSymbolTable));
 
     const matchResult = this.grammar.match(actionContents);
     if (matchResult.failed()) {
@@ -238,14 +500,34 @@ export class ActionCompiler {
     const thisActionName = s.getActionName();
     console.log('Got action name' + thisActionName);
     console.log(JSON.stringify(symbolTable));
-    s.saveSymbols(); // mutates thisActionSymbolTable
+    s.saveUsedActions(); // mutates thisActionSymbolTable
     _.set(symbolTable, [appName, thisActionName], {
       kind: 'action',
       symbolTable: thisActionSymbolTable
     });
     s.saveUsedOutputs();
-    s.toNgTemplate();
+    s.saveInputs();
     console.log(JSON.stringify(symbolTable));
+    const ngTemplate = s.toNgTemplate();
+    const ngComponentBuilder = new NgComponentBuilder(
+      appName, thisActionName, ngTemplate);
+
+    const fields: string[] =  _
+      .chain(ActionCompiler.FilterKind('cliche', thisActionSymbolTable))
+      .map((clicheEntry: ClicheStEntry): ActionStEntry[] =>
+        <ActionStEntry[]> ActionCompiler
+          .FilterKind('action', clicheEntry.symbolTable))
+      .flatten()
+      .map((clicheEntry: ActionStEntry): string[] =>
+        ActionCompiler.GetNgFields('output', clicheEntry.symbolTable))
+      .flatten()
+      .value();
+    const ngComponent = ngComponentBuilder
+      .withInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
+      .withOutputs(ActionCompiler.GetNgFields('output', thisActionSymbolTable))
+      .withFields(fields)
+      .build();
+    console.log(ngComponent);
   }
 }
 
@@ -307,9 +589,9 @@ class NgComponentBuilder {
         style: \`${this.style}\`
       })
       export class ${className} {
-        ${outputFields.join()}
-        ${inputFields.join()}
-        ${fields.join()}
+        ${outputFields.join('\n  ')}
+        ${inputFields.join('\n  ')}
+        ${fields.join('\n  ')}
       }
     `;
   }

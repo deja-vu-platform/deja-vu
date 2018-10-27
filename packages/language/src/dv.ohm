@@ -23,7 +23,8 @@ Action {
   AttributeName
     = output -- output
     | name -- name
-  ActionNameMaybeAlias = actionName ("as" name)?
+  ActionNameMaybeAlias = actionName Alias?
+  Alias = "as" name
   actionName = name "." name
 
   comment = multiLineComment
