@@ -109,7 +109,16 @@ export class RunService {
     return targetAction;
   }
 
-  private async run(runType: RunType, targetAction, id: string) {
+  private async run(runType: RunType, elem: ElementRef) {
+    const targetAction = this.getTargetAction(elem.nativeElement);
+    if (targetAction.hasAttribute(RUN_ID_ATTR)) {
+      console.log(
+        "Skipping ${runType} since the same one is already in progress");
+
+      return;
+    }
+    const id = uuid();
+    targetAction.setAttribute(RUN_ID_ATTR, id);
     let runResultMap: RunResultMap | undefined;
     try {
       runResultMap = await this.callDvOnRun(runType, targetAction, id);
@@ -128,20 +137,14 @@ export class RunService {
    * Cause the action given by `elem` to execute.
    **/
   async exec(elem: ElementRef) {
-    const targetAction = this.getTargetAction(elem.nativeElement);
-    const execId = uuid();
-    this.run('exec', targetAction, execId);
+    this.run('exec', elem);
   }
 
+  /**
+   * Cause the action given by `elem` to evaluate.
+   */
   async eval(elem: ElementRef) {
-    const targetAction = this.getTargetAction(elem.nativeElement);
-    if (targetAction.hasAttribute(RUN_ID_ATTR)) {
-      console.log("skipping eval because another one is already in progress");
-      return;
-    }
-    const evalId = uuid();
-    targetAction.setAttribute(RUN_ID_ATTR, evalId);
-    this.run('eval', targetAction, evalId);
+    this.run('eval', elem);
   }
 
   /**
@@ -160,7 +163,8 @@ export class RunService {
     onAction(target, actionId);
   }
 
-  private async callDvOnRun(runType: RunType, node, id: string): Promise<RunResultMap> {
+  private async callDvOnRun(
+    runType: RunType, node, id: string): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
     const execs: Promise<RunResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
