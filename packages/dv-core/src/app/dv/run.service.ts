@@ -5,19 +5,35 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
+// To abort the run, return a rejected promise
+export type onRun = () => Promise<any> | any;
+// res is the value the promise returned in `dvOnExec` or `dvOnEval` resolved to
+export type onCommit = (res?: any) => void;
+// reason is the error that caused the abort
+export type onAbort = (reason: Error) => void;
+
 export interface OnExec {
-  // To abort the exec return a rejected promise
-  dvOnExec: () => Promise<any> | any;
+  dvOnExec: onRun;
 }
 
 export interface OnExecCommit {
-  // res is the value the promise returned in `dvOnExec` resolved to
-  dvOnExecCommit: (res?: any) => void;
+  dvOnExecCommit: onCommit;
 }
 
 export interface OnExecAbort {
-  // reason is the error that caused the abort
-  dvOnExecAbort: (reason: Error) => void;
+  dvOnExecAbort: onAbort;
+}
+
+export interface OnEval {
+  dvOnEval: onRun;
+}
+
+export interface OnEvalCommit {
+  dvOnEvalCommit: onCommit;
+}
+
+export interface OnEvalAbort {
+  dvOnEvalAbort: onAbort;
 }
 
 interface ActionInfo {
@@ -25,12 +41,27 @@ interface ActionInfo {
   node: any;
 }
 
-interface ExecResultMap {
+interface RunResultMap {
   [actionId: string]: any;
 }
 
+type RunType = 'eval' | 'exec';
+
+const runFunctionNames = {
+  eval: {
+    onRun: 'dvOnEval',
+    onCommit: 'dvOnEvalCommit',
+    onAbort: 'dvOnEvalAbort'
+  },
+  exec: {
+    onRun: 'dvOnExec',
+    onCommit: 'dvOnExecCommit',
+    onAbort: 'dvOnExecAbort'
+  }
+}
+
 const ACTION_ID_ATTR = '_dvActionId';
-export const EXEC_ID_ATTR = '_dvExecId';
+export const RUN_ID_ATTR = '_dvRunId';
 
 
 @Injectable()
@@ -64,11 +95,8 @@ export class RunService {
     this.actionTable[actionId] = {action: action, node: node};
   }
 
-  /**
-   * Cause the action given by `elem` to execute.
-   **/
-  async exec(elem: ElementRef) {
-    let node = elem.nativeElement;
+  private getTargetAction(initialNode) {
+    let node = initialNode;
     let targetAction = node;
 
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
@@ -78,17 +106,42 @@ export class RunService {
       }
       node = this.renderer.parentNode(node);
     }
-    const execId = uuid();
-    let execResultMap: ExecResultMap | undefined;
+    return targetAction;
+  }
+
+  private async run(runType: RunType, targetAction, id: string) {
+    let runResultMap: RunResultMap | undefined;
     try {
-      execResultMap = await this.callDvOnExec(targetAction, execId);
+      runResultMap = await this.callDvOnRun(runType, targetAction, id);
     } catch (error) {
-      console.error(`Got error on exec ${execId}: ${error.message}`);
-      this.callDvOnExecAbort(targetAction, error);
+      console.error(`Got error on ${runType} ${id}: ${error.message}`);
+      this.callDvOnRunAbort(runType, targetAction, error);
+      targetAction.removeAttribute(RUN_ID_ATTR);
     }
-    if (execResultMap) { // no error
-      this.callDvOnExecCommit(targetAction, execResultMap);
+    if (runResultMap) { // no error
+      this.callDvOnRunCommit(runType, targetAction, runResultMap);
+      targetAction.removeAttribute(RUN_ID_ATTR);
     }
+  }
+
+  /**
+   * Cause the action given by `elem` to execute.
+   **/
+  async exec(elem: ElementRef) {
+    const targetAction = this.getTargetAction(elem.nativeElement);
+    const execId = uuid();
+    this.run('exec', targetAction, execId);
+  }
+
+  async eval(elem: ElementRef) {
+    const targetAction = this.getTargetAction(elem.nativeElement);
+    if (targetAction.hasAttribute(RUN_ID_ATTR)) {
+      console.log("skipping eval because another one is already in progress");
+      return;
+    }
+    const evalId = uuid();
+    targetAction.setAttribute(RUN_ID_ATTR, evalId);
+    this.run('eval', targetAction, evalId);
   }
 
   /**
@@ -107,39 +160,45 @@ export class RunService {
     onAction(target, actionId);
   }
 
-  private async callDvOnExec(node, id: string): Promise<ExecResultMap> {
-    const execs: Promise<ExecResultMap>[] = [];
+  private async callDvOnRun(runType: RunType, node, id: string): Promise<RunResultMap> {
+    const dvOnRun = runFunctionNames[runType].onRun;
+    const execs: Promise<RunResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action.dvOnExec) {
-        actionInfo.node.setAttribute(EXEC_ID_ATTR, id);
+        actionInfo.node.setAttribute(RUN_ID_ATTR, id);
         execs.push(
           Promise
-            .resolve(actionInfo.action.dvOnExec())
+            .resolve(actionInfo.action[dvOnRun]())
             .then(result => ({[actionId]: result})));
       }
     });
-    const resultMaps: ExecResultMap[] = await Promise.all(execs);
+    const resultMaps: RunResultMap[] = await Promise.all(execs);
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnExecCommit(node, execResultMap: ExecResultMap): void {
+  private callDvOnRunCommit(
+    runType: RunType, node, runResultMap: RunResultMap): void {
+    const dvOnRun = runFunctionNames[runType].onRun;
+    const dvOnCommit = runFunctionNames[runType].onCommit;
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnExec) {
-        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
+      if (actionInfo.action[dvOnRun]) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action.dvOnExecCommit) {
-        actionInfo.action.dvOnExecCommit(execResultMap[actionId]);
+      if (actionInfo.action[dvOnCommit]) {
+        actionInfo.action[dvOnCommit](runResultMap[actionId]);
       }
     });
   }
 
-  private callDvOnExecAbort(node, reason): void {
+  private callDvOnRunAbort(runType: RunType, node, reason): void {
     this.walkActions(node, (actionInfo) => {
-      if (actionInfo.action.dvOnExec) {
-        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
+      const dvOnRun = runFunctionNames[runType].onRun;
+      const dvOnAbort = runFunctionNames[runType].onCommit;
+      if (actionInfo.action[dvOnRun]) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action.dvOnExecAbort) {
-        actionInfo.action.dvOnExecAbort(reason);
+      if (actionInfo.action[dvOnAbort]) {
+        actionInfo.action[dvOnAbort](reason);
       }
     });
   }

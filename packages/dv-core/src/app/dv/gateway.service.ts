@@ -4,7 +4,7 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
-import { EXEC_ID_ATTR } from './run.service';
+import { RUN_ID_ATTR } from './run.service';
 
 import * as _ from 'lodash';
 
@@ -119,7 +119,7 @@ export class GatewayService {
     : {[params: string]: string} {
     const params = {
       from: this.fromStr,
-      runId: this.from.nativeElement.getAttribute(EXEC_ID_ATTR)
+      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
     };
     if (path) {
       params['path'] = path;

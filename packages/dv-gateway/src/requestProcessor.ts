@@ -256,12 +256,19 @@ export class RequestProcessor {
       reinitDbOnStartup: config.reinitDbOnStartup,
 
       sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+        // cohort doesn't need to commit for GET requests
+        if (gcr.method === 'GET') {
+          return Promise.resolve();
+        }
         return RequestProcessor
           .ForwardRequest(RequestProcessor.NewReqFor('commit', gcr))
           .then((_unusedResp) => undefined);
       },
 
       sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+        if (gcr.method === 'GET') {
+          return Promise.resolve();
+        }
         return RequestProcessor
           .ForwardRequest(RequestProcessor.NewReqFor('abort', gcr))
           .then((_unusedResp) => undefined);
