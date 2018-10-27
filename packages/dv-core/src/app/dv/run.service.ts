@@ -193,7 +193,7 @@ export class RunService {
   private callDvOnRunAbort(runType: RunType, node, reason): void {
     this.walkActions(node, (actionInfo) => {
       const dvOnRun = runFunctionNames[runType].onRun;
-      const dvOnAbort = runFunctionNames[runType].onCommit;
+      const dvOnAbort = runFunctionNames[runType].onAbort;
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
