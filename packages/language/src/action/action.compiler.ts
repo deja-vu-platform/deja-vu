@@ -7,7 +7,7 @@ import * as path from 'path';
 import {
   ActionStEntry, ActionSymbolTable, ClicheStEntry, InputStEntry, EntryKind,
   OutputStEntry, pretty, StEntry, SymbolTable, ActionSymbolTableStEntry
-} from './symbolTable';
+} from '../symbolTable';
 
 import * as _ from 'lodash';
 
@@ -471,7 +471,7 @@ export class ActionCompiler {
   }
 
   constructor() {
-    const grammarPath = path.join(__dirname, 'dv.ohm');
+    const grammarPath = path.join(__dirname, 'action.grammar.ohm');
     this.grammar = ohm.grammar(readFileSync(grammarPath, 'utf-8'));
     this.semantics = this.grammar.createSemantics();
   }

@@ -4,7 +4,7 @@ import * as glob from 'glob';
 
 import * as _ from 'lodash';
 import { SymbolTable } from './symbolTable';
-import { ActionCompiler } from './actionCompiler';
+import { ActionCompiler } from './action/action.compiler';
 
 
 interface DvConfig {
@@ -53,7 +53,7 @@ function htmlFilesFromGlobs(
 }
 
 
-export class DvCompiler {
+export class AppCompiler {
   static DVCONFIG_FILE_PATH = 'dvconfig.json';
 
   private readonly actionCompiler: ActionCompiler = new ActionCompiler();
@@ -68,7 +68,7 @@ export class DvCompiler {
    * @param cacheDir directory to use read and update compiled files
    */
   static Compile(projectDir: string, cacheDir: string) {
-    const compilerForProject = new DvCompiler(projectDir, cacheDir);
+    const compilerForProject = new AppCompiler(projectDir, cacheDir);
     compilerForProject.compile();
   }
 
@@ -77,7 +77,7 @@ export class DvCompiler {
 
   compile() {
     const dvConfigPath: string = path
-      .join(this.projectDir, DvCompiler.DVCONFIG_FILE_PATH);
+      .join(this.projectDir, AppCompiler.DVCONFIG_FILE_PATH);
     const dvConfigContents: string = readFileSync(dvConfigPath, 'utf8');
     const dvConfig: DvConfig = JSON.parse(dvConfigContents);
 

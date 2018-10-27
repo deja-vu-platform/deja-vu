@@ -1,4 +1,4 @@
-import { ActionCompiler } from './actionCompiler';
+import { ActionCompiler } from './action.compiler';
 
 describe('ActionCompiler', () => {
   let actionCompiler: ActionCompiler;
