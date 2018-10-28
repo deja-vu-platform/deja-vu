@@ -5,35 +5,35 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
-// To abort the run, return a rejected promise
+// To indicate run failure, return a rejected promise
 export type onRun = () => Promise<any> | any;
 // res is the value the promise returned in `dvOnExec` or `dvOnEval` resolved to
-export type onCommit = (res?: any) => void;
-// reason is the error that caused the abort
-export type onAbort = (reason: Error) => void;
+export type onSuccess = (res?: any) => void;
+// reason is the error that caused the failure
+export type onFailure = (reason: Error) => void;
 
 export interface OnExec {
   dvOnExec: onRun;
 }
 
-export interface OnExecCommit {
-  dvOnExecCommit: onCommit;
+export interface OnExecSuccess {
+  dvOnExecSuccess: onSuccess;
 }
 
-export interface OnExecAbort {
-  dvOnExecAbort: onAbort;
+export interface OnExecFailure {
+  dvOnExecFailure: onFailure;
 }
 
 export interface OnEval {
   dvOnEval: onRun;
 }
 
-export interface OnEvalCommit {
-  dvOnEvalCommit: onCommit;
+export interface OnEvalSuccess {
+  dvOnEvalSuccess: onSuccess;
 }
 
-export interface OnEvalAbort {
-  dvOnEvalAbort: onAbort;
+export interface OnEvalFailure {
+  dvOnEvalFailure: onFailure;
 }
 
 interface ActionInfo {
@@ -50,13 +50,13 @@ type RunType = 'eval' | 'exec';
 const runFunctionNames = {
   eval: {
     onRun: 'dvOnEval',
-    onCommit: 'dvOnEvalCommit',
-    onAbort: 'dvOnEvalAbort'
+    onSuccess: 'dvOnEvalSuccess',
+    onFailure: 'dvOnEvalFailure'
   },
   exec: {
     onRun: 'dvOnExec',
-    onCommit: 'dvOnExecCommit',
-    onAbort: 'dvOnExecAbort'
+    onSuccess: 'dvOnExecSuccess',
+    onFailure: 'dvOnExecFailure'
   }
 }
 
@@ -95,6 +95,20 @@ export class RunService {
     this.actionTable[actionId] = {action: action, node: node};
   }
 
+  /**
+   * Cause the action given by `elem` to execute.
+   **/
+  async exec(elem: ElementRef) {
+    this.run('exec', elem);
+  }
+
+  /**
+   * Cause the action given by `elem` to evaluate.
+   */
+  async eval(elem: ElementRef) {
+    this.run('eval', elem);
+  }
+
   private getTargetAction(initialNode) {
     let node = initialNode;
     let targetAction = node;
@@ -113,7 +127,7 @@ export class RunService {
     const targetAction = this.getTargetAction(elem.nativeElement);
     if (targetAction.hasAttribute(RUN_ID_ATTR)) {
       console.log(
-        "Skipping ${runType} since the same one is already in progress");
+        `Skipping ${runType} since the same one is already in progress`);
 
       return;
     }
@@ -124,27 +138,13 @@ export class RunService {
       runResultMap = await this.callDvOnRun(runType, targetAction, id);
     } catch (error) {
       console.error(`Got error on ${runType} ${id}: ${error.message}`);
-      this.callDvOnRunAbort(runType, targetAction, error);
+      this.callDvOnRunFailure(runType, targetAction, error);
       targetAction.removeAttribute(RUN_ID_ATTR);
     }
     if (runResultMap) { // no error
-      this.callDvOnRunCommit(runType, targetAction, runResultMap);
+      this.callDvOnRunSuccess(runType, targetAction, runResultMap);
       targetAction.removeAttribute(RUN_ID_ATTR);
     }
-  }
-
-  /**
-   * Cause the action given by `elem` to execute.
-   **/
-  async exec(elem: ElementRef) {
-    this.run('exec', elem);
-  }
-
-  /**
-   * Cause the action given by `elem` to evaluate.
-   */
-  async eval(elem: ElementRef) {
-    this.run('eval', elem);
   }
 
   /**
@@ -166,43 +166,47 @@ export class RunService {
   private async callDvOnRun(
     runType: RunType, node, id: string): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
-    const execs: Promise<RunResultMap>[] = [];
+    const runs: Promise<RunResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnExec) {
+      console.log(`${runType} test ${dvOnRun}`);
+      if (actionInfo.action[dvOnRun]) {
+        console.log(`${runType} gp ${dvOnRun}`);
         actionInfo.node.setAttribute(RUN_ID_ATTR, id);
-        execs.push(
+        runs.push(
           Promise
             .resolve(actionInfo.action[dvOnRun]())
             .then(result => ({[actionId]: result})));
       }
     });
-    const resultMaps: RunResultMap[] = await Promise.all(execs);
+    const resultMaps: RunResultMap[] = await Promise.all(runs);
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnRunCommit(
+  private callDvOnRunSuccess(
     runType: RunType, node, runResultMap: RunResultMap): void {
     const dvOnRun = runFunctionNames[runType].onRun;
-    const dvOnCommit = runFunctionNames[runType].onCommit;
+    const dvOnSuccess = runFunctionNames[runType].onSuccess;
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action[dvOnCommit]) {
-        actionInfo.action[dvOnCommit](runResultMap[actionId]);
+      if (runType == 'eval')
+        console.log(runResultMap[actionId]);
+      if (actionInfo.action[dvOnSuccess]) {
+        actionInfo.action[dvOnSuccess](runResultMap[actionId]);
       }
     });
   }
 
-  private callDvOnRunAbort(runType: RunType, node, reason): void {
+  private callDvOnRunFailure(runType: RunType, node, reason): void {
     this.walkActions(node, (actionInfo) => {
       const dvOnRun = runFunctionNames[runType].onRun;
-      const dvOnAbort = runFunctionNames[runType].onAbort;
+      const dvOnFailure = runFunctionNames[runType].onFailure;
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action[dvOnAbort]) {
-        actionInfo.action[dvOnAbort](reason);
+      if (actionInfo.action[dvOnFailure]) {
+        actionInfo.action[dvOnFailure](reason);
       }
     });
   }
