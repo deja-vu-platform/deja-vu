@@ -50,6 +50,10 @@ export class NgComponentBuilder {
     const fields = _.map(this.fields, (field: string) => `${field};`);
     return `
       import { Component } from '@angular/core';
+      ${_.isEmpty(inputFields) ?
+        '' : 'import { Input } from \'@angular/core\';'}
+      ${_.isEmpty(outputFields) ?
+        '' : 'import { Output } from \'@angular/core\';'}
 
       @Component({
         selector: "${selector}",
