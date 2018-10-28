@@ -49,14 +49,7 @@ export function toNgTemplate(symbolTable: ActionSymbolTable) {
               `Expected entry ${pretty(actionEntry)} to have an "actionName"`);
             const ngOutputField = outputToNgField(
               actionEntry.of, actionEntry.actionName, outputKey, alias);
-/*
-              assert.ok(
-                _.has(entry, `symbolTable.${outputKey}`),
-                `Didn't find ${outputKey} in ${pretty(entry)}`);
-              const outputEntry = entry.symbolTable[outputKey];
-              assert.ok(outputEntry.kind === 'output');
-              (<OutputStEntry> outputEntry).ngOutputField = ngOutputField;
-               */
+
             outputEntry.ngOutputField = ngOutputField;
 
             return `(${outputKey})="${ngOutputField}=$event"`;
@@ -68,10 +61,14 @@ export function toNgTemplate(symbolTable: ActionSymbolTable) {
       attrsString = attrs.sourceString;
     }
 
+    // Close void elements
+    const closeStr = (tagIsNgComponent && close.sourceString === '/>') ?
+      `></${transformedElementName}>` : close.sourceString;
+
     return open.sourceString +
       transformedElementName + ' ' +
       attrsString +
-      close.sourceString;
+      closeStr;
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpRecurse = (leftExpr, op, rightExpr) =>

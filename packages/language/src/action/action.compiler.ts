@@ -53,7 +53,8 @@ export class ActionCompiler {
     this.semantics = this.grammar.createSemantics();
   }
 
-  compile(appName: string, actionContents: string, symbolTable: SymbolTable) {
+  compile(appName: string, actionContents: string, symbolTable: SymbolTable)
+    : string {
     const thisActionSymbolTable: ActionSymbolTable = {};
     this.semantics
       .addOperation('getActionName', getActionName())
@@ -98,5 +99,7 @@ export class ActionCompiler {
       .withFields(fields)
       .build();
     console.log(ngComponent);
+
+    return ngComponent;
   }
 }
