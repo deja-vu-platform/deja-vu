@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 
+
 export class NgComponentBuilder {
   private inputs: string[] = [];
   private outputs: string[] = [];

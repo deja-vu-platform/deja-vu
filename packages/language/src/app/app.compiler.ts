@@ -5,6 +5,7 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 import { SymbolTable } from '../symbolTable';
 import { ActionCompiler } from '../action/action.compiler';
+import { PackageJsonBuilder } from './package-json.builder';
 
 
 interface DvConfig {
@@ -81,7 +82,8 @@ export class AppCompiler {
     const dvConfigContents: string = readFileSync(dvConfigPath, 'utf8');
     const dvConfig: DvConfig = JSON.parse(dvConfigContents);
 
-    this.symbolTable[dvConfig.name] = { kind: 'app' };
+    const appName = dvConfig.name;
+    this.symbolTable[appName] = { kind: 'app' };
     const aliasToClicheNameMap = _.mapValues(
       dvConfig.usedCliches, (value: ClicheInfo, alias: string) => {
         return {
@@ -98,5 +100,16 @@ export class AppCompiler {
       this.actionCompiler.compile(
         dvConfig.name, actionContents, this.symbolTable);
     }
+    const usedCliches: string[] = _
+      .chain(appName)
+      .toPairs()
+      .map((clicheAlias, clicheConfig) =>
+        _.get(clicheConfig, 'name', clicheAlias))
+      .value();
+    const packageJson = new PackageJsonBuilder(appName)
+      .addUsedCliches(usedCliches)
+      .build();
+
+    console.log(packageJson);
   }
 }
