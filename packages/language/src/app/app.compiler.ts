@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as glob from 'glob';
 
 import * as _ from 'lodash';
-import { SymbolTable } from './symbolTable';
-import { ActionCompiler } from './action/action.compiler';
+import { SymbolTable } from '../symbolTable';
+import { ActionCompiler } from '../action/action.compiler';
 
 
 interface DvConfig {
