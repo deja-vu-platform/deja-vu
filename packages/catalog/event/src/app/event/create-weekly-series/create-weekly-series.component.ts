@@ -9,9 +9,9 @@ import {
 import {
   GatewayService,
   GatewayServiceFactory,
-  OnExecAbort,
-  OnExecCommit,
   OnExec,
+  OnExecFailure,
+  OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -31,7 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-weekly-series.component.css']
 })
 export class CreateWeeklySeriesComponent
-implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() save = true;
@@ -104,7 +104,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     if (this.save) {
       this.createWeeklySeriesSaved = true;
       window.setTimeout(() => {
@@ -118,7 +118,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     if (this.save) {
       this.createWeeklySeriesError = reason.message;
     }

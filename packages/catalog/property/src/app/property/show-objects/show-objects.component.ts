@@ -1,8 +1,14 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
-  Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action,
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
@@ -17,7 +23,8 @@ import { API_PATH } from '../property.config';
   templateUrl: './show-objects.component.html',
   styleUrls: ['./show-objects.component.css']
 })
-export class ShowObjectsComponent implements OnInit, OnChanges {
+export class ShowObjectsComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() showObject: Action = {
     type: <Type<Component>> ShowObjectComponent
   };
@@ -33,12 +40,16 @@ export class ShowObjectsComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showObjects = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -50,9 +61,35 @@ export class ShowObjectsComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.properties = await properties(
-      this.showOnly, this.showExclude, this.fetchProperties.bind(this));
-    this.fetchObjects();
+    if (!this.properties) {
+      this.properties = await properties(
+        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    }
+    if (this.properties) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    this.gs
+      .get<{data: {objects: Object[]}}>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              objects {
+                id
+                ${_.map(this.properties)
+                    .join('\n')}
+              }
+            }
+          `
+        }
+      })
+      .subscribe((res) => {
+        this._objects = res.data.objects;
+        this.objects.emit(this._objects);
+        this.objectIds.emit(_.map(this._objects, 'id'));
+      });
   }
 
   async fetchProperties(): Promise<string[]> {
@@ -71,29 +108,5 @@ export class ShowObjectsComponent implements OnInit, OnChanges {
       .toPromise();
 
     return _.map(res.data.properties, 'name');
-  }
-
-  fetchObjects() {
-    if (this.gs) {
-      this.gs
-        .get<{data: {objects: Object[]}}>(this.apiPath, {
-          params: {
-            query: `
-              query {
-                objects {
-                  id
-                  ${_.map(this.properties)
-                      .join('\n')}
-                }
-              }
-            `
-          }
-        })
-        .subscribe((res) => {
-          this._objects = res.data.objects;
-          this.objects.emit(this._objects);
-          this.objectIds.emit(_.map(this._objects, 'id'));
-        });
-    }
   }
 }

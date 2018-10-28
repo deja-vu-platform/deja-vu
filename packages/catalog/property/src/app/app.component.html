@@ -5,6 +5,11 @@
   <property-show-object id="ben"></property-show-object>
   lastname only: <property-show-object id="ben" [showOnly]="['lastName']">
   </property-show-object>
+  <h1>Show Object and Show All Objects in a Transaction</h1>
+  <dv-tx>
+    <property-show-object id="ben"></property-show-object>
+    <property-show-objects></property-show-objects>
+  </dv-tx>
   <h1>Create Objects</h1>
   <dv-tx>
     <property-create-objects [hidden]="true" [objects]="[

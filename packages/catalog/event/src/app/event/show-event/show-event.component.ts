@@ -1,8 +1,13 @@
 import { DatePipe } from '@angular/common';
 import {
-  Component, ElementRef, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit
 } from '@angular/core';
-import { GatewayService, GatewayServiceFactory  } from 'dv-core';
+import {
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService
+} from 'dv-core';
 import { Event, fromUnixTime } from '../../../../shared/data';
 
 
@@ -11,7 +16,8 @@ import { Event, fromUnixTime } from '../../../../shared/data';
   templateUrl: './show-event.component.html',
   providers: [ DatePipe ]
 })
-export class ShowEventComponent implements OnChanges, OnInit {
+export class ShowEventComponent implements AfterViewInit, OnChanges, OnEval,
+OnInit {
   // One is required
   @Input() event: Event | undefined;
   @Input() id: string | undefined;
@@ -19,10 +25,18 @@ export class ShowEventComponent implements OnChanges, OnInit {
 
   private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+    if (this.event && this.event.startDate && this.event.endDate) {
+      this.sameDayEvent = this.isSameDayEvent(this.event);
+    }
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -31,28 +45,32 @@ export class ShowEventComponent implements OnChanges, OnInit {
   }
 
   load() {
-    if (this.event && this.event.startDate && this.event.endDate) {
-      this.sameDayEvent = this.isSameDayEvent(this.event);
-    } else if (this.gs && this.id) {
-      this.gs.get<{
-        data: {event: { startDate: number, endDate: number }}}>('/graphql', {
-        params: {
-          query: ` query {
-            event(id: "${this.id}") {
-              startDate,
-              endDate
-            }
-          }`
-        }
-      })
-      .subscribe((obj) => {
+    if (!this.event && this.gs && this.id) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    this.gs.get<{
+      data: {event: { startDate: number, endDate: number }}}>('/graphql', {
+      params: {
+        query: ` query {
+          event(id: "${this.id}") {
+            startDate,
+            endDate
+          }
+        }`
+      }
+    })
+    .subscribe((obj) => {
+      if (obj.data.event) {
         this.event = {
           startDate: fromUnixTime(obj.data.event.startDate),
           endDate: fromUnixTime(obj.data.event.endDate)
         };
         this.sameDayEvent = this.isSameDayEvent(this.event);
-      });
-    }
+      }
+    });
   }
 
   private isSameDayEvent(event: Event) {
