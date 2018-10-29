@@ -1,4 +1,4 @@
-import * as JSON5 from 'json5';
+import * as RJSON from 'relaxed-json';
 
 export interface Config {
   wsPort: number;
@@ -31,7 +31,7 @@ function getDefaultConfig(name: string): Config {
 
 function getConfigArg(argv) {
   try {
-    const configArg: Config = JSON5.parse(argv.config);
+    const configArg: Config = RJSON.parse(argv.config);
 
     return configArg;
   } catch (e) {
