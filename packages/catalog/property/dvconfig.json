@@ -21,7 +21,7 @@
               "type": "string"
           },
           "age": {
-              "description": "Age in years",
+              "description": "years",
               "type": "integer",
               "minimum": 0
           }
