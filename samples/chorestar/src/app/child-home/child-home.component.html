@@ -15,11 +15,8 @@
           <h3>
             StarBank Total:
             <i class="material-icons icon">star_rate</i>
-            <market-show-party
-              [id]="user?.id"
-              [showId]="false"
-              noBalanceText="0">
-            </market-show-party>
+            <transfer-show-balance [accountId]="user?.id">
+            </transfer-show-balance>
           </h3>
         </div>
       </div>
@@ -84,7 +81,7 @@
           <div class="row section">
             <div class="col-md-12">
               <h3>Rewards You Can Buy</h3>
-              <market-show-goods
+              <!-- <market-show-goods
                 [affordable]="true"
                 [available]="true"
                 [buyerId]="user?.id"
@@ -98,13 +95,13 @@
                 }"
                 [showOptionToBuy]="false"
                 noGoodsToShowText="No rewards to show">
-              </market-show-goods>
+              </market-show-goods> -->
             </div>
           </div>
           <div class="row section">
             <div class="col-md-12">
               <h3>Rewards You Cannot Buy Yet</h3>
-              <market-show-goods
+              <!-- <market-show-goods
                 [affordable]="false"
                 [buyerId]="user?.id"
                 [available]="true"
@@ -117,7 +114,7 @@
                 }"
                 [showOptionToBuy]="false"
                 noGoodsToShowText="No rewards to show">
-              </market-show-goods>
+              </market-show-goods> -->
             </div>
           </div>
         </div>

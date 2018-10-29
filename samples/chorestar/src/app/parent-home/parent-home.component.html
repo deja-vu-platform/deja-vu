@@ -55,14 +55,9 @@
                 [assignerId]="user?.id"
                 assigneeSelectPlaceholder="For Child"
                 (selectedAssignee)="choreAssignee=$event"
-                [showAssignee]="{
-                  type: showUser,
-                  tag: 'authentication-show-user',
-                  dvOf: 'childauthentication'
-                }"
                 [showOptionToSubmit]="false">
               </task-create-task>
-              <market-create-good dvAlias="chore-create-good"
+              <!-- <market-create-good dvAlias="chore-create-good"
                 [id]="choreId"
                 priceLabel="Star Value"
                 [sellerId]="choreAssignee?.id"
@@ -71,14 +66,14 @@
                 [showOptionToInputSeller]="false"
                 [showOptionToInputSupply]="false"
                 [showOptionToSubmit]="false">
-              </market-create-good>
+              </market-create-good> -->
               <dv-button>Create Chore</dv-button>
             </dv-tx>
           </div>
           <div class="row">
             <div class="offset-md-1 col-md-5 white-box">
               <h2>Offered Rewards</h2>
-              <market-show-goods
+              <!-- <market-show-goods
                 [sellerId]="user?.id"
                 [marketId]="user?.id"
                 [available]="true"
@@ -90,7 +85,12 @@
                 }"
                 [showOptionToBuy]="false"
                 noGoodsToShowText="No offered rewards">
-              </market-show-goods>
+              </market-show-goods> -->
+              <property-show-objects
+                dvOf="reward"
+                [showOnly]="['name']"
+              >
+              </property-show-objects>
             </div>
             <dv-tx class="white-box right-box col-md-5">
               <h2>Add a New Reward</h2>
@@ -99,7 +99,7 @@
               <property-create-object dvOf="reward"
                 [id]="rewardId" [showOptionToSubmit]="false">
               </property-create-object>
-              <market-create-good dvAlias="reward-create-good"
+              <!-- <market-create-good dvAlias="reward-create-good"
                 [id]="rewardId"
                 [sellerId]="user?.id"
                 [marketId]="user?.id"
@@ -108,7 +108,7 @@
                 [showOptionToInputSeller]="false"
                 [showOptionToInputSupply]="false"
                 [showOptionToSubmit]="false">
-              </market-create-good>
+              </market-create-good> -->
               <dv-button>Create Reward</dv-button>
             </dv-tx>
           </div>
@@ -125,16 +125,16 @@
                 [signIn]="false"
                 [showOptionToSubmit]="false">
               </authentication-register-user>
-              <task-create-assignee [id]="childId" [hidden]="true">
-              </task-create-assignee>
-              <market-create-party
+              <!-- <task-create-assignee [id]="childId" [hidden]="true">
+              </task-create-assignee> -->
+              <!-- <market-create-party
                 [id]="childId"
                 balance=0
                 [hidden]="true">
-              </market-create-party>
+              </market-create-party> -->
               <group-add-to-group
                 [id]="user?.id"
-                [initialMemberId]="childId"
+                [memberId]="childId"
                 [hidden]="true">
               </group-add-to-group>
               <dv-button>Create Child</dv-button>

@@ -34,10 +34,11 @@
         "reinitDbOnStartup": true
       }
     },
-    "market": {
+    "transfer": {
       "config": {
         "wsPort": 3006,
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": true,
+        "balanceType": "money"
       }
     },
     "task": {
