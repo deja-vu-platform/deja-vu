@@ -31,9 +31,6 @@ OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    if (this.event && this.event.startDate && this.event.endDate) {
-      this.sameDayEvent = this.isSameDayEvent(this.event);
-    }
   }
 
   ngAfterViewInit() {
@@ -41,36 +38,42 @@ OnInit {
   }
 
   ngOnChanges() {
-    this.load();
+    if (this.event && this.event.startDate && this.event.endDate) {
+      this.sameDayEvent = this.isSameDayEvent(this.event);
+    } else {
+      this.load();
+    }
   }
 
   load() {
-    if (!this.event && this.gs && this.id) {
+    if (this.canEval()) {
       this.rs.eval(this.elem);
     }
   }
 
   async dvOnEval(): Promise<void> {
-    this.gs.get<{
-      data: {event: { startDate: number, endDate: number }}}>('/graphql', {
-      params: {
-        query: ` query {
-          event(id: "${this.id}") {
-            startDate,
-            endDate
-          }
-        }`
-      }
-    })
-    .subscribe((obj) => {
-      if (obj.data.event) {
-        this.event = {
-          startDate: fromUnixTime(obj.data.event.startDate),
-          endDate: fromUnixTime(obj.data.event.endDate)
-        };
-        this.sameDayEvent = this.isSameDayEvent(this.event);
-      }
-    });
+    if (this.canEval()) {
+      this.gs.get<{
+        data: {event: { startDate: number, endDate: number }}}>('/graphql', {
+        params: {
+          query: ` query {
+            event(id: "${this.id}") {
+              startDate,
+              endDate
+            }
+          }`
+        }
+      })
+      .subscribe((obj) => {
+        if (obj.data.event) {
+          this.event = {
+            startDate: fromUnixTime(obj.data.event.startDate),
+            endDate: fromUnixTime(obj.data.event.endDate)
+          };
+          this.sameDayEvent = this.isSameDayEvent(this.event);
+        }
+      });
+    }
   }
 
   private isSameDayEvent(event: Event) {
@@ -79,5 +82,9 @@ OnInit {
     }
 
     return event.startDate.isSame(event.endDate, 'day');
+  }
+
+  private canEval(): boolean {
+    return !!(!this.event && this.id && this.gs);
   }
 }

@@ -168,9 +168,7 @@ export class RunService {
     const dvOnRun = runFunctionNames[runType].onRun;
     const runs: Promise<RunResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
-      console.log(`${runType} test ${dvOnRun}`);
       if (actionInfo.action[dvOnRun]) {
-        console.log(`${runType} gp ${dvOnRun}`);
         actionInfo.node.setAttribute(RUN_ID_ATTR, id);
         runs.push(
           Promise
@@ -190,8 +188,6 @@ export class RunService {
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (runType == 'eval')
-        console.log(runResultMap[actionId]);
       if (actionInfo.action[dvOnSuccess]) {
         actionInfo.action[dvOnSuccess](runResultMap[actionId]);
       }

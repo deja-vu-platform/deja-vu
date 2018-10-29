@@ -65,31 +65,33 @@ OnChanges {
       this.properties = await properties(
         this.showOnly, this.showExclude, this.fetchProperties.bind(this));
     }
-    if (this.properties) {
+    if (this.canEval()) {
       this.rs.eval(this.elem);
     }
   }
 
   async dvOnEval(): Promise<void> {
-    this.gs
-      .get<{data: {objects: Object[]}}>(this.apiPath, {
-        params: {
-          query: `
-            query {
-              objects {
-                id
-                ${_.map(this.properties)
-                    .join('\n')}
+    if (this.canEval()) {
+      this.gs
+        .get<{data: {objects: Object[]}}>(this.apiPath, {
+          params: {
+            query: `
+              query {
+                objects {
+                  id
+                  ${_.map(this.properties)
+                      .join('\n')}
+                }
               }
-            }
-          `
-        }
-      })
-      .subscribe((res) => {
-        this._objects = res.data.objects;
-        this.objects.emit(this._objects);
-        this.objectIds.emit(_.map(this._objects, 'id'));
-      });
+            `
+          }
+        })
+        .subscribe((res) => {
+          this._objects = res.data.objects;
+          this.objects.emit(this._objects);
+          this.objectIds.emit(_.map(this._objects, 'id'));
+        });
+    }
   }
 
   async fetchProperties(): Promise<string[]> {
@@ -108,5 +110,9 @@ OnChanges {
       .toPromise();
 
     return _.map(res.data.properties, 'name');
+  }
+
+  private canEval(): boolean {
+    return !!(this.properties && this.gs);
   }
 }

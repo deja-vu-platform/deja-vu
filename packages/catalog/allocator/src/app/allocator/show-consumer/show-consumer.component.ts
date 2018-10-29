@@ -48,31 +48,37 @@ OnInit {
   }
 
   load() {
-    if (this.gs && this.resourceId && this.allocationId) {
+    if (this.canEval()) {
       this.rs.eval(this.elem);
     }
   }
 
   async dvOnEval(): Promise<void> {
-    this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
-      params: {
-        query: `
-          query ConsumerOfResource($input: ConsumerOfResourceInput!) {
-            consumerOfResource(input: $input)
-          }
-        `,
-        variables: JSON.stringify({
-          input: {
-            resourceId: this.resourceId,
-            allocationId: this.allocationId
-          }
-        })
-      }
-    })
-    .pipe(map((res) => res.data.consumerOfResource))
-    .subscribe((consumerId) => {
-      this._consumerId = consumerId;
-      this.consumerId.emit(consumerId);
-    });
+    if (this.canEval()) {
+      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
+        params: {
+          query: `
+            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
+              consumerOfResource(input: $input)
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              resourceId: this.resourceId,
+              allocationId: this.allocationId
+            }
+          })
+        }
+      })
+      .pipe(map((res) => res.data.consumerOfResource))
+      .subscribe((consumerId) => {
+        this._consumerId = consumerId;
+        this.consumerId.emit(consumerId);
+      });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.resourceId && this.allocationId && this.gs);
   }
 }
