@@ -1,0 +1,15 @@
+{
+  "name": "dv-monorepo",
+  "private": true,
+  "license": "MIT",
+  "repository": "github:spderosso/dejavu",
+  "devDependencies": {
+    "lerna": "^3.4.3"
+  },
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "release": "lerna publish"
+  },
+  "workspaces": ["packages/*"]
+}
