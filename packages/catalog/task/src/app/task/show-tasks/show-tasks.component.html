@@ -1,6 +1,7 @@
 <ul *ngIf="tasks && tasks.length > 0" class="list-group">
   <li *ngFor="let task of tasks" class="list-group-item">
-    <dv-include [action]="showTask" tag="task-show-task" [inputs]="{
+    <dv-include [action]="showTask" default-showTask="{ tag: task-show-task }"
+      [inputs]="{
         task: task, showId: showId, showAssigner: showAssigner,
         showAssignee: showAssignee,
         showExpirationDate: showExpirationDate,

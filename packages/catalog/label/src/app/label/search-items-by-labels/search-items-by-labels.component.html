@@ -1,18 +1,18 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="searchForm" class="form-horizontal">  
+<form (ngSubmit)="onSubmit()" [formGroup]="searchForm" class="form-horizontal">
   <div class="form-group">
     <mat-form-field>
       <!-- select multiple from list -->
-      <mat-select placeholder={{searchPlaceholder}} 
-        [formControl]="searchFormControl" 
-        (selectionChange)="updateSelected($event.value)" 
+      <mat-select placeholder={{searchPlaceholder}}
+        [formControl]="searchFormControl"
+        (selectionChange)="updateSelected($event.value)"
         [required]="true" [value]="selectedLabelIds"
         multiple>
         <mat-option *ngFor="let label of labels" [value]="label.id">
           <dv-include
             [action]="showLabel"
+            default-showLabel="{ tag: label-show-label }"
             [inputs]="{label: label}"
-            [parent]="searchItemsByLabels"
-            tag="label-show-label">
+            [parent]="searchItemsByLabels">
           </dv-include>
         </mat-option>
       </mat-select>

@@ -1,7 +1,6 @@
 {
   "name": "group",
   "version": "0.0.0",
-  "license": "MIT",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-group",
@@ -22,7 +21,6 @@
     "dv-start-watch-group": "bash bin/start-watch.sh",
     "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-group\""
   },
-  "private": true,
   "peerDependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/cdk": "^5.2.1",
@@ -89,5 +87,12 @@
     "tslint": "~5.9.1",
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

@@ -35,6 +35,7 @@
     "group": "file:../../packages/catalog/group/pkg",
     "property": "file:../../packages/catalog/property/pkg",
     "bootstrap": "^4.0.0",
+    "cliche-server": "file:../../packages/cliche-server",
     "core-js": "^2.4.1",
     "dv-core": "file:../../packages/dv-core/pkg",
     "dv-gateway": "file:../../packages/dv-gateway",

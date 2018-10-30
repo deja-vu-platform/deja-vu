@@ -1,7 +1,6 @@
 {
   "name": "allocator",
   "version": "0.0.0",
-  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "dv serve",
@@ -23,7 +22,6 @@
     "dv-start-watch-allocator": "bash bin/start-watch-allocator.sh",
     "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-allocator\""
   },
-  "private": true,
   "peerDependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/common": "^5.2.0",
@@ -92,5 +90,12 @@
     "tslint": "~5.9.1",
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

@@ -1,21 +1,20 @@
 <ul *ngIf="publishers && publishers.length > 0" class="list-group">
     <li *ngFor="let publisher of publishers" class="list-group-item">
-      <dv-include 
-        [action]="showPublisher" 
-        [inputs]="{publisher: publisher}" 
-        [parent]="showPublishers"
-        tag="follow-show-publisher">
+      <dv-include
+        [action]="showPublisher"
+        default-showPublisher="{ tag: follow-show-publisher }"
+        [inputs]="{publisher: publisher}"
+        [parent]="showPublishers">
       </dv-include>
       <div *ngIf="showOptionToFollowUnfollow && followedById">
-        <follow-follow-unfollow 
+        <follow-follow-unfollow
           [followerId]="followedById"
-          [publisherId]="publisher.id">          
+          [publisherId]="publisher.id">
         </follow-follow-unfollow>
       </div>
     </li>
   </ul>
-  
+
   <div *ngIf="!publishers || publishers.length === 0">
     <span>{{noPublishersToShowText}}</span>
   </div>
-  

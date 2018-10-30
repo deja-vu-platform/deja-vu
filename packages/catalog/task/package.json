@@ -1,7 +1,6 @@
 {
   "name": "task",
   "version": "0.0.0",
-  "license": "MIT",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-task",
@@ -22,7 +21,6 @@
     "dv-start-watch-task": "bash bin/start-watch-task.sh",
     "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-task\""
   },
-  "private": true,
   "dependencies": {
     "uuid": "^3.2.1"
   },
@@ -91,5 +89,12 @@
     "mongodb": "^3.0.4",
     "rxjs": "5.5.6",
     "zone.js": "^0.8.19"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

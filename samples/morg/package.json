@@ -1,7 +1,6 @@
 {
   "name": "morg",
   "version": "0.0.0",
-  "license": "MIT",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-morg",
@@ -62,5 +61,13 @@
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "author": "Santiago De Rosso",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

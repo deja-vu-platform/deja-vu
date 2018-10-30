@@ -37,11 +37,7 @@
     "dv-package-dv": "ng-packagr -p ng-package.json",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spderosso/dejavu.git"
-  },
-  "author": "Santiago De Rosso",
+  "repository": "github:spderosso/dejavu",
   "license": "MIT",
   "private": true,
   "bugs": {

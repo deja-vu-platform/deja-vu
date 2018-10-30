@@ -1,10 +1,10 @@
 <ul *ngIf="itemIds && itemIds.length > 0" class="list-group">
   <li *ngFor="let itemId of itemIds" class="list-group-item">
-    <dv-include 
-      [action]="showItem" 
-      [inputs]="{id: itemId}" 
-      [parent]="showItems"
-      tag="label-show-item">
+    <dv-include
+      [action]="showItem"
+      default-showItem="{ tag: label-show-item }"
+      [inputs]="{id: itemId}"
+      [parent]="showItems">
     </dv-include>
   </li>
 </ul>

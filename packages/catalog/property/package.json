@@ -1,7 +1,6 @@
 {
   "name": "property",
   "version": "0.0.0",
-  "license": "MIT",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-property",
@@ -22,7 +21,6 @@
     "dv-start-watch-property": "bash bin/start-watch-property.sh",
     "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-property\""
   },
-  "private": true,
   "dependencies": {
     "ajv": "^6.2.1",
     "uuid": "^3.2.1"
@@ -92,5 +90,12 @@
     "dv-gateway": "file:../../dv-gateway",
     "rxjs": "5.5.6",
     "zone.js": "^0.8.19"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

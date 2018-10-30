@@ -7,14 +7,14 @@
 
     <ul *ngIf="showScores" class="list-group">
       <li *ngFor="let score of target.scores" class="list-group-item">
-        <dv-include 
-          [action]="showScore" 
+        <dv-include
+          [action]="showScore"
+          default-showScore="{ tag: scoring-show-score }"
           [inputs]="{
             score: score, showId: showScoreId, showValue: showScoreValue,
-            showTargetId: showScoreTargetId 
+            showTargetId: showScoreTargetId
           }"
-          [parent]="showTarget"
-          tag="scoring-show-score">
+          [parent]="showTarget">
         </dv-include>
       </li>
     </ul>
