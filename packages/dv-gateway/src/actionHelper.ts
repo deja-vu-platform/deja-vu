@@ -168,7 +168,7 @@ export class ActionHelper {
       ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
     `;
 
-    const unparsedActionExpr: string = _
+    const unparsedActionExpr: string | undefined = _
       .get(includeActionTag.inputs, '[action]');
     if (_.isEmpty(unparsedActionExpr)) {
       throw new Error(noActionErrorMsg('no action input'));
@@ -176,7 +176,7 @@ export class ActionHelper {
 
     let actionInput: ActionInput | null;
     try {
-      const actionExpr = this.ParseActionExpr(unparsedActionExpr);
+      const actionExpr = this.ParseActionExpr(unparsedActionExpr as string);
       if (this.IsActionInput(actionExpr)) {
         actionInput = actionExpr;
       } else {
@@ -185,7 +185,7 @@ export class ActionHelper {
           const unparsedParentActionExpr = _
             .get(includeActionTag.context, `[${actionExpr}]`);
           const parentActionExpr = this.ParseActionExpr(
-            unparsedParentActionExpr);
+            unparsedParentActionExpr as string);
           actionInput = this.GetActionInput(
             parentActionExpr, includeActionTag.context);
         } else {
@@ -204,9 +204,11 @@ export class ActionHelper {
 
     const fqtag = ActionHelper.GetFqTag(
       actionInput.tag, actionInput.dvOf, actionInput.dvAlias);
-    const actionInputs: InputMap = _.get(actionInput, 'inputs', {});
+    const actionInputs: InputMap = <InputMap> _.get(actionInput, 'inputs', {});
     const inputs = _.assign({},
-      _.mapValues(_.invert(actionInput.inputMap), (value) => {
+        // `actionInput.inputMap` could actually be `undefined` but the `invert`
+        // typings are wrong (`_.invert(undefined)` -> `undefined`)
+      _.mapValues(_.invert(<InputMap> actionInput.inputMap), (value) => {
         return _.get(includeActionTag.context, value);
       }),
       actionInputs);
@@ -384,7 +386,7 @@ export class ActionHelper {
    * @returns the `ActionTag`s corresponding to the last node of the action path
    */
   getMatchingActions(actionPath: ActionPath): ActionTag[] {
-    return _.map(this.getMatchingPaths(actionPath), _.last);
+    return <ActionTag[]> _.map(this.getMatchingPaths(actionPath), _.last);
   }
 
   /**
@@ -519,7 +521,7 @@ export class ActionHelper {
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
       const routeActions: ActionTag[] = this.getRouteActions(actionTable);
-      ret = _.concat(ret, routeActions);
+      ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
     return ret;

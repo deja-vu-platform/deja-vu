@@ -35,7 +35,7 @@ export class ActionPath {
   }
 
   last(): string {
-    return _.last(this.path);
+    return <string> _.last(this.path);
   }
 
   length(): number {

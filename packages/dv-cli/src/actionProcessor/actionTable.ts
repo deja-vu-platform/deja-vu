@@ -3,7 +3,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { ActionAst, ActionTag, getActionAst } from './actionAst';
+import { ActionAst, getActionAst } from './actionAst';
 
 
 export interface ActionsConfig {
@@ -63,7 +63,7 @@ function getActionNameFromFilePath(fp: string, projectName: string) {
 
 function filesToParse(
   rootDirectory: string, actionsConfig: ActionsConfig | undefined): string[] {
-  const globs = _.get(actionsConfig, 'include', DEFAULT);
+  const globs = <string[]> _.get(actionsConfig, 'include', DEFAULT);
 
   return htmlFilesFromGlobs(globs, rootDirectory, actionsConfig);
 }
@@ -73,7 +73,7 @@ function htmlFilesFromGlobs(
   actionsConfig: ActionsConfig | undefined): string[] {
   const globOptions = {
     cwd: rootDirectory,
-    ignore: [ ...IGNORE, ..._.get(actionsConfig, 'exclude', []) ],
+    ignore: [ ...IGNORE, ...<string[]> _.get(actionsConfig, 'exclude', []) ],
     nodir: true
   };
 
