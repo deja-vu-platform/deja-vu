@@ -2,7 +2,9 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
@@ -19,7 +21,8 @@ interface RatingsRes {
   templateUrl: './show-ratings-by-target.component.html',
   styleUrls: ['./show-ratings-by-target.component.css']
 })
-export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
+export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
+OnInit, OnChanges {
   @Input() targetId: string;
   @Input() showRating: Action = { type: <Type<Component>>ShowRatingComponent };
 
@@ -30,12 +33,16 @@ export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showRatingsByTarget = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadRatings();
   }
 
@@ -44,27 +51,36 @@ export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
   }
 
   async loadRatings() {
-    if (!this.targetId || !this.gs) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<RatingsRes>(this.apiPath, {
-      params: {
-        query: `
-          query Ratings($input: RatingsInput!) {
-            ratings(input: $input) {
-              rating
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<RatingsRes>(this.apiPath, {
+        params: {
+          query: `
+            query Ratings($input: RatingsInput!) {
+              ratings(input: $input) {
+                rating
+              }
             }
-          }
-        `,
-        variables: JSON.stringify({
-          input: {
-            ofTargetId: this.targetId
-          }
-        })
-      }
-    })
+          `,
+          variables: JSON.stringify({
+            input: {
+              ofTargetId: this.targetId
+            }
+          })
+        }
+      })
       .subscribe((res) => {
         this.ratings = res.data.ratings;
       });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.targetId);
   }
 }

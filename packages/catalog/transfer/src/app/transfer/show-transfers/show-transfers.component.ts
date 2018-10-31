@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { Transfer } from '../shared/transfer.model';
 import {
@@ -15,7 +17,8 @@ import { API_PATH, CONFIG } from '../transfer.config';
   templateUrl: './show-transfers.component.html',
   styleUrls: ['./show-transfers.component.css']
 })
-export class ShowTransfersComponent implements OnInit, OnChanges {
+export class ShowTransfersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched transfers are not filtered by that property
   @Input() fromId: string | undefined;
@@ -43,13 +46,18 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(CONFIG) config, @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(CONFIG) config,
+    @Inject(API_PATH) private apiPath) {
     this.showTransfers = this;
     this.balanceType = config.balanceType;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.fetchTransfers();
   }
 
@@ -58,7 +66,13 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
   }
 
   fetchTransfers() {
-    if (this.gs) {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       const selection = this.balanceType === 'money' ?
         '' : ' { id, count }';
       this.gs
@@ -87,5 +101,9 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
           this.transfers = res.data.transfers;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

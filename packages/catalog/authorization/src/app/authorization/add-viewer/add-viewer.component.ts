@@ -3,8 +3,8 @@ import {
   Inject, Input, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -21,7 +21,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./add-viewer.component.css']
 })
 export class AddViewerComponent implements
-  OnInit, OnExec, OnExecCommit, OnExecAbort {
+  OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
   @Input() viewerId: string;
   @Input()
@@ -71,14 +71,14 @@ export class AddViewerComponent implements
       .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.viewerAddedSuccess = true;
     window.setTimeout(() => {
       this.viewerAddedSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.viewerAddedErrorText = reason.message;
   }
 }

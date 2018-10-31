@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit,
+  Output, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -8,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, RunService
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
 } from 'dv-core';
 
 import {
@@ -47,8 +48,8 @@ interface LabelsRes {
     }
   ]
 })
-export class SearchItemsByLabelsComponent
-  implements OnInit, ControlValueAccessor, Validator {
+export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
+OnExec, OnInit, ControlValueAccessor, Validator {
   @Input() initialValue;
   @Input() showLabel = {
     type: ShowLabelComponent
@@ -79,8 +80,11 @@ export class SearchItemsByLabelsComponent
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadLabels();
     this.selectedLabelIds = this.initialValue;
+  }
+
+  ngAfterViewInit() {
+    this.loadLabels();
   }
 
   updateSelected(selectedLabelIds: string[]) {
@@ -91,7 +95,7 @@ export class SearchItemsByLabelsComponent
     this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     this.gs.get<ItemsRes>(this.apiPath, {
       params: {
         query: `
@@ -106,29 +110,34 @@ export class SearchItemsByLabelsComponent
         })
       }
     })
-      .subscribe((res) => {
-        this.searchResultItems.emit(res.data.items);
-      });
+    .subscribe((res) => {
+      this.searchResultItems.emit(res.data.items);
+    });
   }
 
   loadLabels() {
-    if (!this.gs) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<LabelsRes>(this.apiPath, {
-      params: {
-        query: `
-          query {
-            labels (input: { }) {
-              id
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<LabelsRes>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              labels (input: { }) {
+                id
+              }
             }
-          }
-        `
-      }
-    })
+          `
+        }
+      })
       .subscribe((res) => {
         this.labels = res.data.labels;
       });
+    }
   }
 
   writeValue(value: Label[]) {
@@ -151,5 +160,9 @@ export class SearchItemsByLabelsComponent
     }
 
     return null;
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

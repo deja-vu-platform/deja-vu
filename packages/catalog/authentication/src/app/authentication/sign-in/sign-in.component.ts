@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExecFailure,
+  OnExecSuccess, OnExec, RunService
 } from 'dv-core';
 
 
@@ -31,7 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent
-implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -112,7 +112,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     return user;
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newUserSignedIn = true;
     window.setTimeout(() => {
       this.newUserSignedIn = false;
@@ -124,7 +124,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newUserSignedInError = reason.message;
   }
 }

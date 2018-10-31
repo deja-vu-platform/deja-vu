@@ -1,9 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter,
+  AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -18,7 +18,8 @@ import { API_PATH } from '../authorization.config';
   templateUrl: './show-owner.component.html',
   styleUrls: ['./show-owner.component.css']
 })
-export class ShowOwnerComponent implements OnInit, OnChanges {
+export class ShowOwnerComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() resourceId: string;
   @Output() ownerId = new EventEmitter<string>();
 
@@ -33,6 +34,9 @@ export class ShowOwnerComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -41,21 +45,29 @@ export class ShowOwnerComponent implements OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<{data: { owner: string }}>(this.apiPath, {
-      params: {
-        query: `query {
-          owner(resourceId: "${this.resourceId}")
-        }`
-      }
-    })
-    .subscribe((res) => {
-      const ownerId = res.data.owner;
-      this._ownerId = ownerId;
-      this.ownerId.emit(ownerId);
-    });
   }
 
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<{data: { owner: string }}>(this.apiPath, {
+        params: {
+          query: `query {
+            owner(resourceId: "${this.resourceId}")
+          }`
+        }
+      })
+      .subscribe((res) => {
+        const ownerId = res.data.owner;
+        this._ownerId = ownerId;
+        this.ownerId.emit(ownerId);
+      });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
+  }
 }

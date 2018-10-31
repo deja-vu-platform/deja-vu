@@ -9,7 +9,7 @@ import {
 
 import {
   Action,
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -32,7 +32,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-transfer.component.css']
 })
 export class CreateTransferComponent
-implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputAmount = true;
@@ -120,7 +120,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
    this.transfer.emit(res.data.createTransfer);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferSaved = true;
       this.newTransferError = '';
@@ -135,7 +135,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
      }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferError = reason.message;
     }

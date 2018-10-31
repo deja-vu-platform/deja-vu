@@ -2,7 +2,9 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import { GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
@@ -17,7 +19,8 @@ interface AverageRatingForInputRes {
   templateUrl: './show-average-rating.component.html',
   styleUrls: ['./show-average-rating.component.css']
 })
-export class ShowAverageRatingComponent implements OnInit, OnChanges {
+export class ShowAverageRatingComponent implements AfterViewInit, OnEval,
+OnInit, OnChanges {
   @Input() targetId: string;
 
   @Output() averageRating = new EventEmitter<number>();
@@ -29,10 +32,15 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+    this.loadRatingAverage();
+  }
+
+  ngAfterViewInit() {
     this.loadRatingAverage();
   }
 
@@ -46,22 +54,25 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
    * Download ratings for the target from the server.
    */
   loadRatingAverage() {
-    if (!this.targetId || !this.gs) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
+  }
 
-    this.gs.get<AverageRatingForInputRes>(this.apiPath, {
-      params: {
-        query: `
-          query {
-            averageRatingForTarget(targetId: "${this.targetId}") {
-              rating,
-              count
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<AverageRatingForInputRes>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              averageRatingForTarget(targetId: "${this.targetId}") {
+                rating,
+                count
+              }
             }
-          }
-        `
-      }
-    })
+          `
+        }
+      })
       .subscribe((res) => {
         if (res.data.averageRatingForTarget) {
           this.averageRatingValue = res.data.averageRatingForTarget.rating;
@@ -70,5 +81,10 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
           this.ratingCount.emit(this.ratingCountValue);
         }
       });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.targetId);
   }
 }

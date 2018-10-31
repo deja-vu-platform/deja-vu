@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -25,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './add-to-group.component.html',
   styleUrls: ['./add-to-group.component.css']
 })
-export class AddToGroupComponent implements OnExec, OnExecAbort, OnExecCommit,
+export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess,
   OnInit {
   @Input() id: string;
 
@@ -84,7 +84,7 @@ export class AddToGroupComponent implements OnExec, OnExecAbort, OnExecCommit,
     .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.addSaved = true;
     window.setTimeout(() => {
       this.addSaved = false;
@@ -96,7 +96,7 @@ export class AddToGroupComponent implements OnExec, OnExecAbort, OnExecCommit,
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.addError = reason.message;
   }
 }

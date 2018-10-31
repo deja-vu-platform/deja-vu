@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -14,7 +14,7 @@ import {
   styleUrls: ['./complete-task.component.css']
 })
 export class CompleteTaskComponent implements
-  OnInit, OnExec, OnExecCommit  {
+  OnInit, OnExec, OnExecSuccess  {
   @Input() id;
   @Input() disabled = false;
 
@@ -45,7 +45,7 @@ export class CompleteTaskComponent implements
       .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.disabled = true;
   }
 }

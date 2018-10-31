@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowMessageComponent } from '../show-message/show-message.component';
@@ -19,7 +21,8 @@ interface MessagesRes {
   templateUrl: './show-messages.component.html',
   styleUrls: ['./show-messages.component.css']
 })
-export class ShowMessagesComponent implements OnInit, OnChanges {
+export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched messages are not filtered by that property
   @Input() ofPublishersFollowedById: string | undefined;
@@ -42,21 +45,31 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showMessages = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchMessages();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchMessages();
+    this.load();
   }
 
-  fetchMessages() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<MessagesRes>(this.apiPath, {
           params: {
@@ -80,5 +93,9 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
           this.messages = res.data.messages;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

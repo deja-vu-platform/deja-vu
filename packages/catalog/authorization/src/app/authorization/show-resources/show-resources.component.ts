@@ -1,9 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter,
+  AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, RunService
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -26,7 +26,8 @@ interface ResourcesRes {
   templateUrl: './show-resources.component.html',
   styleUrls: ['./show-resources.component.css']
 })
-export class ShowResourcesComponent implements OnInit, OnChanges {
+export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() viewableBy: string;
   @Input() showResource: Action = {
     type: <Type<Component>> ShowResourceComponent
@@ -46,6 +47,9 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -54,28 +58,39 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs || !this.viewableBy) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<ResourcesRes>(this.apiPath, {
-      params: {
-        query: `
-          query Resources($input: ResourcesInput!) {
-            resources(input: $input) {
-              id
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<ResourcesRes>(this.apiPath, {
+        params: {
+          query: `
+            query Resources($input: ResourcesInput!) {
+              resources(input: $input) {
+                id
+              }
             }
-          }
-        `,
-        variables: JSON.stringify({
-          input: {
-            viewableBy: this.viewableBy
-          }
-        })
-      }
-    })
-    .subscribe((res) => {
-      this._resourceIds = _.map(res.data.resources, 'id');
-      this.resourceIds.emit(this._resourceIds);
-    });
+          `,
+          variables: JSON.stringify({
+            input: {
+              viewableBy: this.viewableBy
+            }
+          })
+        }
+      })
+      .subscribe((res) => {
+        console.log('resources viewable by' + this.viewableBy);
+        console.log(res);
+        this._resourceIds = _.map(res.data.resources, 'id');
+        this.resourceIds.emit(this._resourceIds);
+      });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.viewableBy);
   }
 }
