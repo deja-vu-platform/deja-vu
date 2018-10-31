@@ -9,11 +9,6 @@
     "clean": "lerna clean && rm -rf node_modules",
     "release": "lerna publish"
   },
-  "dependencies": {
-    "cliche-server": "file:packages/cliche-server",
-    "dv-core": "file:packages/dv-core",
-    "dv-gateway": "file:packages/dv-gateway"
-  },
   "devDependencies": {
     "lerna": "^3.4.3",
     "@angular/animations": "^5.2.0",
