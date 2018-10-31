@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
-  ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';
@@ -22,7 +22,8 @@ import { API_PATH } from '../authentication.config';
   templateUrl: './show-user.component.html',
   styleUrls: ['./show-user.component.css']
 })
-export class ShowUserComponent implements OnInit, OnChanges {
+export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() id: string;
   @Input() user: User;
   username: string;
@@ -36,36 +37,47 @@ export class ShowUserComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
   ngOnChanges() {
-    this.load();
+    if (this.user) {
+      this.username = this.user.username;
+    } else {
+      this.load();
+    }
   }
 
   load() {
-    if (this.user) {
-      this.username = this.user.username;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
 
-      return;
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<{ data: any }>(this.apiPath, {
+        params: {
+          query: `query {
+            userById(id: "${this.id}") {
+              username
+            }
+          }`
+        }
+      })
+      .subscribe((res) => {
+        const userById = res.data.userById;
+        if (userById) {
+          this.username = res.data.userById.username;
+        }
+      });
     }
-    if (!this.gs || !this.id) {
-      return;
-    }
-    this.gs.get<{ data: any }>(this.apiPath, {
-      params: {
-        query: `query {
-          userById(id: "${this.id}") {
-            username
-          }
-        }`
-      }
-    })
-    .subscribe((res) => {
-      const userById = res.data.userById;
-      if (userById) {
-        this.username = res.data.userById.username;
-      }
-    });
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.id && !this.user);
   }
 }

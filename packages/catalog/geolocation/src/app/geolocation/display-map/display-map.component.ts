@@ -1,10 +1,13 @@
 import { MouseEvent } from '@agm/core';
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Output
 } from '@angular/core';
 import { Marker } from '../shared/geolocation.model';
 
-import { GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import * as _ from 'lodash';
 
@@ -13,7 +16,8 @@ import * as _ from 'lodash';
   templateUrl: './display-map.component.html',
   styleUrls: ['./display-map.component.css']
 })
-export class DisplayMapComponent implements OnInit, OnChanges {
+export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() id: string;
 
 
@@ -34,19 +38,30 @@ export class DisplayMapComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) { }
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchMarkers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchMarkers();
+    this.load()
   }
 
-  fetchMarkers() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
           params: {
@@ -88,5 +103,9 @@ export class DisplayMapComponent implements OnInit, OnChanges {
 
   markerDragEnd(m: Marker, $event: MouseEvent) {
     console.log('dragEnd', m, $event);
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

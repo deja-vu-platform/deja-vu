@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -12,7 +12,7 @@ import {
   styleUrls: ['./approve-task.component.css']
 })
 export class ApproveTaskComponent implements
-  OnInit, OnExec, OnExecCommit  {
+  OnInit, OnExec, OnExecSuccess  {
   @Input() id = '';
   @Input() disabled = false;
 
@@ -43,7 +43,7 @@ export class ApproveTaskComponent implements
       .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.disabled = true;
   }
 }

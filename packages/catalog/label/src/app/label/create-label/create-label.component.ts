@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
-  OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -25,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-label.component.css']
 })
 export class CreateLabelComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() buttonLabel = 'Create Label';
 
@@ -73,7 +73,7 @@ export class CreateLabelComponent implements
     this.label.emit(res.data.createLabel);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newLabelSaved = true;
     this.newLabelError = '';
     window.setTimeout(() => {
@@ -82,7 +82,7 @@ export class CreateLabelComponent implements
     this.id = '';
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newLabelError = reason.message;
   }
 }

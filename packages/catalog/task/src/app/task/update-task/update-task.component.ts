@@ -10,8 +10,8 @@ import {
   GatewayService,
   GatewayServiceFactory,
   OnExec,
-  OnExecAbort,
-  OnExecCommit,
+  OnExecFailure,
+  OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -29,7 +29,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./update-task.component.css']
 })
 export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
-  OnExecAbort, OnExecCommit {
+  OnExecFailure, OnExecSuccess {
   @Input() id;
 
   // Presentation inputs
@@ -113,7 +113,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
     return res.data.updateTask.id;
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.taskSaved = true;
     window.setTimeout(() => {
       this.taskSaved = false;
@@ -125,7 +125,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.taskError = reason.message;
   }
 }

@@ -5,8 +5,8 @@ import {
 import { MatChipInputEvent } from '@angular/material';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
-  OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -27,7 +27,7 @@ interface AddLabelsToItemRes {
   styleUrls: ['./attach-labels.component.css']
 })
 export class AttachLabelsComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() itemId: string;
   @Input() labels: Label[] | undefined;
 
@@ -111,7 +111,7 @@ export class AttachLabelsComponent implements
     }
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
     this.labels = [];
@@ -120,7 +120,7 @@ export class AttachLabelsComponent implements
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.labelsAttachedError = reason.message;
   }
 }

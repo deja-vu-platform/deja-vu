@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
+  GatewayService, GatewayServiceFactory, OnExecFailure, OnExecSuccess,
   OnExec, RunService
 } from 'dv-core';
 
@@ -24,7 +24,7 @@ interface CreatePublisherRes {
   styleUrls: ['./create-publisher.component.css']
 })
 export class CreatePublisherComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() buttonLabel = 'Create Publisher';
 
@@ -72,7 +72,7 @@ export class CreatePublisherComponent implements
     this.publisher.emit({ id: res.data.createPublisher.id });
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newPublisherSaved = true;
     this.newPublisherError = '';
     window.setTimeout(() => {
@@ -81,7 +81,7 @@ export class CreatePublisherComponent implements
     this.id = '';
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newPublisherError = reason.message;
   }
 }

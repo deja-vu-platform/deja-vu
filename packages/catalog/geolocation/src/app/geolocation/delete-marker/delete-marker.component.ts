@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -15,7 +15,7 @@ const DELETED_MSG_TIMEOUT = 3000;
   styleUrls: ['./delete-marker.component.css']
 })
 export class DeleteMarkerComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string;
   @Input() markerDeletedText = 'Marker deleted';
   @Input() buttonLabel = 'Delete Marker';
@@ -54,7 +54,7 @@ export class DeleteMarkerComponent implements
     }
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.markerDeleted = true;
     this.markerDeletedError = '';
     window.setTimeout(() => {
@@ -62,7 +62,7 @@ export class DeleteMarkerComponent implements
     }, DELETED_MSG_TIMEOUT);
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.markerDeletedError = reason.message;
   }
 }

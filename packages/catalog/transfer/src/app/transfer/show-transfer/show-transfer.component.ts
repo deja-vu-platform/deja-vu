@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef, EventEmitter,
   Inject,
@@ -7,7 +8,12 @@ import {
   Output
 } from '@angular/core';
 
-import { GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService
+} from 'dv-core';
 import { Transfer } from '../shared/transfer.model';
 import { API_PATH, CONFIG } from '../transfer.config';
 
@@ -23,7 +29,8 @@ interface TransferRes {
   selector: 'transfer-show-transfer',
   templateUrl: './show-transfer.component.html'
 })
-export class ShowTransferComponent implements OnInit, OnChanges {
+export class ShowTransferComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() transfer: Transfer;
   @Input() id: string;
 
@@ -40,12 +47,17 @@ export class ShowTransferComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath, @Inject(CONFIG) config) {
+    private rs: RunService, @Inject(API_PATH) private apiPath,
+    @Inject(CONFIG) config) {
     this.balanceType = config.balanceType;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadTransfer();
   }
 
@@ -54,33 +66,41 @@ export class ShowTransferComponent implements OnInit, OnChanges {
   }
 
   loadTransfer() {
-    // Only load transfer when id is given
-    if (!this.gs || this.transfer || !this.id) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    const selection = this.balanceType === 'money' ?
-      '' : ' { id, count }';
-    this.gs.get<TransferRes>(this.apiPath, {
-      params: {
-        query: `
-          query {
-            transfer(id: "${this.id}") {
-              ${this.showId ? 'id' : ''}
-              ${this.showFromId ? 'fromId' : ''}
-              ${this.showToId ? 'toId' : ''}
-              ${this.showAmount ? `amount ${selection}` : ''}
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      const selection = this.balanceType === 'money' ?
+        '' : ' { id, count }';
+      this.gs.get<TransferRes>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              transfer(id: "${this.id}") {
+                ${this.showId ? 'id' : ''}
+                ${this.showFromId ? 'fromId' : ''}
+                ${this.showToId ? 'toId' : ''}
+                ${this.showAmount ? `amount ${selection}` : ''}
+              }
             }
-          }
-        `
-      }
-    })
-      .subscribe((res) => {
-        if (res.errors) {
-          throw new Error(_.map(res.errors, 'message')
-            .join());
+          `
         }
-        this.transfer = res.data.transfer;
-        this.loadedTransfer.emit(this.transfer);
-      });
+      })
+        .subscribe((res) => {
+          if (res.errors) {
+            throw new Error(_.map(res.errors, 'message')
+              .join());
+          }
+          this.transfer = res.data.transfer;
+          this.loadedTransfer.emit(this.transfer);
+        });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && !this.transfer && this.id);
   }
 }

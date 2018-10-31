@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 
@@ -13,7 +15,8 @@ import { Task } from '../shared/task.model';
   templateUrl: './show-tasks.component.html',
   styleUrls: ['./show-tasks.component.css']
 })
-export class ShowTasksComponent implements OnInit, OnChanges {
+export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched tasks are not filtered by that property
   @Input() assigneeId: string | undefined;
@@ -50,21 +53,33 @@ export class ShowTasksComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {
     this.showTasks = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchTasks();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchTasks();
+    this.load();
   }
 
-  fetchTasks() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      console.log('requesting tasks');
       this.gs
         .get<{data: {tasks: Task[]}}>('/graphql', {
           params: {
@@ -92,8 +107,13 @@ export class ShowTasksComponent implements OnInit, OnChanges {
           }
         })
         .subscribe((res) => {
+          console.log(res);
           this.tasks = res.data.tasks;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

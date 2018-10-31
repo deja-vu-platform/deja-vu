@@ -2,7 +2,9 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import { GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { take } from 'rxjs/operators';
 
@@ -22,7 +24,7 @@ interface RatingRes {
   styleUrls: ['./show-rating.component.css']
 })
 export class ShowRatingComponent implements
-  OnInit, OnChanges {
+  AfterViewInit, OnEval, OnInit, OnChanges {
   // Either (`sourceId`, `targetId`) or `ratingIn` must be given. If
   // `ratingIn` is given this rating is displayed
   @Input() sourceId: string;
@@ -36,10 +38,14 @@ export class ShowRatingComponent implements
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadRating();
   }
 
@@ -50,14 +56,19 @@ export class ShowRatingComponent implements
   /**
    * Load a rating from the server (if any), and set the value of the widget.
    */
-  async loadRating() {
-    if (!this.gs) {
-      return;
-    }
+  loadRating() {
     if (this.ratingIn) {
-      this.ratingValue = this.ratingIn;
-      this.rating.emit(this.ratingValue);
-    } else if (this.sourceId && this.targetId) {
+      setTimeout(() => {
+        this.ratingValue = this.ratingIn;
+        this.rating.emit(this.ratingValue);
+      });
+    } else if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs.get<RatingRes>(this.apiPath, {
         params: {
           query: `
@@ -82,5 +93,9 @@ export class ShowRatingComponent implements
           }
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.sourceId && this.targetId && !this.ratingIn);
   }
 }

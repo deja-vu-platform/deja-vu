@@ -4,7 +4,7 @@
         [action]="showPublisher" 
         [inputs]="{publisher: publisher}" 
         [parent]="showPublishers"
-        tag="follow-show-publisher">
+        default-showPublisher="{ tag: follow-show-publisher }">
       </dv-include>
       <div *ngIf="showOptionToFollowUnfollow && followedById">
         <follow-follow-unfollow 

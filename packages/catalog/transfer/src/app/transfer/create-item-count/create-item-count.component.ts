@@ -5,7 +5,7 @@ import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective, Validators
 } from '@angular/forms';
 
-import { OnExecCommit, OnExec, RunService } from 'dv-core';
+import { OnExec, OnExecSuccess, RunService } from 'dv-core';
 
 import { ItemCount } from '../shared/transfer.model';
 
@@ -18,7 +18,7 @@ import * as _ from 'lodash';
   styleUrls: ['./create-item-count.component.css']
 })
 export class CreateItemCountComponent
-  implements OnInit, OnExec, OnExecCommit {
+  implements OnInit, OnExec, OnExecSuccess {
   idControl = new FormControl(undefined, [Validators.required]);
   countControl = new FormControl(undefined, [Validators.required]);
 
@@ -87,7 +87,7 @@ export class CreateItemCountComponent
     this.emit();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {

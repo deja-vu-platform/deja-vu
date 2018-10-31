@@ -1,8 +1,10 @@
 import {
-  Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
 } from '@angular/core';
 
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { ShowScoreComponent } from '../show-score/show-score.component';
 
@@ -15,7 +17,8 @@ import { Target } from '../shared/scoring.model';
   templateUrl: './show-target.component.html',
   styleUrls: ['./show-target.component.css']
 })
-export class ShowTargetComponent implements OnInit, OnChanges {
+export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() id: string;
   @Input() target: Target;
 
@@ -38,12 +41,16 @@ export class ShowTargetComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showTarget = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadTarget();
   }
 
@@ -52,31 +59,39 @@ export class ShowTargetComponent implements OnInit, OnChanges {
   }
 
   loadTarget() {
-    // only load target when id is given
-    if (!this.gs || this.target || !this.id) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<{data: {target: Target}}>(this.apiPath, {
-      params: {
-        query: `
-          query {
-            target(id: "${this.id}") {
-              id
-              ${this.showScores ? 'scores ' +
-                '{' +
-                  'id \n' +
-                  `${this.showScoreValue ? 'value' : ''} \n` +
-                  `${this.showScoreTargetId ? 'targetId' : ''}` : ''
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<{data: {target: Target}}>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              target(id: "${this.id}") {
+                id
+                ${this.showScores ? 'scores ' +
+                  '{' +
+                    'id \n' +
+                    `${this.showScoreValue ? 'value' : ''} \n` +
+                    `${this.showScoreTargetId ? 'targetId' : ''}` : ''
+                  }
                 }
+                ${this.showTotal ? 'total': ''}
               }
-              ${this.showTotal ? 'total': ''}
             }
-          }
-        `
-      }
-    })
-    .subscribe((res) => {
-      this.target = res.data.target;
-    });
+          `
+        }
+      })
+      .subscribe((res) => {
+        this.target = res.data.target;
+      });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.id && !this.target);
   }
 }

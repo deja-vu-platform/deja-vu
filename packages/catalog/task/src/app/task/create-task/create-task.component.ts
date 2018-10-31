@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -29,8 +29,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-task.component.html',
   styleUrls: ['./create-task.component.css']
 })
-export class CreateTaskComponent implements OnInit, OnExec, OnExecAbort,
-  OnExecCommit {
+export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
+  OnExecSuccess {
   @Input() id;
   @Input() assignerId;
   @Input() showOptionToInputAssignee = true;
@@ -107,7 +107,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecAbort,
     }
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newTaskSaved = true;
     window.setTimeout(() => {
       this.newTaskSaved = false;
@@ -119,7 +119,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecAbort,
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newTaskError = reason.message;
   }
 }

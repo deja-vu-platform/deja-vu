@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -48,7 +48,7 @@ interface EditCommentRes {
   ]
 })
 export class EditCommentComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit, OnChanges {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
   @Input() id: string;
   @Input() authorId: string;
 
@@ -146,7 +146,7 @@ export class EditCommentComponent implements
     return res.data.editComment;
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.editCommentSaved = true;
     this.editCommentError = '';
     window.setTimeout(() => {
@@ -159,7 +159,7 @@ export class EditCommentComponent implements
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.editCommentError = reason.message;
   }
 }

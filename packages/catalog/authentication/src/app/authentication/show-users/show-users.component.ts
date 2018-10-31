@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -13,7 +14,10 @@ import {
 
 import {
   Action,
-  GatewayService, GatewayServiceFactory
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService,
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';
@@ -27,7 +31,8 @@ import { API_PATH } from '../authentication.config';
   templateUrl: './show-users.component.html',
   styleUrls: ['./show-users.component.css']
 })
-export class ShowUsersComponent implements OnInit, OnChanges {
+export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() showUsername = true;
   @Input() showId = true;
 
@@ -44,21 +49,31 @@ export class ShowUsersComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showUsers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchUsers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchUsers();
+    this.load();
   }
 
-  fetchUsers() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<{ data: { users: User[] } }>(this.apiPath, {
           params: {
@@ -81,5 +96,9 @@ export class ShowUsersComponent implements OnInit, OnChanges {
           this.fetchedUsers.emit(this.users);
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
@@ -12,7 +14,8 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
   templateUrl: './show-members.component.html',
   styleUrls: ['./show-members.component.css']
 })
-export class ShowMembersComponent implements OnInit, OnChanges {
+export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   @Input() inGroupId: string | undefined;
 
@@ -25,21 +28,32 @@ export class ShowMembersComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {
     this.showMembers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchMembers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchMembers();
+    this.load();
   }
 
-  fetchMembers() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<{data: {members: string[]}}>('/graphql', {
           params: {
@@ -59,5 +73,9 @@ export class ShowMembersComponent implements OnInit, OnChanges {
           this.memberIds = res.data.members;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

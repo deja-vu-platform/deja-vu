@@ -5,19 +5,35 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
+// To indicate run failure, return a rejected promise
+export type onRun = () => Promise<any> | any;
+// res is the value the promise returned in `dvOnExec` or `dvOnEval` resolved to
+export type onSuccess = (res?: any) => void;
+// reason is the error that caused the failure
+export type onFailure = (reason: Error) => void;
+
 export interface OnExec {
-  // To abort the exec return a rejected promise
-  dvOnExec: () => Promise<any> | any;
+  dvOnExec: onRun;
 }
 
-export interface OnExecCommit {
-  // res is the value the promise returned in `dvOnExec` resolved to
-  dvOnExecCommit: (res?: any) => void;
+export interface OnExecSuccess {
+  dvOnExecSuccess: onSuccess;
 }
 
-export interface OnExecAbort {
-  // reason is the error that caused the abort
-  dvOnExecAbort: (reason: Error) => void;
+export interface OnExecFailure {
+  dvOnExecFailure: onFailure;
+}
+
+export interface OnEval {
+  dvOnEval: onRun;
+}
+
+export interface OnEvalSuccess {
+  dvOnEvalSuccess: onSuccess;
+}
+
+export interface OnEvalFailure {
+  dvOnEvalFailure: onFailure;
 }
 
 interface ActionInfo {
@@ -25,12 +41,27 @@ interface ActionInfo {
   node: any;
 }
 
-interface ExecResultMap {
+interface RunResultMap {
   [actionId: string]: any;
 }
 
+type RunType = 'eval' | 'exec';
+
+const runFunctionNames = {
+  eval: {
+    onRun: 'dvOnEval',
+    onSuccess: 'dvOnEvalSuccess',
+    onFailure: 'dvOnEvalFailure'
+  },
+  exec: {
+    onRun: 'dvOnExec',
+    onSuccess: 'dvOnExecSuccess',
+    onFailure: 'dvOnExecFailure'
+  }
+}
+
 const ACTION_ID_ATTR = '_dvActionId';
-export const EXEC_ID_ATTR = '_dvExecId';
+export const RUN_ID_ATTR = '_dvRunId';
 
 
 @Injectable()
@@ -68,7 +99,18 @@ export class RunService {
    * Cause the action given by `elem` to execute.
    **/
   async exec(elem: ElementRef) {
-    let node = elem.nativeElement;
+    this.run('exec', elem);
+  }
+
+  /**
+   * Cause the action given by `elem` to evaluate.
+   */
+  async eval(elem: ElementRef) {
+    this.run('eval', elem);
+  }
+
+  private getTargetAction(initialNode) {
+    let node = initialNode;
     let targetAction = node;
 
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
@@ -78,16 +120,30 @@ export class RunService {
       }
       node = this.renderer.parentNode(node);
     }
-    const execId = uuid();
-    let execResultMap: ExecResultMap | undefined;
-    try {
-      execResultMap = await this.callDvOnExec(targetAction, execId);
-    } catch (error) {
-      console.error(`Got error on exec ${execId}: ${error.message}`);
-      this.callDvOnExecAbort(targetAction, error);
+    return targetAction;
+  }
+
+  private async run(runType: RunType, elem: ElementRef) {
+    const targetAction = this.getTargetAction(elem.nativeElement);
+    if (targetAction.hasAttribute(RUN_ID_ATTR)) {
+      console.log(
+        `Skipping ${runType} since the same one is already in progress`);
+
+      return;
     }
-    if (execResultMap) { // no error
-      this.callDvOnExecCommit(targetAction, execResultMap);
+    const id = uuid();
+    targetAction.setAttribute(RUN_ID_ATTR, id);
+    let runResultMap: RunResultMap | undefined;
+    try {
+      runResultMap = await this.callDvOnRun(runType, targetAction, id);
+    } catch (error) {
+      console.error(`Got error on ${runType} ${id}: ${error.message}`);
+      this.callDvOnRunFailure(runType, targetAction, error);
+      targetAction.removeAttribute(RUN_ID_ATTR);
+    }
+    if (runResultMap) { // no error
+      this.callDvOnRunSuccess(runType, targetAction, runResultMap);
+      targetAction.removeAttribute(RUN_ID_ATTR);
     }
   }
 
@@ -107,39 +163,46 @@ export class RunService {
     onAction(target, actionId);
   }
 
-  private async callDvOnExec(node, id: string): Promise<ExecResultMap> {
-    const execs: Promise<ExecResultMap>[] = [];
+  private async callDvOnRun(
+    runType: RunType, node, id: string): Promise<RunResultMap> {
+    const dvOnRun = runFunctionNames[runType].onRun;
+    const runs: Promise<RunResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnExec) {
-        actionInfo.node.setAttribute(EXEC_ID_ATTR, id);
-        execs.push(
+      if (actionInfo.action[dvOnRun]) {
+        actionInfo.node.setAttribute(RUN_ID_ATTR, id);
+        runs.push(
           Promise
-            .resolve(actionInfo.action.dvOnExec())
+            .resolve(actionInfo.action[dvOnRun]())
             .then(result => ({[actionId]: result})));
       }
     });
-    const resultMaps: ExecResultMap[] = await Promise.all(execs);
+    const resultMaps: RunResultMap[] = await Promise.all(runs);
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnExecCommit(node, execResultMap: ExecResultMap): void {
+  private callDvOnRunSuccess(
+    runType: RunType, node, runResultMap: RunResultMap): void {
+    const dvOnRun = runFunctionNames[runType].onRun;
+    const dvOnSuccess = runFunctionNames[runType].onSuccess;
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnExec) {
-        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
+      if (actionInfo.action[dvOnRun]) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action.dvOnExecCommit) {
-        actionInfo.action.dvOnExecCommit(execResultMap[actionId]);
+      if (actionInfo.action[dvOnSuccess]) {
+        actionInfo.action[dvOnSuccess](runResultMap[actionId]);
       }
     });
   }
 
-  private callDvOnExecAbort(node, reason): void {
+  private callDvOnRunFailure(runType: RunType, node, reason): void {
     this.walkActions(node, (actionInfo) => {
-      if (actionInfo.action.dvOnExec) {
-        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
+      const dvOnRun = runFunctionNames[runType].onRun;
+      const dvOnFailure = runFunctionNames[runType].onFailure;
+      if (actionInfo.action[dvOnRun]) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
-      if (actionInfo.action.dvOnExecAbort) {
-        actionInfo.action.dvOnExecAbort(reason);
+      if (actionInfo.action[dvOnFailure]) {
+        actionInfo.action[dvOnFailure](reason);
       }
     });
   }

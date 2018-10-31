@@ -6,7 +6,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { RunService, OnExecCommit } from '../run.service';
+import { RunService, OnExecSuccess } from '../run.service';
 
 
 import { startWith } from 'rxjs/operators';
@@ -28,7 +28,7 @@ import { startWith } from 'rxjs/operators';
   ]
 })
 export class InputIdComponent
-implements OnInit, ControlValueAccessor, Validator, OnExecCommit {
+implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
   @Input() entityName = 'Id';
   idControl = new FormControl('', [Validators.required]);
   @Output() id = new EventEmitter<string>();
@@ -62,7 +62,7 @@ implements OnInit, ControlValueAccessor, Validator, OnExecCommit {
     return this.idControl.errors;
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.reset();
   }
 
