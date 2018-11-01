@@ -206,8 +206,8 @@ export class ActionHelper {
       actionInput.tag, actionInput.dvOf, actionInput.dvAlias);
     const actionInputs: InputMap = <InputMap> _.get(actionInput, 'inputs', {});
     const inputs = _.assign({},
-        // `actionInput.inputMap` could actually be `undefined` but the `invert`
-        // typings are wrong (`_.invert(undefined)` -> `undefined`)
+      // `actionInput.inputMap` could actually be `undefined` but the `invert`
+      // typings are wrong (`_.invert(undefined)` -> `undefined`)
       _.mapValues(_.invert(<InputMap> actionInput.inputMap), (value) => {
         return _.get(includeActionTag.context, value);
       }),
@@ -227,7 +227,8 @@ export class ActionHelper {
    * @return the action table of the given cliche
    */
   private static GetActionTableOfCliche(cliche: string): ActionTable {
-    const fp = path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME);
+    const fp = path.join(
+      ActionHelper.GetClicheFolder(cliche), ACTION_TABLE_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8'));
   }
@@ -238,9 +239,16 @@ export class ActionHelper {
    */
   private static GetActionsNoRequest(cliche: string)
     : { exec: string[] } | undefined {
-    const fp = path.join('node_modules', cliche, CONFIG_FILE_NAME);
+      const fp = path.join(
+        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
+  }
+
+  private static GetClicheFolder(cliche: string): string {
+    // Cliches specify as a main their typings (so that when apps do `import
+    // 'cliche'` it works) . To get to their folder we need to go up a dir
+    return path.join(path.dirname(require.resolve(cliche)), '..');
   }
 
   /**

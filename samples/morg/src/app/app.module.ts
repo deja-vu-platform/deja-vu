@@ -20,10 +20,10 @@ import { PropertyModule } from 'property';
   ],
   imports: [
     BrowserModule,
-    DvModule,
     EventModule,
     AllocatorModule,
-    PropertyModule
+    PropertyModule,
+    DvModule
   ],
   entryComponents: [ShowGroupMeetingComponent],
   providers: [{

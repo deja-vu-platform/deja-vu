@@ -131,7 +131,7 @@ export function updateJsonFile<T>(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node ' + path.join('node_modules', 'dv-gateway', 'dist', 'gateway.js') +
+  return 'node ' + path.join(locatePackage('dv-gateway')) +
     ` --configFilePath ${configFilePath}`;
 }
 
@@ -170,12 +170,21 @@ function startServerCmdOfCliche() {
 function startServerCmdOfUsedCliche(cliche: string | undefined, alias: string)
   : string {
   const clicheFolder = (cliche === undefined) ? alias : cliche;
+  // Cliches specify as a main their typings (so that when apps do `import
+  // 'cliche'` it works) . To get to their folder we need to go up a dir
   const serverDistFolder = path
-    .join('node_modules', clicheFolder, 'server');
+    .join(path.dirname(locatePackage(clicheFolder)), '..', 'server');
   const configKey = `usedCliches.${alias}.config`;
   const asFlagValue = (alias !== cliche) ? alias : undefined;
 
   return startServerCmd(false, serverDistFolder, configKey, asFlagValue);
+}
+
+/*
+ * @return the main file of the given package or its folder if it has no 'main'
+ */
+function locatePackage(pkg: string) {
+  return require.resolve(pkg);
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {

@@ -17,7 +17,7 @@ import {
 } from '../show-resource/show-resource.component';
 
 interface ResourcesRes {
-  data: { resources: Resource; };
+  data: { resources: Resource[]; };
 }
 
 
@@ -73,7 +73,7 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
         })
       }
     })
-    .subscribe((res) => {
+    .subscribe((res: ResourcesRes) => {
       this._resourceIds = _.map(res.data.resources, 'id');
       this.resourceIds.emit(this._resourceIds);
     });
