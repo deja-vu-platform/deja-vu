@@ -13,7 +13,6 @@
     "component-selector": [
       true,
       "element",
-      "authentication",
       "kebab-case"
     ],
     "no-output-on-prefix": true,
