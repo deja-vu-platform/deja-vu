@@ -19,6 +19,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { ParentHomeComponent } from './parent-home/parent-home.component';
 import { ShowChoreComponent } from './show-chore/show-chore.component';
 import { ShowRewardComponent } from './show-reward/show-reward.component';
+import { CreateChoreComponent } from './create-chore/create-chore.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { ShowRewardComponent } from './show-reward/show-reward.component';
     ChildHomeComponent,
     ShowChoreComponent,
     ShowRewardComponent,
-    NavBarComponent
+    NavBarComponent,
+    CreateChoreComponent
   ],
   imports: [
     BrowserModule,

@@ -42,33 +42,9 @@
                 </div>
               </div>
             </div>
-            <dv-tx class="white-box right-box col-md-5">
-              <h2>Add a New Chore</h2>
-              <dv-id (id)="choreId=$event"></dv-id>
-              <dv-status savedText="Chore created"></dv-status>
-              <property-create-object dvOf="chore"
-                [id]="choreId"
-                [showOptionToSubmit]="false">
-              </property-create-object>
-              <task-create-task
-                [id]="choreId"
-                [assignerId]="user?.id"
-                assigneeSelectPlaceholder="For Child"
-                (selectedAssignee)="choreAssignee=$event"
-                [showOptionToSubmit]="false">
-              </task-create-task>
-              <!-- <market-create-good dvAlias="chore-create-good"
-                [id]="choreId"
-                priceLabel="Star Value"
-                [sellerId]="choreAssignee?.id"
-                [marketId]="user?.id"
-                supply=1
-                [showOptionToInputSeller]="false"
-                [showOptionToInputSupply]="false"
-                [showOptionToSubmit]="false">
-              </market-create-good> -->
-              <dv-button>Create Chore</dv-button>
-            </dv-tx>
+            <div class="right-box col-md-5 white-box">
+              <chorestar-create-chore [user]="user"></chorestar-create-chore>
+            </div>
           </div>
           <div class="row">
             <div class="offset-md-1 col-md-5 white-box">
