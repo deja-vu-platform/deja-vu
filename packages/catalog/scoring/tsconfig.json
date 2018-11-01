@@ -1,6 +1,3 @@
 {
-  "extends": "../../../tsconfig.ng.base.json",
-  "compilerOptions": {
-    "outDir": "./dist/out-tsc"
-  }
+  "extends": "../../../tsconfig.ng.base.json"
 }
