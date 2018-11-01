@@ -46,12 +46,13 @@ function isPendingCreate(alloc: AllocationDoc | null) {
   return _.get(alloc, 'pending.type') === 'create-allocation';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const allocations: mongodb.Collection<AllocationDoc> =
     db.collection('allocations');
+
   return {
     Query: {
-      allocation: async (root, { id }) => {
+      allocation: async (_root, { id }) => {
         const alloc: AllocationDoc | null = await allocations
           .findOne({ id: id });
         if (isPendingCreate(alloc)) {
@@ -61,7 +62,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return alloc;
       },
       consumerOfResource: async (
-        root, { input: { resourceId, allocationId } }
+        _root, { input: { resourceId, allocationId } }
         : { input: ConsumerOfResourceInput }) => {
         const alloc: AllocationDoc | null = await allocations
           .findOne(
@@ -89,7 +90,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
     // (e.g., editing a consumer) which shouldn't happen often.
     Mutation: {
       editConsumerOfResource: async (
-        root, { input: { resourceId, allocationId, newConsumerId } }
+        _root, { input: { resourceId, allocationId, newConsumerId } }
         : { input: EditConsumerOfResourceInput }, context: Context) => {
           const updateOp = {
             $set: { 'assignments.$.consumerId': newConsumerId }
@@ -138,17 +139,19 @@ function resolvers(db: mongodb.Db, config: Config): object {
                 },
                 { ...updateOp, $unset: { pending: '' } });
 
-              return;
+              return undefined;
             case 'abort':
               await allocations.updateOne(
-                { 'pending.reqId': context.reqId }, { $unset: { pending: '' } });
+                { 'pending.reqId': context.reqId },
+                { $unset: { pending: '' } });
 
-              return;
+              return undefined;
           }
-          return;
+
+          return undefined;
       },
       createAllocation: async (
-        root, { input: { id, resourceIds, consumerIds } }
+        _root, { input: { id, resourceIds, consumerIds } }
         : { input: CreateAllocationInput }, context: Context) => {
           const reqIdPendingFilter = { 'pending.reqId': context.reqId };
           let pending: PendingDoc | undefined;
@@ -186,16 +189,17 @@ function resolvers(db: mongodb.Db, config: Config): object {
               await allocations.updateOne(
                 reqIdPendingFilter, { $unset: { pending: '' } });
 
-              return;
+              return undefined;
             case 'abort':
               await allocations.deleteOne(reqIdPendingFilter);
 
-              return;
+              return undefined;
           }
-          return;
+
+          return undefined;
       },
       deleteResource: async (
-        root, { input: { resourceId, allocationId } }
+        _root, { input: { resourceId, allocationId } }
         : { input: DeleteResourceInput }, context: Context) => {
         const updateOp = {
           $pull: {
@@ -239,22 +243,24 @@ function resolvers(db: mongodb.Db, config: Config): object {
             await allocations.updateOne(
               reqIdPendingFilter, { ...updateOp, $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await allocations.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
         }
-        return;
+
+        return undefined;
       }
     }
   };
-};
+}
 
 const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const allocations = db.collection('allocations');
+
     return Promise.all([
       allocations.createIndex({ id: 1 }, { unique: true }),
       allocations.createIndex(

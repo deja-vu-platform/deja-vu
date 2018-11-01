@@ -9,7 +9,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { Property } from '../shared/property.model';
+import { PropertiesRes, Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -45,7 +45,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
       return;
     }
     this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
+      .get<PropertiesRes>(this.apiPath, {
         params: {
           query: `
             query {
@@ -56,7 +56,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
           `
         }
       })
-      .pipe(map((res) => res.data.properties))
+      .pipe(map((res: PropertiesRes) => res.data.properties))
       .subscribe((properties: Property[]) => {
         this.properties = _.map(properties, 'name');
       });

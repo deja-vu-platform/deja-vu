@@ -108,7 +108,7 @@ export class EditConsumerComponent implements OnExecAbort,
           })
         }
       })
-      .pipe(map((res) => res.data.consumerOfResource))
+      .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
       .subscribe((consumerId) => {
         this.currentConsumerId.emit(consumerId);
         this._currentConsumerId = consumerId;

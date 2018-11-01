@@ -98,11 +98,12 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     })
     .toPromise();
 
-   if (res.errors) {
-     throw new Error(_.map(res.errors, 'message'));
-   }
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join('\n'));
+    }
 
-   this.transfer.emit(res.data.addToBalance);
+    this.transfer.emit(res.data.addToBalance);
   }
 
   dvOnExecCommit() {

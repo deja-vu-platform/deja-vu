@@ -19,7 +19,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { Property } from '../shared/property.model';
+import { PropertiesRes, Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -29,6 +29,7 @@ import { API_PATH } from '../property.config';
 export interface ValueMap {
   [property: string]: any;
 }
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -87,7 +88,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
       return;
     }
     this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
+      .get<PropertiesRes>(this.apiPath, {
         params: {
           query: `
             query {
@@ -98,7 +99,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
           `
         }
       })
-      .pipe(map((res) => res.data.properties))
+      .pipe(map((res: PropertiesRes) => res.data.properties))
       .subscribe((properties: Property[]) => {
         this.properties = properties;
         const formControls = {};

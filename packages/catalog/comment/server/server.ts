@@ -13,8 +13,7 @@ import {
   CommentInput,
   CommentsInput,
   CreateCommentInput,
-  EditCommentInput,
-  PendingDoc
+  EditCommentInput
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
@@ -30,11 +29,12 @@ function isPendingCreate(doc: CommentDoc | null) {
   return _.get(doc, 'pending.type') === 'create-comment';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const comments: mongodb.Collection<CommentDoc> = db.collection('comments');
+
   return {
     Query: {
-      comment: async (root, { id }) => {
+      comment: async (_root, { id }) => {
         const comment = await CommentValidation.commentExistsOrFails(
           comments, id);
 
@@ -45,7 +45,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return comment;
       },
 
-      commentByAuthorTarget: async (root, { input }: { input: CommentInput }) => {
+      commentByAuthorTarget: async (
+        _root, { input }: { input: CommentInput }) => {
         const comment = await comments.findOne({
           authorId: input.byAuthorId, targetId: input.ofTargetId
         });
@@ -57,7 +58,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return comment;
       },
 
-      comments: async (root, { input }: { input: CommentsInput }) => {
+      comments: async (_root, { input }: { input: CommentsInput }) => {
         const filter = { pending: { $exists: false } };
         if (!_.isEmpty(input.byAuthorId)) {
           // Comments by an author
@@ -82,7 +83,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
     Mutation: {
       createComment: async (
-        root, { input }: { input: CreateCommentInput }, context: Context) => {
+        _root, { input }: { input: CreateCommentInput }, context: Context) => {
         const newComment: CommentDoc = {
           id: input.id ? input.id : uuid(),
           authorId: input.authorId,
@@ -107,18 +108,18 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await comments.deleteOne(reqIdPendingFilter);
 
-            return;
+            return undefined;
         }
 
         return newComment;
       },
 
       editComment: async (
-        root, { input }: { input: EditCommentInput }, context: Context) => {
+        _root, { input }: { input: EditCommentInput }, context: Context) => {
         const comment = await CommentValidation.commentExistsOrFails(
           comments, input.id);
 
@@ -166,23 +167,24 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { ...updateOp, $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await comments.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
         }
 
-        return;
+        return undefined;
       }
     }
   };
-};
+}
 
 const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const comments: mongodb.Collection<CommentDoc> = db.collection('comments');
+
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
   .resolvers(resolvers)

@@ -1,5 +1,8 @@
 import * as moment from 'moment';
 
+import * as _ from 'lodash';
+
+
 export interface Event {
   id?: string;
   startDate: moment.Moment;
@@ -7,11 +10,44 @@ export interface Event {
   seriesId?: string;
 }
 
+export interface GraphQlEvent {
+  id?: string;
+  startDate: number;
+  endDate: number;
+  series?: Series;
+}
+
+export function toEvent(graphQlEvent: GraphQlEvent): Event {
+  return {
+    id: graphQlEvent.id,
+    startDate: fromUnixTime(graphQlEvent.startDate),
+    endDate: fromUnixTime(graphQlEvent.endDate),
+    seriesId: graphQlEvent.series.id
+  };
+}
+
+
 export interface Series {
   id?: string;
   startsOn: moment.Moment;
   endsOn: moment.Moment;
   events: Event[];
+}
+
+export interface GraphQlSeries {
+  id?: string;
+  startsOn: number;
+  endsOn: number;
+  events: GraphQlEvent[];
+}
+
+export function toSeries(graphQlSeries: GraphQlSeries): Series {
+  return {
+    id: graphQlSeries.id,
+    startsOn: fromUnixTime(graphQlSeries.startsOn),
+    endsOn: fromUnixTime(graphQlSeries.endsOn),
+    events: _.map(graphQlSeries.events, toEvent)
+  };
 }
 
 export function toUnixTime(date: moment.Moment, time: string): number {

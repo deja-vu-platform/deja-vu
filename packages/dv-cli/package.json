@@ -13,7 +13,6 @@
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
     "prepare": "npm run package",
-    "postinstall": "npm install -g",
     "reinstall-globally": "npm run clean && npm run build && npm uninstall -g && npm install -g"
   },
   "dependencies": {

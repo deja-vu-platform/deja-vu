@@ -436,11 +436,11 @@ async function addToBalance<Balance>(
       await commitAccountUpdate<Balance>(
         commitAccount, newCommitBalance, isZeroBalanceFn);
 
-      return;
+      return undefined;
     case 'abort':
       await abortUpdate(updateId);
 
-      return;
+      return undefined;
   }
 }
 

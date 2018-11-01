@@ -19,11 +19,12 @@ function isPendingUpdate(doc: RatingDoc | null) {
   return _.get(doc, 'pending.type') === 'update-rating';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+
   return {
     Query: {
-      rating: async (root, { input }: { input: RatingInput }) => {
+      rating: async (_root, { input }: { input: RatingInput }) => {
         const rating = await ratings
           .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
 
@@ -35,7 +36,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return rating;
       },
 
-      ratings: (root, { input }: { input: RatingsInput }) => {
+      ratings: (_root, { input }: { input: RatingsInput }) => {
         const filter = { pending: { $exists: false } };
         if (input.bySourceId) {
           // All ratings by a source
@@ -51,7 +52,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
           .toArray();
       },
 
-      averageRatingForTarget: async (root, { targetId }) => {
+      averageRatingForTarget: async (_root, { targetId }) => {
         const results = await ratings.aggregate([
           // Ignore ratings that are currently being updated
           { $match: { targetId: targetId, pending: { $exists: false } } },
@@ -83,7 +84,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
     Mutation: {
       setRating: async (
-        root, { input }: { input: SetRatingInput }, context: Context) => {
+        _root, { input }: { input: SetRatingInput }, context: Context) => {
         const notPendingRatingFilter = {
           sourceId: input.sourceId,
           targetId: input.targetId,
@@ -149,11 +150,12 @@ function resolvers(db: mongodb.Db, config: Config): object {
       }
     }
   };
-};
+}
 
 const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
   })

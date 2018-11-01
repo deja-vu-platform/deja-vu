@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
-    "dv-build-event": "ng build && (cd server && tsc && cp schema.graphql ../dist/server)",
+    "dv-build-event": "ng build && tsc -p server && cp server/schema.graphql ./dist/server",
     "dv-package-event-client": "ng-packagr -p ng-package.json",
     "dv-package-event": "npm run dv-package-event-client && npm run dv-package-event-server",
     "dv-package-event-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
@@ -98,5 +98,6 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "main": "pkg/bundles/dv-core.umd.js"
 }

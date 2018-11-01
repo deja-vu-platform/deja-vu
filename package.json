@@ -54,5 +54,10 @@
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
   },
-  "workspaces": ["packages/*", "packages/catalog/*"]
+  "workspaces": [
+    "packages/cliche-server",
+    "packages/dv-core",
+    "packages/dv-gateway",
+    "packages/catalog/*"
+  ]
 }

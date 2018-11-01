@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
-    "dv-build-authentication": "ng build && (cd server && tsc && cp schema.graphql ../dist/server)",
+    "dv-build-authentication": "ng build && tsc -p server && cp server/schema.graphql ./dist/server",
     "dv-package-authentication-client": "ng-packagr -p ng-package.json",
     "dv-package-authentication": "npm run dv-package-authentication-client && npm run dv-package-authentication-server",
     "dv-package-authentication-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
@@ -104,5 +104,6 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "main": "pkg/bundles/dv-core.umd.js"
 }

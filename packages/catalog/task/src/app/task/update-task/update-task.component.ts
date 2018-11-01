@@ -23,6 +23,11 @@ import { Task } from '../shared/task.model';
 const SAVED_MSG_TIMEOUT = 3000;
 
 
+interface TaskRes {
+  data: { task: Task };
+}
+
+
 @Component({
   selector: 'task-update-task',
   templateUrl: './update-task.component.html',
@@ -68,7 +73,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
     if (!this.gs || !this.id) {
       return;
     }
-    this.gs.get<{data: {task: Task}}>('/graphql', {
+    this.gs.get<TaskRes>('/graphql', {
       params: {
         query: `
           query {
@@ -81,7 +86,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
         `
       }
     })
-    .pipe(map((res) => res.data.task))
+    .pipe(map((res: TaskRes) => res.data.task))
     .subscribe((task: Task) => {
       this.assignee.setValue(task.assigneeId);
       this.dueDate.setValue(task.dueDate);

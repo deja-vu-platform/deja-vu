@@ -12,8 +12,7 @@ import {
   CreateMarkerInput,
   Marker,
   MarkerDoc,
-  MarkersInput,
-  PendingDoc
+  MarkersInput
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
@@ -26,22 +25,25 @@ class MarkerValidation {
 }
 
 function markerDocToMarker(markerDoc: MarkerDoc): Marker {
-  const ret = _.omit(markerDoc, ['location']);
-  ret.longitude = markerDoc.location.coordinates[0];
-  ret.latitude = markerDoc.location.coordinates[1];
-
-  return ret;
+  return {
+    id: markerDoc.id,
+    title: markerDoc.title,
+    mapId: markerDoc.mapId,
+    longitude: markerDoc.location.coordinates[0],
+    latitude: markerDoc.location.coordinates[1]
+  };
 }
 
 function isPendingCreate(doc: MarkerDoc | null) {
   return _.get(doc, 'pending.type') === 'create-marker';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+
   return {
     Query: {
-      marker: async (root, { id }) => {
+      marker: async (_root, { id }) => {
         const marker = await MarkerValidation.markerExistsOrFail(markers, id);
         if (_.isNil(marker) || isPendingCreate(marker)) {
           throw new Error(`Marker ${id} does not exist`);
@@ -50,7 +52,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return markerDocToMarker(marker);
       },
 
-      markers: (root, { input }: { input: MarkersInput }) => {
+      markers: (_root, { input }: { input: MarkersInput }) => {
         const filter = { pending: { $exists: false } };
         if (input.ofMapId) {
           // Get markers by map
@@ -76,7 +78,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
     Mutation: {
       createMarker: async (
-        root, { input }: { input: CreateMarkerInput }, context: Context) => {
+        _root, { input }: { input: CreateMarkerInput }, context: Context) => {
         const newMarker: MarkerDoc = {
           id: input.id ? input.id : uuid(),
           title: input.title ? input.title : '',
@@ -105,17 +107,17 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return newMarker;
           case 'abort':
             await markers.deleteOne(reqIdPendingFilter);
 
-            return;
+            return newMarker;
         }
 
         return newMarker;
       },
 
-      deleteMarker: async (root, { id }, context: Context) => {
+      deleteMarker: async (_root, { id }, context: Context) => {
         const notPendingResourceFilter = {
           id: id,
           pending: { $exists: false }
@@ -154,23 +156,24 @@ function resolvers(db: mongodb.Db, config: Config): object {
           case 'commit':
             await markers.deleteOne(reqIdPendingFilter);
 
-            return;
+            return true;
           case 'abort':
             await markers.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return true;
         }
 
-        return;
+        return true;
       }
     }
   };
-};
+}
 
 const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+
     return Promise.all([
       markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
       markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },

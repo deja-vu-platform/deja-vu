@@ -19,14 +19,14 @@ const jsonSchemaTypeToGraphQlType = {
 };
 
 interface Property {
-  title: { type: keyof typeof jsonSchemaTypeToGraphQlType }
+  type: keyof typeof jsonSchemaTypeToGraphQlType;
 }
 
 interface Schema {
-  properties: Property[];
+  properties: { [name: string]: Property };
   required?: string[];
   title: string;
-  type: 'object'
+  type: 'object';
 }
 
 interface PropertyConfig extends Config {
@@ -70,7 +70,7 @@ function createObjectFromInput(uncastConfig: Config, input) {
   const validate = ajv.compile(config.schema);
   const valid = validate(_.omit(newObject, 'id'));
   if (!valid) {
-    throw new Error(_.map(validate.errors, (error) => error.message));
+    throw new Error(_.map(validate.errors, 'message').join('\n'));
   }
 
   return newObject;
@@ -81,7 +81,7 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
   const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {
-      property: (root, { name }) => {
+      property: (_root, { name }) => {
         const propertyInfo = config.schema.properties[name];
 
         return {
@@ -90,14 +90,14 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
           required: _.includes(config.schema.required, name)
         };
       },
-      object: async (root, { id }) => {
+      object: async (_root, { id }) => {
         const obj: ObjectDoc | null = await objects.findOne({ id: id });
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: (root) => objects.find({ _pending: { $exists: false } })
+      objects: (_root) => objects.find({ _pending: { $exists: false } })
         .toArray(),
-      properties: (root) => _
+      properties: (_root) => _
         .chain(config['schema'].properties)
         .toPairs()
         .map(([ name, propertyInfo ]) => ({
@@ -113,7 +113,7 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
       required: (root) => root.required
     },
     Mutation: {
-      createObject: async (root, { input }, context: Context) => {
+      createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
         const reqIdPendingFilter = { '_pending.reqId': context.reqId };
         switch (context.reqType) {
@@ -128,17 +128,17 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
             await objects.updateOne(
               reqIdPendingFilter, { $unset: { _pending: '' } });
 
-            return;
+            return newObject;
           case 'abort':
             await objects.deleteOne(reqIdPendingFilter);
 
-            return;
+            return newObject;
         }
 
-        return;
+        return newObject;
       },
 
-      createObjects: async (root, { input }, context: Context) => {
+      createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
         const reqIdPendingFilter = { '_pending.reqId': context.reqId };
@@ -156,14 +156,14 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
             await objects.updateMany(
               reqIdPendingFilter, { $unset: { _pending: '' } });
 
-            return;
+            return objDocs;
           case 'abort':
             await objects.deleteMany(reqIdPendingFilter);
 
-            return;
+            return objDocs;
         }
 
-        return;
+        return objDocs;
       }
     }
   };
@@ -174,6 +174,7 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
     objectResolvers[propertyName] = (obj) => obj[propertyName];
   }
   resolversObj['Object'] = objectResolvers;
+
   return resolversObj;
 };
 
@@ -184,11 +185,12 @@ const propertyCliche: ClicheServer = new ClicheServerBuilder('property')
     await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
     if (!_.isEmpty(config.initialObjects)) {
       return objects.insertMany(_.map(config.initialObjects, (obj) => {
-        obj.id = obj.id ? obj.id : uuid();
+        obj['id'] = obj['id'] ? obj['id'] : uuid();
 
         return obj;
       }));
     }
+
     return Promise.resolve();
   })
   .resolvers(resolvers)

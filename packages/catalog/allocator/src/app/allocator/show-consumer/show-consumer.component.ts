@@ -59,7 +59,7 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
           })
         }
       })
-      .pipe(map((res) => res.data.consumerOfResource))
+      .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
       .subscribe((consumerId) => {
         this._consumerId = consumerId;
         this.consumerId.emit(consumerId);

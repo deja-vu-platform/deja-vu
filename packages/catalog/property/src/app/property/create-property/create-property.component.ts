@@ -12,7 +12,7 @@ import {
   GatewayService, GatewayServiceFactory, OnExecCommit, RunService
 } from 'dv-core';
 
-import { Property } from '../shared/property.model';
+import { PropertyRes, Property } from '../shared/property.model';
 
 import { map, startWith } from 'rxjs/operators';
 
@@ -89,7 +89,7 @@ OnExecCommit {
       return;
     }
     this.gs
-      .get<{data: { property: Property}}>('/graphql', {
+      .get<PropertyRes>('/graphql', {
         params: {
           query: `
             query {
@@ -101,7 +101,7 @@ OnExecCommit {
           `
         }
       })
-      .pipe(map((res) => res.data.property))
+      .pipe(map((res: PropertyRes) => res.data.property))
       .subscribe((property: Property) => {
         const schema = JSON.parse(property.schema);
         this.schemaValidate = this.ajv.compile(schema);

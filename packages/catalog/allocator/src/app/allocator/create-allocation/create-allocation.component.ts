@@ -86,7 +86,7 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
         }
       }
     })
-    .pipe(map((res) => res.data.createAllocation))
+    .pipe(map((res: CreateAllocationRes) => res.data.createAllocation))
     .subscribe((allocation) => {
       this.allocation.emit({ id: allocation.id });
     });

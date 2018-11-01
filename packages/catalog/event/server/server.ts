@@ -54,16 +54,17 @@ function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
   return docPending === 'create-event' || docPending === 'create-series';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const events: mongodb.Collection<EventDoc> = db.collection('events');
   const series: mongodb.Collection<SeriesDoc> = db.collection('series');
+
   return {
     Query: {
       events: () => events.find({ pending: { $exists: false } })
         .toArray(),
       series: () => series.find({ pending: { $exists: false } })
         .toArray(),
-      event: async (root, { id }) => {
+      event: async (_root, { id }) => {
         const evt: EventDoc | null = await events.findOne({ id: id });
         if (isPendingCreate(evt)) {
           return null;
@@ -71,7 +72,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
         return evt;
       },
-      oneSeries: async (root, { id }) => {
+      oneSeries: async (_root, { id }) => {
         const s: SeriesDoc | null = await series.findOne({ id: id });
         if (isPendingCreate(s)) {
           return null;
@@ -92,14 +93,17 @@ function resolvers(db: mongodb.Db, config: Config): object {
       startsOn: (oneSeries: SeriesDoc) => dateToUnixTime(oneSeries.startsOn),
       endsOn: (oneSeries: SeriesDoc) => dateToUnixTime(oneSeries.endsOn),
       events: (oneSeries: SeriesDoc) => _.map(oneSeries.events, (e) => {
-        e.series = oneSeries;
-
-        return e;
+        return {
+          id: e.id,
+          startDate: e.startDate,
+          endDate: e.endDate,
+          series: oneSeries
+        };
       })
     },
     Mutation: {
       createEvent: async (
-        root, { input }: { input: CreateEventInput }, context: Context) => {
+        _root, { input }: { input: CreateEventInput }, context: Context) => {
         const eventId = input.id ? input.id : uuid();
         const e: EventDoc = {
           id: eventId,
@@ -121,17 +125,17 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await events.deleteOne(reqIdPendingFilter);
 
-            return;
+            return undefined;
         }
 
         return e;
       },
       updateEvent: async (
-        root, { input }: { input: UpdateEventInput }, context: Context) => {
+        _root, { input }: { input: UpdateEventInput }, context: Context) => {
         const setObject: { startDate?: Date, endDate?: Date } = {};
         if (input.startDate) {
           setObject.startDate = unixTimeToDate(input.startDate);
@@ -181,17 +185,17 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { ...updateOp, $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await events.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
         }
 
-        return;
+        return undefined;
       },
-      deleteEvent: async (root, { id }, context: Context) => {
+      deleteEvent: async (_root, { id }, context: Context) => {
         const isPartOfSeries: boolean = await events
           .findOne({ id: id }, { projection: { _id: 1 }}) === null;
         const notPendingEventsFilter = {
@@ -235,16 +239,16 @@ function resolvers(db: mongodb.Db, config: Config): object {
                 reqIdPendingFilter,
                 { ...updateOp, $unset: { pending: '' } });
 
-              return;
+              return undefined;
             case 'abort':
               await series.updateOne(
                 reqIdPendingFilter, { $unset: { pending: '' } });
 
-              return;
+              return undefined;
           }
 
           // https://github.com/Microsoft/TypeScript/issues/19423
-          return;
+          return undefined;
         } else {
           switch (context.reqType) {
             case 'vote':
@@ -278,20 +282,20 @@ function resolvers(db: mongodb.Db, config: Config): object {
             case 'commit':
               await events.deleteOne(reqIdPendingFilter);
 
-              return;
+              return undefined;
             case 'abort':
               await events.updateOne(
                 reqIdPendingFilter, { $unset: { pending: '' } });
 
-              return;
+              return undefined;
           }
 
           // https://github.com/Microsoft/TypeScript/issues/19423
-          return;
+          return undefined;
         }
       },
       createSeries: async (
-        root, { input }: { input: CreateSeriesInput }, context: Context)
+        _root, { input }: { input: CreateSeriesInput }, context: Context)
         : Promise<SeriesDoc | undefined> => {
         if (_.isEmpty(input.events)) {
           throw new Error('Series has no events');
@@ -332,26 +336,26 @@ function resolvers(db: mongodb.Db, config: Config): object {
             await series.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await series.deleteOne(reqIdPendingFilter);
 
-            return;
+            return undefined;
         }
 
-        return;
+        return undefined;
       }
     }
   };
-};
+}
 
 const eventCliche: ClicheServer = new ClicheServerBuilder('event')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     // Stores individual events that are not part of any series
     const events: mongodb.Collection<EventDoc> = db.collection('events');
     // Stores event series. Its constituent events are embedded in `SeriesDoc`
     const series: mongodb.Collection<SeriesDoc> = db.collection('series');
-    
+
     return Promise.all([
       events.createIndex({ id: 1 }, { unique: true }),
       series.createIndex({ id: 1 }, { unique: true }),

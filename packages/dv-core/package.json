@@ -2,7 +2,6 @@
   "name": "dv-core",
   "version": "0.0.1",
   "description": "Core libraries of Déjà Vu",
-  "files": [ "pkg/**" ],
   "peerDependencies": {
     "@angular/core": "^5.2.4",
     "@angular/forms": "^5.2.0",
@@ -50,5 +49,6 @@
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "dependencies": {
     "uuid": "^3.2.1"
-  }
+  },
+  "main": "pkg/bundles/dv-core.umd.js"
 }
