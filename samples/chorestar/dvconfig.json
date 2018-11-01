@@ -98,6 +98,9 @@
           "properties": {
               "name": {
                 "type": "string"
+              },
+              "cost": {
+                "type": "number"
               }
           },
           "required": ["name"]

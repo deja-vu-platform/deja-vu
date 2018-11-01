@@ -36,7 +36,6 @@
                       inputMap: {task: 'chore'},
                       inputs: {showOptionToApprove: true}
                     }"
-                    [showOptionToApprove]="false"
                     noTasksToShowText="No chores to approve">
                   </task-show-tasks>
                 </div>
@@ -64,7 +63,7 @@
               </market-show-goods> -->
               <property-show-objects
                 dvOf="reward"
-                [showOnly]="['name']"
+                [showOnly]="['name', 'cost']"
               >
               </property-show-objects>
             </div>
@@ -72,8 +71,11 @@
               <h2>Add a New Reward</h2>
               <dv-id (id)="rewardId=$event"></dv-id>
               <dv-status savedText="Reward created"></dv-status>
-              <property-create-object dvOf="reward"
-                [id]="rewardId" [showOptionToSubmit]="false">
+              <property-create-object
+                dvOf="reward"
+                [id]="rewardId"
+                [showOptionToSubmit]="false"
+              >
               </property-create-object>
               <!-- <market-create-good dvAlias="reward-create-good"
                 [id]="rewardId"

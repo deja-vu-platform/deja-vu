@@ -101,6 +101,11 @@
           <div class="row section">
             <div class="col-md-12">
               <h3>Rewards You Cannot Buy Yet</h3>
+              <!-- TODO: filter by cost -->
+              <property-show-objects
+                dvOf="reward"
+                [showOnly]="['name', 'cost']"
+              ></property-show-objects>
               <!-- <market-show-goods
                 [affordable]="false"
                 [buyerId]="user?.id"
