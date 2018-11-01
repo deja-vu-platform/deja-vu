@@ -1,8 +1,7 @@
 {
   "name": "cliche-server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The server class and its helpers for Déjà Vu cliches",
-  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
@@ -28,7 +27,7 @@
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "~3.0.7",
     "@types/lodash": "^4.14.96",
-    "mongodb": "^3.0.4",
+    "mongodb": "^3.1.8",
     "rxjs": "5.5.6",
     "tslint": "~5.9.1",
     "typescript": ">=2.4.2 <2.7",
@@ -36,7 +35,7 @@
   },
   "peerDependencies": {
     "lodash": "^4.17.5",
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.1.8"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
@@ -44,5 +43,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js"
 }

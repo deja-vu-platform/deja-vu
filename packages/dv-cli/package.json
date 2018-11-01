@@ -2,18 +2,16 @@
   "name": "dv-cli",
   "version": "0.0.1",
   "description": "CLI tool for Déjà Vu",
-  "main": "./dist/dv.js",
   "bin": {
     "dv": "./dist/dv.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && copyfiles -f src/*.blueprint.* dist",
+    "build": "tsc && copyfiles -f src/*.blueprint.* dist && chmod +x dist/dv.js",
     "package": "npm run clean && npm run build",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
-    "prepare": "npm run package",
-    "reinstall-globally": "npm run clean && npm run build && npm uninstall -g && npm install -g"
+    "prepare": "npm run package"
   },
   "dependencies": {
     "commander": "^2.13.0",
@@ -37,5 +35,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/dv.d.ts",
+  "main": "./dist/dv.js"
 }

@@ -5,6 +5,7 @@
   "repository": "github:spderosso/dejavu",
   "scripts": {
     "bootstrap": "yarn install",
+    "prepare": "yarn run package",
     "package": "lerna run package",
     "clean": "lerna clean && rm -rf node_modules",
     "release": "lerna publish"
@@ -55,9 +56,9 @@
     "zone.js": "^0.8.19"
   },
   "workspaces": [
-    "packages/cliche-server",
-    "packages/dv-core",
-    "packages/dv-gateway",
-    "packages/catalog/*"
+    "packages/*",
+    "packages/catalog/*",
+    "samples/morg",
+    "samples/potluck"
   ]
 }

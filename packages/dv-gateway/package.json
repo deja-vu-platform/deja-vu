@@ -2,10 +2,9 @@
   "name": "dv-gateway",
   "version": "0.0.1",
   "description": "Gateway server for Déjà Vu",
-  "main": "./dist/gateway.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && chmod +x ./dist/gateway.js",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts",
     "prepare": "npm run package",
     "package": "npm run build",
@@ -45,5 +44,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/gateway.d.ts",
+  "main": "./dist/gateway.js"
 }
