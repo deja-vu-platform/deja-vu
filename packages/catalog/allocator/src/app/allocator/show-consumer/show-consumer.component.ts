@@ -1,9 +1,10 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
@@ -19,7 +20,8 @@ interface ConsumerOfResourceRes {
   selector: 'allocator-show-consumer',
   templateUrl: './show-consumer.component.html'
 })
-export class ShowConsumerComponent implements OnChanges, OnInit {
+export class ShowConsumerComponent implements AfterViewInit, OnChanges, OnEval,
+OnInit {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Output() consumerId = new EventEmitter();
@@ -35,15 +37,24 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.update();
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.update();
+    this.load();
   }
 
-  update() {
-    if (this.gs && this.resourceId && this.allocationId) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
           query: `
@@ -65,5 +76,9 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
         this.consumerId.emit(consumerId);
       });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.resourceId && this.allocationId && this.gs);
   }
 }

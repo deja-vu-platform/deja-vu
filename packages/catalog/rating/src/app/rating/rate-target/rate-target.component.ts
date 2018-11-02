@@ -3,7 +3,8 @@ import {
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, OnExecFailure,
+  RunService
 } from 'dv-core';
 import { take } from 'rxjs/operators';
 
@@ -27,7 +28,7 @@ interface RatingRes {
   styleUrls: ['./rate-target.component.css']
 })
 export class RateTargetComponent implements
-  OnInit, OnChanges, OnExec, OnExecAbort {
+  AfterViewInit, OnInit, OnChanges, OnEval, OnExec, OnExecFailure {
   @Input() sourceId: string;
   sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
@@ -47,6 +48,9 @@ export class RateTargetComponent implements
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadRating();
   }
 
@@ -99,7 +103,7 @@ export class RateTargetComponent implements
       });
   }
 
-  dvOnExecAbort() {
+  dvOnExecFailure() {
     this.ratingValue = this.prevRatingValue;
     this.rating.emit(this.ratingValue);
   }
@@ -108,31 +112,40 @@ export class RateTargetComponent implements
    * Load a rating from the server (if any), and set the value of the widget.
    */
   async loadRating() {
-    if (!this.sourceId || !this.targetId || !this.gs) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<RatingRes>(this.apiPath, {
-      params: {
-        query: `
-          query Rating($input: RatingInput!) {
-            rating(input: $input) {
-              rating
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<RatingRes>(this.apiPath, {
+        params: {
+          query: `
+            query Rating($input: RatingInput!) {
+              rating(input: $input) {
+                rating
+              }
             }
-          }
-        `,
-        variables: JSON.stringify({
-          input: {
-            bySourceId: this.sourceId,
-            ofTargetId: this.targetId
-          }
-        })
-      }
-    })
+          `,
+          variables: JSON.stringify({
+            input: {
+              bySourceId: this.sourceId,
+              ofTargetId: this.targetId
+            }
+          })
+        }
+      })
       .subscribe((res) => {
         if (res.data.rating) {
           this.ratingValue = res.data.rating.rating;
           this.rating.emit(this.ratingValue);
         }
       });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.sourceId && this.targetId);
   }
 }

@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowMarkerComponent } from '../show-marker/show-marker.component';
@@ -14,7 +16,8 @@ import { Marker } from '../shared/geolocation.model';
   templateUrl: './show-markers.component.html',
   styleUrls: ['./show-markers.component.css']
 })
-export class ShowMarkersComponent implements OnInit, OnChanges {
+export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched markers are not filtered by that property
   @Input() ofMapId: string | undefined;
@@ -37,20 +40,31 @@ export class ShowMarkersComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {
     this.showMarkers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchMarkers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchMarkers();
+    this.load();
   }
 
-  fetchMarkers() {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
     if (this.gs) {
       this.gs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
@@ -77,5 +91,9 @@ export class ShowMarkersComponent implements OnInit, OnChanges {
           this.markers = res.data.markers;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

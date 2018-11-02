@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExecFailure,
+  OnExecSuccess, OnExec, RunService
 } from 'dv-core';
 
 
@@ -45,7 +45,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   ]
 })
 export class RegisterUserComponent
-  implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -138,7 +138,7 @@ export class RegisterUserComponent
     this.user.emit(user);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newUserRegistered = true;
     window.setTimeout(() => {
       this.newUserRegistered = false;
@@ -150,7 +150,7 @@ export class RegisterUserComponent
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newUserRegisteredError = reason.message;
   }
 }

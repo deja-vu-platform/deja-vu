@@ -1,7 +1,10 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Output, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowGroupComponent } from '../show-group/show-group.component';
@@ -14,7 +17,8 @@ import { Group } from '../shared/group.model';
   templateUrl: './show-groups.component.html',
   styleUrls: ['./show-groups.component.css']
 })
-export class ShowGroupsComponent implements OnInit, OnChanges {
+export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
   @Input() withMemberId: string | undefined;
@@ -33,21 +37,32 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {
     this.showGroups = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchGroups();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchGroups();
+    this.load();
   }
 
-  fetchGroups() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<{data: {groups: Group[]}}>('/graphql', {
           params: {
@@ -71,5 +86,9 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
           this.groups.emit(this._groups);
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -39,7 +39,7 @@ const LONGITUDE_LIMIT = 180;
   ]
 })
 export class CreateMarkerComponent implements
-  OnInit, OnChanges, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnChanges, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() mapId: string;
 
@@ -139,7 +139,7 @@ export class CreateMarkerComponent implements
     });
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newMarkerSaved = true;
     this.newMarkerError = '';
     window.setTimeout(() => {
@@ -152,7 +152,7 @@ export class CreateMarkerComponent implements
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newMarkerError = reason.message;
   }
 }

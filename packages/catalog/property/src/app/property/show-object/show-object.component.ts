@@ -1,8 +1,14 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
-  Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action,
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
@@ -15,7 +21,8 @@ import { API_PATH } from '../property.config';
   templateUrl: './show-object.component.html',
   styleUrls: ['./show-object.component.css']
 })
-export class ShowObjectComponent implements OnInit, OnChanges {
+export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() id: string;
   @Input() object: any;
   @Input() showOnly: string[];
@@ -29,10 +36,14 @@ export class ShowObjectComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -48,9 +59,29 @@ export class ShowObjectComponent implements OnInit, OnChanges {
       this.properties = await properties(
         this.showOnly, this.showExclude, this.fetchProperties.bind(this));
     }
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
 
-    if (!this.object && this.id && this.properties) {
-      this.fetchObject();
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs
+        .get<{data: {object: Object}}>(this.apiPath, {
+          params: {
+            query: `
+              query {
+                object(id: "${this.id}") {
+                  ${this.properties.join('\n')}
+                }
+              }
+            `
+          }
+        })
+        .subscribe((res) => {
+          this.object = res.data.object;
+          this.loadedObject.emit(this.object);
+        });
     }
   }
 
@@ -72,22 +103,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
     return _.map(res.data.properties, 'name');
   }
 
-  fetchObject() {
-    this.gs
-      .get<{data: {object: Object}}>(this.apiPath, {
-        params: {
-          query: `
-            query {
-              object(id: "${this.id}") {
-                ${this.properties.join('\n')}
-              }
-            }
-          `
-        }
-      })
-      .subscribe((res) => {
-        this.object = res.data.object;
-        this.loadedObject.emit(this.object);
-      });
+  private canEval(): boolean {
+    return !!(!this.object && this.id && this.properties && this.gs);
   }
 }

@@ -89,7 +89,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         if (input.assigned === false) {
           filterOp['assigneeId'] = null;
         }
-        filterOp['pending'] = { type: { $ne: 'create-task' } };
+        filterOp['pending'] = { $in: [ null, { type: { $ne: 'create-task' } } ]};
 
         return await tasks.find(filterOp)
           .toArray();

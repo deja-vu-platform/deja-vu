@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import {
@@ -21,7 +23,8 @@ interface PublishersRes {
   templateUrl: './show-publishers.component.html',
   styleUrls: ['./show-publishers.component.css']
 })
-export class ShowPublishersComponent implements OnInit, OnChanges {
+export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined, fetch all publishers.
   // Else, fetch the publishers of the given follower.
@@ -45,21 +48,33 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showPublishers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchPublishers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchPublishers();
+    this.load();
   }
 
-  fetchPublishers() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    console.log('trying eval');
+    if (this.canEval()) {
+      console.log('evalling');
       this.gs
         .get<PublishersRes>(this.apiPath, {
           params: {
@@ -81,5 +96,9 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
           this.publishers = res.data.publishers;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

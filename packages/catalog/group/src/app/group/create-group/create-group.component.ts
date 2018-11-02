@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
@@ -26,7 +26,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-group.component.css']
 })
 export class CreateGroupComponent
-implements OnInit, OnExecCommit, OnExecAbort {
+implements OnInit, OnExecSuccess, OnExecFailure {
   @Input() id;
 
   @Input()
@@ -105,7 +105,7 @@ implements OnInit, OnExecCommit, OnExecAbort {
     .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     if (this.showOptionToSubmit) {
       this.newGroupSaved = true;
       this.newGroupError = '';
@@ -120,7 +120,7 @@ implements OnInit, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     if (this.showOptionToSubmit) {
       this.newGroupError = reason.message;
     }

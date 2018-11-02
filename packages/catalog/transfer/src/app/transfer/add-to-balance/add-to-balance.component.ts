@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -30,7 +30,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./add-to-balance.component.css']
 })
 export class AddToBalanceComponent
-implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
 
@@ -106,7 +106,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     this.transfer.emit(res.data.addToBalance);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferSaved = true;
       this.newTransferError = '';
@@ -121,7 +121,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
      }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferError = reason.message;
     }

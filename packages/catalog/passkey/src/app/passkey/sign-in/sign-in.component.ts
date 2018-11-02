@@ -7,8 +7,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 
@@ -31,7 +31,7 @@ interface ValidatePasskeyRes {
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent
-  implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   // Presentation inputs
   @Input() inputLabel = 'Passkey Code';
   @Input() buttonLabel = 'Validate';
@@ -92,7 +92,7 @@ export class SignInComponent
     this.passkey.emit(passkey);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.passkeyValidated = true;
     window.setTimeout(() => {
       this.passkeyValidated = false;
@@ -104,7 +104,7 @@ export class SignInComponent
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.passkeyValidatedError = reason.message;
   }
 }

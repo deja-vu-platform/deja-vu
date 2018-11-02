@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -43,7 +43,7 @@ interface CreateCommentRes {
   ]
 })
 export class CreateCommentComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() authorId: string;
   @Input() targetId: string;
@@ -111,7 +111,7 @@ export class CreateCommentComponent implements
     this.comment.emit(res.data.createComment);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newCommentSaved = true;
     this.newCommentError = '';
     window.setTimeout(() => {
@@ -124,7 +124,7 @@ export class CreateCommentComponent implements
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newCommentError = reason.message;
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -43,7 +43,7 @@ interface CreateMessageRes {
   ]
 })
 export class CreateMessageComponent implements
-  OnInit, OnExec, OnExecAbort, OnExecCommit {
+  OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() publisherId: string;
 
@@ -110,7 +110,7 @@ export class CreateMessageComponent implements
     });
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newMessageSaved = true;
     this.newMessageError = '';
     window.setTimeout(() => {
@@ -123,7 +123,7 @@ export class CreateMessageComponent implements
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newMessageError = reason.message;
   }
 }

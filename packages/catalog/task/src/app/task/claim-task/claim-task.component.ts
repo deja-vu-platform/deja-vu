@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecCommit, OnExec,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
 } from 'dv-core';
 
@@ -12,7 +12,7 @@ import {
   styleUrls: ['./claim-task.component.css']
 })
 export class ClaimTaskComponent implements
-  OnInit, OnExec, OnExecCommit  {
+  OnInit, OnExec, OnExecSuccess  {
   @Input() id;
   @Input() assigneeId;
   @Input() disabled = false;
@@ -46,7 +46,7 @@ export class ClaimTaskComponent implements
       .toPromise();
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.disabled = true;
   }
 }

@@ -23,7 +23,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-series.component.html',
   styleUrls: ['./create-series.component.css']
 })
-export class CreateSeriesComponent implements OnInit {
+export class CreateSeriesComponent implements OnExec, OnInit {
   @Input() id: string | undefined = '';
   @Input() seriesEvents: Event[] = [];
   @Input() seriesEventsIds: string[] = [];

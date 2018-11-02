@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowLabelComponent } from '../show-label/show-label.component';
@@ -19,7 +21,8 @@ interface LabelsRes {
   templateUrl: './show-labels.component.html',
   styleUrls: ['./show-labels.component.css']
 })
-export class ShowLabelsComponent implements OnInit, OnChanges {
+export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined then the fetched labels are not filtered by that property
   @Input() itemId: string | undefined;
@@ -36,21 +39,31 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showLabels = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchLabels();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchLabels();
+    this.load();
   }
 
-  fetchLabels() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
           query: `
@@ -71,5 +84,9 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
           this.labels = res.data.labels;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

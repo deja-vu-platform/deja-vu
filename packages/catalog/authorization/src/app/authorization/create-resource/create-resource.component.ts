@@ -3,8 +3,8 @@ import {
   Inject, Input, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -26,7 +26,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-resource.component.css']
 })
 export class CreateResourceComponent implements
-  OnInit, OnExec, OnExecCommit, OnExecAbort {
+  OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
   @Input() ownerId: string;
   @Input() viewerIds?: string[];
@@ -88,14 +88,14 @@ export class CreateResourceComponent implements
     this.resource.emit(resource);
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newResourceSuccess = true;
     window.setTimeout(() => {
       this.newResourceSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newResourceErrorText = reason.message;
   }
 }

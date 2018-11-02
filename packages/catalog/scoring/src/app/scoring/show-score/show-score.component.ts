@@ -1,8 +1,10 @@
 import {
-  Component, ElementRef, Inject, Input, OnInit, OnChanges
+  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges
 } from '@angular/core';
 
-import { GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 
 import { API_PATH } from '../scoring.config';
 import { Score } from '../shared/scoring.model';
@@ -13,7 +15,8 @@ import { Score } from '../shared/scoring.model';
   templateUrl: './show-score.component.html',
   styleUrls: ['./show-score.component.css']
 })
-export class ShowScoreComponent implements OnInit, OnChanges {
+export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   @Input() id: string;
   @Input() score: Score;
 
@@ -28,10 +31,14 @@ export class ShowScoreComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.loadScore();
   }
 
@@ -40,25 +47,33 @@ export class ShowScoreComponent implements OnInit, OnChanges {
   }
 
   loadScore() {
-    // only load score when id is given
-    if (!this.gs || this.score || !this.id) {
-      return;
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
     }
-    this.gs.get<{data: {score: Score}}>(this.apiPath, {
-      params: {
-        query: `
-          query {
-            score(id: "${this.id}") {
-              ${this.showId ? 'id' : ''}
-              ${this.showValue ? 'value' : ''}
-              ${this.showTargetId ? 'targetId' : ''}
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.gs.get<{data: {score: Score}}>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              score(id: "${this.id}") {
+                ${this.showId ? 'id' : ''}
+                ${this.showValue ? 'value' : ''}
+                ${this.showTargetId ? 'targetId' : ''}
+              }
             }
-          }
-        `
-      }
-    })
-    .subscribe((res) => {
-      this.score = res.data.score;
-    });
+          `
+        }
+      })
+      .subscribe((res) => {
+        this.score = res.data.score;
+      });
+    }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.score && this.id);
   }
 }

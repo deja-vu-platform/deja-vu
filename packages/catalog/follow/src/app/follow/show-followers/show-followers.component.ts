@@ -1,7 +1,9 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from 'dv-core';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../follow.config';
@@ -20,7 +22,8 @@ interface FollowersRes {
   templateUrl: './show-followers.component.html',
   styleUrls: ['./show-followers.component.css']
 })
-export class ShowFollowersComponent implements OnInit, OnChanges {
+export class ShowFollowersComponent implements AfterViewInit, OnEval, OnInit,
+OnChanges {
   // Fetch rules
   // If undefined, fetch all followers.
   // Else, fetch the followers of the given publisher.
@@ -40,21 +43,31 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showFollowers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchFollowers();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.fetchFollowers();
+    this.load();
   }
 
-  fetchFollowers() {
-    if (this.gs) {
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<FollowersRes>(this.apiPath, {
           params: {
@@ -74,5 +87,9 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
           this.followers = res.data.followers;
         });
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

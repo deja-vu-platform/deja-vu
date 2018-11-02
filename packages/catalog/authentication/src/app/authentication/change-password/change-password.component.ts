@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecAbort,
-  OnExecCommit, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExecFailure,
+  OnExecSuccess, OnExec, RunService
 } from 'dv-core';
 
 
@@ -45,7 +45,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   ]
 })
 export class ChangePasswordComponent
-implements OnInit, OnExec, OnExecCommit, OnExecAbort {
+implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -113,7 +113,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.newPasswordSaved = true;
     window.setTimeout(() => {
       this.newPasswordSaved = false;
@@ -125,7 +125,7 @@ implements OnInit, OnExec, OnExecCommit, OnExecAbort {
     }
   }
 
-  dvOnExecAbort(reason: Error) {
+  dvOnExecFailure(reason: Error) {
     this.newPasswordSavedError = reason.message;
   }
 

@@ -3,7 +3,7 @@ import {
   Input, EventEmitter, SimpleChanges
 } from '@angular/core';
 
-import { RunService, OnExec, OnExecCommit } from '../run.service';
+import { RunService, OnExec, OnExecSuccess } from '../run.service';
 
 import { take, filter } from 'rxjs/operators';
 
@@ -15,7 +15,7 @@ import * as _ from 'lodash';
   templateUrl: './merge.component.html'
 })
 export class MergeComponent
-implements OnInit, OnChanges, OnExec, OnExecCommit {
+implements OnInit, OnChanges, OnExec, OnExecSuccess {
   @Input() sources: any[] = [];
   sourcesChange = new EventEmitter<any[]>();
   @Output() object = new EventEmitter<any>();
@@ -46,7 +46,7 @@ implements OnInit, OnChanges, OnExec, OnExecCommit {
     this.object.emit(_.merge({}, ...this.sources));
   }
 
-  dvOnExecCommit() {
+  dvOnExecSuccess() {
     this.sources = [];
   }
 
