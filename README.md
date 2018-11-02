@@ -49,7 +49,8 @@ At this point the easiest way to run Déjà Vu is to clone our repo and install
 everything from source. Good news is that if you want to contribute code, you'll
 be all set to do so.
 
-You are going to need [yarn](https://yarnpkg.com/en/) v1.10+, node v9+ and MongoDB 3.4+.
+You are going to need [yarn](https://yarnpkg.com/en/) v1.10+,
+[lerna](https://lernajs.io/), node v9+ and MongoDB 3.4+.
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything
