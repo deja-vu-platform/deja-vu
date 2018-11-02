@@ -37,9 +37,7 @@ export class CompleteTaskComponent implements
     return this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation {
-          completeTask(id: "${this.id}") {
-            id
-          }
+          completeTask(id: "${this.id}")
         }`
       })
       .toPromise();
