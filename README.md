@@ -1,28 +1,69 @@
 Déjà Vu
 =======
 
-Building and running for development
-------------------------------------
+Déjà Vu is an experimental language and tool for building web apps.
 
-You need to be running npm v5, node v9 and at least MongoDB 3.4. The directory 
-containing `mongod` has to be in your path.
+To build Déjà Vu apps you configure and compose "clichés", drawn from a catalog
+developed by experts. A cliché implements a "concept": a self-contained,
+reusable, increment of functionality that is motivated by a purpose defined in
+terms of the needs of a user (for example, think of the "comment" functionality
+you can find on Facebook, or the "rating" functionality on Amazon).
+Clichés include all the necessary parts to achieve the required
+functionality---from the front-end GUI to the back-end data storage---and export
+a collection of "actions"---composable GUI elements.
 
-Each cliché and sample is its own node project. Like any other node project, you
-need to run `npm install` to install dependencies. To build a library, cliché
-or app do `npm run build`. To run a cliché or an app do `npm start`. When a
-cliché is run it shows a "development" page that is used for testing.
+Building apps with Déjà Vu boils down to tuning the clichés you need via
+configuration variables (using JSON) and linking actions to create pages (using
+the Déjà Vu language). You can also use CSS to customize the appearance of your
+app. Read the [tutorial introduction to Déjà Vu]() for more information.
 
-To check the running cliché or app visit `http://localhost:3000`
+**Déjà Vu is a research prototype and you shouldn't rely on it for anything
+important at this point**, but we would love to hear what you think!
+You can play around with it and shoot us an email or create an issue with your
+feedback or questions. You can find a list of the things we plan to work on next
+on the [roadmap file]().
 
-Some projects depend on others so you need to build the dependencies first.
-If you follow these steps in order then everything should work:
-  1. `npm i`, `npm run package` and `npm i -g` in `packages/dv-cli` to install
-      the cli globally
-  2. `npm i` and `npm run package` in `packages/dv-core`,
-      `packages/dv-gateway`, and `packages/cliche-server`
-  3. `npm i` and `npm run package` in each cliché under `catalog` (e.g.,
-     `npm i` and `npm run package` in `catalog/event`)
-  4. `npm i` in each sample under `samples` (e.g., `npm i` in `samples/morg`)
+Motivation
+----------
 
-If you are developing a sample app and make a change in a cliché you need to
-repackage that cliché and reinstall it.
+As a user, you might have noticed the fundamental similarities between the
+many applications you use on a day-to-day basis. Maybe it was the day you
+were scrolling through your Facebook news feed and then through your
+Twitter feed; or giving a 5-star review to a restaurant in Yelp, and then
+to a book on Amazon; or replying to a tweet and then to a comment on Hacker
+News. And while you as a user are experiencing the same rating concept, for
+example, in multiple applications, developers all over the world are
+implementing that concept afresh as if it had never been implemented before.
+
+In each of these cases, the developer may be implementing something slightly
+different: a rating of a post in one case, for example, and a user in another.
+Our premise, however, is that fundamentally they are all doing the same thing,
+and much of the work in building an application involves combining pre-existing
+*concepts* in novel ways. If we could exploit this fact, applications might be
+assembled with much less effort.
+
+Running
+-------
+
+At this point the easiest way to run Déjà Vu is to clone our repo and install
+everything from source. Good news is that if you want to contribute code, you'll
+be all set to do so.
+
+You are going to need [yarn](https://yarnpkg.com/en/) v1.10+, node v9+ and MongoDB 3.4+.
+
+Each cliché and sample is its own node project. We use yarn workspaces to make
+it easier to build and install all packages. To install and build everything
+do `yarn install`. This will take a while as it downloads dependencies and
+builds all clichés and core libraries. 
+
+To run a cliché or an app start the mongo daemon with `mongod` (all of our
+clichés and the runtime system use MongoDb) and then `cd` into the cliché
+or app you want to run and do `yarn start`. 
+
+To check the running cliché or app visit `http://localhost:3000`.
+
+When a cliché is run it shows a "development" page that is used for testing.
+
+Yarn will symlink dependencies so if you make a change to a cliché you are using
+in an app, the only thing you need to do is rebuild the cliche with
+`yarn package` and restart your app.
