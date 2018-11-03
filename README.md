@@ -1,4 +1,4 @@
-#Déjà Vu
+# Déjà Vu
 
 Déjà Vu is an experimental language for building web apps. It features
 built-in user functionality for rapid construction of apps
@@ -24,7 +24,7 @@ You can play around with it and shoot us an email or create an issue with your
 feedback or questions. See the [roadmap](#roadmap) for a list of the things
 we plan to work on next.
 
-##Motivation
+## Motivation
 
 As a user, you might have noticed the fundamental similarities between the
 many applications you use on a day-to-day basis. Maybe it was the day you
@@ -42,7 +42,7 @@ and much of the work in building an application involves combining pre-existing
 *concepts* in novel ways. If we could exploit this fact, applications might be
 assembled with much less effort.
 
-##Running
+## Running
 
 At this point the easiest way to run Déjà Vu is to clone our repo and install
 everything from source. Good news is that if you want to contribute code, you'll
@@ -73,10 +73,10 @@ Yarn will symlink dependencies so if you make a change to a cliché you are usin
 in an app, the only thing you need to do is rebuild the cliche with
 `yarn package` and restart your app.
 
-##Tutorial
+## Tutorial
 
 TODO
 
-##Roadmap
+## Roadmap
 
 TODO
