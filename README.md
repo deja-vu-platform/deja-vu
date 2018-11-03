@@ -49,23 +49,22 @@ At this point the easiest way to run Déjà Vu is to clone our repo and install
 everything from source. Good news is that if you want to contribute code, you'll
 be all set to do so.
 
-You are going to need [yarn](https://yarnpkg.com/en/) v1.10+,
-[lerna](https://lernajs.io/), node v9+ and MongoDB 3.4+.
+You are going to need [yarn](https://yarnpkg.com) v1.10+,
+[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 3.4+.
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything
-do `yarn install`. Unfortunately, yarn has a
-[bug](https://github.com/yarnpkg/yarn/issues/3421) that
-affects our installation process, so the first `yarn install` will fail. After
-the first `yarn install` fails, run `yarn --check-files` and everything should
-work.
+do `yarn` (running `yarn` with no command will run `yarn install`). Unfortunately,
+yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
+affects our installation process, so the first `yarn` will fail. After
+the first `yarn` fails, run `yarn --check-files` and everything should work.
 
 Installation will take a while as it downloads dependencies and builds all
 clichés and core libraries. 
 
-To run a cliché or an app start the mongo daemon with `mongod` (all of our
-clichés and the runtime system use MongoDb) and then `cd` into the cliché
-or app you want to run and do `yarn start`. 
+To run a cliché or an app start the mongo daemon with `mongod` (all of our clichés
+and the runtime system use MongoDb) and then in a separate shell `cd` into the
+cliché or app you want to run and do `yarn start`.
 
 To check the running cliché or app visit `http://localhost:3000`.
 

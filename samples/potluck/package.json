@@ -2,10 +2,10 @@
   "name": "potluck",
   "version": "0.0.1",
   "scripts": {
-    "start": "./node_modules/.bin/dv serve",
+    "start": "dv serve",
     "build": "npm run dv-build-potluck",
     "test": "ng test",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/*.ts",
+    "lint": "tslint -p . -c tslint.json src/app/**/*.ts",
     "e2e": "ng e2e",
     "dv-build-potluck": "ng build",
     "concurrently": "concurrently",

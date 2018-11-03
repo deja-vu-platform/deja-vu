@@ -2,6 +2,14 @@
   "name": "dv-core",
   "version": "0.0.1",
   "description": "Core libraries of Déjà Vu",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "package": "dv package",
+    "prepare": "npm run package",
+    "dv-package-dv": "ng-packagr -p ng-package.json",
+    "lint": "tslint -p . -c tslint.json src/*.ts"
+  },
   "peerDependencies": {
     "@angular/core": "^5.2.4",
     "@angular/forms": "^5.2.0",
@@ -32,13 +40,8 @@
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "package": "./node_modules/.bin/dv package",
-    "prepare": "npm run package",
-    "dv-package-dv": "ng-packagr -p ng-package.json",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts"
+  "dependencies": {
+    "uuid": "^3.2.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
@@ -47,9 +50,6 @@
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
-  "dependencies": {
-    "uuid": "^3.2.1"
-  },
   "types": "pkg/dv-core.d.ts",
   "main": "pkg/bundles/dv-core.umd.js"
 }

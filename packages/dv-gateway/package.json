@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && chmod +x ./dist/gateway.js",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts",
+    "lint": "tslint -p . -c tslint.json src/*.ts",
     "prepare": "npm run package",
     "package": "npm run build",
     "start": "node dist/gateway.js --configFilePath dvconfig.json",

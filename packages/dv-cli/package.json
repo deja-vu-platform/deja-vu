@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && copyfiles -f src/*.blueprint.* dist && chmod +x dist/dv.js",
     "package": "npm run clean && npm run build",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
     "prepare": "npm run package"
   },
