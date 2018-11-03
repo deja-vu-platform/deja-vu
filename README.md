@@ -1,30 +1,30 @@
-Déjà Vu
-=======
+#Déjà Vu
 
-Déjà Vu is an experimental language and tool for building web apps.
+Déjà Vu is an experimental language for building web apps. It features
+built-in user functionality for rapid construction of apps
+with complex behavior and rich user interfaces.
 
-To build Déjà Vu apps you configure and compose "clichés", drawn from a catalog
+To build apps using Déjà Vu you configure and compose "clichés", drawn from a catalog
 developed by experts. A cliché implements a "concept": a self-contained,
 reusable, increment of functionality that is motivated by a purpose defined in
 terms of the needs of a user (for example, think of the "comment" functionality
 you can find on Facebook, or the "rating" functionality on Amazon).
 Clichés include all the necessary parts to achieve the required
-functionality---from the front-end GUI to the back-end data storage---and export
-a collection of "actions"---composable GUI elements.
+functionality&mdash;from the front-end GUI to the back-end data
+storage&mdash;and export a collection of "actions"&mdash;composable GUI elements.
 
 Building apps with Déjà Vu boils down to tuning the clichés you need via
 configuration variables (using JSON) and linking actions to create pages (using
 the Déjà Vu language). You can also use CSS to customize the appearance of your
-app. Read the [tutorial introduction to Déjà Vu]() for more information.
+app. Read the [tutorial](#tutorial) for more information.
 
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we would love to hear what you think!
 You can play around with it and shoot us an email or create an issue with your
-feedback or questions. You can find a list of the things we plan to work on next
-on the [roadmap file]().
+feedback or questions. See the [roadmap](#roadmap) for a list of the things
+we plan to work on next.
 
-Motivation
-----------
+##Motivation
 
 As a user, you might have noticed the fundamental similarities between the
 many applications you use on a day-to-day basis. Maybe it was the day you
@@ -42,8 +42,7 @@ and much of the work in building an application involves combining pre-existing
 *concepts* in novel ways. If we could exploit this fact, applications might be
 assembled with much less effort.
 
-Running
--------
+##Running
 
 At this point the easiest way to run Déjà Vu is to clone our repo and install
 everything from source. Good news is that if you want to contribute code, you'll
@@ -73,3 +72,11 @@ When a cliché is run it shows a "development" page that is used for testing.
 Yarn will symlink dependencies so if you make a change to a cliché you are using
 in an app, the only thing you need to do is rebuild the cliche with
 `yarn package` and restart your app.
+
+##Tutorial
+
+TODO
+
+##Roadmap
+
+TODO
