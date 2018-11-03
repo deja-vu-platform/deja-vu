@@ -54,8 +54,14 @@ You are going to need [yarn](https://yarnpkg.com/en/) v1.10+,
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything
-do `yarn install`. This will take a while as it downloads dependencies and
-builds all clichés and core libraries. 
+do `yarn install`. Unfortunately, yarn has a
+[bug](https://github.com/yarnpkg/yarn/issues/3421#issuecomment-390230608) that
+affects our installation process, so the first `yarn install` will fail. After
+the first `yarn install` fails, run `yarn --check-files` and everything should
+work.
+
+Installation will take a while as it downloads dependencies and builds all
+clichés and core libraries. 
 
 To run a cliché or an app start the mongo daemon with `mongod` (all of our
 clichés and the runtime system use MongoDb) and then `cd` into the cliché
