@@ -8,6 +8,7 @@ import {
 } from '../../symbolTable';
 
 import {
+  classNameToNgField,
   getStEntryForNgComponent,
   inputToNgField,
   isInput,
@@ -18,9 +19,13 @@ import {
 import * as assert from 'assert';
 
 import * as _ from 'lodash';
+import { ActionInputCompiler } from '../../action-input/action-input.compiler';
+import { ActionCompiler, CompiledAction } from '../action.compiler';
 
 
-export function toNgTemplate(symbolTable: ActionSymbolTable) {
+export function toNgTemplate(
+  appName: string, symbolTable: ActionSymbolTable,
+  actionInputs: CompiledAction[]) {
   const tagTransform = (open, elementName, attrs, close): string => {
     const transformedElementName = elementName.toNgTemplate();
     const transformedActionName = _.split(transformedElementName, ' ', 1)[0];
@@ -128,7 +133,7 @@ export function toNgTemplate(symbolTable: ActionSymbolTable) {
 
       return ngInputField;
     },
-    Expr_element: (element) => {}, // TODO
+    Expr_element: transformActionInput(appName, symbolTable, actionInputs),
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: (leftExpr, and, rightExpr) =>
@@ -180,5 +185,37 @@ export function toNgTemplate(symbolTable: ActionSymbolTable) {
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
       openSb.sourceString + exprs.saveUsedOutputs() + closeSb.sourceString,
+  };
+}
+
+function transformActionInput(
+  appName: string, symbolTable: ActionSymbolTable,
+  actionInputs: CompiledAction[]) {
+
+  return (element) => {
+    const actionInputCompiler = new ActionInputCompiler();
+    const compiledActionInput = actionInputCompiler
+      .compile(element.sourceString, symbolTable);
+
+    const actionCompiler = new ActionCompiler();
+
+    const compiledAction = actionCompiler
+      .compile(appName, compiledActionInput.action, {});
+
+    actionInputs.push(compiledAction);
+
+    const inputsObj = _
+      .reduce(
+        compiledActionInput.inputsFromContext, (obj, inputFromContext) => {
+        obj[inputFromContext.input] = inputFromContext.field;
+
+        return obj;
+      }, {});
+
+    return `{
+      type: ${classNameToNgField(compiledAction.className)},
+      tag: ${compiledAction.selector},
+      inputs: ${JSON.stringify(inputsObj)}
+    }`;
   };
 }

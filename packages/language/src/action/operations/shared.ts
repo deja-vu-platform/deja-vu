@@ -18,6 +18,10 @@ export function isNgComponent(name: string): boolean {
   return _.includes(name, '-');
 }
 
+export function classNameToNgField(name: string): string {
+  return `__actionInput__${_.camelCase(name)}`;
+}
+
 export function getStEntryForNgComponent(
   ngComponentName: string, symbolTable: ActionSymbolTable, alias?: string)
   : ActionStEntry | undefined {

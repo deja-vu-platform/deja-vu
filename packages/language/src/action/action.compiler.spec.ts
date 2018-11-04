@@ -105,19 +105,56 @@ describe('ActionCompiler', () => {
   it('should compile action with action input', () => {
     const action = `
       <dv.action name="home">
-        <div class="row box">
-          <div class="col-md-12">
-            <event.choose-and-show-series
-              showEvent=
-                <dv.action>
-                  <morg.show-group-meeting
-                    groupMeeting=$event
-                    groupMeetings=$events />
-                </dv.action>
-              noEventsToShowText="No meetings to show"
-              chooseSeriesSelectPlaceholder="Choose Meeting Series" />
-          </div>
-        </div>
+        <event.choose-and-show-series
+          showEvent=<event.show-event/>
+          noEventsToShowText="No meetings to show"
+          chooseSeriesSelectPlaceholder="Choose Meeting Series" />
+      </dv.action>
+    `;
+    actionCompiler.compile(appName, action, {});
+  });
+
+  it('should compile action with html action input', () => {
+    const action = `
+      <dv.action name="home">
+        <event.choose-and-show-series
+          showEvent=<h1>Event</h1>
+          noEventsToShowText="No meetings to show"
+          chooseSeriesSelectPlaceholder="Choose Meeting Series" />
+      </dv.action>
+    `;
+    actionCompiler.compile(appName, action, {});
+  });
+
+  it('should compile action with action input ' +
+    'that uses context inputs', () => {
+    const action = `
+      <dv.action name="home">
+        <event.choose-and-show-series
+          showEvent=
+            <morg.show-group-meeting
+              groupMeeting=$event
+              groupMeetings=$events />
+          noEventsToShowText="No meetings to show"
+          chooseSeriesSelectPlaceholder="Choose Meeting Series" />
+      </dv.action>
+    `;
+    actionCompiler.compile(appName, action, {});
+  });
+
+  it('should compile action with action input ' +
+    'that maps outputs', () => {
+    const action = `
+      <dv.action name="home">
+        <event.choose-and-show-series
+          showEvent=
+            <dv.action meeting$=morg.show-group-meeting.shownGroupMeeting>
+              <morg.show-group-meeting
+                groupMeeting=$event
+                groupMeetings=$events />
+            </dv.action>
+          noEventsToShowText="No meetings to show"
+          chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
     actionCompiler.compile(appName, action, {});

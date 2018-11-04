@@ -8,16 +8,25 @@ import {
 } from '../symbolTable';
 
 import * as _ from 'lodash';
-import { NgComponentBuilder } from './ng-component.builder';
+import { NgComponentBuilder, NgField } from './ng-component.builder';
 
 import { saveUsedActions } from './operations/save-used-actions.operation';
 import { saveInputs} from './operations/save-inputs.operation';
 import { toNgTemplate } from './operations/to-ng-template.operation';
 import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
+import { CompiledActionInput } from '../action-input/action-input.compiler';
+import { classNameToNgField } from './operations/shared';
 
 const ohm = require('ohm-js');
 
+
+export interface CompiledAction {
+  readonly className: string;
+  readonly selector: string;
+  readonly ngComponent: string;
+  readonly actionInputs?: ReadonlyArray<CompiledAction>;
+}
 
 export class ActionCompiler {
   private readonly grammar;
@@ -47,21 +56,40 @@ export class ActionCompiler {
         .FilterKind(kind, symbolTable));
   }
 
+  private static GetClassName(actionName: string): string {
+    return `${_.upperFirst(_.camelCase(actionName))}Component`;
+  }
+
+  private static GetSelector(appName: string, actionName: string): string {
+    return `${appName}-${actionName}`;
+  }
+
   constructor() {
     const grammarPath = path.join(__dirname, 'action.grammar.ohm');
     this.grammar = ohm.grammar(readFileSync(grammarPath, 'utf-8'));
     this.semantics = this.grammar.createSemantics();
   }
 
+  /**
+   * Compiles the given action contents and updates the symbol table
+   * @param appName the name of the application the action is part of
+   * @param actionContents the contents of the action to compile
+   * @param symbolTable the symbol table to update
+   *
+   * @return the compiled action object
+   */
   compile(appName: string, actionContents: string, symbolTable: SymbolTable)
-    : string {
+    : CompiledAction {
     const thisActionSymbolTable: ActionSymbolTable = {};
+    const actionInputs: CompiledAction[] = [];
     this.semantics
       .addOperation('getActionName', getActionName())
       .addOperation('saveUsedActions', saveUsedActions(thisActionSymbolTable))
       .addOperation('saveUsedOutputs', saveUsedOutputs(thisActionSymbolTable))
       .addOperation('saveInputs', saveInputs(thisActionSymbolTable))
-      .addOperation('toNgTemplate', toNgTemplate(thisActionSymbolTable));
+      .addOperation(
+        'toNgTemplate', toNgTemplate(
+          appName, thisActionSymbolTable, actionInputs));
 
     const matchResult = this.grammar.match(actionContents);
     if (matchResult.failed()) {
@@ -80,10 +108,12 @@ export class ActionCompiler {
     s.saveInputs();
     console.log(JSON.stringify(symbolTable));
     const ngTemplate = s.toNgTemplate();
+    const className = ActionCompiler.GetClassName(thisActionName);
+    const selector = ActionCompiler.GetSelector(appName, thisActionName);
     const ngComponentBuilder = new NgComponentBuilder(
-      appName, thisActionName, ngTemplate);
+      appName, thisActionName, ngTemplate, className, selector);
 
-    const fields: string[] =  _
+    const fields: NgField[] =  _
       .chain(ActionCompiler.FilterKind('cliche', thisActionSymbolTable))
       .map((clicheEntry: ClicheStEntry): ActionStEntry[] =>
         <ActionStEntry[]> ActionCompiler
@@ -92,14 +122,33 @@ export class ActionCompiler {
       .map((clicheEntry: ActionStEntry): string[] =>
         ActionCompiler.GetNgFields('output', clicheEntry.symbolTable))
       .flatten()
+      .map((fieldName: string): NgField => ({ name: fieldName }))
       .value();
+
+    const actionInputFields: NgField[] = _.map(
+      actionInputs, (actionInput) => ({
+        name: classNameToNgField(actionInput.className),
+        value: actionInput.className
+      }));
     const ngComponent = ngComponentBuilder
-      .withInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
-      .withOutputs(ActionCompiler.GetNgFields('output', thisActionSymbolTable))
-      .withFields(fields)
+      .addInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
+      .addOutputs(ActionCompiler.GetNgFields('output', thisActionSymbolTable))
+      .addFields(fields)
+      .addFields(actionInputFields)
+      .withActionImports(
+        _.map(actionInputs, (actionInput: CompiledAction) => ({
+          className: actionInput.className,
+          actionName: actionInput.selector
+        })))
       .build();
     console.log(ngComponent);
 
-    return ngComponent;
+    return {
+      className: className,
+      selector: selector,
+      ngComponent: ngComponent,
+      actionInputs: actionInputs
+    };
   }
 }
+
