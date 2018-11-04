@@ -12,7 +12,6 @@ import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import {
   ChangePasswordInput,
-  PendingDoc,
   RegisterInput,
   SignInInput,
   SignInOutput,
@@ -162,14 +161,14 @@ async function register(
     case 'commit':
       await users.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
 
-      return;
+      return undefined;
     case 'abort':
       await users.deleteOne(reqIdPendingFilter);
 
-      return;
+      return undefined;
   }
 
-  return;
+  return undefined;
 }
 
 function sign(userId: string): string {
@@ -185,18 +184,18 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const users: mongodb.Collection<UserDoc> = db.collection('users');
   return {
     Query: {
       users: () => users.find({ pending: { $exists: false } })
         .toArray(),
-      user: async (root, { username }) => {
+      user: async (_root, { username }) => {
         const user: UserDoc | null = await users.findOne({ username: username });
 
         return isPendingRegister(user) ? null : user;
       },
-      userById: async (root, { id }) => {
+      userById: async (_root, { id }) => {
         const user: UserDoc | null = await users.findOne({ id: id });
 
         if (_.isNil(user) || isPendingRegister(user)) {
@@ -206,7 +205,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return user;
       },
 
-      verify: (root, { input }: { input: VerifyInput }) => verify(
+      verify: (_root, { input }: { input: VerifyInput }) => verify(
         input.token, input.id)
     },
 
@@ -221,12 +220,13 @@ function resolvers(db: mongodb.Db, config: Config): object {
     },
 
     Mutation: {
-      register: (root, { input }: { input: RegisterInput }, context: Context) => {
+      register: (
+        _root, { input }: { input: RegisterInput }, context: Context) => {
         return register(users, input, context);
       },
 
       registerAndSignIn: async (
-        root, { input }: { input: RegisterInput }, context: Context) => {
+        _root, { input }: { input: RegisterInput }, context: Context) => {
         const user = await register(users, input, context);
 
         if (!_.isNil(user)) {
@@ -238,13 +238,13 @@ function resolvers(db: mongodb.Db, config: Config): object {
           };
         }
 
-        return;
+        return undefined;
       },
 
-      signIn: async (root, { input }: { input: SignInInput }) => {
-        const user = await UserValidation.userExistsByUsername(users, input.username);
-        const verification = await UserValidation.verifyPassword(input.password,
-          user.password);
+      signIn: async (_root, { input }: { input: SignInInput }) => {
+        const user = await UserValidation
+          .userExistsByUsername(users, input.username);
+        await UserValidation.verifyPassword(input.password, user.password);
 
         const token: string = sign(user.id);
 
@@ -255,11 +255,10 @@ function resolvers(db: mongodb.Db, config: Config): object {
       },
 
       changePassword: async (
-        root, { input }: { input: ChangePasswordInput }, context: Context) => {
+        _root, { input }: { input: ChangePasswordInput }, context: Context) => {
         UserValidation.isPasswordValid(input.newPassword);
         const user = await UserValidation.userExistsById(users, input.id);
-        const verification =
-          await UserValidation.verifyPassword(input.oldPassword, user.password);
+        await UserValidation.verifyPassword(input.oldPassword, user.password);
         const newPasswordHash = await bcrypt
           .hash(input.newPassword, SALT_ROUNDS);
 
@@ -317,12 +316,13 @@ function resolvers(db: mongodb.Db, config: Config): object {
       }
     }
   };
-};
+}
 
 const authenticationCliche: ClicheServer =
   new ClicheServerBuilder('authentication')
-    .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+    .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
       const users: mongodb.Collection<UserDoc> = db.collection('users');
+
       return Promise.all([
         users.createIndex({ id: 1 }, { unique: true, sparse: true }),
         users.createIndex({ username: 1 }, { unique: true, sparse: true })

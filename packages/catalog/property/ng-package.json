@@ -6,4 +6,3 @@
   "whitelistedNonPeerDependencies": ["."],
   "dest": "pkg"
 }
-

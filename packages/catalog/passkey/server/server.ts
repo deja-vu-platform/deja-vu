@@ -1,23 +1,18 @@
 import {
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
   Config,
-  Context,
-  Validation
+  Context
 } from 'cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import * as path from 'path';
 import {
   PasskeyDoc,
-  PendingDoc,
   SignInOutput,
-  VerifyInput,
+  VerifyInput
 } from './schema';
 import * as shajs from 'sha.js';
-import { v4 as uuid } from 'uuid';
 import { WORDS } from './words';
 
 
@@ -120,32 +115,33 @@ async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
     case 'commit':
       await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
 
-      return;
+      return newPasskey;
     case 'abort':
       await passkeys.deleteOne(reqIdPendingFilter);
 
-      return;
+      return newPasskey;
   }
 
   return newPasskey;
 
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
+
   return {
     Query: {
       passkeys: () => passkeys.find({ pending: { $exists: false } })
         .toArray(),
 
-      passkey: async (root, { code }) => {
+      passkey: async (_root, { code }) => {
         const passkey: PasskeyDoc = await PasskeyValidation.passkeyExistsOrFail(
           passkeys, code);
 
         return isPendingCreate(passkey) ? null : passkey;
       },
 
-      verify: (root, { input }: { input: VerifyInput }) =>
+      verify: (_root, { input }: { input: VerifyInput }) =>
         verify(input.token, input.code)
     },
 
@@ -159,13 +155,13 @@ function resolvers(db: mongodb.Db, config: Config): object {
     },
 
     Mutation: {
-      createPasskey: async (root, { code }, context: Context) => {
+      createPasskey: async (_root, { code }, context: Context) => {
         const passkey = await createPasskey(passkeys, code, context);
 
         return passkey;
       },
 
-      createAndValidatePasskey: async (root, { code }, context: Context) => {
+      createAndValidatePasskey: async (_root, { code }, context: Context) => {
         const passkey = await createPasskey(passkeys, code, context);
 
         if (!_.isNil(passkey)) {
@@ -177,10 +173,10 @@ function resolvers(db: mongodb.Db, config: Config): object {
           };
         }
 
-        return;
+        return undefined;
       },
 
-      validatePasskey: async (root, { code }) => {
+      validatePasskey: async (_root, { code }) => {
         const passkey = await PasskeyValidation.passkeyExistsOrFail(
           passkeys, code);
 
@@ -193,11 +189,12 @@ function resolvers(db: mongodb.Db, config: Config): object {
       }
     }
   };
-};
+}
 
 const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
+
     return passkeys.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
   .resolvers(resolvers)

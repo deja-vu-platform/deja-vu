@@ -2,29 +2,17 @@
   "name": "dv-cli",
   "version": "0.0.1",
   "description": "CLI tool for Déjà Vu",
-  "main": "./dist/dv.js",
   "bin": {
     "dv": "./dist/dv.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && copyfiles -f src/*.blueprint.* dist",
+    "build": "tsc && copyfiles -f src/*.blueprint.* dist && chmod +x dist/dv.js",
     "package": "npm run clean && npm run build",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
-    "reinstall-globally": "npm run clean && npm run build && npm uninstall -g && npm install -g"
+    "prepare": "npm run package"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spderosso/dejavu.git"
-  },
-  "author": "Santiago De Rosso",
-  "license": "MIT",
-  "private": true,
-  "bugs": {
-    "url": "https://github.com/spderosso/dejavu/issues"
-  },
-  "homepage": "https://github.com/spderosso/dejavu#readme",
   "dependencies": {
     "commander": "^2.13.0",
     "fs-extra": "^6.0.1",
@@ -40,5 +28,14 @@
     "copyfiles": "^1.2.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/dv.d.ts",
+  "main": "./dist/dv.js"
 }

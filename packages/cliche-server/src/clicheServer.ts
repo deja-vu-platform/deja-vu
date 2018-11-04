@@ -62,7 +62,7 @@ export class ClicheServer {
     const app = express();
 
     app.get(/^\/dv\/(.*)\/vote\/.*/,
-      (req, res, next) => {
+      (req, _res, next) => {
         req['reqId'] = req.params[0];
         next();
       },
@@ -85,7 +85,7 @@ export class ClicheServer {
     );
 
     app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
-      (req, res, next) => {
+      (req, _res, next) => {
         req['reqId'] = req.params[0];
         req['reqType'] = req.params[1];
         next();
@@ -162,4 +162,4 @@ export class ClicheServer {
       this.startApp(schema);
     }
   }
-} 
+}

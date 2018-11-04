@@ -1,10 +1,8 @@
 import {
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
   Config,
-  Context,
-  Validation
+  Context
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -18,7 +16,7 @@ import { v4 as uuid } from 'uuid';
 interface ScoringConfig extends Config {
   // Function body that calculates the total score
   // based on the parameter scores which is an array of scores with type number
-  totalScoreFn: string;
+  totalScoreFn?: string;
 }
 
 const DEFAULT_TOTAL_SCORE_FN = (scores: number[]) =>
@@ -28,10 +26,10 @@ function isPendingCreate(doc: ScoreDoc | null) {
   return _.get(doc, 'pending.type') === 'create-score';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, config: ScoringConfig): object {
   const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
-  const totalScoreFn = config['totalScoreFn'] ?
-    new Function('scores', config['totalScoreFn']) : DEFAULT_TOTAL_SCORE_FN;
+  const totalScoreFn = config.totalScoreFn ?
+    new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;
 
   return {
     Query: {
@@ -94,22 +92,23 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return newScore;
           case 'abort':
             await scores.deleteOne(reqIdPendingFilter);
 
-            return;
+            return newScore;
         }
 
         return newScore;
       }
     }
   };
-};
+}
 
 const scoringCliche: ClicheServer = new ClicheServerBuilder('scoring')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+
     return Promise.all([
       scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
       scores.createIndex({ targetId: 1 })

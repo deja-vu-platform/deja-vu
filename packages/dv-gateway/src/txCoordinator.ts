@@ -386,7 +386,7 @@ export class TxCoordinator<Message, Payload, State = any> {
               return this.completeTx(txToAbort.id, false);
             }
 
-            return;
+            return undefined;
           });
       })
     );
@@ -438,7 +438,7 @@ export class TxCoordinator<Message, Payload, State = any> {
             `cohort ${cohort.id} is not waiting for completion ` +
             `(it's ${cohort.state}), not sending complete message`, txId);
 
-          return;
+          return undefined;
         }
 
         log(`On complete tx, sending complete message to ${cohort.id} ` +

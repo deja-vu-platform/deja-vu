@@ -1,6 +1,0 @@
-<ul *ngIf="users && users.length > 0" class="list-group">
-  <li *ngFor="let user of users" class="list-group-item">
-    <dv-widget name="ShowUser" [init]="{user: user}"></dv-widget>
-    <dv-widget name="StartChatButtonWithRedirect" [init]="{user1: currentUser, user2: user, on_chat_ok: on_chat_ok, submit_ok: submit_ok}"></dv-widget>
-  </li>
-</ul>

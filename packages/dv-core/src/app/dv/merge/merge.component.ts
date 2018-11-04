@@ -43,7 +43,7 @@ implements OnInit, OnChanges, OnExec, OnExecSuccess {
         .pipe(filter(this.isReady), take(1))
         .toPromise();
     }
-    this.object.emit(_.merge(...this.sources));
+    this.object.emit(_.merge({}, ...this.sources));
   }
 
   dvOnExecSuccess() {

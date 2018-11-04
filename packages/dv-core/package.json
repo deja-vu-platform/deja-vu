@@ -2,13 +2,21 @@
   "name": "dv-core",
   "version": "0.0.1",
   "description": "Core libraries of Déjà Vu",
-  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "package": "dv package",
+    "prepare": "npm run package",
+    "dv-package-dv": "ng-packagr -p ng-package.json",
+    "lint": "tslint -p . -c tslint.json src/*.ts"
+  },
   "peerDependencies": {
     "@angular/core": "^5.2.4",
     "@angular/forms": "^5.2.0",
     "@angular/common": "^5.2.0",
     "rxjs": "5.5.6",
     "zone.js": "^0.8.19",
+    "lodash": "^4.17.5",
     "@angular/material": "^5.2.1",
     "@angular/platform-browser": "^5.2.0",
     "@angular/compiler": "^5.2.0"
@@ -23,32 +31,25 @@
     "@angular/material": "^5.2.1",
     "@angular/platform-browser": "^5.2.0",
     "@angular/router": "^5.2.9",
+    "dv-cli": "0.0.1",
     "@types/uuid": "^3.4.3",
+    "@types/lodash": "^4.14.96",
     "ng-packagr": "^2.0.0",
     "rxjs": "5.5.6",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "package": "dv package",
-    "dv-package-dv": "ng-packagr -p ng-package.json",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts"
+  "dependencies": {
+    "uuid": "^3.2.1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spderosso/dejavu.git"
-  },
-  "author": "Santiago De Rosso",
+  "repository": "github:spderosso/dejavu",
   "license": "MIT",
   "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
-  "dependencies": {
-    "uuid": "^3.2.1"
-  }
+  "types": "pkg/dv-core.d.ts",
+  "main": "pkg/bundles/dv-core.umd.js"
 }

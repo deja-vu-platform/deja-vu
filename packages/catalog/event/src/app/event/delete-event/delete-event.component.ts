@@ -4,6 +4,8 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
 } from 'dv-core';
+import { Event } from '../../../../shared/data';
+
 import * as _ from 'lodash';
 
 
@@ -38,7 +40,7 @@ export class DeleteEventComponent implements OnInit, OnExec, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
-    _.remove(this.events, {id: this.id});
+    _.remove(this.events, (evt: Event) => evt.id === this.id);
   }
 
   deleteEvent() {

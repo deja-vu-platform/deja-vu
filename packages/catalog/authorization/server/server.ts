@@ -8,11 +8,9 @@ import {
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import * as path from 'path';
 import {
   AddViewerToResourceInput,
   CreateResourceInput,
-  PendingDoc,
   PrincipalResourceInput,
   ResourceDoc,
   ResourcesInput
@@ -27,28 +25,20 @@ class ResourceValidation {
   }
 }
 
-async function isOwner(resources: mongodb.Collection<ResourceDoc>,
-  principalId: string, resourceId: string): Promise<boolean> {
-  const res = await resources
-    .findOne({ id: resourceId, ownerId: principalId },
-      { projection: { _id: 1 } });
-
-  return !_.isNil(res);
-}
-
 function isPendingCreate(doc: ResourceDoc | null) {
   return _.get(doc, 'pending.type') === 'create-resource';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const resources: mongodb.Collection<ResourceDoc> = db.collection('resources');
+
   return {
     Query: {
-      resources: (root, { input }: { input: ResourcesInput }) => resources
+      resources: (_root, { input }: { input: ResourcesInput }) => resources
         .find({ viewerIds: input.viewableBy, pending: { $exists: false } })
         .toArray(),
 
-      resource: async (root, { id }) => {
+      resource: async (_root, { id }) => {
         const resource: ResourceDoc | null = await ResourceValidation
           .resourceExistsOrFail(resources, id);
         if (_.isNil(resource) || isPendingCreate(resource)) {
@@ -58,7 +48,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return resource;
       },
 
-      owner: async (root, { resourceId }) => {
+      owner: async (_root, { resourceId }) => {
         const resource = await resources
           .findOne({ id: resourceId }, { projection: { ownerId: 1 } });
 
@@ -69,7 +59,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return resource!.ownerId;
       },
 
-      canView: async (root, { input }: { input: PrincipalResourceInput }) => {
+      canView: async (_root, { input }: { input: PrincipalResourceInput }) => {
         const resource = await resources
           .findOne({ id: input.resourceId, viewerIds: input.principalId },
             { projection: { _id: 1 } });
@@ -81,7 +71,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return !_.isNil(resource);
       },
 
-      canEdit: async (root, { input }: { input: PrincipalResourceInput }) => {
+      canEdit: async (_root, { input }: { input: PrincipalResourceInput }) => {
         const resource = await resources
           .findOne({ id: input.resourceId, ownerId: input.principalId },
             { projection: { _id: 1 } });
@@ -104,7 +94,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
     Mutation: {
       createResource: async (
-        root, { input }: { input: CreateResourceInput }, context: Context) => {
+        _root, { input }: { input: CreateResourceInput }, context: Context) => {
         const newResource: ResourceDoc = {
           id: input.id ? input.id : uuid(),
           ownerId: input.ownerId,
@@ -128,18 +118,18 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await resources.deleteOne(reqIdPendingFilter);
 
-            return;
+            return undefined;
         }
 
         return newResource;
       },
 
       addViewerToResource: async (
-        root,
+        _root,
         { input }: { input: AddViewerToResourceInput }, context: Context) => {
         const updateOp = { $push: { viewerIds: input.viewerId } };
         const notPendingResourceFilter = {
@@ -181,18 +171,18 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { ...updateOp, $unset: { pending: '' } });
 
-            return;
+            return undefined;
           case 'abort':
             await resources.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
         }
 
-        return;
+        return undefined;
       },
 
-      deleteResource: async (root, { id }, context: Context) => {
+      deleteResource: async (_root, { id }, context: Context) => {
         const notPendingResourceFilter = {
           id: id,
           pending: { $exists: false }
@@ -231,25 +221,26 @@ function resolvers(db: mongodb.Db, config: Config): object {
           case 'commit':
             await resources.deleteOne(reqIdPendingFilter);
 
-            return;
+            return undefined;
           case 'abort':
             await resources.updateOne(
               reqIdPendingFilter, { $unset: { pending: '' } });
 
-            return;
+            return undefined;
         }
 
-        return;
+        return undefined;
       }
     }
   };
-};
+}
 
 const authorizationCliche: ClicheServer =
   new ClicheServerBuilder('authorization')
-    .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+    .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
       const resources: mongodb.Collection<ResourceDoc> =
         db.collection('resources');
+
       return Promise.all([
         resources.createIndex({ id: 1 }, { unique: true }),
         resources.createIndex({ id: 1, viewerIds: 1 }, { unique: true }),

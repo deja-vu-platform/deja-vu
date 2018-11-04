@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as minimist from 'minimist';

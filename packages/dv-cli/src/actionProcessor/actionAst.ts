@@ -178,7 +178,9 @@ function checkForErrors(actionName: string) {
         }
       }
       _.each(tree, (actionTag: ActionTag): void => {
-        _checkForErrors(currPath, actionTag.fqtag)(actionTag.content);
+        if (actionTag.content !== undefined) {
+          _checkForErrors(currPath, actionTag.fqtag)(actionTag.content);
+        }
       });
 
       return tree;

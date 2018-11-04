@@ -82,16 +82,17 @@ async function addOrRemoveMember(
 }
 
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const groups: mongodb.Collection<GroupDoc> = db.collection('groups');
+
   return {
     Query: {
-      group: async (root, { id }) => {
+      group: async (_root, { id }) => {
         const group: GroupDoc | null = await groups.findOne({ id: id });
 
         return isPendingCreate(group) ? null : group;
       },
-      members: async (root, { input }: { input: MembersInput }) =>  {
+      members: async (_root, { input }: { input: MembersInput }) =>  {
         const noCreateGroupPending =  {
           $or: [
             { pending: { $exists: false } },
@@ -128,7 +129,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
         return matchingMembers;
       },
-      groups: async (root, { input }: { input: GroupsInput }) => {
+      groups: async (_root, { input }: { input: GroupsInput }) => {
         const filter = input.withMemberId ?
           { memberIds: input.withMemberId } : {};
         filter['pending'] = { type: { $ne: 'create-group' } };
@@ -143,7 +144,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
     },
     Mutation: {
       createGroup: async (
-        root, { input }: {input: CreateGroupInput}, context: Context) => {
+        _root, { input }: {input: CreateGroupInput}, context: Context) => {
         const g: GroupDoc = {
           id: input.id ? input.id : uuid(),
           memberIds: input.initialMemberIds ? input.initialMemberIds : []
@@ -154,30 +155,34 @@ function resolvers(db: mongodb.Db, config: Config): object {
             g.pending = { reqId: context.reqId, type: 'create-group' };
           case undefined:
             await groups.insertOne(g);
+
             return g;
           case 'commit':
             await groups.updateOne(
               reqIdPendingFilter,
               { $unset: { pending: '' } });
-            return;
+
+            return g;
           case 'abort':
             await groups.deleteOne(reqIdPendingFilter);
-            return;
+
+            return g;
         }
 
         return g;
       },
-      addMember: (root, { groupId, id }, context: Context) => addOrRemoveMember(
-        groups, groupId, id, 'add-member', context),
-      removeMember: (root, { groupId, id }, context: Context) =>
+      addMember: (_root, { groupId, id }, context: Context) =>
+        addOrRemoveMember(groups, groupId, id, 'add-member', context),
+      removeMember: (_root, { groupId, id }, context: Context) =>
         addOrRemoveMember(groups, groupId, id, 'remove-member', context)
     }
   };
-};
+}
 
 const groupCliche: ClicheServer = new ClicheServerBuilder('group')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const groups: mongodb.Collection<GroupDoc> = db.collection('groups');
+
     return groups.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
   .resolvers(resolvers)

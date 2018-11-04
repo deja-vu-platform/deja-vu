@@ -17,7 +17,7 @@ import {
 } from '../show-resource/show-resource.component';
 
 interface ResourcesRes {
-  data: { resources: Resource; };
+  data: { resources: Resource[]; };
 }
 
 
@@ -81,9 +81,7 @@ OnChanges {
           })
         }
       })
-      .subscribe((res) => {
-        console.log('resources viewable by' + this.viewableBy);
-        console.log(res);
+      .subscribe((res: ResourcesRes) => {
         this._resourceIds = _.map(res.data.resources, 'id');
         this.resourceIds.emit(this._resourceIds);
       });

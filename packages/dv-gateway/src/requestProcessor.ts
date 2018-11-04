@@ -186,7 +186,9 @@ export class RequestProcessor {
     const actionPath = gatewayRequest.from;
     const matchingActions = this.actionHelper.getMatchingActions(actionPath);
     const to = RequestProcessor.ClicheOf(matchingActions[0]);
-    const toPort: port | undefined = _.get(this.dstTable, to);
+    // `to` can be `undefined` but the `get` typings are wrong
+    // (`_.get(..., undefined)` -> `undefined)
+    const toPort: port | undefined = _.get(this.dstTable, <string> to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
     if (!this.validateRequest(actionPath, matchingActions, to, toPort, res)) {
@@ -290,7 +292,7 @@ export class RequestProcessor {
       },
 
       sendAbortToClient: (
-        causedAbort: boolean, gcr?: GatewayToClicheRequest,
+        causedAbort: boolean, _gcr?: GatewayToClicheRequest,
         payload?: ClicheResponse<string>, res?: express.Response) => {
         assert.ok(res !== undefined);
         if (causedAbort) {
@@ -357,7 +359,7 @@ export class RequestProcessor {
       },
 
       onError: (
-        e: Error, gcr: GatewayToClicheRequest, res?: express.Response) => {
+        e: Error, _gcr: GatewayToClicheRequest, res?: express.Response) => {
         console.error(e);
         res!.status(INTERNAL_SERVER_ERROR);
         res!.send(e.message);

@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 })
 export class IdsComponent implements OnChanges {
   @Input() for: any[] = [];
-  @Output() ids = new EventEmitter<string>();
+  @Output() ids = new EventEmitter<string[]>();
 
   ngOnChanges() {
     if (!_.isEmpty(this.for)) {

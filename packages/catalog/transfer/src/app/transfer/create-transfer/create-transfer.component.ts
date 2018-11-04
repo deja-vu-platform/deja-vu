@@ -113,11 +113,12 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     })
     .toPromise();
 
-   if (res.errors) {
-     throw new Error(_.map(res.errors, 'message'));
-   }
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join('\n'));
+    }
 
-   this.transfer.emit(res.data.createTransfer);
+    this.transfer.emit(res.data.createTransfer);
   }
 
   dvOnExecSuccess() {

@@ -1,13 +1,13 @@
 <ul *ngIf="markers && markers.length > 0" class="list-group">
   <li *ngFor="let marker of markers" class="list-group-item">
-    <dv-include 
-      [action]="showMarker" 
+    <dv-include
+      [action]="showMarker"
+      default-showMarker="{ tag: geolocation-show-marker }"
       [inputs]="{
       marker: marker, showId: showId, showTitle: showTitle,
       showLatLong: showLatLong, showMapId: showMapId
-      }" 
-      [parent]="showMarkers"
-      default-showMarker="{ tag: geolocation-show-marker }">
+      }"
+      [parent]="showMarkers">
     </dv-include>
   </li>
 </ul>

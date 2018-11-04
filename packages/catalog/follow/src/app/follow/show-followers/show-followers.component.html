@@ -1,10 +1,10 @@
 <ul *ngIf="followers && followers.length > 0" class="list-group">
   <li *ngFor="let followerId of followers" class="list-group-item">
-    <dv-include 
-      [action]="showFollower" 
-      [inputs]="{id: followerId}" 
-      [parent]="showFollowers"
-      default-showFollower="{ tag: follow-show-follower }">
+    <dv-include
+      [action]="showFollower"
+      default-showFollower="{ tag: follow-show-follower }"
+      [inputs]="{id: followerId}"
+      [parent]="showFollowers">
     </dv-include>
   </li>
 </ul>

@@ -77,7 +77,7 @@ export class StageComponent
     }
   }
 
-  unstage(index: string) {
+  unstage(index: number) {
     _.pullAt(this.staged, index);
     this.stagedEntities.emit(_.cloneDeep(this.staged));
   }

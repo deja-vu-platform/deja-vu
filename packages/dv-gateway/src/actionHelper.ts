@@ -168,7 +168,7 @@ export class ActionHelper {
       ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
     `;
 
-    const unparsedActionExpr: string = _
+    const unparsedActionExpr: string | undefined = _
       .get(includeActionTag.inputs, '[action]');
     if (_.isEmpty(unparsedActionExpr)) {
       throw new Error(noActionErrorMsg('no action input'));
@@ -176,7 +176,7 @@ export class ActionHelper {
 
     let actionInput: ActionInput | null;
     try {
-      const actionExpr = this.ParseActionExpr(unparsedActionExpr);
+      const actionExpr = this.ParseActionExpr(unparsedActionExpr as string);
       if (this.IsActionInput(actionExpr)) {
         actionInput = actionExpr;
       } else {
@@ -185,7 +185,7 @@ export class ActionHelper {
           const unparsedParentActionExpr = _
             .get(includeActionTag.context, `[${actionExpr}]`);
           const parentActionExpr = this.ParseActionExpr(
-            unparsedParentActionExpr);
+            unparsedParentActionExpr as string);
           actionInput = this.GetActionInput(
             parentActionExpr, includeActionTag.context);
         } else {
@@ -204,9 +204,11 @@ export class ActionHelper {
 
     const fqtag = ActionHelper.GetFqTag(
       actionInput.tag, actionInput.dvOf, actionInput.dvAlias);
-    const actionInputs: InputMap = _.get(actionInput, 'inputs', {});
+    const actionInputs: InputMap = <InputMap> _.get(actionInput, 'inputs', {});
     const inputs = _.assign({},
-      _.mapValues(_.invert(actionInput.inputMap), (value) => {
+      // `actionInput.inputMap` could actually be `undefined` but the `invert`
+      // typings are wrong (`_.invert(undefined)` -> `undefined`)
+      _.mapValues(_.invert(<InputMap> actionInput.inputMap), (value) => {
         return _.get(includeActionTag.context, value);
       }),
       actionInputs);
@@ -225,7 +227,8 @@ export class ActionHelper {
    * @return the action table of the given cliche
    */
   private static GetActionTableOfCliche(cliche: string): ActionTable {
-    const fp = path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME);
+    const fp = path.join(
+      ActionHelper.GetClicheFolder(cliche), ACTION_TABLE_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8'));
   }
@@ -236,9 +239,16 @@ export class ActionHelper {
    */
   private static GetActionsNoRequest(cliche: string)
     : { exec: string[] } | undefined {
-    const fp = path.join('node_modules', cliche, CONFIG_FILE_NAME);
+      const fp = path.join(
+        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
+  }
+
+  private static GetClicheFolder(cliche: string): string {
+    // Cliches specify as a main their typings (so that when apps do `import
+    // 'cliche'` it works) . To get to their folder we need to go up a dir
+    return path.join(path.dirname(require.resolve(cliche)), '..');
   }
 
   /**
@@ -384,7 +394,7 @@ export class ActionHelper {
    * @returns the `ActionTag`s corresponding to the last node of the action path
    */
   getMatchingActions(actionPath: ActionPath): ActionTag[] {
-    return _.map(this.getMatchingPaths(actionPath), _.last);
+    return <ActionTag[]> _.map(this.getMatchingPaths(actionPath), _.last);
   }
 
   /**
@@ -519,7 +529,7 @@ export class ActionHelper {
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
       const routeActions: ActionTag[] = this.getRouteActions(actionTable);
-      ret = _.concat(ret, routeActions);
+      ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
     return ret;

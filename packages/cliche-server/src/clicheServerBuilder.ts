@@ -1,6 +1,5 @@
 import * as callsite from 'callsite';
 import * as minimist from 'minimist';
-import * as mongodb from 'mongodb';
 import * as path from 'path';
 
 import {

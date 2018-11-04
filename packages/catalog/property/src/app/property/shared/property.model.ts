@@ -6,6 +6,14 @@ export interface Property {
   schema: any;
 }
 
+export interface PropertiesRes {
+  data: { properties: Property[] };
+}
+
+export interface PropertyRes {
+  data: { property: Property };
+}
+
 export async function properties(
   showOnly: string[], showExclude: string[],
   propertyFetcher: () => Promise<string[]>): Promise<string[]> {

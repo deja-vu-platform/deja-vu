@@ -39,4 +39,5 @@ lib
 tscommand-*.txt
 dv-dev
 pkg
+.ng_pkg_build
 pkg.tgz

@@ -12,8 +12,7 @@ import {
   AddLabelsToItemInput,
   ItemsInput,
   LabelDoc,
-  LabelsInput,
-  PendingDoc
+  LabelsInput
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
@@ -34,11 +33,12 @@ function isPendingCreate(doc: LabelDoc | null) {
   return _.get(doc, 'pending.type') === 'create-label';
 }
 
-function resolvers(db: mongodb.Db, config: Config): object {
+function resolvers(db: mongodb.Db, _config: Config): object {
   const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
+
   return {
     Query: {
-      label: async (root, { id }) => {
+      label: async (_root, { id }) => {
         const label = await LabelValidation.labelExistsOrFail(
           labels, standardizeLabel(id));
         if (_.isNil(label) || isPendingCreate(label)) {
@@ -48,7 +48,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return label;
       },
 
-      items: async (root, { input }: { input: ItemsInput }) => {
+      items: async (_root, { input }: { input: ItemsInput }) => {
         const matchQuery = {};
         const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
         const reduceOperator = {};
@@ -91,7 +91,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
         return !_.isEmpty(results) ? results[0].itemIds : [];
       },
 
-      labels: async (root, { input }: { input: LabelsInput }) => {
+      labels: async (_root, { input }: { input: LabelsInput }) => {
         const query = { pending: { $exists: false } };
         if (input.itemId) {
           // Labels of an item
@@ -110,7 +110,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
     Mutation: {
       addLabelsToItem: async (
-        root, { input }: { input: AddLabelsToItemInput }, context: Context) => {
+        _root, { input }: { input: AddLabelsToItemInput },
+        context: Context) => {
         const labelIds = _.map(input.labelIds, standardizeLabel);
 
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
@@ -179,7 +180,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
             await labels.bulkWrite(bulkCommitUpdateOps);
 
-            return;
+            return true;
 
           case 'abort':
             const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
@@ -192,13 +193,13 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
             await labels.bulkWrite(bulkAbortUpdateOps);
 
-            return;
+            return true;
         }
 
-        return;
+        return true;
       },
 
-      createLabel: async (root, { id }, context: Context) => {
+      createLabel: async (_root, { id }, context: Context) => {
         const labelId = id ? standardizeLabel(id) : uuid();
         const newLabel: LabelDoc = { id: labelId };
 
@@ -219,22 +220,23 @@ function resolvers(db: mongodb.Db, config: Config): object {
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return;
+            return true;
           case 'abort':
             await labels.deleteOne(reqIdPendingFilter);
 
-            return;
+            return true;
         }
 
         return newLabel;
       }
     }
   };
-};
+}
 
 const labelCliche: ClicheServer = new ClicheServerBuilder('label')
-  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
+
     return Promise.all([
       labels.createIndex({ id: 1 }, { unique: true, sparse: true }),
       labels.createIndex({ id: 1, itemIds: 1 }, { unique: true })

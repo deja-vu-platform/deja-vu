@@ -6,9 +6,22 @@ import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { Event, fromUnixTime, Series } from '../../../../shared/data';
+import {
+  Event, GraphQlEvent, toEvent, Series, toSeries, GraphQlSeries
+} from '../../../../shared/data';
 
 import { ShowEventComponent } from '../show-event/show-event.component';
+
+
+interface SeriesRes {
+  data: { series: GraphQlSeries[] };
+}
+
+interface OneSeriesRes {
+  data: {
+    oneSeries: { events: GraphQlEvent[] }
+  };
+}
 
 
 @Component({
@@ -41,7 +54,7 @@ export class ChooseAndShowSeriesComponent implements OnInit {
   maybeFetchEvents(toggle: boolean) {
     if (toggle) {
       this.gs
-        .get<{data: {series: Series[]}}>('/graphql', {
+        .get<SeriesRes>('/graphql', {
           params: {
             query: `
               query {
@@ -54,14 +67,9 @@ export class ChooseAndShowSeriesComponent implements OnInit {
             `
           }
         })
-        .pipe(map((res) => res.data.series))
-        .subscribe((series: Series[]) => {
-          this.series = _.map(series, (series) => {
-            series.startsOn = fromUnixTime(series.startsOn);
-            series.endsOn = fromUnixTime(series.endsOn);
-
-            return series;
-          });
+        .pipe(map((res: SeriesRes) => res.data.series))
+        .subscribe((series: GraphQlSeries[]) => {
+          this.series = _.map(series, toSeries);
         });
     }
   }
@@ -73,7 +81,7 @@ export class ChooseAndShowSeriesComponent implements OnInit {
       return;
     }
     this.gs
-      .get<{data: {oneSeries: {events: Event[]}}}>('/graphql', {
+      .get<OneSeriesRes>('/graphql', {
         params: {
           query: `
             query {
@@ -91,15 +99,9 @@ export class ChooseAndShowSeriesComponent implements OnInit {
           `
         }
       })
-      .pipe(map((res) => res.data.oneSeries.events))
-      .subscribe((events: Event[]) => {
-        this.events = _.map(events, (evt) => {
-          evt.seriesId = evt.series.id;
-          evt.startDate = fromUnixTime(evt.startDate);
-          evt.endDate = fromUnixTime(evt.endDate);
-
-          return evt;
-        });
+      .pipe(map((res: OneSeriesRes) => res.data.oneSeries.events))
+      .subscribe((events: GraphQlEvent[]) => {
+        this.events = _.map(events, toEvent);
       });
   }
 }

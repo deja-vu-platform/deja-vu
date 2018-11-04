@@ -1,17 +1,16 @@
 {
   "name": "morg",
-  "version": "0.0.0",
-  "license": "MIT",
+  "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-morg",
     "test": "ng test",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/*.ts",
+    "lint": "tslint -p . -c tslint.json src/app/**/*.ts",
     "e2e": "ng e2e",
     "dv-build-morg": "ng build",
-    "dv-build-watch-morg": "chokidar src node_modules/allocator node_modules/event -c 'if ! [[ \"{path}\" =~ node_modules/.*/.*]]; then ng build'; fi",
     "concurrently": "concurrently",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "ng": "ng"
   },
   "private": true,
   "dependencies": {
@@ -27,25 +26,28 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "allocator": "file:../../packages/catalog/allocator/pkg",
+    "lodash": "^4.17.5",
     "bootstrap": "^4.0.0",
-    "cliche-server": "file:../../packages/cliche-server",
+    "cliche-server": "0.0.1",
     "core-js": "^2.4.1",
-    "dv-core": "file:../../packages/dv-core/pkg",
-    "dv-gateway": "file:../../packages/dv-gateway",
-    "event": "file:../../packages/catalog/event/pkg",
+    "dv-core": "0.0.1",
+    "dv-gateway": "0.0.1",
+    "event": "0.0.1",
+    "allocator": "0.0.1",
+    "property": "0.0.1",
     "moment": "^2.20.1",
-    "property": "file:../../packages/catalog/property/pkg",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
-    "@angular/cli": "1.6.5",
+    "@angular/cli": "^1.7.3",
     "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
+    "dv-cli": "0.0.1",
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~6.0.60",
+    "@types/lodash": "^4.14.96",
     "chokidar-cli": "^1.2.0",
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
@@ -57,10 +59,17 @@
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
-    "nodemon": "^1.14.12",
+    "nodemon": "^1.15.1",
     "protractor": "~5.1.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
 }

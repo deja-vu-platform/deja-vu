@@ -142,7 +142,7 @@ OnExec, OnInit, ControlValueAccessor, Validator {
 
   writeValue(value: Label[]) {
     if (value) {
-      this.selectedLabelIds = _.map(value, (labelId) => ({ id: labelId }));
+      this.selectedLabelIds = _.map(value, 'id');
     } else {
       this.selectedLabelIds = undefined;
     }
