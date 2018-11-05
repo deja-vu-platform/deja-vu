@@ -75,9 +75,9 @@ OnChanges {
                 ${this.showScores ? 'scores ' +
                   '{' +
                     'id \n' +
-                    `${this.showScoreValue ? 'value' : ''} \n` +
-                    `${this.showScoreTargetId ? 'targetId' : ''}` : ''
-                  }
+                    `${this.showScoreValue ? 'value \n' : ''}` +
+                    `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                  '}' : ''
                 }
                 ${this.showTotal ? 'total': ''}
               }
