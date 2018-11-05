@@ -57,7 +57,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
       },
       // TODO: pagination, max num results
       targetsByScore: async (_root, asc: boolean): Promise<Target[]> => {
-        const targets = await scores.aggregate([
+        const targets: any = await scores.aggregate([
           {
             $group: {
               _id: '$targetId', scores: { $push: '$$ROOT' }
