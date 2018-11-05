@@ -13,8 +13,6 @@ export class NgComponentBuilder {
   private style = '';
 
   constructor(
-    private readonly appName: string,
-    private readonly actionName: string,
     private readonly template: string,
     private readonly className: string,
     private readonly selector: string) {}

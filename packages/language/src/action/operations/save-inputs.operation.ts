@@ -27,7 +27,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
       const input = inputNode.sourceString;
       symbolTable[input] = { kind: 'input' };
     },
-    Expr_element: (element) => {}, // TODO
+    Expr_element: (_element) => {}, // TODO
 
     UnExpr_not: (_not, expr) => expr.saveInputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
@@ -35,7 +35,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
 
     MemberExpr: binOpRecurse,
 
-    Literal_number: (number) => {},
+    Literal_number: (_number) => {},
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
     Literal_obj: (_openCb, propAssignments, _closeCb) =>

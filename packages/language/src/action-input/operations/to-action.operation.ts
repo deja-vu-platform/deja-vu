@@ -17,8 +17,8 @@ export interface InputFromContext {
  * @param inputsFromContext array where the inputs from context should be saved
  */
 export function toAction(
-  symbolTable: ActionSymbolTable, context: ActionSymbolTable,
-  inputsFromContext: InputFromContext[]) {
+  _symbolTable: ActionSymbolTable, _context: ActionSymbolTable,
+  _inputsFromContext: InputFromContext[]) {
   const recurse = (expr) => expr.toAction();
   const binOpRecurse = (leftExpr, op, rightExpr) =>
     `${leftExpr.toAction()}${op.sourceString}${rightExpr.toAction()}`;

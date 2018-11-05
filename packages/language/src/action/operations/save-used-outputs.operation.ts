@@ -39,7 +39,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Expr_literal: recurse,
     Expr_name: (name) => name.sourceString,
     Expr_input: (input) => input.sourceString,
-    Expr_element: (element) => {}, // TODO
+    Expr_element: (_element) => {}, // TODO
 
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
@@ -80,7 +80,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       }
     },
 
-    Literal_number: (number) => {},
+    Literal_number: (_number) => {},
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
     Literal_obj: (_openCb, propAssignments, _closeCb) =>

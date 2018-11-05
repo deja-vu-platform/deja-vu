@@ -15,7 +15,6 @@ import { saveInputs} from './operations/save-inputs.operation';
 import { toNgTemplate } from './operations/to-ng-template.operation';
 import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
-import { CompiledActionInput } from '../action-input/action-input.compiler';
 import { classNameToNgField } from './operations/shared';
 
 const ohm = require('ohm-js');
@@ -108,7 +107,7 @@ export class ActionCompiler {
     const className = ActionCompiler.GetClassName(thisActionName);
     const selector = ActionCompiler.GetSelector(appName, thisActionName);
     const ngComponentBuilder = new NgComponentBuilder(
-      appName, thisActionName, ngTemplate, className, selector);
+      ngTemplate, className, selector);
 
     const fields: NgField[] =  _
       .chain(ActionCompiler.FilterKind('cliche', thisActionSymbolTable))

@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 
@@ -77,6 +77,7 @@ export class AppCompiler {
     private readonly projectDir: string, private readonly cacheDir: string) {}
 
   compile() {
+    console.log(`Using cache dir ${this.cacheDir}`);
     const dvConfigPath: string = path
       .join(this.projectDir, AppCompiler.DVCONFIG_FILE_PATH);
     const dvConfigContents: string = readFileSync(dvConfigPath, 'utf8');

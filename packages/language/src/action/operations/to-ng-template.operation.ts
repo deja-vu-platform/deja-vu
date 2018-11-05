@@ -136,11 +136,11 @@ export function toNgTemplate(
     Expr_element: transformActionInput(appName, symbolTable, actionInputs),
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
-    BinExpr_and: (leftExpr, and, rightExpr) =>
+    BinExpr_and: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
-    BinExpr_or: (leftExpr, and, rightExpr) =>
+    BinExpr_or: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
-    MemberExpr: (nameOrInputNode, dot, namesNode) => {
+    MemberExpr: (nameOrInputNode, _dot, namesNode) => {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
       const fullMemberAccess = nameOrInput + names;

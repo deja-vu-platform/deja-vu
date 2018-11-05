@@ -2,37 +2,36 @@
   "name": "language",
   "version": "0.0.1",
   "description": "Déjà Vu language",
-  "main": "./dist/service.js",
   "scripts": {
     "test": "jasmine-ts",
-    "build": "tsc && copyfiles -f src/*.blueprint.* dist",
+    "build": "tsc",
     "package": "npm run clean && npm run build",
-    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spderosso/dejavu.git"
-  },
-  "author": "Santiago De Rosso",
-  "license": "MIT",
-  "private": true,
-  "bugs": {
-    "url": "https://github.com/spderosso/dejavu/issues"
-  },
-  "homepage": "https://github.com/spderosso/dejavu#readme",
   "dependencies": {
-    "lodash": "^4.17.4",
     "ohm-js": "^0.14.0"
   },
+  "peerDepencies": {
+    "lodash": "^4.17.4"
+  },
   "devDependencies": {
-    "@types/jasmine": "^2.8.9",
-    "@types/lodash": "^4.14.117",
+    "@types/jasmine": "~2.8.3",
+    "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
     "jasmine": "^3.2.0",
     "jasmine-ts": "^0.3.0",
     "ts-node": "^7.0.1",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/app/app.compiler.d.ts",
+  "main": "./dist/app/app.compiler.js"
 }
