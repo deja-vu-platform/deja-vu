@@ -1,0 +1,21 @@
+<!-- TODO: this hasn't been fixed yet -->
+<div class="container" id="signin-container">
+  <div class="row">
+    <div class="offset-md-2 col-md">
+      <h1>Sign In</h1>
+      <dv-tx>
+        <authentication-sign-in></authentication-sign-in>
+        <dv-link href="/news" [hidden]="true"></dv-link>
+      </dv-tx>
+    </div>
+    <div class="col-md">
+      <h1>Register</h1>
+      <dv-tx>
+        <dv-id (id)="userId=$event"></dv-id>
+        <authentication-register-user [id]="userId">
+        </authentication-register-user>
+        <dv-link href="/news" [hidden]="true"></dv-link>
+      </dv-tx>
+    </div>
+  </div>
+</div>

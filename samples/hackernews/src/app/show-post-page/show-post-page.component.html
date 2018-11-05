@@ -1,0 +1,19 @@
+<hackernews-navbar (user)="user=$event"></hackernews-navbar>
+
+<div class="main">
+  <hackernews-show-post [id]="id"></hackernews-show-post>
+  <comment-create-comment
+    [authorId]="user ? user.username : ''" 
+    [targetId]="id"
+    buttonLabel="add comment"
+  >
+  </comment-create-comment>
+  <!-- should redirect to login page when submit is clicked and not logged in -->
+  <comment-show-comments
+    [ofTargetId]="id"
+    [showComment]="{
+      type: showComment, tag: 'hackernews-show-comment',
+      inputMap: {comment: 'comment'}
+    }">
+  </comment-show-comments>
+</div>

@@ -1,0 +1,18 @@
+<div *ngIf="comment">
+  <!-- TODO: upvote button here -->
+  <span>{{comment.authorId}}</span> <!-- TODO: specify how long ago -->
+  <div>{{comment.content}}</div>
+
+  <!-- TODO: create reply page  -->
+  <dv-link href="/">reply</dv-link>
+  <!-- TODO: dv can't seem to handle the recursion here -->
+  <!-- <div>
+    <comment-show-comments
+      [ofTargetId]="comment.id"
+      [showComment]="{
+        type: showComment, tag: 'hackernews-show-comment',
+        inputMap: {comment: 'comment'}
+      }">
+    </comment-show-comments>
+  </div> -->
+</div>

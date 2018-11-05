@@ -1,0 +1,25 @@
+<authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
+</authentication-logged-in>
+
+<nav class="navbar fixed-top">
+  <div class="container">
+    <dv-link class="navbar-brand" href="/">DV Hacker News</dv-link>
+
+    <dv-link href="/submit">submit</dv-link>
+
+    <span class="space-filler"></span>
+    <ul *ngIf="user" class="navbar-nav">
+      <li class="username">{{user.username}}</li>
+      <li>
+        <dv-tx>
+          <authentication-sign-out>
+          </authentication-sign-out>
+          <dv-link href="/" [hidden]="true"></dv-link>
+        </dv-tx>
+      </li>
+    </ul>
+    <div *ngIf="!user">
+      <dv-link href="/login">login</dv-link>
+    </div>
+  </div>
+</nav>
