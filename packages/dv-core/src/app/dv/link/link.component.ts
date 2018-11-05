@@ -9,6 +9,7 @@ import { OnExecSuccess, RunService } from '../run.service';
 })
 export class LinkComponent implements OnInit, OnExecSuccess {
   @Input() href: string;
+  @Input() params;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -23,6 +24,6 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
-    this.router.navigate([this.href]);
+    this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
   }
 }
