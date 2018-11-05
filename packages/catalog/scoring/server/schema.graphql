@@ -19,6 +19,7 @@ input CreateScoreInput {
 type Query {
   score(id: ID!): Score
   target(id: ID!): Target
+  targetsByScore(asc: Boolean): [Target!]
 }
 
 type Mutation {

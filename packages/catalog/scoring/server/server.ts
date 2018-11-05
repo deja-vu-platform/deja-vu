@@ -54,6 +54,29 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           id: id,
           scores: targetScores
         };
+      },
+      // TODO: pagination, max num results
+      targetsByScore: async (_root, asc: boolean): Promise<Target[]> => {
+        const targets = await scores.aggregate([
+          {
+            $group: {
+              _id: '$targetId', scores: { $push: '$$ROOT' }
+            }
+          }, {
+            $match: { pending: { $exists: false } }
+          }
+        ]).toArray();
+
+        return _.chain(targets)
+        .map((target) => {
+          return {
+            ...target,
+            total: totalScoreFn(_.map(target.scores, 'value')),
+            id: target._id
+          }
+        })
+        .orderBy('total', [ asc ? 'asc' : 'desc' ])
+        .value();
       }
     },
     Score: {
