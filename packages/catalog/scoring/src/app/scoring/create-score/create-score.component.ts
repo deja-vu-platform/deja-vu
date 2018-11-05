@@ -46,6 +46,7 @@ export class CreateScoreComponent
   @Input() buttonLabel = 'Create';
   @Input() valueInputLabel = 'Score';
   @Input() newScoreSavedText = 'New Score saved';
+  @Input() submitMatIconName: string | undefined;
 
   @ViewChild(FormGroupDirective) form;
 
