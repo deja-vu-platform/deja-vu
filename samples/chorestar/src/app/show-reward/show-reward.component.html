@@ -1,28 +1,19 @@
 <div class="row">
   <div class="col-md-4">
-    <property-show-object
-      dvOf="reward"
-      [object]="reward"
-      [showOnly]="['name']">
-    </property-show-object>
+    {{reward.name}}
   </div>
   <div class="col-md-4">
     <i class="material-icons icon">star_rate</i>
-    <property-show-object
-      dvOf="reward"
-      [object]="reward"
-      [showOnly]="['cost']"
-    ></property-show-object>
+    {{reward.cost}}
   </div>
   <div class="col-md-4">
-    <dv-tx *ngIf="showOptionToPurchase">
-      <!-- <market-create-transaction
-        [goodId]="reward.id"
-        [buyerId]="user?.id"
-        quantity=1
-        [hidden]=true>
-      </market-create-transaction> -->
-      <dv-button>Purchase</dv-button>
-    </dv-tx>
+    <transfer-add-to-balance
+      *ngIf="showOptionToPurchase"
+      [accountId]="user.id"
+      [showOptionToInputBalance]="false"
+      [amount]="-1 * reward.cost"
+      buttonLabel="Purchase"
+    >
+    </transfer-add-to-balance>
   </div>
 </div>
