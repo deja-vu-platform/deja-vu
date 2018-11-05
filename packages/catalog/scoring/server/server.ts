@@ -19,7 +19,7 @@ interface ScoringConfig extends Config {
   totalScoreFn?: string;
 }
 
-const DEFAULT_TOTAL_SCORE_FN = (scores: number[]) =>
+const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
   scores.reduce((total, score) => total + score, 0);
 
 function isPendingCreate(doc: ScoreDoc | null) {
@@ -56,7 +56,8 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         };
       },
       // TODO: pagination, max num results
-      targetsByScore: async (_root, asc: boolean): Promise<Target[]> => {
+      targetsByScore: async (
+        _root, { asc }: { asc: boolean }): Promise<Target[]> => {
         const targets: any = await scores.aggregate([
           {
             $group: {
@@ -67,7 +68,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           }
         ]).toArray();
 
-        return _.chain(targets)
+        return _(targets)
         .map((target) => {
           return {
             ...target,
@@ -75,7 +76,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
             id: target._id
           }
         })
-        .orderBy('total', [ asc ? 'asc' : 'desc' ])
+        .orderBy(['total'], [ asc ? 'asc' : 'desc' ])
         .value();
       }
     },
