@@ -2,19 +2,17 @@
   <div class="col-md-4">
     <property-show-object
       dvOf="reward"
-      [id]="reward.id"
+      [object]="reward"
       [showOnly]="['name']">
     </property-show-object>
   </div>
   <div class="col-md-4">
     <i class="material-icons icon">star_rate</i>
-    <!-- <market-show-good
-      [good]="reward"
-      [showId]="false"
-      [showSupply]="false"
-      [showSeller]="false"
-      [showMarketId]="false">
-    </market-show-good> -->
+    <property-show-object
+      dvOf="reward"
+      [object]="reward"
+      [showOnly]="['cost']"
+    ></property-show-object>
   </div>
   <div class="col-md-4">
     <dv-tx *ngIf="showOptionToPurchase">

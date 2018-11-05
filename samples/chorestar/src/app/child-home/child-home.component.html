@@ -15,7 +15,10 @@
           <h3>
             StarBank Total:
             <i class="material-icons icon">star_rate</i>
-            <transfer-show-balance [accountId]="user?.id">
+            <transfer-show-balance
+              [accountId]="user?.id"
+              (fetchedBalance)="balance=$event"
+            >
             </transfer-show-balance>
           </h3>
         </div>
@@ -78,48 +81,35 @@
 
         <div class="white-box right-box col-md-5">
           <h2>Rewards</h2>
+          <property-show-objects
+            dvOf="reward"
+            (objects)="rewards=$event"
+            [hidden]="true"
+          ></property-show-objects>
           <div class="row section">
             <div class="col-md-12">
               <h3>Rewards You Can Buy</h3>
-              <!-- <market-show-goods
-                [affordable]="true"
-                [available]="true"
-                [buyerId]="user?.id"
-                [marketId]="parent?.id"
-                [waitOn]="['buyerId', 'marketId']"
-                [showGood]="{
-                  type: showReward,
-                  tag: 'chorestar-show-reward',
-                  inputMap: { good: 'reward' },
-                  inputs: { user: user, showOptionToPurchase: true }
-                }"
-                [showOptionToBuy]="false"
-                noGoodsToShowText="No rewards to show">
-              </market-show-goods> -->
+              <div *ngFor="let reward of rewards">
+                <chorestar-show-reward
+                  *ngIf="reward.cost <= balance"
+                  [reward]="reward"
+                  [user]="user"
+                  [showOptionToPurchase]="true"
+                ></chorestar-show-reward>
+              </div>
             </div>
           </div>
           <div class="row section">
             <div class="col-md-12">
               <h3>Rewards You Cannot Buy Yet</h3>
-              <!-- TODO: filter by cost -->
-              <property-show-objects
-                dvOf="reward"
-                [showOnly]="['name', 'cost']"
-              ></property-show-objects>
-              <!-- <market-show-goods
-                [affordable]="false"
-                [buyerId]="user?.id"
-                [available]="true"
-                [marketId]="parent?.id"
-                [waitOn]="['buyerId', 'marketId']"
-                [showGood]="{
-                  type: showReward,
-                  tag: 'chorestar-show-reward',
-                  inputMap: { good: 'reward' }
-                }"
-                [showOptionToBuy]="false"
-                noGoodsToShowText="No rewards to show">
-              </market-show-goods> -->
+              <div *ngFor="let reward of rewards">
+                <chorestar-show-reward
+                  *ngIf="reward.cost > balance"
+                  [reward]="reward"
+                  [user]="user"
+                  [showOptionToPurchase]="false"
+                ></chorestar-show-reward>
+              </div>
             </div>
           </div>
         </div>

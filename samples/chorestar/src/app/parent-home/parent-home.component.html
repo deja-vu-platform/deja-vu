@@ -48,19 +48,6 @@
           <div class="row">
             <div class="offset-md-1 col-md-5 white-box">
               <h2>Offered Rewards</h2>
-              <!-- <market-show-goods
-                [sellerId]="user?.id"
-                [marketId]="user?.id"
-                [available]="true"
-                [waitOn]="['sellerId', 'marketId']"
-                [showGood]="{
-                  type: showReward,
-                  tag: 'chorestar-show-reward',
-                  inputMap: { good: 'reward' }
-                }"
-                [showOptionToBuy]="false"
-                noGoodsToShowText="No offered rewards">
-              </market-show-goods> -->
               <property-show-objects
                 dvOf="reward"
                 [showOnly]="['name', 'cost']"
@@ -77,16 +64,6 @@
                 [showOptionToSubmit]="false"
               >
               </property-create-object>
-              <!-- <market-create-good dvAlias="reward-create-good"
-                [id]="rewardId"
-                [sellerId]="user?.id"
-                [marketId]="user?.id"
-                supply=1
-                priceLabel="Star Cost"
-                [showOptionToInputSeller]="false"
-                [showOptionToInputSupply]="false"
-                [showOptionToSubmit]="false">
-              </market-create-good> -->
               <dv-button>Create Reward</dv-button>
             </dv-tx>
           </div>
@@ -103,13 +80,6 @@
                 [signIn]="false"
                 [showOptionToSubmit]="false">
               </authentication-register-user>
-              <!-- <task-create-assignee [id]="childId" [hidden]="true">
-              </task-create-assignee> -->
-              <!-- <market-create-party
-                [id]="childId"
-                balance=0
-                [hidden]="true">
-              </market-create-party> -->
               <group-add-to-group
                 [id]="user?.id"
                 [memberId]="childId"
