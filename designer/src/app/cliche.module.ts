@@ -2,17 +2,35 @@ import { NgModule, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import * as Allocator from 'allocator';
+import * as Authentication from 'authentication';
+import * as Authorization from 'authorization';
 import * as EventDV from 'event';
+import * as Follow from 'follow';
+import * as Geolocation from 'geolocation';
+import * as Group from 'group';
+import * as Passkey from 'passkey';
 import * as Property from 'property';
+import * as Rating from 'rating';
+import * as Task from 'task';
+import * as Transfer from 'transfer';
 
-import { isString } from '../../utils';
-import { Cliche, ClicheComponents } from '../datatypes';
-import { TextComponent } from '../text/text.component';
+import { isString } from '../utils';
+import { Cliche, ClicheComponents } from './datatypes';
+import { TextComponent } from './text/text.component';
 
 const importedCliches = {
   Allocator,
-  Property,
+  Authentication,
+  Authorization,
   Event: EventDV,
+  Follow,
+  Geolocation,
+  Group,
+  Passkey,
+  Property,
+  Rating,
+  Task,
+  Transfer,
 };
 
 function getNamedComponents(importedModule) {

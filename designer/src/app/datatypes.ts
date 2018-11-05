@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import * as uuidv4 from 'uuid/v4';
 
-import { cliches } from './cliche/cliche.module';
+import { cliches } from './cliche.module';
 
 export interface Widget {
   readonly id: string;

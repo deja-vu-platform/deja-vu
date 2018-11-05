@@ -3,7 +3,7 @@ import { filter } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
 import { ComposedWidget, BaseWidget, TextWidget } from './datatypes';
-import { cliches } from './cliche/cliche.module';
+import { cliches } from './cliche.module';
 
 const DV = 'Déjà Vu';
 

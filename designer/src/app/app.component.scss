@@ -15,6 +15,6 @@
   flex: 1;
 }
 
-app-main-view {
-  overflow-y: auto; /* enable component scrolling */
+.scroll {
+  overflow-y: scroll; /* enable component scrolling */
 }

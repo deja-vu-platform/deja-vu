@@ -8,8 +8,8 @@ import { QuillModule } from 'ngx-quill';
 
 import { GATEWAY_URL, DvModule } from 'dv-core';
 
-import { MatModule } from './mat/mat.module';
-import { ClicheModule } from './cliche/cliche.module';
+import { MatModule } from './mat.module';
+import { ClicheModule } from './cliche.module';
 
 import { WidgetDirective } from './widget.directive';
 
