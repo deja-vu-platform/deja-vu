@@ -19,7 +19,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { PropertiesRes, Property } from '../shared/property.model';
+import { Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -29,7 +29,6 @@ import { API_PATH } from '../property.config';
 export interface ValueMap {
   [property: string]: any;
 }
-
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -54,6 +53,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
       }
     }
   }
+  @Input() showExclude: string[] = [];
 
   @Input() buttonLabel = 'Create Object';
   @Input() newObjectSavedText = 'New object saved';
@@ -88,7 +88,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
       return;
     }
     this.gs
-      .get<PropertiesRes>(this.apiPath, {
+      .get<{data: {properties: Property[]}}>(this.apiPath, {
         params: {
           query: `
             query {
@@ -99,7 +99,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
           `
         }
       })
-      .pipe(map((res: PropertiesRes) => res.data.properties))
+      .pipe(map((res) => res.data.properties))
       .subscribe((properties: Property[]) => {
         this.properties = properties;
         const formControls = {};
@@ -145,6 +145,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   dvOnExecSuccess() {
     if (this.showOptionToSubmit && this.save) {
+      this.newObjectError = '';
       this.newObjectSaved = true;
       window.setTimeout(() => {
         this.newObjectSaved = false;
