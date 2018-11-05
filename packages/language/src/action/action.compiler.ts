@@ -97,8 +97,6 @@ export class ActionCompiler {
     }
     const s = this.semantics(matchResult);
     const thisActionName = s.getActionName();
-    console.log('Got action name' + thisActionName);
-    console.log(JSON.stringify(symbolTable));
     s.saveUsedActions(); // mutates thisActionSymbolTable
     _.set(symbolTable, [appName, thisActionName], {
       kind: 'action',
@@ -106,7 +104,6 @@ export class ActionCompiler {
     });
     s.saveUsedOutputs();
     s.saveInputs();
-    console.log(JSON.stringify(symbolTable));
     const ngTemplate = s.toNgTemplate();
     const className = ActionCompiler.GetClassName(thisActionName);
     const selector = ActionCompiler.GetSelector(appName, thisActionName);
@@ -141,7 +138,6 @@ export class ActionCompiler {
           actionName: actionInput.selector
         })))
       .build();
-    console.log(ngComponent);
 
     return {
       className: className,

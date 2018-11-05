@@ -1,4 +1,5 @@
-import { ActionCompiler } from './action.compiler';
+import { ActionCompiler, CompiledAction } from './action.compiler';
+
 
 describe('ActionCompiler', () => {
   let actionCompiler: ActionCompiler;
@@ -9,8 +10,9 @@ describe('ActionCompiler', () => {
   });
 
   it('should compile action with HTML only', () => {
+    const actionName = 'action-with-html-only';
     const action = `
-      <dv.action name="action-with-html-only">
+      <dv.action name="${actionName}">
         <div class="col-md-2 main">
           <!-- Hello -->
           <h1>Hello</h1>
@@ -26,10 +28,18 @@ describe('ActionCompiler', () => {
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch('Hello');
+    expect(compiledAction.ngComponent)
+      .not.toMatch('dv.action');
+    expect(compiledAction.ngComponent)
+      .toMatch(`selector: "${appName}-action-with-html-only"`);
   });
 
   it('should compile action with actions', () => {
+    const heading = 'Group meeting organizer';
     const action =  `
       <dv.action name="home">
         <div class="container main">
@@ -37,7 +47,7 @@ describe('ActionCompiler', () => {
             <div class="col-md-12">
               <div class="row">
                 <div class="col-md-12">
-                  <h1>Group meeting organizer</h1>
+                  <h1>${heading}</h1>
                 </div>
               </div>
               <div class="row box">
@@ -68,7 +78,12 @@ describe('ActionCompiler', () => {
         </div>
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(heading);
+    expect(compiledAction.ngComponent)
+      .not.toMatch('dv.action');
   });
 
   it('should compile action accessing member of output', () => {
@@ -80,7 +95,10 @@ describe('ActionCompiler', () => {
         <allocator.edit-consumer hidden=true />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(/\(currentConsumer\)=.+=\$event/);
   });
 
   /* TODO
@@ -99,7 +117,10 @@ describe('ActionCompiler', () => {
         <property.show-objects hidden=true object=$supply />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(/\[hidden]="true"/);
   });
 
   it('should compile action with action input', () => {
@@ -111,7 +132,14 @@ describe('ActionCompiler', () => {
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngComponent)
+      .toMatch(`tag`);
+    expect(compiledAction.ngComponent)
+      .toMatch(`type`);
   });
 
   it('should compile action with html action input', () => {
@@ -123,7 +151,14 @@ describe('ActionCompiler', () => {
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngComponent)
+      .toMatch(`tag`);
+    expect(compiledAction.ngComponent)
+      .toMatch(`type`);
   });
 
   it('should compile action with action input ' +
@@ -139,7 +174,10 @@ describe('ActionCompiler', () => {
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(`[showEvent]`);
   });
 
   it('should compile action with action input ' +
@@ -157,7 +195,10 @@ describe('ActionCompiler', () => {
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngComponent)
+      .toMatch(`[showEvent]`);
   });
 
   it('should compile action with an alias', () => {
