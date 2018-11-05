@@ -1,5 +1,4 @@
 {
-  "extends": "tslint-config-airbnb",
   "rulesDirectory": [
     "node_modules/codelyzer"
   ],
