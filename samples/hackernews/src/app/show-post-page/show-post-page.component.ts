@@ -17,6 +17,7 @@ export class ShowPostPageComponent implements OnInit {
   showComment = ShowCommentComponent;
   showPost = ShowPostComponent;
   id: string;
+  post: any;
   user: any = { username: "ahacker" }; // TODO: remove temp value
 
   constructor(private route: ActivatedRoute) {}

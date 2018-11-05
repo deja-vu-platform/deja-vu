@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'hackernews-show-post',
@@ -7,6 +7,7 @@ import { Component, Input, OnInit, Output } from '@angular/core';
 })
 export class ShowPostComponent implements OnInit {
   @Input() id: string;
+  @Output() loadedPost = new EventEmitter();
   post: any;
 
   constructor() { }
@@ -14,4 +15,7 @@ export class ShowPostComponent implements OnInit {
   ngOnInit() {
   }
 
+  outputPost(value) {
+    this.loadedPost.emit(value);
+  }
 }

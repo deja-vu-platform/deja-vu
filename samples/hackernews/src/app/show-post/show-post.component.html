@@ -1,24 +1,40 @@
 <div>
   <property-show-object [id]="id"
     [hidden]="true"
-    (loadedObject)="post=$event"
+    (loadedObject)="post=$event; outputPost($event)"
   >
   </property-show-object>
+
+  <div *ngIf="!post">
+    Post not found
+  </div>
+
   <div *ngIf="post">
-    <span><a [href]="post.url">{{post.title}}</a></span>
-    <!-- TODO: show the base url of the post, just like how HN does it -->
-    <div>
-      <scoring-show-target
-        [id]="id"
-        [showId]="false"
-        [showScores]="false"
-        totalLabel=""
-        style="display: inline-block"
-      >
-      </scoring-show-target> points by {{post.author}} | 
-      <dv-link href="/item" [params]="{ id: id }">comments</dv-link>
-      <!-- TODO: show number of comments -->
-      <!-- TODO: save timestamp and show how long ago this was posted -->
+    <scoring-create-score
+      class="upvote-button"
+      newScoreSavedText=""
+      [showOptionToInputValue]="false"
+      submitMatIconName="arrow_drop_up"
+      [targetId]="id"
+      [value]="1"
+    >
+    </scoring-create-score>
+    <div class="inline-block">
+      <span><a [href]="post.url">{{post.title}}</a></span>
+      <!-- TODO: show the base url of the post, just like how HN does it -->
+      <div>
+        <scoring-show-target
+          class="inline-block"
+          [id]="id"
+          [showId]="false"
+          [showScores]="false"
+          totalLabel=""
+        >
+        </scoring-show-target> points by {{post.author}} | 
+        <dv-link href="/item" [params]="{ id: id }">comments</dv-link>
+        <!-- TODO: show number of comments -->
+        <!-- TODO: save timestamp and show how long ago this was posted -->
+      </div>
     </div>
   </div>
 </div>
