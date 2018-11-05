@@ -39,10 +39,12 @@
   <dv-tx class="offset-md-4 col-md-4">
     <!-- TODO: Chore Value -->
     <transfer-add-to-balance
+      [showOptionToInputAccountId]="false"
       [showOptionToInputBalance]="false"
       [showOptionToSubmit]="false"
       [accountId]="chore.assigneeId"
       [amount]="1"
+      newTransferSavedText="Chore completion approved."
     >
     </transfer-add-to-balance>
     <task-approve-task [id]="chore.id" [hidden]="true">

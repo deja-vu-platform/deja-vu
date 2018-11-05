@@ -9,10 +9,12 @@
   <div class="col-md-4">
     <transfer-add-to-balance
       *ngIf="showOptionToPurchase"
-      [accountId]="user.id"
+      [showOptionToInputAccountId]="false"
       [showOptionToInputBalance]="false"
+      [accountId]="user.id"
       [amount]="-1 * reward.cost"
       buttonLabel="Purchase"
+      newTransferSavedText="Reward purchased."
     >
     </transfer-add-to-balance>
   </div>
