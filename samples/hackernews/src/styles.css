@@ -31,7 +31,8 @@
   height: 4rem;
 }
 
-.write-comment-container .mat-form-field {
+.write-comment-container .mat-form-field, .mat-form-field-wrapper {
+  display: block;
   width: 300px;
 }
 
