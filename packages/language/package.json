@@ -32,6 +32,6 @@
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
-  "types": "./dist/app/app.compiler.d.ts",
-  "main": "./dist/app/app.compiler.js"
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js"
 }
