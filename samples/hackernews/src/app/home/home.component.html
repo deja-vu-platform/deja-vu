@@ -1,15 +1,17 @@
 <hackernews-navbar></hackernews-navbar>
 
 <div class="main">
-  <scoring-show-targets-by-score
-    dvOf="scoringposts"
-    noTargetsText="No posts yet."
-    [showAscending]="false"
-    [showScores]="false"
-    [showTarget]="{
-      type: showPost, tag: 'hackernews-show-post',
-      inputMap: {post: 'target', id: 'id'}
-    }"
-  >
-  </scoring-show-targets-by-score>
+  <div class="container">
+    <scoring-show-targets-by-score
+      dvOf="scoringposts"
+      noTargetsText="No posts yet."
+      [showAscending]="false"
+      [showScores]="false"
+      [showTarget]="{
+        type: showPost, tag: 'hackernews-show-post',
+        inputMap: {post: 'target', id: 'id'}
+      }"
+    >
+    </scoring-show-targets-by-score>
+  </div>
 </div>

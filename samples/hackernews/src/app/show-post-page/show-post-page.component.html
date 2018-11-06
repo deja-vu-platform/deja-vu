@@ -1,34 +1,36 @@
 <hackernews-navbar (loggedInUser)="user=$event"></hackernews-navbar>
 
 <div class="main">
-  <hackernews-show-post [id]="id" (loadedPost)="post=$event"></hackernews-show-post>
+  <div class="container">
+    <hackernews-show-post [id]="id" (loadedPost)="post=$event"></hackernews-show-post>
 
-  <div *ngIf="post">
-    <div class="write-comment-container">
-      <hr class="post-separator" />
+    <div *ngIf="post">
+      <div class="write-comment-container">
+        <hr class="post-separator" />
 
-      <comment-create-comment
-        [authorId]="user ? user.username : ''"
-        buttonLabel="add comment"
-        [showOptionToSubmit]="!!user"
-        [targetId]="id"
-      >
-      </comment-create-comment>
+        <comment-create-comment
+          [authorId]="user ? user.username : ''"
+          buttonLabel="add comment"
+          [showOptionToSubmit]="!!user"
+          [targetId]="id"
+        >
+        </comment-create-comment>
 
-      <div *ngIf="!user">
-        <hackernews-redirect-to-login linkText="add comment">
-        </hackernews-redirect-to-login>
+        <div *ngIf="!user">
+          <hackernews-redirect-to-login linkText="add comment">
+          </hackernews-redirect-to-login>
+        </div>
       </div>
-    </div>
 
-    <div class="post-show-comments">
-      <comment-show-comments
-        [ofTargetId]="id"
-        [showComment]="{
-          type: showComment, tag: 'hackernews-show-comment',
-          inputMap: { comment: 'comment' }
-        }">
-      </comment-show-comments>
+      <div class="post-show-comments">
+        <comment-show-comments
+          [ofTargetId]="id"
+          [showComment]="{
+            type: showComment, tag: 'hackernews-show-comment',
+            inputMap: { comment: 'comment' }
+          }">
+        </comment-show-comments>
+      </div>
     </div>
   </div>
 </div>
