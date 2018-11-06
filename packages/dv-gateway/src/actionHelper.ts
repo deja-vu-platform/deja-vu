@@ -1,4 +1,4 @@
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as _ from 'lodash';
@@ -316,6 +316,7 @@ export class ActionHelper {
       DV_CORE_CLICHE);
     const allActionsTable = _.assign(
       {}, appActionTable, ...clicheActionTables, dvCoreActionTable);
+
     console.log(
       `Unpruned action table ` +
       JSON.stringify(allActionsTable, null, 2));
