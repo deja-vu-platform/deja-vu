@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { GroupWithUserComponent } from '../group-with-user/group-with-user.component';
 
 @Component({
   selector: 'mapmit-user-groups',
@@ -7,9 +8,10 @@ import { Component } from '@angular/core';
 })
 export class UserGroupsComponent {
   user: User;
+  groupWithUser = GroupWithUserComponent;
 
   getMemberIds() {
-    return this.user ? '["' + this.user.id + '"]' : undefined;
+    return this.user ? [this.user.id] : undefined;
   }
 }
 

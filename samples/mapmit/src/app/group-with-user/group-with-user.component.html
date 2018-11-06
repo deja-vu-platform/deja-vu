@@ -6,13 +6,14 @@
         [showMembers]="false">
       </group-show-group>
     </h4>
-    <group-join-leave
-      class="btn btn-default remove-from-group-btn"
-      [group]="group"
-      [memberId]="loggedInUserId">
-    </group-join-leave>
-
-    <authorization-can-view
+    <dv-tx>
+      <group-join-leave
+        class="btn btn-default remove-from-group-btn"
+        [group]="group"
+        [memberId]="loggedInUserId">
+      </group-join-leave>
+    </dv-tx>
+    <!-- <authorization-can-view
       dvAlias="can-view-groups"
       [principalId]="loggedInUserId"
       [resourceId]="group.id"
@@ -22,6 +23,6 @@
       dvAlias="authenticate-groups"
       [id]="loggedInUserId" 
       [hidden]="true">
-    </authentication-authenticate>
+    </authentication-authenticate> -->
   </div>
 </div>

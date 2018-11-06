@@ -25,14 +25,14 @@
               [showOptionToAddMembers]="false"
               [hidden]="true">
             </group-create-group>
-            <authorization-create-resource
+            <!-- <authorization-create-resource
               [id]="groupId"
               [ownerId]="user?.id"
               [hidden]="true">
             </authorization-create-resource>
             <authentication-authenticate
               [id]="loggedInUserId" [hidden]="true">
-            </authentication-authenticate>
+            </authentication-authenticate> -->
             <dv-button class="btn btn-blue create-group-btn vertical-align-top">
               Create Group
             </dv-button>
@@ -42,8 +42,9 @@
     </div>
   </div>
 
-  <div class="my-groups-column" id="my-groups-column-right">
     <!-- Show groups for which the user is a member -->
+
+  <div class="my-groups-column" id="my-groups-column-right">
     <div class="panel panel-default">
       <div class="panel-body groups-panel-body">
         <h2>Groups I'm In</h2>
