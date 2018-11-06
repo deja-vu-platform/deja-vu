@@ -35,11 +35,3 @@
   display: block;
   width: 300px;
 }
-
-.list-group-item {
-  background-color: initial;
-  padding: 0;
-  padding-bottom: 1rem;
-  border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
