@@ -67,18 +67,16 @@
       <dv-tx *ngIf="loggedInUserId === hostId">
         <!-- Edit/ Delete Buttons -->   
         <!-- TODO: Edit Button -->
-        <event-delete-event [id]="eventId"></event-delete-event>
-        <!-- <geolocation-delete-marker 
-          [id]="eventId" [hidden]="true">
-        </geolocation-delete-marker>
+        
+        <!-- works with delete resource, delete marker, NOT delete event... -->
         <authorization-delete-resource
           [id]="eventId" [hidden]="true">
         </authorization-delete-resource>
-        <authentication-authenticate 
-          dvAlias="authenticate-show-delete-event" 
-          [id]="loggedInUserId" 
-          [hidden]="true">
-        </authentication-authenticate> -->
+        <geolocation-delete-marker 
+          [id]="eventId" [hidden]="true">
+        </geolocation-delete-marker>
+        <dv-button>Delete Event</dv-button>
+        <dv-link href="/user-events" [hidden]="true"></dv-link>
       </dv-tx>
     </div>
   </div>
