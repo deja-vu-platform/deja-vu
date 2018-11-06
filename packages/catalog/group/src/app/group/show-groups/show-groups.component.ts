@@ -69,8 +69,8 @@ OnChanges {
             query: `
               query Groups($input: GroupsInput!) {
                 groups(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showMembers ? 'memberIds' : ''}
+                  id
+                  memberIds
                 }
               }
             `,
