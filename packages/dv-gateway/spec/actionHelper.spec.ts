@@ -2,11 +2,7 @@ import { ActionHelper , ActionTable } from '../src/actionHelper';
 import { ActionPath } from '../src/actionPath';
 
 describe('ActionHelper', () => {
-  it('can be created', () => {
-    expect(new ActionHelper(null, null, null)).toBeTruthy();
-  });
-
-  it('is well', () => {
+  it('should require alias for duplicate paths', () => {
     const actionTable: ActionTable = {
       'chorestar-root': [
         {
@@ -572,6 +568,6 @@ describe('ActionHelper', () => {
     ];
     const actionPath = new ActionPath(arrayActionPath);
     const matchingPaths = actionHelper.getMatchingPaths(actionPath);
-    expect(matchingPaths.length).toBe(1);
+    expect(matchingPaths.length).toBeGreaterThan(1);
   });
 });
