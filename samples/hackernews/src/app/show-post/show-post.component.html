@@ -21,8 +21,13 @@
     >
     </scoring-create-score>
     <div class="inline-block">
-      <span class="post-title"><a [href]="post.url">{{post.title}}</a></span>
-      <!-- TODO: show the base url of the post, just like how HN does it -->
+      <div>
+        <span class="post-title"><a [href]="post.url">{{post.title}}</a></span>
+        <!-- TODO: below should link to list of all posts with that base url -->
+        <span *ngIf="getBaseUrl(post.url)" class="subtext">
+          ({{getBaseUrl(post.url)}})
+        </span>
+      </div>
       <div class="subtext">
         <scoring-show-target
           class="inline-block"
