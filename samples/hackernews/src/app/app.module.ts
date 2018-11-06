@@ -7,6 +7,9 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import {
+  RedirectToLoginComponent
+} from './redirect-to-login/redirect-to-login.component';
 import { ShowCommentComponent } from './show-comment/show-comment.component';
 import { ShowPostComponent } from './show-post/show-post.component';
 import { ShowPostPageComponent } from './show-post-page/show-post-page.component';
@@ -24,6 +27,7 @@ import { ScoringModule } from 'scoring';
     HomeComponent,
     LoginComponent,
     NavbarComponent,
+    RedirectToLoginComponent,
     ShowCommentComponent,
     ShowPostComponent,
     ShowPostPageComponent,
@@ -44,7 +48,10 @@ import { ScoringModule } from 'scoring';
     ]),
     ScoringModule
   ],
-  entryComponents: [ NavbarComponent, ShowCommentComponent, ShowPostComponent ],
+  entryComponents: [
+    NavbarComponent, RedirectToLoginComponent, ShowCommentComponent,
+    ShowPostComponent
+  ],
   providers: [{
     provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
   }],
