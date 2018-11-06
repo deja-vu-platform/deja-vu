@@ -6,3 +6,11 @@
   font-weight: bold;
   font-size: 14pt;
 }
+
+.post-title a {
+  color: #000000;
+}
+
+.post-title a:hover {
+  color: #000000;
+}

@@ -8,7 +8,7 @@
       <dv-tx>
         <dv-id (id)="postId=$event"></dv-id>
         <property-create-object
-          buttonLabel="submit"
+          buttonLabel="Submit"
           [id]="postId"
           [initialValue]="{ author: user.username }"
           newObjectSavedText="Post submitted"
@@ -30,7 +30,7 @@
     </div>
 
     <div *ngIf="!user">
-      <hackernews-redirect-to-login linkText="login to submit">
+      <hackernews-redirect-to-login linkText="Login to submit">
       </hackernews-redirect-to-login>
     </div>
   </div>

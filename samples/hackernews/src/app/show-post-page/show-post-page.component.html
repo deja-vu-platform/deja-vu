@@ -10,14 +10,14 @@
 
         <comment-create-comment
           [authorId]="user ? user.username : ''"
-          buttonLabel="add comment"
+          buttonLabel="Add comment"
           [showOptionToSubmit]="!!user"
           [targetId]="id"
         >
         </comment-create-comment>
 
         <div *ngIf="!user">
-          <hackernews-redirect-to-login linkText="add comment">
+          <hackernews-redirect-to-login linkText="Add comment">
           </hackernews-redirect-to-login>
         </div>
       </div>

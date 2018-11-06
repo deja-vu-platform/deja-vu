@@ -6,7 +6,7 @@
     <dv-link class="navbar-brand" href="/">DV Hacker News</dv-link>
 
     <dv-link [href]="user ? '/submit' : '/login'"
-      [params]="user ? {} : { goto: currentUrl }">submit</dv-link>
+      [params]="user ? {} : { goto: currentUrl }">Submit</dv-link>
 
     <span class="space-filler"></span>
     <div *ngIf="user">
@@ -20,7 +20,7 @@
       </span>
     </div>
     <div *ngIf="!user">
-      <dv-link href="/login">login</dv-link>
+      <dv-link href="/login">Login</dv-link>
     </div>
   </div>
 </nav>
