@@ -1,18 +1,43 @@
-<div *ngIf="comment">
-  <!-- TODO: upvote button here -->
-  <span>{{comment.authorId}}</span> <!-- TODO: specify how long ago -->
-  <div>{{comment.content}}</div>
+<div class="comment-container">
+  <div *ngIf="!comment">
+    Comment not found
+  </div>
 
-  <!-- TODO: create reply page  -->
-  <dv-link href="/">reply</dv-link>
-  <!-- TODO: dv can't seem to handle the recursion here -->
-  <!-- <div>
-    <comment-show-comments
-      [ofTargetId]="comment.id"
-      [showComment]="{
-        type: showComment, tag: 'hackernews-show-comment',
-        inputMap: {comment: 'comment'}
-      }">
-    </comment-show-comments>
-  </div> -->
+  <div *ngIf="comment">
+    <scoring-create-score
+      class="upvote-button"
+      dvOf="scoringcomments"
+      newScoreSavedText=""
+      [showOptionToInputValue]="false"
+      submitMatIconName="arrow_drop_up"
+      [targetId]="id"
+      [value]="1"
+    >
+    </scoring-create-score>
+
+    <div class="inline-block">
+      <span class="subtext">{{comment.authorId}}</span>
+      <span *ngIf="showAncestorSummary">
+        | <dv-link href="/item" [params]="{ id: comment.targetId }">parent</dv-link>
+        <!-- TODO: get original post title and link to it as well -->
+      </span>
+      <!-- TODO: specify how long ago -->
+      <div>{{comment.content}}</div>
+    </div>
+
+    <div class="reply-container">
+      <!-- TODO: create reply page and enable when nested comments are supported  -->
+      <div class="subtext"><dv-link href="/">reply</dv-link></div>
+      <!-- TODO: dv can't seem to handle the recursion here -->
+      <!-- <div>
+        <comment-show-comments
+          [ofTargetId]="comment.id"
+          [showComment]="{
+            type: showComment, tag: 'hackernews-show-comment',
+            inputMap: {comment: 'comment'}
+          }">
+        </comment-show-comments>
+      </div> -->
+    </div>
+  </div>
 </div>

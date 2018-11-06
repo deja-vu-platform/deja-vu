@@ -41,10 +41,16 @@
         }
       }
     },
-    "scoring": {
+    "scoringposts": {
       "name": "scoring",
       "config": {
         "wsPort": 3005
+      }
+    },
+    "scoringcomments": {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3006
       }
     }
   },
