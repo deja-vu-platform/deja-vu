@@ -1,0 +1,81 @@
+<mapmit-nav-bar (loggedInUser)="user=$event"></mapmit-nav-bar>
+
+<div class="events-container">
+  <div class="events-panel panel panel-default">
+    <h2 class="create-event-header">Create an Event!</h2>
+
+    <!-- Causes tx to abort if inside dv-tx -->
+    <div class="create-event-input">
+      <geolocation-display-map 
+        [id]="user?.id" 
+        (newPosition)="mPos=$event">
+      </geolocation-display-map>
+    </div>
+
+    <dv-tx>        
+      <dv-id (id)="eventId=$event"></dv-id>
+      <dv-status savedText="Event created"></dv-status>
+      <!-- Title, Description, Room Number, Location Description -->
+      <!-- Host is the one creating the event -->
+      <div class="create-event-input">
+        <property-create-object
+          dvOf="eventInfo"
+          [id]="eventId"
+          [showOptionToSubmit]="false">
+        </property-create-object>
+      </div>
+
+      <!-- Location -->
+      <div class="create-event-input">
+        <geolocation-create-marker 
+          [id]="eventId"
+          mapId="homeMapId" 
+          [latitude]="mPos?.latitude" 
+          [longitude]="mPos?.longitude" 
+          (marker)="m=$event"
+          [showOptionToSubmit]="false">
+        </geolocation-create-marker>
+      </div>
+      
+      <!-- Time + Date -->
+      <div class="create-event-input">
+        <event-create-event
+          [id]="eventId"
+          [showOptionToSubmit]="false">
+        </event-create-event>
+      </div>
+
+      <!-- Public or Specific Group Only: Need to fix widget -->
+      <!-- <div class="create-event-input">
+        <group-choose-group 
+          [withMemberId]="user?.id"
+          (selectedGroup)="$group=event"
+          [showOptionToSubmit]="false">
+        </group-choose-group>
+      </div> -->
+
+      <!-- Authorization + Authentication Checks -->
+      <!-- [viewerIds]="group?.memberIds" -->
+      <authorization-create-resource
+        [id]="eventId"
+        [ownerId]="user?.id"
+        [hidden]="true">
+      </authorization-create-resource>
+      <authentication-authenticate
+        [id]="user?.id" [hidden]="true">
+      </authentication-authenticate>
+
+      <div class="event-btn-container">
+        <div class="cancel-button">
+          <dv-link href="/home" class="btn btn-default event-cancel-btn">
+            Cancel
+          </dv-link>
+        </div>
+        <div class="save-button">
+          <dv-button>Save Event</dv-button>
+          <dv-link href="/user-events" [hidden]="true"></dv-link>
+        </div>
+      </div>
+    </dv-tx>
+  </div>
+</div>

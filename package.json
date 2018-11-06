@@ -59,6 +59,7 @@
     "packages/*",
     "packages/catalog/*",
     "samples/morg",
-    "samples/potluck"
+    "samples/potluck",
+    "samples/mapmit"
   ]
 }

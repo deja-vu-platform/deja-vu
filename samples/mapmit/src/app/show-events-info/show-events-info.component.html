@@ -1,0 +1,13 @@
+<div class="container-fluid event-card-container">
+    <authorization-show-resources
+      [viewableBy]="user?.id"
+      [showResource]="{
+        type: showEventInfo, tag: 'mapmit-show-event-info',
+        inputMap: { id: 'eventId' },
+        inputs: { loggedInUserId: user?.id }
+      }"
+      noResourcesText="No events to show">
+    </authorization-show-resources>
+    <authentication-authenticate [id]="user?.id" [hidden]="true">
+    </authentication-authenticate>
+</div>

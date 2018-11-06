@@ -1,0 +1,27 @@
+<div class="group-im-in">
+  <div class="group-im-in-container">
+    <h4 class="group-im-in-name">
+      <group-show-group
+        [group]="group"
+        [showMembers]="false">
+      </group-show-group>
+    </h4>
+    <group-join-leave
+      class="btn btn-default remove-from-group-btn"
+      [group]="group"
+      [memberId]="loggedInUserId">
+    </group-join-leave>
+
+    <authorization-can-view
+      dvAlias="can-view-groups"
+      [principalId]="loggedInUserId"
+      [resourceId]="group.id"
+      [hidden]="true">
+    </authorization-can-view>
+    <authentication-authenticate 
+      dvAlias="authenticate-groups"
+      [id]="loggedInUserId" 
+      [hidden]="true">
+    </authentication-authenticate>
+  </div>
+</div>

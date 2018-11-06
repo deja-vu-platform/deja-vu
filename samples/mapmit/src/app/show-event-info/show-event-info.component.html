@@ -1,0 +1,85 @@
+<div className="row event-card-row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <!-- Title -->
+        <property-show-object 
+          dvAlias="show-event-title" dvOf="eventInfo" 
+          [id]="eventId" [showOnly]="['title']">
+        </property-show-object>
+      </div>
+
+      <div class="panel-body">
+        <!-- Host -->
+        <div>
+          <span class="italic">Host:</span>
+          <authorization-show-owner 
+            [resourceId]="eventId" 
+            (ownerId)="hostId=$event" [hidden]="true">
+          </authorization-show-owner>
+          <authentication-show-user [id]="hostId">
+          </authentication-show-user>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <span class="italic">Description:</span>
+          <property-show-object 
+            dvAlias="show-event-description" dvOf="eventInfo" 
+            [id]="eventId" [showOnly]="['description']">
+          </property-show-object>
+        </div>
+
+        <!-- Date + Time -->
+        <div>
+          <span class="italic">Time:</span>
+          <event-show-event [id]="eventId"></event-show-event>
+        </div>
+
+        <!-- Location + Room Number -->
+        <div>
+          <span class="italic">Room Number:</span>
+          <property-show-object 
+            dvAlias="show-event-room-number" dvOf="eventInfo" 
+            [id]="eventId" [showOnly]="['roomNumber']">
+          </property-show-object>
+
+          <span class="italic">Location Description:</span>
+          <property-show-object 
+            dvAlias="show-event-location-description" dvOf="eventInfo" 
+            [id]="eventId" [showOnly]="['locationDescription']">
+          </property-show-object>
+        </div>
+      </div>
+
+      <authorization-can-view 
+        dvAlias="can-view-show-event-info" 
+        [principalId]="loggedInUserId" 
+        [resourceId]="eventId"
+        [hidden]="true">
+      </authorization-can-view>
+      <authentication-authenticate 
+        dvAlias="authenticate-show-event-info" 
+        [id]="loggedInUserId" 
+        [hidden]="true">
+      </authentication-authenticate>
+
+      <dv-tx *ngIf="loggedInUserId === hostId">
+        <!-- Edit/ Delete Buttons -->   
+        <!-- TODO: Edit Button -->
+        <event-delete-event [id]="eventId"></event-delete-event>
+        <!-- <geolocation-delete-marker 
+          [id]="eventId" [hidden]="true">
+        </geolocation-delete-marker>
+        <authorization-delete-resource
+          [id]="eventId" [hidden]="true">
+        </authorization-delete-resource>
+        <authentication-authenticate 
+          dvAlias="authenticate-show-delete-event" 
+          [id]="loggedInUserId" 
+          [hidden]="true">
+        </authentication-authenticate> -->
+      </dv-tx>
+    </div>
+  </div>
+</div>
