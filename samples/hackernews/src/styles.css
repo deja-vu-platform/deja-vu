@@ -3,11 +3,42 @@
 
 .main {
   margin-top: 56px; /* height of navbar */
-  padding: 40px;
+  padding: 15px 40px;
   background-color: #f6f6ef; /* hacker news bg color */
   min-height: 100vh;
 }
 
 .inline-block {
   display: inline-block;
+}
+
+.subtext {
+  color: grey;
+  font-size: 9pt; /* hacker news subtext font size */
+}
+
+.upvote-button {
+  display: inline-block;
+  vertical-align: super;
+}
+
+.mat-icon-button .mat-button-wrapper > * {
+  vertical-align: inherit !important;
+}
+
+.write-comment-container textarea {
+  width: 300px !important;
+  height: 4rem;
+}
+
+.write-comment-container .mat-form-field {
+  width: 300px;
+}
+
+.list-group-item {
+  background-color: initial;
+  padding: 0;
+  padding-bottom: 1rem;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }

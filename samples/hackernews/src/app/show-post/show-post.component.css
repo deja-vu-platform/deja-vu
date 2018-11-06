@@ -1,4 +1,8 @@
-.upvote-button {
-  display: inline-block;
-  vertical-align: bottom;
+.post-container {
+  padding-top: 1rem;
+}
+
+.post-title {
+  font-weight: bold;
+  font-size: 14pt;
 }
