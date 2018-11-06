@@ -21,6 +21,10 @@ import {
 import { DeleteEventComponent } from './delete-event/delete-event.component';
 import { ShowEventComponent } from './show-event/show-event.component';
 
+export {
+  ChooseAndShowSeriesComponent, CreateEventComponent, CreateSeriesComponent,
+  CreateWeeklySeriesComponent, DeleteEventComponent, ShowEventComponent
+};
 
 const allComponents = [
   ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
