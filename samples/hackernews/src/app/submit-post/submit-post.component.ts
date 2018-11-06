@@ -8,7 +8,6 @@ import { Component, OnInit } from '@angular/core';
 export class SubmitPostComponent implements OnInit {
   postId: string;
   post: any;
-  user: any = { username: "ahacker" }; // TODO: remove temp value
 
   constructor() { }
 

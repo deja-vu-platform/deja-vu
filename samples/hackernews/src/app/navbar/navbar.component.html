@@ -5,19 +5,20 @@
   <div class="container">
     <dv-link class="navbar-brand" href="/">DV Hacker News</dv-link>
 
-    <dv-link href="/submit">submit</dv-link>
+    <dv-link [href]="user ? '/submit' : '/login'"
+      [params]="user ? {} : { goto: currentUrl }">submit</dv-link>
 
     <span class="space-filler"></span>
-    <ul *ngIf="user" class="navbar-nav">
-      <li class="username">{{user.username}}</li>
-      <li>
+    <div *ngIf="user">
+      <span class="username">{{user.username}}</span>
+      <span>
         <dv-tx>
           <authentication-sign-out>
           </authentication-sign-out>
           <dv-link href="/" [hidden]="true"></dv-link>
         </dv-tx>
-      </li>
-    </ul>
+      </span>
+    </div>
     <div *ngIf="!user">
       <dv-link href="/login">login</dv-link>
     </div>
