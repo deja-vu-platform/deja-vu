@@ -22,9 +22,11 @@ OnChanges {
 
   @Input() showId = true;
   @Input() showValue = true;
+  @Input() showSourceId = true;
   @Input() showTargetId = true;
 
   @Input() noValueText = 'No value';
+  @Input() noSourceIdText = 'No source id';
   @Input() noTargetIdText = 'No target id';
 
   private gs: GatewayService;
@@ -61,6 +63,7 @@ OnChanges {
               score(id: "${this.id}") {
                 ${this.showId ? 'id' : ''}
                 ${this.showValue ? 'value' : ''}
+                ${this.showSourceId ? 'sourceId' : ''}
                 ${this.showTargetId ? 'targetId' : ''}
               }
             }

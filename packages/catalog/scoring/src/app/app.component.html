@@ -1,8 +1,13 @@
 <div class="container">
   <h1>Scoring</h1>
 
-  <h2>Create Score (id win, targetId ben)</h2>
-  <scoring-create-score id="win" targetId="ben" (score)="scoreId = $event.id">
+  <h2>Create Score (id win, sourceId competition1, targetId ben)</h2>
+  <scoring-create-score
+    id="win"
+    sourceId="competition1"
+    targetId="ben"
+    (score)="scoreId = $event.id"
+  >
   </scoring-create-score>
 
   <h2>Show Target (id ben)</h2>

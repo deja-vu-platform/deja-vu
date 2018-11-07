@@ -31,6 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateScoreComponent
     implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
   @Input() id: string | undefined;
+  @Input() sourceId: string;
   @Input() targetId: string;
   @Input() showOptionToInputValue = true;
   @Input() showOptionToSubmit = true;
@@ -76,9 +77,13 @@ export class CreateScoreComponent
   }
 
   async dvOnExec(): Promise<void> {
+    if (_.isNil(this.valueControl.value) || !this.sourceId || !this.targetId) {
+      return;
+    }
     const newScore: Score = {
       id: this.id,
       value: this.valueControl.value,
+      sourceId: this.sourceId,
       targetId: this.targetId
     };
     if (this.save) {
@@ -93,6 +98,7 @@ export class CreateScoreComponent
             input: {
               id: this.id,
               value: this.valueControl.value,
+              sourceId: this.sourceId,
               targetId: this.targetId
             }
           }

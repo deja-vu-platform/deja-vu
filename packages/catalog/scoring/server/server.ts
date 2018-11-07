@@ -14,9 +14,11 @@ import {
 import { v4 as uuid } from 'uuid';
 
 interface ScoringConfig extends Config {
-  // Function body that calculates the total score
-  // based on the parameter scores which is an array of scores with type number
+  /* Function body that calculates the total score
+  based on the parameter scores which is an array of scores with type number */
   totalScoreFn?: string;
+  /* Whether sourceId can give targetId a score only once or not */
+  oneToOneScoring?: boolean;
 }
 
 const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
@@ -93,9 +95,18 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
     Mutation: {
       createScore: async (
         _root, { input }: { input: CreateScoreInput }, context: Context) => {
+        if (config.oneToOneScoring) {
+          const existing = await scores.findOne({
+            sourceId: input.sourceId, targetId: input.targetId });
+          if (existing) {
+            throw new Error(`Source ${input.sourceId} already has a score for 
+              target ${input.targetId}`);
+          }
+        }
         const newScore: ScoreDoc = {
           id: input.id ? input.id : uuid(),
           value: input.value,
+          sourceId: input.sourceId,
           targetId: input.targetId
         };
 
