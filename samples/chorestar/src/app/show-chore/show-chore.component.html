@@ -1,10 +1,15 @@
+<property-show-object
+  dvOf="chore"
+  (loadedObject)="choreProps=$event"
+  [id]="chore.id"
+  [showOnly]="['name', 'stars']"
+  [hidden]="true"
+>
+</property-show-object>
+
 <div class="row">
   <div class="col-md-4">
-    <property-show-object
-      dvOf="chore"
-      [id]="chore.id"
-      [showOnly]="['name']">
-    </property-show-object>
+    <span>{{choreProps?.name}}</span>
   </div>
 
   <div class="offset-md-1 col-md-7">
@@ -30,8 +35,7 @@
   </div>
   <div class="offset-md-1 col-md-7">
     <i class="material-icons icon">star_rate</i>
-    1
-    <!-- TODO: Chore Value -->
+    <span>{{choreProps?.stars}}</span>
   </div>
 </div>
 
@@ -43,7 +47,7 @@
       [showOptionToInputBalance]="false"
       [showOptionToSubmit]="false"
       [accountId]="chore.assigneeId"
-      [amount]="1"
+      [amount]="choreProps?.stars"
       newTransferSavedText="Chore completion approved."
     >
     </transfer-add-to-balance>

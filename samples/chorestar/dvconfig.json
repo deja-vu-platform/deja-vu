@@ -64,9 +64,12 @@
           "properties": {
               "name": {
                 "type": "string"
+              },
+              "stars": {
+                "type": "number"
               }
           },
-          "required": ["name"]
+          "required": ["name", "stars"]
         }
       }
     },
