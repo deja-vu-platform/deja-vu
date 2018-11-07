@@ -17,8 +17,11 @@
           [showOptionToSubmit]="user"
         >
         </property-create-object>
+        <!-- use author as sourceId of initial score -->
+        <!-- also allows database to prevent author from upvoting own post -->
         <scoring-create-score
           dvOf="scoringposts"
+          [sourceId]="loggedInUser.id"
           [targetId]="postId"
           [value]="0"
           [hidden]="true"

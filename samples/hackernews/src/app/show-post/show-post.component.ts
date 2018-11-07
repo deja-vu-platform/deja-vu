@@ -7,6 +7,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class ShowPostComponent implements OnInit {
   @Input() id: string;
+  @Input() loggedInUser: any;
   @Output() loadedPost = new EventEmitter();
   post: any;
 

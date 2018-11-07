@@ -44,13 +44,15 @@
     "scoringposts": {
       "name": "scoring",
       "config": {
-        "wsPort": 3005
+        "wsPort": 3005,
+        "oneToOneScoring": true
       }
     },
     "scoringcomments": {
       "name": "scoring",
       "config": {
-        "wsPort": 3006
+        "wsPort": 3006,
+        "oneToOneScoring": true
       }
     }
   },
