@@ -9,11 +9,11 @@ import {
 } from '../show-post/show-post.component';
 
 @Component({
-  selector: 'hackernews-show-post-page',
-  templateUrl: './show-post-page.component.html',
-  styleUrls: ['./show-post-page.component.css']
+  selector: 'hackernews-show-post-details',
+  templateUrl: './show-post-details.component.html',
+  styleUrls: ['./show-post-details.component.css']
 })
-export class ShowPostPageComponent implements OnInit {
+export class ShowPostDetailsComponent implements OnInit {
   showComment = ShowCommentComponent;
   showPost = ShowPostComponent;
   id: string;

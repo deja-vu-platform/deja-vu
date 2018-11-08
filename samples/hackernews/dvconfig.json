@@ -64,7 +64,7 @@
     }
   },
   "routes": [
-    { "path": "item", "action": "hackernews-show-post-page" },
+    { "path": "item", "action": "hackernews-show-post-details" },
     { "path": "login", "action": "hackernews-login" },
     { "path": "news", "action": "hackernews-home" },
     { "path": "submit", "action": "hackernews-submit-post" },

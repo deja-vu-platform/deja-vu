@@ -12,7 +12,9 @@ import {
 } from './redirect-to-login/redirect-to-login.component';
 import { ShowCommentComponent } from './show-comment/show-comment.component';
 import { ShowPostComponent } from './show-post/show-post.component';
-import { ShowPostPageComponent } from './show-post-page/show-post-page.component';
+import {
+  ShowPostDetailsComponent
+} from './show-post-details/show-post-details.component';
 import { SubmitPostComponent } from './submit-post/submit-post.component';
 import { UpvoteComponent } from './upvote/upvote.component';
 
@@ -31,7 +33,7 @@ import { ScoringModule } from 'scoring';
     RedirectToLoginComponent,
     ShowCommentComponent,
     ShowPostComponent,
-    ShowPostPageComponent,
+    ShowPostDetailsComponent,
     SubmitPostComponent,
     UpvoteComponent
   ],
@@ -42,7 +44,7 @@ import { ScoringModule } from 'scoring';
     DvModule,
     PropertyModule,
     RouterModule.forRoot([
-      { path: 'item', component: ShowPostPageComponent },
+      { path: 'item', component: ShowPostDetailsComponent },
       { path: 'login', component: LoginComponent },
       { path: 'news', component: HomeComponent },
       { path: 'submit', component: SubmitPostComponent },
