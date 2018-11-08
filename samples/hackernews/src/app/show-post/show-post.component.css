@@ -1,5 +1,9 @@
 .post-container {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
+}
+
+:host /deep/ .form-group {
+  margin-bottom: 0.5rem;
 }
 
 .post-title {
