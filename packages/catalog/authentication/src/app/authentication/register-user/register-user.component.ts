@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, ValidatorFn, Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  NG_VALIDATORS, NG_VALUE_ACCESSOR
 } from '@angular/forms';
 
 import {
@@ -14,8 +14,6 @@ import {
 
 
 import { AuthenticationService } from '../shared/authentication.service';
-
-import { User } from '../shared/authentication.model';
 
 import {
   PasswordValidator, RetypePasswordValidator, UsernameValidator
@@ -151,6 +149,6 @@ export class RegisterUserComponent
   }
 
   dvOnExecFailure(reason: Error) {
-    this.newUserRegisteredError = reason.message;
+    this.newUserRegisteredError = 'User already exists';
   }
 }
