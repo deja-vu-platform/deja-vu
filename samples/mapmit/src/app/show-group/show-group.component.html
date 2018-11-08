@@ -13,6 +13,20 @@
         [memberId]="loggedInUserId">
       </group-join-leave>
     </dv-tx>
+
+    <h5>Add User</h5>
+    <!-- Adding users to groups reserved for owners of group, but not supported yet -->
+    <authentication-choose-user
+        [showChooseButton]="false"
+        (selectedUser)="chosen=$event">
+    </authentication-choose-user>
+    <dv-tx>
+      <group-add-to-group
+        [id]="group?.id"
+        [member]="chosen ? chosen : undefined"
+        [showInput]="false">
+      </group-add-to-group>
+    </dv-tx>
     <!-- <authorization-can-view
       dvAlias="can-view-groups"
       [principalId]="loggedInUserId"

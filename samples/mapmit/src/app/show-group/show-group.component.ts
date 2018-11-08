@@ -8,10 +8,16 @@ import { Component, Input } from '@angular/core';
 export class ShowGroupComponent {
   @Input() group: Group;
   @Input() loggedInUserId: string;
+
+  chosen: User;
 }
 
 interface Group {
   id: string;
   memberIds: string[];
-  subgroups: Group[]
 };
+
+interface User {
+  id: string;
+  username: string;
+}
