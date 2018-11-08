@@ -1,4 +1,4 @@
-<hackernews-navbar></hackernews-navbar>
+<hackernews-navbar (loggedInUser)="user=$event"></hackernews-navbar>
 
 <div class="main">
   <div class="container">
@@ -9,7 +9,8 @@
       [showScores]="false"
       [showTarget]="{
         type: showPost, tag: 'hackernews-show-post',
-        inputMap: {post: 'target', id: 'id'}
+        inputMap: { post: 'target', id: 'id' },
+        inputs: { loggedInUser: user }
       }"
     >
     </scoring-show-targets-by-score>

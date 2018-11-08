@@ -11,6 +11,7 @@ import {
 })
 export class HomeComponent implements OnInit {
   showPost = ShowPostComponent;
+  user: any;
 
   constructor() { }
 
