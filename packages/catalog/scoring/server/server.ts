@@ -97,7 +97,8 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         _root, { input }: { input: CreateScoreInput }, context: Context) => {
         if (config.oneToOneScoring) {
           const existing = await scores.findOne({
-            sourceId: input.sourceId, targetId: input.targetId });
+            sourceId: input.sourceId, targetId: input.targetId,
+            pending: { $exists: false } });
           if (existing) {
             throw new Error(`Source ${input.sourceId} already has a score for 
               target ${input.targetId}`);
