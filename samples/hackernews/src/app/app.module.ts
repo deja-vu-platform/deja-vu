@@ -14,6 +14,7 @@ import { ShowCommentComponent } from './show-comment/show-comment.component';
 import { ShowPostComponent } from './show-post/show-post.component';
 import { ShowPostPageComponent } from './show-post-page/show-post-page.component';
 import { SubmitPostComponent } from './submit-post/submit-post.component';
+import { UpvoteComponent } from './upvote/upvote.component';
 
 import { AuthenticationModule } from 'authentication';
 import { CommentModule } from 'comment';
@@ -31,7 +32,8 @@ import { ScoringModule } from 'scoring';
     ShowCommentComponent,
     ShowPostComponent,
     ShowPostPageComponent,
-    SubmitPostComponent
+    SubmitPostComponent,
+    UpvoteComponent
   ],
   imports: [
     AuthenticationModule,
@@ -50,7 +52,7 @@ import { ScoringModule } from 'scoring';
   ],
   entryComponents: [
     NavbarComponent, RedirectToLoginComponent, ShowCommentComponent,
-    ShowPostComponent
+    ShowPostComponent, UpvoteComponent
   ],
   providers: [{
     provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'

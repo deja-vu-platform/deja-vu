@@ -21,7 +21,7 @@
         <!-- also allows database to prevent author from upvoting own post -->
         <scoring-create-score
           dvOf="scoringposts"
-          [sourceId]="loggedInUser.id"
+          [sourceId]="user.username"
           [targetId]="postId"
           [value]="0"
           [hidden]="true"

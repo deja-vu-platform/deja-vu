@@ -4,17 +4,12 @@
   </div>
 
   <div *ngIf="comment">
-    <scoring-create-score
-      class="upvote-button"
-      dvOf="scoringcomments"
-      newScoreSavedText=""
-      [showOptionToInputValue]="false"
-      [sourceId]="loggedInUser?.id"
-      submitMatIconName="arrow_drop_up"
-      [targetId]="id"
-      [value]="1"
-    >
-    </scoring-create-score>
+    <div class="inline-block">
+      <hackernews-upvote
+        [disabled]="!loggedInUser || comment.authorId === loggedInUser.username"
+        [id]="comment.id" [loggedInUser]="loggedInUser" [isPost]="false">
+      </hackernews-upvote>
+    </div>
 
     <div class="inline-block">
       <span class="subtext">{{comment.authorId}}</span>
@@ -32,10 +27,11 @@
       <!-- TODO: dv can't seem to handle the recursion here -->
       <!-- <div>
         <comment-show-comments
-          [ofTargetId]="comment.id"
+          [ofTargetId]="commend.id"
           [showComment]="{
             type: showComment, tag: 'hackernews-show-comment',
-            inputMap: {comment: 'comment'}
+            inputMap: { comment: 'comment' },
+            inputs: { loggedInUser: loggedInUser }
           }">
         </comment-show-comments>
       </div> -->

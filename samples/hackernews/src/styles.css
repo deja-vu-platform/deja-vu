@@ -17,11 +17,6 @@
   font-size: 9pt; /* hacker news subtext font size */
 }
 
-.upvote-button {
-  display: inline-block;
-  vertical-align: super;
-}
-
 .mat-icon-button .mat-button-wrapper > * {
   vertical-align: inherit !important;
 }

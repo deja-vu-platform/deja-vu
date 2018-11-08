@@ -10,17 +10,12 @@
   </div>
 
   <div *ngIf="post" class="post-container">
-    <scoring-create-score
-      class="upvote-button"
-      dvOf="scoringposts"
-      newScoreSavedText=""
-      [showOptionToInputValue]="false"
-      [sourceId]="loggedInUser?.id"
-      submitMatIconName="arrow_drop_up"
-      [targetId]="id"
-      [value]="1"
-    >
-    </scoring-create-score>
+    <div class="inline-block">
+      <hackernews-upvote
+        [disabled]="!loggedInUser || post.author === loggedInUser.username"
+        [id]="id" [isPost]="true" [loggedInUser]="loggedInUser">
+      </hackernews-upvote>
+    </div>
     <div class="inline-block">
       <div>
         <span class="post-title"><a [href]="post.url">{{post.title}}</a></span>

@@ -1,0 +1,19 @@
+<div *ngIf="id">
+  <dv-tx>
+    <authentication-authenticate
+      [id]="loggedInUserId" [hidden]="true">
+    </authentication-authenticate>
+    <scoring-create-score
+      [buttonDisabled]="disabled || !loggedInUser"
+      class="upvote-button"
+      [dvOf]="isPost ? 'scoringposts' : 'scoringcomments'"
+      newScoreSavedText=""
+      [showOptionToInputValue]="false"
+      [sourceId]="loggedInUser?.username"
+      submitMatIconName="arrow_drop_up"
+      [targetId]="id"
+      [value]="1"
+    >
+    </scoring-create-score>
+  </dv-tx>
+</div>
