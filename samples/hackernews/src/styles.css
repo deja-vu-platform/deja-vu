@@ -17,6 +17,10 @@
   font-size: 9pt; /* hacker news subtext font size */
 }
 
+.black-link a {
+  color: black;
+}
+
 .mat-icon-button .mat-button-wrapper > * {
   vertical-align: inherit !important;
 }
