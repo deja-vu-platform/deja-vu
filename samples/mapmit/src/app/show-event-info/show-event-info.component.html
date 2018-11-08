@@ -68,13 +68,16 @@
         <!-- Edit/ Delete Buttons -->   
         <!-- TODO: Edit Button -->
         
-        <!-- works with delete resource, delete marker, NOT delete event... -->
+        <!-- works with delete resource, delete marker -->
         <authorization-delete-resource
           [id]="eventId" [hidden]="true">
         </authorization-delete-resource>
         <geolocation-delete-marker 
           [id]="eventId" [hidden]="true">
         </geolocation-delete-marker>
+        <event-delete-event
+        [id]="eventId" [hidden]="true">
+        </event-delete-event>
         <dv-button>Delete Event</dv-button>
         <dv-link href="/my-events" [hidden]="true"></dv-link>
       </dv-tx>

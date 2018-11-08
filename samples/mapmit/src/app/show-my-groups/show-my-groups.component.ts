@@ -9,10 +9,6 @@ import { ShowGroupComponent } from '../show-group/show-group.component';
 export class ShowMyGroupsComponent {
   user: User;
   showGroup = ShowGroupComponent;
-
-  getMemberIds() {
-    return this.user ? [this.user.id] : undefined;
-  }
 }
 
 interface User {

@@ -21,7 +21,7 @@
             <group-create-group 
               class="create-group-name-input"
               [id]="groupId"
-              [memberIds]="getMemberIds()"
+              [memberIds]="user ? [user.id] : undefined"
               [showOptionToAddMembers]="false"
               [hidden]="true">
             </group-create-group>
