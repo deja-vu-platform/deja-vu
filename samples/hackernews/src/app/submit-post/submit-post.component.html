@@ -7,6 +7,9 @@
     <div *ngIf="user">
       <dv-tx>
         <dv-id (id)="postId=$event"></dv-id>
+        <authentication-authenticate
+          [id]="user.id" [hidden]="true">
+        </authentication-authenticate>
         <property-create-object
           buttonLabel="Submit"
           [id]="postId"
@@ -28,7 +31,8 @@
         >
         </scoring-create-score>
 
-        <dv-link href="/item" [params]="{ id: postId }" [hidden]="true"></dv-link>
+        <dv-link href="/item" [params]="{ id: postId }" [hidden]="true">
+        </dv-link>
       </dv-tx>
     </div>
 
