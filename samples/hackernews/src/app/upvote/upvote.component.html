@@ -22,6 +22,7 @@
   <div *ngIf="!isPost">
     <dv-tx>
       <authentication-authenticate
+        dvAlias="scoringcomments-authenticate"
         [id]="loggedInUser?.id" [hidden]="true">
       </authentication-authenticate>
       <scoring-create-score
