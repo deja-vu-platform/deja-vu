@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
 
 
 @Component({
@@ -12,9 +11,7 @@ export class NavbarComponent {
   @Output() loggedInUser = new EventEmitter();
   user: any;
 
-  constructor(private router: Router) {
-    this.currentUrl = this.router.url;
-  }
+  constructor() { }
 
   outputAsLoggedInUser(value) {
     this.loggedInUser.emit(value);

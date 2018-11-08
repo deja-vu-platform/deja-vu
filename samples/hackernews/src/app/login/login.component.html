@@ -7,14 +7,14 @@
         <h1>Sign In</h1>
         <dv-tx>
           <authentication-sign-in></authentication-sign-in>
-          <dv-link href="/news" [hidden]="true"></dv-link>
+          <dv-link [href]="redirectTo" [hidden]="true"></dv-link>
         </dv-tx>
       </div>
       <div class="col-md">
         <h1>Register</h1>
         <dv-tx>
           <authentication-register-user></authentication-register-user>
-          <dv-link href="/news" [hidden]="true"></dv-link>
+          <dv-link [href]="redirectTo" [hidden]="true"></dv-link>
         </dv-tx>
       </div>
     </div>
