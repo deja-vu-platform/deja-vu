@@ -5,7 +5,8 @@ import { OnExecSuccess, RunService } from '../run.service';
 
 @Component({
   selector: 'dv-link',
-  templateUrl: './link.component.html'
+  templateUrl: './link.component.html',
+  styleUrls: ['./link.component.css']
 })
 export class LinkComponent implements OnInit, OnExecSuccess {
   @Input() href: string;
