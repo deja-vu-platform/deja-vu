@@ -74,8 +74,8 @@
     { "path": "home", "action": "mapmit-home" },
     { "path": "signup", "action": "mapmit-signup" },
     { "path": "login", "action": "mapmit-login" },
-    { "path": "user-events", "action": "mapmit-user-events" },
+    { "path": "my-events", "action": "mapmit-show-my-events" },
     { "path": "create-event", "action": "mapmit-create-event" },
-    { "path": "user-groups", "action": "mapmit-user-groups" }
+    { "path": "my-groups", "action": "mapmit-show-my-groups" }
   ]
 }

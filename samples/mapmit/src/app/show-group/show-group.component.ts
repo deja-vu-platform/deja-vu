@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'mapmit-group-with-user',
-  templateUrl: './group-with-user.component.html',
-  styleUrls: ['./group-with-user.component.css']
+  selector: 'mapmit-show-group',
+  templateUrl: './show-group.component.html',
+  styleUrls: ['./show-group.component.css']
 })
-export class GroupWithUserComponent {
+export class ShowGroupComponent {
   @Input() group: Group;
   @Input() loggedInUserId: string;
 }

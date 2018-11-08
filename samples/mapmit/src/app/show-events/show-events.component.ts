@@ -4,11 +4,11 @@ import {
 } from '../show-event-info/show-event-info.component';
 
 @Component({
-  selector: 'mapmit-show-events-info',
-  templateUrl: './show-events-info.component.html',
-  styleUrls: ['./show-events-info.component.css']
+  selector: 'mapmit-show-events',
+  templateUrl: './show-events.component.html',
+  styleUrls: ['./show-events.component.css']
 })
-export class ShowEventsInfoComponent implements OnInit {
+export class ShowEventsComponent implements OnInit {
   @Input() user: any;
   showEventInfo = ShowEventInfoComponent;
 

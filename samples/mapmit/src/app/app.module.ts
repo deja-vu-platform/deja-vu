@@ -13,32 +13,32 @@ import { GroupModule } from 'group';
 import { PropertyModule } from 'property';
 
 import { CreateEventComponent } from './create-event/create-event.component';
-import { GroupWithUserComponent } from './group-with-user/group-with-user.component';
+import { ShowGroupComponent } from './show-group/show-group.component';
 import { EventInfoWindowComponent } from './event-info-window/event-info-window.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
-import { UserEventsComponent } from './user-events/user-events.component';
-import { UserGroupsComponent } from './user-groups/user-groups.component';
+import { ShowMyEventsComponent } from './show-my-events/show-my-events.component';
+import { ShowMyGroupsComponent } from './show-my-groups/show-my-groups.component';
 import { SignupComponent } from './signup/signup.component';
 import { ShowEventInfoComponent } from './show-event-info/show-event-info.component';
-import { ShowEventsInfoComponent } from './show-events-info/show-events-info.component';
+import { ShowEventsComponent } from './show-events/show-events.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     CreateEventComponent,
-    GroupWithUserComponent,
+    ShowGroupComponent,
     EventInfoWindowComponent,
     HomeComponent,
     LoginComponent,
     NavBarComponent,
-    UserEventsComponent,
-    UserGroupsComponent,
+    ShowMyEventsComponent,
+    ShowMyGroupsComponent,
     SignupComponent,
     ShowEventInfoComponent,
-    ShowEventsInfoComponent
+    ShowEventsComponent
   ],
   imports: [
     BrowserModule,
@@ -47,9 +47,9 @@ import { ShowEventsInfoComponent } from './show-events-info/show-events-info.com
       { path: 'home', component: HomeComponent },
       { path: 'signup', component: SignupComponent },
       { path: 'login', component: LoginComponent },
-      { path: 'user-events', component: UserEventsComponent },
+      { path: 'my-events', component: ShowMyEventsComponent },
       { path: 'create-event', component: CreateEventComponent },
-      { path: 'user-groups', component: UserGroupsComponent }
+      { path: 'my-groups', component: ShowMyGroupsComponent }
     ]),
     AuthenticationModule,
     AuthorizationModule,
@@ -64,7 +64,7 @@ import { ShowEventsInfoComponent } from './show-events-info/show-events-info.com
   bootstrap: [AppComponent],
   entryComponents: [
     ShowEventInfoComponent, // anything with dv-include
-    GroupWithUserComponent
+    ShowGroupComponent
   ]
 })
 export class AppModule { }
