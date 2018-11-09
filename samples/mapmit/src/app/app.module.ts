@@ -14,7 +14,6 @@ import { PropertyModule } from 'property';
 
 import { CreateEventComponent } from './create-event/create-event.component';
 import { ShowGroupComponent } from './show-group/show-group.component';
-import { EventInfoWindowComponent } from './event-info-window/event-info-window.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
@@ -30,7 +29,6 @@ import { ShowEventsComponent } from './show-events/show-events.component';
     AppComponent,
     CreateEventComponent,
     ShowGroupComponent,
-    EventInfoWindowComponent,
     HomeComponent,
     LoginComponent,
     NavBarComponent,
