@@ -18,6 +18,8 @@ import { LinkComponent } from './link/link.component';
 import { StatusComponent } from './status/status.component';
 import { MergeComponent } from './merge/merge.component';
 import { ChooseComponent } from './choose/choose.component';
+import { GotoComponent } from './goto/goto.component';
+import { RedirectComponent } from './redirect/redirect.component';
 import { IncludeComponent, IncludeDirective } from './include/include.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { RunService } from './run.service';
@@ -28,8 +30,8 @@ import { OfDirective } from './of.directive';
 const allComponents = [
   IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
-  StatusComponent, MergeComponent,
-  InputIdComponent, StageComponent, ChooseComponent
+  StatusComponent, MergeComponent, InputIdComponent, StageComponent,
+  ChooseComponent, GotoComponent, RedirectComponent
 ];
 
 @NgModule({
