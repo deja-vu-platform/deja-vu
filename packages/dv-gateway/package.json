@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Gateway server for Déjà Vu",
   "scripts": {
-    "test": "ts-node node_modules/jasmine/bin/jasmine",
+    "test": "ts-node node_modules/.bin/jasmine spec/**/*.spec.ts",
     "build": "tsc && chmod +x ./dist/gateway.js",
     "lint": "tslint -p . -c tslint.json src/*.ts",
     "prepare": "npm run package",
@@ -32,7 +32,7 @@
     "@types/superagent": "^3.5.7",
     "@types/uuid": "^3.4.3",
     "jasmine": "^3.3.0",
-    "ts-node": "^7.0.1",
+    "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
   },
