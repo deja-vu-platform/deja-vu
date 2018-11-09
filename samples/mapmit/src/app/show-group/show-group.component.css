@@ -1,0 +1,15 @@
+.remove-from-group-btn {
+  margin-left: 10px;
+  display: inline-block;
+}
+
+.add-member-input {
+  margin-left: 15px;
+  width: 200px;
+  display: inline-block;
+ }
+
+.add-member-btn {
+  margin-left: 5px;
+  display: inline-block;
+}

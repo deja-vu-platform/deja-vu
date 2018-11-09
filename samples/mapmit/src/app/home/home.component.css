@@ -1,0 +1,22 @@
+#homepage-left {
+  display: inline-block;
+  width: 24%;
+  vertical-align: top;
+  padding-right: 1%;
+}
+
+#homepage-right {
+  display: inline-block;
+  width: 74%;
+  vertical-align: top;
+  padding-left: 1%;
+}
+
+#homepage-container {
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+#homepage-left .panel .panel-body {
+  min-height: 430px;
+}

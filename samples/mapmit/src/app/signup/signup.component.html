@@ -5,7 +5,9 @@
         <img class="logo-img" src='https://s3.amazonaws.com/mapmit/logo.png' />
         <dv-tx>
           <dv-id (id)="userId=$event"></dv-id>
-          <authentication-register-user [id]="userId">
+          <authentication-register-user 
+            class="username-password-container"
+            [id]="userId">
           </authentication-register-user>
           <dv-link href="/home" [hidden]="true"></dv-link>
         </dv-tx>

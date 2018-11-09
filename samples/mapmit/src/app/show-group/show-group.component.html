@@ -17,11 +17,13 @@
     <h5>Add User</h5>
     <!-- Adding users to groups reserved for owners of group, but not supported yet -->
     <authentication-choose-user
-        [showChooseButton]="false"
-        (selectedUser)="chosen=$event">
+      class="add-member-input"
+      [showChooseButton]="false"
+      (selectedUser)="chosen=$event">
     </authentication-choose-user>
     <dv-tx>
       <group-add-to-group
+        class="add-member-btn"
         [id]="group?.id"
         [member]="chosen ? chosen : undefined"
         [showInput]="false">
