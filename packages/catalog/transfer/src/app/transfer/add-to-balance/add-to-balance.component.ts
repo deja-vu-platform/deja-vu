@@ -33,6 +33,7 @@ export class AddToBalanceComponent
 implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
+  @Input() showOptionToInputAccountId = true;
 
   @Input() save = true;
 

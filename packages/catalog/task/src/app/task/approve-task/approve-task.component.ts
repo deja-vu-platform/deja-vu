@@ -35,9 +35,7 @@ export class ApproveTaskComponent implements
     return this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation {
-          approveTask(id: "${this.id}") {
-            id
-          }
+          approveTask(id: "${this.id}")
         }`
       })
       .toPromise();

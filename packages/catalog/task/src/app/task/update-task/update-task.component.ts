@@ -101,9 +101,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
   async dvOnExec(): Promise<string> {
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation UpdateTask($input: UpdateTaskInput!) {
-        updateTask(input: $input) {
-          id
-        }
+        updateTask(input: $input)
       }`,
       variables: {
         input: {

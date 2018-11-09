@@ -6,6 +6,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./show-chore.component.css']
 })
 export class ShowChoreComponent {
+  @Input() chore;
   @Input() view: 'child' | 'parent' = 'parent';
   @Input() showOptionToApprove = false;
 }
