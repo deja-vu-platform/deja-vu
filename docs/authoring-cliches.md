@@ -29,56 +29,60 @@
   Subscribe to the value changes of the input field and emit the new values.
   Do this then set the initial value in `ngOnInit`. For example, in the
   `CreateGoodPrice` component of `Market`:
-```typescript
-@Input() initialValue = 0;
-@Output() price = new EventEmitter<number>();
 
-ngOnInit() {
-  this.priceControl.valueChanges.subscribe((newValue: number) => {
-    this.price.emit(newValue);
-  });
-  // set initial value after subscribing to changes so that it will be emitted
-  this.priceControl.setValue(this.initialValue);
-}
-```
+  ```typescript
+  @Input() initialValue = 0;
+  @Output() price = new EventEmitter<number>();
+  
+  ngOnInit() {
+    this.priceControl.valueChanges.subscribe((newValue: number) => {
+      this.price.emit(newValue);
+    });
+    // set initial value after subscribing to changes so that it will be emitted
+    this.priceControl.setValue(this.initialValue);
+  }
+  ```
 
 - Users could create their own form with the custom form controls. For example,
   to create a `Good` in `Market`, instead of using the given form layout in the
   `CreateGood` component, a user can create a `Good` with just a price:
-```html
-<market-create-good-price (price)="goodPrice=$event"></market-create-good-price>
-<market-create-good [price]="goodPrice" [hidden]="true"></market-create-good>
-```
-Since the `CreateGood` component internally also has its own `CreateGoodPrice`
-form control component, it needs to be able to know whether it will use the
-price value from its own `CreateGoodPrice` or the one from its input. The
-solution is to sync its `@Input price` and the value in its own
-`CreateGoodPrice` form control. This way, the `dvOnRun` of `CreateGood` only
-needs to use the values from its own form. The following code achieves this for
-each input of `CreateGood`:
-```typescript
-// optional input values to override form control values
-@Input() set price(price: number) {
-  this.priceControl.setValue(price);
-}
-@Input() set supply(supply: number) {
-  this.supplyControl.setValue(supply);
-}
-@Input() set sellerId(sellerId: string) {
-  this.sellerIdControl.setValue(sellerId);
-}
 
-@ViewChild(FormGroupDirective) form;
+  ```html
+  <market-create-good-price (price)="goodPrice=$event"></market-create-good-price>
+  <market-create-good [price]="goodPrice" [hidden]="true"></market-create-good>
+  ```
 
-priceControl = new FormControl();
-supplyControl = new FormControl();
-sellerIdControl = new FormControl();
-createGoodForm: FormGroup = this.builder.group({
-  priceControl: this.priceControl,
-  supplyControl: this.supplyControl,
-  sellerIdControl: this.sellerIdControl
-});
-```
+  Since the `CreateGood` component internally also has its own `CreateGoodPrice`
+  form control component, it needs to be able to know whether it will use the
+  price value from its own `CreateGoodPrice` or the one from its input. The
+  solution is to sync its `@Input price` and the value in its own
+  `CreateGoodPrice` form control. This way, the `dvOnRun` of `CreateGood` only
+  needs to use the values from its own form. The following code achieves this for
+  each input of `CreateGood`:
+
+  ```typescript
+  // optional input values to override form control values
+  @Input() set price(price: number) {
+    this.priceControl.setValue(price);
+  }
+  @Input() set supply(supply: number) {
+    this.supplyControl.setValue(supply);
+  }
+  @Input() set sellerId(sellerId: string) {
+    this.sellerIdControl.setValue(sellerId);
+  }
+  
+  @ViewChild(FormGroupDirective) form;
+  
+  priceControl = new FormControl();
+  supplyControl = new FormControl();
+  sellerIdControl = new FormControl();
+  createGoodForm: FormGroup = this.builder.group({
+    priceControl: this.priceControl,
+    supplyControl: this.supplyControl,
+    sellerIdControl: this.sellerIdControl
+  });
+  ```
 
 - When using custom form controls as shown above, since we also need an
   `@Input()` for the same field `foo`, declare the variable for the custom form
@@ -104,30 +108,30 @@ createGoodForm: FormGroup = this.builder.group({
   value create a `waitOn: string[]` input that takes a list of input fields to
   wait on when run. In your Component class you have:
 
-```typescript
-// A list of fields to wait for
-@Input() waitOn: string[] = [];
-// Watcher of changes to fields specified in `waitOn`
-// Emits the field name that changes
-fieldChange = new EventEmitter<string>();
-  
-...
-ngOnChanges(changes: SimpleChanges) {
-  for (const field of this.waitOn) {
-    if (changes[field]) {
-      this.fieldChange.emit(field);
-    }
-  }
+  ```typescript
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+    
   ...
-}
-```
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field]) {
+        this.fieldChange.emit(field);
+      }
+    }
+    ...
+  }
+  ```
 
-And in your run method, to wait on changes to the specified inputs, do:
-```typescript
-await Promise.all(_.chain(this.waitOn)
-  .filter((field) => !this[field])
-  .map((fieldToWaitFor) => this.fieldChange
-    .pipe(filter((field) => field === fieldToWaitFor), take(1))
-    .toPromise())
-  .value());
-```
+  And in your run method, to wait on changes to the specified inputs, do:
+  ```typescript
+  await Promise.all(_.chain(this.waitOn)
+    .filter((field) => !this[field])
+    .map((fieldToWaitFor) => this.fieldChange
+      .pipe(filter((field) => field === fieldToWaitFor), take(1))
+      .toPromise())
+    .value());
+  ```
