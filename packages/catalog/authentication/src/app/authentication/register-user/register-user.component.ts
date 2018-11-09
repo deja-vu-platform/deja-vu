@@ -12,6 +12,7 @@ import {
   OnExecSuccess, OnExec, RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
 
 import { AuthenticationService } from '../shared/authentication.service';
 
@@ -96,6 +97,11 @@ export class RegisterUserComponent
     this.rs.exec(this.elem);
   }
 
+  showErrors(errors: any) {
+    throw new Error(_.map(errors, 'message')
+      .join());
+  }
+
   async dvOnExec(): Promise<void> {
     const variables = {
       input: {
@@ -106,7 +112,7 @@ export class RegisterUserComponent
     };
     let user;
     if (this.signIn) {
-      const res = await this.gs.post<{ data: any }>(this.apiPath, {
+      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation RegisterAndSignIn($input: RegisterInput!) {
           registerAndSignIn(input: $input) {
             user { id, username }
@@ -117,11 +123,14 @@ export class RegisterUserComponent
       })
       .toPromise();
 
+      if (res.errors) this.showErrors(res.errors);
+
       const token = res.data.registerAndSignIn.token;
       user = res.data.registerAndSignIn.user;
       this.authenticationService.setSignedInUser(token, user);
+
     } else {
-      const res = await this.gs.post<{ data: any }>(this.apiPath, {
+      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation Register($input: RegisterInput!) {
           register(input: $input) {
             id,
@@ -131,6 +140,9 @@ export class RegisterUserComponent
         variables: variables
       })
       .toPromise();
+
+      if (res.errors) this.showErrors(res.errors);
+
       user = res.data.register;
     }
     this.user.emit(user);
@@ -149,6 +161,6 @@ export class RegisterUserComponent
   }
 
   dvOnExecFailure(reason: Error) {
-    this.newUserRegisteredError = 'User already exists';
+    this.newUserRegisteredError = reason.message;
   }
 }

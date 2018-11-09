@@ -24,7 +24,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showId = true;
 
   @Input() showUser: Action = {
-    type: <Type<Component>>ShowUserComponent
+    type: <Type<Component>> ShowUserComponent
   };
   @Input() noUsersToShowText = 'No users to show';
   users: User[] = [];
