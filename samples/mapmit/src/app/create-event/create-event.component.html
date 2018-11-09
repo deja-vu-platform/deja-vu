@@ -3,14 +3,10 @@
 <div class="events-container">
   <div class="events-panel panel panel-default">
     <h2 class="create-event-header">Create an Event!</h2>
-
-    <!-- Causes tx to abort if inside dv-tx -->
-    <div class="create-event-input">
-      <geolocation-display-map 
-        id="homeMapId"
-        (newPosition)="mPos=$event">
-      </geolocation-display-map>
-    </div>
+    <geolocation-display-map 
+      id="homeMapId"
+      (newPosition)="mPos=$event">
+    </geolocation-display-map>
 
     <dv-tx>        
       <dv-id (id)="eventId=$event"></dv-id>
@@ -55,7 +51,6 @@
       </div> -->
 
       <!-- Authorization + Authentication Checks -->
-      <!-- [viewerIds]="group?.memberIds" -->
       <authorization-create-resource
         [id]="eventId"
         [ownerId]="user?.id"
