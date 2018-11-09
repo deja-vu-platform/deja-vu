@@ -1,3 +1,3 @@
-# passkey
+# Passkey
 
-Verifies the user's identity with a code.
+Verify identity with a code

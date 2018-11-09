@@ -1,4 +1,3 @@
-Authorization
-====
+# Authorization
 
-Controls a user's access to resources.
+Controls access to resources

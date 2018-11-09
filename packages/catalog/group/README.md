@@ -1,3 +1,3 @@
 # Group
 
-Allows users to work with named collections of group members.
+Organize members into groups so that they can be handled in aggregate

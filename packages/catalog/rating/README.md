@@ -1,3 +1,3 @@
 # Rating
 
-Allows users to create and view ratings on targets.
+Crowdsource evaluation of items
