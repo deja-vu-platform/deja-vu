@@ -13,8 +13,14 @@ export interface Config {
  * @param  argv the args to get additional config details from
  * @return      the resulting config
  */
-export function getConfig(name: string, argv): Config {
-  return {...getDefaultConfig(name), ...getConfigArg(argv)};
+export function getConfig<C extends Config>(name: string, argv): C {
+  // https://github.com/Microsoft/TypeScript/issues/10727
+  /*
+  return {
+    ...getDefaultConfig(name),
+    ...getConfigArg<C>(argv)
+  };*/
+  return Object.assign({}, getDefaultConfig(name), getConfigArg<C>(argv));
 }
 
 function getDefaultConfig(name: string): Config {
@@ -24,13 +30,14 @@ function getDefaultConfig(name: string): Config {
     wsPort: 3000,
     dbName: `${name}-db`,
     reinitDbOnStartup: true
-  }
+  };
 }
 
-function getConfigArg(argv) {
+function getConfigArg<C extends Config>(argv): C {
   let configArg;
   try {
     configArg = JSON.parse(argv.config);
+
     return configArg;
   } catch (e) {
     throw new Error(`Couldn't parse config ${argv.config}`);

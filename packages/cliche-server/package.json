@@ -5,8 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "package": "npm run build",
-    "prepare": "npm run package",
+    "package": "yarn run build",
+    "prepare": "yarn run package",
     "lint": "tslint -p . -c tslint.json src/*.ts"
   },
   "dependencies": {

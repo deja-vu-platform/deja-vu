@@ -76,11 +76,11 @@ OnChanges {
                 followers(input: $input)
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 ofPublisherId: this.ofPublisherId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {
