@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -8,14 +7,10 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  redirectTo: string = '/news';
+  goto: string = '/news';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor() {}
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      if (params.has('goto'))
-        this.redirectTo = params.get('goto');
-    });
   }
 }

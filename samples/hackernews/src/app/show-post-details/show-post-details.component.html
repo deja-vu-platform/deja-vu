@@ -19,8 +19,7 @@
         </comment-create-comment>
 
         <div *ngIf="!user">
-          <hackernews-redirect-to-login linkText="Add comment">
-          </hackernews-redirect-to-login>
+          <dv-redirect dst="/login">Add comment</dv-redirect>
         </div>
       </div>
 
