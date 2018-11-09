@@ -62,11 +62,11 @@ OnChanges {
                 members(input: $input)
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 inGroupId: this.inGroupId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {

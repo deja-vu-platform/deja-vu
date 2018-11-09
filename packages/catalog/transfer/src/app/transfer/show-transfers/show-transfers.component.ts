@@ -88,13 +88,13 @@ OnChanges {
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 fromId: this.fromId,
                 toId: this.toId,
                 amount: this.amount
               }
-            })
+            }
           }
         })
         .subscribe((res) => {
