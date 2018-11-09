@@ -2,6 +2,16 @@
 
 Describe an object with properties that have values
 
+## Actions
+
+- choose-object
+- create-objects
+- object-autocomplete
+- show-object
+- create-object
+- create-property
+- show-objects
+
 
 ## Configuration Options
 
