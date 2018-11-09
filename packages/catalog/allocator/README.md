@@ -1,5 +1,7 @@
 # Allocator
 
+Distribute resources among consumers
+
 ## Actions
 
 - create-allocation

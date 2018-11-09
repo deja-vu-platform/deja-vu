@@ -1,6 +1,6 @@
 # Authentication
 
-Verify identity with a username and password
+Verify the user's identity with a username and password
 
 ## Actions
 

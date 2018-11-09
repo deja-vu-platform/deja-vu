@@ -1,3 +1,3 @@
 # Passkey
 
-Verify identity with a code
+Verify the user's identity with a code
