@@ -10,6 +10,8 @@ import { DvModule } from 'dv-core';
 
 import { AddToGroupComponent } from './add-to-group/add-to-group.component';
 export { AddToGroupComponent };
+import { ChooseGroupComponent } from './choose-group/choose-group.component';
+export { ChooseGroupComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
 export { CreateGroupComponent };
 import { InputMemberComponent } from './input-member/input-member.component';
@@ -28,8 +30,8 @@ import { StageComponent } from './stage/stage.component';
 export { StageComponent };
 
 
-const allComponents =  [
-  AddToGroupComponent, CreateGroupComponent,
+const allComponents = [
+  AddToGroupComponent, ChooseGroupComponent, CreateGroupComponent,
   InputMemberComponent, JoinLeaveComponent, ShowGroupComponent,
   ShowGroupsComponent, ShowMemberComponent, ShowMembersComponent,
   StageComponent

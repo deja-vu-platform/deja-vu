@@ -1,14 +1,10 @@
-import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
-} from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
-
-import { ShowGroupComponent } from '../show-group/show-group.component';
 
 import { Group } from '../shared/group.model';
 
@@ -29,7 +25,7 @@ export class JoinLeaveComponent implements OnExec, OnInit {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -51,7 +47,7 @@ export class JoinLeaveComponent implements OnExec, OnInit {
 
       return;
     }
-    this.gs.get<{data: any}>('/graphql', {
+    this.gs.get<{ data: any }>('/graphql', {
       params: {
         query: `
           query {
@@ -63,10 +59,10 @@ export class JoinLeaveComponent implements OnExec, OnInit {
         `
       }
     })
-    .subscribe((res) => {
-      this.group = res.data.group;
-      this.inGroup = this.groupContains(this.group, this.memberId);
-    });
+      .subscribe((res) => {
+        this.group = res.data.group;
+        this.inGroup = this.groupContains(this.group, this.memberId);
+      });
   }
 
   async dvOnExec(): Promise<void> {
@@ -75,7 +71,7 @@ export class JoinLeaveComponent implements OnExec, OnInit {
     }
     const action = this.inGroup ? 'removeMember' : 'addMember';
     this.gs
-      .post<{data: {groups: Group}}>('/graphql', {
+      .post<{ data: { groups: Group } }>('/graphql', {
         query: `
           mutation {
             ${action}(
@@ -95,6 +91,6 @@ export class JoinLeaveComponent implements OnExec, OnInit {
   }
 
   private groupContains(group: Group, memberId: string) {
-    return _.includes(group.memberIds, memberId);
+    return this.group ? _.includes(group!.memberIds, memberId) : false;
   }
 }

@@ -1,0 +1,16 @@
+<group-show-groups 
+  (groups)="groups=$event" 
+  [withMemberId]="withMemberId"
+  [showMembers]="showMembers"
+  [hidden]="true">
+</group-show-groups>
+<dv-choose 
+  [showEntity]="showGroup" 
+  default-showGroup="{ tag: 'group-show-group' }"
+  [entities]="groups" 
+  [chooseSelectPlaceholder]="chooseSelectPlaceholder"
+  [addButtonLabel]="addButtonLabel"
+  [showChooseButton]="showChooseButton"
+  (selectedEntity)="outputSelectedGroup($event)">
+</dv-choose>
+  

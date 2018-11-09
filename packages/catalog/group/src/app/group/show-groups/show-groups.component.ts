@@ -24,7 +24,6 @@ OnChanges {
   @Input() withMemberId: string | undefined;
 
   // Show rules
-  @Input() showId = true;
   @Input() showMembers = true;
 
   @Input() showGroup: Action = {
