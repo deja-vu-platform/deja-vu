@@ -1,7 +1,8 @@
 <group-show-groups 
   (groups)="groups=$event" 
   [withMemberId]="withMemberId"
-  [showMembers]="showMembers"
+  [showMembers]="loadMembers"
+  [loadMembers]="loadMembers"
   [hidden]="true">
 </group-show-groups>
 <dv-choose 

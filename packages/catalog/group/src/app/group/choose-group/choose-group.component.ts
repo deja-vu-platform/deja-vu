@@ -19,7 +19,7 @@ export class ChooseGroupComponent {
 
   @Input() withMemberId: string | undefined;
 
-  @Input() showMembers = false;
+  @Input() loadMembers = true;
   @Input() showChooseButton = true;
   @Input() chooseSelectPlaceholder = 'Choose Group';
   @Input() addButtonLabel = 'Add Group';

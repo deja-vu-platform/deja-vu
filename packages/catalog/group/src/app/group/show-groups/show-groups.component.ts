@@ -24,7 +24,9 @@ OnChanges {
   @Input() withMemberId: string | undefined;
 
   // Show rules
+  @Input() showId = true;
   @Input() showMembers = true;
+  @Input() loadMembers = true;
 
   @Input() showGroup: Action = {
     type: <Type<Component>> ShowGroupComponent
@@ -69,7 +71,7 @@ OnChanges {
               query Groups($input: GroupsInput!) {
                 groups(input: $input) {
                   id
-                  memberIds
+                  ${this.loadMembers ? 'memberIds' : ''}
                 }
               }
             `,

@@ -97,7 +97,7 @@ export class RegisterUserComponent
     this.rs.exec(this.elem);
   }
 
-  showErrors(errors: any) {
+  private throwErrors(errors: any) {
     throw new Error(_.map(errors, 'message')
       .join());
   }
@@ -123,7 +123,7 @@ export class RegisterUserComponent
       })
       .toPromise();
 
-      if (res.errors) this.showErrors(res.errors);
+      if (res.errors) this.throwErrors(res.errors);
 
       const token = res.data.registerAndSignIn.token;
       user = res.data.registerAndSignIn.user;
@@ -141,7 +141,7 @@ export class RegisterUserComponent
       })
       .toPromise();
 
-      if (res.errors) this.showErrors(res.errors);
+      if (res.errors) this.throwErrors(res.errors);
 
       user = res.data.register;
     }
