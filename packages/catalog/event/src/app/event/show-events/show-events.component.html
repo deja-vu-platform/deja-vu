@@ -1,0 +1,18 @@
+<ul *ngIf="events && events.length > 0" class="list-group">
+  <li *ngFor="let event of events" class="list-group-item">
+    <dv-include 
+      [action]="showEvent" 
+      default-showEvent="{ tag: event-show-event }"
+      [inputs]="{
+        event: event, showId: showId, 
+        showStartDate: showStartDate, showEndDate: showEndDate
+      }"
+      [parent]="showEvents">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!events || events.length === 0">
+  <span>{{noEventsToShowText}}</span>
+</div>
+  

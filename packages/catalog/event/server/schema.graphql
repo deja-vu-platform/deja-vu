@@ -14,6 +14,11 @@ type Series {
   events: [Event!]!
 }
 
+input EventsInput {
+  startDate: Int
+  endDate: Int
+}
+
 input CreateEventInput {
   id: ID
   startDate: Int!
@@ -33,7 +38,7 @@ input CreateSeriesInput {
 }
 
 type Query {
-  events: [Event!]
+  events(input: EventsInput!): [Event!]
   series: [Series!]
   event(id: ID!): Event
   oneSeries(id: ID!): Series

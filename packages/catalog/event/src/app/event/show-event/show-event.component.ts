@@ -21,6 +21,11 @@ OnInit {
   // One is required
   @Input() event: Event | undefined;
   @Input() id: string | undefined;
+
+  @Input() showId = true;
+  @Input() showStartDate = true;
+  @Input() showEndDate = true;
+
   sameDayEvent = false;
 
   private gs: GatewayService;

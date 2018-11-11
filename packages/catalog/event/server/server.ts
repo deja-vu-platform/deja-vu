@@ -60,6 +60,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
   return {
     Query: {
+      // TODO: search between dates
       events: () => events.find({ pending: { $exists: false } })
         .toArray(),
       series: () => series.find({ pending: { $exists: false } })
