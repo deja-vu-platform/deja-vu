@@ -58,6 +58,7 @@
   "workspaces": [
     "packages/*",
     "packages/catalog/*",
+    "samples/chorestar",
     "samples/hackernews",
     "samples/morg",
     "samples/potluck"

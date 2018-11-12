@@ -85,10 +85,10 @@ OnChanges {
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
               }
-            })
+            }
           }
         })
         .subscribe((res) => {

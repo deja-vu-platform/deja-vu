@@ -67,11 +67,11 @@ OnInit, OnChanges {
               }
             }
           `,
-          variables: JSON.stringify({
+          variables: {
             input: {
               ofTargetId: this.targetId
             }
-          })
+          }
         }
       })
       .subscribe((res) => {

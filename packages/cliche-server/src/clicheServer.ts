@@ -1,6 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as mongodb from 'mongodb';
+
 import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -14,18 +15,21 @@ const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 /**
  * The error message to include when there is a concurrent update in the server.
  */
-export const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
+export const CONCURRENT_UPDATE_ERROR =
+  'An error has occured. Please try again later';
 
 /**
  * The type of the function to be called after connecting to the db.
  */
-export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => Promise<any>);
+export type InitDbCallbackFn<C = Config> =
+  (db: mongodb.Db, config: C) => Promise<any>;
 
 /**
  * The type of the function to be called to generate the resolvers.
  * @return the resolvers object
  */
-export type InitResolversFn = ((db: mongodb.Db, config: Config) => object);
+export type InitResolversFn<C = Config> =
+  (db: mongodb.Db, config: C) => object;
 
 export interface Context {
   reqType: 'vote' | 'commit' | 'abort' | undefined;
@@ -37,18 +41,18 @@ export interface Context {
  * The server for a cliche that contains its associated db (if applicable)
  * and that accepts applicable read and write requests.
  */
-export class ClicheServer {
+export class ClicheServer<C extends Config = Config> {
   private readonly _name: string;
   private readonly _schemaPath: string;
-  private readonly _config: Config;
+  private readonly _config: C;
   private _db: mongodb.Db | undefined;
   private _resolvers: object | undefined;
-  private readonly _initDbCallback: InitDbCallbackFn | undefined;
-  private readonly _initResolvers: InitResolversFn | undefined;
+  private readonly _initDbCallback: InitDbCallbackFn<C> | undefined;
+  private readonly _initResolvers: InitResolversFn<C> | undefined;
   private readonly _dynamicTypeDefs: string[];
 
-  constructor(name: string, config: Config, schemaPath: string,
-    initDbCallback?: InitDbCallbackFn, initResolvers?: InitResolversFn,
+  constructor(name: string, config: C, schemaPath: string,
+    initDbCallback?: InitDbCallbackFn<C>, initResolvers?: InitResolversFn<C>,
     dynamicTypeDefs: string[] = []) {
     this._name = name;
     this._config = config;
@@ -126,7 +130,7 @@ export class ClicheServer {
 
 
     app.listen(this._config.wsPort, () => {
-      console.log(`Running ${this._name} with config 
+      console.log(`Running ${this._name} with config
         ${JSON.stringify(this._config)}`);
     });
   }
@@ -137,7 +141,7 @@ export class ClicheServer {
   async start(): Promise<void> {
     // TODO: make connecting to mongo optional since there will be cliches that
     // don't require a db, e.g. email cliche
-    const mongoServer: string = `${this._config.dbHost}:${this._config.dbPort}`;
+    const mongoServer = `${this._config.dbHost}:${this._config.dbPort}`;
     console.log(`Connecting to mongo server ${mongoServer}`);
     const client: mongodb.MongoClient = await mongodb.MongoClient.connect(
       `mongodb://${mongoServer}`);

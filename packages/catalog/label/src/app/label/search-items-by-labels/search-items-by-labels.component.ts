@@ -103,11 +103,11 @@ OnExec, OnInit, ControlValueAccessor, Validator {
             items (input: $input)
           }
         `,
-        variables: JSON.stringify({
+        variables: {
           input: {
             labelIds: this.selectedLabelIds
           }
-        })
+        }
       }
     })
     .subscribe((res) => {

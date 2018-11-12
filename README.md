@@ -16,7 +16,7 @@ storage&mdash;and export a collection of "actions"&mdash;composable GUI elements
 Building apps with Déjà Vu boils down to tuning the clichés you need via
 configuration variables (using JSON) and linking actions to create pages (using
 the Déjà Vu language). You can also use CSS to customize the appearance of your
-app. Read the [tutorial](#tutorial) for more information.
+app. Read the [tutorial](docs/tutorial.md) for more information.
 
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we would love to hear what you think!
@@ -72,10 +72,6 @@ When a cliché is run it shows a "development" page that is used for testing.
 Yarn will symlink dependencies so if you make a change to a cliché you are using
 in an app, the only thing you need to do is rebuild the cliche with
 `yarn package` and restart your app.
-
-## Tutorial
-
-TODO
 
 ## Roadmap
 

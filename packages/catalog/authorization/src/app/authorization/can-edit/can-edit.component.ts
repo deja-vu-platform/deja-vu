@@ -53,12 +53,12 @@ export class CanEditComponent implements OnInit, OnChanges, OnExec {
             canEdit(input: $input)
           }
         `,
-        variables: JSON.stringify({
+        variables: {
           input: {
             principalId: this.principalId,
             resourceId: this.resourceId
           }
-        })
+        }
       }
     })
     .subscribe((res) => {

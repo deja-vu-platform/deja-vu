@@ -5050,6 +5050,11 @@ has-cors@1.1.0:
   resolved "https://registry.yarnpkg.com/has-cors/-/has-cors-1.1.0.tgz#5e474793f7ea9843d1bb99c23eef49ff126fff39"
   integrity sha1-XkdHk/fqmEPRu5nCPu9J/xJv/zk=
 
+has-flag@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-1.0.0.tgz#9d9e793165ce017a00f00418c43f942a7b1d11fa"
+  integrity sha1-nZ55MWXOAXoA8AQYxD+UKnsdEfo=
+
 has-flag@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-2.0.0.tgz#e8207af1cc7b30d446cc70b734b5e8be18f88d51"
@@ -6076,6 +6081,11 @@ jasmine-core@~2.99.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.99.1.tgz#e6400df1e6b56e130b61c4bcd093daa7f6e8ca15"
   integrity sha1-5kAN8ea1bhMLYcS80JPap/boyhU=
 
+jasmine-core@~3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.3.0.tgz#dea1cdc634bc93c7e0d4ad27185df30fa971b10e"
+  integrity sha512-3/xSmG/d35hf80BEN66Y6g9Ca5l/Isdeg/j6zvbTYlTzeKinzmaTM4p9am5kYqOmE05D7s1t8FGjzdSnbUbceA==
+
 jasmine-spec-reporter@~4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/jasmine-spec-reporter/-/jasmine-spec-reporter-4.2.1.tgz#1d632aec0341670ad324f92ba84b4b32b35e9e22"
@@ -6091,6 +6101,14 @@ jasmine@^2.5.3:
     exit "^0.1.2"
     glob "^7.0.6"
     jasmine-core "~2.99.0"
+
+jasmine@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.3.0.tgz#4f64e4aba2f9cbd30418957468c024c3b4c82551"
+  integrity sha512-haZzMvmoWSI2VCKfDgPqyEOPBQA7C1fgtIMgKNU4hVMcrVkWU5NPOWQqOTA6mVFyKcSUUrnkXu/ZEgY0bRnd6A==
+  dependencies:
+    glob "^7.0.6"
+    jasmine-core "~3.3.0"
 
 jasminewd2@^2.1.0:
   version "2.2.0"
@@ -10447,6 +10465,8 @@ supports-color@^3.1.2, supports-color@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
   integrity sha1-ZawFBLOVQXHYpklGsq48u4pfVPY=
+  dependencies:
+    has-flag "^1.0.0"
 
 supports-color@^4.0.0, supports-color@^4.2.1:
   version "4.5.0"

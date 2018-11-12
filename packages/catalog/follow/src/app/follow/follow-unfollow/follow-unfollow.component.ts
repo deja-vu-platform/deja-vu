@@ -74,12 +74,12 @@ export class FollowUnfollowComponent implements
                 isFollowing(input: $input)
               }
             `,
-          variables: JSON.stringify({
+          variables: {
             input: {
               followerId: this.followerId,
               publisherId: this.publisherId
             }
-          })
+          }
         }
       })
       .subscribe((res) => {
