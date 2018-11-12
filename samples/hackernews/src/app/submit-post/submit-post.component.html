@@ -1,6 +1,10 @@
-<!-- TODO: users should not be able to access this page if not logged in -->
-<!-- they should be redirected to the login page -->
 <hackernews-navbar (loggedInUser)="user=$event"></hackernews-navbar>
+
+<dv-tx>
+  <authentication-logged-in></authentication-logged-in>
+  <dv-redirect-on-fail href="login/" [params]="{ callback: 'submit/' }">
+  </dv-redirect-on-fail>
+</dv-tx>
 
 <div class="main">
   <div class="container">
