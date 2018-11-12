@@ -53,17 +53,19 @@
         </div>
       </div>
 
-      <authorization-can-view 
-        dvAlias="can-view-show-event-info" 
-        [principalId]="loggedInUserId" 
-        [resourceId]="eventId"
-        [hidden]="true">
-      </authorization-can-view>
-      <authentication-authenticate 
-        dvAlias="authenticate-show-event-info" 
-        [id]="loggedInUserId" 
-        [hidden]="true">
-      </authentication-authenticate>
+      <div *ngIf="loggedInUser">
+        <authorization-can-view 
+          dvAlias="can-view-show-event-info" 
+          [principalId]="loggedInUserId" 
+          [resourceId]="eventId"
+          [hidden]="true">
+        </authorization-can-view>
+        <authentication-authenticate 
+          dvAlias="authenticate-show-event-info" 
+          [id]="loggedInUserId" 
+          [hidden]="true">
+        </authentication-authenticate>
+      </div>
 
       <dv-tx *ngIf="loggedInUserId === hostId">
         <!-- Edit/ Delete Buttons -->   

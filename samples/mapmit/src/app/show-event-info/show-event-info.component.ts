@@ -8,4 +8,7 @@ import { Component, Input } from '@angular/core';
 export class ShowEventInfoComponent {
   @Input() eventId: string;
   @Input() loggedInUserId: string;
+  @Input() set event(event: any) {
+    this.eventId = event.id;
+  }
 }

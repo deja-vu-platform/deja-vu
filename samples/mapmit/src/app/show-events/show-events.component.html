@@ -1,4 +1,5 @@
 <div class="container-fluid event-card-container">
+  <div *ngIf="user">
     <authorization-show-resources
       [viewableBy]="user?.id"
       [showResource]="{
@@ -10,4 +11,14 @@
     </authorization-show-resources>
     <authentication-authenticate [id]="user?.id" [hidden]="true">
     </authentication-authenticate>
+  </div>
+
+  <div *ngIf="!user">
+    <event-show-events
+      [showEvent]="{
+        type: showEventInfo, tag: 'mapmit-show-event-info',
+        inputMap: { event: 'event' }
+      }">
+    </event-show-events>
+  </div>
 </div>

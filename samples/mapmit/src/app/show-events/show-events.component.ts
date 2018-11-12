@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {
   ShowEventInfoComponent
 } from '../show-event-info/show-event-info.component';
@@ -8,13 +8,7 @@ import {
   templateUrl: './show-events.component.html',
   styleUrls: ['./show-events.component.css']
 })
-export class ShowEventsComponent implements OnInit {
+export class ShowEventsComponent {
   @Input() user: any;
   showEventInfo = ShowEventInfoComponent;
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
 }
