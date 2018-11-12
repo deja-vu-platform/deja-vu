@@ -6,7 +6,7 @@
     <dv-link class="black-link navbar-brand" href="/">DV Hacker News</dv-link>
 
     <dv-link class="black-link" [href]="user ? '/submit' : '/login'"
-      [params]="user ? {} : { goto: '/submit' }">Submit</dv-link>
+      [params]="user ? {} : { callback: '/submit' }">Submit</dv-link>
 
     <span class="space-filler"></span>
     <div *ngIf="user">

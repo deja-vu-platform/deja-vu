@@ -19,7 +19,9 @@
         </comment-create-comment>
 
         <div *ngIf="!user">
-          <dv-redirect class="black-link" dst="/login">Add comment</dv-redirect>
+          <dv-callback-link class="black-link" dst="/login">
+            Add comment
+          </dv-callback-link>
         </div>
       </div>
 

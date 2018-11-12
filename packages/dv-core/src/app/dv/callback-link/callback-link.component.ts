@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 
 
 @Component({
-  selector: 'dv-redirect',
-  templateUrl: './redirect.component.html'
+  selector: 'dv-callback-link',
+  templateUrl: './callback-link.component.html'
 })
-export class RedirectComponent implements OnInit {
+export class CallbackLinkComponent implements OnInit {
   currentUrl: string;
   @Input() dst: string;
 
