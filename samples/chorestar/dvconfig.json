@@ -34,10 +34,11 @@
         "reinitDbOnStartup": true
       }
     },
-    "market": {
+    "transfer": {
       "config": {
         "wsPort": 3006,
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": true,
+        "balanceType": "money"
       }
     },
     "task": {
@@ -63,9 +64,12 @@
           "properties": {
               "name": {
                 "type": "string"
+              },
+              "stars": {
+                "type": "number"
               }
           },
-          "required": ["name"]
+          "required": ["name", "stars"]
         }
       }
     },
@@ -97,6 +101,9 @@
           "properties": {
               "name": {
                 "type": "string"
+              },
+              "cost": {
+                "type": "number"
               }
           },
           "required": ["name"]

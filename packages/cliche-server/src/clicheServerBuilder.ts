@@ -14,18 +14,18 @@ import { Config, getConfig } from './config';
  * The type of the function to be called to get the dynamic type definitions
  * for the schema from the config
  */
-export type GetDynamicTypeDefsFn = (config: Config) => string[];
+export type GetDynamicTypeDefsFn<C = Config> = (config: C) => string[];
 
 /**
  * A builder for {@link ClicheServer}
  */
-export class ClicheServerBuilder {
+export class ClicheServerBuilder<C extends Config = Config> {
   private readonly _name: string;
   private _schemaPath: string = path.join(
     path.dirname(callsite()[1].getFileName()), 'schema.graphql');
-  private _config: Config;
-  private _initDbCallback?: InitDbCallbackFn;
-  private _initResolvers?: InitResolversFn;
+  private _config: C;
+  private _initDbCallback?: InitDbCallbackFn<C>;
+  private _initResolvers?: InitResolversFn<C>;
   private _getDynamicTypeDefsFn: GetDynamicTypeDefsFn = (_) => [];
 
   /**
@@ -38,7 +38,7 @@ export class ClicheServerBuilder {
   constructor(defaultName: string) {
     const argv = minimist(process.argv);
     this._name = argv.as ? argv.as : defaultName;
-    this._config = getConfig(this._name, argv);
+    this._config = getConfig<C>(this._name, argv);
   }
 
   /**
@@ -48,8 +48,11 @@ export class ClicheServerBuilder {
    * @param  config the config to use for updating
    * @return        this builder
    */
-  config(config): ClicheServerBuilder {
-    this._config = {...this._config, ...config};
+  config(config: C): ClicheServerBuilder<C> {
+    // https://github.com/Microsoft/TypeScript/issues/10727
+    // this._config = {...this._config, ...config};
+    this._config = Object.assign({}, this._config, config);
+
     return this;
   }
 
@@ -59,8 +62,9 @@ export class ClicheServerBuilder {
    *                  after connecting to the db
    * @return          this builder
    */
-  initDb(callback: InitDbCallbackFn): ClicheServerBuilder {
+  initDb(callback: InitDbCallbackFn<C>): ClicheServerBuilder<C> {
     this._initDbCallback = callback;
+
     return this;
   }
 
@@ -69,8 +73,9 @@ export class ClicheServerBuilder {
    * @param  initResolvers the function to init resolvers
    * @return               this builder
    */
-  resolvers(initResolvers: InitResolversFn): ClicheServerBuilder {
+  resolvers(initResolvers: InitResolversFn<C>): ClicheServerBuilder<C> {
     this._initResolvers = initResolvers;
+
     return this;
   }
 
@@ -80,8 +85,9 @@ export class ClicheServerBuilder {
    * @param  schemaPath the filepath of the schema
    * @return            this builder
    */
-  schemaPath(schemaPath: string): ClicheServerBuilder {
+  schemaPath(schemaPath: string): ClicheServerBuilder<C> {
     this._schemaPath = schemaPath;
+
     return this;
   }
 
@@ -94,8 +100,9 @@ export class ClicheServerBuilder {
    * @return                      this builder
    */
   dynamicTypeDefs(
-    getDynamicTypeDefsFn: GetDynamicTypeDefsFn): ClicheServerBuilder {
+    getDynamicTypeDefsFn: GetDynamicTypeDefsFn): ClicheServerBuilder<C> {
     this._getDynamicTypeDefsFn = getDynamicTypeDefsFn;
+
     return this;
   }
 
@@ -103,8 +110,8 @@ export class ClicheServerBuilder {
    * Create a ClicheServer out of this builder
    * @return the resulting cliche server
    */
-  build(): ClicheServer {
-    return new ClicheServer(this._name, this._config, this._schemaPath,
+  build(): ClicheServer<C> {
+    return new ClicheServer<C>(this._name, this._config, this._schemaPath,
       this._initDbCallback, this._initResolvers,
       this._getDynamicTypeDefsFn(this._config));
   }

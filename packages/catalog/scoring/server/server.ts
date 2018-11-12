@@ -105,16 +105,17 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
   };
 }
 
-const scoringCliche: ClicheServer = new ClicheServerBuilder('scoring')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+const scoringCliche: ClicheServer<ScoringConfig> =
+  new ClicheServerBuilder<ScoringConfig>('scoring')
+    .initDb((db: mongodb.Db, _config: ScoringConfig): Promise<any> => {
+      const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
 
-    return Promise.all([
-      scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      scores.createIndex({ targetId: 1 })
-    ]);
-  })
-  .resolvers(resolvers)
-  .build();
+      return Promise.all([
+        scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
+        scores.createIndex({ targetId: 1 })
+      ]);
+    })
+    .resolvers(resolvers)
+    .build();
 
 scoringCliche.start();

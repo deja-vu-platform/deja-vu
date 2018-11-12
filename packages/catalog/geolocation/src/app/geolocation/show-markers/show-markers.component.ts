@@ -80,11 +80,11 @@ OnChanges {
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 ofMapId: this.ofMapId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {
