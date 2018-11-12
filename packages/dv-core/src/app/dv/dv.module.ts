@@ -20,6 +20,9 @@ import { MergeComponent } from './merge/merge.component';
 import { ChooseComponent } from './choose/choose.component';
 import { CallbackComponent } from './callback/callback.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
+import {
+  RedirectOnFailComponent
+} from './redirect-on-fail/redirect-on-fail.component';
 import { IncludeComponent, IncludeDirective } from './include/include.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { RunService } from './run.service';
@@ -31,7 +34,8 @@ const allComponents = [
   IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
-  ChooseComponent, CallbackComponent, CallbackLinkComponent
+  ChooseComponent, CallbackComponent, CallbackLinkComponent,
+  RedirectOnFailComponent
 ];
 
 @NgModule({
