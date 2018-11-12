@@ -14,31 +14,54 @@
       </group-join-leave>
     </dv-tx>
 
-    <h5>Add User</h5>
-    <!-- Adding users to groups reserved for owners of group, but not supported yet -->
-    <authentication-choose-user
-      class="add-member-input"
-      [showChooseButton]="false"
-      (selectedUser)="chosen=$event">
-    </authentication-choose-user>
-    <dv-tx>
-      <group-add-to-group
-        class="add-member-btn"
-        [id]="group?.id"
-        [member]="chosen ? chosen : undefined"
-        [showInput]="false">
-      </group-add-to-group>
-    </dv-tx>
-    <!-- <authorization-can-view
-      dvAlias="can-view-groups"
-      [principalId]="loggedInUserId"
-      [resourceId]="group.id"
-      [hidden]="true">
-    </authorization-can-view>
+    <authorization-show-owner 
+      [resourceId]="group.id" 
+      (ownerId)="hostId=$event" [hidden]="true">
+    </authorization-show-owner>
+
+    <div *ngIf="loggedInUserId === hostId">
+      <h5>Add User</h5>
+        <authentication-choose-user
+          class="add-member-input"
+          [showChooseButton]="false"
+          (selectedUser)="chosen=$event">
+        </authentication-choose-user>
+        <dv-tx>
+          <authorization-add-viewer
+            [id]="group?.id"
+            [viewer]="chosen"
+            [hidden]="true">
+          </authorization-add-viewer>
+          <group-add-to-group
+            [id]="group?.id"
+            [member]="chosen"
+            [showInput]="false">
+          </group-add-to-group>
+        </dv-tx>      
+    </div> 
+    
+    <div *ngIf="isMemberOf">
+      <authorization-can-view
+        dvAlias="can-view-groups"
+        [principalId]="loggedInUserId"
+        [resourceId]="group.id"
+        [hidden]="true">
+      </authorization-can-view>
+    </div>
+
+    <div *ngIf="createdByUser">
+      <authorization-can-edit
+        dvAlias="owns-groups"
+        [principalId]="loggedInUserId"
+        [resourceId]="group.id"
+        [hidden]="true">
+      </authorization-can-edit>
+    </div>
+
     <authentication-authenticate 
       dvAlias="authenticate-groups"
       [id]="loggedInUserId" 
       [hidden]="true">
-    </authentication-authenticate> -->
+    </authentication-authenticate>
   </div>
 </div>
