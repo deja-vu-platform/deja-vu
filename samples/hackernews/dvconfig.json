@@ -34,7 +34,8 @@
                 "type": "string"
               },
               "url": {
-                "type": "string"
+                "type": "string",
+                "format": "url"
               }
           },
           "required": ["author", "title", "url"]
