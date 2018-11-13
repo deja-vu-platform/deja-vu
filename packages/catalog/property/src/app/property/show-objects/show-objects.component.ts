@@ -31,6 +31,7 @@ OnChanges {
   _objects: Object[] = [];
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() objects = new EventEmitter<Object[]>();
   @Output() objectIds = new EventEmitter<string[]>();
 
@@ -79,8 +80,7 @@ OnChanges {
               query {
                 objects {
                   id
-                  ${_.map(this.properties)
-                      .join('\n')}
+                  ${this.properties.join('\n')}
                 }
               }
             `

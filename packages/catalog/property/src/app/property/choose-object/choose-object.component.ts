@@ -27,6 +27,7 @@ export class ChooseObjectComponent implements OnInit {
   };
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() objects = new EventEmitter<Object[]>();
   _objects: Object[] = [];
 
@@ -58,8 +59,10 @@ export class ChooseObjectComponent implements OnInit {
     if (!this.gs) {
       return;
     }
-    this.properties = await properties(
-      this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    if (!this.properties) {
+      this.properties = await properties(
+        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    }
     this.fetchObjects();
   }
 
@@ -90,8 +93,7 @@ export class ChooseObjectComponent implements OnInit {
               query {
                 objects {
                   id
-                  ${_.map(this.properties)
-                      .join('\n')}
+                  ${this.properties.join('\n')}
                 }
               }
             `

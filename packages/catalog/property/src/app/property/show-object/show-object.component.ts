@@ -13,6 +13,10 @@ import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
 
+import {
+  ShowPropertyUrlComponent
+} from '../show-property-url/show-property-url.component';
+
 import { API_PATH } from '../property.config';
 
 
@@ -23,20 +27,31 @@ import { API_PATH } from '../property.config';
 })
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  @Input() showPropertyUrl: Action = {
+    type: <Type<Component>> ShowPropertyUrlComponent
+  };
   @Input() id: string;
   @Input() object: any;
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() loadedObject = new EventEmitter<any>();
 
   // Internal input
   @Input() properties: string[];
+  propertySchemas: { [propName: string]: {
+    type: string,
+    format?: string
+  }} = {};
 
+  showObject;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    this.showObject = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -93,6 +108,7 @@ OnChanges {
             query {
               properties {
                 name
+                schema
               }
             }
           `
@@ -100,7 +116,11 @@ OnChanges {
       })
       .toPromise();
 
-    return _.map(res.data.properties, 'name');
+    const properties = res.data.properties;
+    _.forEach(properties, (prop) => {
+      this.propertySchemas[prop.name] = JSON.parse(prop.schema);
+    });
+    return _.map(properties, 'name');
   }
 
   private canEval(): boolean {
