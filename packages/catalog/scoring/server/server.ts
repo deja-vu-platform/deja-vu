@@ -95,15 +95,6 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
     Mutation: {
       createScore: async (
         _root, { input }: { input: CreateScoreInput }, context: Context) => {
-        if (config.oneToOneScoring) {
-          const existing = await scores.findOne({
-            sourceId: input.sourceId, targetId: input.targetId,
-            pending: { $exists: false } });
-          if (existing) {
-            throw new Error(`Source ${input.sourceId} already has a score for 
-              target ${input.targetId}`);
-          }
-        }
         const newScore: ScoreDoc = {
           id: input.id ? input.id : uuid(),
           value: input.value,
@@ -143,12 +134,15 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
 const scoringCliche: ClicheServer<ScoringConfig> =
   new ClicheServerBuilder<ScoringConfig>('scoring')
-    .initDb((db: mongodb.Db, _config: ScoringConfig): Promise<any> => {
+    .initDb((db: mongodb.Db, config: ScoringConfig): Promise<any> => {
       const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+      const sourceTargetIndexOptions = config.oneToOneScoring ?
+        { unique: true, sparse: true } : {};
 
       return Promise.all([
         scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
-        scores.createIndex({ targetId: 1 })
+        scores.createIndex(
+          { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);
     })
     .resolvers(resolvers)
