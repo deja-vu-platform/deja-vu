@@ -23,7 +23,7 @@ export class PackageJsonBuilder {
   build(): string {
     const clichePackages = _
       .map(Array.from(this.usedCliches), (usedCliche: string) =>
-        `"${usedCliche}: "file:../../packages/catalog/${usedCliche}/pkg"`);
+        `"${usedCliche}: "0.0.1"`);
     return `
       {
         "name": "${this.appName}",

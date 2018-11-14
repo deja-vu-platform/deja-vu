@@ -121,18 +121,7 @@ export function toNgTemplate(
     Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
     Expr_literal: recurse,
     Expr_name: (name) => name.sourceString,
-    Expr_input: (input) => {
-      const inputEntry = symbolTable[input.sourceString];
-      assert.ok(
-        inputEntry !== undefined,
-        `Didn't find input ${input.sourceString} in ${pretty(symbolTable)}`);
-      assert.ok(
-        inputEntry.kind === 'input', `Unexpected entry kind ${inputEntry.kind}`);
-      const ngInputField = inputToNgField(input.sourceString);
-      (<InputStEntry> inputEntry).ngInputField = ngInputField;
-
-      return ngInputField;
-    },
+    Expr_input: (input) => input.toNgTemplate(),
     Expr_element: transformActionInput(appName, symbolTable, actionInputs),
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
@@ -175,16 +164,31 @@ export function toNgTemplate(
       return `${outputField}${memberAccessStr}`;
     },
 
-    Literal_number: (number) => `${number.sourceString}`,
+    Literal_number: (number) => number.sourceString,
     Literal_text: (_openQuote, text, _closeQuote) =>
       '\'' + text.sourceString + '\'',
-    Literal_true: (trueNode) => `${trueNode.sourceString}`,
-    Literal_false: (falseNode) => `${falseNode.sourceString}`,
+    Literal_true: (trueNode) => trueNode.sourceString,
+    Literal_false: (falseNode) => falseNode.sourceString,
     Literal_obj: (openCb, propAssignments, closeCb) =>
       openCb.sourceString + propAssignments.toNgTemplate() +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
       openSb.sourceString + exprs.saveUsedOutputs() + closeSb.sourceString,
+    input: (sbNode, inputNameNode) => {
+      const input = `${sbNode.sourceString}${inputNameNode.sourceString}`;
+      const inputEntry = <InputStEntry> symbolTable[input];
+      assert.ok(
+        inputEntry !== undefined,
+        `Didn't find input ${input} in ${pretty(symbolTable)}`);
+      assert.ok(
+        inputEntry.kind === 'input', `Unexpected entry kind ${inputEntry.kind}`);
+      const ngInputField = inputToNgField(input);
+      if (!_.has(inputEntry, 'ngInputField')) {
+        inputEntry.ngInputField = ngInputField;
+      }
+
+      return ngInputField;
+    }
   };
 }
 

@@ -58,7 +58,7 @@ export class AppCompiler {
   static DVCONFIG_FILE_PATH = 'dvconfig.json';
 
   private readonly actionCompiler: ActionCompiler = new ActionCompiler();
-  private readonly symbolTable: SymbolTable;
+  private readonly symbolTable: SymbolTable = {};
 
 
   /**
@@ -97,7 +97,8 @@ export class AppCompiler {
     const htmlFilesToParse = filesToParse(
       this.projectDir, dvConfig.actions.app);
     for (const actionFilePath of htmlFilesToParse) {
-      const actionContents = readFileSync(actionFilePath, 'utf8');
+      const actionContents = readFileSync(
+        path.join(this.projectDir, actionFilePath), 'utf8');
       this.actionCompiler.compile(
         dvConfig.name, actionContents, this.symbolTable);
     }

@@ -23,10 +23,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
     Expr_literal: recurse,
     Expr_name: (_name) =>  {},
-    Expr_input: (inputNode) => {
-      const input = inputNode.sourceString;
-      symbolTable[input] = { kind: 'input' };
-    },
+    Expr_input: (inputNode) => inputNode.saveInputs(),
     Expr_element: (_element) => {}, // TODO
 
     UnExpr_not: (_not, expr) => expr.saveInputs(),
@@ -43,6 +40,9 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     Literal_array: (_openSb, exprs, _closeSb) => exprs.saveInputs(),
     Content_element: (element) => element.saveInputs(),
     Content_text: (_text) => {},
-    name: (_letter, _rest)  => {}
+    name: (_letter, _rest)  => {},
+    input: (ds, inputName) => {
+      symbolTable[ds.sourceString + inputName.sourceString] = { kind: 'input' };
+    }
   };
 }

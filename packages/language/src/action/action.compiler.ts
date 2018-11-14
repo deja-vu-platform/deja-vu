@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 import { NgComponentBuilder, NgField } from './ng-component.builder';
 
 import { saveUsedActions } from './operations/save-used-actions.operation';
-import { saveInputs} from './operations/save-inputs.operation';
+import { saveInputs } from './operations/save-inputs.operation';
 import { toNgTemplate } from './operations/to-ng-template.operation';
 import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
@@ -29,7 +29,6 @@ export interface CompiledAction {
 
 export class ActionCompiler {
   private readonly grammar;
-  private readonly semantics;
 
   private static FilterKind(kind: EntryKind, symbolTable: ActionSymbolTable)
     : ActionSymbolTableStEntry[] {
@@ -66,7 +65,6 @@ export class ActionCompiler {
   constructor() {
     const grammarPath = path.join(__dirname, 'action.grammar.ohm');
     this.grammar = ohm.grammar(readFileSync(grammarPath, 'utf-8'));
-    this.semantics = this.grammar.createSemantics();
   }
 
   /**
@@ -81,7 +79,8 @@ export class ActionCompiler {
     : CompiledAction {
     const thisActionSymbolTable: ActionSymbolTable = {};
     const actionInputs: CompiledAction[] = [];
-    this.semantics
+    const semantics = this.grammar.createSemantics();
+    semantics
       .addOperation('getActionName', getActionName())
       .addOperation('saveUsedActions', saveUsedActions(thisActionSymbolTable))
       .addOperation('saveUsedOutputs', saveUsedOutputs(thisActionSymbolTable))
@@ -94,7 +93,7 @@ export class ActionCompiler {
     if (matchResult.failed()) {
       throw new Error('Syntax error:' + matchResult.message);
     }
-    const s = this.semantics(matchResult);
+    const s = semantics(matchResult);
     const thisActionName = s.getActionName();
     s.saveUsedActions(); // mutates thisActionSymbolTable
     _.set(symbolTable, [appName, thisActionName], {
