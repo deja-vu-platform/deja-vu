@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'morg-root',
+  selector: 'morg-app',
   templateUrl: './app.component.html'
 })
 export class AppComponent {

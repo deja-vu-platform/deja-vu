@@ -37,13 +37,6 @@
       }
     }
   },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "morg-root"}
-      ]
-    }
-  },
   "routes": [
     { "path": "", "action": "morg-home" }
   ]
