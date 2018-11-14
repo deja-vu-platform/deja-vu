@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 import { DvModule, GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
@@ -20,10 +21,13 @@ import { PropertyModule } from 'property';
   ],
   imports: [
     BrowserModule,
+    DvModule,
+    RouterModule.forRoot([
+      { path: '', component: HomeComponent }
+    ]),
     EventModule,
     AllocatorModule,
-    PropertyModule,
-    DvModule
+    PropertyModule
   ],
   entryComponents: [ShowGroupMeetingComponent],
   providers: [{
