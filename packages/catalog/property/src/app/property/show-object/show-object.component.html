@@ -1,7 +1,6 @@
 <div *ngIf="object" class="property-show-object">
   <div *ngFor="let prop of properties" class="property-show-object-property">
-    <span *ngIf="propertySchemas[prop]?.type === 'string'
-      && propertySchemas[prop]?.format === 'url'">
+    <span *ngIf="isUrl(prop)">
       <dv-include [action]="showPropertyUrl"
         default-showPropertyUrl="{ tag: property-show-property-url }"
         [inputs]="{
@@ -10,8 +9,7 @@
         [parent]="showObject">
       </dv-include>
     </span>
-    <span *ngIf="!(propertySchemas[prop]?.type === 'string'
-      && propertySchemas[prop]?.format === 'url')">
+    <span *ngIf="!isUrl(prop)">
       {{object[prop]}}
     </span>
   </div>

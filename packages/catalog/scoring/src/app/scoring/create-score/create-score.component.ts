@@ -138,6 +138,10 @@ export class CreateScoreComponent
     }
   }
 
+  canSubmit(): boolean {
+    return this.createScoreForm.valid && this.canExec() && !this.buttonDisabled;
+  }
+
   private canExec() {
     return !_.isNil(this.valueControl.value) && this.sourceId && this.targetId;
   }

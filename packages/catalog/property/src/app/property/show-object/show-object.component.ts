@@ -123,6 +123,12 @@ OnChanges {
     return _.map(properties, 'name');
   }
 
+  isUrl(propName: string): boolean {
+    return this.propertySchemas[propName] &&
+      this.propertySchemas[propName].type === 'string' &&
+      this.propertySchemas[propName].format === 'url';
+  }
+
   private canEval(): boolean {
     return !!(!this.object && this.id && this.properties && this.gs);
   }

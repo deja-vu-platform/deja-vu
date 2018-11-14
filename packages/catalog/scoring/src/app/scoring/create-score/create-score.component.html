@@ -26,14 +26,12 @@
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="submitMatIconName">
-      <button mat-icon-button type="submit"
-        [disabled]="!(createScoreForm.valid && canExec()) || buttonDisabled">
+      <button mat-icon-button type="submit" [disabled]="!canSubmit()">
         <i class="material-icons">{{submitMatIconName}}</i>
       </button>
     </div>
     <div *ngIf="!submitMatIconName">
-      <button mat-button type="submit"
-        [disabled]="!(createScoreForm.valid && canExec()) || buttonDisabled">
+      <button mat-button type="submit" [disabled]="!canSubmit()">
         {{buttonLabel}}
       </button>
     </div>
