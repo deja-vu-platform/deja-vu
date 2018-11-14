@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowPropertyUrlComponent } from './show-property-url.component';
+import { ShowUrlComponent } from './show-url.component';
 
-describe('ShowPropertyUrlComponent', () => {
-  let component: ShowPropertyUrlComponent;
-  let fixture: ComponentFixture<ShowPropertyUrlComponent>;
+describe('ShowUrlComponent', () => {
+  let component: ShowUrlComponent;
+  let fixture: ComponentFixture<ShowUrlComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowPropertyUrlComponent ]
+      declarations: [ ShowUrlComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowPropertyUrlComponent);
+    fixture = TestBed.createComponent(ShowUrlComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

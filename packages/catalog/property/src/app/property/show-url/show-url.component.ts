@@ -4,11 +4,11 @@ import { URL_REGEX } from '../shared/property.model';
 
 
 @Component({
-  selector: 'property-show-property-url',
-  templateUrl: './show-property-url.component.html',
-  styleUrls: ['./show-property-url.component.css']
+  selector: 'property-show-url',
+  templateUrl: './show-url.component.html',
+  styleUrls: ['./show-url.component.css']
 })
-export class ShowPropertyUrlComponent {
+export class ShowUrlComponent {
   @Input() url: string;
   @Input() showBaseUrlOnly: boolean = false;
 

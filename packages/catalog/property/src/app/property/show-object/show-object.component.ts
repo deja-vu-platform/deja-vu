@@ -13,9 +13,7 @@ import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
 
-import {
-  ShowPropertyUrlComponent
-} from '../show-property-url/show-property-url.component';
+import { ShowUrlComponent } from '../show-url/show-url.component';
 
 import { API_PATH } from '../property.config';
 
@@ -27,8 +25,8 @@ import { API_PATH } from '../property.config';
 })
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
-  @Input() showPropertyUrl: Action = {
-    type: <Type<Component>> ShowPropertyUrlComponent
+  @Input() showUrl: Action = {
+    type: <Type<Component>> ShowUrlComponent
   };
   @Input() id: string;
   @Input() object: any;
