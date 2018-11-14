@@ -8,7 +8,7 @@ import {
 } from '../symbolTable';
 
 import * as _ from 'lodash';
-import { NgComponentBuilder, NgField } from './ng-component.builder';
+import { NgComponentBuilder, NgField } from './builders/ng-component.builder';
 
 import { saveUsedActions } from './operations/save-used-actions.operation';
 import { saveInputs } from './operations/save-inputs.operation';

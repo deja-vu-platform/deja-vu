@@ -5,7 +5,7 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 import { SymbolTable } from '../symbolTable';
 import { ActionCompiler } from '../action/action.compiler';
-import { PackageJsonBuilder } from './package-json.builder';
+import { PackageJsonBuilder } from './builders/package-json.builder';
 
 
 interface DvConfig {
