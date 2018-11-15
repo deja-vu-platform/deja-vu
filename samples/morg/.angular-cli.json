@@ -15,7 +15,6 @@
       "main": "main.ts",
       "polyfills": "polyfills.ts",
       "tsconfig": "tsconfig.app.json",
-      "testTsconfig": "tsconfig.spec.json",
       "prefix": "morg",
       "styles": [
         "styles.css"
