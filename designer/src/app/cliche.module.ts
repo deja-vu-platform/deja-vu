@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
+import * as _ from 'lodash';
 
 import * as Allocator from 'allocator';
 import * as Authentication from 'authentication';
@@ -14,7 +15,6 @@ import * as Rating from 'rating';
 import * as Task from 'task';
 import * as Transfer from 'transfer';
 
-import { isString } from '../utils';
 import { Cliche, ClicheComponents } from './datatypes';
 import { TextComponent } from './text/text.component';
 
@@ -38,7 +38,7 @@ const componentSuffix = 'Component';
 function getNamedComponents(importedModule) {
   const namedComponents: ClicheComponents = {};
   Object.values(importedModule)
-    .filter((f) => isString(f['name']) && f['name'].endsWith(componentSuffix))
+    .filter((f) => _.isString(f['name']) && f['name'].endsWith(componentSuffix))
     .forEach((c) => {
       const componentName = c['name'].slice(0, componentSuffix.length * -1);
       namedComponents[componentName] = c;
