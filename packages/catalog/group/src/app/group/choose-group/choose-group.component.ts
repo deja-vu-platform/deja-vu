@@ -1,4 +1,4 @@
-import { Component, Input, Type, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
 import { Action } from 'dv-core';
 

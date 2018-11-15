@@ -6,14 +6,15 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   CreateGroupInput,
   GroupDoc,
   GroupsInput,
   MembersInput
 } from './schema';
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
@@ -30,7 +31,8 @@ function isPendingCreate(group: GroupDoc | null) {
 
 async function addOrRemoveMember(
   groups: mongodb.Collection<GroupDoc>, groupId: string, memberId: string,
-  updateType: 'add-member' | 'remove-member', context: Context) : Promise<Boolean> {
+  updateType: 'add-member' | 'remove-member',
+  context: Context): Promise<Boolean> {
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 

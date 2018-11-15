@@ -19,8 +19,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './add-to-group.component.html',
   styleUrls: ['./add-to-group.component.css']
 })
-export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess,
-  OnInit {
+export class AddToGroupComponent implements OnExec, OnExecFailure,
+  OnExecSuccess, OnInit {
   @Input() id: string;
 
   @Input() set memberId(value: string | undefined) {
