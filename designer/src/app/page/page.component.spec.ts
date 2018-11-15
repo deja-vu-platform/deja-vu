@@ -8,7 +8,7 @@ describe('PageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PageComponent],
+      declarations: [PageComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('PageComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

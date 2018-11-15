@@ -8,7 +8,7 @@ describe('TextComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TextComponent],
+      declarations: [TextComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('TextComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

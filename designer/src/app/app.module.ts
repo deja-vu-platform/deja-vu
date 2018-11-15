@@ -1,28 +1,28 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DragulaModule } from 'ng2-dragula';
 import { QuillModule } from 'ngx-quill';
 
-import { GATEWAY_URL, DvModule } from 'dv-core';
+import { DvModule, GATEWAY_URL } from 'dv-core';
 
-import { MatModule } from './mat.module';
 import { ClicheModule } from './cliche.module';
+import { MatModule } from './mat.module';
 
 import { WidgetDirective } from './widget.directive';
 
 import { AppComponent } from './app.component';
-import { MainViewComponent } from './main-view/main-view.component';
-import { SideMenuComponent } from './side-menu/side-menu.component';
-import { TopBarComponent } from './top-bar/top-bar.component';
 import { ClicheListComponent } from './cliche-list/cliche-list.component';
-import { WidgetListComponent } from './widget-list/widget-list.component';
+import { MainViewComponent } from './main-view/main-view.component';
 import { PageComponent } from './page/page.component';
-import { WidgetComponent } from './widget/widget.component';
 import { RowComponent } from './row/row.component';
+import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
+import { TopBarComponent } from './top-bar/top-bar.component';
+import { WidgetListComponent } from './widget-list/widget-list.component';
+import { WidgetComponent } from './widget/widget.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +36,7 @@ import { TextComponent } from './text/text.component';
     WidgetDirective,
     WidgetComponent,
     RowComponent,
-    TextComponent,
+    TextComponent
   ],
   imports: [
     BrowserModule,
@@ -46,12 +46,12 @@ import { TextComponent } from './text/text.component';
     DragulaModule.forRoot(),
     QuillModule,
     DvModule,
-    ClicheModule,
+    ClicheModule
   ],
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' },
+    { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [TextComponent],
+  entryComponents: [TextComponent]
 })
 export class AppModule { }

@@ -8,7 +8,7 @@ describe('RowComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [RowComponent],
+      declarations: [RowComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('RowComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

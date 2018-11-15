@@ -8,7 +8,7 @@ describe('WidgetComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [WidgetComponent],
+      declarations: [WidgetComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('WidgetComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

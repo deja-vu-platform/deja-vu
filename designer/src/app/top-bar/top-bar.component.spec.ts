@@ -8,7 +8,7 @@ describe('TopBarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TopBarComponent],
+      declarations: [TopBarComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('TopBarComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

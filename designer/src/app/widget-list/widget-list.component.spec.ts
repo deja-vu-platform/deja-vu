@@ -8,7 +8,7 @@ describe('WidgetListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [WidgetListComponent],
+      declarations: [WidgetListComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('WidgetListComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

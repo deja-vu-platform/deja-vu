@@ -8,7 +8,7 @@ describe('ClicheListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ClicheListComponent],
+      declarations: [ClicheListComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('ClicheListComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

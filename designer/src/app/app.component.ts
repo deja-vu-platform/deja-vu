@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { filter } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
+import { filter } from 'rxjs/operators';
 
-import { ComposedWidget, BaseWidget, TextWidget } from './datatypes';
 import { cliches } from './cliche.module';
+import { BaseWidget, ComposedWidget, TextWidget } from './datatypes';
 
 const DV = 'Déjà Vu';
 
@@ -13,6 +13,7 @@ const clicheList = Object.values(cliches)
     if (nameA === nameB) { return 0; }
     if (nameA === DV) { return -1; }
     if (nameB === DV) { return 1; }
+
     return (nameA < nameB) ? -1 : 1;
   });
 
@@ -20,11 +21,11 @@ const clicheList = Object.values(cliches)
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  viewProviders: [DragulaService],
+  viewProviders: [DragulaService]
 })
 export class AppComponent {
   composedWidgets: ComposedWidget[] = [
-    new ComposedWidget(),
+    new ComposedWidget()
   ];
 
   composedWidget = this.composedWidgets[0]; // TODO: dynamic
@@ -41,11 +42,13 @@ export class AppComponent {
   configureDragula(dragulaService: DragulaService) {
     dragulaService.createGroup('widget', {
       copy: (el, source) => source.classList.contains('widget-list'),
-      accepts: (el, target) => target.classList.contains('page-row'),
+      accepts: (el, target) => target.classList.contains('page-row')
     });
 
     dragulaService.drop('widget')
-      .pipe(filter(({ el, source, target }) => !!el && !!source && !!target && source !== target))
+      .pipe(
+        filter(({ el: e, source: s, target: t }) => e && s && t && (s !== t))
+      )
       .subscribe(({ el, source, target }) => {
         let widget;
         if (source.classList.contains('widget-list')) {
@@ -65,6 +68,7 @@ export class AppComponent {
     if (clicheName === 'Déjà Vu' && widgetName === 'Text') {
       return new TextWidget();
     }
+
     return new BaseWidget(clicheName, widgetName);
   }
 }

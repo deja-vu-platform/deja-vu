@@ -34,7 +34,9 @@ export class BaseWidget implements Widget {
       this.component = undefined;
     }
     if (!this.component) {
-      throw new Error(`Component for widget ${widgetName} in cliché ${clicheName} not found.`);
+      throw new Error(
+        `Component for widget ${widgetName} in cliché ${clicheName} not found.`
+      );
     }
   }
 }
@@ -66,12 +68,13 @@ export class ComposedWidget implements Widget {
   }
 
   addWidget(widget: Widget, rowID?: string) {
-    const row = this.rows.find(r => r.id === rowID);
+    const row = this.rows.find((r) => r.id === rowID);
     if (row) {
       row.widgets.push(widget);
     } else {
       this.rows.push({ id: uuidv4(), widgets: [widget] });
     }
+
     return widget;
   }
 
@@ -82,19 +85,23 @@ export class ComposedWidget implements Widget {
     if (this.rows[rowIndex].widgets.length === 0) {
       this.rows.splice(rowIndex, 1);
     }
+
     return widget;
   }
 
-  private findWidget(widgetID: string): { rowIndex: number, widgetIndex: number } {
-    for (let rowIndex = 0; rowIndex < this.rows.length; rowIndex += 1) {
-      const row = this.rows[rowIndex];
-      for (let widgetIndex = 0; widgetIndex < row.widgets.length; widgetIndex += 1) {
-        const widget = row.widgets[widgetIndex];
+  private findWidget(
+    widgetID: string
+  ): { rowIndex: number, widgetIndex: number } {
+    for (let rowIdx = 0; rowIdx < this.rows.length; rowIdx += 1) {
+      const row = this.rows[rowIdx];
+      for (let widgetIdx = 0; widgetIdx < row.widgets.length; widgetIdx += 1) {
+        const widget = row.widgets[widgetIdx];
         if (widget.id === widgetID) {
-          return { rowIndex, widgetIndex };
+          return { rowIndex: rowIdx, widgetIndex: widgetIdx };
         }
       }
     }
+
     return { rowIndex: -1 , widgetIndex: -1 };
   }
 }

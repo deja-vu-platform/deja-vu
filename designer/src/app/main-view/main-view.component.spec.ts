@@ -8,7 +8,7 @@ describe('MainViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MainViewComponent],
+      declarations: [MainViewComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('MainViewComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

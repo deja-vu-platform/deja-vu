@@ -1,11 +1,18 @@
-import { Component, OnInit, Input, ViewChild, ComponentFactoryResolver, Type } from '@angular/core';
-import { WidgetDirective } from '../widget.directive';
+import {
+  Component,
+  ComponentFactoryResolver,
+  Input,
+  OnInit,
+  Type,
+  ViewChild
+} from '@angular/core';
 import { BaseWidget } from '../datatypes';
+import { WidgetDirective } from '../widget.directive';
 
 @Component({
   selector: 'app-widget',
   templateUrl: './widget.component.html',
-  styleUrls: ['./widget.component.scss'],
+  styleUrls: ['./widget.component.scss']
 })
 export class WidgetComponent implements OnInit {
   @Input() widget: BaseWidget;

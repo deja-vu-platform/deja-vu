@@ -1,7 +1,7 @@
 import { Directive, ViewContainerRef } from '@angular/core';
 
 @Directive({
-  selector: '[appWidget]',
+  selector: '[propertyAppWidget]'
 })
 export class WidgetDirective {
 

@@ -8,7 +8,7 @@ describe('SideMenuComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SideMenuComponent],
+      declarations: [SideMenuComponent]
     })
     .compileComponents();
   }));
@@ -20,6 +20,7 @@ describe('SideMenuComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });
