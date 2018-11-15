@@ -80,12 +80,12 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 startDate: this.startDateFilter,
                 endDate: this.endDateFilter
               }
-            })
+            }
           }
         })
         .subscribe((res) => {
