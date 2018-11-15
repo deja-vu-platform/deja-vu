@@ -4,13 +4,17 @@ import { RunService, OnEvalFailure, OnExecFailure } from '../run.service';
 
 
 @Component({
-  selector: 'dv-redirect-on-fail',
-  templateUrl: './redirect-on-fail.component.html'
+  selector: 'dv-redirect',
+  templateUrl: './redirect.component.html'
 })
-export class RedirectOnFailComponent
+export class RedirectComponent
 implements OnInit, OnEvalFailure, OnExecFailure {
   @Input() href: string;
   @Input() params;
+  @Input() onEvalSuccess: boolean = false;
+  @Input() onEvalFailure: boolean = false;
+  @Input() onExecSuccess: boolean = false;
+  @Input() onExecFailure: boolean = false;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -21,11 +25,27 @@ implements OnInit, OnEvalFailure, OnExecFailure {
   }
 
   dvOnEvalFailure() {
-    this.redirect();
+    if (this.onEvalFailure) {
+      this.redirect();
+    }
+  }
+
+  dvOnEvalSuccess() {
+    if (this.onEvalSuccess) {
+      this.redirect();
+    }
   }
 
   dvOnExecFailure() {
-    this.redirect();
+    if (this.onExecFailure) {
+      this.redirect();
+    }
+  }
+
+  dvOnExecSuccess() {
+    if (this.onExecSuccess) {
+      this.redirect();
+    }
   }
 
   private redirect() {

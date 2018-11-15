@@ -1,5 +1,4 @@
 <hackernews-navbar></hackernews-navbar>
-<dv-callback (callback)="callback=$event" [hidden]="true"></dv-callback>
 
 <div class="main">
   <div class="container">
@@ -8,14 +7,16 @@
         <h1>Sign In</h1>
         <dv-tx>
           <authentication-sign-in></authentication-sign-in>
-          <dv-link [href]="callback" [hidden]="true"></dv-link>
+          <dv-callback defaultCallback="/news" [onExecSuccess]="true"
+            [hidden]="true"></dv-callback>
         </dv-tx>
       </div>
       <div class="col-md">
         <h1>Register</h1>
         <dv-tx>
           <authentication-register-user></authentication-register-user>
-          <dv-link [href]="callback" [hidden]="true"></dv-link>
+          <dv-callback defaultCallback="/news" [onExecSuccess]="true"
+            [hidden]="true"></dv-callback>
         </dv-tx>
       </div>
     </div>

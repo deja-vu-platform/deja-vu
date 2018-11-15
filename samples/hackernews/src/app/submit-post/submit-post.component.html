@@ -2,8 +2,9 @@
 
 <dv-tx>
   <authentication-logged-in></authentication-logged-in>
-  <dv-redirect-on-fail href="login/" [params]="{ callback: 'submit/' }">
-  </dv-redirect-on-fail>
+  <dv-redirect href="login/" [params]="{ callback: 'submit/' }"
+    [onEvalFailure]="true">
+  </dv-redirect>
 </dv-tx>
 
 <div class="main">
