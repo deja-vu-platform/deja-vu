@@ -74,10 +74,7 @@ cliches['Déjà Vu'] = {
 };
 
 @NgModule({
-  imports: [
-    CommonModule,
-    ...modules
-  ],
+  imports: [CommonModule].concat(modules),
   exports: modules,
   declarations: []
 })
