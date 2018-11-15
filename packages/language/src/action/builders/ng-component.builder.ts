@@ -13,7 +13,7 @@ export class NgComponentBuilder {
   private style = '';
 
   constructor(
-    private readonly template: string,
+    private readonly templateUrl: string,
     private readonly className: string,
     private readonly selector: string) {}
 
@@ -72,7 +72,7 @@ export class NgComponentBuilder {
 
       @Component({
         selector: "${this.selector}",
-        template: \`${this.template}\`,
+        templateUrl: "${this.templateUrl}",
         style: \`${this.style}\`
       })
       export class ${this.className} {

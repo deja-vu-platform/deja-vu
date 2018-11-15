@@ -4,7 +4,7 @@
   "description": "Déjà Vu language",
   "scripts": {
     "test": "jasmine-ts",
-    "build": "tsc && cp src/action/action.grammar.ohm dist/action",
+    "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints",
     "package": "npm run clean && npm run build",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist"

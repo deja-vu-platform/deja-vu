@@ -30,9 +30,9 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch('Hello');
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .not.toMatch('dv.action');
     expect(compiledAction.ngComponent)
       .toMatch(`selector: "${appName}-action-with-html-only"`);
@@ -80,9 +80,9 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(heading);
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .not.toMatch('dv.action');
   });
 
@@ -97,7 +97,7 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(/\(currentConsumer\)=.+=\$event/);
   });
 
@@ -119,7 +119,7 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(/\[hidden]="true"/);
   });
 
@@ -134,11 +134,11 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`tag`);
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`type`);
   });
 
@@ -153,11 +153,11 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`tag`);
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`type`);
   });
 
@@ -176,7 +176,7 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
   });
 
@@ -197,7 +197,7 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
-    expect(compiledAction.ngComponent)
+    expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
   });
 

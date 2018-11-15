@@ -21,9 +21,11 @@ const ohm = require('ohm-js');
 
 
 export interface CompiledAction {
+  readonly name: string;
   readonly className: string;
   readonly selector: string;
   readonly ngComponent: string;
+  readonly ngTemplate: string;
   readonly actionInputs?: ReadonlyArray<CompiledAction>;
 }
 
@@ -56,6 +58,10 @@ export class ActionCompiler {
 
   private static GetClassName(actionName: string): string {
     return `${_.upperFirst(_.camelCase(actionName))}Component`;
+  }
+
+  private static GetTemplateUrl(actionName: string): string {
+    return `./${actionName.toLowerCase()}.component.html`;
   }
 
   private static GetSelector(appName: string, actionName: string): string {
@@ -103,10 +109,13 @@ export class ActionCompiler {
     s.saveUsedOutputs();
     s.saveInputs();
     const ngTemplate = s.toNgTemplate();
+
     const className = ActionCompiler.GetClassName(thisActionName);
     const selector = ActionCompiler.GetSelector(appName, thisActionName);
+    const templateUrl = ActionCompiler.GetTemplateUrl(thisActionName);
+
     const ngComponentBuilder = new NgComponentBuilder(
-      ngTemplate, className, selector);
+      templateUrl, className, selector);
 
     const fields: NgField[] =  _
       .chain(ActionCompiler.FilterKind('cliche', thisActionSymbolTable))
@@ -138,9 +147,11 @@ export class ActionCompiler {
       .build();
 
     return {
+      name: thisActionName,
       className: className,
       selector: selector,
       ngComponent: ngComponent,
+      ngTemplate: ngTemplate,
       actionInputs: actionInputs
     };
   }

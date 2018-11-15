@@ -14,6 +14,7 @@ describe('AppCompiler', () => {
     projectDir = dirSync({ prefix: 'dvTestsSrc_' });
     Morg.WriteTo(projectDir.name);
     outputDir = dirSync({ prefix: 'dvTestsOutput_' });
+    console.log(`source dir: ${projectDir.name}, dst dir: ${outputDir.name}`);
     AppCompiler.Compile(projectDir.name, outputDir.name);
   });
 
@@ -24,22 +25,17 @@ describe('AppCompiler', () => {
   });
 
   it('should generate package.json', () => {
-    console.log(projectDir);
   });
 
   it('should generate index.html', () => {
-    console.log(projectDir);
   });
 
   it('should generate a component per action', () => {
-    console.log(projectDir);
   });
-
 });
 
 
 class Morg {
-
   static WriteTo(projectDir: string) {
     writeFileSync(path.join(projectDir, 'dvconfig.json'), Morg.DvConfig());
     const srcDir = path.join(projectDir, 'src');

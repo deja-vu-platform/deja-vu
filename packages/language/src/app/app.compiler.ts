@@ -5,7 +5,7 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 import { SymbolTable } from '../symbolTable';
 import { ActionCompiler } from '../action/action.compiler';
-import { PackageJsonBuilder } from './builders/package-json.builder';
+import { NgAppBuilder } from './builders/ng-app.builder';
 
 
 interface DvConfig {
@@ -94,24 +94,34 @@ export class AppCompiler {
       });
     _.extend(this.symbolTable, aliasToClicheNameMap);
 
+    const usedCliches: string[] = _
+      .chain(dvConfig.usedCliches)
+      .toPairs()
+      .map(([clicheAlias, clicheConfig]) => _.get(clicheConfig, 'name', clicheAlias))
+      .value();
+
+    const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
+    _.each(usedCliches, (usedCliche: string) => {
+      ngAppBuilder.addDependency(usedCliche, '0.0.1');
+    });
+
     const htmlFilesToParse = filesToParse(
       this.projectDir, dvConfig.actions.app);
     for (const actionFilePath of htmlFilesToParse) {
       const actionContents = readFileSync(
         path.join(this.projectDir, actionFilePath), 'utf8');
-      this.actionCompiler.compile(
+      const compiledAction = this.actionCompiler.compile(
         dvConfig.name, actionContents, this.symbolTable);
+      ngAppBuilder.addComponent(
+        compiledAction.name, compiledAction.className,
+        compiledAction.ngComponent, compiledAction.ngTemplate);
+      for (const actionInput of compiledAction.actionInputs) {
+        ngAppBuilder.addComponent(
+          actionInput.name, actionInput.className,
+          actionInput.ngComponent, actionInput.ngTemplate);
+      }
     }
-    const usedCliches: string[] = _
-      .chain(appName)
-      .toPairs()
-      .map((clicheAlias, clicheConfig) =>
-        _.get(clicheConfig, 'name', clicheAlias))
-      .value();
-    const packageJson = new PackageJsonBuilder(appName)
-      .addUsedCliches(usedCliches)
-      .build();
 
-    console.log(packageJson);
+    ngAppBuilder.build(this.cacheDir);
   }
 }
