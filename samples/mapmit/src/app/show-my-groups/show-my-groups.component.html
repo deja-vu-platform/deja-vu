@@ -8,6 +8,7 @@
       <div class="panel-body groups-panel-body">
         <h2>Groups I Own</h2>
         <group-show-groups 
+          dvAlias="groups-owned-by-user"
           [withMemberId]="user?.id" 
           [showMembers]="false"
           [showGroup]="{
@@ -26,6 +27,7 @@
       <div class="panel-body groups-panel-body">
         <h2>Groups I'm In</h2>
         <group-show-groups 
+          dvAlias="groups-user-is-member-of"
           [withMemberId]="user?.id" 
           [showMembers]="false"
           [showGroup]="{

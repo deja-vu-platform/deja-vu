@@ -1,67 +1,69 @@
 <div class="group-im-in">
   <div class="group-im-in-container">
     <h4 class="group-im-in-name">
-      <group-show-group
-        [group]="group"
-        [showMembers]="false">
-      </group-show-group>
-    </h4>
-    <dv-tx>
-      <group-join-leave
-        class="btn btn-default remove-from-group-btn"
-        [group]="group"
-        [memberId]="loggedInUserId">
-      </group-join-leave>
-    </dv-tx>
-
     <authorization-show-owner 
       [resourceId]="group.id" 
       (ownerId)="hostId=$event" [hidden]="true">
     </authorization-show-owner>
+      <div *ngIf="createdByUser && loggedInUserId === hostId">
+        <group-show-group
+          [group]="group"
+          [showMembers]="false">
+        </group-show-group>
+        <dv-tx>
+          <group-join-leave
+            class="btn btn-default remove-from-group-btn"
+            [group]="group"
+            [memberId]="loggedInUserId">
+          </group-join-leave>
+        </dv-tx>
+      </div>
+      <div *ngIf="isMemberOf">
+        <group-show-group
+          [group]="group"
+          [showMembers]="false">
+        </group-show-group>
+        <dv-tx>
+          <group-join-leave
+            class="btn btn-default remove-from-group-btn"
+            [group]="group"
+            [memberId]="loggedInUserId">
+          </group-join-leave>
+        </dv-tx>
+      </div>
+    </h4>
 
     <div *ngIf="loggedInUserId === hostId">
       <h5>Add User</h5>
-        <authentication-choose-user
-          class="add-member-input"
-          [showChooseButton]="false"
-          (selectedUser)="chosen=$event">
-        </authentication-choose-user>
-        <dv-tx>
-          <authorization-add-viewer
-            [id]="group?.id"
-            [viewer]="chosen"
-            [hidden]="true">
-          </authorization-add-viewer>
-          <group-add-to-group
-            [id]="group?.id"
-            [member]="chosen"
-            [showInput]="false">
-          </group-add-to-group>
-        </dv-tx>      
+      <authentication-choose-user
+        class="add-member-input"
+        [showChooseButton]="false"
+        (selectedUser)="chosen=$event">
+      </authentication-choose-user>
+      <dv-tx >
+        <dv-status savedText="Member added to group"></dv-status>
+        <group-add-to-group
+          [id]="group?.id"
+          [member]="chosen"
+          [showInput]="false"
+          [hidden]="true">
+        </group-add-to-group>
+        <authorization-can-view
+          [principalId]="loggedInUserId"
+          [resourceId]="group.id"
+          [hidden]="true">
+        </authorization-can-view>
+        <authorization-add-viewer
+          [id]="group?.id"
+          [viewer]="chosen"
+          [hidden]="true">
+        </authorization-add-viewer>
+        <authentication-authenticate 
+          [id]="loggedInUserId" 
+          [hidden]="true">
+        </authentication-authenticate>
+        <dv-button>Add Member to Group</dv-button>
+      </dv-tx>      
     </div> 
-    
-    <div *ngIf="isMemberOf">
-      <authorization-can-view
-        dvAlias="can-view-groups"
-        [principalId]="loggedInUserId"
-        [resourceId]="group.id"
-        [hidden]="true">
-      </authorization-can-view>
-    </div>
-
-    <div *ngIf="createdByUser">
-      <authorization-can-edit
-        dvAlias="owns-groups"
-        [principalId]="loggedInUserId"
-        [resourceId]="group.id"
-        [hidden]="true">
-      </authorization-can-edit>
-    </div>
-
-    <authentication-authenticate 
-      dvAlias="authenticate-groups"
-      [id]="loggedInUserId" 
-      [hidden]="true">
-    </authentication-authenticate>
   </div>
 </div>
