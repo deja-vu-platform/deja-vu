@@ -6,8 +6,6 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   CreateEventInput,
   CreateSeriesInput,
@@ -17,6 +15,9 @@ import {
   SeriesDoc,
   UpdateEventInput
 } from './schema';
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 

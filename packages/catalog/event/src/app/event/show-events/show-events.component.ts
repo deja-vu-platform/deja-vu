@@ -7,7 +7,7 @@ import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
-import { Event, toEvent, GraphQlEvent } from '../../../../shared/data';
+import { Event, GraphQlEvent, toEvent } from '../../../../shared/data';
 import { ShowEventComponent } from '../show-event/show-event.component';
 
 import { API_PATH } from '../event.config';
