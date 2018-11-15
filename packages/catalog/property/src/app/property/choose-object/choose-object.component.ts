@@ -60,8 +60,8 @@ export class ChooseObjectComponent implements OnInit {
       return;
     }
     if (!this.properties) {
-      this.properties = await properties(
-        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+      this.properties = properties(
+        this.showOnly, this.showExclude, await this.fetchProperties());
     }
     this.fetchObjects();
   }
