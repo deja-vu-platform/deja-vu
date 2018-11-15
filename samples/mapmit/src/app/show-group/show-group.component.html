@@ -1,39 +1,24 @@
 <div class="group-im-in">
   <div class="group-im-in-container">
-    <h4 class="group-im-in-name">
-    <authorization-show-owner 
-      [resourceId]="group.id" 
+    <authorization-show-owner
+      [resourceId]="group.id"
       (ownerId)="hostId=$event" [hidden]="true">
     </authorization-show-owner>
-      <div *ngIf="createdByUser && loggedInUserId === hostId">
-        <group-show-group
-          [group]="group"
-          [showMembers]="false">
-        </group-show-group>
-        <dv-tx>
-          <group-join-leave
-            class="btn btn-default remove-from-group-btn"
-            [group]="group"
-            [memberId]="loggedInUserId">
-          </group-join-leave>
-        </dv-tx>
-      </div>
-      <div *ngIf="isMemberOf">
-        <group-show-group
-          [group]="group"
-          [showMembers]="false">
-        </group-show-group>
-        <dv-tx>
-          <group-join-leave
-            class="btn btn-default remove-from-group-btn"
-            [group]="group"
-            [memberId]="loggedInUserId">
-          </group-join-leave>
-        </dv-tx>
-      </div>
-    </h4>
 
-    <div *ngIf="loggedInUserId === hostId">
+    <div *ngIf="createdByUser && loggedInUserId === hostId">
+      <group-show-group
+        dvAlias="group-owned-by-user"
+        [group]="group"
+        [showMembers]="true">
+      </group-show-group>
+      <dv-tx>
+        <group-join-leave
+          dvAlias="join-leave-group-owned-by-user"
+          class="btn btn-default remove-from-group-btn"
+          [group]="group"
+          [memberId]="loggedInUserId">
+        </group-join-leave>
+      </dv-tx>
       <h5>Add User</h5>
       <authentication-choose-user
         class="add-member-input"
@@ -58,12 +43,29 @@
           [viewer]="chosen"
           [hidden]="true">
         </authorization-add-viewer>
-        <authentication-authenticate 
-          [id]="loggedInUserId" 
+        <authentication-authenticate
+          [id]="loggedInUserId"
           [hidden]="true">
         </authentication-authenticate>
         <dv-button>Add Member to Group</dv-button>
-      </dv-tx>      
-    </div> 
+      </dv-tx>
+    </div>
+
+    <div *ngIf="isMemberOf">
+      <group-show-group
+        dvAlias="group-user-is-member-of"
+        [group]="group"
+        [showMembers]="false">
+      </group-show-group>
+      <dv-tx>
+        <group-join-leave
+          dvAlias="join-leave-group-user-is-member-of"
+          class="btn btn-default remove-from-group-btn"
+          [group]="group"
+          [memberId]="loggedInUserId">
+        </group-join-leave>
+      </dv-tx>
+    </div>
+
   </div>
 </div>
