@@ -13,3 +13,16 @@
   margin-left: 5px;
   display: inline-block;
 }
+
+.group-i-own, .group-im-in {
+  margin-left: 15px;
+}
+
+.group-im-in-name {
+  display: inline-block;
+}
+
+.group-im-in-container {
+  display: inline-block;
+  min-width: 150px;
+}

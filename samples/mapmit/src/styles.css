@@ -1,7 +1,7 @@
 /* good for black */
 /* @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";*/
 /* @import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
-/* 
+/*
 @import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
 */
 /*@import "~@angular/material/prebuilt-themes/purple-green.css";*/
@@ -18,16 +18,8 @@ body {
   background-color: #f5f8fa;
 }
 
-.group-i-own, .group-im-in {
-  margin-left: 15px;
-}
-
 .group-members-section, .add-group-member-section, .group-members-list {
   margin-left: 15px;
-}
-
-.group-im-in-name {
-  display: inline-block;
 }
 
 .create-event-input {
@@ -144,9 +136,4 @@ input.checkbox-btn {
 
 #filter-header {
   margin-bottom: 13px;
-}
-
-.group-im-in-container {
-  display: inline-block;
-  min-width: 150px;
 }
