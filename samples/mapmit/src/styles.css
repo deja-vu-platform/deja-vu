@@ -70,25 +70,25 @@ body {
 }
 
 h2 {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 .panel-default > .panel-heading {
-	background-color: #f5f8fa;
+  background-color: #f5f8fa;
 }
 
 .members-header {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 .panel-group {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .events-panel {
-	width: 70%;
-	margin-left: auto;
-	margin-right: auto;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-horizontal .form-group {
