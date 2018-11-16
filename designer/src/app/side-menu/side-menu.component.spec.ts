@@ -1,0 +1,37 @@
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatExpansionModule, MatListModule } from '@angular/material';
+
+import { ClicheListComponent } from '../cliche-list/cliche-list.component';
+import { WidgetListComponent } from '../widget-list/widget-list.component';
+import { SideMenuComponent } from './side-menu.component';
+
+describe('SideMenuComponent', () => {
+  let component: SideMenuComponent;
+  let fixture: ComponentFixture<SideMenuComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        SideMenuComponent,
+        ClicheListComponent,
+        WidgetListComponent
+      ],
+      imports: [
+        MatExpansionModule,
+        MatListModule
+      ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SideMenuComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component)
+      .toBeTruthy();
+  });
+});

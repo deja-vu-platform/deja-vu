@@ -60,6 +60,7 @@
     "packages/catalog/*",
     "samples/chorestar",
     "samples/morg",
-    "samples/potluck"
+    "samples/potluck",
+    "designer"
   ]
 }
