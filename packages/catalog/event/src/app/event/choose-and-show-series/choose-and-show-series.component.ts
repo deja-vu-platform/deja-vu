@@ -3,11 +3,10 @@ import { Component, ElementRef, Input, OnInit, Type } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
-import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
 import {
-  Event, GraphQlEvent, toEvent, Series, toSeries, GraphQlSeries
+  Event, GraphQlEvent, GraphQlSeries, Series, toEvent, toSeries
 } from '../../../../shared/data';
 
 import { ShowEventComponent } from '../show-event/show-event.component';

@@ -1,0 +1,18 @@
+<mapmit-nav-bar (loggedInUser)="user=$event"></mapmit-nav-bar>
+
+<div id="homepage-container">
+  <div id="homepage-left">
+    <!--TODO-->
+    <h2>Coming Soon: Search for events!</h2>
+  </div>
+  <div id="homepage-right">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <geolocation-display-map id="homeMapId"></geolocation-display-map>
+
+        <!-- Show All Events -->
+        <mapmit-show-events></mapmit-show-events>
+      </div>
+    </div>
+  </div>
+</div>

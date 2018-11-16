@@ -1,23 +1,10 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  Type,
-  ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 
 import {
-  Action,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService,
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';
@@ -32,7 +19,7 @@ import { API_PATH } from '../authentication.config';
   styleUrls: ['./show-users.component.css']
 })
 export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   @Input() showUsername = true;
   @Input() showId = true;
 

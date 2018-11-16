@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, ValidatorFn, Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  NG_VALIDATORS, NG_VALUE_ACCESSOR
 } from '@angular/forms';
 
 import {
@@ -12,10 +12,9 @@ import {
   OnExecSuccess, OnExec, RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
 
 import { AuthenticationService } from '../shared/authentication.service';
-
-import { User } from '../shared/authentication.model';
 
 import {
   PasswordValidator, RetypePasswordValidator, UsernameValidator
@@ -98,6 +97,11 @@ export class RegisterUserComponent
     this.rs.exec(this.elem);
   }
 
+  private throwErrors(errors: any) {
+    throw new Error(_.map(errors, 'message')
+      .join());
+  }
+
   async dvOnExec(): Promise<void> {
     const variables = {
       input: {
@@ -108,7 +112,7 @@ export class RegisterUserComponent
     };
     let user;
     if (this.signIn) {
-      const res = await this.gs.post<{ data: any }>(this.apiPath, {
+      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation RegisterAndSignIn($input: RegisterInput!) {
           registerAndSignIn(input: $input) {
             user { id, username }
@@ -119,11 +123,14 @@ export class RegisterUserComponent
       })
       .toPromise();
 
+      if (res.errors) this.throwErrors(res.errors);
+
       const token = res.data.registerAndSignIn.token;
       user = res.data.registerAndSignIn.user;
       this.authenticationService.setSignedInUser(token, user);
+
     } else {
-      const res = await this.gs.post<{ data: any }>(this.apiPath, {
+      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation Register($input: RegisterInput!) {
           register(input: $input) {
             id,
@@ -133,6 +140,9 @@ export class RegisterUserComponent
         variables: variables
       })
       .toPromise();
+
+      if (res.errors) this.throwErrors(res.errors);
+
       user = res.data.register;
     }
     this.user.emit(user);

@@ -29,11 +29,18 @@
       <h1>Create group <em>bobs</em> with member <em>bob</em></h1>
       <group-create-group id="bobs" [memberIds]="['bob']">
       </group-create-group>
+
       <h1><em>ben</em> join/leave <em>bens</em></h1>
       <group-join-leave
         groupId="bens"
         memberId="ben">
       </group-join-leave>
+
+      <h1>Show groups that ben is in</h1>
+      <group-show-groups withMemberId="ben"></group-show-groups>
+
+      <h1>Choose Group</h1>
+      <group-choose-group [loadMembers]="false"></group-choose-group>
     </div>
   </div>
 </div>
