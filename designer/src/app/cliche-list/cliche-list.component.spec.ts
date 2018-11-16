@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatExpansionModule, MatListModule } from '@angular/material';
 
+import { WidgetListComponent } from '../widget-list/widget-list.component';
 import { ClicheListComponent } from './cliche-list.component';
 
 describe('ClicheListComponent', () => {
@@ -8,7 +10,14 @@ describe('ClicheListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ClicheListComponent]
+      declarations: [
+        ClicheListComponent,
+        WidgetListComponent
+      ],
+      imports: [
+        MatExpansionModule,
+        MatListModule
+      ]
     })
     .compileComponents();
   }));

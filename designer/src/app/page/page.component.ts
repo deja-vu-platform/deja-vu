@@ -7,5 +7,5 @@ import { ComposedWidget } from '../datatypes';
   styleUrls: ['./page.component.scss']
 })
 export class PageComponent {
-  @Input() composedWidget: ComposedWidget;
+  @Input() composedWidget = new ComposedWidget();
 }

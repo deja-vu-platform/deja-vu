@@ -21,7 +21,7 @@ export class WidgetComponent implements OnInit {
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
-    this.loadWidget();
+    if (this.widget) { this.loadWidget(); }
   }
 
   loadWidget() {

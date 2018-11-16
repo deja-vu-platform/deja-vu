@@ -6,7 +6,8 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./text.component.scss']
 })
 export class TextComponent {
-  @Input() widget: any;
+  // type is TextWidget but this would create a circular dependency
+  @Input() widget: any = { content: '' };
 
   constructor() { }
 

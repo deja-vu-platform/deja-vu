@@ -7,5 +7,5 @@ import { Row } from '../datatypes';
   styleUrls: ['./row.component.scss']
 })
 export class RowComponent {
-  @Input() row: Row;
+  @Input() row: Row = { id: '', widgets: [] };
 }

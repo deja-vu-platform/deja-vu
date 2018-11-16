@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { WidgetComponent } from '../widget/widget.component';
 import { RowComponent } from './row.component';
 
 describe('RowComponent', () => {
@@ -8,7 +9,10 @@ describe('RowComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [RowComponent]
+      declarations: [
+        RowComponent,
+        WidgetComponent
+      ]
     })
     .compileComponents();
   }));

@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 
 import { TextComponent } from './text.component';
 
@@ -8,7 +10,11 @@ describe('TextComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TextComponent]
+      declarations: [TextComponent],
+      imports: [
+        QuillModule,
+        FormsModule
+      ]
     })
     .compileComponents();
   }));
