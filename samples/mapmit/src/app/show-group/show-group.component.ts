@@ -18,7 +18,7 @@ export class ShowGroupComponent {
 interface Group {
   id: string;
   memberIds: string[];
-};
+}
 
 interface User {
   id: string;
