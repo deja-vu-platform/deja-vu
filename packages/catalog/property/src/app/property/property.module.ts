@@ -23,13 +23,14 @@ import {
 } from './object-autocomplete/object-autocomplete.component';
 import { ShowObjectComponent } from './show-object/show-object.component';
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
+import { ShowUrlComponent } from './show-url/show-url.component';
 
 import { API_PATH } from './property.config';
 
 const allComponents = [
   ChooseObjectComponent, CreateObjectComponent, CreateObjectsComponent,
   CreatePropertyComponent, ObjectAutocompleteComponent,
-  ShowObjectComponent, ShowObjectsComponent
+  ShowObjectComponent, ShowObjectsComponent, ShowUrlComponent
 ];
 
 

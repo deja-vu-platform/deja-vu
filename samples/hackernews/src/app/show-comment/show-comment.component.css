@@ -1,0 +1,7 @@
+.comment-container {
+  padding-top: 1rem;
+}
+
+.reply-container {
+  margin-left: 45px; /* mat-icon-button (upvote button) width is 40 + extra */
+}

@@ -6,7 +6,8 @@
     <mat-option *ngFor="let object of _objects" [value]="object.id"
       [disabled]="isDisabled(object.id)">
       <dv-include [action]="showObject" default-showObject="{ tag: property-show-object }" [inputs]="{
-          object: object, showOnly: showOnly, showExclude: showExclude
+          object: object, showOnly: showOnly, showExclude: showExclude,
+          properties: properties, showBaseUrlsOnly: showBaseUrlsOnly
         }"
         [parent]="objectAutocomplete">
       </dv-include>

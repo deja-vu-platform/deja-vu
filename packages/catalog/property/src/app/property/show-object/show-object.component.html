@@ -1,5 +1,16 @@
 <div *ngIf="object" class="property-show-object">
   <div *ngFor="let prop of properties" class="property-show-object-property">
-    {{object[prop]}}
+    <span *ngIf="isUrl(prop)">
+      <dv-include [action]="showUrl"
+        default-showUrl="{ tag: property-show-url }"
+        [inputs]="{
+          url: object[prop], showBaseUrlOnly: showBaseUrlsOnly
+        }"
+        [parent]="showObject">
+      </dv-include>
+    </span>
+    <span *ngIf="!isUrl(prop)">
+      {{object[prop]}}
+    </span>
   </div>
 </div>

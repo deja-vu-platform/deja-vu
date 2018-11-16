@@ -1,6 +1,7 @@
 type Score {
   id: ID!
   value: Float
+  sourceId: ID
   targetId: ID
 }
 
@@ -13,12 +14,14 @@ type Target {
 input CreateScoreInput {
   id: ID
   value: Float
+  sourceId: ID
   targetId: ID
 }
 
 type Query {
   score(id: ID!): Score
   target(id: ID!): Target
+  targetsByScore(asc: Boolean): [Target!]
 }
 
 type Mutation {

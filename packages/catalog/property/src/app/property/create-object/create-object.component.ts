@@ -54,6 +54,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
       }
     }
   }
+  @Input() showExclude: string[] = [];
 
   @Input() buttonLabel = 'Create Object';
   @Input() newObjectSavedText = 'New object saved';
@@ -145,6 +146,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   dvOnExecSuccess() {
     if (this.showOptionToSubmit && this.save) {
+      this.newObjectError = '';
       this.newObjectSaved = true;
       window.setTimeout(() => {
         this.newObjectSaved = false;

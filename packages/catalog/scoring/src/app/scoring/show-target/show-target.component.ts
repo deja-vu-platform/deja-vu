@@ -27,6 +27,7 @@ OnChanges {
   @Input() showTotal = true;
   @Input() showScoreId = true;
   @Input() showScoreValue = true;
+  @Input() showScoreSourceId = true;
   @Input() showScoreTargetId = true;
 
   @Input() totalLabel = 'Total: ';
@@ -75,9 +76,10 @@ OnChanges {
                 ${this.showScores ? 'scores ' +
                   '{' +
                     'id \n' +
-                    `${this.showScoreValue ? 'value' : ''} \n` +
-                    `${this.showScoreTargetId ? 'targetId' : ''}` : ''
-                  }
+                    `${this.showScoreValue ? 'value \n' : ''}` +
+                    `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
+                    `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                  '}' : ''
                 }
                 ${this.showTotal ? 'total': ''}
               }

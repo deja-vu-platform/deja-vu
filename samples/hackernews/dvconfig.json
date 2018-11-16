@@ -1,0 +1,74 @@
+{
+  "name": "hackernews",
+  "watch": true,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "name": "authentication",
+      "config": {
+        "wsPort": 3002
+      }
+    },
+    "comment": {
+      "name": "comment",
+      "config": {
+        "wsPort": 3003
+      }
+    },
+    "property": {
+      "name": "property",
+      "config": {
+        "wsPort": 3004,
+        "schema": {
+          "title": "Post",
+          "type": "object",
+          "properties": {
+              "author": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "url"
+              }
+          },
+          "required": ["author", "title", "url"]
+        }
+      }
+    },
+    "scoringposts": {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3005,
+        "oneToOneScoring": true
+      }
+    },
+    "scoringcomments": {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3006,
+        "oneToOneScoring": true
+      }
+    }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "hackernews-root"}
+      ]
+    }
+  },
+  "routes": [
+    { "path": "item", "action": "hackernews-show-post-details" },
+    { "path": "login", "action": "hackernews-login" },
+    { "path": "news", "action": "hackernews-home" },
+    { "path": "submit", "action": "hackernews-submit-post" },
+    { "path": "", "action": "hackernews-home" }
+  ]
+}

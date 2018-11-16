@@ -14,18 +14,14 @@ export interface PropertyRes {
   data: { property: Property };
 }
 
-export async function properties(
-  showOnly: string[], showExclude: string[],
-  propertyFetcher: () => Promise<string[]>): Promise<string[]> {
-  let ret: string[] = [];
+export function properties(showOnly: string[], showExclude: string[],
+  propertyNames: string[]): string[] {
+
   if (!_.isEmpty(showOnly)) {
-    ret = showOnly;
+    return showOnly;
   } else if (!_.isEmpty(showExclude)) {
-    const allProperties = await propertyFetcher();
-    ret = _.difference(allProperties, showExclude);
-  } else {
-    ret = await propertyFetcher();
+    return _.difference(propertyNames, showExclude);
   }
 
-  return ret;
+  return propertyNames;
 }

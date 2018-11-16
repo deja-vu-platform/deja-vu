@@ -31,6 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateScoreComponent
     implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
   @Input() id: string | undefined;
+  @Input() sourceId: string;
   @Input() targetId: string;
   @Input() showOptionToInputValue = true;
   @Input() showOptionToSubmit = true;
@@ -43,9 +44,11 @@ export class CreateScoreComponent
   }
 
   // Presentation inputs
+  @Input() buttonDisabled = false; // button remains disabled for invalid inputs
   @Input() buttonLabel = 'Create';
   @Input() valueInputLabel = 'Score';
   @Input() newScoreSavedText = 'New Score saved';
+  @Input() submitMatIconName: string | undefined;
 
   @ViewChild(FormGroupDirective) form;
 
@@ -75,9 +78,13 @@ export class CreateScoreComponent
   }
 
   async dvOnExec(): Promise<void> {
+    if (!this.canExec()) {
+      return;
+    }
     const newScore: Score = {
       id: this.id,
       value: this.valueControl.value,
+      sourceId: this.sourceId,
       targetId: this.targetId
     };
     if (this.save) {
@@ -92,6 +99,7 @@ export class CreateScoreComponent
             input: {
               id: this.id,
               value: this.valueControl.value,
+              sourceId: this.sourceId,
               targetId: this.targetId
             }
           }
@@ -128,5 +136,13 @@ export class CreateScoreComponent
     if (this.showOptionToSubmit && this.save) {
       this.newScoreError = reason.message;
     }
+  }
+
+  canSubmit(): boolean {
+    return this.createScoreForm.valid && this.canExec() && !this.buttonDisabled;
+  }
+
+  private canExec() {
+    return !_.isNil(this.valueControl.value) && this.sourceId && this.targetId;
   }
 }

@@ -49,6 +49,7 @@ implements OnInit, ControlValueAccessor, Validator {
   };
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() objects = new EventEmitter<Object[]>();
   _objects: Object[] = [];
 
@@ -100,8 +101,10 @@ implements OnInit, ControlValueAccessor, Validator {
     if (!this.gs) {
       return;
     }
-    this.properties = await properties(
-      this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    if (!this.properties) {
+      this.properties = properties(
+        this.showOnly, this.showExclude, await this.fetchProperties());
+    }
     this.fetchObjects();
   }
 
@@ -132,8 +135,7 @@ implements OnInit, ControlValueAccessor, Validator {
               query {
                 objects {
                   id
-                  ${_.map(this.properties)
-                      .join('\n')}
+                  ${this.properties.join('\n')}
                 }
               }
             `

@@ -8,6 +8,13 @@
     {{noValueText}}
   </div>
 
+  <div *ngIf="showSourceId && score.sourceId">
+    {{score.sourceId}}
+  </div>
+  <div *ngIf="showSourceId && !score.sourceId">
+    {{noSourceIdText}}
+  </div>
+
   <div *ngIf="showTargetId && score.targetId">
     {{score.targetId}}
   </div>
