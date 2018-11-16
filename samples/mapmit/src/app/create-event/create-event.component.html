@@ -3,12 +3,12 @@
 <div class="events-container">
   <div class="events-panel panel panel-default">
     <h2 class="create-event-header">Create an Event!</h2>
-    <geolocation-display-map 
+    <geolocation-display-map
       id="homeMapId"
       (newPosition)="mPos=$event">
     </geolocation-display-map>
 
-    <dv-tx>        
+    <dv-tx>
       <dv-id (id)="eventId=$event"></dv-id>
       <dv-status savedText="Event created"></dv-status>
       <!-- Title, Description, Room Number, Location Description -->
@@ -23,16 +23,16 @@
 
       <!-- Location -->
       <div class="create-event-input">
-        <geolocation-create-marker 
+        <geolocation-create-marker
           [id]="eventId"
-          mapId="homeMapId" 
-          [latitude]="mPos?.latitude" 
-          [longitude]="mPos?.longitude" 
+          mapId="homeMapId"
+          [latitude]="mPos?.latitude"
+          [longitude]="mPos?.longitude"
           (marker)="m=$event"
           [showOptionToSubmit]="false">
         </geolocation-create-marker>
       </div>
-      
+
       <!-- Time + Date -->
       <div class="create-event-input">
         <event-create-event
@@ -70,7 +70,9 @@
           </dv-link>
         </div>
         <div class="save-button">
-          <dv-button>Save Event</dv-button>
+          <dv-button class='btn btn-default btn-blue event-submit-btn'>
+            Save Event
+          </dv-button>
           <dv-link href="/my-events" [hidden]="true"></dv-link>
         </div>
       </div>
