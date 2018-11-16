@@ -72,10 +72,10 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
               }
-            })
+            }
           }
         })
         .subscribe((res) => {

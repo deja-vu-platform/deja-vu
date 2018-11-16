@@ -9,9 +9,9 @@ import { AppComponent } from './app.component';
 import { AuthenticationModule } from 'authentication';
 import { AuthorizationModule } from 'authorization';
 import { GroupModule } from 'group';
-import { MarketModule } from 'market';
 import { PropertyModule } from 'property';
 import { TaskModule } from 'task';
+import { TRANSFER_CONFIG, TransferModule } from 'transfer';
 
 import { ChildHomeComponent } from './child-home/child-home.component';
 import { LandingComponent } from './landing/landing.component';
@@ -19,6 +19,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { ParentHomeComponent } from './parent-home/parent-home.component';
 import { ShowChoreComponent } from './show-chore/show-chore.component';
 import { ShowRewardComponent } from './show-reward/show-reward.component';
+import { CreateChoreComponent } from './create-chore/create-chore.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { ShowRewardComponent } from './show-reward/show-reward.component';
     ChildHomeComponent,
     ShowChoreComponent,
     ShowRewardComponent,
-    NavBarComponent
+    NavBarComponent,
+    CreateChoreComponent
   ],
   imports: [
     BrowserModule,
@@ -41,14 +43,15 @@ import { ShowRewardComponent } from './show-reward/show-reward.component';
     ]),
     AuthenticationModule,
     AuthorizationModule,
-    MarketModule,
+    TransferModule,
     TaskModule,
     GroupModule,
     PropertyModule
   ],
-  providers: [{
-    provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
-  }],
+  providers: [
+    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'},
+    { provide: TRANSFER_CONFIG, useValue: { balanceType: 'money' } }
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     ShowChoreComponent,

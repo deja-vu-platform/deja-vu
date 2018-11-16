@@ -58,8 +58,10 @@
   "workspaces": [
     "packages/*",
     "packages/catalog/*",
+    "samples/chorestar",
     "samples/morg",
     "samples/potluck",
     "samples/mapmit"
+    "designer"
   ]
 }

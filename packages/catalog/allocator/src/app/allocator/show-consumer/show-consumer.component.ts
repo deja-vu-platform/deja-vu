@@ -62,12 +62,12 @@ OnInit {
               consumerOfResource(input: $input)
             }
           `,
-          variables: JSON.stringify({
+          variables: {
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId
             }
-          })
+          }
         }
       })
       .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))

@@ -58,12 +58,12 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
           query Verify($input: VerifyInput!) {
             verify(input: $input)
           }`,
-        variables: JSON.stringify({
+        variables: {
           input: {
             code: code,
             token: token
           }
-        })
+        }
       }
     })
       .subscribe((res) => {

@@ -37,8 +37,8 @@ type Query {
 
 type Mutation {
   createTask(input: CreateTaskInput!): Task
-  updateTask(input: UpdateTaskInput!): Task
-  claimTask(id: ID!, assigneeId: ID!): Task
-  completeTask(id: ID!): Task
-  approveTask(id: ID!): Task
+  updateTask(input: UpdateTaskInput!): Boolean
+  claimTask(id: ID!, assigneeId: ID!): Boolean
+  completeTask(id: ID!): Boolean
+  approveTask(id: ID!): Boolean
 }
