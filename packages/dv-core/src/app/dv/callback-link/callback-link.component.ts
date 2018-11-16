@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class CallbackLinkComponent implements OnInit {
   currentUrl: string;
-  @Input() dst: string;
+  @Input() href: string;
 
   constructor(private router: Router) {
     this.currentUrl = this.router.url;

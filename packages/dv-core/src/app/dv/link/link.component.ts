@@ -25,6 +25,7 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
+    console.log(this.href);
     this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
   }
 }

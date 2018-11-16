@@ -13,7 +13,7 @@ import {
 })
 export class CallbackComponent
 implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
-  @Input() defaultCallback: string = '/';
+  @Input() defaultHref: string = '/';
   @Input() params;
   @Input() onEvalSuccess: boolean = false;
   @Input() onEvalFailure: boolean = false;
@@ -60,8 +60,7 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
   }
 
   private redirectToCallback() {
-    const href = this.loadedCallback ?
-      this.loadedCallback : this.defaultCallback;
+    const href = this.loadedCallback ? this.loadedCallback : this.defaultHref;
     this.router.navigate([href, ...(this.params ? [this.params] : []) ]);
   }
 }
