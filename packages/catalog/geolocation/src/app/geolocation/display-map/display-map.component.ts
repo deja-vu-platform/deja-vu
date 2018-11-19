@@ -1,14 +1,17 @@
-import { MouseEvent } from '@agm/core';
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
   Output
 } from '@angular/core';
-import { Marker } from '../shared/geolocation.model';
-
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
+import { Marker } from '../shared/geolocation.model';
+
+import {
+  icon, latLng, LatLng, LeafletMouseEvent, map, Map, marker,
+  Marker as lMarker, tileLayer
+} from 'leaflet';
 import * as _ from 'lodash';
 
 @Component({
@@ -17,23 +20,36 @@ import * as _ from 'lodash';
   styleUrls: ['./display-map.component.css']
 })
 export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
-  @Input() id: string;
+  OnChanges {
+  // Required
+  @Input() displayMapId: string;
 
-
-  // Default configurations for the Google Maps Display
+  // Default configurations for Leaflet.js
   // Default center: MIT Stata Center
-  @Input() lat = 42.361635760915846;
-  @Input() lng = -71.0906195640564;
+  @Input() lat = 42.36157;
+  @Input() lng = -71.09067;
   @Input() zoom = 16;
   @Input() maxZoom = 20;
   @Input() minZoom = 3;
-  @Input() streetViewControl = false;
-  @Input() draggableMarker = false;
+
+  // Default Tile Provider: OpenStreetMaps
+  @Input() urlTemplate = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  @Input() attribution = 'Map data &copy; \
+   <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, \
+   <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
 
   @Output() newPosition: EventEmitter<Marker> = new EventEmitter<Marker>();
 
-  markers: Marker[] = [];
+  private myMap: Map;
+  private markers: lMarker[];
+  private markerIcon = {
+    icon: icon({
+      iconSize: [25, 41],
+      iconAnchor: [13, 41],
+      iconUrl: '../assets/img/marker-icon.png',
+      shadowUrl: '../assets/img/marker-shadow.png'
+    })
+  };
 
   private gs: GatewayService;
 
@@ -42,6 +58,7 @@ OnChanges {
     private rs: RunService) { }
 
   ngOnInit() {
+    this.setUpMap();
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }
@@ -51,13 +68,38 @@ OnChanges {
   }
 
   ngOnChanges() {
-    this.load()
+    this.load();
   }
 
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
+  }
+
+  setUpMap() {
+    // Do NOT change 'mapid'
+    this.myMap = map('mapid')
+      .setView(latLng(this.lat, this.lng), this.zoom);
+    tileLayer(this.urlTemplate, {
+      attribution: this.attribution,
+      minZoom: this.minZoom,
+      maxZoom: this.maxZoom
+    })
+      .addTo(this.myMap);
+    this.myMap.on('click', (event: LeafletMouseEvent) => {
+      this.onMapClick(event);
+    });
+  }
+
+  onMapClick(e: LeafletMouseEvent) {
+    const coords: LatLng = e.latlng;
+    const m: Marker = {
+      latitude: coords.lat,
+      longitude: coords.lng,
+      mapId: this.displayMapId
+    };
+    this.newPosition.emit(m);
   }
 
   async dvOnEval(): Promise<void> {
@@ -76,33 +118,21 @@ OnChanges {
             `,
             variables: {
               input: {
-                ofMapId: this.id
+                ofMapId: this.displayMapId
               }
             }
           }
         })
         .subscribe((res) => {
-          this.markers = res.data.markers;
+          _.forEach(this.markers, (m: lMarker) => this.myMap.removeLayer(m));
+
+          this.markers = _.map(res.data.markers, (m: Marker) => {
+            return marker(latLng([m.latitude, m.longitude]), this.markerIcon)
+              .bindPopup(`<b>${m.title}</b>`)
+              .addTo(this.myMap);
+          });
         });
     }
-  }
-
-  mapClicked($event: MouseEvent) {
-    console.log(`Marker location: ${$event.coords.lat}, ${$event.coords.lng}`);
-    const m: Marker = {
-      latitude: $event.coords.lat,
-      longitude: $event.coords.lng,
-      mapId: this.id
-    };
-    this.newPosition.emit(m);
-  }
-
-  clickedMarker(title: string) {
-    console.log(`clicked the marker: ${title}`);
-  }
-
-  markerDragEnd(m: Marker, $event: MouseEvent) {
-    console.log('dragEnd', m, $event);
   }
 
   private canEval(): boolean {

@@ -1,8 +1,0 @@
-/* Required for @agm/core. Height must be in pixels.*/
-agm-map {
-  height: 500px;
-  margin: 0px;
-  padding: 0px;
-  position: relative;
-  overflow: hidden;
-}

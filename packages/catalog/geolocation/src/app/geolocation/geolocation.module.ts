@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ApplicationRef, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule
@@ -15,9 +15,6 @@ import { DisplayMapComponent } from './display-map/display-map.component';
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
-import { AgmCoreModule } from '@agm/core';
-
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBbPL7hviCiMdW7ZkIuq119PuidXV0epwY';
 
 const allComponents = [
   CreateMarkerComponent,
@@ -37,10 +34,7 @@ const allComponents = [
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
-    FormsModule,
-    AgmCoreModule.forRoot({
-      apiKey: GOOGLE_MAPS_API_KEY
-    })
+    FormsModule
   ],
   declarations: allComponents,
   exports: allComponents,
