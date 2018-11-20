@@ -11,7 +11,12 @@ export function isInput(name: string) {
 }
 
 export function inputToNgField(input: string) {
-  return `__ngInput__${input.substr(1)}`;
+  return input.substr(1);
+}
+
+// This one needs to match `inputToNgField`
+export function attributeNameToInput(attributeName: string) {
+  return attributeName;
 }
 
 export function isNgComponent(name: string): boolean {
@@ -34,7 +39,9 @@ export function getStEntryForNgComponent(
 
 export function outputToNgField(
   clicheName: string, actionName: string, output: string, alias?: string) {
-  const aliasStr = (alias === undefined) ? '' : `_${alias}`;
+  const aliasStr = (alias === undefined) ? '' : `__${alias}`;
+  const actionNameNoHyphens = actionName.replace(/-/g, '_');
 
-  return `__ngOutput__${clicheName}_${actionName}_${output}${aliasStr}`;
+  return `__ngOutput__${clicheName}__` +
+    `${actionNameNoHyphens}__${output}${aliasStr}`;
 }

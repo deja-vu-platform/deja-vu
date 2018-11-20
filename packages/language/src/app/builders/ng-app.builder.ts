@@ -1,7 +1,10 @@
 import * as path from 'path'
-import { mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 
 import * as _ from 'lodash';
+
+import * as rimraf from 'rimraf';
+import { spawnSync } from "child_process";
 
 
 interface Dependency {
@@ -17,8 +20,27 @@ interface Component {
 }
 
 interface Route {
- path: string;
- component: string;
+  path: string;
+  selector: string;
+}
+
+interface CacheRecord {
+  name: string;
+  dependencies: Dependency[];
+  components: Component[];
+  routes: Route[];
+  globalStyle: string;
+}
+
+
+interface CacheRecordDiff {
+  nameChanged: boolean;
+  dependenciesChanged: boolean;
+  componentsChanged: boolean;
+  routesChanged: boolean;
+  globalStyleChanged: boolean;
+  prev: CacheRecord | undefined;
+  curr: CacheRecord;
 }
 
 
@@ -26,7 +48,9 @@ export class NgAppBuilder {
   private readonly dependencies: Dependency[] = [];
   private readonly components: Component[] = [];
   private readonly routes: Route[] = [];
+  private globalStyle = '';
   private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
+  private static readonly cacheRecordFile = '.dvcache';
 
   private static Replace(
     srcFile: string, srcExt: string, dstDir: string,
@@ -51,6 +75,36 @@ export class NgAppBuilder {
     return `${_.capitalize(dep)}Module`;
   }
 
+  private static DiffCacheRecord(
+    prev: CacheRecord | undefined, curr: CacheRecord): CacheRecordDiff {
+    const diff = {};
+    _.each(_.keys(curr), key => {
+      diff[`${key}Changed`] = (prev !== undefined) ?
+        NgAppBuilder.ObjectCompare(prev[key], curr[key]) !== 0 : true;
+      diff[`prev${_.capitalize(key)}`] = _.get(prev, key);
+      diff[`curr${_.capitalize(key)}`] = curr[key];
+    });
+
+    return <CacheRecordDiff> diff;
+  }
+
+  private static ObjectCompare(a: any, b: any): number {
+    return JSON.stringify(a).localeCompare(JSON.stringify(b));
+  }
+
+  private static InstallDependencies(cacheDir: string) {
+    // Windows users must include `shell: true` for the cli to work
+    // TODO: Remove `shell: true` in the future
+    const c = spawnSync(
+      'yarn', [], { stdio: 'inherit', cwd: cacheDir, shell: true });
+    if (c.error) {
+      throw new Error(`Failed to install dependencies: ${c.error}`);
+    }
+    if (c.status !== 0) {
+      throw new Error(`Failed to install dependencies: status is ${c.status}`);
+    }
+  }
+
   constructor(
     private readonly appName: string,
     private readonly dvConfigContents: string) {}
@@ -70,13 +124,63 @@ export class NgAppBuilder {
     return this;
   }
 
-  addRoute(path: string, component: string) {
-    this.routes.push({ path: path, component: component });
+  setGlobalStyle(style: string) {
+    this.globalStyle = style;
+  }
+
+  addRoute(path: string, selector: string) {
+    this.routes.push({ path: path, selector: selector });
 
     return this;
   }
 
-  build(dir: string) {
+  build(cacheDir: string, installDependencies = true) {
+    if (!_.includes(_.map(this.routes, 'path'), '')) {
+      throw new Error(
+        'Missing default route "". In your dvconfig.json file add:\n' +
+        '"routes": [ {"path": "", "action": "your-main-action-here"} ]');
+    }
+    const srcDir = path.join(cacheDir, 'src');
+    const appDir = path.join(srcDir, 'app');
+    const assetsDir = path.join(srcDir, 'assets');
+
+    if (!existsSync(cacheDir)) {
+      mkdirSync(cacheDir);
+    }
+
+    if (!existsSync(srcDir)) {
+      // | src/
+      mkdirSync(srcDir);
+      // | | main.ts
+      NgAppBuilder.Replace('main', 'ts', srcDir);
+      // | | polyfills.ts
+      NgAppBuilder.Replace('polyfills', 'ts', srcDir);
+      // | | tsconfig.ts
+      NgAppBuilder.Replace('tsconfig', 'json', srcDir);
+      // | | typings.d.ts
+      NgAppBuilder.Replace('typings', 'd.ts', srcDir);
+    }
+
+    if (!existsSync(appDir)) {
+      // | | app/
+      mkdirSync(appDir);
+      // | | | app.component.html
+      NgAppBuilder.Replace('app.component', 'html', appDir);
+      // | assets/
+      mkdirSync(assetsDir);
+    }
+
+    const diff = this.updateCache(cacheDir);
+
+    const selectorToComponent = _.reduce(
+      this.components, (acc, c: Component) => {
+        if (!c.name.startsWith('anonymous-')) {
+          acc[`${this.appName}-${c.name}`] = c.className;
+        }
+
+        return acc;
+      }, {});
+
     const replaceMap = {
       name: this.appName,
       dependencies: _
@@ -102,59 +206,102 @@ export class NgAppBuilder {
       routes: _
         .map(
           this.routes,
-          (r: Route) => `{ path: ${r.path}, component: ${r.component} }`)
+          (r: Route) => {
+            const c = selectorToComponent[r.selector];
+            if (c === undefined) {
+              throw new Error(
+                `Action for route "${r.path}" (${r.selector}) not found\n` +
+              `Valid actions are: ${_.keys(selectorToComponent)}`);
+            }
+
+            return `{ path: "${r.path}", component: ${c} }`;
+          })
         .join(', '),
       modules: _
         .map(_.map(this.dependencies, 'name'), NgAppBuilder.DepToModule)
-        .join(', '),
+        .join(', ')
     };
 
     // /
     // | package.json
-    NgAppBuilder.Replace('package', 'json', dir, replaceMap);
+    if (diff.nameChanged || diff.dependenciesChanged) {
+      NgAppBuilder.Replace('package', 'json', cacheDir, replaceMap);
+    }
     // | .angular-cli.json
-    NgAppBuilder.Replace('.angular-cli', 'json', dir, replaceMap);
+    if (diff.nameChanged) {
+      NgAppBuilder.Replace('.angular-cli', 'json', cacheDir, replaceMap);
+    }
     // | dvconfig.json
-    writeFileSync(path.join(dir, 'dvconfig.json'), this.dvConfigContents);
+    writeFileSync(path.join(cacheDir, 'dvconfig.json'), this.dvConfigContents);
 
     // | src/
-    const srcDir = path.join(dir, 'src');
-    mkdirSync(srcDir);
     // | | index.html
-    NgAppBuilder.Replace('index', 'html', srcDir, replaceMap);
-    // | | main.ts
-    NgAppBuilder.Replace('main', 'ts', srcDir);
-    // | | polyfills.ts
-    NgAppBuilder.Replace('polyfills', 'ts', srcDir);
-    // | | tsconfig.ts
-    NgAppBuilder.Replace('tsconfig', 'json', srcDir);
-    // | | typings.d.ts
-    NgAppBuilder.Replace('typings', 'd.ts', srcDir);
-
-
-    // | | app/
-    const appDir = path.join(srcDir, 'app');
-    mkdirSync(appDir);
-    // | | | app.component.html
-    NgAppBuilder.Replace('app.component', 'html', appDir, replaceMap);
-    // | | | app.component.ts
-    NgAppBuilder.Replace('app.component', 'ts', appDir, replaceMap);
-    // | | | app.module.ts
-    NgAppBuilder.Replace('app.module', 'ts', appDir, replaceMap);
-
-    for (const component of this.components) {
-      const componentDir = path.join(appDir, component.name);
-      mkdirSync(componentDir);
-      writeFileSync(
-        path.join(componentDir, `${component.name}.component.html`),
-        component.template);
-      writeFileSync(
-        path.join(componentDir, `${component.name}.component.ts`),
-        component.component);
+    if (diff.nameChanged) {
+      NgAppBuilder.Replace('index', 'html', srcDir, replaceMap);
     }
 
+    // | | app/
+    // | | | app.component.ts
+    if (diff.nameChanged) {
+      NgAppBuilder.Replace('app.component', 'ts', appDir, replaceMap);
+    }
+    // | | | app.module.ts
+    if (diff.componentsChanged || diff.routesChanged) {
+      NgAppBuilder.Replace('app.module', 'ts', appDir, replaceMap);
+    }
+
+    if (diff.componentsChanged) {
+      if (diff.prev !== undefined) {
+        for (const component of diff.prev.components) {
+          const componentDir = path.join(appDir, component.name);
+          rimraf.sync(componentDir);
+        }
+      }
+      for (const component of this.components) {
+        const componentDir = path.join(appDir, component.name);
+        if (!existsSync(componentDir)) {
+          mkdirSync(componentDir);
+        }
+        writeFileSync(
+          path.join(componentDir, `${component.name}.component.html`),
+          component.template);
+        writeFileSync(
+          path.join(componentDir, `${component.name}.component.ts`),
+          component.component);
+      }
+    }
+
+    // | styles.css
+    if (diff.globalStyleChanged || diff.prev.globalStyle === undefined) {
+      writeFileSync(path.join(srcDir, 'styles.css'), this.globalStyle);
+    }
     // | assets/
-    const assetsDir = path.join(srcDir, 'assets');
-    mkdirSync(assetsDir);
+    // TODO
+
+    if (installDependencies && diff.dependenciesChanged) {
+      NgAppBuilder.InstallDependencies(cacheDir);
+    }
+  }
+
+  private updateCache(cacheDir: string): CacheRecordDiff {
+    const cacheFile = path.join(cacheDir, NgAppBuilder.cacheRecordFile);
+    const cacheValues: CacheRecord | undefined = existsSync(cacheFile) ?
+      JSON.parse(readFileSync(cacheFile, 'utf8')) : undefined;
+
+    this.dependencies.sort(NgAppBuilder.ObjectCompare);
+    this.components.sort(NgAppBuilder.ObjectCompare);
+    this.routes.sort(NgAppBuilder.ObjectCompare);
+
+    const currCache: CacheRecord = {
+      name: this.appName,
+      dependencies: this.dependencies,
+      components: this.components,
+      routes: this.routes,
+      globalStyle: this.globalStyle
+    };
+
+    writeFileSync(cacheFile, JSON.stringify(currCache));
+
+    return NgAppBuilder.DiffCacheRecord(cacheValues, currCache);
   }
 }

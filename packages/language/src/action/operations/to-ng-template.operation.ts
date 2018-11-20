@@ -8,6 +8,7 @@ import {
 } from '../../symbolTable';
 
 import {
+  attributeNameToInput,
   classNameToNgField,
   getStEntryForNgComponent,
   inputToNgField,
@@ -99,7 +100,7 @@ export function toNgTemplate(
       // should be converted to an ng input
       const attributeName = attributeNameNode.sourceString;
       const newAttributeName = (attributeName === 'class') ?
-        attributeName : `[${attributeName}]`;
+        attributeName : `[${attributeNameToInput(attributeName)}]`;
 
       return `${newAttributeName}${eq.sourceString}"${expr.toNgTemplate()}"`;
     },

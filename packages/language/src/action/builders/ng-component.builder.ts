@@ -24,11 +24,13 @@ export class NgComponentBuilder {
 
   addOutputs(outputs: string[]): NgComponentBuilder {
     this.outputs.push(...outputs);
+
     return this;
   }
 
   addFields(fields: NgField[]): NgComponentBuilder {
     this.fields.push(...fields);
+
     return this;
   }
 
@@ -37,17 +39,20 @@ export class NgComponentBuilder {
     for (const actionImport of actionImports) {
       this.withActionImport(actionImport.actionName, actionImport.className);
     }
+
     return this;
   }
 
   withActionImport(actionName: string, className: string): NgComponentBuilder {
-    this.actionImportStatements
-      .push(`import { ${className} } from './${actionName}.html'`);
-   return this;
+    const from = `../${actionName}/${actionName}.component`;
+    this.actionImportStatements.push(`import { ${className} } from '${from}'`);
+
+    return this;
   }
 
   withStyle(style: string): NgComponentBuilder {
     this.style = style;
+
     return this;
   }
 
@@ -73,7 +78,7 @@ export class NgComponentBuilder {
       @Component({
         selector: "${this.selector}",
         templateUrl: "${this.templateUrl}",
-        style: \`${this.style}\`
+        styles: [\`${this.style}\`]
       })
       export class ${this.className} {
         ${outputFields.join('\n  ')}

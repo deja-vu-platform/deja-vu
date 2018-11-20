@@ -4,12 +4,13 @@
   "description": "Déjà Vu language",
   "scripts": {
     "test": "jasmine-ts",
-    "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints",
+    "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
     "package": "npm run clean && npm run build",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
+    "rimraf": "^2.6.2",
     "ohm-js": "^0.14.0"
   },
   "peerDepencies": {
@@ -23,7 +24,6 @@
     "@types/tmp": "^0.0.33",
     "jasmine": "^3.2.0",
     "jasmine-ts": "^0.3.0",
-    "rimraf": "^2.6.2",
     "tmp": "^0.0.33",
     "ts-node": "^7.0.1",
     "tslint": "~5.9.1",

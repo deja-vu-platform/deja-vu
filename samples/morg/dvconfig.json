@@ -1,6 +1,5 @@
 {
   "name": "morg",
-  "type": "cliche",
   "gateway": {
     "config": {
       "wsPort": 3000

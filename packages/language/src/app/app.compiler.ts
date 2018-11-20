@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 
@@ -66,15 +66,19 @@ export class AppCompiler {
    *
    * @param projectDir the directory containing the dv app files. There must be
    *                   a `dvconfig.json` file at the root
-   * @param cacheDir directory to use read and update compiled files
+   * @param cacheDir directory to use to read and update compiled files
+   * @param installDependencies whether to install app dependencies or not
    */
-  static Compile(projectDir: string, cacheDir: string) {
-    const compilerForProject = new AppCompiler(projectDir, cacheDir);
+  static Compile(
+    projectDir: string, cacheDir: string, installDependencies = true) {
+    const compilerForProject = new AppCompiler(
+      projectDir, cacheDir, installDependencies);
     compilerForProject.compile();
   }
 
   private constructor(
-    private readonly projectDir: string, private readonly cacheDir: string) {}
+    private readonly projectDir: string, private readonly cacheDir: string,
+    private readonly installDependencies: boolean) {}
 
   compile() {
     console.log(`Using cache dir ${this.cacheDir}`);
@@ -105,8 +109,19 @@ export class AppCompiler {
       ngAppBuilder.addDependency(usedCliche, '0.0.1');
     });
 
-    const htmlFilesToParse = filesToParse(
-      this.projectDir, dvConfig.actions.app);
+    if (dvConfig.routes !== undefined) {
+      for (const route of dvConfig.routes) {
+        ngAppBuilder.addRoute(route.path, route.action);
+      }
+    }
+    const globalStyleFile = path.join(this.projectDir, 'src', 'styles.css');
+    const globalStyle: string = existsSync(globalStyleFile) ?
+      readFileSync(globalStyleFile, 'utf8') : '';
+    ngAppBuilder.setGlobalStyle(globalStyle);
+
+    const actionsConfig = (dvConfig.actions !== undefined) ?
+      dvConfig.actions.app : undefined;
+    const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
     for (const actionFilePath of htmlFilesToParse) {
       const actionContents = readFileSync(
         path.join(this.projectDir, actionFilePath), 'utf8');
@@ -122,6 +137,6 @@ export class AppCompiler {
       }
     }
 
-    ngAppBuilder.build(this.cacheDir);
+    ngAppBuilder.build(this.cacheDir, this.installDependencies);
   }
 }

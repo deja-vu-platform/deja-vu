@@ -41,3 +41,6 @@ dv-dev
 pkg
 .ng_pkg_build
 pkg.tgz
+
+# Dv build cache
+.dv

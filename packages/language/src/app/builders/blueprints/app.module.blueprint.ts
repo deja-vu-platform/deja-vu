@@ -3,11 +3,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { DvModule, GATEWAY_URL } from 'dv-core';
 
+import { AppComponent } from './app.component';
+
 @@componentImports
 
 @@moduleImports
 
-const components = [ @@components ];
+const components = [ AppComponent, @@components ];
 
 @NgModule({
   declarations: components,

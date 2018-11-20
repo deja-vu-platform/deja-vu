@@ -263,6 +263,8 @@ function actionTable(
   return JSON.stringify(actionTable, null, 2);
 }
 
+const CACHE_DIR = '.dv';
+
 program
   .version('0.0.1')
   .command('new <type>', 'create a new app or cliché')
@@ -298,13 +300,10 @@ program
       console.log('Done');
       process.exit(0); // commander sucks
     } else if (subcmd === 'serve') {
-      if (config.type === 'cliche') {
-        console.log('Serving cliche');
-      } else {
+      if (config.type !== 'cliche') {
         console.log('Serving app');
-        AppCompiler.Compile('.', '.dv');
-
-        process.exit(0);
+        AppCompiler.Compile('.', CACHE_DIR);
+        process.chdir(CACHE_DIR);
       }
       // Serve everything (including all dep cliches)
       cmd('npm', ['run', `dv-build-${config.name}`]);

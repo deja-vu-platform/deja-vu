@@ -142,7 +142,7 @@ export class ActionCompiler {
       .withActionImports(
         _.map(actionInputs, (actionInput: CompiledAction) => ({
           className: actionInput.className,
-          actionName: actionInput.selector
+          actionName: actionInput.name
         })))
       .build();
 

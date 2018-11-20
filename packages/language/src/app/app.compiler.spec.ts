@@ -15,7 +15,7 @@ describe('AppCompiler', () => {
     Morg.WriteTo(projectDir.name);
     outputDir = dirSync({ prefix: 'dvTestsOutput_' });
     console.log(`source dir: ${projectDir.name}, dst dir: ${outputDir.name}`);
-    AppCompiler.Compile(projectDir.name, outputDir.name);
+    AppCompiler.Compile(projectDir.name, outputDir.name, false);
   });
 
   afterAll(() => {
@@ -85,13 +85,9 @@ class Morg {
             }
           }
         },
-        "actions": {
-          "app": {
-            "names": [
-              {"for": "src/app/app.component.html", "use": "morg-root"}
-            ]
-          }
-        }
+        "routes": [
+          { "path": "", "action": "morg-home" }
+        ]
       }
     `;
   }

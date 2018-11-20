@@ -59,7 +59,7 @@
     "packages/*",
     "packages/catalog/*",
     "samples/morg",
-    "samples/morg-new",
+    "samples/morg/.dv",
     "samples/potluck"
   ]
 }
