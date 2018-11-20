@@ -9,7 +9,7 @@
       {{addError}}
     </mat-error>
   </div>
-  <div *ngIf="memberIdControl" class="form-group">
+  <div *ngIf="memberIdControl && showInput" class="form-group">
     <group-input-member formControlName="memberId">
     </group-input-member>
   </div>

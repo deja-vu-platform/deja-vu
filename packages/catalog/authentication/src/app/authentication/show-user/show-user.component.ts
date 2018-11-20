@@ -1,12 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, ViewChild
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
-
-import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
-} from '@angular/forms';
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -23,16 +17,18 @@ import { API_PATH } from '../authentication.config';
   styleUrls: ['./show-user.component.css']
 })
 export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
-  @Input() id: string;
-  @Input() user: User;
-  username: string;
+  OnChanges {
+  @Input() id: string | undefined;
+  @Input() user: User | undefined;
+
+  @Input() showId = false;
+  @Input() showUsername = true;
 
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -44,9 +40,7 @@ OnChanges {
   }
 
   ngOnChanges() {
-    if (this.user) {
-      this.username = this.user.username;
-    } else {
+    if (!this.user) {
       this.load();
     }
   }
@@ -63,17 +57,18 @@ OnChanges {
         params: {
           query: `query {
             userById(id: "${this.id}") {
+              id
               username
             }
           }`
         }
       })
-      .subscribe((res) => {
-        const userById = res.data.userById;
-        if (userById) {
-          this.username = res.data.userById.username;
-        }
-      });
+        .subscribe((res) => {
+          const userById = res.data.userById;
+          if (userById) {
+            this.user = res.data.userById;
+          }
+        });
     }
   }
 

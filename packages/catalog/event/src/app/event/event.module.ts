@@ -20,11 +20,20 @@ import {
 } from './create-weekly-series/create-weekly-series.component';
 import { DeleteEventComponent } from './delete-event/delete-event.component';
 import { ShowEventComponent } from './show-event/show-event.component';
+import { ShowEventsComponent } from './show-events/show-events.component';
 
+export {
+  ChooseAndShowSeriesComponent, CreateEventComponent, CreateSeriesComponent,
+  CreateWeeklySeriesComponent, DeleteEventComponent, ShowEventComponent,
+  ShowEventsComponent
+};
+
+import { API_PATH } from './event.config';
 
 const allComponents = [
   ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
-  CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent
+  CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent,
+  ShowEventsComponent
 ];
 
 @NgModule({
@@ -37,6 +46,9 @@ const allComponents = [
     MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule,
     MatFormFieldModule,
     MatMomentDateModule
+  ],
+  providers: [
+    { provide: API_PATH, useValue: '/graphql' }
   ],
   declarations: allComponents,
   entryComponents: allComponents,

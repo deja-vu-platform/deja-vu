@@ -1,22 +1,16 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output,
-  Type, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
-
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
-
-import { ShowGroupComponent } from '../show-group/show-group.component';
-import { ShowMemberComponent } from '../show-member/show-member.component';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -25,8 +19,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './add-to-group.component.html',
   styleUrls: ['./add-to-group.component.css']
 })
-export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess,
-  OnInit {
+export class AddToGroupComponent implements OnExec, OnExecFailure,
+  OnExecSuccess, OnInit {
   @Input() id: string;
 
   @Input() set memberId(value: string | undefined) {
@@ -40,6 +34,8 @@ export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess
       this.memberIdControl.setValue(value.id);
     }
   }
+
+  @Input() showInput = true;
 
   @Output() selectedId = new EventEmitter<string>();
 
@@ -62,7 +58,7 @@ export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -74,17 +70,18 @@ export class AddToGroupComponent implements OnExec, OnExecFailure, OnExecSuccess
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
+    const res = await this.gs.post<{ data: any }>('/graphql', {
       query: `mutation {
         addMember(
           groupId: "${this.id}",
           id: "${this.memberIdControl.value}")
       }`
     })
-    .toPromise();
+      .toPromise();
   }
 
   dvOnExecSuccess() {
+    this.selectedId.emit(this.memberIdControl.value);
     this.addSaved = true;
     window.setTimeout(() => {
       this.addSaved = false;

@@ -5,10 +5,12 @@ import { OnExecSuccess, RunService } from '../run.service';
 
 @Component({
   selector: 'dv-link',
-  templateUrl: './link.component.html'
+  templateUrl: './link.component.html',
+  styleUrls: ['./link.component.css']
 })
 export class LinkComponent implements OnInit, OnExecSuccess {
   @Input() href: string;
+  @Input() params;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -23,6 +25,7 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
-    this.router.navigate([this.href]);
+    console.log(this.href);
+    this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
   }
 }

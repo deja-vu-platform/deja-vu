@@ -31,6 +31,7 @@ OnChanges {
   _objects: Object[] = [];
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() objects = new EventEmitter<Object[]>();
   @Output() objectIds = new EventEmitter<string[]>();
 
@@ -62,8 +63,8 @@ OnChanges {
       return;
     }
     if (!this.properties) {
-      this.properties = await properties(
-        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+      this.properties = properties(
+        this.showOnly, this.showExclude, await this.fetchProperties());
     }
     if (this.canEval()) {
       this.rs.eval(this.elem);
@@ -79,8 +80,7 @@ OnChanges {
               query {
                 objects {
                   id
-                  ${_.map(this.properties)
-                      .join('\n')}
+                  ${this.properties.join('\n')}
                 }
               }
             `

@@ -1,4 +1,4 @@
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as _ from 'lodash';
@@ -316,9 +316,6 @@ export class ActionHelper {
       DV_CORE_CLICHE);
     const allActionsTable = _.assign(
       {}, appActionTable, ...clicheActionTables, dvCoreActionTable);
-    console.log(
-      `Unpruned action table ` +
-      JSON.stringify(allActionsTable, null, 2));
 
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
@@ -417,25 +414,25 @@ export class ActionHelper {
       return [[ matchingNode ]] ;
     }
 
-    return _.map(
-      this._getMatchingPaths(actionPath.tail(), matchingNode.content),
-      (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
+    return this._getMatchingPaths(actionPath.tail(), matchingNode.content)
+      .map((matchingPath) => [ matchingNode, ...matchingPath ]);
   }
 
   private _getMatchingPaths(
-    actionPath: ActionPath, actionAst: ActionAst | undefined)
-    : ActionTagPath[] {
+    actionPath: ActionPath,
+    actionAst: ActionAst | undefined
+  ): ActionTagPath[] {
     // actionPath.length is always >= 1
 
     if (_.isEmpty(actionAst)) {
       return [];
     }
-    const matchingNodes: ActionTag[] = _.map(
-      _.filter(actionAst, (at) => at.fqtag === actionPath.first()),
-      (matchingNode: ActionTag) => _
-        .assign(matchingNode, {
-          content: this.getContent(matchingNode, this.actionTable)
-        }));
+
+    const matchingNodes: ActionTag[] = actionAst
+      .filter((at) => at.fqtag === actionPath.first())
+      .map((matchingNode) => _.assign(matchingNode, {
+        content: this.getContent(matchingNode, this.actionTable)
+      }));
 
     if (actionPath.length() === 1) {
       return _.map(
@@ -499,15 +496,10 @@ export class ActionHelper {
               actionTag.context![inputValue]);
             childContext![inputName] = JSON.stringify(
               ActionHelper.GetActionInput(actionExpr, actionTag.context));
-            console.log(
-              `Overwrote ${inputName} with ${childContext![inputName]}`);
           } catch (e) {
-            console.log('got an error so no action');
             // Do nothing. If the attempt to parse and obtain an action input
             // failed it means that it was not an action expr.
           }
-        } else {
-         console.log(`didn't find ${inputValue} in context`) ;
         }
       });
       ActionHelper.ActionExistsOrFail(actionTag, actionTable);

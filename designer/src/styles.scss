@@ -1,0 +1,27 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "./dragula.scss";
+@import "~quill/dist/quill.bubble.css";
+@import "~quill/dist/quill.snow.css";
+
+* {
+  box-sizing: border-box;
+}
+
+/* app shall take up full screen with no scrolling */
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Apparently we can't easlily make dragula not clone or drag.
+Hacky solution: hide the clone a la The Prestige. */
+.page-row > .mat-list-item {
+  display: none;
+}
+
+/* Ensure text boxes do not get squished */
+.ql-container {
+  min-width: 300px;
+}

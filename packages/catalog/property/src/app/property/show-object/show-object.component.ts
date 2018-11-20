@@ -13,6 +13,8 @@ import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
 
+import { ShowUrlComponent } from '../show-url/show-url.component';
+
 import { API_PATH } from '../property.config';
 
 
@@ -23,20 +25,31 @@ import { API_PATH } from '../property.config';
 })
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  @Input() showUrl: Action = {
+    type: <Type<Component>> ShowUrlComponent
+  };
   @Input() id: string;
   @Input() object: any;
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Input() showBaseUrlsOnly: boolean = false;
   @Output() loadedObject = new EventEmitter<any>();
 
   // Internal input
   @Input() properties: string[];
+  propertySchemas: { [propName: string]: {
+    type: string,
+    format?: string
+  }} = {};
 
+  showObject;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    this.showObject = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -56,8 +69,8 @@ OnChanges {
       return;
     }
     if (!this.properties) {
-      this.properties = await properties(
-        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+      this.properties = properties(
+        this.showOnly, this.showExclude, await this.fetchProperties());
     }
     if (this.canEval()) {
       this.rs.eval(this.elem);
@@ -93,6 +106,7 @@ OnChanges {
             query {
               properties {
                 name
+                schema
               }
             }
           `
@@ -100,7 +114,17 @@ OnChanges {
       })
       .toPromise();
 
-    return _.map(res.data.properties, 'name');
+    const properties = res.data.properties;
+    _.forEach(properties, (prop) => {
+      this.propertySchemas[prop.name] = JSON.parse(prop.schema);
+    });
+    return _.map(properties, 'name');
+  }
+
+  isUrl(propName: string): boolean {
+    return this.propertySchemas[propName] &&
+      this.propertySchemas[propName].type === 'string' &&
+      this.propertySchemas[propName].format === 'url';
   }
 
   private canEval(): boolean {

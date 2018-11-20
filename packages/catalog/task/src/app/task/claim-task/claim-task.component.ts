@@ -38,9 +38,7 @@ export class ClaimTaskComponent implements
         query: `mutation {
           claimTask(
             id: "${this.id}",
-            assigneeId: "${this.assigneeId}") {
-            id
-          }
+            assigneeId: "${this.assigneeId}")
         }`
       })
       .toPromise();

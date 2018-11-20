@@ -1,0 +1,37 @@
+<authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
+</authentication-logged-in>
+
+<nav class="navbar">
+  <div id="navbar-left">
+    <div id="home-link" class="navbar-item right-bar">
+      <dv-link href="/home" class="homepage">Home</dv-link>
+    </div>
+    <div id="show-my-events" class="navbar-item right-bar">
+      <dv-link href="/my-events" class="myevents">My Events</dv-link>
+    </div>
+    <div id="show-my-groups" class="navbar-item">
+      <dv-link href="/my-groups" class="mygroups">My Groups</dv-link>
+    </div>
+  </div>
+
+  <div id="navbar-right" *ngIf="user">
+    <div id="welcome-user" class="navbar-item">
+      <span>Logged in as: {{user.username}}</span>
+    </div>
+    <div id="logout" class="navbar-item">
+      <dv-tx>
+        <authentication-sign-out>
+        </authentication-sign-out>
+        <dv-link href="/login" [hidden]="true"></dv-link>
+      </dv-tx>
+    </div>
+  </div>
+
+  <div id="navbar-center">
+    <div class="navbar-item">
+      <dv-link href="/home" class="homepage">
+        <img class="navbar-logo-img" src='https://s3.amazonaws.com/mapmit/logo_white.png' />
+      </dv-link>
+    </div>
+  </div>
+</nav>

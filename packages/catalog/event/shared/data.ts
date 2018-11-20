@@ -22,7 +22,7 @@ export function toEvent(graphQlEvent: GraphQlEvent): Event {
     id: graphQlEvent.id,
     startDate: fromUnixTime(graphQlEvent.startDate),
     endDate: fromUnixTime(graphQlEvent.endDate),
-    seriesId: graphQlEvent.series.id
+    seriesId: graphQlEvent.series ? graphQlEvent.series.id : undefined
   };
 }
 

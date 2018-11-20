@@ -17,7 +17,7 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@types/jasmine": "~2.8.3",
+    "@types/jasmine": "2.8.3",
     "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
     "@types/rimraf": "^2.0.2",

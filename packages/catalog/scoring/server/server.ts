@@ -14,12 +14,14 @@ import {
 import { v4 as uuid } from 'uuid';
 
 interface ScoringConfig extends Config {
-  // Function body that calculates the total score
-  // based on the parameter scores which is an array of scores with type number
+  /* Function body that calculates the total score
+  based on the parameter scores which is an array of scores with type number */
   totalScoreFn?: string;
+  /* Whether sourceId can give targetId a score only once or not */
+  oneToOneScoring?: boolean;
 }
 
-const DEFAULT_TOTAL_SCORE_FN = (scores: number[]) =>
+const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
   scores.reduce((total, score) => total + score, 0);
 
 function isPendingCreate(doc: ScoreDoc | null) {
@@ -54,6 +56,30 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           id: id,
           scores: targetScores
         };
+      },
+      // TODO: pagination, max num results
+      targetsByScore: async (
+        _root, { asc }: { asc: boolean }): Promise<Target[]> => {
+        const targets: any = await scores.aggregate([
+          {
+            $group: {
+              _id: '$targetId', scores: { $push: '$$ROOT' }
+            }
+          }, {
+            $match: { pending: { $exists: false } }
+          }
+        ]).toArray();
+
+        return _(targets)
+        .map((target) => {
+          return {
+            ...target,
+            total: totalScoreFn(_.map(target.scores, 'value')),
+            id: target._id
+          }
+        })
+        .orderBy(['total'], [ asc ? 'asc' : 'desc' ])
+        .value();
       }
     },
     Score: {
@@ -72,6 +98,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         const newScore: ScoreDoc = {
           id: input.id ? input.id : uuid(),
           value: input.value,
+          sourceId: input.sourceId,
           targetId: input.targetId
         };
 
@@ -105,16 +132,20 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
   };
 }
 
-const scoringCliche: ClicheServer = new ClicheServerBuilder('scoring')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+const scoringCliche: ClicheServer<ScoringConfig> =
+  new ClicheServerBuilder<ScoringConfig>('scoring')
+    .initDb((db: mongodb.Db, config: ScoringConfig): Promise<any> => {
+      const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+      const sourceTargetIndexOptions = config.oneToOneScoring ?
+        { unique: true, sparse: true } : {};
 
-    return Promise.all([
-      scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      scores.createIndex({ targetId: 1 })
-    ]);
-  })
-  .resolvers(resolvers)
-  .build();
+      return Promise.all([
+        scores.createIndex({ id: 1 }, { unique: true, sparse: true }),
+        scores.createIndex(
+          { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
+      ]);
+    })
+    .resolvers(resolvers)
+    .build();
 
 scoringCliche.start();

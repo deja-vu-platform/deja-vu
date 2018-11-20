@@ -1,3 +1,10 @@
 # Rating
 
-Allows users to create and view ratings on targets.
+Crowdsource evaluation of items
+
+## Actions
+
+- rate-target
+- show-average-rating
+- show-ratings-by-target
+- show-rating

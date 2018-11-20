@@ -1,6 +1,7 @@
 export interface ScoreDoc {
   id: string;
   value: number;
+  sourceId: string;
   targetId: string;
   pending?: PendingDoc;
 }
@@ -19,5 +20,6 @@ export interface Target {
 export interface CreateScoreInput {
   id: string;
   value: number;
+  sourceId: string;
   targetId: string;
 }

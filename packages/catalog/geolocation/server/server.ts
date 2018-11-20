@@ -6,14 +6,15 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   CreateMarkerInput,
   Marker,
   MarkerDoc,
   MarkersInput
 } from './schema';
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 

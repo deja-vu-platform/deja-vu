@@ -59,7 +59,7 @@
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
     "dv-cli": "0.0.1",
-    "@types/jasmine": "~2.8.3",
+    "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/mongodb": "~3.0.7",
     "@types/uuid": "^3.4.3",

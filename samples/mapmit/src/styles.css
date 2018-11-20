@@ -1,0 +1,117 @@
+/* good for black */
+/* @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";*/
+/* @import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
+/*
+@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
+*/
+/*@import "~@angular/material/prebuilt-themes/purple-green.css";*/
+
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+md-icon {
+  font-family: 'Material Icons' !important;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background-color: #f5f8fa;
+}
+
+.logo-img {
+  width: 80%;
+  margin-bottom: 10px;
+}
+
+.btn-blue, .btn-blue:hover {
+  background-color: #1FB8CC;
+  color: white;
+  border-color: white;
+}
+
+.login-signup-container {
+  text-align: center;
+  padding-top: 100px;
+}
+
+.username-password-container {
+  width: 80%;
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blue-background {
+  width: 100%;
+  height: 100%;
+  padding-top: 70px;
+  background-color: #75C7CE;
+}
+
+.login-register-panel {
+  width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #f5f8fa;
+}
+
+.switch-login-register {
+  color: #808080;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.panel-default > .panel-heading {
+  background-color: #f5f8fa;
+}
+
+.panel-group {
+  margin-bottom: 0;
+}
+
+.events-panel {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-horizontal .form-group {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.event-btn-container {
+  float: right;
+}
+
+.event-btn-container > .btn {
+  margin-left: 10px;
+}
+
+input.checkbox-btn, input.radio-btn {
+  margin-right: 5px;
+}
+
+input.checkbox-btn {
+  margin-left: 20px;
+}
+
+.float-right {
+  float: right;
+}
+
+.normal-weight {
+  font-weight: normal;
+}
+
+.filtering-datetimepicker {
+  margin-left: 20px;
+}
+
+#filter-header {
+  margin-bottom: 13px;
+}

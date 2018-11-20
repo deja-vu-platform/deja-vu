@@ -25,10 +25,16 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      const user = this.authenticationService.getSignedInUser();
-      if (user) {
-        this.user.emit(user);
-      }
+      this.rs.eval(this.elem);
     });
+  }
+
+  async dvOnEval(): Promise<void> {
+    const user = this.authenticationService.getSignedInUser();
+    if (user) {
+      this.user.emit(user);
+    } else {
+      throw new Error('No user is logged in');
+    }
   }
 }

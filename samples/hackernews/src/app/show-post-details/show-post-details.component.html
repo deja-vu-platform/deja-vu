@@ -1,0 +1,40 @@
+<hackernews-navbar (loggedInUser)="user=$event"></hackernews-navbar>
+
+<div class="main">
+  <div class="container">
+    <hackernews-show-post
+      [id]="id" [loggedInUser]="user" (loadedPost)="post=$event">
+    </hackernews-show-post>
+
+    <div *ngIf="post">
+      <div class="write-comment-container">
+        <hr class="post-separator" />
+
+        <comment-create-comment
+          [authorId]="user ? user.username : ''"
+          buttonLabel="Add comment"
+          [showOptionToSubmit]="!!user"
+          [targetId]="id"
+        >
+        </comment-create-comment>
+
+        <div *ngIf="!user">
+          <dv-callback-link class="black-link" href="/login">
+            Add comment
+          </dv-callback-link>
+        </div>
+      </div>
+
+      <div class="post-show-comments">
+        <comment-show-comments
+          [ofTargetId]="id"
+          [showComment]="{
+            type: showComment, tag: 'hackernews-show-comment',
+            inputMap: { comment: 'comment' },
+            inputs: { loggedInUser: user }
+          }">
+        </comment-show-comments>
+      </div>
+    </div>
+  </div>
+</div>

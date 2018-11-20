@@ -1,0 +1,4 @@
+  <div id="page">
+    <app-row *ngFor="let row of composedWidget.rows;" [row]="row"></app-row>
+    <app-row [row]="{ id: '', widgets: [] }"></app-row>
+  </div>

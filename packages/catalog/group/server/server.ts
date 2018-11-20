@@ -6,14 +6,15 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   CreateGroupInput,
   GroupDoc,
   GroupsInput,
   MembersInput
 } from './schema';
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
@@ -30,8 +31,8 @@ function isPendingCreate(group: GroupDoc | null) {
 
 async function addOrRemoveMember(
   groups: mongodb.Collection<GroupDoc>, groupId: string, memberId: string,
-  updateType: 'add-member' | 'remove-member', context: Context)
-  : Promise<Boolean> {
+  updateType: 'add-member' | 'remove-member',
+  context: Context): Promise<Boolean> {
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 
@@ -92,15 +93,15 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         return isPendingCreate(group) ? null : group;
       },
-      members: async (_root, { input }: { input: MembersInput }) =>  {
-        const noCreateGroupPending =  {
+      members: async (_root, { input }: { input: MembersInput }) => {
+        const noCreateGroupPending = {
           $or: [
             { pending: { $exists: false } },
             { pending: { type: { $ne: 'create-group' } } }
           ]
         };
         const filter = input.inGroupId ?
-          { $and: [ { id: input.inGroupId }, noCreateGroupPending ] } :
+          { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
           noCreateGroupPending;
 
         const pipelineResults = await groups.aggregate([
@@ -123,16 +124,23 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             }
           }
         ])
-        .toArray();
+          .toArray();
 
         const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
 
         return matchingMembers;
       },
       groups: async (_root, { input }: { input: GroupsInput }) => {
+        const noCreateGroupPending = {
+          $or: [
+            { pending: { $exists: false } },
+            { pending: { type: { $ne: 'create-group' } } }
+          ]
+        };
+
         const filter = input.withMemberId ?
-          { memberIds: input.withMemberId } : {};
-        filter['pending'] = { type: { $ne: 'create-group' } };
+          { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
+          noCreateGroupPending;
 
         return groups.find(filter)
           .toArray();
@@ -144,7 +152,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     },
     Mutation: {
       createGroup: async (
-        _root, { input }: {input: CreateGroupInput}, context: Context) => {
+        _root, { input }: { input: CreateGroupInput }, context: Context) => {
         const g: GroupDoc = {
           id: input.id ? input.id : uuid(),
           memberIds: input.initialMemberIds ? input.initialMemberIds : []

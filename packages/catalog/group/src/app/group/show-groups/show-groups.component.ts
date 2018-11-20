@@ -26,6 +26,7 @@ OnChanges {
   // Show rules
   @Input() showId = true;
   @Input() showMembers = true;
+  @Input() loadMembers = true;
 
   @Input() showGroup: Action = {
     type: <Type<Component>> ShowGroupComponent
@@ -69,16 +70,16 @@ OnChanges {
             query: `
               query Groups($input: GroupsInput!) {
                 groups(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showMembers ? 'memberIds' : ''}
+                  id
+                  ${this.loadMembers ? 'memberIds' : ''}
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 withMemberId: this.withMemberId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {

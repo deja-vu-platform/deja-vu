@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
+import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
 import { Action } from 'dv-core';
 
@@ -15,7 +15,7 @@ import { User } from '../shared/authentication.model';
 export class ChooseUserComponent {
   users: User[];
   @Input() showUser: Action = {
-    type: <Type<Component>> ShowUserComponent,
+    type: <Type<Component>>ShowUserComponent,
     inputMap: { entity: 'user' }
   };
 

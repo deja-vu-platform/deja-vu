@@ -34,8 +34,7 @@ interface PropertyConfig extends Config {
   schema: Schema;
 }
 
-function getDynamicTypeDefs(uncastConfig: Config): string[] {
-  const config: PropertyConfig = uncastConfig as PropertyConfig;
+function getDynamicTypeDefs(config: PropertyConfig): string[] {
   const requiredProperties: Set<string> = new Set(config.schema.required);
   const properties = _
     .chain(config.schema.properties)
@@ -62,8 +61,7 @@ function getDynamicTypeDefs(uncastConfig: Config): string[] {
   `];
 }
 
-function createObjectFromInput(uncastConfig: Config, input) {
-  const config: PropertyConfig = uncastConfig as PropertyConfig;
+function createObjectFromInput(config: PropertyConfig, input) {
   const newObject = input;
   newObject.id = input.id ? input.id : uuid();
   const ajv = new Ajv();
@@ -76,8 +74,7 @@ function createObjectFromInput(uncastConfig: Config, input) {
   return newObject;
 }
 
-function resolvers(db: mongodb.Db, uncastConfig: Config): object {
-  const config: PropertyConfig = uncastConfig as PropertyConfig;
+function resolvers(db: mongodb.Db, config: PropertyConfig): object {
   const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {
@@ -176,25 +173,25 @@ function resolvers(db: mongodb.Db, uncastConfig: Config): object {
   resolversObj['Object'] = objectResolvers;
 
   return resolversObj;
-};
+}
 
-const propertyCliche: ClicheServer = new ClicheServerBuilder('property')
-  .initDb(async (db: mongodb.Db, uncastConfig: Config): Promise<any> => {
-    const config: PropertyConfig = uncastConfig as PropertyConfig;
-    const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
-    await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
-    if (!_.isEmpty(config.initialObjects)) {
-      return objects.insertMany(_.map(config.initialObjects, (obj) => {
-        obj['id'] = obj['id'] ? obj['id'] : uuid();
+const propertyCliche: ClicheServer<PropertyConfig> =
+  new ClicheServerBuilder<PropertyConfig>('property')
+    .initDb(async (db: mongodb.Db, config: PropertyConfig): Promise<any> => {
+      const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
+      await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
+      if (!_.isEmpty(config.initialObjects)) {
+        return objects.insertMany(_.map(config.initialObjects, (obj) => {
+          obj['id'] = obj['id'] ? obj['id'] : uuid();
 
-        return obj;
-      }));
-    }
+          return obj;
+        }));
+      }
 
-    return Promise.resolve();
-  })
-  .resolvers(resolvers)
-  .dynamicTypeDefs(getDynamicTypeDefs)
-  .build();
+      return Promise.resolve();
+    })
+    .resolvers(resolvers)
+    .dynamicTypeDefs(getDynamicTypeDefs)
+    .build();
 
 propertyCliche.start();

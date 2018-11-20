@@ -11,7 +11,7 @@
       {{newTransferError}}
     </mat-error>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputAccountId" class="form-group">
     <dv-input-id
       [entityName]="accountIdInputPlaceholder"
       formControlName="accountIdControl">

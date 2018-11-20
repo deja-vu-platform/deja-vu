@@ -1,0 +1,23 @@
+<dv-tx>
+  <h2>Add a New Chore</h2>
+  <dv-id (id)="choreId=$event"></dv-id>
+  <dv-status savedText="Chore created"></dv-status>
+  <property-create-object dvOf="chore" [id]="choreId" [showOptionToSubmit]="false">
+  </property-create-object>
+  <task-create-task
+    [id]="choreId"
+    [assignerId]="user?.id"
+    [assigneeId]="choreAssigneeId"
+    [showOptionToInputAssignee]="false"
+    [showOptionToSubmit]="false">
+  </task-create-task>
+  <div>
+    <property-choose-object
+      dvOf="child"
+      chooseObjectSelectPlaceholder="Select Assignee"
+      [showOnly]="['name']"
+      (selectedObjectId)="choreAssigneeId=$event">
+    </property-choose-object>
+  </div>
+  <dv-button>Create Chore</dv-button>
+</dv-tx>

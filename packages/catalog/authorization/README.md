@@ -1,4 +1,14 @@
-Authorization
-====
+# Authorization
 
-Controls a user's access to resources.
+Controls access to resources
+
+## Actions
+
+- add-viewer
+- can-view
+- delete-resource
+- show-owner
+- show-resources
+- can-edit
+- create-resource
+- show-resource

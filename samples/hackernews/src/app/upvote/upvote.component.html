@@ -1,0 +1,42 @@
+<div *ngIf="id">
+  <div *ngIf="isPost">
+    <dv-tx>
+      <authentication-authenticate
+        [id]="loggedInUser?.id" [hidden]="true">
+      </authentication-authenticate>
+      <scoring-create-score
+        [buttonDisabled]="disabled || !loggedInUser"
+        class="upvote-button"
+        dvOf="scoringposts"
+        newScoreSavedText=""
+        [showOptionToInputValue]="false"
+        [sourceId]="loggedInUser?.username"
+        submitMatIconName="arrow_drop_up"
+        [targetId]="id"
+        [value]="1"
+      >
+      </scoring-create-score>
+    </dv-tx>
+  </div>
+  <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
+  <div *ngIf="!isPost">
+    <dv-tx>
+      <authentication-authenticate
+        dvAlias="scoringcomments-authenticate"
+        [id]="loggedInUser?.id" [hidden]="true">
+      </authentication-authenticate>
+      <scoring-create-score
+        [buttonDisabled]="disabled || !loggedInUser"
+        class="upvote-button"
+        dvOf="scoringcomments"
+        newScoreSavedText=""
+        [showOptionToInputValue]="false"
+        [sourceId]="loggedInUser?.username"
+        submitMatIconName="arrow_drop_up"
+        [targetId]="id"
+        [value]="1"
+      >
+      </scoring-create-score>
+    </dv-tx>
+  </div>
+</div>

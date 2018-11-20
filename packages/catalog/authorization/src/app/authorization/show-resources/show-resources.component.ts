@@ -74,11 +74,11 @@ OnChanges {
               }
             }
           `,
-          variables: JSON.stringify({
+          variables: {
             input: {
               viewableBy: this.viewableBy
             }
-          })
+          }
         }
       })
       .subscribe((res: ResourcesRes) => {

@@ -1,10 +1,27 @@
 <div *ngIf="event" class="event-show-event">
-  <div *ngIf="!sameDayEvent" class="event-show-event-same-day-event">
-    {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
-    {{event.endDate | date:'EEE MMM d, y h:mm a'}}
+  <div *ngIf="showId">
+    {{ event?.id }}
   </div>
-  <div *ngIf="sameDayEvent" class="event-show-event-diff-day-event">
-    {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
-    {{event.endDate | date:'h:mm a'}}
+
+  <div class="event-dates">
+    <div *ngIf="showStartDate && showEndDate">
+      <div *ngIf="!sameDayEvent" class="event-show-event-same-day-event">
+        {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
+        {{event.endDate | date:'EEE MMM d, y h:mm a'}}
+      </div>
+
+      <div *ngIf="sameDayEvent" class="event-show-event-diff-day-event">
+        {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
+        {{event.endDate | date:'h:mm a'}}
+      </div>
+    </div>
+
+    <div *ngIf="showStartDate && !showEndDate">
+      {{event.startDate | date:'EEE MMM d, y h:mm a'}}
+    </div>
+
+    <div *ngIf="!showStartDate && showEndDate">
+      {{event.endDate | date:'EEE MMM d, y h:mm a'}}
+    </div>
   </div>
 </div>

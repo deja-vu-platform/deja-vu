@@ -17,10 +17,9 @@ import { Marker } from '../shared/geolocation.model';
   styleUrls: ['./show-markers.component.css']
 })
 export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   // Fetch rules
-  // If undefined then the fetched markers are not filtered by that property
-  @Input() ofMapId: string | undefined;
+  @Input() ofMapId = '';
 
   // Show rules
   /* What fields of the marker to show. These are passed as input
@@ -65,7 +64,7 @@ OnChanges {
   }
 
   async dvOnEval(): Promise<void> {
-    if (this.gs) {
+    if (this.canEval()) {
       this.gs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
           params: {
@@ -80,11 +79,11 @@ OnChanges {
                 }
               }
             `,
-            variables: JSON.stringify({
+            variables: {
               input: {
                 ofMapId: this.ofMapId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {
