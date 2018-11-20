@@ -89,7 +89,7 @@
     "@angular/cli": "1.6.7",
     "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
-    "@types/jasmine": "~2.8.3",
+    "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~6.0.60",
     "chokidar-cli": "^1.2.0",

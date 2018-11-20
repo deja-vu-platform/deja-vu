@@ -1,3 +1,7 @@
+#mapid {
+  height: 500px;
+}
+
 /* Required for @agm/core. Height must be in pixels.*/
 agm-map {
   height: 500px;
