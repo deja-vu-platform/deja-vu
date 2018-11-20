@@ -300,7 +300,7 @@ program
       console.log('Done');
       process.exit(0); // commander sucks
     } else if (subcmd === 'serve') {
-      if (config.type !== 'cliche') {
+      if (config.type === 'app') {
         console.log('Serving app');
         AppCompiler.Compile('.', CACHE_DIR);
         process.chdir(CACHE_DIR);

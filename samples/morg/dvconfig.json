@@ -1,5 +1,6 @@
 {
   "name": "morg",
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000

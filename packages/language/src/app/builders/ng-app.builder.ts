@@ -272,7 +272,7 @@ export class NgAppBuilder {
     }
 
     // | styles.css
-    if (diff.globalStyleChanged || diff.prev.globalStyle === undefined) {
+    if (diff.globalStyleChanged || _.has(diff, 'prev.globalStyle')) {
       writeFileSync(path.join(srcDir, 'styles.css'), this.globalStyle);
     }
     // | assets/
