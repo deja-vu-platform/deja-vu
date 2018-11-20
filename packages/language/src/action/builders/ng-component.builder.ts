@@ -5,6 +5,9 @@ export interface NgField {
   value?: any;
 }
 
+/**
+ * Builder for Angular components
+ */
 export class NgComponentBuilder {
   private inputs: string[] = [];
   private outputs: string[] = [];
@@ -35,7 +38,8 @@ export class NgComponentBuilder {
   }
 
   withActionImports(
-    actionImports: { actionName: string, className: string }[]) {
+    actionImports: { actionName: string, className: string }[])
+    : NgComponentBuilder {
     for (const actionImport of actionImports) {
       this.withActionImport(actionImport.actionName, actionImport.className);
     }

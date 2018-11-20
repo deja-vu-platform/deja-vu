@@ -43,7 +43,9 @@ interface CacheRecordDiff {
   curr: CacheRecord;
 }
 
-
+/**
+ * Builder for Angular applications
+ */
 export class NgAppBuilder {
   private readonly dependencies: Dependency[] = [];
   private readonly components: Component[] = [];
@@ -93,7 +95,7 @@ export class NgAppBuilder {
   }
 
   private static InstallDependencies(cacheDir: string) {
-    // Windows users must include `shell: true` for the cli to work
+    // Windows users must include `shell: true` for the command to work
     // TODO: Remove `shell: true` in the future
     const c = spawnSync(
       'yarn', [], { stdio: 'inherit', cwd: cacheDir, shell: true });

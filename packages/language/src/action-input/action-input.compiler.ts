@@ -41,9 +41,9 @@ export class ActionInputCompiler {
   /**
    * Compiles the given action input contents to a valid action
    * @param actionInputContents the contents of the action to compile
-   * @param context the context information given by its containing action
+   * @param context the context information, given by its enclosing action
    *
-   * @return an action
+   * @return an (uncompiled) action
    */
   compile(actionInputContents: string, context: ActionSymbolTable)
     : CompiledActionInput {
