@@ -23,7 +23,6 @@ OnChanges {
   // If undefined then the fetched transfers are not filtered by that property
   @Input() fromId: string | undefined;
   @Input() toId: string | undefined;
-  @Input() amount: any | undefined;
 
   // Show rules
   /* What fields of the transfer to show. These are passed as input
@@ -88,13 +87,14 @@ OnChanges {
                 }
               }
             `,
-            variables: {
+            // When we are sending a potentially empty input object we need to
+            // stringify the variables
+            variables: JSON.stringify({
               input: {
                 fromId: this.fromId,
-                toId: this.toId,
-                amount: this.amount
+                toId: this.toId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {
