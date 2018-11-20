@@ -1,6 +1,29 @@
-<!-- Notes:
-- Must specify a height in pixels
-- Do NOT change/ remove id="mapid" otherwise the map will be shifted
--->
-<div style="height: 500px;" id="mapid">
+<div *ngIf="mapType === 'leaflet'">
+  <!-- Notes:
+  - Do NOT change/ remove id="mapid" otherwise the map will be shifted
+  -->
+  <div id="mapid"></div>
+</div>
+<div *ngIf="mapType === 'gmap'">
+  <agm-map
+    [latitude]="lat"
+    [longitude]="lng"
+    [zoom]="zoom"
+    [disableDefaultUI]="false"
+    [maxZoom]="maxZoom"
+    [minZoom]="minZoom"
+    [zoomControl]="true"
+    [streetViewControl]="streetViewControl"
+    (mapClick)="onMapClick($event)">
+
+    <agm-marker *ngFor="let m of markers"
+      [latitude]="m.latitude"
+      [longitude]="m.longitude">
+
+      <agm-info-window>
+        <strong>{{m.title}}</strong>
+      </agm-info-window>
+    </agm-marker>
+
+  </agm-map>
 </div>
