@@ -46,6 +46,11 @@ th {
   border-radius: 3px;
 }
 
+.btn a {
+  color: white;
+  text-decoration: none;
+}
+
 .clear {
   width: 1%;
   display: table-cell;
@@ -72,9 +77,10 @@ th {
   border-color: #e7e7e7;
 }
 
-.navbar-brand {
+.navbar-brand a {
   font-family: 'Pacifico', cursive;
   color: #777;
+  text-decoration: none;
 }
 
 .view-more-or-less {

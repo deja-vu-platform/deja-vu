@@ -4,8 +4,8 @@ Déjà Vu is an experimental language for building web apps. It features
 built-in user functionality for rapid construction of apps
 with complex behavior and rich user interfaces.
 
-To build apps using Déjà Vu you configure and compose "clichés", drawn from a catalog
-developed by experts. A cliché implements a "concept": a self-contained,
+To build apps using Déjà Vu you configure and compose *clichés*, drawn from a catalog
+developed by experts. A cliché implements a *concept*: a self-contained,
 reusable, increment of functionality that is motivated by a purpose defined in
 terms of the needs of a user (for example, think of the "comment" functionality
 you can find on Facebook, or the "rating" functionality on Amazon).
@@ -21,7 +21,7 @@ app. Read the [tutorial](docs/tutorial.md) for more information.
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we would love to hear what you think!
 You can play around with it and shoot us an email or create an issue with your
-feedback or questions. See the [roadmap](#roadmap) for a list of the things
+feedback or questions. See the [roadmap](ROADMAP.md) for a list of things
 we plan to work on next.
 
 ## Motivation
@@ -44,7 +44,7 @@ assembled with much less effort.
 
 ## Running
 
-At this point the easiest way to run Déjà Vu is to clone our repo and install
+At this point, the easiest way to run Déjà Vu is to clone our repo and install
 everything from source. Good news is that if you want to contribute code, you'll
 be all set to do so.
 
@@ -62,7 +62,7 @@ Installation will take a while as it downloads dependencies and builds all
 clichés and core libraries. 
 
 To run a cliché or an app start the mongo daemon with `mongod` (all of our clichés
-and the runtime system use MongoDb) and then in a separate shell `cd` into the
+and the runtime system use MongoDB) and then in a separate shell `cd` into the
 cliché or app you want to run and do `yarn start`.
 
 To check the running cliché or app visit `http://localhost:3000`.
@@ -72,7 +72,3 @@ When a cliché is run it shows a "development" page that is used for testing.
 Yarn will symlink dependencies so if you make a change to a cliché you are using
 in an app, the only thing you need to do is rebuild the cliche with
 `yarn package` and restart your app.
-
-## Roadmap
-
-TODO
