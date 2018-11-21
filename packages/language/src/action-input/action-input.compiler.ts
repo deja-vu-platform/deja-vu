@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 
 import * as path from 'path';
 
-import { ActionSymbolTable} from '../symbolTable';
+import { ActionSymbolTable } from '../symbolTable';
 
 import { InputFromContext, toAction } from './operations/to-action.operation';
 import { saveUsedActions } from '../action/operations/save-used-actions.operation';

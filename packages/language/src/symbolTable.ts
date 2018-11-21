@@ -1,5 +1,3 @@
-
-
 export type EntryKind = 'cliche' | 'app' | 'action' | 'output' | 'input';
 
 export interface ClicheStEntry {

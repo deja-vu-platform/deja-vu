@@ -22,6 +22,7 @@ export class NgComponentBuilder {
 
   addInputs(inputs: string[]): NgComponentBuilder {
     this.inputs.push(...inputs);
+
     return this;
   }
 
