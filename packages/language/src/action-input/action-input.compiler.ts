@@ -43,10 +43,14 @@ export class ActionInputCompiler {
    * @param actionInputContents the contents of the action to compile
    * @param context the context information, given by its enclosing action
    *
-   * @return an (uncompiled) action
+   * @return a Deja Vu action. The result of compiling an action input
+   *         is a valid Deja Vu action, which can be then compiled into an
+   *         ng component (see ActionCompiler).
    */
   compile(actionInputContents: string, context: ActionSymbolTable)
     : CompiledActionInput {
+    const wrappedActionInput = this.setActionName(actionInputContents);
+
     const symbolTable: ActionSymbolTable = {};
     const inputsFromContext: InputFromContext[] = [];
     this.semantics
@@ -54,6 +58,17 @@ export class ActionInputCompiler {
       .addOperation(
         'toAction', toAction(symbolTable, context, inputsFromContext));
 
+    const s = this.semantics(wrappedActionInput);
+    s.saveUsedActions();
+    const action = s.toAction();
+
+    return {
+      action: action,
+      inputsFromContext: inputsFromContext
+    };
+  }
+
+  private setActionName(actionInputContents: string): string {
     const name = `anonymous-${ActionInputCompiler.GetUniqueId()}`;
     const wrappedActionInputContents =
       (actionInputContents.trim().startsWith('<dv.action')) ?
@@ -65,13 +80,7 @@ export class ActionInputCompiler {
     if (matchResult.failed()) {
       throw new Error('Syntax error in action input:' + matchResult.message);
     }
-    const s = this.semantics(matchResult);
-    s.saveUsedActions();
-    const action = s.toAction();
 
-    return {
-      action: action,
-      inputsFromContext: inputsFromContext
-    };
+    return matchResult;
   }
 }
