@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
-    "build": "npm run dv-build-morg",
-    "dv-build-morg": "ng build",
+    "build": "npm run dv-build-@@name",
+    "dv-build-@@name": "ng build",
     "concurrently": "concurrently",
     "tsc": "tsc",
     "ng": "ng"
