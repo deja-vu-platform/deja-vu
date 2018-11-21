@@ -98,7 +98,11 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=.+=\$event/);
+      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+    const outputField = compiledAction.ngTemplate
+      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
   });
 
   /* TODO
@@ -119,6 +123,7 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
+
     expect(compiledAction.ngTemplate)
       .toMatch(/\[hidden]="true"/);
   });
@@ -140,6 +145,10 @@ describe('ActionCompiler', () => {
       .toMatch(`tag`);
     expect(compiledAction.ngTemplate)
       .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`show-event`);
   });
 
   it('should compile action with html action input', () => {
@@ -178,6 +187,14 @@ describe('ActionCompiler', () => {
       .compile(appName, action, {});
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch('show-group-meeting');
   });
 
   it('should compile action with action input ' +
@@ -199,6 +216,10 @@ describe('ActionCompiler', () => {
       .compile(appName, action, {});
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
   });
 
   it('should compile action with an alias', () => {
