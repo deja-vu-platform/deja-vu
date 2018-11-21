@@ -106,6 +106,7 @@ export class AppCompiler {
 
     const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
     _.each(usedCliches, (usedCliche: string) => {
+      // TODO: get the current version instead of hard-coding a value
       ngAppBuilder.addDependency(usedCliche, '0.0.1');
     });
 
