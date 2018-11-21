@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 
 import * as _ from 'lodash';
 
@@ -51,6 +51,7 @@ export class NgAppBuilder {
   private readonly components: Component[] = [];
   private readonly routes: Route[] = [];
   private globalStyle = '';
+  private faviconPath: string | undefined;
   private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
   private static readonly cacheRecordFile = '.dvcache';
 
@@ -126,8 +127,19 @@ export class NgAppBuilder {
     return this;
   }
 
-  setGlobalStyle(style: string) {
+  setGlobalStyle(style: string): NgAppBuilder {
     this.globalStyle = style;
+
+    return this;
+  }
+
+  /**
+   * Uses the file at the given path for the app favicon
+   */
+  setFavicon(path: string) {
+    this.faviconPath = path;
+
+    return this;
   }
 
   addRoute(path: string, selector: string) {
@@ -277,6 +289,12 @@ export class NgAppBuilder {
     if (diff.globalStyleChanged || _.has(diff, 'prev.globalStyle')) {
       writeFileSync(path.join(srcDir, 'styles.css'), this.globalStyle);
     }
+
+    // | favicon.ico
+    if (this.faviconPath !== undefined) {
+      copyFileSync(this.faviconPath, path.join(srcDir, 'favicon.ico'));
+    }
+
     // | assets/
     // TODO
 

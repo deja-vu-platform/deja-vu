@@ -119,6 +119,11 @@ export class AppCompiler {
       readFileSync(globalStyleFile, 'utf8') : '';
     ngAppBuilder.setGlobalStyle(globalStyle);
 
+    const faviconFile = path.join(this.projectDir, 'favicon.ico');
+    if (existsSync(faviconFile)) {
+      ngAppBuilder.setFavicon(faviconFile);
+    }
+
     const actionsConfig = (dvConfig.actions !== undefined) ?
       dvConfig.actions.app : undefined;
     const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
