@@ -22,7 +22,6 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
 
     Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
     Expr_literal: recurse,
-    Expr_name: (_name) =>  {},
     Expr_input: (inputNode) => inputNode.saveInputs(),
     Expr_element: (_element) => {}, // TODO
 

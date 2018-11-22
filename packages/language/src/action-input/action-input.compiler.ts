@@ -4,7 +4,9 @@ import * as path from 'path';
 
 import { ActionSymbolTable } from '../symbolTable';
 
-import { InputFromContext, toAction } from './operations/to-action.operation';
+import {
+  InputFromContext, capturesToInputs
+} from './operations/captures-to-inputs.operation';
 import { saveUsedActions } from '../action/operations/save-used-actions.operation';
 
 const ohm = require('ohm-js');
@@ -56,11 +58,11 @@ export class ActionInputCompiler {
     this.semantics
       .addOperation('saveUsedActions', saveUsedActions(symbolTable))
       .addOperation(
-        'toAction', toAction(symbolTable, context, inputsFromContext));
+        'capturesToInputs', capturesToInputs(symbolTable, context, inputsFromContext));
 
     const s = this.semantics(wrappedActionInput);
     s.saveUsedActions();
-    const action = s.toAction();
+    const action = s.capturesToInputs();
 
     return {
       action: action,

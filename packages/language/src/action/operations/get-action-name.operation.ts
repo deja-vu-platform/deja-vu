@@ -33,7 +33,7 @@ export function getActionName() {
       }
       return null;
     },
-    Expr_un: err, Expr_bin: err, Expr_name: err, Expr_input: err,
+    Expr_un: err, Expr_bin: err, Expr_input: err,
     Expr_element: err,
     Expr_literal: (literal) => literal.getActionName(),
     Literal_number: err, Literal_true: err, Literal_false: err,

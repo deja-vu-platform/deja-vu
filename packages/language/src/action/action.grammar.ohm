@@ -37,7 +37,6 @@ Action {
     | BinExpr -- bin
     | MemberExpr -- member
     | Literal -- literal
-    | name -- name
     | input -- input
     | Element -- element
 
@@ -63,7 +62,7 @@ Action {
   PropAssignment = name ":" Expr
 
   number = "-"? digit+
-  name = letter (alnum | "-")*
+  name = letter (alnum | "-" | "_")*
   input = "$" name
   output = name "$"
 

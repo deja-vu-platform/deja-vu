@@ -174,11 +174,11 @@ describe('ActionCompiler', () => {
     'that uses context inputs', () => {
     const action = `
       <dv.action name="home">
+        <foo.action />
         <event.choose-and-show-series
           showEvent=
             <morg.show-group-meeting
-              groupMeeting=$event
-              groupMeetings=$events />
+              groupMeeting=foo.action.someValue />
           noEventsToShowText="No meetings to show"
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
@@ -191,10 +191,33 @@ describe('ActionCompiler', () => {
       .toMatch(`tag`);
     expect(compiledAction.ngTemplate)
       .toMatch(`type`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`inputs`);
     expect(compiledAction.actionInputs.length)
       .toBe(1);
-    expect(compiledAction.actionInputs[0].ngTemplate)
-      .toMatch('show-group-meeting');
+    const actionInput = compiledAction.actionInputs[0];
+    expect(actionInput.ngTemplate)
+      .toMatch(`show-group-meeting`);
+    const inputRegex = /@Input\(\)\s+(.*);/;
+    expect(actionInput.ngComponent)
+      .toMatch(inputRegex);
+
+    const inputField = actionInput.ngComponent
+      .match(inputRegex)[1];
+    expect(actionInput.ngTemplate)
+      .toMatch(inputField);
+
+    const inputsObjRegex = new RegExp(`{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch(inputsObjRegex);
+
+    const outputField = compiledAction.ngTemplate
+      .match(inputsObjRegex)[1];
+    expect(compiledAction.ngTemplate)
+      .toMatch(`${outputField}=`);
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
   });
 
   it('should compile action with action input ' +

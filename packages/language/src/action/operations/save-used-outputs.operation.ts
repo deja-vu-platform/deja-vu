@@ -22,6 +22,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     leftExpr.saveUsedOutputs();
     rightExpr.saveUsedOutputs();
   };
+  let throwErrorOnSymbolNotFound = true;
 
   return {
     Element: (element) => element.saveUsedOutputs(),
@@ -37,9 +38,17 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
 
     Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
     Expr_literal: recurse,
-    Expr_name: (name) => name.sourceString,
     Expr_input: (input) => input.sourceString,
-    Expr_element: (_element) => {}, // TODO
+    Expr_element: (element) => {
+      // We need to figure out if the action input is using an output from this
+      // action. To do so, we can simply do the same thing we are doing for this
+      // action, the only difference being that we shouldn't throw an error if
+      // we don't find a symbol on the table (because it could be a symbol
+      // that's local to the action input)
+      throwErrorOnSymbolNotFound = false;
+      element.saveUsedOutputs();
+      throwErrorOnSymbolNotFound = true;
+    },
 
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
@@ -53,9 +62,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       }
       const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
       if (!_.has(symbolTable, clicheOrActionAlias)) {
-        throw new Error(
-          `${clicheOrActionAlias} not found in ` +
-          `symbol table ${pretty(symbolTable)}`);
+        if (throwErrorOnSymbolNotFound) {
+          throw new Error(
+            `${clicheOrActionAlias} not found in ` +
+            `symbol table ${pretty(symbolTable)}`);
+        } else {
+          return;
+        }
       }
       const stEntry: StEntry = symbolTable[clicheOrActionAlias];
       switch (stEntry.kind) {

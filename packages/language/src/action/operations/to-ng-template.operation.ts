@@ -24,6 +24,38 @@ import { ActionInputCompiler } from '../../action-input/action-input.compiler';
 import { ActionCompiler, CompiledAction } from '../action.compiler';
 
 
+function nonInputMemberAccessToField(
+  fullMemberAccess: string, symbolTable: ActionSymbolTable) {
+  const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+  const stEntry: StEntry = symbolTable[clicheOrActionAlias];
+  let clicheName: string, actionName: string, output: string;
+  let alias: string | undefined;
+  let memberAccesses: string[];
+  switch (stEntry.kind) {
+    case 'cliche':
+      clicheName = clicheOrActionAlias;
+      [ actionName, output, ...memberAccesses ] = rest;
+      break;
+    case 'action':
+      clicheName = stEntry.of;
+      actionName = stEntry.actionName;
+      alias = clicheOrActionAlias;
+      [ output, ...memberAccesses ] = rest;
+      break;
+    default:
+      throw new Error(`Unexpected entry ${stEntry.kind}`);
+  }
+
+  const outputField = outputToNgField(
+    clicheName, actionName, output, alias);
+
+  const memberAccessStr = _.isEmpty(memberAccesses) ?
+    '' : `.${_.join(memberAccesses, '.')}`;
+
+  return `${outputField}${memberAccessStr}`;
+}
+
+
 export function toNgTemplate(
   appName: string, symbolTable: ActionSymbolTable,
   actionInputs: CompiledAction[]) {
@@ -121,7 +153,6 @@ export function toNgTemplate(
     Alias: (_as, alias) => alias.sourceString,
     Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
     Expr_literal: recurse,
-    Expr_name: (name) => name.sourceString,
     Expr_input: (input) => input.toNgTemplate(),
     Expr_element: transformActionInput(appName, symbolTable, actionInputs),
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
@@ -137,32 +168,8 @@ export function toNgTemplate(
       if (isInput(nameOrInput)) {
         return `${nameOrInputNode.toNgTemplate()}${names}`;
       }
-      const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
-      const stEntry: StEntry = symbolTable[clicheOrActionAlias];
-      let clicheName: string, actionName: string, output: string;
-      let alias: string | undefined;
-      let memberAccesses: string[];
-      switch (stEntry.kind) {
-        case 'cliche':
-          clicheName = clicheOrActionAlias;
-          [ actionName, output, ...memberAccesses ] = rest;
-          break;
-        case 'action':
-          clicheName = stEntry.of;
-          actionName = stEntry.actionName;
-          alias = clicheOrActionAlias;
-          [ output, ...memberAccesses ] = rest;
-          break;
-        default:
-          throw new Error(`Unexpected entry ${stEntry.kind}`);
-      }
 
-      const outputField = outputToNgField(
-        clicheName, actionName, output, alias);
-
-      const memberAccessStr = _.isEmpty(memberAccesses) ?
-        '' : `.${_.join(memberAccesses, '.')}`;
-      return `${outputField}${memberAccessStr}`;
+      return nonInputMemberAccessToField(fullMemberAccess, symbolTable);
     },
 
     Literal_number: (number) => number.sourceString,
@@ -212,15 +219,20 @@ function transformActionInput(
     const inputsObj = _
       .reduce(
         compiledActionInput.inputsFromContext, (obj, inputFromContext) => {
-        obj[inputFromContext.input] = inputFromContext.field;
+        obj[inputToNgField(inputFromContext.input)] = inputFromContext.field;
 
         return obj;
       }, {});
 
+    const inputsStr = '{ ' + _
+      .map(_.keys(inputsObj), (k: string) =>
+        `"${k}": ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
+      .join(', ') + ' }';
+
     return `{
       type: ${classNameToNgField(compiledAction.className)},
       tag: ${compiledAction.selector},
-      inputs: ${JSON.stringify(inputsObj)}
+      inputs: ${inputsStr}
     }`;
   };
 }
