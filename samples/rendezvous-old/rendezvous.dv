@@ -1,0 +1,136 @@
+// Plan public events on campus
+app Rendezvous {
+  include access/StandardAuthentication[UserData for User]
+  include access/Authorization[UserData for Principal]
+  include community/Geolocation[
+    MapData for Map,
+    EventData for Marker,
+    EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
+  ]
+  include community/Geolocation[
+    MapData for Map,
+    EventData for Marker
+  ] as SearchGeolocation
+  include organization/Event[
+    EventData for Event,
+    EventPanel replacing ShowEvent in ShowEvents
+  ]
+  include messaging/Comment[
+    CommentData for Comment,
+    UserData for Author,
+    EventData for Target,
+    EventComment replacing ShowComment in ShowComments
+  ]
+  include organization/Label[
+    EventData for Item,
+    EventDataArr for ItemArr
+  ]
+  include messaging/Post[
+    EventData for Post,
+    UserData for User,
+    EventPanel replacing ShowPost in Posts
+  ]
+  include organization/Group[
+    EventData for Group,
+    UserData for Member,
+    EventPanel replacing ShowNameOfGroup in ShowGroupsByMember
+  ]
+
+  data UserData {
+    username: text
+  }
+
+  data MapData {}
+
+  data EventData {}
+
+  data CommentData {}
+
+  // TODO: remove once array fields work
+  data EventDataArr {
+    arr: [EventData]
+  }
+
+  events_map: MapData
+
+  search_map: MapData
+
+  main widget Login {
+    on_login_ok: Widget = Main
+  }
+
+  widget Register {
+    on_register_ok: Widget = Main
+  }
+
+  widget Main {
+    map: MapData = events_map
+  }
+
+  widget EventPanel {
+    map: MapData = events_map,
+    to_event_details: Widget = EventDetails,
+    event: EventData
+  }
+
+  widget NewEvent {
+    map: MapData = search_map,
+    user: UserData,
+    new_event: EventData,
+    new_event_ok: boolean
+  }
+
+  widget EventDetails {
+    event: EventData,
+    user: UserData
+  }
+
+  widget Profile {
+    on_signout_ok: Widget = Login,
+    // to_edit_profile: Widget = EditProfile,
+    user: UserData
+  }
+
+  widget EditProfile {}
+
+  widget AddComment {
+    event: EventData,
+    user: UserData,
+    comment: CommentData,
+    submit_ok: boolean
+  }
+
+  widget EventInfoWindow {
+    to_event_details: Widget = EventDetails,
+    event: EventData
+  }
+
+  widget UserMenu {
+    to_profile: Widget = Profile,
+    user: UserData
+  }
+
+  widget EventsByHost {
+    user: UserData
+  }
+
+  widget EventsByAttendee {
+    user: UserData
+  }
+
+  widget EventComments {
+    event: EventData
+  }
+
+  widget EventComment {
+    comment: CommentData
+  }
+
+  login: route = {path: "login", widget: Login}
+  register: route = {path: "register", widget: Register}
+  main: route = {path: "main", widget: Main}
+  new_event: route = {path: "new-event", widget: NewEvent}
+  event_details: route = {path: "event", widget: EventDetails}
+  user_profile: route = {path: "profile", widget: Profile}
+  edit_profile: route = {path: "edit-profile", widget: EditProfile}
+}
