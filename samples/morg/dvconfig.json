@@ -1,6 +1,6 @@
 {
   "name": "morg",
-  "watch": true,
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -37,11 +37,7 @@
       }
     }
   },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "morg-root"}
-      ]
-    }
-  }
+  "routes": [
+    { "path": "", "action": "morg-home" }
+  ]
 }

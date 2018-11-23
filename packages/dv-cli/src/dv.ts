@@ -6,6 +6,8 @@ import { copySync } from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
+import { AppCompiler } from 'language';
+
 import { ActionsConfig, getActionTable } from './actionProcessor/actionTable';
 
 /** Executes `ng` synchronously **/
@@ -240,6 +242,7 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
 
 export interface DvConfig {
   name?: string;
+  type?: 'cliche' | 'app';
   startServer?: boolean;
   watch?: boolean;
   config?: any;
@@ -259,6 +262,8 @@ function actionTable(
     config.name, process.cwd(), actionsConfig, Array.from(usedClicheNames));
   return JSON.stringify(actionTable, null, 2);
 }
+
+const CACHE_DIR = '.dv';
 
 program
   .version('0.0.1')
@@ -295,9 +300,12 @@ program
       console.log('Done');
       process.exit(0); // commander sucks
     } else if (subcmd === 'serve') {
-      console.log('Serving app');
+      if (config.type === 'app') {
+        console.log('Serving app');
+        AppCompiler.Compile('.', CACHE_DIR);
+        process.chdir(CACHE_DIR);
+      }
       // Serve everything (including all dep cliches)
-
       cmd('npm', ['run', `dv-build-${config.name}`]);
       writeFileOrFail(
         path.join('dist', ACTION_TABLE_FILE_NAME),

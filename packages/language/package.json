@@ -1,0 +1,41 @@
+{
+  "name": "language",
+  "version": "0.0.1",
+  "description": "Déjà Vu language",
+  "scripts": {
+    "test": "jasmine-ts",
+    "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
+    "package": "npm run clean && npm run build",
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "clean": "rm -rf ./dist"
+  },
+  "dependencies": {
+    "rimraf": "^2.6.2",
+    "ohm-js": "^0.14.0"
+  },
+  "peerDepencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "@types/jasmine": "2.8.3",
+    "@types/lodash": "^4.14.96",
+    "@types/node": "^9.3.0",
+    "@types/rimraf": "^2.0.2",
+    "@types/tmp": "^0.0.33",
+    "jasmine": "^3.2.0",
+    "jasmine-ts": "^0.3.0",
+    "tmp": "^0.0.33",
+    "ts-node": "^7.0.1",
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3"
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js"
+}
