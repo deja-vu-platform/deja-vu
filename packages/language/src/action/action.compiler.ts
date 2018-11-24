@@ -4,11 +4,11 @@ import * as path from 'path';
 
 import {
   ActionStEntry, ActionSymbolTable, ClicheStEntry, InputStEntry, EntryKind,
-  OutputStEntry, SymbolTable, ActionSymbolTableStEntry
+  OutputStEntry, SymbolTable, ActionSymbolTableStEntry, AppOutputStEntry
 } from '../symbolTable';
 
 import * as _ from 'lodash';
-import { NgComponentBuilder, NgField } from './builders/ng-component.builder';
+import { NgComponentBuilder, NgField, NgOutput } from './builders/ng-component.builder';
 
 import { saveUsedActions } from './operations/save-used-actions.operation';
 import { saveInputs } from './operations/save-inputs.operation';
@@ -16,6 +16,7 @@ import { toNgTemplate } from './operations/to-ng-template.operation';
 import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
 import { classNameToNgField } from './operations/shared';
+import { saveOutputs } from "./operations/save-outputs.operation";
 
 const ohm = require('ohm-js');
 
@@ -91,6 +92,7 @@ export class ActionCompiler {
       .addOperation('saveUsedActions', saveUsedActions(thisActionSymbolTable))
       .addOperation('saveUsedOutputs', saveUsedOutputs(thisActionSymbolTable))
       .addOperation('saveInputs', saveInputs(thisActionSymbolTable))
+      .addOperation('saveOutputs', saveOutputs(thisActionSymbolTable))
       .addOperation(
         'toNgTemplate', toNgTemplate(
           appName, thisActionSymbolTable, actionInputs));
@@ -108,6 +110,7 @@ export class ActionCompiler {
     });
     s.saveUsedOutputs();
     s.saveInputs();
+    s.saveOutputs();
     const ngTemplate = s.toNgTemplate();
 
     const className = ActionCompiler.GetClassName(thisActionName);
@@ -134,9 +137,15 @@ export class ActionCompiler {
         name: classNameToNgField(actionInput.className),
         value: actionInput.className
       }));
+    const appOutputFields = _.map(
+      ActionCompiler.FilterKind('app-output', thisActionSymbolTable),
+      (appOutputEntry: AppOutputStEntry): NgOutput => ({
+        name: appOutputEntry.ngOutputField,
+        expr: appOutputEntry.expr
+      }));
     const ngComponent = ngComponentBuilder
       .addInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
-      .addOutputs(ActionCompiler.GetNgFields('output', thisActionSymbolTable))
+      .addOutputs(appOutputFields)
       .addFields(fields)
       .addFields(actionInputFields)
       .withActionImports(

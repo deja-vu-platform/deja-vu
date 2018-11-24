@@ -105,15 +105,38 @@ describe('ActionCompiler', () => {
       .toMatch(outputField);
   });
 
-  /* TODO
   it('should compile action with output', () => {
     const action = `
       <dv.action name="action-with-outputs" objects$=property.show-objects.objects>
         <property.show-objects hidden=true />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
-  }); */
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+  });
+
+  it('should compile action with output expr', () => {
+    const action = `
+      <dv.action name="action-with-output-expr"
+        objects$=property.show-objects.objects.length + 1>
+        <property.show-objects hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+    expect(compiledAction.ngComponent)
+      .toMatch(/\+ 1/);
+  });
 
   it('should compile action with input', () => {
     const action = `

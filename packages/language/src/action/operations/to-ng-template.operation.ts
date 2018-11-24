@@ -110,7 +110,7 @@ export function toNgTemplate(
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpRecurse = (leftExpr, op, rightExpr) =>
-    `${leftExpr.toNgTemplate()} ${op} ${rightExpr.saveUsedOutputs()}`;
+    `${leftExpr.toNgTemplate()} ${op.sourceString} ${rightExpr.toNgTemplate()}`;
 
   return {
     Element: (element): string => element.toNgTemplate(),
@@ -181,7 +181,7 @@ export function toNgTemplate(
       openCb.sourceString + propAssignments.toNgTemplate() +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
-      openSb.sourceString + exprs.saveUsedOutputs() + closeSb.sourceString,
+      openSb.sourceString + exprs.toNgTemplate() + closeSb.sourceString,
     input: (sbNode, inputNameNode) => {
       const input = `${sbNode.sourceString}${inputNameNode.sourceString}`;
       const inputEntry = <InputStEntry> symbolTable[input];
