@@ -18,47 +18,72 @@
         "reinitDbOnStartup": true
       }
     },
-    "event": {
+    "comment": {
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": true
       }
     },
-    "geolocation": {
+    "event": {
       "config": {
         "wsPort": 3005,
         "reinitDbOnStartup": true
       }
     },
-    "group": {
+    "geolocation": {
       "config": {
         "wsPort": 3006,
         "reinitDbOnStartup": true
       }
     },
-    "eventInfo": {
-      "name": "property",
+    "group": {
       "config": {
         "wsPort": 3007,
+        "reinitDbOnStartup": true
+      }
+    },
+    "label": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
+      }
+    },
+    "post": {
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": true
+      }
+    },
+    "userProfile": {
+      "name": "property",
+      "config": {
+        "wsPort": 3010,
         "reinitDbOnStartup": true,
         "schema": {
-          "title": "EventInfo",
+          "title": "UserProfile",
           "type": "object",
           "properties": {
-              "title": {
+              "firstName": {
                 "type": "string"
               },
-              "description": {
+              "middleName": {
                 "type": "string"
               },
-              "roomNumber": {
+              "lastName": {
                 "type": "string"
               },
-              "locationDescription": {
+              "phoneNumber": {
+                "type": "string",
+                "format": "tel"
+              },
+              "zipCode": {
+                "type": "number"
+              },
+              "major": {
                 "type": "string"
               }
           },
-          "required": ["title", "description"]
+          "required": ["firstName", "lastName", "zipCode"]
         }
       }
     }
@@ -71,11 +96,12 @@
     }
   },
   "routes": [
-    { "path": "home", "action": "rendezvous-home" },
-    { "path": "signup", "action": "rendezvous-signup" },
+    { "path": "main", "action": "rendezvous-main" },
     { "path": "login", "action": "rendezvous-login" },
-    { "path": "my-events", "action": "rendezvous-show-my-events" },
+    { "path": "registration", "action": "rendezvous-registration" },
+    { "path": "event-details", "action": "rendezvous-show-event-details" },
     { "path": "create-event", "action": "rendezvous-create-event" },
-    { "path": "my-groups", "action": "rendezvous-show-my-groups" }
+    { "path": "profile", "action": "rendezvous-show-user-profile" },
+    { "path": "edit-profile", "action": "rendezvous-edit-user-profile" }
   ]
 }
