@@ -2,6 +2,9 @@
   <h1>Create resource with id key, owner alice</h1>
   <authorization-create-resource id="key" ownerId="alice">
   </authorization-create-resource>
+  <h1>Create resource by owner bob</h1>
+  <authorization-create-resource ownerId="bob">
+  </authorization-create-resource>
   <h1>Add bob as viewer of resource key</h1>
   <authorization-add-viewer id="key" viewerId="bob"></authorization-add-viewer>
   <h1>Delete resource key</h1>
@@ -13,6 +16,10 @@
   <h1>Resources viewable by alice</h1>
   <authorization-show-resources
     viewableBy="alice">
+  </authorization-show-resources>
+  <h1>Resources created by bob</h1>
+  <authorization-show-resources
+    createdBy="bob">
   </authorization-show-resources>
   <h1>Show resource key</h1>
   <authorization-show-resource id="key">

@@ -12,7 +12,8 @@ export interface PendingDoc {
 }
 
 export interface ResourcesInput {
-  viewableBy: string;
+  createdBy?: string;
+  viewableBy?: string;
 }
 
 export interface CreateResourceInput {

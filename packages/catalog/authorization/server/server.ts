@@ -6,8 +6,6 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   AddViewerToResourceInput,
   CreateResourceInput,
@@ -15,6 +13,10 @@ import {
   ResourceDoc,
   ResourcesInput
 } from './schema';
+
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
@@ -34,9 +36,18 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
   return {
     Query: {
-      resources: (_root, { input }: { input: ResourcesInput }) => resources
-        .find({ viewerIds: input.viewableBy, pending: { $exists: false } })
-        .toArray(),
+      resources: async (_root, { input }: { input: ResourcesInput }) => {
+        const filter = { pending: { $exists: false } };
+        if (input.createdBy) {
+          filter['ownerId'] = input.createdBy;
+        } else if (input.viewableBy) {
+          filter['viewerIds'] = input.viewableBy;
+        }
+
+        return await resources
+          .find(filter)
+          .toArray();
+      },
 
       resource: async (_root, { id }) => {
         const resource: ResourceDoc | null = await ResourceValidation

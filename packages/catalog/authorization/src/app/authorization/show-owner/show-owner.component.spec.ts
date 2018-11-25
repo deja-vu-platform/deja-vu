@@ -8,9 +8,9 @@ describe('ShowOwnerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowOwnerComponent ]
+      declarations: [ShowOwnerComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +20,7 @@ describe('ShowOwnerComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

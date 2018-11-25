@@ -28,6 +28,7 @@ interface ResourcesRes {
 })
 export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  @Input() createdBy: string;
   @Input() viewableBy: string;
   @Input() showResource: Action = {
     type: <Type<Component>> ShowResourceComponent
@@ -76,6 +77,7 @@ OnChanges {
           `,
           variables: {
             input: {
+              createdBy: this.createdBy,
               viewableBy: this.viewableBy
             }
           }
@@ -89,6 +91,6 @@ OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.viewableBy);
+    return !!(this.gs && (this.viewableBy || this.createdBy));
   }
 }
