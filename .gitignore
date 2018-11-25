@@ -41,6 +41,9 @@ typings
 e2e/*.js
 e2e/*.map
 
+# Dv build cache
+.dv
+
 # System Files
 .DS_Store
 Thumbs.db

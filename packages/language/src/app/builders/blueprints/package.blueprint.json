@@ -1,0 +1,49 @@
+{
+  "name": "ng-@@name",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "dv serve",
+    "build": "npm run dv-build-@@name",
+    "dv-build-@@name": "ng build",
+    "concurrently": "concurrently",
+    "tsc": "tsc",
+    "ng": "ng"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^5.2.0",
+    "@angular/cdk": "^5.2.1",
+    "@angular/common": "^5.2.0",
+    "@angular/compiler": "^5.2.0",
+    "@angular/core": "^5.2.0",
+    "@angular/forms": "^5.2.0",
+    "@angular/http": "^5.2.0",
+    "@angular/material": "^5.2.1",
+    "@angular/material-moment-adapter": "^5.2.1",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/platform-browser-dynamic": "^5.2.0",
+    "@angular/router": "^5.2.0",
+    "lodash": "^4.17.5",
+    "bootstrap": "^4.0.0",
+    "cliche-server": "0.0.1",
+    "core-js": "^2.4.1",
+    "dv-core": "0.0.1",
+    "dv-gateway": "0.0.1",
+    @@dependencies,
+    "moment": "^2.20.1",
+    "rxjs": "^5.5.6",
+    "zone.js": "^0.8.19"
+  },
+  "devDependencies": {
+    "@angular/cli": "^1.7.3",
+    "@angular/compiler-cli": "^5.2.0",
+    "@angular/language-service": "^5.2.0",
+    "dv-cli": "0.0.1",
+    "@types/node": "~6.0.60",
+    "@types/lodash": "^4.14.96",
+    "concurrently": "^3.5.1",
+    "ts-node": "~4.1.0",
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3"
+  }
+}

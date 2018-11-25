@@ -1,0 +1,80 @@
+Action {
+  Element
+    = NormalElement -- normal
+    | VoidElement -- void
+
+  // Normal Element
+  NormalElement = StartTag Content* EndTag
+  StartTag = "<" ElementName Attribute* ">"
+  EndTag = "</" ElementName ">"
+
+  // Void Element
+  VoidElement = "<" ElementName Attribute* "/>"
+
+  Attribute = AttributeName "=" Expr
+
+  Content
+    = Text -- text
+    | Element -- element
+  Text = (~"<" ~">" any)+
+  ElementName
+   = ActionNameMaybeAlias -- action
+   | name -- html
+  AttributeName
+    = output -- output
+    | name -- name
+  ActionNameMaybeAlias = actionName Alias?
+  Alias = "as" name
+  actionName = name "." name
+
+  comment = multiLineComment
+  eol = "\r"?"\n"
+  multiLineComment = "<!--" (~"-->" any)* "-->"
+
+  // Exprs
+  Expr
+    = UnExpr -- un
+    | BinExpr -- bin
+    | MemberExpr -- member
+    | Literal -- literal
+    | input -- input
+    | Element -- element
+
+  UnExpr
+    = "not" Expr -- not
+
+  BinExpr
+    = Expr "+" Expr -- plus
+    | Expr "-" Expr -- minus
+    | Expr "and" Expr -- and
+    | Expr "or" Expr -- or
+
+  MemberExpr = (name | input) ("." name)+
+
+  Literal
+    = number -- number
+    | "\"" (~"\"" any)* "\"" -- text
+    | "true" -- true
+    | "false" -- false
+    | "{" ListOf<PropAssignment, ","> "}" -- obj
+    | "[" ListOf<Expr, ","> "]" -- array
+
+  PropAssignment = name ":" Expr
+
+  number = "-"? digit+
+  name = letter (alnum | "-" | "_")*
+  input = "$" name
+  output = name "$"
+
+  space := whitespace | lineTerminator | comment
+  whitespace = "\t"
+             | "\x0B"    -- verticalTab
+             | "\x0C"    -- formFeed
+             | " "
+             | "\u00A0"  -- noBreakSpace
+             | "\uFEFF"  -- byteOrderMark
+             | unicodeSpaceSeparator
+  unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
+
+  lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
+}
