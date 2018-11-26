@@ -19,6 +19,11 @@ input EditCommentInput {
   content: String!
 }
 
+input DeleteCommentInput {
+  id: ID!
+  authorId: ID!
+}
+
 input CommentInput {
   byAuthorId: ID!
   ofTargetId: ID!
@@ -38,4 +43,5 @@ type Query {
 type Mutation {
   createComment(input: CreateCommentInput!): Comment
   editComment(input: EditCommentInput!): Boolean
+  deleteComment(input: DeleteCommentInput!): Boolean
 }

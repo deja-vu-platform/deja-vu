@@ -13,6 +13,9 @@ import { DvModule } from 'dv-core';
 import {
   CreateCommentComponent
 } from './create-comment/create-comment.component';
+import {
+  DeleteCommentComponent
+} from './delete-comment/delete-comment.component';
 import { EditCommentComponent } from './edit-comment/edit-comment.component';
 import { ShowCommentComponent } from './show-comment/show-comment.component';
 import { ShowCommentsComponent } from './show-comments/show-comments.component';
@@ -20,8 +23,8 @@ import { ShowCommentsComponent } from './show-comments/show-comments.component';
 import { API_PATH } from './comment.config';
 
 const allComponents = [
-  CreateCommentComponent, EditCommentComponent, ShowCommentComponent,
-  ShowCommentsComponent
+  CreateCommentComponent, DeleteCommentComponent, EditCommentComponent,
+  ShowCommentComponent, ShowCommentsComponent
 ];
 
 @NgModule({
@@ -36,7 +39,7 @@ const allComponents = [
     MatFormFieldModule,
     MatMomentDateModule
   ],
-  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
+  providers: [{ provide: API_PATH, useValue: '/graphql' }],
   declarations: allComponents,
   exports: allComponents,
   entryComponents: allComponents
