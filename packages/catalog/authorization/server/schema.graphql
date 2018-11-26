@@ -26,6 +26,11 @@ input AddViewerToResourceInput {
   viewerId: ID!
 }
 
+input RemoveViewerFromResourceInput {
+  id: ID!,
+  viewerId: ID!
+}
+
 type Query {
   resource(id: ID!): Resource
   owner(resourceId: ID!): ID
@@ -37,5 +42,6 @@ type Query {
 type Mutation {
   createResource(input: CreateResourceInput!): Resource
   addViewerToResource(input: AddViewerToResourceInput!): Boolean
+  removeViewerFromResource(input: RemoveViewerFromResourceInput!): Boolean
   deleteResource(id: ID!): Boolean
 }

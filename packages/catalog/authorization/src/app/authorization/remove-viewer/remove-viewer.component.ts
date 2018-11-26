@@ -5,19 +5,19 @@ import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from 'dv-core';
+import { API_PATH } from '../authorization.config';
 
 import * as _ from 'lodash';
 
-import { API_PATH } from '../authorization.config';
-
 const SAVED_MSG_TIMEOUT = 3000;
 
+
 @Component({
-  selector: 'authorization-add-viewer',
-  templateUrl: './add-viewer.component.html',
-  styleUrls: ['./add-viewer.component.css']
+  selector: 'authorization-remove-viewer',
+  templateUrl: './remove-viewer.component.html',
+  styleUrls: ['./remove-viewer.component.css']
 })
-export class AddViewerComponent implements
+export class RemoveViewerComponent implements
   OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
   @Input() viewerId: string;
@@ -29,11 +29,11 @@ export class AddViewerComponent implements
   // Presentation Inputs
   @Input() resourceInputLabel = 'Resource Id';
   @Input() viewerInputLabel = 'Viewer Id';
-  @Input() buttonLabel = 'Add Viewer to Resource';
-  @Input() viewerAddedSuccessText = 'Viewer added to resource';
+  @Input() buttonLabel = 'Remove Viewer from Resource';
+  @Input() viewerRemovedSuccessText = 'Viewer removed from resource';
 
-  viewerAddedSuccess = false;
-  viewerAddedErrorText: string;
+  viewerRemovedSuccess = false;
+  viewerRemovedErrorText: string;
 
   private gs: GatewayService;
 
@@ -54,9 +54,10 @@ export class AddViewerComponent implements
     this.gs
       .post(this.apiPath, {
         query: `
-          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
-            addViewerToResource (input: $input)
-          }
+          mutation
+            RemoveViewerFromResource($input: RemoveViewerFromResourceInput!) {
+              removeViewerFromResource (input: $input)
+            }
         `,
         variables: {
           input: {
@@ -69,13 +70,13 @@ export class AddViewerComponent implements
   }
 
   dvOnExecSuccess() {
-    this.viewerAddedSuccess = true;
+    this.viewerRemovedSuccess = true;
     window.setTimeout(() => {
-      this.viewerAddedSuccess = false;
+      this.viewerRemovedSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
   dvOnExecFailure(reason: Error) {
-    this.viewerAddedErrorText = reason.message;
+    this.viewerRemovedErrorText = reason.message;
   }
 }

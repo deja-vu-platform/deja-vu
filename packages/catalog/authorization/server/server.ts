@@ -10,6 +10,7 @@ import {
   AddViewerToResourceInput,
   CreateResourceInput,
   PrincipalResourceInput,
+  RemoveViewerFromResourceInput,
   ResourceDoc,
   ResourcesInput
 } from './schema';
@@ -160,6 +161,61 @@ function resolvers(db: mongodb.Db, _config: Config): object {
                     pending: {
                       reqId: context.reqId,
                       type: 'add-viewer-to-resource'
+                    }
+                  }
+                });
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await ResourceValidation.resourceExistsOrFail(resources, input.id);
+            const updateObj = await resources
+              .updateOne(notPendingResourceFilter, updateOp);
+            if (updateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await resources.updateOne(
+              reqIdPendingFilter,
+              { ...updateOp, $unset: { pending: '' } });
+
+            return undefined;
+          case 'abort':
+            await resources.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
+      },
+
+      removeViewerFromResource: async (
+        _root,
+        { input }: { input: RemoveViewerFromResourceInput },
+        context: Context) => {
+        const updateOp = { $pull: { viewerIds: input.viewerId } };
+        const notPendingResourceFilter = {
+          id: input.id,
+          pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await ResourceValidation.resourceExistsOrFail(resources, input.id);
+            const pendingUpdateObj = await resources
+              .updateOne(
+                notPendingResourceFilter,
+                {
+                  $set: {
+                    pending: {
+                      reqId: context.reqId,
+                      type: 'remove-viewer-from-resource'
                     }
                   }
                 });
