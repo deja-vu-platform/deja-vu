@@ -25,7 +25,7 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   // Fetch rules
   // If undefined then the fetched labels are not filtered by that property
-  @Input() itemId: string | undefined;
+  @Input() itemId = '';
 
   @Input() showLabel: Action = {
     type: <Type<Component>>ShowLabelComponent
