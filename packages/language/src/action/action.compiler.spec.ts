@@ -241,6 +241,100 @@ describe('ActionCompiler', () => {
       .toMatch(`${outputField}=`);
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch('capture__');
+  });
+
+  it('should compile action with action input ' +
+    'that uses context inputs', () => {
+    const action = `
+      <dv.action name="home">
+        <foo.navbar />
+        <div>
+          <scoringposts.show-targets-by-score
+            showTarget=<foo.show-post
+            loggedInUser=foo.navbar.loggedInUser />
+          >
+          </scoringposts.show-targets-by-score>
+        </div>
+      </dv.action>`;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showTarget]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`inputs`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    const actionInput = compiledAction.actionInputs[0];
+    expect(actionInput.ngTemplate)
+      .toMatch(`show-post`);
+    const inputRegex = /@Input\(\)\s+(.*);/;
+    expect(actionInput.ngComponent)
+      .toMatch(inputRegex);
+
+    const inputField = actionInput.ngComponent
+      .match(inputRegex)[1];
+    expect(actionInput.ngTemplate)
+      .toMatch(inputField);
+
+    const inputsObjRegex = new RegExp(`{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch(inputsObjRegex);
+
+    const outputField = compiledAction.ngTemplate
+      .match(inputsObjRegex)[1];
+    expect(compiledAction.ngTemplate)
+      .toMatch(`${outputField}=`);
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch('capture__');
+  });
+
+  it('should compile action with action input ' +
+    'that shadows context inputs', () => {
+    const action = `
+      <dv.action name="home">
+        <foo.navbar />
+        <div>
+          <scoringposts.show-targets-by-score
+            showTarget=<div>
+              <foo.navbar />
+              <foo.show-post
+               loggedInUser=foo.navbar.loggedInUser />
+               </div>
+          >
+          </scoringposts.show-targets-by-score>
+        </div>
+      </dv.action>`;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showTarget]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    const actionInput = compiledAction.actionInputs[0];
+    expect(actionInput.ngTemplate)
+      .toMatch(`navbar`);
+    expect(actionInput.ngTemplate)
+      .toMatch(`show-post`);
+    expect(actionInput.ngComponent)
+      .not.toMatch('@Input()');
+
+    expect(compiledAction.ngTemplate)
+      .not.toMatch('capture__');
   });
 
   it('should compile action with action input ' +

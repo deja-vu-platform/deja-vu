@@ -53,22 +53,33 @@ export function capturesToInputs(
 
     MemberExpr: (nameOrInputNode, restNode, _rest) => {
       const nameOrInput = nameOrInputNode.sourceString;
+      const rest = restNode.sourceString;
       if (isInput(nameOrInput)) {
         return nameOrInput + restNode.sourceString;
       } else {
         const name = nameOrInput;
         if (_.has(symbolTable, name)) {
-          return name + restNode.sourceString;
-        } else if (_.has(context, name)) {
-          const field = name + restNode.sourceString;
+          const stEntry = _.get(symbolTable, name);
+          if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
+            const action = rest.slice(1).split('.')[0];
+            if (_.has(symbolTable, [ name, 'symbolTable', action ])) {
+              return name + rest;
+            }
+          } else if (stEntry.kind == 'action') {
+            return name + rest;
+          } else {
+            throw new Error(`Unexpected entry type for ${pretty(stEntry)}`);
+          }
+        }
+        if (_.has(context, name)) {
+          const field = name + rest;
           const input = captureToInput(field);
           inputsFromContext.push({ input: input, field: field });
 
           return input;
-        } else {
-          throw new Error(`${name} not found in ` +
-            `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
         }
+        throw new Error(`${name} (${name + rest}) not found in ` +
+          `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
       }
     },
     Literal_number: (number) => number.sourceString,

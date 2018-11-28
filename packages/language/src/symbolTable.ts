@@ -45,7 +45,7 @@ export type StEntry =
 
 export type ActionSymbolTableStEntry =
   ClicheStEntry | ActionStEntry | OutputStEntry | InputStEntry |
-  AppOutputStEntry;
+  AppStEntry | AppOutputStEntry;
 
 /**
  * Each action has its own symbol table to keep track of the symbols that can
