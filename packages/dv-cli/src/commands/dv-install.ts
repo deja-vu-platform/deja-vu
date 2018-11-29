@@ -15,7 +15,7 @@ import * as path from 'path';
 
 exports.command = 'install <name> <loc>';
 exports.desc = 'install a cliché';
-exports.builder = yargs => {
+exports.builder = (yargs) => {
   yargs
     .option('a', {
       alias: 'as',
@@ -45,13 +45,13 @@ exports.handler = ({ name, loc, opts }) => {
   };
 
   updateDvConfig((dvConfig: DvConfig) => {
-    if (dvConfig.usedCliches == undefined ||
+    if (dvConfig.usedCliches === undefined ||
         _.isEmpty(dvConfig.usedCliches)) {
       usedCliche.config = { wsPort: 3002 };
       dvConfig.usedCliches = { [usedCliche.name]: usedCliche };
     } else {
       let maxPort = 3002;
-      for (const usedCliche of _.values(dvConfig.usedCliches)) {
+      for (usedCliche of _.values(dvConfig.usedCliches)) {
         if (usedCliche.config.wsPort > maxPort) {
           maxPort = usedCliche.config.wsPort;
         }
@@ -61,6 +61,7 @@ exports.handler = ({ name, loc, opts }) => {
       };
       dvConfig.usedCliches[usedCliche.name] = usedCliche;
     }
+
     return dvConfig;
   });
 
@@ -69,7 +70,7 @@ exports.handler = ({ name, loc, opts }) => {
   const cd = (cmd: string) => `(cd ${loc}; ${cmd})`;
   const serverDistFolder = path.join('node_modules', name, 'server');
   // TODO: this assumes cliche has a server
-  updatePackage(pkg => {
+  updatePackage((pkg) => {
     pkg.scripts[`dv-package-${alias}`] = cd(
       `npm run dv-package-${name}`);
     pkg.scripts[`dv-package-watch-${alias}`] = cd(
@@ -96,5 +97,8 @@ exports.handler = ({ name, loc, opts }) => {
 };
 
 function moduleClassName(clicheName: string): string {
-  return _.chain(clicheName).camelCase().upperFirst().value() + 'Module';
+  return _.chain(clicheName)
+    .camelCase()
+    .upperFirst()
+    .value() + 'Module';
 }

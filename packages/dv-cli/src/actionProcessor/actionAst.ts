@@ -38,6 +38,7 @@ export function getActionAst(
   const shouldKeep = (tag: Tag): boolean =>  {
     return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
   };
+
   return posthtml([
       pruneSubtreesWithNoActions(shouldKeep),
       removeNonActions(shouldKeep),
@@ -81,6 +82,7 @@ function pruneSubtreesWithNoActions(shouldKeep: (tag: Tag) => boolean) {
 
     return ret;
   };
+
   return _pruneSubtreesWithNoActions;
 }
 
@@ -97,6 +99,7 @@ function removeNonActions(shouldKeep: (tag: Tag) => boolean) {
       .map((tag: TagOnly) => {
         if (shouldKeep(tag)) {
           tag.content = _removeNonActions(tag.content);
+
           return [tag];
         } else {
           return _removeNonActions(tag.content);
@@ -105,6 +108,7 @@ function removeNonActions(shouldKeep: (tag: Tag) => boolean) {
       .flatten()
       .value();
   };
+
   return _removeNonActions;
 }
 
@@ -150,6 +154,7 @@ function checkForErrors(actionName: string) {
       if (fqtag !== 'dv-tx' && fqtag.startsWith('dv')) {
         return false;
       }
+
       return actions.length > 1;
     });
   const _checkForErrors = (path: string, fqtag: string) =>
@@ -199,7 +204,7 @@ function getFqTag(
   if (dvAlias) {
     return dvAlias;
   }
-  let [clicheName, ...actionTagName] = tag.split('-');
+  const [clicheName, ...actionTagName] = tag.split('-');
   if (dvOf) { clicheName = dvOf; }
 
   return clicheName + '-' + actionTagName.join('-');
