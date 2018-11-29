@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
-    "dv-build-task": "ng build && tsc -p server && cp server/schema.graphql ./dist/server",
+    "dv-build-task": "ng build --outputPath=dist/app && tsc -p server && cp server/schema.graphql ./dist/server",
     "dv-package-task-client": "ng-packagr -p ng-package.json",
     "dv-package-task": "npm run dv-package-task-client && npm run dv-package-task-server",
     "dv-package-task-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
