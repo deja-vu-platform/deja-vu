@@ -204,7 +204,7 @@ function getFqTag(
   if (dvAlias) {
     return dvAlias;
   }
-  const [clicheName, ...actionTagName] = tag.split('-');
+  let [clicheName, ...actionTagName] = tag.split('-');
   if (dvOf) { clicheName = dvOf; }
 
   return clicheName + '-' + actionTagName.join('-');

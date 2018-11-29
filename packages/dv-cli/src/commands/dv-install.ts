@@ -51,9 +51,9 @@ exports.handler = ({ name, loc, opts }) => {
       dvConfig.usedCliches = { [usedCliche.name]: usedCliche };
     } else {
       let maxPort = 3002;
-      for (usedCliche of _.values(dvConfig.usedCliches)) {
-        if (usedCliche.config.wsPort > maxPort) {
-          maxPort = usedCliche.config.wsPort;
+      for (const configUsedCliche of _.values(dvConfig.usedCliches)) {
+        if (configUsedCliche.config.wsPort > maxPort) {
+          maxPort = configUsedCliche.config.wsPort;
         }
       }
       usedCliche.config = {
