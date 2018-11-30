@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
-import * as glob from 'glob';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as glob from 'glob';
+import * as _ from 'lodash';
+import * as path from 'path';
 
 import { ActionAst, getActionAst } from './actionAst';
 
@@ -56,9 +56,11 @@ export function getActionTable(
 /**
  *  @returns the action name corresponding to the given file path. It assumes
  *  that the path follows the convention `action-name.something-else.html`
- **/
+ */
 function getActionNameFromFilePath(fp: string, projectName: string) {
-  return projectName + '-' + path.basename(fp).split('.')[0];
+  return projectName + '-' +
+    path.basename(fp)
+      .split('.')[0];
 }
 
 function filesToParse(

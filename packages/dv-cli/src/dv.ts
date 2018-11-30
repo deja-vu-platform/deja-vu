@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-import * as program from 'commander';
 import { spawnSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { copySync } from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
@@ -62,7 +60,7 @@ export const NG_PACKAGR = {
 
 
 const NG_CLI_CONFIG_FILE = '.angular-cli.json';
-const ACTION_TABLE_FILE_NAME = 'actionTable.json';
+export const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 export const DVCONFIG_FILE_PATH = 'dvconfig.json';
 
 /**
@@ -252,7 +250,7 @@ export interface DvConfig {
   routes?: { path: string, action: string }[];
 }
 
-function actionTable(
+export function actionTable(
   config: DvConfig, actionsConfig: ActionsConfig | undefined): string {
   const usedClicheNames = new Set(
     _.map(_.toPairs(config.usedCliches),
@@ -265,69 +263,42 @@ function actionTable(
 
 const CACHE_DIR = '.dv';
 
-program
-  .version('0.0.1')
-  .command('new <type>', 'create a new app or cliché')
-  .command('generate <type>', 'runs a specific generator')
-  .command('install <name>', 'install a cliché')
-  .command('uninstall <name>', 'uninstall a cliché')
-  .command('get <key>', 'get a value from the configuration')
-  .command('package', 'package a cliche')
-  .command('serve', 'serve the app')
-  .command(
-    'package', 'package the cliché so that it can be used in other projects')
-  .action(subcmd => {
-    // There seems to be something wrong with commander because if we do
-    // `package` with a subcommand it doesn't work unless the user provides args
+const yargs = require('yargs');
+
+yargs.commandDir('commands')
+  .completion('completion', 'generate the bash completion script')
+  .recommendCommands()
+  .demandCommand(1, 'You must provide a single command to run')
+  .command('serve', 'serve the app', {}, () => {
+    console.log('Serving');
+
     const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-    if (subcmd === 'package') {
-      console.log('Packaging cliche');
-      npm(['run', `dv-package-${config.name}`]);
-
-      updatePackage(pkg => {
-        if (_.has(pkg, 'peerDependencies.dv-gateway')) {
-          const newGatewayPath = path.join(
-            '..', pkg['peerDependencies']['dv-gateway'].slice('file:'.length));
-          pkg['peerDependencies']['dv-gateway'] = `file:${newGatewayPath}`;
-        }
-        return pkg;
-      }, NG_PACKAGR.configFileContents.dest);
-
-      writeFileOrFail(
-        path.join('pkg', ACTION_TABLE_FILE_NAME),
-        actionTable(config, _.get(config.actions, 'package')));
-      copySync(DVCONFIG_FILE_PATH, path.join('pkg', DVCONFIG_FILE_PATH));
-      console.log('Done');
-      process.exit(0); // commander sucks
-    } else if (subcmd === 'serve') {
-      if (config.type === 'app') {
-        console.log('Serving app');
-        AppCompiler.Compile('.', CACHE_DIR);
-        process.chdir(CACHE_DIR);
-      }
-      // Serve everything (including all dep cliches)
-      cmd('npm', ['run', `dv-build-${config.name}`]);
-      writeFileOrFail(
-        path.join('dist', ACTION_TABLE_FILE_NAME),
-        actionTable(config, _.get(config.actions, 'app')));
-      const startServerOfCurrentProjectCmd =
-        (existsSync(path.join('dist', 'server'))) ?
-        [ startServerCmdOfCliche() ] : [];
-      const startServerCmds = _
-        .chain(config.usedCliches)
-        .entries()
-        .map(e => startServerCmdOfUsedCliche(e[1].name, e[0]))
-        .concat(startServerOfCurrentProjectCmd)
-        .value();
-
-      const allStartCmds: string[] = _
-        .chain(startServerCmds)
-        .concat(startGatewayCmd('dvconfig.json'))
-        .map(startCmd => `"${startCmd}"`)
-        .value();
-      cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);
-
-      process.exit(0); // commander sucks
+    if (config.type === 'app') {
+      console.log('Serving app');
+      AppCompiler.Compile('.', CACHE_DIR);
+      process.chdir(CACHE_DIR);
     }
+    // Serve everything (including all dep cliches)
+    cmd('npm', ['run', `dv-build-${config.name}`]);
+    writeFileOrFail(
+      path.join('dist', ACTION_TABLE_FILE_NAME),
+      actionTable(config, _.get(config.actions, 'app')));
+    const startServerOfCurrentProjectCmd =
+      (existsSync(path.join('dist', 'server'))) ?
+      [ startServerCmdOfCliche() ] : [];
+    const startServerCmds = _
+      .chain(config.usedCliches)
+      .entries()
+      .map(e => startServerCmdOfUsedCliche(e[1].name, e[0]))
+      .concat(startServerOfCurrentProjectCmd)
+      .value();
+
+    const allStartCmds: string[] = _
+      .chain(startServerCmds)
+      .concat(startGatewayCmd('dvconfig.json'))
+      .map(startCmd => `"${startCmd}"`)
+      .value();
+    cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);
   })
-  .parse(process.argv);
+  .help()
+  .argv;
