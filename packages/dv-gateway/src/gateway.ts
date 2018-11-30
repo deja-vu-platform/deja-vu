@@ -63,9 +63,9 @@ app.use('/api', bodyParser.json(), async (req, res) => {
 });
 
 // Serve SPA
-app.use(express.static(distFolder));
+app.use(express.static(path.join(distFolder, 'app')));
 app.get('*', ({}, res) => {
-  res.sendFile(path.join(distFolder, 'index.html'));
+  res.sendFile(path.join(distFolder, 'app', 'index.html'));
 });
 
 // Listen
@@ -75,7 +75,7 @@ requestProcessor.start()
     app.listen(port, async () => {
       console.log(`Running gateway on port ${port}`);
       console.log(`Using config ${stringify(dvConfig)}`);
-      console.log(`Serving ${distFolder}`);
+      console.log(`Serving ${distFolder}/app`);
     });
   });
 
