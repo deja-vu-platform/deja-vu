@@ -1,0 +1,29 @@
+<dv.action name="navbar" loggedInUser$=authentication.logged-in.user>
+  <authentication.logged-in />
+
+  <nav class="navbar fixed-top">
+    <div class="container">
+      <dv.link class="black-link navbar-brand" href="/">DV Hacker News</dv.link>
+
+      <dv.link class="black-link"
+        href=authentication.logged-in.user ? "/submit" : "/login"
+        params=authentication.logged-in.user ? {} : { callback: "/submit" }>
+        Submit
+      </dv.link>
+
+      <span class="space-filler"></span>
+      <dv.if condition="authentication.logged-in.user">
+        <authentication.show-user user=authentication.logged-in.user />
+        <span>
+          <dv.tx>
+            <authentication.sign-out />
+            <dv.link href="/" hidden=true />
+          </dv.tx>
+        </span>
+      </dv.if>
+      <dv.if condition="!authentication.logged-in.user">
+        <dv.link class="black-link" href="/login">Login</dv.link>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

@@ -60,6 +60,8 @@
     "packages/catalog/*",
     "samples/chorestar",
     "samples/hackernews",
+    "samples/hackernews-new",
+    "samples/hackernews-new/.dv",
     "samples/morg",
     "samples/morg/.dv",
     "samples/potluck",

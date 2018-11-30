@@ -1,0 +1,20 @@
+.post-container {
+  padding-top: 0.5rem;
+}
+
+:host /deep/ .form-group {
+  margin-bottom: 0.5rem;
+}
+
+.post-title {
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.post-title a {
+  color: #000000;
+}
+
+.post-title a:hover {
+  color: #000000;
+}

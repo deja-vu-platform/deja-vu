@@ -1,0 +1,35 @@
+<dv.action name="show-post-details">
+  <hackernews.navbar />
+
+  <div class="main">
+    <div class="container">
+      <hackernews.show-post id=$id loggedInUser=hackernews.navbar.user />
+
+      <dv.if condition=hackernews.show-post.post>
+        <div class="write-comment-container">
+          <hr class="post-separator" />
+
+          <comment.create-comment
+            authorId=hackernews.navbar.user ?
+              hackernews.navbar.user.username : ''
+            buttonLabel="Add comment"
+            showOptionToSubmit=!!hackernews.navbar.user
+            targetId=$id />
+
+          <dv.if condition=!hackernews.navbar.user>
+            <dv.callback-link class="black-link" href="/login">
+              Add comment
+            </dv.callback-link>
+          </dv.if>
+        </div>
+
+        <div class="post-show-comments">
+          <comment.show-comments
+            ofTargetId=$id
+            showComment=<hackernews.show-comment
+            comment=$comment loggedInUser=hackernews.navbar.user /> />
+        </div>
+      </dv.if>
+    </div>
+  </div>
+</dv.action>
