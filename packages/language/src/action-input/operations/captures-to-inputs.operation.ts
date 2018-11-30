@@ -41,8 +41,8 @@ export function capturesToInputs(
       `${attributes.capturesToInputs().join(' ')} ${close.sourceString}`,
     Attribute: (attributeName, eq, expr) =>
       attributeName.sourceString + eq.sourceString + expr.capturesToInputs(),
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
 
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => element.sourceString,
@@ -50,6 +50,10 @@ export function capturesToInputs(
     UnExpr_not: (not, expr) => `${not.sourceString}${expr.capturesToInputs()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
+      `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +
+      ifFalse.capturesToInputs(),
 
     MemberExpr: (nameOrInputNode, restNode, _rest) => {
       const nameOrInput = nameOrInputNode.sourceString;

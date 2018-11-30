@@ -20,14 +20,19 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
       attributes.saveInputs(),
     Attribute: (_attributeName, _eq, expr) => expr.saveInputs(),
 
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (inputNode) => inputNode.saveInputs(),
     Expr_element: (_element) => {}, // TODO
 
     UnExpr_not: (_not, expr) => expr.saveInputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
+      cond.saveInputs();
+      ifTrue.saveInputs();
+      ifFalse.saveInputs();
+    },
 
     MemberExpr: binOpRecurse,
 

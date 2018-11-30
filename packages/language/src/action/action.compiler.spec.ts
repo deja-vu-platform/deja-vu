@@ -38,6 +38,25 @@ describe('ActionCompiler', () => {
       .toMatch(`selector: "${appName}-action-with-html-only"`);
   });
 
+  it('should compile action with exprs', () => {
+    const actionName = 'action-with-exprs';
+    const action = `
+      <dv.action name="${actionName}">
+        <foo.action
+          obj={a: "hi" b: 3 + 2}
+          numberArray=[1, 2]
+          objArray=[{a: 1}, {b: 2}]
+          conditional=a ? b : c />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .not.toMatch('dv.action');
+    expect(compiledAction.ngTemplate)
+      .toMatch('hi');
+  });
+
   it('should compile action with actions', () => {
     const heading = 'Group meeting organizer';
     const action =  `

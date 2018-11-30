@@ -35,6 +35,7 @@ Action {
   Expr
     = UnExpr -- un
     | BinExpr -- bin
+    | TerExpr -- ter
     | MemberExpr -- member
     | Literal -- literal
     | input -- input
@@ -48,6 +49,8 @@ Action {
     | Expr "-" Expr -- minus
     | Expr "and" Expr -- and
     | Expr "or" Expr -- or
+
+  TerExpr = Expr "?" Expr ":" Expr
 
   MemberExpr = (name | input) ("." name)+
 

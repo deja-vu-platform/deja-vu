@@ -36,8 +36,8 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       attributes.saveUsedOutputs(),
     Attribute: (_attributeName, _eq, expr) => expr.saveUsedOutputs(),
 
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => {
       // We need to figure out if the action input is using an output from this
@@ -53,6 +53,11 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
+      cond.saveUsedOutputs();
+      ifTrue.saveUsedOutputs();
+      ifFalse.saveUsedOutputs();
+    },
     MemberExpr: (nameOrInputNode, _dot, namesNode) =>  {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
@@ -97,9 +102,11 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
     Literal_obj: (_openCb, propAssignments, _closeCb) =>
-      propAssignments.saveUsedOutputs(),
-    Literal_array: (_openSb, exprs, _closeSb) => exprs.saveUsedOutputs(),
+      propAssignments.asIteration().saveUsedOutputs(),
+    Literal_array: (_openSb, exprs, _closeSb) =>
+      exprs.asIteration().saveUsedOutputs(),
     Content_element: (element) => element.saveUsedOutputs(),
-    Content_text: (_text) => {}
+    Content_text: (_text) => {},
+    PropAssignment: (_name, _c, expr) => expr.saveUsedOutputs()
   };
 }

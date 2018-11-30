@@ -151,8 +151,8 @@ export function toNgTemplate(
       return `${transformedActionName} ${dvAlias}`;
     },
     Alias: (_as, alias) => alias.sourceString,
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.toNgTemplate(),
     Expr_element: transformActionInput(appName, symbolTable, actionInputs),
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
@@ -161,6 +161,9 @@ export function toNgTemplate(
       `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
     BinExpr_or: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
+      `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
+      ifFalse.toNgTemplate(),
     MemberExpr: (nameOrInputNode, _dot, namesNode) => {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
