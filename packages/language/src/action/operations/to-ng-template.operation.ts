@@ -102,7 +102,7 @@ export function toNgTemplate(
 
     // Close void elements
     const closeStr = (tagIsNgComponent && close.sourceString === '/>') ?
-      `></${transformedElementName}>` : close.sourceString;
+      `></${transformedActionName}>` : close.sourceString;
 
     return open.sourceString +
       transformedElementName + ' ' +
@@ -247,7 +247,7 @@ function transformActionInput(
 
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
-        `"${k}": ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
+        `${k}: ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 
     return `{

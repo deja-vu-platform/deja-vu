@@ -249,7 +249,9 @@ export class NgAppBuilder {
       NgAppBuilder.Replace('.angular-cli', 'json', cacheDir, replaceMap);
     }
     // | dvconfig.json
-    writeFileSync(path.join(cacheDir, 'dvconfig.json'), this.dvConfigContents);
+    const newDvConfigContents = JSON.stringify(
+      _.omit(JSON.parse(this.dvConfigContents), 'type'), null, 2);
+    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContents);
 
     // | src/
     // | | index.html

@@ -278,7 +278,7 @@ describe('ActionCompiler', () => {
       .toMatch(inputField);
 
     const inputsObjRegex = new RegExp(
-      `{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+      `{\\s*${inputField}:\\s*([^}\\s]*)\\s*}`);
 
     expect(compiledAction.ngTemplate)
       .toMatch(inputsObjRegex);
@@ -332,7 +332,7 @@ describe('ActionCompiler', () => {
       .toMatch(inputField);
 
     const inputsObjRegex = new RegExp(
-      `{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+      `{\\s*${inputField}:\\s*([^}\\s]*)\\s*}`);
 
     expect(compiledAction.ngTemplate)
       .toMatch(inputsObjRegex);
