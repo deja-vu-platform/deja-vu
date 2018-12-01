@@ -49,10 +49,12 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       element.saveUsedOutputs();
       throwErrorOnSymbolNotFound = true;
     },
+    Expr_parens: (_op, expr, _cp) => expr.saveUsedOutputs(),
 
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    BinExpr_is: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveUsedOutputs();
       ifTrue.saveUsedOutputs();

@@ -44,10 +44,10 @@ describe('ActionCompiler', () => {
     const action = `
       <dv.action name="${actionName}">
         <foo.action
-          obj={a: "hi" b: 3 + 2}
+          obj={a: "hi", b: 3 + 2}
           numberArray=[1, 2]
           objArray=[{a: 1}, {b: 2}]
-          conditional=a ? b : c />
+          conditional=(2 + 2) === 5 ? "b" : "c" />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler

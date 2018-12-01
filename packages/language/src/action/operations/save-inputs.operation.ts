@@ -24,10 +24,12 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (inputNode) => inputNode.saveInputs(),
     Expr_element: (_element) => {}, // TODO
+    Expr_parens: (_op, expr, _cp) => expr.saveInputs(),
 
     UnExpr_not: (_not, expr) => expr.saveInputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    BinExpr_is: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveInputs();
       ifTrue.saveInputs();
@@ -39,14 +41,18 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     Literal_number: (_number) => {},
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
-    Literal_obj: (_openCb, propAssignments, _closeCb) =>
-      propAssignments.saveInputs(),
-    Literal_array: (_openSb, exprs, _closeSb) => exprs.saveInputs(),
+    Literal_obj: (_openCb, propAssignments, _closeCb) => propAssignments
+      .asIteration()
+      .saveInputs(),
+    Literal_array: (_openSb, exprs, _closeSb) => exprs
+      .asIteration()
+      .saveInputs(),
     Content_element: (element) => element.saveInputs(),
     Content_text: (_text) => {},
     name: (_letter, _rest)  => {},
     input: (ds, inputName) => {
       symbolTable[ds.sourceString + inputName.sourceString] = { kind: 'input' };
-    }
+    },
+    PropAssignment: (_name, _c, expr) => expr.saveInputs()
   };
 }

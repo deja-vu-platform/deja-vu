@@ -157,12 +157,16 @@ export function toNgTemplate(
     Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.toNgTemplate(),
     Expr_element: transformActionInput(appName, symbolTable, actionInputs),
+    Expr_parens: (_op, expr, _cp) => `(${expr.toNgTemplate()})`,
+
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
     BinExpr_or: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
+    BinExpr_is: (leftExpr, _is, rightExpr) =>
+      `${leftExpr.toNgTemplate()} === ${rightExpr.toNgTemplate()}`,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
       ifFalse.toNgTemplate(),
@@ -183,10 +187,19 @@ export function toNgTemplate(
     Literal_true: (trueNode) => trueNode.sourceString,
     Literal_false: (falseNode) => falseNode.sourceString,
     Literal_obj: (openCb, propAssignments, closeCb) =>
-      openCb.sourceString + propAssignments.toNgTemplate() +
+      openCb.sourceString +
+      propAssignments
+        .asIteration()
+        .toNgTemplate()
+        .join(', ') +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
-      openSb.sourceString + exprs.toNgTemplate() + closeSb.sourceString,
+      openSb.sourceString +
+      exprs
+        .asIteration()
+        .toNgTemplate()
+        .join(', ') +
+      closeSb.sourceString,
     input: (sbNode, inputNameNode) => {
       const input = `${sbNode.sourceString}${inputNameNode.sourceString}`;
       const inputEntry = <InputStEntry> symbolTable[input];
@@ -202,7 +215,9 @@ export function toNgTemplate(
       }
 
       return ngInputField;
-    }
+    },
+    PropAssignment: (name, _c, expr) =>
+      `${name.sourceString}: ${expr.toNgTemplate()}`
   };
 }
 

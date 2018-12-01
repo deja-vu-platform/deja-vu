@@ -47,9 +47,13 @@ export function capturesToInputs(
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => element.sourceString,
 
+    Expr_parens: (op, expr, cp) => op.sourceString +
+      expr.capturesToInputs() + cp.sourceString,
+
     UnExpr_not: (not, expr) => `${not.sourceString}${expr.capturesToInputs()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    BinExpr_is: binOpRecurse,
 
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +
@@ -93,11 +97,13 @@ export function capturesToInputs(
     Literal_false: (falseNode) => falseNode.sourceString,
     Literal_obj: (openCb, propAssignments, closeCb) =>
       openCb.sourceString +
-      propAssignments.capturesToInputs().join(', ') +
+      propAssignments.capturesToInputs()
+        .join(', ') +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
       openSb.sourceString +
-      exprs.capturesToInputs().join(', ') +
+      exprs.capturesToInputs()
+        .join(', ') +
       closeSb.sourceString,
     Content_element: (element) => element.capturesToInputs(),
     Content_text: (text) => text.sourceString,

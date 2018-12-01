@@ -40,6 +40,7 @@ Action {
     | Literal -- literal
     | input -- input
     | Element -- element
+    | "(" Expr ")" -- parens
 
   UnExpr
     = "not" Expr -- not
@@ -47,8 +48,9 @@ Action {
   BinExpr
     = Expr "+" Expr -- plus
     | Expr "-" Expr -- minus
-    | Expr "and" Expr -- and
-    | Expr "or" Expr -- or
+    | Expr "&&" Expr -- and
+    | Expr "||" Expr -- or
+    | Expr "===" Expr -- is
 
   TerExpr = Expr "?" Expr ":" Expr
 
