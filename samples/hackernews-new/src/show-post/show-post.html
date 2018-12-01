@@ -1,6 +1,6 @@
-<dv.action name="show-post" post$=property.show-object.loadedObject>
+<dv.action name="show-post" loadedPost$=property.show-object.loadedObject>
   <div>
-    <property.show-object id=$id hidden=true />
+    <property.show-object post=$post id=$id hidden=true />
 
     <dv.if condition=!property.show-object.loadedObject>
       Post not found
@@ -43,6 +43,6 @@
           <!-- TODO: save timestamp and show how long ago this was posted -->
         </div>
       </div>
-    </div>
+    </dv.if>
   </div>
 </dv.action>

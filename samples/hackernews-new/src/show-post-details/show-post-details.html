@@ -5,7 +5,7 @@
     <div class="container">
       <hackernews.show-post id=$id loggedInUser=hackernews.navbar.user />
 
-      <dv.if condition=hackernews.show-post.post>
+      <dv.if condition=hackernews.show-post.loadedPost>
         <div class="write-comment-container">
           <hr class="post-separator" />
 
