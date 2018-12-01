@@ -97,7 +97,7 @@ export class ActionCompiler {
       .addOperation('saveOutputs', saveOutputs(thisActionSymbolTable))
       .addOperation(
         'toNgTemplate', toNgTemplate(
-          appName, thisActionSymbolTable, actionInputs));
+          appName, thisActionSymbolTable, actionInputs, symbolTable));
 
     const matchResult = this.grammar.match(actionContents);
     if (matchResult.failed()) {
