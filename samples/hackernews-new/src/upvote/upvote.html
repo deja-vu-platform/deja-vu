@@ -3,13 +3,13 @@
     <dv.if condition=$isPost>
       <dv.tx>
         <authentication.authenticate
-          id=loggedInUser?.id hidden=true />
+          id=$loggedInUser?.id hidden=true />
         <scoringposts.create-score
-          buttonDisabled=$disabled || !loggedInUser
+          buttonDisabled=$disabled || !$loggedInUser
           class="upvote-button"
           newScoreSavedText=""
           showOptionToInputValue=false
-          sourceId=loggedInUser?.username
+          sourceId=$loggedInUser?.username
           submitMatIconName="arrow_drop_up"
           targetId=$id
           value=1 />
@@ -18,14 +18,14 @@
     <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
     <dv.if condition=!$isPost>
       <dv.tx>
-        <authentication.authenticate as "scoringcomments-authenticate"
+        <authentication.authenticate as scoringcomments-authenticate
           id=$loggedInUser?.id hidden=true />
         <scoringcomments.create-score
-          buttonDisabled=$disabled || !loggedInUser
+          buttonDisabled=$disabled || !$loggedInUser
           class="upvote-button"
           newScoreSavedText=""
           showOptionToInputValue=false
-          sourceId=loggedInUser?.username
+          sourceId=$loggedInUser?.username
           submitMatIconName="arrow_drop_up"
           targetId=$id
           value="1" />

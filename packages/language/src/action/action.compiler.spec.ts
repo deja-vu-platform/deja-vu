@@ -44,10 +44,10 @@ describe('ActionCompiler', () => {
     const action = `
       <dv.action name="${actionName}">
         <foo.action
-          obj={a: "hi", b: 3 + 2}
+          obj={a: "hi", b: 3 + 2, c: 'hello'}
           numberArray=[1, 2]
           objArray=[{a: 1}, {b: 2}]
-          conditional=(2 + 2) === 5 ? "b" : "c" />
+          conditional=!((2 + 2) === 5) ? "b" : "c" />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
@@ -139,6 +139,30 @@ describe('ActionCompiler', () => {
 
     expect(compiledAction.ngComponent)
       .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('new EventEmitter');
+    expect(compiledAction.ngComponent)
+      .toMatch(/import .* EventEmitter .*/);
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+  });
+
+  it('should compile action with output expr', () => {
+    const action = `
+      <dv.action name="action-with-output-expr"
+        objects$=property.show-objects.objects.length + 1>
+        <property.show-objects hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+    expect(compiledAction.ngComponent)
+      .toMatch(/\+ 1/);
     expect(compiledAction.ngComponent)
       .toMatch('emit');
   });

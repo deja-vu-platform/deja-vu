@@ -43,7 +43,7 @@ Action {
     | "(" Expr ")" -- parens
 
   UnExpr
-    = "not" Expr -- not
+    = "!" Expr -- not
 
   BinExpr
     = Expr "+" Expr -- plus
@@ -54,11 +54,11 @@ Action {
 
   TerExpr = Expr "?" Expr ":" Expr
 
-  MemberExpr = (name | input) ("." name)+
+  MemberExpr = (name | input) (nav name)+
 
   Literal
     = number -- number
-    | "\"" (~"\"" any)* "\"" -- text
+    | quote (~quote any)* quote -- text
     | "true" -- true
     | "false" -- false
     | "{" ListOf<PropAssignment, ","> "}" -- obj
@@ -71,6 +71,8 @@ Action {
   input = "$" name
   output = name "$"
 
+  quote = "\"" | "\'"
+  nav = "." | "?."
   space := whitespace | lineTerminator | comment
   whitespace = "\t"
              | "\x0B"    -- verticalTab

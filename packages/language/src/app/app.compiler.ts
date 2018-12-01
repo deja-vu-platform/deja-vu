@@ -103,6 +103,7 @@ export class AppCompiler {
       .toPairs()
       .map(([clicheAlias, clicheConfig]) =>
         _.get(clicheConfig, 'name', clicheAlias))
+      .uniq()
       .value();
 
     const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
@@ -130,17 +131,22 @@ export class AppCompiler {
       dvConfig.actions.app : undefined;
     const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
     for (const actionFilePath of htmlFilesToParse) {
-      const actionContents = readFileSync(
-        path.join(this.projectDir, actionFilePath), 'utf8');
-      const compiledAction = this.actionCompiler.compile(
-        dvConfig.name, actionContents, this.symbolTable);
-      ngAppBuilder.addComponent(
-        compiledAction.name, compiledAction.className,
-        compiledAction.ngComponent, compiledAction.ngTemplate);
-      for (const actionInput of compiledAction.actionInputs) {
+      try {
+        const actionContents = readFileSync(
+          path.join(this.projectDir, actionFilePath), 'utf8');
+        const compiledAction = this.actionCompiler.compile(
+          dvConfig.name, actionContents, this.symbolTable);
         ngAppBuilder.addComponent(
-          actionInput.name, actionInput.className,
-          actionInput.ngComponent, actionInput.ngTemplate);
+          compiledAction.name, compiledAction.className,
+          compiledAction.ngComponent, compiledAction.ngTemplate);
+        for (const actionInput of compiledAction.actionInputs) {
+          ngAppBuilder.addComponent(
+            actionInput.name, actionInput.className,
+            actionInput.ngComponent, actionInput.ngTemplate);
+        }
+      } catch (e) {
+        console.error(`Error in action ${actionFilePath}`);
+        throw e;
       }
     }
 

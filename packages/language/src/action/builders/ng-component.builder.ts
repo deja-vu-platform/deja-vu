@@ -120,7 +120,7 @@ export class NgComponentBuilder {
       ${_.isEmpty(inputFields) ?
         '' : 'import { Input } from \'@angular/core\';'}
       ${_.isEmpty(outputFields) ?
-        '' : 'import { Output } from \'@angular/core\';'}
+        '' : 'import { Output, EventEmitter } from \'@angular/core\';'}
       ${actionImports}
 
       @Component({
