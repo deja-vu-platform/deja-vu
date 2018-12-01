@@ -102,9 +102,11 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
     Literal_obj: (_openCb, propAssignments, _closeCb) =>
-      propAssignments.asIteration().saveUsedOutputs(),
+      propAssignments.asIteration()
+        .saveUsedOutputs(),
     Literal_array: (_openSb, exprs, _closeSb) =>
-      exprs.asIteration().saveUsedOutputs(),
+      exprs.asIteration()
+        .saveUsedOutputs(),
     Content_element: (element) => element.saveUsedOutputs(),
     Content_text: (_text) => {},
     PropAssignment: (_name, _c, expr) => expr.saveUsedOutputs()

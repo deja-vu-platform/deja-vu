@@ -1,4 +1,4 @@
-import { ActionSymbolTable } from "../../symbolTable";
+import { ActionSymbolTable } from '../../symbolTable';
 
 
 export function saveOutputs(symbolTable: ActionSymbolTable) {

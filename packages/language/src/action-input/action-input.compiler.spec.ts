@@ -1,6 +1,6 @@
+import { ActionSymbolTable } from '../symbolTable';
 import {
   ActionInputCompiler, CompiledActionInput } from './action-input.compiler';
-import { ActionSymbolTable } from "../symbolTable";
 
 
 describe('ActionInputCompiler', () => {

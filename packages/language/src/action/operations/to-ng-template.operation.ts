@@ -69,7 +69,8 @@ export function toNgTemplate(
         .match(/dvAlias="(.*)"/);
       const alias = (maybeAlias !== null) ? maybeAlias[1] : undefined;
 
-      const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(transformedActionName, symbolTable, alias);
+      const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(
+        transformedActionName, symbolTable, alias);
       if (actionEntry === undefined) {
         assert.fail(
           `No entries for ${transformedActionName}, alias ${alias}` +
@@ -120,6 +121,7 @@ export function toNgTemplate(
       if (_.startsWith(startTagNg, '<dv-action')) {
         return content;
       }
+
       return startTagNg + content + endTag.toNgTemplate();
     },
     StartTag: tagTransform,
@@ -175,7 +177,7 @@ export function toNgTemplate(
       return nonInputMemberAccessToField(fullMemberAccess, symbolTable);
     },
 
-    Literal_number: (number) => number.sourceString,
+    Literal_number: (numberNode) => numberNode.sourceString,
     Literal_text: (_openQuote, text, _closeQuote) =>
       '\'' + text.sourceString + '\'',
     Literal_true: (trueNode) => trueNode.sourceString,
@@ -192,7 +194,8 @@ export function toNgTemplate(
         inputEntry !== undefined,
         `Didn't find input ${input} in ${pretty(symbolTable)}`);
       assert.ok(
-        inputEntry.kind === 'input', `Unexpected entry kind ${inputEntry.kind}`);
+        inputEntry.kind === 'input',
+        `Unexpected entry kind ${inputEntry.kind}`);
       const ngInputField = inputToNgField(input);
       if (!_.has(inputEntry, 'ngInputField')) {
         inputEntry.ngInputField = ngInputField;

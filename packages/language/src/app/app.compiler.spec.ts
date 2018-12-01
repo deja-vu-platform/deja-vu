@@ -7,34 +7,6 @@ import * as path from 'path';
 // import * as rimraf from 'rimraf';
 
 
-describe('AppCompiler', () => {
-  let projectDir, outputDir;
-
-  beforeAll(() => {
-    projectDir = dirSync({ prefix: 'dvTestsSrc_' });
-    Morg.WriteTo(projectDir.name);
-    outputDir = dirSync({ prefix: 'dvTestsOutput_' });
-    console.log(`source dir: ${projectDir.name}, dst dir: ${outputDir.name}`);
-    AppCompiler.Compile(projectDir.name, outputDir.name, false);
-  });
-
-  afterAll(() => {
-    /*
-    rimraf.sync(projectDir.name);
-    rimraf.sync(outputDir.name); */
-  });
-
-  it('should generate package.json', () => {
-  });
-
-  it('should generate index.html', () => {
-  });
-
-  it('should generate a component per action', () => {
-  });
-});
-
-
 class Morg {
   static WriteTo(projectDir: string) {
     writeFileSync(path.join(projectDir, 'dvconfig.json'), Morg.DvConfig());
@@ -172,3 +144,31 @@ class Morg {
     ];
   }
 }
+
+describe('AppCompiler', () => {
+  let projectDir, outputDir;
+
+  beforeAll(() => {
+    projectDir = dirSync({ prefix: 'dvTestsSrc_' });
+    Morg.WriteTo(projectDir.name);
+    outputDir = dirSync({ prefix: 'dvTestsOutput_' });
+    console.log(`source dir: ${projectDir.name}, dst dir: ${outputDir.name}`);
+    AppCompiler.Compile(projectDir.name, outputDir.name, false);
+  });
+
+  afterAll(() => {
+    /*
+    rimraf.sync(projectDir.name);
+    rimraf.sync(outputDir.name); */
+  });
+
+  it('should generate package.json', () => {
+  });
+
+  it('should generate index.html', () => {
+  });
+
+  it('should generate a component per action', () => {
+  });
+});
+

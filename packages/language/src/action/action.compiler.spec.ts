@@ -33,7 +33,8 @@ describe('ActionCompiler', () => {
     expect(compiledAction.ngTemplate)
       .toMatch('Hello');
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
     expect(compiledAction.ngComponent)
       .toMatch(`selector: "${appName}-action-with-html-only"`);
   });
@@ -52,7 +53,8 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, {});
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
     expect(compiledAction.ngTemplate)
       .toMatch('hi');
   });
@@ -102,7 +104,8 @@ describe('ActionCompiler', () => {
     expect(compiledAction.ngTemplate)
       .toMatch(heading);
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
   });
 
   it('should compile action accessing member of output', () => {
@@ -126,7 +129,8 @@ describe('ActionCompiler', () => {
 
   it('should compile action with output', () => {
     const action = `
-      <dv.action name="action-with-outputs" objects$=property.show-objects.objects>
+      <dv.action name="action-with-outputs"
+        objects$=property.show-objects.objects>
         <property.show-objects hidden=true />
       </dv.action>
     `;
@@ -249,7 +253,8 @@ describe('ActionCompiler', () => {
     expect(actionInput.ngTemplate)
       .toMatch(inputField);
 
-    const inputsObjRegex = new RegExp(`{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+    const inputsObjRegex = new RegExp(
+      `{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
 
     expect(compiledAction.ngTemplate)
       .toMatch(inputsObjRegex);
@@ -302,7 +307,8 @@ describe('ActionCompiler', () => {
     expect(actionInput.ngTemplate)
       .toMatch(inputField);
 
-    const inputsObjRegex = new RegExp(`{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+    const inputsObjRegex = new RegExp(
+      `{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
 
     expect(compiledAction.ngTemplate)
       .toMatch(inputsObjRegex);
@@ -350,10 +356,12 @@ describe('ActionCompiler', () => {
     expect(actionInput.ngTemplate)
       .toMatch(`show-post`);
     expect(actionInput.ngComponent)
-      .not.toMatch('@Input()');
+      .not
+      .toMatch('@Input()');
 
     expect(compiledAction.ngTemplate)
-      .not.toMatch('capture__');
+      .not
+      .toMatch('capture__');
   });
 
   it('should compile action with action input ' +

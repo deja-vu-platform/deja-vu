@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from 'fs';
-import * as path from 'path';
 import * as glob from 'glob';
+import * as path from 'path';
 
 import * as _ from 'lodash';
-import { SymbolTable } from '../symbolTable';
 import { ActionCompiler } from '../action/action.compiler';
+import { SymbolTable } from '../symbolTable';
 import { NgAppBuilder } from './builders/ng-app.builder';
 
 
@@ -101,7 +101,8 @@ export class AppCompiler {
     const usedCliches: string[] = _
       .chain(dvConfig.usedCliches)
       .toPairs()
-      .map(([clicheAlias, clicheConfig]) => _.get(clicheConfig, 'name', clicheAlias))
+      .map(([clicheAlias, clicheConfig]) =>
+        _.get(clicheConfig, 'name', clicheAlias))
       .value();
 
     const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);

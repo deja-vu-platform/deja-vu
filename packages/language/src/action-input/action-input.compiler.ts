@@ -5,9 +5,11 @@ import * as path from 'path';
 import { ActionSymbolTable } from '../symbolTable';
 
 import {
-  InputFromContext, capturesToInputs
+  saveUsedActions
+} from '../action/operations/save-used-actions.operation';
+import {
+  capturesToInputs, InputFromContext
 } from './operations/captures-to-inputs.operation';
-import { saveUsedActions } from '../action/operations/save-used-actions.operation';
 
 const ohm = require('ohm-js');
 
@@ -27,6 +29,7 @@ export class ActionInputCompiler {
 
   private static GetUniqueId(): string {
     const domain = 'abcdefghijklmnopqrstuvwxyz';
+
     return _
       .times(UNIQUE_ID_LENGTH, () => domain
         .charAt(Math.floor(Math.random() * domain.length)))
@@ -58,7 +61,8 @@ export class ActionInputCompiler {
     this.semantics
       .addOperation('saveUsedActions', saveUsedActions(symbolTable))
       .addOperation(
-        'capturesToInputs', capturesToInputs(symbolTable, context, inputsFromContext));
+        'capturesToInputs',
+        capturesToInputs(symbolTable, context, inputsFromContext));
 
     const s = this.semantics(wrappedActionInput);
     s.saveUsedActions();
@@ -73,7 +77,8 @@ export class ActionInputCompiler {
   private setActionName(actionInputContents: string): string {
     const name = `anonymous-${ActionInputCompiler.GetUniqueId()}`;
     const wrappedActionInputContents =
-      (actionInputContents.trim().startsWith('<dv.action')) ?
+      (actionInputContents.trim()
+        .startsWith('<dv.action')) ?
         actionInputContents
           .replace('<dv.action', `<dv.action name="${name}"`) :
         `<dv.action name="${name}">${actionInputContents}</dv.action>`;

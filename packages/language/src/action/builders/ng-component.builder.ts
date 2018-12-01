@@ -111,7 +111,8 @@ export class NgComponentBuilder {
         `private _${field.name}` :
         field.name) +
       ((field.value) ?
-        ` = ${JSON.stringify(field.value).slice(1, -1)};` :
+        ` = ${JSON.stringify(field.value)
+                .slice(1, -1)};` :
         ';')));
     const actionImports = _.join(this.actionImportStatements, '\n');
     return `
@@ -131,12 +132,12 @@ export class NgComponentBuilder {
         ${outputFields.join('\n  ')}
         ${inputFields.join('\n  ')}
         ${fields.join('\n  ')}
-        
+
         ${[...allUsedFields].map((usedField: string) => `
         get ${usedField}() {
           return this._${usedField};
         }
-        
+
         set ${usedField}(value) {
           ${[...usedFieldToOutputInfo[usedField]]
              .map((o: NgOutputWithInfo) =>
@@ -147,8 +148,8 @@ export class NgComponentBuilder {
              .join('\n')}
           this._${usedField} = value;
         }
-        `).join('\n')}
-        
+        `)
+      .join('\n')}
       }
     `;
   }

@@ -3,20 +3,22 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import {
-  ActionStEntry, ActionSymbolTable, ClicheStEntry, InputStEntry, EntryKind,
-  OutputStEntry, SymbolTable, ActionSymbolTableStEntry, AppOutputStEntry
+  ActionStEntry, ActionSymbolTable, ActionSymbolTableStEntry, AppOutputStEntry,
+  ClicheStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
 } from '../symbolTable';
 
 import * as _ from 'lodash';
-import { NgComponentBuilder, NgField, NgOutput } from './builders/ng-component.builder';
+import {
+  NgComponentBuilder, NgField, NgOutput
+} from './builders/ng-component.builder';
 
-import { saveUsedActions } from './operations/save-used-actions.operation';
-import { saveInputs } from './operations/save-inputs.operation';
-import { toNgTemplate } from './operations/to-ng-template.operation';
-import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
+import { saveInputs } from './operations/save-inputs.operation';
+import { saveOutputs } from './operations/save-outputs.operation';
+import { saveUsedActions } from './operations/save-used-actions.operation';
+import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { classNameToNgField } from './operations/shared';
-import { saveOutputs } from "./operations/save-outputs.operation";
+import { toNgTemplate } from './operations/to-ng-template.operation';
 
 const ohm = require('ohm-js');
 
