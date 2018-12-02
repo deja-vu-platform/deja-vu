@@ -1,7 +1,7 @@
 import { ActionSymbolTable, pretty } from '../../symbolTable';
 
 import * as _ from 'lodash';
-import { isInput } from "../../action/operations/shared";
+import { isInput, NAV_SPLIT_REGEX } from '../../action/operations/shared';
 
 
 export interface InputFromContext {
@@ -69,11 +69,12 @@ export function capturesToInputs(
         if (_.has(symbolTable, name)) {
           const stEntry = _.get(symbolTable, name);
           if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
-            const action = rest.slice(1).split('.')[0];
+            const action = rest.slice(1)
+              .split(NAV_SPLIT_REGEX)[0];
             if (_.has(symbolTable, [ name, 'symbolTable', action ])) {
               return name + rest;
             }
-          } else if (stEntry.kind == 'action') {
+          } else if (stEntry.kind === 'action') {
             return name + rest;
           } else {
             throw new Error(`Unexpected entry type for ${pretty(stEntry)}`);

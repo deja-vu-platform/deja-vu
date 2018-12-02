@@ -1,5 +1,5 @@
 import { ActionSymbolTable, pretty, StEntry } from '../../symbolTable';
-import { isInput } from './shared';
+import { isInput, NAV_SPLIT_REGEX } from './shared';
 
 import * as _ from 'lodash';
 
@@ -67,7 +67,8 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       if (isInput(nameOrInput)) {
         return;
       }
-      const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+      const [ clicheOrActionAlias, ...rest ] = _
+        .split(fullMemberAccess, NAV_SPLIT_REGEX);
       if (!_.has(symbolTable, clicheOrActionAlias)) {
         if (throwErrorOnSymbolNotFound) {
           throw new Error(
@@ -82,13 +83,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
         case 'cliche':
           const clicheName = clicheOrActionAlias;
           const [ actionName, output ] = rest;
-          if (!_.has(stEntry, `symbolTable.${actionName}`)) {
+          if (!_.has(stEntry, [ 'symbolTable', actionName ])) {
             throw new Error(
               `${clicheName}.${actionName} not found in ` +
               `symbol table ${pretty(symbolTable)}`);
           }
           _.set(
-            stEntry.symbolTable[actionName], `symbolTable.${output}`,
+            stEntry.symbolTable[actionName], [ 'symbolTable', output ],
             { kind: 'output' });
           break;
         case 'action':

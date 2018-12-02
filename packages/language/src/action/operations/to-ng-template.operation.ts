@@ -26,21 +26,31 @@ import { ActionCompiler, CompiledAction } from '../action.compiler';
 
 function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {
-  const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+  const clicheOrActionAlias = _
+    .split(fullMemberAccess, '.', 1)[0];
   const stEntry: StEntry = symbolTable[clicheOrActionAlias];
   let clicheName: string, actionName: string, output: string;
   let alias: string | undefined;
-  let memberAccesses: string[];
+  let memberAccesses: string;
   switch (stEntry.kind) {
     case 'cliche':
       clicheName = clicheOrActionAlias;
-      [ actionName, output, ...memberAccesses ] = rest;
+      [ actionName, output ] = fullMemberAccess
+        .slice(clicheOrActionAlias.length + 1)
+        .split('.', 2);
+      memberAccesses = fullMemberAccess
+        .slice(clicheOrActionAlias.length + actionName.length +
+          output.length + 2);
       break;
     case 'action':
       clicheName = stEntry.of;
       actionName = stEntry.actionName;
       alias = clicheOrActionAlias;
-      [ output, ...memberAccesses ] = rest;
+      output = fullMemberAccess
+        .slice(clicheOrActionAlias.length + 1)
+        .split('.', 1)[0];
+      memberAccesses = fullMemberAccess
+        .slice(clicheOrActionAlias.length + output.length + 1);
       break;
     default:
       throw new Error(`Unexpected entry ${stEntry.kind}`);
@@ -49,10 +59,7 @@ function nonInputMemberAccessToField(
   const outputField = outputToNgField(
     clicheName, actionName, output, alias);
 
-  const memberAccessStr = _.isEmpty(memberAccesses) ?
-    '' : `.${_.join(memberAccesses, '.')}`;
-
-  return `${outputField}${memberAccessStr}`;
+  return `${outputField}${memberAccesses}`;
 }
 
 
@@ -179,8 +186,10 @@ export function toNgTemplate(
       const attributeName = attributeNameNode.sourceString;
       const newAttributeName = (attributeName === 'class') ?
         attributeName : `[${attributeNameToInput(attributeName)}]`;
+      const exprStr = (attributeName === 'class') ?
+        expr.sourceString : `"${expr.toNgTemplate()}"`;
 
-      return `${newAttributeName}${eq.sourceString}"${expr.toNgTemplate()}"`;
+      return newAttributeName + eq.sourceString + exprStr;
     },
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),

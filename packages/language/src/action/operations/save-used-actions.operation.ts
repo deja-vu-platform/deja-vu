@@ -1,6 +1,7 @@
 import { ActionSymbolTable, ClicheStEntry } from '../../symbolTable';
 
 import * as _ from 'lodash';
+import { NAV_SPLIT_REGEX } from './shared';
 
 
 export function saveUsedActions(symbolTable: ActionSymbolTable) {
@@ -22,7 +23,7 @@ export function saveUsedActions(symbolTable: ActionSymbolTable) {
       const maybeAlias = maybeAliasNode.saveUsedActions();
       if (!_.isEmpty(maybeAlias)) {
         const [ clicheName, actionName ] = _
-          .split(actionNameNode.sourceString, '.');
+          .split(actionNameNode.sourceString, NAV_SPLIT_REGEX);
         symbolTable[maybeAlias] = {
           kind: 'action',
           of: clicheName,
