@@ -134,8 +134,14 @@ export class AppCompiler {
       try {
         const actionContents = readFileSync(
           path.join(this.projectDir, actionFilePath), 'utf8');
+
+        const actionStylePath = path.join(this.projectDir,
+          _.replace(actionFilePath, '.html', '.css'));
+        const actionStyle = existsSync(actionStylePath) ?
+          readFileSync(actionStylePath, 'utf8') : '';
+
         const compiledAction = this.actionCompiler.compile(
-          dvConfig.name, actionContents, this.symbolTable);
+          dvConfig.name, actionContents, this.symbolTable, actionStyle);
         ngAppBuilder.addComponent(
           compiledAction.name, compiledAction.className,
           compiledAction.ngComponent, compiledAction.ngTemplate);

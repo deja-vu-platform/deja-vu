@@ -81,10 +81,13 @@ export class ActionCompiler {
    * @param appName the name of the application the action is part of
    * @param actionContents the contents of the action to compile
    * @param symbolTable the symbol table to update
+   * @param style the CSS for the action
    *
    * @return the compiled action object
    */
-  compile(appName: string, actionContents: string, symbolTable: SymbolTable)
+  compile(
+    appName: string, actionContents: string, symbolTable: SymbolTable,
+    style?: string)
     : CompiledAction {
     const thisActionSymbolTable: ActionSymbolTable = {};
     const actionInputs: CompiledAction[] = [];
@@ -146,6 +149,7 @@ export class ActionCompiler {
         expr: appOutputEntry.expr
       }));
     const ngComponent = ngComponentBuilder
+      .withStyle(style)
       .addInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
       .addOutputs(appOutputFields)
       .addFields(fields)

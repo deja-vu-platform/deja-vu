@@ -1,12 +1,12 @@
-import * as path from 'path';
 import {
   copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync
 } from 'fs';
+import * as path from 'path';
 
 import * as _ from 'lodash';
 
-import * as rimraf from 'rimraf';
 import { spawnSync } from 'child_process';
+import * as rimraf from 'rimraf';
 
 
 interface Dependency {
@@ -49,13 +49,14 @@ interface CacheRecordDiff {
  * Builder for Angular applications
  */
 export class NgAppBuilder {
+  private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
+  private static readonly cacheRecordFile = '.dvcache';
+
   private readonly dependencies: Dependency[] = [];
   private readonly components: Component[] = [];
   private readonly routes: Route[] = [];
   private globalStyle = '';
   private faviconPath: string | undefined;
-  private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
-  private static readonly cacheRecordFile = '.dvcache';
 
   private static Replace(
     srcFile: string, srcExt: string, dstDir: string,
