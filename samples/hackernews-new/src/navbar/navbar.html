@@ -12,7 +12,7 @@
       </dv.link>
 
       <span class="space-filler"></span>
-      <dv.if condition="authentication.logged-in.user">
+      <dv.if condition=authentication.logged-in.user>
         <authentication.show-user user=authentication.logged-in.user />
         <span>
           <dv.tx>
@@ -21,7 +21,7 @@
           </dv.tx>
         </span>
       </dv.if>
-      <dv.if condition="!authentication.logged-in.user">
+      <dv.if condition=!authentication.logged-in.user>
         <dv.link class="black-link" href="/login">Login</dv.link>
       </dv.if>
     </div>
