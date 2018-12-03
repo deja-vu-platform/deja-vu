@@ -15,8 +15,9 @@ import { ChooseComponent } from './choose/choose.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { IdComponent } from './id/id.component';
 import { IdsComponent } from './ids/ids.component';
-import { IfComponent } from './if/if.component';
-import { IncludeComponent, IncludeDirective } from './include/include.component';
+import {
+  IncludeComponent, IncludeDirective
+} from './include/include.component';
 import { InputIdComponent } from './input-id/input-id.component';
 import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
@@ -30,7 +31,7 @@ import { OfDirective } from './of.directive';
 
 
 const allComponents = [
-  IdComponent, IdsComponent, TxComponent, IncludeComponent, IfComponent,
+  IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,

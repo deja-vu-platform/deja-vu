@@ -65,6 +65,29 @@ describe('ActionCompiler', () => {
       .toMatch('hi');
   });
 
+  it('should compile action with dv.if', () => {
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <dv.if condition=true class="col-md-2 main">
+          <h1>Hello</h1>
+        </dv.if>
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .toMatch('Hello');
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\*ngIf="true"/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv\.if/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv-if/);
+  });
+
   it('should compile action with actions', () => {
     const heading = 'Group meeting organizer';
     const st: SymbolTable = {

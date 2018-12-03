@@ -129,6 +129,12 @@ export function toNgTemplate(
       attrsString = attrs.sourceString;
     }
 
+    if (transformedActionName === 'dv-if') {
+      transformedActionName = 'div';
+      transformedElementName = transformedElementName.replace('dv-if ', 'div ');
+      attrsString = attrsString.replace('[condition]=', '*ngIf=');
+    }
+
 
     // Close void elements
     const closeStr = (tagIsNgComponent && close.sourceString === '/>') ?
@@ -173,6 +179,10 @@ export function toNgTemplate(
               .slice(elementName.indexOf('-'));
             elementName = clicheName + rest;
           }
+        }
+
+        if (elementName.trim() === 'dv-if') {
+          elementName = 'div';
         }
       }
 
