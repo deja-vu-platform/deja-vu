@@ -70,7 +70,7 @@ export function toNgTemplate(
     let transformedElementName = elementName.toNgTemplate();
     let transformedActionName = _.split(transformedElementName, ' ', 1)[0];
     const tagIsNgComponent = isNgComponent(transformedActionName);
-    let attrsString;
+    let outputs = [];
     if (tagIsNgComponent && transformedActionName !== 'dv-action') {
       const maybeAlias: string[] | null = transformedElementName
         .match(/dvAlias="(.*)"/);
@@ -84,7 +84,7 @@ export function toNgTemplate(
           ` symbol table ${pretty(symbolTable)}`);
       }
 
-      const outputs = _
+      outputs = _
         .map(actionEntry.symbolTable,
           (outputEntry: OutputStEntry, outputKey: string) => {
             assert.ok(
@@ -100,10 +100,6 @@ export function toNgTemplate(
 
             return `(${outputKey})="${ngOutputField}=$event"`;
           });
-
-      attrsString = _
-        .join(_.concat(attrs.toNgTemplate(), outputs), ' ');
-
 
       const clicheAlias = _.split(transformedActionName, '-', 1)[0];
       if (clicheAlias !== 'dv' && clicheAlias !== appName) {
@@ -125,9 +121,10 @@ export function toNgTemplate(
           transformedActionName = clicheName + actionRest;
         }
       }
-    } else {
-      attrsString = attrs.sourceString;
     }
+
+    let attrsString = _
+      .join(_.concat(attrs.toNgTemplate(), outputs), ' ');
 
     if (transformedActionName === 'dv-if') {
       transformedActionName = 'div';
@@ -189,18 +186,9 @@ export function toNgTemplate(
       return open.sourceString + elementName + close.sourceString;
     },
     VoidElement: tagTransform,
-    Attribute: (attributeNameNode, eq, expr) => {
-      // If we got to this point we know that this is an attribute of an
-      // action => with the exception of the html class attribute, the attr
-      // should be converted to an ng input
-      const attributeName = attributeNameNode.sourceString;
-      const newAttributeName = (attributeName === 'class') ?
-        attributeName : `[${attributeNameToInput(attributeName)}]`;
-      const exprStr = (attributeName === 'class') ?
-        expr.sourceString : `"${expr.toNgTemplate()}"`;
-
-      return newAttributeName + eq.sourceString + exprStr;
-    },
+    Attribute: (attributeNameNode, _eq, expr) =>
+      `[${attributeNameToInput(attributeNameNode.sourceString)}]=` +
+        `"${expr.toNgTemplate()}"`,
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),
     ElementName_action: (actionNameMaybeAlias) =>

@@ -34,3 +34,7 @@
   display: block;
   width: 300px;
 }
+
+.authentication-show-user-username {
+  display: inline;
+}

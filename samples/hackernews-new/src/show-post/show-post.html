@@ -1,6 +1,6 @@
 <dv.action name="show-post" loadedPost$=property.show-object.loadedObject>
   <div>
-    <property.show-object object=$post id=$id hidden=true />
+    <property.show-object id=$id hidden=true />
 
     <dv.if condition=!property.show-object.loadedObject>
       Post not found
@@ -17,7 +17,7 @@
         <div>
           <span class="post-title">
             <a href=property.show-object.loadedObject.url>
-              <property.show-object
+              <property.show-object class="inline-block"
                 object=property.show-object.loadedObject
                 showOnly=['title'] />
             </a>
@@ -35,7 +35,7 @@
             showScores=false
             totalLabel="" />
           points by
-          <property.show-object
+          <property.show-object class="inline-block"
             object=property.show-object.loadedObject
             showOnly=['author'] /> |
           <dv.link href="/item" params={ id: $id }>comments</dv.link>
