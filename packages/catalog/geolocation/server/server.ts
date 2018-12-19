@@ -8,7 +8,6 @@ import {
 } from 'cliche-server';
 import {
   CreateMarkerInput,
-  Marker,
   MarkerDoc,
   MarkersInput
 } from './schema';
@@ -23,16 +22,6 @@ class MarkerValidation {
     markers: mongodb.Collection<MarkerDoc>, id: string): Promise<MarkerDoc> {
     return Validation.existsOrFail(markers, id, 'Marker');
   }
-}
-
-function markerDocToMarker(markerDoc: MarkerDoc): Marker {
-  return {
-    id: markerDoc.id,
-    title: markerDoc.title,
-    mapId: markerDoc.mapId,
-    longitude: markerDoc.location.coordinates[0],
-    latitude: markerDoc.location.coordinates[1]
-  };
 }
 
 function isPendingCreate(doc: MarkerDoc | null) {
@@ -50,7 +39,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           throw new Error(`Marker ${id} does not exist`);
         }
 
-        return markerDocToMarker(marker);
+        return marker;
       },
 
       markers: (_root, { input }: { input: MarkersInput }) => {
