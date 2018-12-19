@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EventInfoWindowComponent } from './event-info-window.component';
+import { RegisterComponent } from './register.component';
 
-describe('EventInfoWindowComponent', () => {
-  let component: EventInfoWindowComponent;
-  let fixture: ComponentFixture<EventInfoWindowComponent>;
+describe('RegisterComponent', () => {
+  let component: RegisterComponent;
+  let fixture: ComponentFixture<RegisterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [EventInfoWindowComponent]
+      declarations: [RegisterComponent]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EventInfoWindowComponent);
+    fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

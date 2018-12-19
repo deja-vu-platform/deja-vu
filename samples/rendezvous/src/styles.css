@@ -640,3 +640,19 @@ select {
 #comment-table td {
   display: block;
 }
+
+dv-link:link {
+  text-decoration: none;
+}
+
+dv-link:visited {
+  text-decoration: none;
+}
+
+dv-link:hover {
+  text-decoration: underline;
+}
+
+dv-link:active {
+  text-decoration: underline;
+}

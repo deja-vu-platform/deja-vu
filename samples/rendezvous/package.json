@@ -45,7 +45,6 @@
     "geolocation": "0.0.1",
     "group": "0.0.1",
     "label": "0.0.1",
-    "post": "0.0.1",
     "property": "0.0.1",
     "moment": "^2.20.1",
     "rxjs": "^5.5.6",

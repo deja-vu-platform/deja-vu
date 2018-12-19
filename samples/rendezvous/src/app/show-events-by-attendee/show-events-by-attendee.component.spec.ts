@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowEventsByAttendeeComponent } from './show-events-by-attendee.component';
+import {
+  ShowEventsByAttendeeComponent
+} from './show-events-by-attendee.component';
 
 describe('ShowEventsByAttendeeComponent', () => {
   let component: ShowEventsByAttendeeComponent;
@@ -8,9 +10,9 @@ describe('ShowEventsByAttendeeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowEventsByAttendeeComponent ]
+      declarations: [ShowEventsByAttendeeComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +22,7 @@ describe('ShowEventsByAttendeeComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ShowMemberNameComponent } from '../show-member-name/show-member-name.component';
+import { ShowEventCommentComponent } from '../show-event-comment/show-event-comment.component';
 
 @Component({
   selector: 'rendezvous-show-event-details',
@@ -6,10 +9,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./show-event-details.component.css']
 })
 export class ShowEventDetailsComponent implements OnInit {
+  @Input() eventId: string;
+  @Input() set event(event: any) {
+    this.eventId = event.id;
+  }
+  user: any;
+  hostId: string;
+  action: string;
+  showMemberName = ShowMemberNameComponent;
+  showEventComment = ShowEventCommentComponent;
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      this.eventId = params.get('id');
+    });
   }
-
 }

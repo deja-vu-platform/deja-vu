@@ -1,3 +1,10 @@
-<p>
-  show-events-by-host works!
-</p>
+<authorization-show-resources
+  [createdBy]="user?.id"
+  [showResource]="{
+    type: showEventSummary, tag: 'rendezvous-show-event-summary',
+    inputMap: { id: 'eventId' }
+  }"
+  noResourcesText="You haven't created any events yet">
+</authorization-show-resources>
+<authentication-authenticate [id]="user?.id" [hidden]="true">
+</authentication-authenticate>
