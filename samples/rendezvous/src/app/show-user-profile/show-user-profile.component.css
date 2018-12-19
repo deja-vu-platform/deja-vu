@@ -1,3 +1,19 @@
 table, th, td {
   border: 1px solid #CC9088;
 }
+
+.reset_password{
+  padding-top: 200px;
+  margin: 0 auto;
+}
+
+.messagePanel {
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#edit-prof-btn {
+  margin-left:0;
+  margin-top:0;
+}

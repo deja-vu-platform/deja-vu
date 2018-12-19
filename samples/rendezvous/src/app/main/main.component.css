@@ -1,0 +1,59 @@
+.wrapper {
+  height: 100vh;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content:"";
+  display:table;
+}
+.clearfix:after {
+  clear:both;
+}
+
+.col-2-3 {
+  height: 100vh;
+  width: 66.66%;
+}
+
+.col-1-3 {
+  width: 33.33%;
+  height: 100vh;
+  padding-left: 12px;
+  padding-right: 10px;
+  background-color: #f9e8e8;
+  border-right: 2px solid #B3594D;
+
+  overflow: scroll;
+}
+
+#all-evnts .row {
+  margin: 0;
+}
+
+#all-evnts li {
+  padding: 0;
+  margin: 10 0 10 0;
+}
+
+#evnts-by-hst ul {
+  padding-left: 0;
+  list-style: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#evnts-by-hst .container {
+  width: 100%;
+  padding: 0;
+}
+
+#shw-pst .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#evnts-by-attnd .list-group-item {
+  padding-left: 0;
+  padding-right: 0;
+}
