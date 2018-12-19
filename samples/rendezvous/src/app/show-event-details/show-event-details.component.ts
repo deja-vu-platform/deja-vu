@@ -1,7 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ShowMemberNameComponent } from '../show-member-name/show-member-name.component';
-import { ShowEventCommentComponent } from '../show-event-comment/show-event-comment.component';
+
+import {
+  ShowEventCommentComponent
+} from '../show-event-comment/show-event-comment.component';
+import {
+  ShowMemberNameComponent
+} from '../show-member-name/show-member-name.component';
 
 @Component({
   selector: 'rendezvous-show-event-details',
@@ -19,10 +24,10 @@ export class ShowEventDetailsComponent implements OnInit {
   showMemberName = ShowMemberNameComponent;
   showEventComment = ShowEventCommentComponent;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       this.eventId = params.get('id');
     });
   }

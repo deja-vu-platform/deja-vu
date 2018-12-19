@@ -8,10 +8,6 @@ import { Component, Input } from '@angular/core';
 export class ShowEventCommentComponent {
   @Input() loggedInUserId: string;
   @Input() comment: Comment;
-
-  ngOnInit() {
-    console.log('yo', this.loggedInUserId);
-  }
 }
 
 interface Comment {

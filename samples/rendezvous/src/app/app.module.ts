@@ -6,8 +6,7 @@ import { DvModule, GATEWAY_URL } from 'dv-core';
 import { AppComponent } from './app.component';
 
 import {
-  MatButtonModule, MatIconModule,
-  MatCardModule, MatDialogModule
+  MatButtonModule, MatIconModule, MatCardModule, MatDialogModule
 } from '@angular/material';
 
 import { AuthenticationModule } from 'authentication';
@@ -83,7 +82,6 @@ import { ShowMemberNameComponent } from './show-member-name/show-member-name.com
   bootstrap: [AppComponent],
   entryComponents: [
     NavBarComponent,
-    ProfileOptionsComponent,
     ShowEventCommentComponent,
     ShowEventSummaryComponent,
     ShowMemberNameComponent

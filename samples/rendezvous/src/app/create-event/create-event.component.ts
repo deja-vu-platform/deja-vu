@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./create-event.component.css']
 })
 export class CreateEventComponent {
-  user: any
+  user: any;
 }

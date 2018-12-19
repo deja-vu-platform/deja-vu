@@ -13,7 +13,7 @@ export class ShowUserProfileComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       this.id = params.get('id');
     });
   }
