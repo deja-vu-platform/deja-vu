@@ -1,0 +1,168 @@
+<div class="index">
+  <rendezvous-nav-bar
+    (loggedInUser)="user=$event">
+  </rendezvous-nav-bar>
+
+  <div class="new_event">
+    <div class="panel panel-default">
+      <div class="panel-heading eventName" style="background-color: #ffa599;">
+        <!-- Event Title -->
+        <property-show-object
+          dvAlias="show-event-title" dvOf="eventDetails"
+          [id]="eventId" [showOnly]="['title']">
+        </property-show-object>
+      </div>
+
+      <div class="panel-body" style="padding: 15px;">
+        <div style="overflow: auto; margin-bottom: 15px">
+
+          <div id="hostBadge"
+            style="float: left; margin-top: 4px; cursor: pointer;">
+            <!-- Host -->
+            <authorization-show-owner
+              [resourceId]="eventId"
+              (ownerId)="hostId=$event" [hidden]="true">
+            </authorization-show-owner>
+            Hosted By
+            <span class="badge userBadge"
+                  style="color: black; margin-left: 5px;">
+              <authentication-show-user [id]="hostId">
+              </authentication-show-user>
+            </span>
+            <dv-link href="/profile" [params]="{ id: hostId }">
+              Go to profile
+            </dv-link>
+          </div>
+
+          <!-- Relevant Interests -->
+          <!-- Uncomment below when cliche restriction bug is resolved -->
+          <!-- <div style="float: left; margin-top: 4px;">
+            <button type="button" class="displayButtons btn btn-info">
+              Relevant Interests
+              <span class="badge" style="color: black; margin-left: 5px;">
+                <label-show-labels id="rlvnt-intrsts"
+                  dvAlias="event-interests"
+                  [itemId]="eventId"
+                  noLabelsToShowText="No interests added for this event">
+                </label-show-labels>
+              </span>
+            </button>
+          </div> -->
+
+          <div id="attendeesDiv" style="display: block; margin-top: 50px;">
+            <!-- List of Attendees -->
+            <p>Attendees</p>
+            <div class="panel-body"
+              style="background-color: #FFEFEE; border: 1px solid #CC9088">
+              <group-show-members [inGroupId]="eventId" [showMember]="{
+                type: showMemberName, tag: 'rendezvous-show-member-name',
+                inputMap: { id: 'id' }
+              }">
+              </group-show-members>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-info-table">
+          <p> Event Details</p>
+          <!-- Location -->
+          <p>Location:
+            <span>
+              <geolocation-show-marker
+                [id]="eventId"
+                [showId]="false"
+                [showMapId]="false">
+              </geolocation-show-marker>
+            </span>
+          </p>
+
+          <!-- Date + Time -->
+          <p>Date + Time:
+            <span>
+              <event-show-event [id]="eventId"></event-show-event>
+            </span>
+          </p>
+        </div>
+
+        <div class="event_details">
+          <!-- Additional Info -->
+          <p> Event Description</p>
+          <div id="shw-pst"
+            style="background-color: #FFEFEE; border: 1px solid #CC9088">
+            <property-show-object
+              dvAlias="show-event-additional-info" dvOf="eventDetails"
+              [id]="eventId" [showOnly]="['additionalInfo']">
+            </property-show-object>
+          </div>
+        </div>
+
+        <div *ngIf="user?.id === hostId">
+          <!-- TODO: Edit Event -->
+          <div class="inline btn-group form-group"
+            style="display: inline-block; float: right; margin-top: 10px;">
+            <button class="btn button">Coming Soon: Edit Event</button>
+          </div>
+
+          <p style="display:inline-block;float:right;margin-top:37px;margin-right:15px;">
+            YOU ARE THE HOST OF THIS EVENT
+          </p>
+        </div>
+
+        <!-- Join Group if already not in it -->
+        <div class="inline btn-group form-group" id="jn-lv-grp">
+          <dv-tx>
+            <div *ngIf="action === 'addMember'">
+              <authorization-add-viewer
+                [id]="eventId"
+                [viewerId]="user?.id"
+                [hidden]="true">
+              </authorization-add-viewer>
+            </div>
+
+            <div *ngIf="action === 'removeMember'">
+              <authorization-remove-viewer
+                [id]="eventId"
+                [viewerId]="user?.id"
+                [hidden]="true">
+              </authorization-remove-viewer>
+            </div>
+
+            <group-join-leave
+              (actionToTake)="action=$event"
+              [groupId]="eventId"
+              [memberId]="user?.id">
+            </group-join-leave>
+          </dv-tx>
+        </div>
+
+        <div>
+          <p style="margin-top: 80px;display:flex;">Comments</p>
+        </div>
+        <table id="comment-table" class="event_info event_display table">
+          <tbody>
+            <tr id="add-comment-row">
+              <th id="add-comment">
+                <dv-tx>
+                  <comment-create-comment
+                    [authorId]="user?.id"
+                    [targetId]="eventId"
+                    inputLabel="Post a new comment"
+                    buttonLabel="Post">
+                  </comment-create-comment>
+                </dv-tx>
+              </th>
+            </tr>
+            <comment-show-comments
+              [ofTargetId]="eventId"
+              [showComment]="{
+                type: showEventComment, tag: 'rendezvous-show-event-comment',
+                inputMap: { comment: 'comment' },
+                inputs: { loggedInUserId: user?.id }
+              }">
+            </comment-show-comments>
+          </tbody>
+        </table>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,134 @@
+<div class="index">
+  <rendezvous-nav-bar
+    [redirectParams]="{ callback: '/create-event' }"
+    (loggedInUser)="user=$event">
+  </rendezvous-nav-bar>
+
+  <div class="new_event">
+    <div class="panel panel-default">
+      <div class="panel-heading" style="background-color: #ffa599;">
+        Create Event
+      </div>
+      <div class="panel-body" style="padding: 15px;">
+
+        <div style="float: left; margin-top: 4px;">
+          <button type="button" class="displayButtons btn btn-info">
+            Hosted By
+            <span class="badge" style="color: black; margin-left: 5px;">
+              {{user?.username}}
+            </span>
+          </button>
+        </div>
+
+        <!-- <geolocation-display-map
+          displayMapId="mainMapId"
+          (newPosition)="mPos=$event">
+        </geolocation-display-map> -->
+        <dv-tx>
+          <dv-id (id)="eventId=$event"></dv-id>
+          <dv-status savedText="Event created"></dv-status>
+
+          <table id="event_info" class="table">
+            <tr>
+              <!-- Location -->
+              <!-- TODO: Allow users to search for a location -->
+              <td rowspan="2" style="width: 30%">
+                <div class="form-group">
+                  <p>Location</p>
+                  <div id="map_new_event">
+                    <geolocation-create-marker
+                      [id]="eventId"
+                      mapId="mainMapId"
+                      [latitude]="mPos?.latitude"
+                      [longitude]="mPos?.longitude"
+                      (marker)="m=$event"
+                      [showOptionToSubmit]="false">
+                    </geolocation-create-marker>
+                  </div>
+                  <div class="guidelines"
+                    style="margin-top: 3px; width: 100%;">
+                    (must be within 50 miles of current location)
+                  </div>
+                </div>
+              </td>
+
+              <!-- Event -->
+              <td style="width: 30%">
+                <p>Date & Time</p>
+                <event-create-event
+                  [id]="eventId"
+                  [showOptionToSubmit]="false">
+                </event-create-event>
+              </td>
+            </tr>
+
+            <!--
+              - Uncomment below when restriction of number of cliches resolved.
+              - TODO: Choose from list of tags
+            -->
+            <!-- <tr>
+              <td>
+                <p>Tags</p>
+                <br>
+                <div class="btn-group" style="padding-top: 0px;">
+                  <label-attach-labels [itemId]="eventId">
+                  </label-attach-labels>
+                </div>
+              </td>
+            </tr> -->
+          </table>
+
+          <!-- Event Title + Additional Info -->
+          <div class="event_details">
+            <p>Event Details</p>
+            <property-create-object
+              dvOf="eventDetails"
+              [id]="eventId"
+              [showOptionToSubmit]="false">
+            </property-create-object>
+          </div>
+
+          <!-- Create Group w/ Logged In User as a Member -->
+          <group-create-group
+            [id]="eventId"
+            [showOptionToAddMembers]="false"
+            [showOptionToSubmit]="false"
+            [memberIds]="user ? [user.id] : undefined"
+            [hidden]="true">
+          </group-create-group>
+
+          <!-- Authorization + Authentication Checks -->
+          <authorization-create-resource
+            [id]="eventId"
+            [ownerId]="user?.id"
+            [hidden]="true">
+          </authorization-create-resource>
+          <!-- <authentication-authenticate
+            [id]="user?.id" [hidden]="true">
+          </authentication-authenticate> -->
+
+          <!-- Cancel and Create Buttons -->
+          <div style="float:right;">
+            <dv-button id="create"
+              style="margin-top: 10px; margin-left: 10px; width: 80px;">
+              Create!
+            </dv-button>
+            <dv-link
+              href="/event-details"
+              [params]="{ eventid : eventId }"
+              [hidden]="true">
+            </dv-link>
+          </div>
+          <div style="float:right;">
+            <dv-link href="/main" type="button"
+              class="btn button btn-info" id="back"
+              style="margin-top: 10px; width: 80px;">
+              Cancel
+            </dv-link>
+          </div>
+
+        </dv-tx>
+      </div>
+    </div>
+  </div>
+</div>

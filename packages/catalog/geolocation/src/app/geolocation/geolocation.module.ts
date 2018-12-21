@@ -17,6 +17,10 @@ import { DisplayMapComponent } from './display-map/display-map.component';
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
+export {
+  CreateMarkerComponent, DeleteMarkerComponent, DisplayMapComponent,
+  ShowMarkerComponent, ShowMarkersComponent
+}
 
 import {
   API_PATH, CONFIG, GeolocationConfig, GOOGLE_MAPS_API_KEY

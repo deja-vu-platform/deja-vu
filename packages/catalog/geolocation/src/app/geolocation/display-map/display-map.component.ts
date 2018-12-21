@@ -16,6 +16,7 @@ import {
 } from 'leaflet';
 import * as _ from 'lodash';
 
+
 @Component({
   selector: 'geolocation-display-map',
   templateUrl: './display-map.component.html',
@@ -53,8 +54,8 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     icon: icon({
       iconSize: [25, 41],
       iconAnchor: [13, 41],
-      iconUrl: '../assets/img/marker-icon.png',
-      shadowUrl: '../assets/img/marker-shadow.png'
+      iconUrl: 'assets/leaflet/images/marker-icon.png',
+      shadowUrl: 'assets/leaflet/images/marker-shadow.png'
     })
   };
 

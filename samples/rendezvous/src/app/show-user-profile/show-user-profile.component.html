@@ -1,0 +1,92 @@
+<rendezvous-nav-bar
+  [showProfileButton]="false"
+  [redirectParams]="{ callback: '/profile' }"
+  (loggedInUser)="user=$event">
+</rendezvous-nav-bar>
+
+<div class="index">
+  <div *ngIf="!id">
+    Need to provide an id.
+  </div>
+  <div *ngIf="id" class="reset_password">
+    <div class="panel panel-default messagePanel" style="width: 500px;">
+      <div class="panel-heading"
+        style="background-color:#ffa599;display:flex;">
+        <!-- Username -->
+        <div style="flex-grow:1;">
+          <h4 style="margin-top:15px;">
+            <authentication-show-user [id]="id">
+            </authentication-show-user>
+          </h4>
+        </div>
+
+        <!-- Edit Profile -->
+        <div *ngIf="id === user?.id" style="margin-top:10px;">
+          <dv-link href="/edit-profile" class="btn button" type="button"
+            id="edit-prof-btn">
+            Edit Profile
+          </dv-link>
+        </div>
+      </div>
+
+      <div class="panel-body" style="padding: 15px; text-align: center">
+        <table class="event_info event_display table"
+          style="margin-top: 10px; margin-bottom: 0px;">
+          <!-- Email -->
+          <tr>
+            <th>Email</th>
+            <td>
+              <property-show-object
+                dvAlias="show-user-email"
+                dvOf="userProfile"
+                [id]="id"
+                [showOnly]="['email']">
+              </property-show-object>
+            </td>
+          </tr>
+
+          <!-- Phone Number -->
+          <tr>
+            <th>Phone</th>
+            <td>
+              <property-show-object
+                dvAlias="show-user-phone-number"
+                dvOf="userProfile"
+                [id]="id"
+                [showOnly]="['phoneNumber']">
+              </property-show-object>
+            </td>
+          </tr>
+
+          <!-- Majors -->
+          <tr style="text-align: center;">
+            <th>Majors</th>
+            <td>
+              <p style="white-space:pre; margin-bottom:0px;">
+                <property-show-object
+                  dvAlias="show-user-majors"
+                  dvOf="userProfile"
+                  [id]="id"
+                  [showOnly]="['majors']">
+                </property-show-object>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Location -->
+          <tr>
+            <th>Location</th>
+            <td>
+              <property-show-object
+                dvAlias="show-user-location"
+                dvOf="userProfile"
+                [id]="id"
+                [showOnly]="['zipCode']">
+              </property-show-object>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

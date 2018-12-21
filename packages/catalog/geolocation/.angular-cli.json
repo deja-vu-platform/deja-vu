@@ -20,7 +20,7 @@
       "prefix": "geolocation",
       "styles": [
         "styles.css",
-        "../../../../node_modules/leaflet/dist/leaflet.css"
+        "assets/leaflet/leaflet.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

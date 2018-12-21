@@ -8,11 +8,13 @@ export interface ResourceDoc {
 
 export interface PendingDoc {
   reqId: string;
-  type: 'create-resource' | 'add-viewer-to-resource' | 'delete-resource';
+  type: 'create-resource' | 'add-viewer-to-resource' |
+  'delete-resource' | 'remove-viewer-from-resource';
 }
 
 export interface ResourcesInput {
-  viewableBy: string;
+  createdBy?: string;
+  viewableBy?: string;
 }
 
 export interface CreateResourceInput {
@@ -27,6 +29,11 @@ export interface PrincipalResourceInput {
 }
 
 export interface AddViewerToResourceInput {
+  id: string;
+  viewerId: string;
+}
+
+export interface RemoveViewerFromResourceInput {
   id: string;
   viewerId: string;
 }

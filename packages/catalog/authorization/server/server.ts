@@ -6,15 +6,18 @@ import {
   Context,
   Validation
 } from 'cliche-server';
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   AddViewerToResourceInput,
   CreateResourceInput,
   PrincipalResourceInput,
+  RemoveViewerFromResourceInput,
   ResourceDoc,
   ResourcesInput
 } from './schema';
+
+
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
@@ -34,9 +37,18 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
   return {
     Query: {
-      resources: (_root, { input }: { input: ResourcesInput }) => resources
-        .find({ viewerIds: input.viewableBy, pending: { $exists: false } })
-        .toArray(),
+      resources: async (_root, { input }: { input: ResourcesInput }) => {
+        const filter = { pending: { $exists: false } };
+        if (input.createdBy) {
+          filter['ownerId'] = input.createdBy;
+        } else if (input.viewableBy) {
+          filter['viewerIds'] = input.viewableBy;
+        }
+
+        return await resources
+          .find(filter)
+          .toArray();
+      },
 
       resource: async (_root, { id }) => {
         const resource: ResourceDoc | null = await ResourceValidation
@@ -149,6 +161,61 @@ function resolvers(db: mongodb.Db, _config: Config): object {
                     pending: {
                       reqId: context.reqId,
                       type: 'add-viewer-to-resource'
+                    }
+                  }
+                });
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await ResourceValidation.resourceExistsOrFail(resources, input.id);
+            const updateObj = await resources
+              .updateOne(notPendingResourceFilter, updateOp);
+            if (updateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await resources.updateOne(
+              reqIdPendingFilter,
+              { ...updateOp, $unset: { pending: '' } });
+
+            return undefined;
+          case 'abort':
+            await resources.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
+      },
+
+      removeViewerFromResource: async (
+        _root,
+        { input }: { input: RemoveViewerFromResourceInput },
+        context: Context) => {
+        const updateOp = { $pull: { viewerIds: input.viewerId } };
+        const notPendingResourceFilter = {
+          id: input.id,
+          pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await ResourceValidation.resourceExistsOrFail(resources, input.id);
+            const pendingUpdateObj = await resources
+              .updateOne(
+                notPendingResourceFilter,
+                {
+                  $set: {
+                    pending: {
+                      reqId: context.reqId,
+                      type: 'remove-viewer-from-resource'
                     }
                   }
                 });

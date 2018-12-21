@@ -1,0 +1,16 @@
+#login_panel {
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 200px;
+}
+
+.authLink {
+  background:none;
+  border:none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 10px;
+  text-decoration:underline;
+  color: #B3594D;
+}

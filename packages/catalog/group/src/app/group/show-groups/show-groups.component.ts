@@ -21,7 +21,7 @@ export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
-  @Input() withMemberId: string | undefined;
+  @Input() withMemberId = '';
 
   // Show rules
   @Input() showId = true;

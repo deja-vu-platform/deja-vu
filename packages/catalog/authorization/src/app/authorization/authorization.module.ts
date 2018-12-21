@@ -25,6 +25,9 @@ import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
 import {
+  RemoveViewerComponent
+} from './remove-viewer/remove-viewer.component';
+import {
   ShowOwnerComponent
 } from './show-owner/show-owner.component';
 import {
@@ -39,7 +42,8 @@ import { API_PATH } from './authorization.config';
 
 const allComponents = [
   AddViewerComponent, CanEditComponent, CanViewComponent,
-  CreateResourceComponent, DeleteResourceComponent, ShowOwnerComponent,
+  CreateResourceComponent, DeleteResourceComponent,
+  RemoveViewerComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent
 ];
 

@@ -18,8 +18,8 @@ Team Winner Winner Chicken Dinner
 ## Cliches Used
 - StandardAuthentication
 - Authentication
-- Geolocation 
-- Post
+- Geolocation
+- Property
 - Event
 - Group
 - Label
@@ -27,20 +27,17 @@ Team Winner Winner Chicken Dinner
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
-- Edit events (edit/delete, trivial but not worth research time)
-- Edit user page (^)
-- Delete comments (^)
-- Delete events (^)
-- User Full Name (persisted field -- attach arbitrary info to cliche)
-- User Phone Number (^, probably with regex)
-- User ZIP code (^, ^)
-- User Major, Choose multiple from a list (^, select from preset options)
+- Edit events
+- Edit user page
+- User Phone Number (added with property, but can be verified with regex)
+- User ZIP code (added with property, but can be verified with regex)
+- User Major, Choose multiple from a list (labels from preset options)
 - Choose relevant interests from list (labels from preset options)
-- User profile page. (^, or possibly user cliche)
-- Password Recovery (auth cliche functionality)
-- Timestamps for comments (comment functionality, possibly make this general)
-- Need MIT email to sign up (new access cliche?)
+- Password Recovery (authentication)
+- Timestamps for comments (comment)
+- Need MIT email to sign up (regex? email cliche for verification)
 - Events are hidden once they pass (Show events by date w/ current date)
 - Only show one event filter at a time (probably want some user scripting)
 - Recenter Button (probably won’t do)
-- Show street view in info window (Works but it’s hacked, probably won’t do)
+- Display map
+- Customize marker info window
