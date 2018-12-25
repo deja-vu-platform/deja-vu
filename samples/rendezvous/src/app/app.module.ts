@@ -13,7 +13,7 @@ import { AuthenticationModule } from 'authentication';
 import { AuthorizationModule } from 'authorization';
 import { CommentModule } from 'comment';
 import { EventModule } from 'event';
-import { GeolocationModule } from 'geolocation';
+import { GeolocationModule, GEOLOCATION_CONFIG } from 'geolocation';
 import { GroupModule } from 'group';
 import { LabelModule } from 'label';
 import { PropertyModule } from 'property';
@@ -77,7 +77,9 @@ import { ShowMemberNameComponent } from './show-member-name/show-member-name.com
     ])
   ],
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' }
+    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
+    { provide: GEOLOCATION_CONFIG, useValue: { mapType: 'leaflet' } }
+
   ],
   bootstrap: [AppComponent],
   entryComponents: [

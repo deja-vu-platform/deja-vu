@@ -6,8 +6,13 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "dist",
+      "outDir": "dist/app",
       "assets": [
+        {
+          "glob": "**/*",
+          "input": "assets/leaflet/images",
+          "output": "leaflet/"
+        },
         "assets",
         "favicon.ico"
       ],
@@ -19,7 +24,8 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "rendezvous",
       "styles": [
-        "styles.css"
+        "styles.css",
+        "assets/leaflet/leaflet.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
