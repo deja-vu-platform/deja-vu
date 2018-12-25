@@ -42,6 +42,7 @@ export class CreateMarkerComponent implements
   OnInit, OnChanges, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() mapId: string;
+  @Input() foo: any;
 
   @Input() set title(label: string | undefined) {
     const markerTitle = label ? label : '';

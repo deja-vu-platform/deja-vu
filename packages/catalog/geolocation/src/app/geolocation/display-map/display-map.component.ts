@@ -63,9 +63,9 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath,
-    @Inject(CONFIG) config) {
-    this.mapType = config.mapType;
+    private rs: RunService, @Inject(CONFIG) private config,
+    @Inject(API_PATH) private apiPath) {
+    this.mapType = 'leaflet';
   }
 
   ngOnInit() {

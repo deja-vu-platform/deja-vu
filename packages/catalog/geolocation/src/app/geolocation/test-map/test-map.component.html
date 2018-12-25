@@ -1,0 +1,42 @@
+<div *ngIf="id">
+  <!-- Leaflet Maps -->
+  <!-- <div *ngIf="mapType === 'leaflet'">
+    <div class="map"
+      leaflet
+      (leafletMapReady)="onMapReady($event)"
+      [leafletOptions]="options"
+      [leafletLayersControl]="layers"
+      [leafletFitBounds]="bounds">
+    </div>
+  </div> -->
+  <!-- Google Maps -->
+  <!-- <div *ngIf="mapType === 'gmap'">
+    <agm-map
+      [latitude]="lat"
+      [longitude]="lng"
+      [zoom]="zoom"
+      [disableDefaultUI]="false"
+      [maxZoom]="maxZoom"
+      [minZoom]="minZoom"
+      [zoomControl]="true"
+      [streetViewControl]="streetViewControl"
+      (mapClick)="onMapClick($event)">
+
+      <agm-marker *ngFor="let m of markers"
+        [latitude]="m.latitude"
+        [longitude]="m.longitude">
+
+        <agm-info-window>
+          <strong>{{m.title}}</strong>
+        </agm-info-window>
+      </agm-marker>
+    </agm-map>
+  </div> -->
+</div>
+
+<div *ngIf="!id">
+  <mat-error>
+    <mat-icon class="inline-icon">report_problem</mat-icon>
+    Must provide an ID to load the map.
+  </mat-error>
+</div>

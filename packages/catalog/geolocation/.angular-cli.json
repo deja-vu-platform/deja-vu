@@ -8,6 +8,11 @@
       "root": "src",
       "outDir": "dist/app",
       "assets": [
+        {
+          "glob": "**/*",
+          "input": "assets/leaflet/images",
+          "output": "leaflet/"
+        },
         "assets",
         "favicon.ico"
       ],

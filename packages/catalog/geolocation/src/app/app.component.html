@@ -1,5 +1,13 @@
 <div class="container">
-  <h1>Display Map <i>markerMapId</i></h1>
+  <geolocation-test-map id="test" (newMarker)="mPos=$event"></geolocation-test-map>
+  <geolocation-create-marker mapId="test" [foo]="mPos"
+    [latitude]="mPos?.latitude" [longitude]="mPos?.longitude"
+    (marker)="m=$event">
+  </geolocation-create-marker>
+  <h1>Show Marker</h1>
+  <geolocation-show-marker [marker]="m"></geolocation-show-marker>
+
+  <!-- <h1>Display Map <i>markerMapId</i></h1>
   <geolocation-display-map
     displayMapId="markerMapId"
     (newPosition)="mPos=$event">
@@ -14,10 +22,10 @@
   <h1>Show All Markers</h1>
   <geolocation-show-markers></geolocation-show-markers>
   <h1>Show Markers for Map <i>markerMapId</i></h1>
-  <geolocation-show-markers ofMapId="markerMapId"></geolocation-show-markers>
+  <geolocation-show-markers ofMapId="markerMapId"></geolocation-show-markers> -->
 
   <!-- Create marker to delete -->
-  <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>
+  <!-- <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>
     (<i>Stata Center</i>)</h1>
   <geolocation-create-marker
     id="markerId" mapId="markerMapId" title="Stata Center"
@@ -26,5 +34,5 @@
   <h1>Show Marker</h1>
   <geolocation-show-marker id="markerId"></geolocation-show-marker>
   <h1>Delete Marker <i>markerId</i></h1>
-  <geolocation-delete-marker id="markerId"></geolocation-delete-marker>
+  <geolocation-delete-marker id="markerId"></geolocation-delete-marker> -->
 </div>
