@@ -59,8 +59,6 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   @Output() newMarker: EventEmitter<Marker> = new EventEmitter<Marker>();
 
-  // TODO: give size option
-
   private gs: GatewayService;
 
   constructor(
