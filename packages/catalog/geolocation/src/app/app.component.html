@@ -16,6 +16,14 @@
   <h1>Show Markers for Map <i>markerMapId</i></h1>
   <geolocation-show-markers ofMapId="markerMapId"></geolocation-show-markers>
 
+  <!-- Search for Location -->
+  <h1>Search for Location</h1>
+  <geolocation-search-for-location mapId="markerMapId" (location)="l=$event">
+  </geolocation-search-for-location>
+  <geolocation-create-marker mapId="markerMapId"
+    [title]="l?.title" [latitude]="l?.latitude" [longitude]="l?.longitude">
+  </geolocation-create-marker>
+
   <!-- Create marker to delete -->
   <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>
     (<i>Stata Center</i>)</h1>

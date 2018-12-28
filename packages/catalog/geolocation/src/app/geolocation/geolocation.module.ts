@@ -15,12 +15,15 @@ import { AgmCoreModule } from '@agm/core';
 import { CreateMarkerComponent } from './create-marker/create-marker.component';
 import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
 import { DisplayMapComponent } from './display-map/display-map.component';
+import {
+  SearchForLocationComponent
+} from './search-for-location/search-for-location.component';
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
 export {
   CreateMarkerComponent, DeleteMarkerComponent, DisplayMapComponent,
-  ShowMarkerComponent, ShowMarkersComponent
+  SearchForLocationComponent, ShowMarkerComponent, ShowMarkersComponent
 }
 
 import {
@@ -31,6 +34,7 @@ const allComponents = [
   CreateMarkerComponent,
   DeleteMarkerComponent,
   DisplayMapComponent,
+  SearchForLocationComponent,
   ShowMarkerComponent,
   ShowMarkersComponent
 ];
