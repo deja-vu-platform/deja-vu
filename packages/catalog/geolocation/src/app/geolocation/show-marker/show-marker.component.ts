@@ -33,7 +33,6 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
     private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    console.log(this.id);
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }

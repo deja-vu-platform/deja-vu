@@ -9,7 +9,7 @@ import {
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import * as _ from 'lodash';
 
-import { Marker } from '../shared/geolocation.model';
+import { Location } from '../shared/geolocation.model';
 
 const CLEAR_ERRORS_TIMEOUT = 3000;
 
@@ -35,13 +35,11 @@ export class SearchForLocationComponent {
   public searchError: string;
   private provider;
 
-  @Input() mapId: string;
-
   // Presentation inputs
   @Input() searchLabel = 'Address';
   @Input() buttonLabel = 'Search for Location';
 
-  @Output() location: EventEmitter<Marker> = new EventEmitter<Marker>();
+  @Output() location: EventEmitter<Location> = new EventEmitter<Location>();
 
   @ViewChild(FormGroupDirective) form;
   addressControl = new FormControl('', [Validators.required]);
@@ -65,11 +63,10 @@ export class SearchForLocationComponent {
       this.searchError = 'No results. Try again.';
     } else {
       const searchResult = results[0];
-      const m: Marker = {
+      const m: Location = {
         title: searchResult.label,
         latitude: searchResult.y,
-        longitude: searchResult.x,
-        mapId: this.mapId
+        longitude: searchResult.x
       };
 
       this.location.emit(m);
