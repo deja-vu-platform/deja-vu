@@ -2,11 +2,12 @@ import { DatePipe } from '@angular/common';
 import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
-import { Marker } from '../shared/geolocation.model';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
+
 import { API_PATH } from '../geolocation.config';
+import { Marker } from '../shared/geolocation.model';
 
 @Component({
   selector: 'geolocation-show-marker',

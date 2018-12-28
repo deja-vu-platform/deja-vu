@@ -17,11 +17,10 @@ import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
 import { DisplayMapComponent } from './display-map/display-map.component';
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
-import { TestMapComponent } from './test-map/test-map.component';
 
 export {
   CreateMarkerComponent, DeleteMarkerComponent, DisplayMapComponent,
-  ShowMarkerComponent, ShowMarkersComponent, TestMapComponent
+  ShowMarkerComponent, ShowMarkersComponent
 }
 
 import {
@@ -33,8 +32,7 @@ const allComponents = [
   DeleteMarkerComponent,
   DisplayMapComponent,
   ShowMarkerComponent,
-  ShowMarkersComponent,
-  TestMapComponent
+  ShowMarkersComponent
 ];
 
 @NgModule({
