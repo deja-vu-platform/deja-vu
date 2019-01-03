@@ -7,7 +7,11 @@ import {
 } from 'dv-core';
 
 import { MouseEvent as AgmMouseEvent } from '@agm/core';
-import * as L from 'leaflet';
+
+import 'leaflet';
+import 'leaflet-routing-machine';
+import 'leaflet-control-geocoder';
+declare let L;
 
 import { API_PATH, CONFIG } from '../geolocation.config';
 import { Marker } from '../shared/geolocation.model';
@@ -25,6 +29,9 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   public layers: L.Layer[];
   public mapType: 'gmap' | 'leaflet';
 
+  private _map: L.Map;
+  private _geocoder;
+  private geocodeMarker: L.Marker;
   private markerIcon = L.icon({
     iconSize: [25, 41],
     iconAnchor: [13, 41],
@@ -90,16 +97,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   setUpMap() {
+    L.Marker.prototype.options.icon = this.markerIcon;
+
     // Set the initial set of displayed layers
     this.options = {
-      layers: [ L.tileLayer(this.urlTemplate, {
+      layers: [L.tileLayer(this.urlTemplate, {
         attribution: this.attribution,
         minZoom: this.minZoom,
         maxZoom: this.maxZoom
       })],
       zoom: this.zoom,
-      center: L.latLng([ this.lat, this.lng ])
+      center: L.latLng([this.lat, this.lng])
     };
+
+    this._geocoder = L.Control.Geocoder.nominatim();
   }
 
   setMarkers() {
@@ -109,13 +120,41 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
           icon: this.markerIcon,
           title: m.title
         })
-        .bindPopup(`<b>${m.title}</b>`);
+          .bindPopup(`<b>${m.title}</b>`);
       });
     }
   }
 
   onMapReady(map: L.Map) {
-    map.on('click', (e) => this.zone.run(() => this.onMapClick(e)));
+    this._map = map;
+
+    // search
+    L.Control.geocoder({
+      geocoder: this._geocoder,
+      position: "topleft"
+    })
+    .addTo(this._map);
+
+    // directions
+    L.Routing.control({
+      waypoints: [
+        L.latLng(42.3590, -71.0940), // point A
+        L.latLng(42.3620, -71.0810)  // point B
+      ],
+      routeWhileDragging: true,
+      reverseWaypoints: true,
+      showAlternatives: true,
+      altLineOptions: {
+        styles: [
+          { color: 'black', opacity: 0.15, weight: 9 },
+          { color: 'white', opacity: 0.8, weight: 6 },
+          { color: 'blue', opacity: 0.5, weight: 2 }
+        ]
+      },
+      geocoder: this._geocoder // search with directions
+    }).addTo(this._map);
+
+    this._map.on('click', (e) => this.zone.run(() => this.onMapClick(e)));
   }
 
   onMapClick(e) {
@@ -124,6 +163,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     if (this.mapType === 'leaflet') {
       const event: L.LeafletMouseEvent = e;
       coords = event.latlng;
+
+      // Get address and possible name
+      this._geocoder.reverse(coords, this._map.options.crs.scale(this._map.getZoom()), (results) => {
+        var r = results[0];
+        if (this.geocodeMarker) this._map.removeLayer(this.geocodeMarker);
+        this.geocodeMarker = L.marker(coords, {
+          icon: this.markerIcon,
+          title: r.html || r.name
+        })
+          .bindPopup(r.html || r.name)
+          .addTo(this._map)
+          .openPopup();
+      });
+
     } else {
       const event: AgmMouseEvent = e;
       coords = event.coords;
@@ -137,7 +190,6 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
     this.newMarker.emit(m);
   }
-
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
