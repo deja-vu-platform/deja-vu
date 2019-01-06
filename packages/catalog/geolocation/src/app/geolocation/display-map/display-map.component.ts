@@ -9,12 +9,12 @@ import {
 import { MouseEvent as AgmMouseEvent } from '@agm/core';
 
 import 'leaflet';
-import 'leaflet-routing-machine';
 import 'leaflet-control-geocoder';
+import 'leaflet-routing-machine';
 declare let L;
 
 import { API_PATH, CONFIG } from '../geolocation.config';
-import { Marker } from '../shared/geolocation.model';
+import { Location, Marker } from '../shared/geolocation.model';
 
 
 @Component({
@@ -29,10 +29,11 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   public layers: L.Layer[];
   public mapType: 'gmap' | 'leaflet';
 
+  private _markers: Marker[];
   private _map: L.Map;
-  private _geocoder;
-  private geocodeMarker: L.Marker;
-  private markerIcon = L.icon({
+  private _geocoder: any;
+  private _geocodeMarker: L.Marker;
+  private _markerIcon = L.icon({
     iconSize: [25, 41],
     iconAnchor: [13, 41],
     iconUrl: 'assets/leaflet/images/marker-icon.png',
@@ -42,13 +43,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   // Required
   @Input() id: string;
 
-  _markers: Marker[];
+  // If not provided, all markers will be loaded
   get markers() { return this._markers; }
   @Input() set markers(markers: Marker[]) {
     this._markers = markers;
   }
 
-  @Input() streetViewControl = false;
+  @Input() start: Location; // N/A for Google Maps
+  @Input() end: Location;   // N/A for Google Maps
+
+  // Presentation Inputs
+  @Input() showLoadedMarkers = true;
+  @Input() showSearchControl = true;      // N/A for Google Maps
+  @Input() showDirectionsControl = true;  // N/A for Google Maps
+  @Input() streetViewControl = false;     // N/A for Leaflet
 
   // Default configurations for map displays
   // Default center: MIT Stata Center
@@ -71,13 +79,12 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private zone: NgZone,
-    @Inject(API_PATH) private apiPath,
-    @Inject(CONFIG) private config) {
+    @Inject(API_PATH) private apiPath, @Inject(CONFIG) private config) {
     this.mapType = this.config.mapType;
   }
 
   ngOnInit() {
-    this.setUpMap();
+    if (this.mapType === 'leaflet') { this.setUpLeafletMap(); }
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }
@@ -96,8 +103,8 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     }
   }
 
-  setUpMap() {
-    L.Marker.prototype.options.icon = this.markerIcon;
+  setUpLeafletMap() {
+    L.Marker.prototype.options.icon = this._markerIcon;
 
     // Set the initial set of displayed layers
     this.options = {
@@ -113,34 +120,36 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     this._geocoder = L.Control.Geocoder.nominatim();
   }
 
-  setMarkers() {
+  setLeafletMarkers() {
     if (this.markers) {
       this.layers = this.markers.map((m: Marker) => {
         return L.marker([m.latitude, m.longitude], {
-          icon: this.markerIcon,
-          title: m.title
+          icon: this._markerIcon
         })
           .bindPopup(`<b>${m.title}</b>`);
       });
     }
   }
 
-  onMapReady(map: L.Map) {
-    this._map = map;
-
-    // search
+  setUpLeafletSearchControl() {
     L.Control.geocoder({
       geocoder: this._geocoder,
-      position: "topleft"
+      position: 'topleft'
     })
-    .addTo(this._map);
+      .on('markgeocode', (e) => {
+        const m: Marker = {
+          title: e.geocode.name,
+          latitude: e.geocode.center.lat,
+          longitude: e.geocode.center.lng,
+          mapId: this.id
+        };
+        this.newMarker.emit(m);
+      })
+      .addTo(this._map);
+  }
 
-    // directions
-    L.Routing.control({
-      waypoints: [
-        L.latLng(42.3590, -71.0940), // point A
-        L.latLng(42.3620, -71.0810)  // point B
-      ],
+  setUpLeafletDirectionsControl() {
+    const routingOptions = {
       routeWhileDragging: true,
       reverseWaypoints: true,
       showAlternatives: true,
@@ -151,31 +160,60 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
           { color: 'blue', opacity: 0.5, weight: 2 }
         ]
       },
-      geocoder: this._geocoder // search with directions
-    }).addTo(this._map);
+      geocoder: this._geocoder
+    };
 
+    // Display route for given points
+    if (this.start && this.end) {
+      routingOptions['waypoints'] = [
+        L.latLng(this.start.latitude, this.start.longitude),
+        L.latLng(this.end.latitude, this.end.longitude)
+      ];
+    }
+
+    L.Routing.control(routingOptions)
+      .addTo(this._map);
+  }
+
+  // Leaflet only
+  onMapReady(map: L.Map) {
+    this._map = map;
+
+    // search
+    if (this.showSearchControl) {
+      this.setUpLeafletSearchControl();
+    }
+
+    // directions between two or more points
+    // (the points are either provided from the UI or inputted as start and end)
+    if (this.showDirectionsControl) {
+      this.setUpLeafletDirectionsControl();
+    }
+
+    // click handler
     this._map.on('click', (e) => this.zone.run(() => this.onMapClick(e)));
   }
 
   onMapClick(e) {
-    let coords;
+    let coords, title;
 
     if (this.mapType === 'leaflet') {
       const event: L.LeafletMouseEvent = e;
       coords = event.latlng;
 
-      // Get address and possible name
-      this._geocoder.reverse(coords, this._map.options.crs.scale(this._map.getZoom()), (results) => {
-        var r = results[0];
-        if (this.geocodeMarker) this._map.removeLayer(this.geocodeMarker);
-        this.geocodeMarker = L.marker(coords, {
-          icon: this.markerIcon,
-          title: r.html || r.name
-        })
-          .bindPopup(r.html || r.name)
-          .addTo(this._map)
-          .openPopup();
-      });
+      // Retrieve address from clicked location
+      this._geocoder.reverse(coords,
+        this._map.options.crs.scale(this._map.getZoom()), (results) => {
+          const r = results[0];
+          title = r.html || r.name;
+          if (this._geocodeMarker) {
+            this._map.removeLayer(this._geocodeMarker);
+          }
+          this._geocodeMarker = L.marker(coords, { icon: this._markerIcon })
+            .bindPopup(title)
+            .addTo(this._map)
+            .openPopup();
+        });
 
     } else {
       const event: AgmMouseEvent = e;
@@ -183,6 +221,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     }
 
     const m: Marker = {
+      title: title,
       latitude: coords.lat,
       longitude: coords.lng,
       mapId: this.id
@@ -215,7 +254,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.markers = res.data.markers;
           if (this.mapType === 'leaflet') {
-            this.setMarkers();
+            this.setLeafletMarkers();
           }
         });
     }
