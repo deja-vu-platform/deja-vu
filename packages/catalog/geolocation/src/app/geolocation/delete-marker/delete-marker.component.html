@@ -1,10 +1,10 @@
 <div *ngIf="showNotifications" class="form-group">
   <div *ngIf="markerDeleted" class="delete-marker-success">
-    <i class="material-icons">done</i>
+    <mat-icon class="inline-icon">done</mat-icon>
     {{markerDeletedText}}
   </div>
   <mat-error *ngIf="markerDeletedError">
-    <i class="material-icons">report_problem</i>
+    <mat-icon class="inline-icon">report_problem</mat-icon>
     {{markerDeletedError}}
   </mat-error>
 </div>

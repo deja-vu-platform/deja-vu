@@ -2,11 +2,11 @@
  class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newMarkerSaved" class="create-marker-success">
-      <i class="material-icons">done</i>
+      <mat-icon class="inline-icon">done</mat-icon>
       {{newMarkerSavedText}}
     </div>
     <mat-error *ngIf="newMarkerError">
-      <i class="material-icons">report_problem</i>
+      <mat-icon class="inline-icon">report_problem</mat-icon>
       {{newMarkerError}}
     </mat-error>
   </div>

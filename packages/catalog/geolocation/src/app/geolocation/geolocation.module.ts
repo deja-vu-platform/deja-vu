@@ -18,16 +18,12 @@ import { DisplayMapComponent } from './display-map/display-map.component';
 import {
   GetCurrentLocationComponent
 } from './get-current-location/get-current-location.component';
-import {
-  SearchForLocationComponent
-} from './search-for-location/search-for-location.component';
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
 export {
   CreateMarkerComponent, DeleteMarkerComponent, DisplayMapComponent,
-  GetCurrentLocationComponent, SearchForLocationComponent, ShowMarkerComponent,
-  ShowMarkersComponent
+  GetCurrentLocationComponent, ShowMarkerComponent, ShowMarkersComponent
 }
 
 import {
@@ -39,7 +35,6 @@ const allComponents = [
   DeleteMarkerComponent,
   DisplayMapComponent,
   GetCurrentLocationComponent,
-  SearchForLocationComponent,
   ShowMarkerComponent,
   ShowMarkersComponent
 ];
