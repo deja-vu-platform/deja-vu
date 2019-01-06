@@ -40,5 +40,4 @@ export class GetCurrentLocationComponent implements OnInit, AfterViewInit {
       }
     );
   }
-
 }

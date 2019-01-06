@@ -24,14 +24,6 @@
   </geolocation-get-current-location>
   <geolocation-show-marker [marker]="l"></geolocation-show-marker>
 
-  <!-- Search for Location -->
-  <h1>Search for Location</h1>
-  <geolocation-search-for-location (location)="l=$event">
-  </geolocation-search-for-location>
-  <geolocation-create-marker mapId="markerMapId"
-    [title]="l?.title" [latitude]="l?.latitude" [longitude]="l?.longitude">
-  </geolocation-create-marker>
-
   <!-- Create marker to delete -->
   <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>
     (<i>Stata Center</i>)</h1>

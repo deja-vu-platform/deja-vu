@@ -38,13 +38,11 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
   }
 
   ngAfterViewInit() {
-    if (!this.id || !this.marker) {
-      this.load();
-    }
+    this.load();
   }
 
   ngOnChanges() {
-    if (!this.id || !this.marker) {
+    if (!this.marker) {
       this.load();
     }
   }
