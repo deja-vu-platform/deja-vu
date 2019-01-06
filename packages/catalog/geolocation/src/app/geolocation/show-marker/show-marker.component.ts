@@ -7,7 +7,7 @@ import {
 } from 'dv-core';
 
 import { API_PATH } from '../geolocation.config';
-import { Marker } from '../shared/geolocation.model';
+import { Location, Marker } from '../shared/geolocation.model';
 
 @Component({
   selector: 'geolocation-show-marker',
@@ -19,7 +19,7 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
   OnEval {
 
   @Input() id: string | undefined;
-  @Input() marker: Marker | undefined;
+  @Input() marker: Marker | Location | undefined;
 
   @Input() showId = true;
   @Input() showTitle = true;
@@ -38,11 +38,13 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
   }
 
   ngAfterViewInit() {
-    this.load();
+    if (!this.id || !this.marker) {
+      this.load();
+    }
   }
 
   ngOnChanges() {
-    if (!this.marker) {
+    if (!this.id || !this.marker) {
       this.load();
     }
   }

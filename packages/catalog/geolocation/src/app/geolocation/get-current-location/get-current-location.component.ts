@@ -11,6 +11,7 @@ import { Location } from '../shared/geolocation.model';
   styleUrls: ['./get-current-location.component.css']
 })
 export class GetCurrentLocationComponent implements OnInit, AfterViewInit {
+
   @Output() location: EventEmitter<Location> = new EventEmitter<Location>();
 
   constructor(private elem: ElementRef, private rs: RunService) { }
@@ -32,6 +33,7 @@ export class GetCurrentLocationComponent implements OnInit, AfterViewInit {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
+        this.location.emit(l);
       },
       (error) => {
         throw new Error(error.message);
