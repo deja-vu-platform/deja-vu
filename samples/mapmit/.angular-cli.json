@@ -6,8 +6,13 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "dist",
+      "outDir": "dist/app",
       "assets": [
+        {
+          "glob": "**/*",
+          "input": "assets/leaflet/images",
+          "output": "leaflet/"
+        },
         "assets",
         "favicon.ico"
       ],
@@ -19,7 +24,10 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "mapmit",
       "styles": [
-        "styles.css"
+        "styles.css",
+        "assets/leaflet/leaflet.css",
+        "../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css",
+        "../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

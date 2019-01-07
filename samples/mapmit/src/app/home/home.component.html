@@ -8,7 +8,10 @@
   <div id="homepage-right">
     <div class="panel panel-default">
       <div class="panel-body">
-        <geolocation-display-map id="homeMapId"></geolocation-display-map>
+        <geolocation-display-map id="homeMapId"
+        [showSearchControl]="false"
+        [showDirectionsControl]="false">
+        </geolocation-display-map>
 
         <!-- Show All Events -->
         <mapmit-show-events></mapmit-show-events>

@@ -26,7 +26,9 @@
     </div>
 
     <div class="col-2-3">
-      <geolocation-display-map id="mainMapId">
+      <geolocation-display-map id="mainMapId"
+        [showSearchControl]="false"
+        [showDirectionsControl]="false">
       </geolocation-display-map>
 
       <rendezvous-nav-bar

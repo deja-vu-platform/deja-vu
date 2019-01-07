@@ -5,7 +5,9 @@
     <h2 class="create-event-header">Create an Event!</h2>
     <geolocation-display-map
       id="homeMapId"
-      (newPosition)="mPos=$event">
+      [showLoadedMarkers]="false"
+      [showDirectionsControl]="false"
+      (newMarker)="mPos=$event">
     </geolocation-display-map>
 
     <dv-tx>

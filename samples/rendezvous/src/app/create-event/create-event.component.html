@@ -22,6 +22,8 @@
 
         <geolocation-display-map
           id="mainMapId"
+          [showLoadedMarkers]="false"
+          [showDirectionsControl]="false"
           (newMarker)="mPos=$event">
         </geolocation-display-map>
         <dv-tx>
