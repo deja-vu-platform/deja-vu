@@ -31,7 +31,7 @@ To use Leaflet maps in your application, you must do the following:
 "styles": [
   "styles.css",
   "assets/leaflet/leaflet.css",
-  "../../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css",
-  "../../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"
+  "../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css",
+  "../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"
 ],
 ```
