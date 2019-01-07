@@ -1,12 +1,14 @@
 <div class="container">
   <h1>Display Map <i>markerMapId</i></h1>
   <geolocation-display-map
-    displayMapId="markerMapId"
-    (newPosition)="mPos=$event">
+    id="markerMapId"
+    (newMarker)="selectedMarker=$event">
   </geolocation-display-map>
   <h1>Create Marker on Map <i>markerMapId</i></h1>
   <geolocation-create-marker mapId="markerMapId"
-    [latitude]="mPos?.latitude" [longitude]="mPos?.longitude"
+    [title]="selectedMarker?.title"
+    [latitude]="selectedMarker?.latitude"
+    [longitude]="selectedMarker?.longitude"
     (marker)="m=$event">
   </geolocation-create-marker>
   <h1>Show Marker</h1>
@@ -15,6 +17,12 @@
   <geolocation-show-markers></geolocation-show-markers>
   <h1>Show Markers for Map <i>markerMapId</i></h1>
   <geolocation-show-markers ofMapId="markerMapId"></geolocation-show-markers>
+
+  <!-- Current Location -->
+  <h1>Display current location</h1>
+  <geolocation-get-current-location (location)="l=$event">
+  </geolocation-get-current-location>
+  <geolocation-show-marker [marker]="l"></geolocation-show-marker>
 
   <!-- Create marker to delete -->
   <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>

@@ -1,5 +1,6 @@
-#mapid {
+.map {
   height: 500px;
+  padding: 0;
 }
 
 /* Required for @agm/core. Height must be in pixels.*/

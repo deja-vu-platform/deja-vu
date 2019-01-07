@@ -2,11 +2,12 @@ import { DatePipe } from '@angular/common';
 import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
-import { Marker } from '../shared/geolocation.model';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
+
 import { API_PATH } from '../geolocation.config';
+import { Location, Marker } from '../shared/geolocation.model';
 
 @Component({
   selector: 'geolocation-show-marker',
@@ -18,7 +19,7 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
   OnEval {
 
   @Input() id: string | undefined;
-  @Input() marker: Marker | undefined;
+  @Input() marker: Marker | Location | undefined;
 
   @Input() showId = true;
   @Input() showTitle = true;
@@ -32,7 +33,6 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
     private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    console.log(this.id);
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }

@@ -27,7 +27,8 @@
     "geolocation": {
       "config": {
         "wsPort": 3005,
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": true,
+        "mapType": "leaflet"
       }
     },
     "group": {

@@ -21,8 +21,10 @@
         </div>
 
         <geolocation-display-map
-          displayMapId="mainMapId"
-          (newPosition)="mPos=$event">
+          id="mainMapId"
+          [showLoadedMarkers]="false"
+          [showDirectionsControl]="false"
+          (newMarker)="mPos=$event">
         </geolocation-display-map>
         <dv-tx>
           <dv-id (id)="eventId=$event"></dv-id>

@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { AuthenticationModule } from 'authentication';
 import { AuthorizationModule } from 'authorization';
 import { EventModule } from 'event';
-import { GeolocationModule } from 'geolocation';
+import { GeolocationModule, GEOLOCATION_CONFIG } from 'geolocation';
 import { GroupModule } from 'group';
 import { PropertyModule } from 'property';
 
@@ -57,11 +57,12 @@ import { ShowEventsComponent } from './show-events/show-events.component';
     PropertyModule
   ],
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' }
+    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
+    { provide: GEOLOCATION_CONFIG, useValue: { mapType: 'leaflet' } }
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    ShowEventInfoComponent, // anything with dv-include
+    ShowEventInfoComponent,
     ShowGroupComponent
   ]
 })
