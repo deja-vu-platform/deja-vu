@@ -72,12 +72,12 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 byAuthorId: this.byAuthorId,
                 ofTargetId: this.ofTargetId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

@@ -100,12 +100,12 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
               consumerOfResource(input: $input)
             }
           `,
-          variables: {
+          variables: JSON.stringify({
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId
             }
-          }
+          })
         }
       })
       .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))

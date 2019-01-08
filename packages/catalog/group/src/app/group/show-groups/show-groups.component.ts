@@ -75,11 +75,11 @@ OnChanges {
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 withMemberId: this.withMemberId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {
