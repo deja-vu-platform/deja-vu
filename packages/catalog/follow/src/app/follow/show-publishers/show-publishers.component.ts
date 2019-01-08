@@ -85,11 +85,11 @@ OnChanges {
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 followedById: this.followedById
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

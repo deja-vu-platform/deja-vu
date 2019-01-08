@@ -95,7 +95,7 @@ OnChanges {
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 assigneeId: this.assigneeId,
                 assignerId: this.assignerId,
@@ -103,7 +103,7 @@ OnChanges {
                 assigned: this.assigned,
                 completed: this.completed
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

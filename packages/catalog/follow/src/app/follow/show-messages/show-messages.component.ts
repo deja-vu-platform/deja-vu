@@ -81,12 +81,12 @@ OnChanges {
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 ofPublishersFollowedById: this.ofPublishersFollowedById,
                 byPublisherId: this.byPublisherId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

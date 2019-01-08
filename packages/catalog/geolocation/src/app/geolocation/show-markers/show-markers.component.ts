@@ -79,11 +79,11 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 ofMapId: this.ofMapId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

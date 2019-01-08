@@ -78,12 +78,12 @@ export class ShowRatingComponent implements
               }
             }
           `,
-          variables: {
+          variables: JSON.stringify({
             input: {
               bySourceId: this.sourceId,
               ofTargetId: this.targetId
             }
-          }
+          })
         }
       })
         .subscribe((res) => {

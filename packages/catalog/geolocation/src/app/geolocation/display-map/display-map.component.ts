@@ -244,11 +244,11 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
                 }
               }
             `,
-            variables: {
+            variables: JSON.stringify({
               input: {
                 ofMapId: this.id
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

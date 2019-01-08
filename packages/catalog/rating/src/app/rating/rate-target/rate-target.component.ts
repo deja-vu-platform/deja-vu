@@ -128,12 +128,12 @@ export class RateTargetComponent implements
               }
             }
           `,
-          variables: {
+          variables: JSON.stringify({
             input: {
               bySourceId: this.sourceId,
               ofTargetId: this.targetId
             }
-          }
+          })
         }
       })
       .subscribe((res) => {
