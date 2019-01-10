@@ -57,18 +57,14 @@ OnInit {
     if (this.canEval()) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          query: `
-            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
-              consumerOfResource(input: $input)
-            }
-          `,
           variables: JSON.stringify({
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId
             }
-          })
-        }
+          }),
+          extraInfo: { }
+        },
       })
       .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
       .subscribe((consumerId) => {
