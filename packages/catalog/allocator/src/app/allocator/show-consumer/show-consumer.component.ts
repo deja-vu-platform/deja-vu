@@ -62,8 +62,7 @@ OnInit {
               resourceId: this.resourceId,
               allocationId: this.allocationId
             }
-          }),
-          extraInfo: { }
+          })
         },
       })
       .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))

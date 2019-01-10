@@ -66,8 +66,7 @@ export class DeleteResourceComponent implements OnInit, OnChanges, OnExec {
             resourceId: this.resourceId,
             allocationId: this.allocationId
           }
-        },
-        extraInfo: {}
+        }
       })
       .toPromise();
   }

@@ -65,9 +65,9 @@ const actionRequestTable: ActionRequestTable = {
         `;
       case 'consumer':
         return `
-        query ConsumerOfResource($input: ConsumerOfResourceInput!) {
-          consumerOfResource(input: $input) ${getReturnFields(extraInfo)}
-        }
+          query ConsumerOfResource($input: ConsumerOfResourceInput!) {
+            consumerOfResource(input: $input) ${getReturnFields(extraInfo)}
+          }
         `;
       default:
         throw new Error('Need to specify extraInfo.action');
