@@ -25,6 +25,7 @@ export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 export const OF_ATTR = 'dvOf';
 export const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
+const SUCCESS = 200;
 
 enum Method {
   GET = 'GET',
@@ -45,6 +46,12 @@ interface ChildRequest {
   body: string | Object;
   query: Params;
 }
+
+interface ChildResponse {
+  status: number;
+  body: Object;
+}
+
 
 const headers = new HttpHeaders({'Content-type': 'application/json'});
 
@@ -74,14 +81,22 @@ class TxRequest {
    * Send all of the requests.
    */
   send() {
-    return this.http.post<[]>(
+    return this.http.post<string>(
       this.gatewayUrl,
       JSON.stringify(this.requests),
       { headers, params: { isTx: '1' } }
     )
-      .do((responses) => {
-        responses.forEach((response, i) => {
-          this.subjects[i].next(response);
+      .do((responsesArrayString) => {
+        const responses: ChildResponse[] = JSON.parse(responsesArrayString);
+        responses.forEach(({ status, body }, i) => {
+          if (status === SUCCESS) {
+            this.subjects[i].next(body);
+          } else {
+            this.subjects[i].error({
+              status,
+              error: body
+            });
+          }
           this.subjects[i].complete();
         });
       });

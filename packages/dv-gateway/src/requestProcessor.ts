@@ -110,7 +110,7 @@ class TxResponse {
         .filter(({ status: s }) => s !== SUCCESS)
         .length === 0 ? SUCCESS : INTERNAL_SERVER_ERROR;
       text = '[' + this.responses
-        .map(({ text: t }) => t)
+        .map(({ text: t, status: s }) => `{"status": ${s}, "body": ${t}}`)
         .join(',') + ']';
     }
     this.res
