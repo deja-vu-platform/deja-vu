@@ -4,6 +4,8 @@ import {
 import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
+import { GatewayService } from './gateway.service';
+
 
 // To indicate run failure, return a rejected promise
 export type onRun = () => Promise<any> | any;
@@ -58,11 +60,10 @@ const runFunctionNames = {
     onSuccess: 'dvOnExecSuccess',
     onFailure: 'dvOnExecFailure'
   }
-}
+};
 
 const ACTION_ID_ATTR = '_dvActionId';
 export const RUN_ID_ATTR = '_dvRunId';
-export const NUM_COHORTS_ATTR = '_dvNumCohorts';
 
 
 @Injectable()
@@ -88,7 +89,7 @@ export class RunService {
   /**
    * Register a new action. Should be called on init. Only actions that can be
    * Exec are required to be registered.
-   **/
+   */
   register(elem: ElementRef, action: any) {
     const actionId = uuid();
     const node = elem.nativeElement;
@@ -98,7 +99,7 @@ export class RunService {
 
   /**
    * Cause the action given by `elem` to execute.
-   **/
+   */
   async exec(elem: ElementRef) {
     this.run('exec', elem);
   }
@@ -114,13 +115,15 @@ export class RunService {
     let node = initialNode;
     let targetAction = node;
 
-    while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
+    // 'document' doesn't have `getAttribute`
+    while (node && node.getAttribute) {
       if (RunService.IsDvTx(node)) {
         targetAction = node;
         break;
       }
       node = this.renderer.parentNode(node);
     }
+
     return targetAction;
   }
 
@@ -151,13 +154,14 @@ export class RunService {
   /**
    * Walks the dom starting from `node` calling `onAction` with the action info
    * when an action is encountered. No child of actions are traversed.
-   **/
-  private walkActions(node, onAction: (ActionInfo, string?) => void): void {
+   */
+  private walkActions(node, onAction: (actionInfo, str?) => void): void {
     const actionId = node.getAttribute ?
       node.getAttribute(ACTION_ID_ATTR) : undefined;
     if (!actionId) {
       // node is not a dv-action (e.g., it's a <div>) or is dv-tx
-      _.each(node.childNodes, n => this.walkActions(n, onAction));
+      _.each(node.childNodes, (n) => this.walkActions(n, onAction));
+
       return;
     }
     const target = this.actionTable[actionId];
@@ -169,27 +173,25 @@ export class RunService {
     const dvOnRun = runFunctionNames[runType].onRun;
     const runs: Promise<RunResultMap>[] = [];
 
-    // count number of cohorts for actions (> 0 for tx)
-    let numCohorts = -1;
-    this.walkActions(node, (actionInfo) => {
-      if (actionInfo.action[dvOnRun]) {
-        numCohorts += 1;
-      }
-    });
-
     // run the action, or each action in tx with the same RUN ID
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.setAttribute(RUN_ID_ATTR, id);
-        actionInfo.node.setAttribute(NUM_COHORTS_ATTR, numCohorts);
         runs.push(
           Promise
             .resolve(actionInfo.action[dvOnRun]())
-            .then(result => ({[actionId]: result})));
+            .then((result) => ({[actionId]: result})));
       }
     });
 
+    // send the request, if relevant
+    if (GatewayService.txBatches[id]) {
+      GatewayService.txBatches[id].send();
+      delete GatewayService.txBatches[id];
+    }
+
     const resultMaps: RunResultMap[] = await Promise.all(runs);
+
     return _.assign({}, ...resultMaps);
   }
 

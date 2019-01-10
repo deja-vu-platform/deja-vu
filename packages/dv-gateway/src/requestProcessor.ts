@@ -40,7 +40,6 @@ enum Method {
 interface Params {
   from: string;
   runId: string;
-  numCohorts: string; // numeric
   path?: string;
   options?: string;
 }
@@ -89,7 +88,7 @@ class TxResponse {
    * Add a response to the batch.
    * A single response is sent once we have reached the batchSize
    */
-  add<T>(status: number, text: string): void {
+  add(status: number, text: string): void {
     this.responses.push({
       status,
       text
@@ -247,7 +246,7 @@ export class RequestProcessor {
       return this.doProcessRequest(req, new TxResponse(res, 1));
     }
 
-    const childRequests: ChildRequest[] = JSON.parse(req.body);
+    const childRequests: ChildRequest[] = RequestProcessor.JsonParse(req.body);
     const txRes = new TxResponse(res, childRequests.length);
 
     return Promise

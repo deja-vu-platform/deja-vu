@@ -7,7 +7,7 @@ import 'rxjs/add/operator/do';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { NUM_COHORTS_ATTR, RUN_ID_ATTR } from './run.service';
+import { RUN_ID_ATTR } from './run.service';
 
 import * as _ from 'lodash';
 
@@ -23,25 +23,24 @@ export interface RequestOptions {
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
 export const OF_ATTR = 'dvOf';
-export const ALIAS_ATTR = 'dvAlias';
+export const ALIAS_ATTR = 'dvAliazs';
 const CLASS_ATTR = 'class';
 const SUCCESS = 200;
 
-enum Method {
+export enum Method {
   GET = 'GET',
   POST = 'POST'
 }
 
-interface Params {
+export interface Params {
   from: string;
   runId: string;
-  numCohorts: string; // numeric
   path?: string;
   options?: string;
   [s: string]: string; // won't actually ever have more but typing expects this
 }
 
-interface ChildRequest {
+export interface ChildRequest {
   method: Method;
   body: string | Object;
   query: Params;
@@ -59,7 +58,7 @@ const headers = new HttpHeaders({'Content-type': 'application/json'});
 /**
  * Class for batching transaction requests.
  */
-class TxRequest {
+export class TxRequest {
   private requests: ChildRequest[] = [];
   private subjects: Subject<any>[] = [];
 
@@ -80,26 +79,57 @@ class TxRequest {
   /**
    * Send all of the requests.
    */
-  send() {
-    return this.http.post<string>(
-      this.gatewayUrl,
-      JSON.stringify(this.requests),
-      { headers, params: { isTx: '1' } }
-    )
-      .do((responsesArrayString) => {
-        const responses: ChildResponse[] = JSON.parse(responsesArrayString);
-        responses.forEach(({ status, body }, i) => {
-          if (status === SUCCESS) {
-            this.subjects[i].next(body);
-          } else {
-            this.subjects[i].error({
-              status,
-              error: body
+  send(): void {
+    // not in transaction: just send it
+    if (this.size === 1) {
+      const { method, body, query: params } = this.requests[0];
+      let obs: Observable<any> = null;
+      switch (method) {
+        case Method.GET:
+          obs = this.http.get(
+            this.gatewayUrl,
+            { params }
+          );
+        case Method.POST:
+          obs = this.http.post(
+            this.gatewayUrl,
+            typeof body === 'object' ? JSON.stringify(body) : body,
+            { params, headers }
+          );
+      }
+      const subject = this.subjects[0];
+      obs.subscribe(
+        (resBody) => {
+          subject.next(resBody);
+          subject.complete();
+        },
+        (error) => {
+          subject.error(error);
+          subject.complete();
+        }
+      );
+    } else {
+      this.http.post<string>(
+        this.gatewayUrl,
+        JSON.stringify(this.requests),
+        { headers, params: { isTx: '1' } }
+      )
+        .subscribe(
+          (responsesArrayString) => {
+            const responses: ChildResponse[] = JSON.parse(responsesArrayString);
+            responses.forEach(({ status, body }, i) => {
+              if (status === SUCCESS) {
+                this.subjects[i].next(body);
+              } else {
+                this.subjects[i].error({
+                  status,
+                  error: body
+                });
+              }
+              this.subjects[i].complete();
             });
-          }
-          this.subjects[i].complete();
         });
-      });
+    }
   }
 
   get size() {
@@ -109,7 +139,7 @@ class TxRequest {
 
 
 export class GatewayService {
-  private static txBatches: { [txId: string]: TxRequest} = {};
+  static txBatches: { [txId: string]: TxRequest} = {};
 
   fromStr: string;
 
@@ -209,54 +239,31 @@ export class GatewayService {
 
     const params = this.buildParams(path, options);
 
-    // in transaction: batch it
-    const numCohorts = parseInt(params.numCohorts, 10);
-    if (numCohorts > 0) {
-      let txRequest = GatewayService.txBatches[params.txId];
-      if (txRequest === undefined) {
-        txRequest = new TxRequest(this.gatewayUrl, this.http);
-        GatewayService.txBatches[params.txId] = txRequest;
+    let txRequest = GatewayService.txBatches[params.runId];
+    if (txRequest === undefined) {
+      txRequest = new TxRequest(this.gatewayUrl, this.http);
+      if (params.runId) {
+        GatewayService.txBatches[params.runId] = txRequest;
       }
-
-      const strQuery = JSON.stringify(params);
-      const individualResponseObservable = txRequest.add<T>({
-        method,
-        body,
-        query: params
-      });
-
-      if (txRequest.size > numCohorts) {
-        txRequest
-          .send()
-          .subscribe(() => {
-            delete GatewayService.txBatches[params.txId];
-          });
-      }
-
-      return individualResponseObservable;
     }
 
-    // not in transaction: just send it
-    switch (method) {
-      case Method.GET:
-        return this.http.get<T>(
-          this.gatewayUrl,
-          { params }
-        );
-      case Method.POST:
-        return this.http.post<T>(
-          this.gatewayUrl,
-          typeof body === 'object' ? JSON.stringify(body) : body,
-          { params, headers }
-        );
+    const individualResponseObservable = txRequest.add<T>({
+      method,
+      body,
+      query: params
+    });
+
+    if (!params.runId) {
+      txRequest.send();
     }
+
+    return individualResponseObservable;
   }
 
   private buildParams(path?: string, options?: RequestOptions): Params {
     const params = {
       from: this.fromStr,
-      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR),
-      numCohorts: this.from.nativeElement.getAttribute(NUM_COHORTS_ATTR)
+      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
     };
     if (path) {
       params['path'] = path;
