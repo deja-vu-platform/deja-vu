@@ -57,7 +57,7 @@ OnInit {
     if (this.canEval()) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId

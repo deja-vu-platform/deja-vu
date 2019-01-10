@@ -58,7 +58,7 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {score: Score}}>(this.apiPath, {
         params: {
-          variables: { id: this.id },
+          inputs: { id: this.id },
           extraInfo: {
             returnFields: `
                 ${this.showId ? 'id' : ''}

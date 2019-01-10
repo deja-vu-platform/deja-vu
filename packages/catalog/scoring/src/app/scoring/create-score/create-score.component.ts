@@ -90,7 +90,7 @@ export class CreateScoreComponent
     if (this.save) {
       const res = await this.gs
         .post<CreateScoreResponse>(this.apiPath, {
-          variables: {
+          inputs: {
             input: {
               id: this.id,
               value: this.valueControl.value,

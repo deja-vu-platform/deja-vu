@@ -69,7 +69,7 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {target: Target}}>(this.apiPath, {
         params: {
-          variables: { id: this.id },
+          inputs: { id: this.id },
           extraInfo: {
             returnFields: `
                 id

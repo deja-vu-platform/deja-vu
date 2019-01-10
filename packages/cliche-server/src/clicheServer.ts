@@ -102,6 +102,7 @@ export class ClicheServer<C extends Config = Config> {
           clicheServer._name, req['fullActionName']
         )
       ](req[reqField].extraInfo);
+      req[reqField].variables = req[reqField].inputs;
       next();
     }
 

@@ -123,7 +123,7 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
     }
     const newConsumerId = this.newConsumerControl.value;
     const res = await this.gs.post<EditConsumerOfResourceRes>(this.apiPath, {
-      variables: {
+      inputs: {
         input: {
           resourceId: this.resourceId,
           allocationId: this.allocationId,
