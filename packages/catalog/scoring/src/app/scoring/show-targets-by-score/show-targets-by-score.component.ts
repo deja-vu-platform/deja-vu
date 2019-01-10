@@ -70,22 +70,21 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {targetsByScore: Target[]}}>(this.apiPath, {
         params: {
-          query: `
-            query {
-              targetsByScore(asc: ${this.showAscending}) {
-                id
-                ${this.showScores ? 'scores ' +
-                  '{' +
-                    'id \n' +
-                    `${this.showScoreValue ? 'value \n' : ''}` +
-                    `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
-                    `${this.showScoreTargetId ? 'targetId \n' : ''}` +
-                  '}' : ''
-                }
-                ${this.showTotal ? 'total': ''}
+          variables: { asc: this.showAscending },
+          extraInfo: {
+            returnFields: `
+              id
+              ${this.showScores ? 'scores ' +
+                '{' +
+                  'id \n' +
+                  `${this.showScoreValue ? 'value \n' : ''}` +
+                  `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
+                  `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                '}' : ''
               }
-            }
-          `
+              ${this.showTotal ? 'total': ''}
+            `
+          }
         }
       })
       .subscribe((res) => {
