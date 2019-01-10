@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
@@ -19,7 +19,6 @@ export class JoinLeaveComponent implements OnExec, OnInit {
   // One of `group` or `groupId` is required
   @Input() group: Group;
   @Input() groupId: string;
-  @Output() actionToTake = new EventEmitter<string>();
   inGroup = false;
 
   private gs: GatewayService;
@@ -63,7 +62,6 @@ export class JoinLeaveComponent implements OnExec, OnInit {
       .subscribe((res) => {
         this.group = res.data.group;
         this.inGroup = this.groupContains(this.group, this.memberId);
-        this.actionToTake.emit(this.getActionToTake());
       });
   }
 
