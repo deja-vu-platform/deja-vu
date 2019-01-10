@@ -23,16 +23,17 @@ export const CONCURRENT_UPDATE_ERROR =
  * The type of the table that maps action names to
  * functions that return the corresponding graphql request
  */
-export type ActionRequestTable = {[key: string]: (extraInfo) => string};
+export type ActionRequestTable = { [key: string]: (extraInfo) => string };
 
 /**
- * Generates the request for extra information, e.g. return fields, for a
- * graphql request
- * @param extraInfo - information to include with the graphql request
+ * Generates the return fields for a graphql request, if any
+ * @param e - extra information to include with the graphql request
  */
-export function requestExtraInfo(extraInfo: any) {
-  const hasValue: boolean = !(_.isEmpty(extraInfo) || _.isNil(extraInfo));
-  return hasValue ? '{' + extraInfo.returnFields + '}' : '';
+export function getReturnFields(e: any) {
+  const hasValue = !(_.isEmpty(e) || _.isNil(e));
+  const hasReturnFields = hasValue ?
+    !(_.isEmpty(e.returnFields) || _.isNil(e.returnFields)) : false;
+  return hasReturnFields ? '{' + e.returnFields + '}' : '';
 }
 
 /**
@@ -86,7 +87,7 @@ export class ClicheServer<C extends Config = Config> {
    * @param fullActionName the action name that includes/begins
    *                           with the cliché name and a separator
    */
-  private static GetActionName(clicheName:string, fullActionName: string) {
+  private static GetActionName(clicheName: string, fullActionName: string) {
     // +1 to the length for the separator
     return fullActionName.substring(clicheName.length + 1);
   }
@@ -94,15 +95,15 @@ export class ClicheServer<C extends Config = Config> {
   // needs clicheServer passed in because `this` is not in scope
   // when this function is used
   private static SetGraphqlQuery = (clicheServer: ClicheServer) =>
-  (req, _res, next) => {
-    const reqField = req.method === 'GET' ? 'query' : 'body';
-    req[reqField].query = clicheServer._actionRequestTable[
-      ClicheServer.GetActionName(
-        clicheServer._name, req['fullActionName']
-      )
-    ](req[reqField].extraInfo);
-    next();
-  }
+    (req, _res, next) => {
+      const reqField = req.method === 'GET' ? 'query' : 'body';
+      req[reqField].query = clicheServer._actionRequestTable[
+        ClicheServer.GetActionName(
+          clicheServer._name, req['fullActionName']
+        )
+      ](req[reqField].extraInfo);
+      next();
+    }
 
   private startApp(schema) {
     const app = express();
