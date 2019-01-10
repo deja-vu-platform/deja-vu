@@ -71,7 +71,7 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
     }
     console.log(`Create allocation with ${this.id}`);
     this.gs.post<CreateAllocationRes>(this.apiPath, {
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           resourceIds: this.resourceIds,
