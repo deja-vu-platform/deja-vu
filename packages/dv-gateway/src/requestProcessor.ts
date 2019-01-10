@@ -19,6 +19,7 @@ import { DvConfig, GatewayConfig } from './gateway.model';
 
 
 const JSON_INDENTATION = 2;
+const SUCCESS = 200;
 const INTERNAL_SERVER_ERROR = 500;
 
 
@@ -29,6 +30,25 @@ interface Dict {
 interface RequestOptions {
   readonly params?: Dict;
   readonly headers?: Dict;
+}
+
+enum Method {
+  GET = 'GET',
+  POST = 'POST'
+}
+
+interface Params {
+  from: string;
+  runId: string;
+  numCohorts: string; // numeric
+  path?: string;
+  options?: string;
+}
+
+interface ChildRequest {
+  method: Method;
+  body: string | Object;
+  query: Params;
 }
 
 interface GatewayRequest {
@@ -73,8 +93,9 @@ export class RequestProcessor {
   /**
    *  Forwards to the cliche the given request.
    */
-  private static async ForwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
-    : Promise<ClicheResponse<T>> {
+  private static async ForwardRequest<T>(
+    gatewayRequest: GatewayToClicheRequest
+  ): Promise<ClicheResponse<T>> {
     let url = gatewayRequest.url;
     if (gatewayRequest.path) {
       url += gatewayRequest.path;
@@ -113,7 +134,9 @@ export class RequestProcessor {
       .assign({}, gcr, { path: `/dv/${gcr.reqId}/${msg}` + gcr.path });
   }
 
-  private static BuildGatewayRequest(req): GatewayRequest {
+  private static BuildGatewayRequest(
+    req: express.Request | ChildRequest
+  ): GatewayRequest {
     return {
       from: ActionPath.fromString(req.query.from),
       reqId: uuid(),
@@ -172,18 +195,45 @@ export class RequestProcessor {
       });
   }
 
-  async processRequest(req: express.Request, res: express.Response)
-    : Promise<void> {
-    if (!req.query.from) {
-      res.status(INTERNAL_SERVER_ERROR)
-        .send('No from specified');
+  async processRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
+    if (req.query.isTx) {
+      const childRequests: ChildRequest[] = JSON.parse(req.body);
 
-      return;
+      return Promise
+        .all(childRequests.map((chReq) => this.doProcessRequest(chReq)))
+        .then((clicheResponse) => {
+          const allGood = clicheResponse
+            .filter(({ status }) => status === SUCCESS).length > 0;
+          const payload = '[' + clicheResponse
+            .map(({ text }) => text)
+            .join(',') + ']';
+          res
+            .status(allGood ? SUCCESS : INTERNAL_SERVER_ERROR)
+            .send(allGood ? payload : 'The transaction failed');
+        });
+    } else {
+      return this.doProcessRequest(req)
+        .then((clicheResponse) => {
+          res
+            .status(clicheResponse.status)
+            .send(clicheResponse.text);
+        });
     }
+  }
+
+  private async doProcessRequest(
+    req: express.Request | ChildRequest
+  ): Promise<ClicheResponse<string>> {
+    if (!req.query.from) {
+      return { status: INTERNAL_SERVER_ERROR, text: 'No from specified' };
+    }
+
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
-    const runId = gatewayRequest.runId;
-    const actionPath = gatewayRequest.from;
+    const { runId, from: actionPath } = gatewayRequest;
     const matchingActions = this.actionHelper.getMatchingActions(actionPath);
     const to = RequestProcessor.ClicheOf(matchingActions[0]);
     // `to` can be `undefined` but the `get` typings are wrong
@@ -191,8 +241,10 @@ export class RequestProcessor {
     const toPort: port | undefined = _.get(this.dstTable, <string> to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!this.validateRequest(actionPath, matchingActions, to, toPort, res)) {
-      return;
+    const invalidCheckRes = this.validateRequest(
+      actionPath, matchingActions, to, toPort);
+    if (invalidCheckRes !== null) {
+      return invalidCheckRes;
     }
 
     console.log(
@@ -200,7 +252,7 @@ export class RequestProcessor {
       `action path: ${actionPath}, runId: ${runId}` +
       (actionPath.isDvTx() ? `, dvTxId: ${runId}` : ' not part of a tx'));
 
-    const gatewayToClicheRequest = {
+    const gatewayToClicheRequest: GatewayToClicheRequest = {
       ...gatewayRequest,
       ...{
         url: `http://localhost:${toPort}`,
@@ -219,34 +271,32 @@ export class RequestProcessor {
       await this.txCoordinator.processMessage(
         runId!, actionPath.serialize(), gatewayToClicheRequest, res);
     } else {
-      const clicheRes: ClicheResponse<string> = await RequestProcessor
-        .ForwardRequest<string>(gatewayToClicheRequest);
-      res.status(clicheRes.status);
-      res.send(clicheRes.text);
+      return RequestProcessor.ForwardRequest<string>(gatewayToClicheRequest);
     }
   }
 
   private validateRequest(
-    actionPath: ActionPath, matchingActions: ActionTag[],
-    to: string | undefined, toPort: string | undefined, res)
-    : boolean {
+    actionPath: ActionPath,
+    matchingActions: ActionTag[],
+    to: string | undefined,
+    toPort: string | undefined
+  ): ClicheResponse<string> | null {
     if (_.isEmpty(matchingActions)) {
-      res.status(INTERNAL_SERVER_ERROR)
-        .send(
-          `Invalid action path: ${actionPath}, my actionConfig is ` +
-          this.actionHelper.toString());
-
-      return false;
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        text: `Invalid action path: ${actionPath}, my actionConfig is `
+          + this.actionHelper.toString()
+      };
     }
 
     if (toPort === undefined) {
-      res.status(INTERNAL_SERVER_ERROR)
-        .send(`Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
-
-      return false;
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        text: `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
+      };
     }
 
-    return true;
+    return null;
   }
 
   private getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
@@ -262,6 +312,7 @@ export class RequestProcessor {
         if (gcr.method === 'GET') {
           return Promise.resolve();
         }
+
         return RequestProcessor
           .ForwardRequest(RequestProcessor.NewReqFor('commit', gcr))
           .then((_unusedResp) => undefined);
@@ -271,6 +322,7 @@ export class RequestProcessor {
         if (gcr.method === 'GET') {
           return Promise.resolve();
         }
+
         return RequestProcessor
           .ForwardRequest(RequestProcessor.NewReqFor('abort', gcr))
           .then((_unusedResp) => undefined);

@@ -31,11 +31,19 @@ enum Method {
   POST = 'POST'
 }
 
-interface Request {
-  method: Method;
+interface Params {
+  from: string;
+  runId: string;
+  numCohorts: string; // numeric
   path?: string;
-  body?: string | Object;
-  options?: RequestOptions;
+  options?: string;
+  [s: string]: string; // won't actually ever have more but typing expects this
+}
+
+interface ChildRequest {
+  method: Method;
+  body: string | Object;
+  query: Params;
 }
 
 const headers = new HttpHeaders({'Content-type': 'application/json'});
@@ -45,7 +53,7 @@ const headers = new HttpHeaders({'Content-type': 'application/json'});
  * Class for batching transaction requests.
  */
 class TxRequest {
-  private requests: Request[] = [];
+  private requests: ChildRequest[] = [];
   private subjects: Subject<any>[] = [];
 
   constructor(private gatewayUrl: string, private http: HttpClient) { }
@@ -54,8 +62,8 @@ class TxRequest {
    * Add a request to the batch.
    * Returned observable resolves with response (after send is called)
    */
-  add<T>(request: Request): Observable<T> {
-    this.requests.push(request);
+  add<T>(chReq: ChildRequest): Observable<T> {
+    this.requests.push(chReq);
     const subject = new Subject<T>();
     this.subjects.push(subject);
 
@@ -67,7 +75,9 @@ class TxRequest {
    */
   send() {
     return this.http.post<[]>(
-      this.gatewayUrl, this.requests, { headers, params: { isTx: '1' } }
+      this.gatewayUrl,
+      JSON.stringify(this.requests),
+      { headers, params: { isTx: '1' } }
     )
       .do((responses) => {
         responses.forEach((response, i) => {
@@ -152,33 +162,39 @@ export class GatewayService {
   }
 
   get<T>(path?: string, options?: RequestOptions) {
-    return this.request<T>({
+    return this.request<T>(
+      Method.GET,
       path,
-      options,
-      body: undefined,
-      method: Method.GET
-    });
+      undefined,
+      options
+    );
   }
 
   /**
    * If the body is an Object it will be converted to JSON
    */
   post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
-    return this.request<T>({
+    return this.request<T>(
+      Method.POST,
       path,
-      options,
       body,
-      method: Method.POST
-    });
+      options
+    );
   }
 
-  private request<T>(request: Request): Observable<T> {
-    const { method, path, body, options } = request;
+  private request<T>(
+    method: Method,
+    path?: string,
+    body?: string | Object,
+    options?: RequestOptions
+  ): Observable<T> {
     console.log(
       `Sending ${method} from ${this.from.nativeElement.nodeName.toLowerCase()}`
     );
 
     const params = this.buildParams(path, options);
+
+    // in transaction: batch it
     const numCohorts = parseInt(params.numCohorts, 10);
     if (numCohorts > 0) {
       let txRequest = GatewayService.txBatches[params.txId];
@@ -187,7 +203,13 @@ export class GatewayService {
         GatewayService.txBatches[params.txId] = txRequest;
       }
 
-      const individualResponseObservable = txRequest.add<T>(request);
+      const strQuery = JSON.stringify(params);
+      const individualResponseObservable = txRequest.add<T>({
+        method,
+        body,
+        query: params
+      });
+
       if (txRequest.size > numCohorts) {
         txRequest
           .send()
@@ -199,6 +221,7 @@ export class GatewayService {
       return individualResponseObservable;
     }
 
+    // not in transaction: just send it
     switch (method) {
       case Method.GET:
         return this.http.get<T>(
@@ -206,18 +229,15 @@ export class GatewayService {
           { params }
         );
       case Method.POST:
-        const strBody = typeof body === 'object' ? JSON.stringify(body) : body;
-
         return this.http.post<T>(
           this.gatewayUrl,
-          strBody,
+          typeof body === 'object' ? JSON.stringify(body) : body,
           { params, headers }
         );
     }
   }
 
-  private buildParams(path?: string, options?: RequestOptions)
-    : {[params: string]: string} {
+  private buildParams(path?: string, options?: RequestOptions): Params {
     const params = {
       from: this.fromStr,
       runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR),
