@@ -1,15 +1,42 @@
 <div class="container">
   <h1>Scoring</h1>
 
-  <h2>Create Score (id win, sourceId competition1, targetId ben)</h2>
+  <h2>Create Score (id win1, sourceId competition1, targetId ben)</h2>
   <scoring-create-score
-    id="win"
+    id="win1"
     sourceId="competition1"
     targetId="ben"
     (score)="scoreId = $event.id"
   >
   </scoring-create-score>
 
+  <h2>Create Score in a tx (targetId ben)</h2>
+  <dv-tx>
+    <scoring-create-score
+      dvAlias="createScore2"
+      id="win2"
+      sourceId="competition2"
+      targetId="ben"
+      (score)="scoreId = $event.id"
+    >
+    </scoring-create-score>
+    <scoring-create-score
+      dvAlias="createScore3"
+      id="win3"
+      sourceId="competition3"
+      targetId="ben"
+      (score)="scoreId = $event.id"
+    >
+    </scoring-create-score>
+  </dv-tx>
+
   <h2>Show Target (id ben)</h2>
   <scoring-show-target id="ben"></scoring-show-target>
+
+  <h2>Show Targets by Score and Show Target in a tx</h2>
+  <dv-tx>
+    <scoring-show-target id="ben"></scoring-show-target>
+    <span>---</span>
+    <scoring-show-targets-by-score></scoring-show-targets-by-score>
+  </dv-tx>
 </div>
