@@ -199,36 +199,25 @@ export class RequestProcessor {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    if (req.query.isTx) {
-      const childRequests: ChildRequest[] = JSON.parse(req.body);
-
-      return Promise
-        .all(childRequests.map((chReq) => this.doProcessRequest(chReq)))
-        .then((clicheResponse) => {
-          const allGood = clicheResponse
-            .filter(({ status }) => status === SUCCESS).length > 0;
-          const payload = '[' + clicheResponse
-            .map(({ text }) => text)
-            .join(',') + ']';
-          res
-            .status(allGood ? SUCCESS : INTERNAL_SERVER_ERROR)
-            .send(allGood ? payload : 'The transaction failed');
-        });
-    } else {
-      return this.doProcessRequest(req)
-        .then((clicheResponse) => {
-          res
-            .status(clicheResponse.status)
-            .send(clicheResponse.text);
-        });
+    if (!req.query.isTx) {
+      return this.doProcessRequest(req, res);
     }
+
+    const childRequests: ChildRequest[] = JSON.parse(req.body);
+
+    return Promise
+      .all(childRequests.map((chReq) => this.doProcessRequest(chReq, res)))
+      .then(() => {});
   }
 
   private async doProcessRequest(
-    req: express.Request | ChildRequest
-  ): Promise<ClicheResponse<string>> {
+    req: express.Request | ChildRequest,
+    res: express.Response
+  ): Promise<void> {
     if (!req.query.from) {
-      return { status: INTERNAL_SERVER_ERROR, text: 'No from specified' };
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send('No from specified' );
     }
 
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
@@ -241,10 +230,8 @@ export class RequestProcessor {
     const toPort: port | undefined = _.get(this.dstTable, <string> to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    const invalidCheckRes = this.validateRequest(
-      actionPath, matchingActions, to, toPort);
-    if (invalidCheckRes !== null) {
-      return invalidCheckRes;
+    if (!this.validateRequest(actionPath, matchingActions, to, toPort, res)) {
+        return;
     }
 
     console.log(
@@ -271,7 +258,10 @@ export class RequestProcessor {
       await this.txCoordinator.processMessage(
         runId!, actionPath.serialize(), gatewayToClicheRequest, res);
     } else {
-      return RequestProcessor.ForwardRequest<string>(gatewayToClicheRequest);
+      const clicheRes: ClicheResponse<string> = await RequestProcessor
+        .ForwardRequest<string>(gatewayToClicheRequest);
+      res.status(clicheRes.status);
+      res.send(clicheRes.text);
     }
   }
 
@@ -279,21 +269,24 @@ export class RequestProcessor {
     actionPath: ActionPath,
     matchingActions: ActionTag[],
     to: string | undefined,
-    toPort: string | undefined
-  ): ClicheResponse<string> | null {
+    toPort: string | undefined,
+    res: express.Response
+  ): boolean {
     if (_.isEmpty(matchingActions)) {
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        text: `Invalid action path: ${actionPath}, my actionConfig is `
-          + this.actionHelper.toString()
-      };
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send(`Invalid action path: ${actionPath}, my actionConfig is `
+          + this.actionHelper.toString());
+
+      return false;
     }
 
     if (toPort === undefined) {
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        text: `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
-      };
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send(`Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
+
+      return false;
     }
 
     return null;
