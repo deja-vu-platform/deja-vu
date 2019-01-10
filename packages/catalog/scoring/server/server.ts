@@ -3,7 +3,8 @@ import {
   ClicheServer,
   ClicheServerBuilder,
   Config,
-  Context
+  Context,
+  requestExtraInfo
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -29,29 +30,22 @@ const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
 const actionRequestTable: ActionRequestTable = {
   'create-score': (extraInfo) => `
     mutation CreateScore($input: CreateScoreInput!) {
-      createScore (input: $input)
-      ${extraInfo.returnFields ? `{ ${extraInfo.returnFields} }`: ''}
+      createScore (input: $input) ${requestExtraInfo(extraInfo)}
     }
   `,
   'show-score': (extraInfo) => `
     query ShowScore($id: ID!) {
-      score(id: $id) {
-        ${extraInfo.returnFields}
-      }
+      score(id: $id) ${requestExtraInfo(extraInfo)}
     }
   `,
   'show-target': (extraInfo) => `
     query ShowTarget($id: ID!) {
-      target(id: $id) {
-        ${extraInfo.returnFields}
-      }
+      target(id: $id) ${requestExtraInfo(extraInfo)}
     }
   `,
   'show-targets-by-score': (extraInfo) => `
     query ShowTargetsByScore($asc: Boolean) {
-      targetsByScore(asc: $asc) {
-        ${extraInfo.returnFields}
-      }
+      targetsByScore(asc: $asc) ${requestExtraInfo(extraInfo)}
     }
   `
 };
