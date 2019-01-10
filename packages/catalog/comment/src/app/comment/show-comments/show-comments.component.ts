@@ -62,22 +62,20 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
       this.gs
         .get<CommentsRes>(this.apiPath, {
           params: {
-            query: `
-              query Comments($input: CommentsInput!) {
-                comments(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showAuthorId ? 'authorId' : ''}
-                  ${this.showTargetId ? 'targetId' : ''}
-                  ${this.showContent ? 'content' : ''}
-                }
-              }
-            `,
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 byAuthorId: this.byAuthorId,
                 ofTargetId: this.ofTargetId
               }
-            })
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showAuthorId ? 'authorId' : ''}
+                ${this.showTargetId ? 'targetId' : ''}
+                ${this.showContent ? 'content' : ''}
+              `
+            }
           }
         })
         .subscribe((res) => {

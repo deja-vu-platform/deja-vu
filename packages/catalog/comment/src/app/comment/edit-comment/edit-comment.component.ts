@@ -93,13 +93,11 @@ export class EditCommentComponent implements
 
     this.gs.get<CommentRes>(this.apiPath, {
       params: {
-        query: `
-        query {
-          comment(id: "${this.id}") {
-            content
-          }
+        inputs: { id: this.id },
+        extraInfo: {
+          action: 'load',
+          returnFields: 'id'
         }
-        `
       }
     })
       .subscribe((res) => {
@@ -125,15 +123,15 @@ export class EditCommentComponent implements
 
   async dvOnExec(): Promise<boolean> {
     const res = await this.gs.post<EditCommentRes>(this.apiPath, {
-      query: `mutation EditComment($input: EditCommentInput!) {
-            editComment(input: $input)
-          }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           authorId: this.authorId,
           content: this.contentControl.value
         }
+      },
+      extraInfo: {
+        action: 'edit'
       }
     })
       .toPromise();

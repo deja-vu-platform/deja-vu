@@ -84,21 +84,21 @@ export class CreateCommentComponent implements
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateCommentRes>(this.apiPath, {
-      query: `mutation CreateComment($input: CreateCommentInput!) {
-            createComment(input: $input) {
-              id
-              authorId
-              targetId
-              content
-            }
-          }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           authorId: this.authorId,
           targetId: this.targetId,
           content: this.contentControl.value
         }
+      },
+      extraInfo: {
+        returnFields : `
+          id
+          authorId
+          targetId
+          content
+        `
       }
     })
       .toPromise();

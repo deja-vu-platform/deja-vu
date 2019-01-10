@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -24,6 +26,42 @@ class CommentValidation {
     comments: mongodb.Collection<CommentDoc>, id: string): Promise<CommentDoc> {
     return Validation.existsOrFail(comments, id, 'Comment');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'create-comment': (extraInfo) => `
+    mutation CreateComment($input: CreateCommentInput!) {
+      createComment (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-comment': (extraInfo) => `
+    mutation DeleteComment($input: DeleteCommentInput!) {
+      deleteComment (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'edit-comment': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'edit':
+        return `
+          mutation EditComment($input: EditCommentInput!) {
+            editComment (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Comment($id: ID!) {
+            comment(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-comments': (extraInfo) => `
+    query ShowComments($input: CommentsInput!) {
+      comments(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: CommentDoc | null) {
@@ -246,6 +284,7 @@ const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

@@ -43,7 +43,7 @@ export class DeleteCommentComponent implements OnInit, OnExec {
         query: `mutation DeleteComment($input: DeleteCommentInput!) {
           deleteComment(input: $input)
         }`,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             authorId: this.authorId
