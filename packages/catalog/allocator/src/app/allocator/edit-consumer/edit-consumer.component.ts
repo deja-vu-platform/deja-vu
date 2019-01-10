@@ -95,7 +95,7 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
     if (this.gs && this.resourceId && this.allocationId) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId
