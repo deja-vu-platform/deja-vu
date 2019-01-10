@@ -19,6 +19,12 @@ export const CONCURRENT_UPDATE_ERROR =
   'An error has occured. Please try again later';
 
 /**
+ * The type of the table that maps action names to
+ * functions that return the corresponding graphql request
+ */
+export type ActionRequestTable = {[key: string]: (extraInfo) => string};
+
+/**
  * The type of the function to be called after connecting to the db.
  */
 export type InitDbCallbackFn<C = Config> =
@@ -44,6 +50,7 @@ export interface Context {
 export class ClicheServer<C extends Config = Config> {
   private readonly _name: string;
   private readonly _schemaPath: string;
+  private readonly _actionRequestTable: ActionRequestTable;
   private readonly _config: C;
   private _db: mongodb.Db | undefined;
   private _resolvers: object | undefined;
@@ -51,10 +58,11 @@ export class ClicheServer<C extends Config = Config> {
   private readonly _initResolvers: InitResolversFn<C> | undefined;
   private readonly _dynamicTypeDefs: string[];
 
-  constructor(name: string, config: C, schemaPath: string,
+  constructor(name: string, actionRequestTable: ActionRequestTable, config: C, schemaPath: string,
     initDbCallback?: InitDbCallbackFn<C>, initResolvers?: InitResolversFn<C>,
     dynamicTypeDefs: string[] = []) {
     this._name = name;
+    this._actionRequestTable = actionRequestTable;
     this._config = config;
     this._schemaPath = schemaPath;
     this._initDbCallback = initDbCallback;
@@ -62,39 +70,42 @@ export class ClicheServer<C extends Config = Config> {
     this._dynamicTypeDefs = dynamicTypeDefs;
   }
 
+  /**
+   * Get the action name from the full one
+   * @param fullActionName the action name that includes/begins
+   *                           with the cliché name and a separator
+   */
+  private static GetActionName(clicheName:string, fullActionName: string) {
+    // +1 to the length for the separator
+    return fullActionName.substring(clicheName.length + 1);
+  }
+
+  // needs clicheServer passed in because `this` is not in scope
+  // when this function is used
+  private static SetGraphqlQuery = (clicheServer: ClicheServer) =>
+  (req, _res, next) => {
+    const reqField = req.method === 'GET' ? 'query' : 'body';
+    req[reqField].query = clicheServer._actionRequestTable[
+      ClicheServer.GetActionName(
+        clicheServer._name, req['fullActionName']
+      )
+    ](req[reqField].extraInfo);
+    next();
+  }
+
   private startApp(schema) {
     const app = express();
 
-    app.get(/^\/dv\/(.*)\/vote\/.*/,
+    // /dv-{fullActionName}/{reqId}/{reqType}/
+    app.use(/^\/dv-(.*)\/(.*)\/(vote|commit|abort)\/.*/,
       (req, _res, next) => {
-        req['reqId'] = req.params[0];
+        req['fullActionName'] = req.params[0];
+        req['reqId'] = req.params[1];
+        req['reqType'] = req.params[2];
         next();
       },
       bodyParser.json(),
-      graphqlExpress((req) => {
-        return {
-          schema: schema,
-          context: {
-            reqType: 'vote',
-            reqId: req!['reqId']
-          },
-          formatResponse: (gqlResp) => {
-            return {
-              result: (gqlResp.errors) ? 'no' : 'yes',
-              payload: gqlResp
-            };
-          }
-        };
-      })
-    );
-
-    app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
-      (req, _res, next) => {
-        req['reqId'] = req.params[0];
-        req['reqType'] = req.params[1];
-        next();
-      },
-      bodyParser.json(),
+      ClicheServer.SetGraphqlQuery(this),
       graphqlExpress((req) => {
         return {
           schema: schema,
@@ -122,9 +133,17 @@ export class ClicheServer<C extends Config = Config> {
       })
     );
 
-    app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
-      extended: true
-    }), graphqlExpress({ schema }));
+    app.use('/graphql/:fullActionName', bodyParser.json(),
+      bodyParser.urlencoded({
+        extended: true
+      }),
+      (req, _res, next) => {
+        req['fullActionName'] = req.params.fullActionName;
+        next();
+      },
+      ClicheServer.SetGraphqlQuery(this),
+      graphqlExpress({ schema })
+    );
 
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 

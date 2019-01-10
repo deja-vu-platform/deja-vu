@@ -6,6 +6,7 @@ import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
 
+import { ShowScoreComponent } from '../show-score/show-score.component';
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../scoring.config';
@@ -34,6 +35,9 @@ OnChanges {
   @Input() noScoresText = 'No scores to show';
   @Input() noTargetsText = 'No targets to show';
 
+  @Input() showScore: Action = {
+    type: <Type<Component>> ShowScoreComponent
+  };
   @Input() showTarget: Action = {
     type: <Type<Component>> ShowTargetComponent
   };
@@ -70,22 +74,21 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {targetsByScore: Target[]}}>(this.apiPath, {
         params: {
-          query: `
-            query {
-              targetsByScore(asc: ${this.showAscending}) {
-                id
-                ${this.showScores ? 'scores ' +
-                  '{' +
-                    'id \n' +
-                    `${this.showScoreValue ? 'value \n' : ''}` +
-                    `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
-                    `${this.showScoreTargetId ? 'targetId \n' : ''}` +
-                  '}' : ''
-                }
-                ${this.showTotal ? 'total': ''}
+          variables: { asc: this.showAscending },
+          extraInfo: {
+            returnFields: `
+              id
+              ${this.showScores ? 'scores ' +
+                '{' +
+                  'id \n' +
+                  `${this.showScoreValue ? 'value \n' : ''}` +
+                  `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
+                  `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                '}' : ''
               }
-            }
-          `
+              ${this.showTotal ? 'total': ''}
+            `
+          }
         }
       })
       .subscribe((res) => {

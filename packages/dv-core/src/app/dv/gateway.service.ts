@@ -92,7 +92,7 @@ export class GatewayService {
 
   get<T>(path?: string, options?: RequestOptions): Observable<T> {
     console.log(
-      `Sending get from ${this.from.nativeElement.nodeName.toLowerCase()}`);
+      `Sending get from ${this.getActionName()}`);
     return this.http.get<T>(
       this.gatewayUrl, {
         params: this.buildParams(path, options)
@@ -103,7 +103,7 @@ export class GatewayService {
   post<T>(
     path?: string, body?: string | Object, options?: RequestOptions): Observable<T> {
     console.log(
-      `Sending post from ${this.from.nativeElement.nodeName.toLowerCase()}`);
+      `Sending post from ${this.getActionName()}`);
     if (typeof body === 'object') {
       body = JSON.stringify(body);
     }
@@ -119,6 +119,7 @@ export class GatewayService {
     : {[params: string]: string} {
     const params = {
       from: this.fromStr,
+      fullActionName: this.getActionName(),
       runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
     };
     if (path) {
@@ -127,7 +128,12 @@ export class GatewayService {
     if (options) {
       params['options'] = JSON.stringify(options);
     }
-   return params;
+
+    return params;
+  }
+
+  private getActionName(): string {
+    return this.from.nativeElement.nodeName.toLowerCase();
   }
 }
 

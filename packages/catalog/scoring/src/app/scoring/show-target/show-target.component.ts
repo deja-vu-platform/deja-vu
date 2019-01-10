@@ -69,9 +69,9 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {target: Target}}>(this.apiPath, {
         params: {
-          query: `
-            query {
-              target(id: "${this.id}") {
+          variables: { id: this.id },
+          extraInfo: {
+            returnFields: `
                 id
                 ${this.showScores ? 'scores ' +
                   '{' +
@@ -82,9 +82,8 @@ OnChanges {
                   '}' : ''
                 }
                 ${this.showTotal ? 'total': ''}
-              }
-            }
-          `
+            `
+          }
         }
       })
       .subscribe((res) => {

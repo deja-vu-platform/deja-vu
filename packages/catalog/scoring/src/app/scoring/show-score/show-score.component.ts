@@ -58,16 +58,15 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {score: Score}}>(this.apiPath, {
         params: {
-          query: `
-            query {
-              score(id: "${this.id}") {
+          variables: { id: this.id },
+          extraInfo: {
+            returnFields: `
                 ${this.showId ? 'id' : ''}
                 ${this.showValue ? 'value' : ''}
                 ${this.showSourceId ? 'sourceId' : ''}
                 ${this.showTargetId ? 'targetId' : ''}
-              }
-            }
-          `
+            `
+          }
         }
       })
       .subscribe((res) => {
