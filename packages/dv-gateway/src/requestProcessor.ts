@@ -76,9 +76,53 @@ type port = string;
 const MAX_BROWSER_CONNECTIONS = 6;
 
 
+/**
+ * Class for batching transaction responses.
+ * Also just sends a regular response for batchSize === 1
+ */
+class TxResponse {
+  private responses: ClicheResponse<string>[] = [];
+
+  constructor(private res: express.Response, private batchSize: number) { }
+
+  /**
+   * Add a response to the batch.
+   * A single response is sent once we have reached the batchSize
+   */
+  add<T>(status: number, text: string): void {
+    this.responses.push({
+      status,
+      text
+    });
+
+    if (this.responses.length === this.batchSize) {
+      this.send();
+    }
+  }
+
+  /**
+   * Send the batched response.
+   */
+  private send() {
+    let { status, text } = this.responses[0];
+    if (this.batchSize > 1) {
+      status = this.responses
+        .filter(({ status: s }) => s !== SUCCESS)
+        .length === 0 ? SUCCESS : INTERNAL_SERVER_ERROR;
+      text = '[' + this.responses
+        .map(({ text: t }) => t)
+        .join(',') + ']';
+    }
+    this.res
+      .status(status)
+      .send(text);
+  }
+}
+
+
 export class RequestProcessor {
   private readonly txCoordinator: TxCoordinator<
-    GatewayToClicheRequest, ClicheResponse<string>, express.Response>;
+    GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
   private readonly actionHelper: ActionHelper;
   private readonly dstTable: { [cliche: string]: port };
 
@@ -183,7 +227,7 @@ export class RequestProcessor {
 
     const txConfig = this.getTxConfig(config, this.actionHelper);
     this.txCoordinator = new TxCoordinator<
-      GatewayToClicheRequest, ClicheResponse<string>, express.Response>(
+      GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
         txConfig);
   }
 
@@ -200,24 +244,25 @@ export class RequestProcessor {
     res: express.Response
   ): Promise<void> {
     if (!req.query.isTx) {
-      return this.doProcessRequest(req, res);
+      return this.doProcessRequest(req, new TxResponse(res, 1));
     }
 
     const childRequests: ChildRequest[] = JSON.parse(req.body);
+    const txRes = new TxResponse(res, childRequests.length);
 
     return Promise
-      .all(childRequests.map((chReq) => this.doProcessRequest(chReq, res)))
+      .all(childRequests.map((chReq) => this.doProcessRequest(chReq, txRes)))
       .then(() => {});
   }
 
   private async doProcessRequest(
     req: express.Request | ChildRequest,
-    res: express.Response
+    txRes: TxResponse
   ): Promise<void> {
     if (!req.query.from) {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send('No from specified' );
+      txRes.add(INTERNAL_SERVER_ERROR, 'No from specified');
+
+      return;
     }
 
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
@@ -230,7 +275,7 @@ export class RequestProcessor {
     const toPort: port | undefined = _.get(this.dstTable, <string> to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!this.validateRequest(actionPath, matchingActions, to, toPort, res)) {
+    if (!this.validateRequest(actionPath, matchingActions, to, toPort, txRes)) {
         return;
     }
 
@@ -256,12 +301,11 @@ export class RequestProcessor {
      */
     if (RequestProcessor.HasRunId(gatewayRequest) && actionPath.isDvTx()) {
       await this.txCoordinator.processMessage(
-        runId!, actionPath.serialize(), gatewayToClicheRequest, res);
+        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes);
     } else {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
-      res.status(clicheRes.status);
-      res.send(clicheRes.text);
+      txRes.add(clicheRes.status, clicheRes.text);
     }
   }
 
@@ -270,21 +314,23 @@ export class RequestProcessor {
     matchingActions: ActionTag[],
     to: string | undefined,
     toPort: string | undefined,
-    res: express.Response
+    txRes: TxResponse
   ): boolean {
     if (_.isEmpty(matchingActions)) {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send(`Invalid action path: ${actionPath}, my actionConfig is `
-          + this.actionHelper.toString());
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid action path: ${actionPath}, my actionConfig is `
+          + this.actionHelper.toString()
+      );
 
       return false;
     }
 
     if (toPort === undefined) {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send(`Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
+      );
 
       return false;
     }
@@ -293,7 +339,7 @@ export class RequestProcessor {
   }
 
   private getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
-    TxConfig<GatewayToClicheRequest, ClicheResponse<string>, express.Response> {
+    TxConfig<GatewayToClicheRequest, ClicheResponse<string>, TxResponse> {
     return {
       dbHost: config.dbHost,
       dbPort: config.dbPort,
@@ -338,22 +384,22 @@ export class RequestProcessor {
 
       sendAbortToClient: (
         causedAbort: boolean, _gcr?: GatewayToClicheRequest,
-        payload?: ClicheResponse<string>, res?: express.Response) => {
-        assert.ok(res !== undefined);
+        payload?: ClicheResponse<string>, txRes?: TxResponse) => {
+        assert.ok(txRes !== undefined);
         if (causedAbort) {
           assert.ok(payload !== undefined);
-          res!.status(payload!.status);
-          res!.send(payload!.text);
+          txRes!.add(payload!.status, payload!.text);
         } else {
-          res!.status(INTERNAL_SERVER_ERROR);
-          res!.send('the tx that this action is part of aborted');
+          txRes!.add(
+            INTERNAL_SERVER_ERROR,
+            'the tx that this action is part of aborted'
+          );
         }
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>, res?: express.Response) => {
-        res!.status(payload.status);
-        res!.send(payload.text);
+        payload: ClicheResponse<string>, txRes?: TxResponse) => {
+        txRes!.add(payload.status, payload.text);
       },
 
       getCohorts: (actionPathId: string): string[] => {
@@ -404,10 +450,9 @@ export class RequestProcessor {
       },
 
       onError: (
-        e: Error, _gcr: GatewayToClicheRequest, res?: express.Response) => {
+        e: Error, _gcr: GatewayToClicheRequest, txRes?: TxResponse) => {
         console.error(e);
-        res!.status(INTERNAL_SERVER_ERROR);
-        res!.send(e.message);
+        txRes!.add(INTERNAL_SERVER_ERROR, e.message);
       }
     };
   }
