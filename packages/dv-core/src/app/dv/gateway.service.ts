@@ -1,10 +1,13 @@
-import {
-  ElementRef, Renderer2, RendererFactory2, InjectionToken, Inject, Injectable
-} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  ElementRef, Inject, Injectable, InjectionToken, Renderer2, RendererFactory2
+} from '@angular/core';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/do';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
-import { RUN_ID_ATTR } from './run.service';
+import { NUM_COHORTS_ATTR, RUN_ID_ATTR } from './run.service';
 
 import * as _ from 'lodash';
 
@@ -23,8 +26,66 @@ export const OF_ATTR = 'dvOf';
 export const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
 
+enum Method {
+  GET = 'GET',
+  POST = 'POST'
+}
+
+interface Request {
+  method: Method;
+  path?: string;
+  body?: string | Object;
+  options?: RequestOptions;
+}
+
+const headers = new HttpHeaders({'Content-type': 'application/json'});
+
+
+/**
+ * Class for batching transaction requests.
+ */
+class TxRequest {
+  private requests: Request[] = [];
+  private subjects: Subject<any>[] = [];
+
+  constructor(private gatewayUrl: string, private http: HttpClient) { }
+
+  /**
+   * Add a request to the batch.
+   * Returned observable resolves with response (after send is called)
+   */
+  add<T>(request: Request): Observable<T> {
+    this.requests.push(request);
+    const subject = new Subject<T>();
+    this.subjects.push(subject);
+
+    return subject.asObservable();
+  }
+
+  /**
+   * Send all of the requests.
+   */
+  send() {
+    return this.http.post<[]>(
+      this.gatewayUrl, this.requests, { headers, params: { isTx: '1' } }
+    )
+      .do((responses) => {
+        responses.forEach((response, i) => {
+          this.subjects[i].next(response);
+          this.subjects[i].complete();
+        });
+      });
+  }
+
+  get size() {
+    return this.subjects.length;
+  }
+}
+
 
 export class GatewayService {
+  private static txBatches: { [txId: string]: TxRequest} = {};
+
   fromStr: string;
 
   private static GetAttribute(node, attribute: string): string | undefined {
@@ -90,36 +151,77 @@ export class GatewayService {
     this.fromStr = JSON.stringify(_.reverse(seenActionNodes));
   }
 
-  get<T>(path?: string, options?: RequestOptions): Observable<T> {
-    console.log(
-      `Sending get from ${this.from.nativeElement.nodeName.toLowerCase()}`);
-    return this.http.get<T>(
-      this.gatewayUrl, {
-        params: this.buildParams(path, options)
-      });
+  get<T>(path?: string, options?: RequestOptions) {
+    return this.request<T>({
+      path,
+      options,
+      body: undefined,
+      method: Method.GET
+    });
   }
 
-  /** If the body is an Object it will be converted to JSON **/
-  post<T>(
-    path?: string, body?: string | Object, options?: RequestOptions): Observable<T> {
+  /**
+   * If the body is an Object it will be converted to JSON
+   */
+  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
+    return this.request<T>({
+      path,
+      options,
+      body,
+      method: Method.POST
+    });
+  }
+
+  private request<T>(request: Request): Observable<T> {
+    const { method, path, body, options } = request;
     console.log(
-      `Sending post from ${this.from.nativeElement.nodeName.toLowerCase()}`);
-    if (typeof body === 'object') {
-      body = JSON.stringify(body);
-    }
-    return this.http.post<T>(
-      this.gatewayUrl, body, {
-        params: this.buildParams(path, options),
-        headers: new HttpHeaders({'Content-type': 'application/json'})
-      });
+      `Sending ${method} from ${this.from.nativeElement.nodeName.toLowerCase()}`
+    );
+
+    const params = this.buildParams(path, options);
+    const numCohorts = parseInt(params.numCohorts, 10);
+    if (numCohorts > 0) {
+      let txRequest = GatewayService.txBatches[params.txId];
+      if (txRequest === undefined) {
+        txRequest = new TxRequest(this.gatewayUrl, this.http);
+        GatewayService.txBatches[params.txId] = txRequest;
+      }
+
+      const individualResponseObservable = txRequest.add<T>(request);
+      if (txRequest.size > numCohorts) {
+        txRequest
+          .send()
+          .subscribe(() => {
+            delete GatewayService.txBatches[params.txId];
+          });
+      }
+
+      return individualResponseObservable;
     }
 
+    switch (method) {
+      case Method.GET:
+        return this.http.get<T>(
+          this.gatewayUrl,
+          { params }
+        );
+      case Method.POST:
+        const strBody = typeof body === 'object' ? JSON.stringify(body) : body;
+
+        return this.http.post<T>(
+          this.gatewayUrl,
+          strBody,
+          { params, headers }
+        );
+    }
+  }
 
   private buildParams(path?: string, options?: RequestOptions)
     : {[params: string]: string} {
     const params = {
       from: this.fromStr,
-      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
+      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR),
+      numCohorts: this.from.nativeElement.getAttribute(NUM_COHORTS_ATTR)
     };
     if (path) {
       params['path'] = path;
@@ -127,6 +229,7 @@ export class GatewayService {
     if (options) {
       params['options'] = JSON.stringify(options);
     }
+
    return params;
   }
 }
@@ -147,7 +250,7 @@ export class GatewayServiceFactory {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
-  /** This method should be called onInit (or after) **/
+  // This method should be called onInit (or after)
   // Calling `for` in before onInit can cause problems because the component
   // might not be attached to the dom (thus making it impossible to find the
   // parents of the from element).

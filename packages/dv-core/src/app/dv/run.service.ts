@@ -62,6 +62,7 @@ const runFunctionNames = {
 
 const ACTION_ID_ATTR = '_dvActionId';
 export const RUN_ID_ATTR = '_dvRunId';
+export const NUM_COHORTS_ATTR = '_dvNumCohorts';
 
 
 @Injectable()
@@ -167,15 +168,27 @@ export class RunService {
     runType: RunType, node, id: string): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
     const runs: Promise<RunResultMap>[] = [];
+
+    // count number of cohorts for actions (> 0 for tx)
+    let numCohorts = -1;
+    this.walkActions(node, (actionInfo) => {
+      if (actionInfo.action[dvOnRun]) {
+        numCohorts += 1;
+      }
+    });
+
+    // run the action, or each action in tx with the same RUN ID
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnRun]) {
         actionInfo.node.setAttribute(RUN_ID_ATTR, id);
+        actionInfo.node.setAttribute(NUM_COHORTS_ATTR, numCohorts);
         runs.push(
           Promise
             .resolve(actionInfo.action[dvOnRun]())
             .then(result => ({[actionId]: result})));
       }
     });
+
     const resultMaps: RunResultMap[] = await Promise.all(runs);
     return _.assign({}, ...resultMaps);
   }
