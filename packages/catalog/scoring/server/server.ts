@@ -29,9 +29,8 @@ const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
 const actionRequestTable: ActionRequestTable = {
   'create-score': (extraInfo) => `
     mutation CreateScore($input: CreateScoreInput!) {
-      createScore (input: $input) {
-        ${extraInfo.returnFields}
-      }
+      createScore (input: $input)
+      ${extraInfo.returnFields ? `{ ${extraInfo.returnFields} }`: ''}
     }
   `,
   'show-score': (extraInfo) => `

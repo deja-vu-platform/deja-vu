@@ -1,6 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as mongodb from 'mongodb';
+import * as _ from 'lodash';
 
 import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
@@ -23,6 +24,16 @@ export const CONCURRENT_UPDATE_ERROR =
  * functions that return the corresponding graphql request
  */
 export type ActionRequestTable = {[key: string]: (extraInfo) => string};
+
+/**
+ * Generates the request for extra information, e.g. return fields, for a
+ * graphql request
+ * @param extraInfo - information to include with the graphql request
+ */
+export function requestExtraInfo(extraInfo: any) {
+  const hasValue: boolean = !(_.isEmpty(extraInfo) || _.isNil(extraInfo));
+  return hasValue ? '{' + extraInfo.returnFields + '}' : '';
+}
 
 /**
  * The type of the function to be called after connecting to the db.
