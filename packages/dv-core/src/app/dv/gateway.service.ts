@@ -1,8 +1,11 @@
-import {
-  ElementRef, Renderer2, RendererFactory2, InjectionToken, Inject, Injectable
-} from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  ElementRef, Inject, Injectable, InjectionToken, Renderer2, RendererFactory2
+} from '@angular/core';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/do';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { RUN_ID_ATTR } from './run.service';
 
@@ -22,9 +25,123 @@ export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 export const OF_ATTR = 'dvOf';
 export const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
+const SUCCESS = 200;
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST'
+}
+
+export interface Params {
+  from: string;
+  runId: string;
+  path?: string;
+  options?: string;
+  [s: string]: string; // won't actually ever have more but typing expects this
+}
+
+export interface ChildRequest {
+  method: Method;
+  body: string | Object;
+  query: Params;
+}
+
+interface ChildResponse {
+  status: number;
+  body: Object;
+}
+
+
+const headers = new HttpHeaders({'Content-type': 'application/json'});
+
+
+/**
+ * Class for batching transaction requests.
+ */
+export class TxRequest {
+  private requests: ChildRequest[] = [];
+  private subjects: Subject<any>[] = [];
+
+  constructor(private gatewayUrl: string, private http: HttpClient) { }
+
+  /**
+   * Add a request to the batch.
+   * Returned observable resolves with response (after send is called)
+   */
+  add<T>(chReq: ChildRequest): Observable<T> {
+    this.requests.push(chReq);
+    const subject = new Subject<T>();
+    this.subjects.push(subject);
+
+    return subject.asObservable();
+  }
+
+  /**
+   * Send all of the requests.
+   */
+  send(): void {
+    // not in transaction: just send it
+    if (this.size === 1) {
+      const { method, body, query: params } = this.requests[0];
+      let obs: Observable<any> = null;
+      switch (method) {
+        case Method.GET:
+          obs = this.http.get(
+            this.gatewayUrl,
+            { params }
+          );
+          break;
+        case Method.POST:
+          obs = this.http.post(
+            this.gatewayUrl,
+            typeof body === 'object' ? JSON.stringify(body) : body,
+            { params, headers }
+          );
+          break;
+      }
+      const subject = this.subjects[0];
+      obs.subscribe(
+        (resBody) => {
+          subject.next(resBody);
+          subject.complete();
+        },
+        (error) => {
+          subject.error(error);
+          subject.complete();
+        }
+      );
+    } else {
+      this.http.post<ChildResponse[]>(
+        this.gatewayUrl,
+        this.requests,
+        { headers, params: { isTx: '1' } }
+      )
+        .subscribe(
+          (responses) => {
+            responses.forEach(({ status, body }, i) => {
+              if (status === SUCCESS) {
+                this.subjects[i].next(body);
+              } else {
+                this.subjects[i].error({
+                  status,
+                  error: body
+                });
+              }
+              this.subjects[i].complete();
+            });
+        });
+    }
+  }
+
+  get size() {
+    return this.subjects.length;
+  }
+}
 
 
 export class GatewayService {
+  static txBatches: { [txId: string]: TxRequest} = {};
+
   fromStr: string;
 
   private static GetAttribute(node, attribute: string): string | undefined {
@@ -90,33 +207,59 @@ export class GatewayService {
     this.fromStr = JSON.stringify(_.reverse(seenActionNodes));
   }
 
-  get<T>(path?: string, options?: RequestOptions): Observable<T> {
-    console.log(
-      `Sending get from ${this.getActionName()}`);
-    return this.http.get<T>(
-      this.gatewayUrl, {
-        params: this.buildParams(path, options)
-      });
+  get<T>(path?: string, options?: RequestOptions) {
+    return this.request<T>(
+      Method.GET,
+      path,
+      undefined,
+      options
+    );
   }
 
-  /** If the body is an Object it will be converted to JSON **/
-  post<T>(
-    path?: string, body?: string | Object, options?: RequestOptions): Observable<T> {
-    console.log(
-      `Sending post from ${this.getActionName()}`);
-    if (typeof body === 'object') {
-      body = JSON.stringify(body);
-    }
-    return this.http.post<T>(
-      this.gatewayUrl, body, {
-        params: this.buildParams(path, options),
-        headers: new HttpHeaders({'Content-type': 'application/json'})
-      });
+  /**
+   * If the body is an Object it will be converted to JSON
+   */
+  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
+    return this.request<T>(
+      Method.POST,
+      path,
+      body,
+      options
+    );
+  }
+
+  private request<T>(
+    method: Method,
+    path?: string,
+    body?: string | Object,
+    options?: RequestOptions
+  ): Observable<T> {
+    console.log(`Sending get from ${this.getActionName()}`);
+
+    const params = this.buildParams(path, options);
+
+    let txRequest = GatewayService.txBatches[params.runId];
+    if (txRequest === undefined) {
+      txRequest = new TxRequest(this.gatewayUrl, this.http);
+      if (params.runId) {
+        GatewayService.txBatches[params.runId] = txRequest;
+      }
     }
 
+    const individualResponseObservable = txRequest.add<T>({
+      method,
+      body,
+      query: params
+    });
 
-  private buildParams(path?: string, options?: RequestOptions)
-    : {[params: string]: string} {
+    if (!params.runId) {
+      txRequest.send();
+    }
+
+    return individualResponseObservable;
+  }
+
+  private buildParams(path?: string, options?: RequestOptions): Params {
     const params = {
       from: this.fromStr,
       fullActionName: this.getActionName(),
@@ -153,7 +296,7 @@ export class GatewayServiceFactory {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
-  /** This method should be called onInit (or after) **/
+  // This method should be called onInit (or after)
   // Calling `for` in before onInit can cause problems because the component
   // might not be attached to the dom (thus making it impossible to find the
   // parents of the from element).
