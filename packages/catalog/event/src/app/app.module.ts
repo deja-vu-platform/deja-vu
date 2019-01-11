@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 import { EventModule } from './event/event.module';
 
 
@@ -13,7 +13,8 @@ import { EventModule } from './event/event.module';
   ],
   imports: [
     BrowserModule,
-    EventModule
+    EventModule,
+    DvModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]
