@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
-  Context
+  Context,
+  getReturnFields
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -14,6 +16,41 @@ import {
   SetRatingInput
 } from './schema';
 
+const actionRequestTable: ActionRequestTable = {
+  'rate-target': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'load':
+        return `
+          query LoadRating($input: RatingInput!) {
+            rating(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'set':
+        return `
+          mutation SetRating($input: SetRatingInput!) {
+            setRating(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-average-rating': (extraInfo) => `
+    query ShowAverageRating($targetId: ID!) {
+      averageRatingForTarget(targetId: $targetId) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-rating': (extraInfo) => `
+    query ShowRating($input: RatingInput!) {
+      rating(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-ratings-by-target': (extraInfo) => `
+    query ShowRatingsByTarget($input: RatingsInput!) {
+      ratings(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
+}
 
 function isPendingUpdate(doc: RatingDoc | null) {
   return _.get(doc, 'pending.type') === 'update-rating';
@@ -159,6 +196,7 @@ const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 
