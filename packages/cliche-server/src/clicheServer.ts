@@ -87,9 +87,8 @@ export class ClicheServer<C extends Config = Config> {
    * @param fullActionName the action name that includes/begins
    *                           with the cliché name and a separator
    */
-  private static GetActionName(clicheName: string, fullActionName: string) {
-    // +1 to the length for the separator
-    return fullActionName.substring(clicheName.length + 1);
+  private static GetActionName(fullActionName: string) {
+    return fullActionName.split('-').slice(1).join('-');
   }
 
   // needs clicheServer passed in because `this` is not in scope
@@ -98,9 +97,7 @@ export class ClicheServer<C extends Config = Config> {
     (req, _res, next) => {
       const reqField = req.method === 'GET' ? 'query' : 'body';
       req[reqField].query = clicheServer._actionRequestTable[
-        ClicheServer.GetActionName(
-          clicheServer._name, req['fullActionName']
-        )
+        ClicheServer.GetActionName(req['fullActionName'])
       ](req[reqField].extraInfo);
       req[reqField].variables = req[reqField].inputs;
       next();
