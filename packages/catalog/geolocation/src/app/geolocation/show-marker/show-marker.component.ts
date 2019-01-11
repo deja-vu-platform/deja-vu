@@ -57,15 +57,16 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<{ data: any }>(this.apiPath, {
         params: {
-          query: `query {
-            marker(id: "${this.id}") {
+          inputs: { id: this.id },
+          extraInfo: {
+            returnFields: `
               id
               title
               latitude
               longitude
               mapId
-            }
-          }`
+            `
+          }
         }
       })
         .subscribe((res) => {
