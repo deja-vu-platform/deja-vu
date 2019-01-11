@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -22,6 +24,52 @@ class TaskValidation {
     tasks: mongodb.Collection<TaskDoc>, id: string): Promise<TaskDoc> {
     return Validation.existsOrFail(tasks, id, 'Task');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'approve-task': (extraInfo) => `
+    mutation ApproveTask($id: ID!) {
+      approveTask (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'claim-task': (extraInfo) => `
+    mutation ClaimTask($id: ID!, $assigneeId) {
+      claimTask (id: $id, assigneeId: $assigneeId) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'complete-task': (extraInfo) => `
+    mutation CompleteTask($id: ID!) {
+      completeTask (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-task': (extraInfo) => `
+    mutation CreateTask($input: CreateTaskInput!) {
+      createTask (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-tasks': (extraInfo) => `
+    query ShowTasks($input: TasksInput!) {
+      tasks(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'update-task': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateTask($input: UpdateTaskInput!) {
+            updateTask(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Task($id: ID!) {
+            task(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
 }
 
 function isPendingCreate(task: TaskDoc | null) {
@@ -166,6 +214,7 @@ const taskCliche: ClicheServer = new ClicheServerBuilder('task')
 
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

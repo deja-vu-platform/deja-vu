@@ -35,11 +35,10 @@ export class ClaimTaskComponent implements
   dvOnExec(): Promise<{data: any}> {
     return this.gs
       .post<{data: any}>('/graphql', {
-        query: `mutation {
-          claimTask(
-            id: "${this.id}",
-            assigneeId: "${this.assigneeId}")
-        }`
+        inputs: {
+          id: this.id,
+          assigneeId: this.assigneeId
+        }
       })
       .toPromise();
   }
