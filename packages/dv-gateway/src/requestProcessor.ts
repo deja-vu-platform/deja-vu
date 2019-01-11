@@ -334,7 +334,7 @@ export class RequestProcessor {
       return false;
     }
 
-    return null;
+    return true;
   }
 
   private getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
