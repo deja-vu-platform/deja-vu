@@ -1,9 +1,11 @@
 import * as Ajv from 'ajv';
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   Config,
-  Context
+  Context,
+  getReturnFields
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -32,6 +34,80 @@ interface Schema {
 interface PropertyConfig extends Config {
   initialObjects: Object[];
   schema: Schema;
+}
+
+const loadSchemaQuery = (extraInfo) => `
+  query Properties {
+    properties ${getReturnFields(extraInfo)}
+  }
+`;
+const loadSchemaAndObjectsQueries = (extraInfo) => {
+  switch (extraInfo.action) {
+    case 'properties':
+      return loadSchemaQuery(extraInfo);
+    case 'objects':
+      return `
+        query Objects {
+          objects ${getReturnFields(extraInfo)}
+        }
+      `;
+    default:
+      throw new Error('Need to specify extraInfo.action');
+  }
+}
+
+
+const actionRequestTable: ActionRequestTable = {
+  'choose-object': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
+  'create-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'schema':
+        return loadSchemaQuery(extraInfo);
+      case 'create':
+        return `
+          mutation CreateObject($input: CreateObjectInput!) {
+            createObject(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'create-objects': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'schema':
+        return loadSchemaQuery(extraInfo);
+      case 'create':
+        return `
+          mutation CreateObjects($input: [CreateObjectInput!]!) {
+            createObjects(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'create-property': (extraInfo) => `
+    query Property($name: String!) {
+      property(name: $name) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
+  'show-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'properties':
+        return loadSchemaQuery(extraInfo);
+      case 'object':
+        return `
+          query ShowObject($id: ID!) {
+            object(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-objects': (extraInfo) =>loadSchemaAndObjectsQueries(extraInfo)
 }
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -190,6 +266,7 @@ const propertyCliche: ClicheServer<PropertyConfig> =
 
       return Promise.resolve();
     })
+    .actionRequestTable(actionRequestTable)
     .resolvers(resolvers)
     .dynamicTypeDefs(getDynamicTypeDefs)
     .build();

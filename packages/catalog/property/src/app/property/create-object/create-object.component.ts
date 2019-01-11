@@ -39,7 +39,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-object.component.css']
 })
 export class CreateObjectComponent
-implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string | undefined;
   savedInitialValue: ValueMap;
   @Input() set initialValue(value: ValueMap) {
@@ -76,7 +76,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -91,13 +91,10 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     this.gs
       .get<PropertiesRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              properties {
-                name
-              }
-            }
-          `
+          extraInfo: {
+            action: 'schema',
+            returnFields: 'name'
+          }
         }
       })
       .pipe(map((res: PropertiesRes) => res.data.properties))
@@ -125,14 +122,11 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     }
     if (this.save) {
       const res = await this.gs
-        .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
-          query: `mutation CreateObject($input: CreateObjectInput!) {
-            createObject(input: $input) {
-              id
-            }
-          }`,
-          variables: {
-            input: input
+        .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
+          inputs: { input: input },
+          extraInfo: {
+            action: 'create',
+            returnFields: 'id'
           }
         })
         .toPromise();
