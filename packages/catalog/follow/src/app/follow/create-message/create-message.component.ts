@@ -83,13 +83,7 @@ export class CreateMessageComponent implements
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateMessageRes>(this.apiPath, {
-      query: `mutation CreateMessage($input: CreateMessageInput!) {
-            createMessage(input: $input) {
-              id,
-              content
-            }
-          }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           publisherId: this.publisherId,

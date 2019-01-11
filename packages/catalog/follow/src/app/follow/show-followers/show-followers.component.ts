@@ -71,12 +71,7 @@ OnChanges {
       this.gs
         .get<FollowersRes>(this.apiPath, {
           params: {
-            query: `
-              query Followers($input: FollowersInput!) {
-                followers(input: $input)
-              }
-            `,
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 ofPublisherId: this.ofPublisherId
               }

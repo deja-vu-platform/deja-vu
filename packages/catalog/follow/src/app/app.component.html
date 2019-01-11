@@ -5,16 +5,14 @@
   <h1>Show Publisher <i>alice</i></h1>
   <follow-show-publisher [publisher]="alicePublisher">
   </follow-show-publisher>
-  <h1>Create Message <i>herMessage</i> by Publisher <i>alice</i></h1>
-  <follow-create-message id="herMessage" publisherId="alice" 
+  <!-- <h1>Create Message <i>herMessage</i> by Publisher <i>alice</i></h1>
+  <follow-create-message id="herMessage" publisherId="alice"
     (message)="aliceMessage=$event">
-  </follow-create-message>
+  </follow-create-message> -->
   <h1>Show Message <i>herMessage</i></h1>
   <follow-show-message [message]="aliceMessage"></follow-show-message>
-  <h1>Show All Followers</h1> 
+  <h1>Show All Followers</h1>
   <follow-show-followers></follow-show-followers>
-  <h1>Show All Publishers w/out Follow/ Unfollow</h1>
-  <follow-show-publishers></follow-show-publishers>
   <h1>Show All Messages</h1>
   <follow-show-messages></follow-show-messages>
   <h1>Let <i>ben</i> Follow/ Unfollow publisher <i>alice</i></h1>
