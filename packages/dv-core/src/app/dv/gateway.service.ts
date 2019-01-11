@@ -90,12 +90,14 @@ export class TxRequest {
             this.gatewayUrl,
             { params }
           );
+          break;
         case Method.POST:
           obs = this.http.post(
             this.gatewayUrl,
             typeof body === 'object' ? JSON.stringify(body) : body,
             { params, headers }
           );
+          break;
       }
       const subject = this.subjects[0];
       obs.subscribe(
@@ -109,14 +111,13 @@ export class TxRequest {
         }
       );
     } else {
-      this.http.post<string>(
+      this.http.post<ChildResponse[]>(
         this.gatewayUrl,
-        JSON.stringify(this.requests),
+        this.requests,
         { headers, params: { isTx: '1' } }
       )
         .subscribe(
-          (responsesArrayString) => {
-            const responses: ChildResponse[] = JSON.parse(responsesArrayString);
+          (responses) => {
             responses.forEach(({ status, body }, i) => {
               if (status === SUCCESS) {
                 this.subjects[i].next(body);

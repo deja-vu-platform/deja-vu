@@ -103,18 +103,18 @@ class TxResponse {
    * Send the batched response.
    */
   private send() {
-    let { status, text } = this.responses[0];
+    let status = this.responses[0].status;
+    let body: any = this.responses[0].text;
     if (this.batchSize > 1) {
       status = this.responses
         .filter(({ status: s }) => s !== SUCCESS)
         .length === 0 ? SUCCESS : INTERNAL_SERVER_ERROR;
-      text = '[' + this.responses
-        .map(({ text: t, status: s }) => `{"status": ${s}, "body": ${t}}`)
-        .join(',') + ']';
+      body = this.responses
+        .map(({ text: t, status: s }) => ({ status: s, body: t }));
     }
     this.res
       .status(status)
-      .send(text);
+      .send(body);
   }
 }
 
@@ -246,7 +246,7 @@ export class RequestProcessor {
       return this.doProcessRequest(req, new TxResponse(res, 1));
     }
 
-    const childRequests: ChildRequest[] = RequestProcessor.JsonParse(req.body);
+    const childRequests: ChildRequest[] = req.body;
     const txRes = new TxResponse(res, childRequests.length);
 
     return Promise

@@ -1,8 +1,8 @@
 import {
-  ElementRef, Renderer2, RendererFactory2, Injectable
+  ElementRef, Injectable, Renderer2, RendererFactory2
 } from '@angular/core';
-import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 import { GatewayService } from './gateway.service';
 
