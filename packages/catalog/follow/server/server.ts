@@ -22,7 +22,6 @@ import {
 import { v4 as uuid } from 'uuid';
 
 const actionRequestTable: ActionRequestTable = {
-  // TODO
   'create-message': (extraInfo) => `
     mutation CreateMessage($input: CreateMessageInput!) {
       createMessage (input: $input) ${getReturnFields(extraInfo)}

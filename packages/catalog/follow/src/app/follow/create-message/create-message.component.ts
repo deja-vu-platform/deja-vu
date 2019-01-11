@@ -89,6 +89,12 @@ export class CreateMessageComponent implements
           publisherId: this.publisherId,
           content: this.contentControl.value
         }
+      },
+      extraInfo: {
+        returnFields: `
+          id
+          content
+        `
       }
     })
       .toPromise();
