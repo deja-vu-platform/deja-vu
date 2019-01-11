@@ -77,24 +77,22 @@ OnChanges {
       this.gs
         .get<{data: {transfers: Transfer[]}}>(this.apiPath, {
           params: {
-            query: `
-              query Transfers($input: TransfersInput!) {
-                transfers(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showFromId ? 'fromId' : ''}
-                  ${this.showToId ? 'toId' : ''}
-                  ${this.showAmount ? `amount ${selection}` : ''}
-                }
-              }
-            `,
             // When we are sending a potentially empty input object we need to
             // stringify the variables
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 fromId: this.fromId,
                 toId: this.toId
               }
-            })
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showFromId ? 'fromId' : ''}
+                ${this.showToId ? 'toId' : ''}
+                ${this.showAmount ? `amount ${selection}` : ''}
+              `
+            }
           }
         })
         .subscribe((res) => {

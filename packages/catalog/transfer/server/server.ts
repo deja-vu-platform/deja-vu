@@ -1,141 +1,60 @@
-import * as bodyParser from 'body-parser';
-import * as express from 'express';
+import * as assert from 'assert';
+import {
+  ActionRequestTable,
+  ClicheServer,
+  ClicheServerBuilder,
+  Config,
+  Context,
+  getReturnFields
+} from 'cliche-server';
 import { readFileSync } from 'fs';
-import * as minimist from 'minimist';
+import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
+import {
+  AccountDoc,
+  AccountPendingDoc,
+  AddToBalanceInput,
+  CreateTransferInput,
+  ItemCount,
+  PendingTransfer,
+  TransferDoc,
+  TransfersInput
+} from './schema';
 import { v4 as uuid } from 'uuid';
 
-import * as _ from 'lodash';
 
-// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
-// tslint:disable-next-line:no-var-requires
-const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
-import { makeExecutableSchema } from 'graphql-tools';
-
-import * as assert from 'assert';
-
-
-interface ItemCount {
-  id: string;
-  count: number;
-}
-
-interface PendingTransfer<Balance> {
-  updateId: string;
-  transfer: TransferDoc<Balance>;
-}
-
-interface AccountDoc<Balance> {
-  id: string;
-  balance: Balance;
-  /*
-   * This field exists if the account itself is pending.
-   * This could be because it's the first time we are seeing a transfer from/to
-   * this account. If the transfer ends up being aborted, we'll delete
-   * the account.
-   */
-  pending?: string;
-  // This field exists if the account has a pending transfer
-  pendingTransfer?: PendingTransfer<Balance>;
-}
-
-interface AccountPendingDoc<Balance> {
-  id: string;
-  balance: Balance;
-  pending: string;
-  pendingTransfer: PendingTransfer<Balance>;
-}
-
-interface TransferDoc<Balance> {
-  id: string;
-  fromId?: string;
-  toId: string;
-  amount: Balance;
-}
-
-interface AddToBalanceInput<Balance> {
-  accountId: string;
-  amount: Balance;
-}
-
-interface CreateTransferInput<Balance> {
-  id: string;
-  fromId: string;
-  toId: string;
-  amount: Balance;
-}
-
-interface TransfersInput {
-  fromId?: string;
-  toId?: string;
-}
-
-
-interface Context {
-  reqType: 'vote' | 'commit' | 'abort' | undefined;
-  reqId: string | undefined;
-}
-
-
-interface Config {
-  wsPort: number;
-  dbHost: string;
-  dbPort: number;
-  dbName: string;
-  reinitDbOnStartup: boolean;
+interface TransferConfig extends Config {
   balanceType: 'money' | 'items';
 }
 
-const argv = minimist(process.argv);
-
-const name = argv.as ? argv.as : 'transfer';
-
-const DEFAULT_CONFIG: Config = {
-  dbHost: 'localhost',
-  dbPort: 27017,
-  wsPort: 3000,
-  dbName: `${name}-db`,
-  reinitDbOnStartup: true,
-  balanceType: 'money'
+const actionRequestTable: ActionRequestTable = {
+  'add-to-balance': (extraInfo) => `
+    mutation AddToBalance($input: AddToBalanceInput!) {
+      addToBalance(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-transfer': (extraInfo) => `
+    mutation CreateTransfer($input: CreateTransferInput!) {
+      createTransfer(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-balance': (extraInfo) => `
+    query ShowBalance($accountId: ID!) {
+      balance(accountId: $accountId) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-transfer': (extraInfo) => `
+    query ShowTransfer($id: ID!) {
+      transfer(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-transfers': (extraInfo) => `
+    query ShowTransfers($input: TransfersInput!) {
+      transfers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 };
-
-let configArg;
-try {
-  configArg = JSON.parse(argv.config);
-} catch (e) {
-  throw new Error(`Couldn't parse config ${argv.config}`);
-}
-
-const config: Config = { ...DEFAULT_CONFIG, ...configArg };
-
-console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db: mongodb.Db;
-/**
- * `transfers` is the main collection, the only reason why we have an `accounts`
- * collection is to keep track of the balance (to avoid having to compute it
- * every time) and to be able to lock accounts when processing transfers.
- */
-let accounts: mongodb.Collection, transfers: mongodb.Collection;
-mongodb.MongoClient.connect(
-  `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
-    if (err) {
-      throw err;
-    }
-    db = client.db(config.dbName);
-    if (config.reinitDbOnStartup) {
-      await db.dropDatabase();
-      console.log(`Reinitialized db ${config.dbName}`);
-    }
-    accounts = db.collection('accounts');
-    accounts.createIndex({ id: 1 }, { unique: true, sparse: true });
-
-    transfers = db.collection('transfers');
-    transfers.createIndex({ id: 1 }, { unique: true, sparse: true });
-    transfers.createIndex({ fromId: 1 }, { sparse: true });
-    transfers.createIndex({ toId: 1 }, { sparse: true });
-  });
-
 
 type AccountHasFundsFn<Balance> = (
   accountBalance: Balance, transferAmount: Balance) => boolean;
@@ -146,6 +65,8 @@ type ZeroBalanceFn<Balance> = () => Balance;
 type IsZeroBalanceFn<Balance> = (balance: Balance) => boolean;
 
 function getResolvers<Balance>(
+  accounts: mongodb.Collection<AccountDoc<Balance>>,
+  transfers: mongodb.Collection<TransferDoc<Balance>>,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
   negateBalanceFn: NegateBalanceFn<Balance>,
@@ -177,15 +98,15 @@ function getResolvers<Balance>(
           amount: input.amount
         };
         const updateId = _.get(context, 'reqId', uuid());
-
         try {
           await addToBalance<Balance>(
+            accounts, transfers,
             input.accountId, input.amount, transfer,
             updateId, context.reqType, true,
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortUpdate(updateId);
+          await abortUpdate(accounts, transfers, updateId);
           throw e;
         }
 
@@ -210,12 +131,13 @@ function getResolvers<Balance>(
            * account if the account has insufficient funds
            */
           await addToBalance<Balance>(
+            accounts, transfers,
             input.fromId, negateBalanceFn(input.amount), transfer,
             updateId, context.reqType, true,
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortUpdate(updateId);
+          await abortUpdate(accounts, transfers, updateId);
           throw e;
        }
 
@@ -228,6 +150,7 @@ function getResolvers<Balance>(
         * data
         */
        await addToBalance<Balance>(
+         accounts, transfers,
          input.toId, input.amount, transfer, updateId, context.reqType, false,
          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
@@ -238,6 +161,7 @@ function getResolvers<Balance>(
 }
 
 async function voteAccountUpdate<Balance>(
+  accounts /* no type because of usage of AccountDoc vs AccountPendingDoc */,
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
   updateId: string,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
@@ -281,7 +205,7 @@ async function voteAccountUpdate<Balance>(
 
   // Throw an error if the balance in acct would be negative after updating
   if (!accountHasFundsFn(voteAccount.balance, amount)) {
-    await abortAccountUpdate(updateId);
+    await abortAccountUpdate(accounts, updateId);
     throw new Error(noFundsMsg(accountId));
   }
 
@@ -289,6 +213,7 @@ async function voteAccountUpdate<Balance>(
 }
 
 async function commitAccountUpdate<Balance>(
+  accounts: mongodb.Collection<AccountDoc<Balance>>,
   account: AccountPendingDoc<Balance>, newBalance: Balance,
   isZeroBalanceFn: IsZeroBalanceFn<Balance>) {
   const reqIdPendingFilter = {
@@ -323,14 +248,19 @@ async function commitAccountUpdate<Balance>(
   return;
 }
 
-async function abortUpdate(updateId: string): Promise<void> {
-  await Promise
-    .all([abortAccountUpdate(updateId), abortTransferUpdate(updateId)]);
+async function abortUpdate<Balance>(
+  accounts: mongodb.Collection<AccountDoc<Balance>>,
+  transfers: mongodb.Collection<TransferDoc<Balance>>,
+  updateId: string): Promise<void> {
+  await Promise.all([
+    abortAccountUpdate(accounts, updateId),
+    abortTransferUpdate(transfers, updateId)]);
 
   return;
 }
 
-async function abortAccountUpdate(updateId: string) {
+async function abortAccountUpdate<Balance>(
+  accounts: mongodb.Collection<AccountDoc<Balance>>, updateId: string) {
   const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
   await accounts
     .updateMany(reqIdPendingFilter, { $unset: { pendingTransfer: '' } });
@@ -346,7 +276,8 @@ async function abortAccountUpdate(updateId: string) {
   return res;
 }
 
-function abortTransferUpdate(updateId: string) {
+function abortTransferUpdate<Balance>(
+  transfers: mongodb.Collection<TransferDoc<Balance>>,updateId: string) {
   return transfers.deleteMany({ pending: updateId });
 }
 
@@ -371,6 +302,8 @@ function abortTransferUpdate(updateId: string) {
  *         a pending update
  */
 async function addToBalance<Balance>(
+  accounts /* no type because of usage of AccountDoc vs AccountPendingDoc */,
+  transfers: mongodb.Collection<TransferDoc<Balance>>,
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
   updateId: string, action: 'vote' | 'commit' | 'abort' | undefined,
   onCommitAddTransferToLog: boolean,
@@ -390,7 +323,7 @@ async function addToBalance<Balance>(
   switch (action) {
     case 'vote':
       return await voteAccountUpdate<Balance>(
-        accountId, amount, transfer, updateId,
+        accounts, accountId, amount, transfer, updateId,
         accountHasFundsFn, zeroBalanceFn);
     case undefined:
       /*
@@ -403,7 +336,7 @@ async function addToBalance<Balance>(
       try {
         const account: AccountPendingDoc<Balance> = await
           voteAccountUpdate<Balance>(
-            accountId, amount, transfer, updateId,
+            accounts, accountId, amount, transfer, updateId,
             accountHasFundsFn, zeroBalanceFn);
 
         if (onCommitAddTransferToLog) {
@@ -411,13 +344,13 @@ async function addToBalance<Balance>(
         }
         const newBalance = newBalanceFn(account.balance, amount);
         await commitAccountUpdate<Balance>(
-          account, newBalance, isZeroBalanceFn);
+          accounts, account, newBalance, isZeroBalanceFn);
 
         return account;
       } catch (e) {
         console.error(
           `Balance update ${updateId} aborted, error: ${e.message}`);
-        await abortUpdate(updateId);
+        await abortUpdate(accounts, transfers, updateId);
         throw e;
       }
     case 'commit':
@@ -434,167 +367,162 @@ async function addToBalance<Balance>(
       }
       const newCommitBalance = newBalanceFn(commitAccount.balance, amount);
       await commitAccountUpdate<Balance>(
-        commitAccount, newCommitBalance, isZeroBalanceFn);
+        accounts, commitAccount, newCommitBalance, isZeroBalanceFn);
 
       return undefined;
     case 'abort':
-      await abortUpdate(updateId);
+      await abortUpdate(accounts, transfers, updateId);
 
       return undefined;
   }
 }
 
-let typeDefinitions, resolvers;
-if (config.balanceType === 'money') {
+function getDynamicTypeDefs(config: TransferConfig): string[] {
+  const schemaTemplatePath = path.join(__dirname, 'schema.template.graphql');
+  const schemaTemplate = readFileSync(schemaTemplatePath, 'utf8');
+  if (config.balanceType === 'money') {
 
-  const schemaPath = path.join(__dirname, 'schema.graphql');
-  typeDefinitions = [
-    _.replace(
+    return [
       _.replace(
-        readFileSync(schemaPath, 'utf8'),
-        /#BalanceInput/g, 'Float'),
-      /#Balance/g, 'Float')
-  ];
+        _.replace(
+          schemaTemplate,
+          /#BalanceInput/g, 'Float'),
+        /#Balance/g, 'Float')
+    ];
+  } else {
 
-  const newBalanceFn: NewBalanceFn<number> =
-    (accountBalance: number, transferAmount: number) => (
-      accountBalance + transferAmount
-    );
-  const accountHasFundsFn: AccountHasFundsFn<number> =
-    (accountBalance: number, transferAmount: number) => (
-      newBalanceFn(accountBalance, transferAmount) >= 0
-    );
-  const negateBalanceFn: NegateBalanceFn<number> =
-    (balance: number) => -balance;
-  const zeroBalanceFn: ZeroBalanceFn<number> = () => 0;
-  const isZeroBalanceFn: IsZeroBalanceFn<number> =
-    (balance: number) => balance === 0;
-
-  resolvers = getResolvers<number>(
-    accountHasFundsFn, newBalanceFn, negateBalanceFn,
-    zeroBalanceFn, isZeroBalanceFn);
-
-} else {
-  const schemaPath = path.join(__dirname, 'schema.graphql');
-  typeDefinitions = [
-    _.replace(
+    return [
       _.replace(
-        readFileSync(schemaPath, 'utf8')
-          .concat(`
-            input ItemCountInput {
-              id: ID!
-              count: Int
-            }
+        _.replace(
+          schemaTemplate
+            .concat(`
+              input ItemCountInput {
+                id: ID!
+                count: Int
+              }
 
-            type ItemCount {
-              id: ID!
-              count: Int
-            }
-          `),
-        /#BalanceInput/g, '[ItemCountInput]'),
-      /#Balance/g, '[ItemCount]')
-  ];
-
-  const newBalanceFn: NewBalanceFn<ItemCount[]> =
-    (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
-      const accountBalanceMap = _
-        .reduce(accountBalance, (acc, itemCount: ItemCount) => {
-          acc[itemCount.id] = itemCount.count;
-
-          return acc;
-        }, {});
-
-      _.each(transferAmount, (itemCount: ItemCount) => {
-        const prevItemCount = _.get(accountBalanceMap, itemCount.id, 0);
-        const newCount = prevItemCount + itemCount.count;
-        if (newCount === 0) {
-          delete accountBalanceMap[itemCount.id];
-        } else {
-          accountBalanceMap[itemCount.id] = newCount;
-        }
-      });
-
-      return _
-        .map(accountBalanceMap, (value: number, key: string): ItemCount => {
-          return { id: key, count: value };
-        });
-    };
-  const accountHasFundsFn: AccountHasFundsFn<ItemCount[]> =
-    (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
-      const newBalance = newBalanceFn(accountBalance, transferAmount);
-      for (const itemCount of newBalance) {
-        if (itemCount.count < 0) {
-          return false;
-        }
-      }
-
-      return true;
-    };
-  const negateBalanceFn: NegateBalanceFn<ItemCount[]> =
-    (balance: ItemCount[]) => {
-      return _.map(balance, (itemCount: ItemCount) => {
-        return { id: itemCount.id, count: -itemCount.count };
-      });
-    };
-  const zeroBalanceFn: ZeroBalanceFn<ItemCount[]> = () => [];
-  const isZeroBalanceFn: IsZeroBalanceFn<ItemCount[]> =
-    (balance: ItemCount[]) => _.isEmpty(balance);
-
-  resolvers = getResolvers<ItemCount[]>(
-    accountHasFundsFn, newBalanceFn,
-    negateBalanceFn, zeroBalanceFn, isZeroBalanceFn);
-
-  _.merge(resolvers, {
-    ItemCount: {
-      id: (itemCount: ItemCount) => itemCount.id,
-      count: (itemCount: ItemCount) => itemCount.count
-    }
-  });
+              type ItemCount {
+                id: ID!
+                count: Int
+              }
+            `),
+          /#BalanceInput/g, '[ItemCountInput]'),
+        /#Balance/g, '[ItemCount]')
+    ];
+  }
 }
 
-const schema = makeExecutableSchema({ typeDefs: typeDefinitions, resolvers });
+function resolvers(db: mongodb.Db, config: TransferConfig): object {
+  if (config.balanceType === 'money') {
+    const accounts: mongodb.Collection<AccountDoc<number>> =
+      db.collection('accounts');
+    const transfers: mongodb.Collection<TransferDoc<number>> =
+      db.collection('transfers');
 
-const app = express();
+    const newBalanceFn: NewBalanceFn<number> =
+      (accountBalance: number, transferAmount: number) => (
+        accountBalance + transferAmount
+      );
+    const accountHasFundsFn: AccountHasFundsFn<number> =
+      (accountBalance: number, transferAmount: number) => (
+        newBalanceFn(accountBalance, transferAmount) >= 0
+      );
+    const negateBalanceFn: NegateBalanceFn<number> =
+      (balance: number) => -balance;
+    const zeroBalanceFn: ZeroBalanceFn<number> = () => 0;
+    const isZeroBalanceFn: IsZeroBalanceFn<number> =
+      (balance: number) => balance === 0;
 
-app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
-  (req, _res, next) => {
-    req['reqId'] = req.params[0];
-    req['reqType'] = req.params[1];
-    next();
-  },
-  bodyParser.json(),
-  graphqlExpress((req) => {
-    return {
-      schema: schema,
-      context: {
-        reqType: req!['reqType'],
-        reqId: req!['reqId']
-      },
-      formatResponse: (gqlResp) => {
-        const reqType = req!['reqType'];
-        switch (reqType) {
-          case 'vote':
-            return {
-              result: (gqlResp.errors) ? 'no' : 'yes',
-              payload: gqlResp
-            };
-          case 'abort':
-          case 'commit':
-            return 'ACK';
-          case undefined:
-            return gqlResp;
+    return getResolvers<number>(
+      accounts, transfers,
+      accountHasFundsFn, newBalanceFn, negateBalanceFn,
+      zeroBalanceFn, isZeroBalanceFn);
+
+  } else {
+    const accounts: mongodb.Collection<AccountDoc<ItemCount[]>> =
+      db.collection('accounts');
+    const transfers: mongodb.Collection<TransferDoc<ItemCount[]>> =
+      db.collection('transfers');
+    
+    const newBalanceFn: NewBalanceFn<ItemCount[]> =
+      (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
+        const accountBalanceMap = _
+          .reduce(accountBalance, (acc, itemCount: ItemCount) => {
+            acc[itemCount.id] = itemCount.count;
+
+            return acc;
+          }, {});
+
+        _.each(transferAmount, (itemCount: ItemCount) => {
+          const prevItemCount = _.get(accountBalanceMap, itemCount.id, 0);
+          const newCount = prevItemCount + itemCount.count;
+          if (newCount === 0) {
+            delete accountBalanceMap[itemCount.id];
+          } else {
+            accountBalanceMap[itemCount.id] = newCount;
+          }
+        });
+
+        return _
+          .map(accountBalanceMap, (value: number, key: string): ItemCount => {
+            return { id: key, count: value };
+          });
+      };
+    const accountHasFundsFn: AccountHasFundsFn<ItemCount[]> =
+      (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
+        const newBalance = newBalanceFn(accountBalance, transferAmount);
+        for (const itemCount of newBalance) {
+          if (itemCount.count < 0) {
+            return false;
+          }
         }
+
+        return true;
+      };
+    const negateBalanceFn: NegateBalanceFn<ItemCount[]> =
+      (balance: ItemCount[]) => {
+        return _.map(balance, (itemCount: ItemCount) => {
+          return { id: itemCount.id, count: -itemCount.count };
+        });
+      };
+    const zeroBalanceFn: ZeroBalanceFn<ItemCount[]> = () => [];
+    const isZeroBalanceFn: IsZeroBalanceFn<ItemCount[]> =
+      (balance: ItemCount[]) => _.isEmpty(balance);
+
+    let resolvers = getResolvers<ItemCount[]>(
+      accounts, transfers,
+      accountHasFundsFn, newBalanceFn,
+      negateBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+
+    return _.merge(resolvers, {
+      ItemCount: {
+        id: (itemCount: ItemCount) => itemCount.id,
+        count: (itemCount: ItemCount) => itemCount.count
       }
-    };
+    });
+  }
+}
+
+const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
+  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
+    /**
+     * `transfers` is the main collection, the only reason why we have an `accounts`
+     * collection is to keep track of the balance (to avoid having to compute it
+     * every time) and to be able to lock accounts when processing transfers.
+     */
+    const accounts = db.collection('accounts');
+    const transfers = db.collection('transfers');
+    
+    return Promise.all([
+      accounts.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      transfers.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      transfers.createIndex({ fromId: 1 }, { sparse: true }),
+      transfers.createIndex({ toId: 1 }, { sparse: true }),
+    ]);
   })
-);
+  .actionRequestTable(actionRequestTable)
+  .resolvers(resolvers)
+  .dynamicTypeDefs(getDynamicTypeDefs)
+  .build();
 
-app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
-  extended: true
-}), graphqlExpress({ schema }));
-
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-
-app.listen(config.wsPort, () => {
-  console.log(`Running ${name} with config ${JSON.stringify(config)}`);
-});
+transferCliche.start();

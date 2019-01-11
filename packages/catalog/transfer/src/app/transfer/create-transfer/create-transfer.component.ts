@@ -95,21 +95,15 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   async dvOnExec() {
     const res = await this.gs.post<CreateTransferRes>(this.apiPath, {
-      query: `
-        mutation CreateTransfer($input: CreateTransferInput!) {
-          createTransfer(input: $input) {
-            id
-          }
-        }
-       `,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           fromId: this.fromIdControl.value,
           toId: this.toIdControl.value,
           amount: this.amount
         }
-      }
+      },
+      extraInfo: { returnFields: 'id' }
     })
     .toPromise();
 
