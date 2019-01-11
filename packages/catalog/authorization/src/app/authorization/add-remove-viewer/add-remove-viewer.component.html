@@ -1,0 +1,4 @@
+<div *ngIf="resource || resourceId">
+  <button mat-button *ngIf="!canViewResource" (click)="addViewer()">Add Viewer</button>
+  <button mat-button *ngIf="canViewResource" (click)="removeViewer()">Remove Viewer</button>
+</div>

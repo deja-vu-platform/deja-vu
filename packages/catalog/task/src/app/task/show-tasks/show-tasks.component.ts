@@ -79,23 +79,10 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      console.log('requesting tasks');
       this.gs
         .get<{data: {tasks: Task[]}}>('/graphql', {
           params: {
-            query: `
-              query Tasks($input: TasksInput!) {
-                tasks(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showAssigner ? 'assignerId' : ''}
-                  ${this.showAssignee ? 'assigneeId' : ''}
-                  ${this.showDueDate ? 'dueDate' : ''}
-                  ${this.showApproved ? 'approved' : ''}
-                  ${this.showCompleted ? 'completed' : ''}
-                }
-              }
-            `,
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 assigneeId: this.assigneeId,
                 assignerId: this.assignerId,
@@ -103,11 +90,20 @@ OnChanges {
                 assigned: this.assigned,
                 completed: this.completed
               }
-            })
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showAssigner ? 'assignerId' : ''}
+                ${this.showAssignee ? 'assigneeId' : ''}
+                ${this.showDueDate ? 'dueDate' : ''}
+                ${this.showApproved ? 'approved' : ''}
+                ${this.showCompleted ? 'completed' : ''}
+              `
+            }
           }
         })
         .subscribe((res) => {
-          console.log(res);
           this.tasks = res.data.tasks;
         });
     }

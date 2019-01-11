@@ -83,19 +83,13 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   async dvOnExec() {
     const res = await this.gs.post<CreateTransferRes>(this.apiPath, {
-      query: `
-        mutation AddToBalance($input: AddToBalanceInput!) {
-          addToBalance(input: $input) {
-            id
-          }
-        }
-       `,
-      variables: {
+      inputs: {
         input: {
           accountId: this.accountIdControl.value,
           amount: this.amountControl.value
         }
-      }
+      },
+      extraInfo: { returnFields: 'id' }
     })
     .toPromise();
 

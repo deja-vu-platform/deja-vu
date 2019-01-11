@@ -66,18 +66,12 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
-          query: `
-              query Labels($input: LabelsInput!) {
-                labels(input: $input) {
-                  id
-                }
-              }
-            `,
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               itemId: this.itemId
             }
-          })
+          }),
+          extraInfo: { returnFields: 'id' }
         }
       })
         .subscribe((res) => {

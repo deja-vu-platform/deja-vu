@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { RatingModule } from './rating/rating.module';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,8 @@ import { GATEWAY_URL } from 'dv-core';
   ],
   imports: [
     BrowserModule,
-    RatingModule
+    RatingModule,
+    DvModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]

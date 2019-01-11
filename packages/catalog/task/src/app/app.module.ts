@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { TaskModule } from './task/task.module';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 
 import { AppComponent } from './app.component';
 
@@ -14,7 +14,8 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    TaskModule
+    TaskModule,
+    DvModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]

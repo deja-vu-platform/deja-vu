@@ -13,7 +13,7 @@ import { API_PATH } from '../allocator.config';
 
 
 interface CreateAllocationRes {
-  data: {createAllocation: {id: string}};
+  data: { createAllocation: { id: string } };
 }
 
 @Component({
@@ -38,7 +38,7 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -71,24 +71,18 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
     }
     console.log(`Create allocation with ${this.id}`);
     this.gs.post<CreateAllocationRes>(this.apiPath, {
-      query: `
-        mutation CreateAllocation($input: CreateAllocationInput!) {
-          createAllocation(input: $input) {
-            id
-          }
-        }
-      `,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           resourceIds: this.resourceIds,
           consumerIds: this.consumerIds
         }
-      }
+      },
+      extraInfo: { returnFields: 'id' }
     })
-    .pipe(map((res: CreateAllocationRes) => res.data.createAllocation))
-    .subscribe((allocation) => {
-      this.allocation.emit({ id: allocation.id });
-    });
+      .pipe(map((res: CreateAllocationRes) => res.data.createAllocation))
+      .subscribe((allocation) => {
+        this.allocation.emit({ id: allocation.id });
+      });
   }
 }

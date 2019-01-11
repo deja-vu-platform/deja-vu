@@ -109,26 +109,16 @@
         </div>
 
         <!-- Join Group if already not in it -->
-        <div class="inline btn-group form-group" id="jn-lv-grp">
+        <div *ngIf="user?.id !== hostId" class="inline btn-group form-group"
+          id="jn-lv-grp">
           <dv-tx>
-            <div *ngIf="action === 'addMember'">
-              <authorization-add-viewer
-                [id]="eventId"
-                [viewerId]="user?.id"
-                [hidden]="true">
-              </authorization-add-viewer>
-            </div>
-
-            <div *ngIf="action === 'removeMember'">
-              <authorization-remove-viewer
-                [id]="eventId"
-                [viewerId]="user?.id"
-                [hidden]="true">
-              </authorization-remove-viewer>
-            </div>
+            <authorization-add-remove-viewer
+              [resourceId]="eventId"
+              [viewerId]="user?.id"
+              hidden="true">
+            </authorization-add-remove-viewer>
 
             <group-join-leave
-              (actionToTake)="action=$event"
               [groupId]="eventId"
               [memberId]="user?.id">
             </group-join-leave>

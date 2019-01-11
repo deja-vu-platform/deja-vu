@@ -1,8 +1,10 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   Config,
-  Context
+  Context,
+  getReturnFields
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -23,6 +25,30 @@ interface ScoringConfig extends Config {
 
 const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
   scores.reduce((total, score) => total + score, 0);
+
+// TODO: maybe write a function that will autogenerate some repetitive parts
+const actionRequestTable: ActionRequestTable = {
+  'create-score': (extraInfo) => `
+    mutation CreateScore($input: CreateScoreInput!) {
+      createScore (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-score': (extraInfo) => `
+    query ShowScore($id: ID!) {
+      score(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-target': (extraInfo) => `
+    query ShowTarget($id: ID!) {
+      target(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-targets-by-score': (extraInfo) => `
+    query ShowTargetsByScore($asc: Boolean) {
+      targetsByScore(asc: $asc) ${getReturnFields(extraInfo)}
+    }
+  `
+};
 
 function isPendingCreate(doc: ScoreDoc | null) {
   return _.get(doc, 'pending.type') === 'create-score';
@@ -145,6 +171,7 @@ const scoringCliche: ClicheServer<ScoringConfig> =
           { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);
     })
+    .actionRequestTable(actionRequestTable)
     .resolvers(resolvers)
     .build();
 

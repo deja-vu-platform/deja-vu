@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import {
@@ -47,6 +49,57 @@ class EventValidation {
       throw new Error(`Event ${id} doesn't exist `);
     }
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'choose-and-show-series': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'all-series':
+        return `
+          query ChooseAndShowSeries {
+            series ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'one-series':
+        return `
+          query ChooseAndShowSeries($id: ID!) {
+            oneSeries(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'create-event': (extraInfo) => `
+    mutation CreateEvent($input: CreateEventInput!) {
+      createEvent (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-series': (extraInfo) => `
+    mutation CreateSeries($input: CreateSeriesInput!) {
+      createSeries (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-weekly-series': (extraInfo) => `
+    mutation CreateSeries($input: CreateSeriesInput!) {
+      createSeries (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-event': (extraInfo) => `
+    mutation DeleteEvent($id: ID!) {
+      deleteEvent (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-event': (extraInfo) => `
+    query ShowEvent($id: ID!) {
+      event(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-events': (extraInfo) => `
+    query ShowEvents($input: EventsInput!) {
+      events(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
@@ -365,6 +418,7 @@ const eventCliche: ClicheServer = new ClicheServerBuilder('event')
       series.createIndex({ 'events.id': 1 }, { unique: true })
     ]);
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

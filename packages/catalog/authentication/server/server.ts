@@ -1,10 +1,12 @@
 import * as bcrypt from 'bcryptjs';
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import * as jwt from 'jsonwebtoken';
@@ -118,6 +120,52 @@ class UserValidation {
 
     return valid;
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'authenticate': (extraInfo) => `
+    query Authenticate($input: VerifyInput!) {
+      verify(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'change-password': (extraInfo) => `
+    mutation ChangePassword($input: ChangePasswordInput!) {
+      changePassword (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'register-user': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'login':
+        return `
+          mutation Register($input: RegisterInput!) {
+            registerAndSignIn(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'register-only':
+        return `
+          mutation Register($input: RegisterInput!) {
+            register(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-user': (extraInfo) => `
+    query ShowUser($id: String!) {
+      userById(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-users': (extraInfo) => `
+    query ShowUsers($input: UsersInput!) {
+      users(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'sign-in': (extraInfo) => `
+    mutation SignIn($input: SignInInput!) {
+      signIn (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingRegister(user: UserDoc | null) {
@@ -328,6 +376,7 @@ const authenticationCliche: ClicheServer =
         users.createIndex({ username: 1 }, { unique: true, sparse: true })
       ]);
     })
+    .actionRequestTable(actionRequestTable)
     .resolvers(resolvers)
     .build();
 

@@ -47,13 +47,10 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     this.gs
       .get<PropertiesRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              properties {
-                name
-              }
-            }
-          `
+          extraInfo: {
+            action: 'schema',
+            returnFields: 'name'
+          }
         }
       })
       .pipe(map((res: PropertiesRes) => res.data.properties))
@@ -68,13 +65,12 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     }
     const res = await this.gs
       .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
-        query: `mutation CreateObjects($input: [CreateObjectInput!]!) {
-          createObjects(input: $input) {
-            id
-          }
-        }`,
-        variables: {
+        inputs: {
           input: _.map(this.objects, this.objectToCreateObjectInput.bind(this))
+        },
+        extraInfo: {
+          action: 'create',
+          returnFields: 'id'
         }
       })
       .toPromise();

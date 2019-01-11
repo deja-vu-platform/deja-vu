@@ -36,9 +36,7 @@ export class CompleteTaskComponent implements
   dvOnExec(): Promise<{data: any}> {
     return this.gs
       .post<{data: any}>('/graphql', {
-        query: `mutation {
-          completeTask(id: "${this.id}")
-        }`
+        inputs: { id: this.id }
       })
       .toPromise();
   }

@@ -91,14 +91,13 @@ OnExecSuccess {
     this.gs
       .get<PropertyRes>('/graphql', {
         params: {
-          query: `
-            query {
-              property(name: "${this.name}") {
-                schema
-                required
-              }
-            }
-          `
+          inputs: { name: this.name },
+          extraInfo: {
+            returnFields: `
+              schema
+              required
+            `
+          }
         }
       })
       .pipe(map((res: PropertyRes) => res.data.property))

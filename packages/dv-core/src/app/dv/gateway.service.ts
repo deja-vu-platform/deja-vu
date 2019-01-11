@@ -234,9 +234,7 @@ export class GatewayService {
     body?: string | Object,
     options?: RequestOptions
   ): Observable<T> {
-    console.log(
-      `Sending ${method} from ${this.from.nativeElement.nodeName.toLowerCase()}`
-    );
+    console.log(`Sending get from ${this.getActionName()}`);
 
     const params = this.buildParams(path, options);
 
@@ -264,6 +262,7 @@ export class GatewayService {
   private buildParams(path?: string, options?: RequestOptions): Params {
     const params = {
       from: this.fromStr,
+      fullActionName: this.getActionName(),
       runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
     };
     if (path) {
@@ -273,7 +272,11 @@ export class GatewayService {
       params['options'] = JSON.stringify(options);
     }
 
-   return params;
+    return params;
+  }
+
+  private getActionName(): string {
+    return this.from.nativeElement.nodeName.toLowerCase();
   }
 }
 

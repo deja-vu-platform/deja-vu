@@ -42,9 +42,7 @@ export class DeleteMarkerComponent implements
     const res = await this.gs.post<{
       data: { deleteMarker: { id: string } }, errors: { message: string }[]
     }>('/graphql', {
-      query: `mutation {
-        deleteMarker(id: "${this.id}")
-      }`
+      inputs: { id: this.id }
     })
       .toPromise();
 

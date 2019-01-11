@@ -15,7 +15,7 @@ import { API_PATH } from '../authorization.config';
 
 
 interface CreateResourceRes {
- data: { createResource: Resource; };
+  data: { createResource: Resource; };
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -53,7 +53,7 @@ export class CreateResourceComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -72,18 +72,10 @@ export class CreateResourceComponent implements
     };
     if (this.save) {
       const res = await this.gs.post<CreateResourceRes>(this.apiPath, {
-        query: `
-          mutation CreateResource($input: CreateResourceInput!) {
-            createResource(input: $input) {
-              id
-            }
-          }
-        `,
-        variables: {
-          input: resource
-        }
+        inputs: { input: resource },
+        extraInfo: { returnFields: 'id' }
       })
-      .toPromise();
+        .toPromise();
     }
     this.resource.emit(resource);
   }

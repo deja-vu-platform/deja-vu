@@ -90,19 +90,15 @@ export class CreateScoreComponent
     if (this.save) {
       const res = await this.gs
         .post<CreateScoreResponse>(this.apiPath, {
-          query: `mutation CreateScore($input: CreateScoreInput!) {
-            createScore (input: $input) {
-              id
-            }
-          }`,
-          variables: {
+          inputs: {
             input: {
               id: this.id,
               value: this.valueControl.value,
               sourceId: this.sourceId,
               targetId: this.targetId
             }
-          }
+          },
+          extraInfo: { returnFields: 'id' }
         })
         .toPromise();
 

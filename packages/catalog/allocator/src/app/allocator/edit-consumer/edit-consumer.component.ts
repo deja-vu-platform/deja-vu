@@ -48,10 +48,10 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
 
   newConsumerControl = new FormControl('', [
     Validators.required,
-    (control: AbstractControl): {[key: string]: any} => {
+    (control: AbstractControl): { [key: string]: any } => {
       if (!this._currentConsumerId ||
         control.value === this._currentConsumerId) {
-        return { noChange: this._currentConsumerId  };
+        return { noChange: this._currentConsumerId };
       }
 
       return null;
@@ -77,7 +77,7 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -95,25 +95,21 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
     if (this.gs && this.resourceId && this.allocationId) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          query: `
-            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
-              consumerOfResource(input: $input)
-            }
-          `,
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               resourceId: this.resourceId,
               allocationId: this.allocationId
             }
-          })
+          }),
+          extraInfo: { action: 'consumer' }
         }
       })
-      .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
-      .subscribe((consumerId) => {
-        this.currentConsumerId.emit(consumerId);
-        this._currentConsumerId = consumerId;
-        this.newConsumerControl.setValue(consumerId);
-      });
+        .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
+        .subscribe((consumerId) => {
+          this.currentConsumerId.emit(consumerId);
+          this._currentConsumerId = consumerId;
+          this.newConsumerControl.setValue(consumerId);
+        });
     }
   }
 
@@ -127,21 +123,16 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
     }
     const newConsumerId = this.newConsumerControl.value;
     const res = await this.gs.post<EditConsumerOfResourceRes>(this.apiPath, {
-      query: `
-        mutation EditConsumerOfResource(
-          $input: EditConsumerOfResourceInput!) {
-          editConsumerOfResource(input: $input)
-        }
-      `,
-      variables: {
+      inputs: {
         input: {
           resourceId: this.resourceId,
           allocationId: this.allocationId,
           newConsumerId: newConsumerId
         }
-      }
+      },
+      extraInfo: { action: 'edit' }
     })
-    .toPromise();
+      .toPromise();
     if (res.data.editConsumerOfResource) {
       this._currentConsumerId = newConsumerId;
     }

@@ -101,28 +101,27 @@ export class CreateMarkerComponent implements
   ngOnChanges() { }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
-      query: `mutation CreateMarker($input: CreateMarkerInput!) {
-            createMarker(input: $input) {
-              id,
-              title,
-              latitude,
-              longitude,
-              mapId
-            }
-          }`,
-      variables: {
-        input: {
-          id: this.id,
-          title: this.titleControl.value,
-          latitude: this.latitudeControl.value,
-          longitude: this.longitudeControl.value,
-          mapId: this.mapId
+    const res = await this.gs
+      .post<{ data: any, errors: { message: string }[] }>('/graphql', {
+        inputs: {
+          input: {
+            id: this.id,
+            title: this.titleControl.value,
+            latitude: this.latitudeControl.value,
+            longitude: this.longitudeControl.value,
+            mapId: this.mapId
+          }
+        },
+        extraInfo: {
+          returnFields: `
+            id
+            title
+            latitude
+            longitude
+            mapId
+          `
         }
-      }
-    })
+      })
       .toPromise();
 
     if (res.errors) {

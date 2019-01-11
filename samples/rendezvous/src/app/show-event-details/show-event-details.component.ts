@@ -20,7 +20,6 @@ export class ShowEventDetailsComponent implements OnInit {
   }
   user: any;
   hostId: string;
-  action: string;
   showMemberName = ShowMemberNameComponent;
   showEventComment = ShowEventCommentComponent;
 
