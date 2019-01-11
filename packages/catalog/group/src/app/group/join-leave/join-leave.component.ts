@@ -49,14 +49,14 @@ export class JoinLeaveComponent implements OnExec, OnInit {
     }
     this.gs.get<{ data: any }>('/graphql', {
       params: {
-        query: `
-          query {
-            group(id: "${this.groupId}") {
-              id
-              memberIds
-            }
-          }
-        `
+        inputs: { id: this.groupId },
+        extraInfo: {
+          action: 'is-in-group',
+          returnFields: `
+            id
+            memberIds
+          `
+        }
       }
     })
       .subscribe((res) => {
@@ -69,16 +69,13 @@ export class JoinLeaveComponent implements OnExec, OnInit {
     if (!this.gs) {
       return;
     }
-    const action = this.getActionToTake();
-    this.gs
-      .post<{ data: { groups: Group } }>('/graphql', {
-        query: `
-          mutation {
-            ${action}(
-              groupId: "${this.group.id}", id: "${this.memberId}")
-          }
-        `
-      })
+    this.gs.post<{ data: { groups: Group } }>('/graphql', {
+      inputs: {
+        groupId: this.group.id,
+        id: this.memberId
+      },
+      extraInfo: { action: this.getActionToTake() }
+    })
       .toPromise();
   }
 
@@ -101,6 +98,6 @@ export class JoinLeaveComponent implements OnExec, OnInit {
   }
 
   private getActionToTake() {
-    return this.inGroup ? 'removeMember' : 'addMember';
+    return this.inGroup ? 'leave' : 'join';
   }
 }

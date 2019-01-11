@@ -235,20 +235,16 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{ data: { markers: Marker[] } }>(this.apiPath, {
           params: {
-            query: `
-              query Markers($input: MarkersInput!) {
-                markers(input: $input) {
-                  title
-                  latitude
-                  longitude
-                }
-              }
-            `,
-            variables: JSON.stringify({
-              input: {
-                ofMapId: this.id
-              }
-            })
+            inputs: JSON.stringify({
+              input: { ofMapId: this.id }
+            }),
+            extraInfo: {
+              returnFields: `
+                title
+                latitude
+                longitude
+              `
+            }
           }
         })
         .subscribe((res) => {

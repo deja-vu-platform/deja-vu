@@ -59,12 +59,7 @@ OnChanges {
       this.gs
         .get<{data: {members: string[]}}>('/graphql', {
           params: {
-            query: `
-              query Members($input: MembersInput!) {
-                members(input: $input)
-              }
-            `,
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 inGroupId: this.inGroupId
               }

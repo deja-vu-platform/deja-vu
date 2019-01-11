@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -27,6 +29,47 @@ class LabelValidation {
     labels: mongodb.Collection<LabelDoc>, id: string): Promise<LabelDoc> {
     return Validation.existsOrFail(labels, id, 'Label');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'attach-labels': (extraInfo) => `
+    mutation AttachLabels($input: AddLabelsToItemInput!) {
+      addLabelsToItem(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-label': (extraInfo) => `
+    mutation CreateLabel($id: ID!) {
+      createLabel(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'search-items-by-labels': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'items':
+        return `
+          query SearchItemsByLabel($input: ItemsInput!) {
+            items(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'labels':
+        return `
+          query SearchItemsByLabel($input: LabelsInput!) {
+            labels(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-items': (extraInfo) => `
+    query ShowItems($input: ItemsInput!) {
+      items(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-labels': (extraInfo) => `
+    query ShowLabels($input: LabelsInput!) {
+      labels(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: LabelDoc | null) {
@@ -242,6 +285,7 @@ const labelCliche: ClicheServer = new ClicheServerBuilder('label')
       labels.createIndex({ id: 1, itemIds: 1 }, { unique: true })
     ]);
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

@@ -71,11 +71,10 @@ export class AddToGroupComponent implements OnExec, OnExecFailure,
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{ data: any }>('/graphql', {
-      query: `mutation {
-        addMember(
-          groupId: "${this.id}",
-          id: "${this.memberIdControl.value}")
-      }`
+      inputs: {
+        groupId: this.id,
+        id: this.memberIdControl.value
+      }
     })
       .toPromise();
   }

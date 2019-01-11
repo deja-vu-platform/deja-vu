@@ -53,13 +53,7 @@ export class RemoveViewerComponent implements
   dvOnExec() {
     this.gs
       .post(this.apiPath, {
-        query: `
-          mutation
-            RemoveViewerFromResource($input: RemoveViewerFromResourceInput!) {
-              removeViewerFromResource (input: $input)
-            }
-        `,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             viewerId: this.viewerId

@@ -11,13 +11,6 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../follow.config';
 
-const followQuery = `mutation Follow($input: FollowUnfollowInput!) {
-  follow(input: $input)
-}`;
-const unfollowQuery = `mutation Unfollow($input: FollowUnfollowInput!) {
-  unfollow(input: $input)
-}`;
-
 interface IsFollowingRes {
   data: { isFollowing: boolean };
   errors: { message: string }[];
@@ -69,17 +62,13 @@ export class FollowUnfollowComponent implements
     this.gs
       .get<{ data: any }>(this.apiPath, {
         params: {
-          query: `
-              query IsFollowing($input: FollowUnfollowInput!) {
-                isFollowing(input: $input)
-              }
-            `,
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               followerId: this.followerId,
               publisherId: this.publisherId
             }
-          })
+          }),
+          extraInfo: { action: 'is-follower' }
         }
       })
       .subscribe((res) => {
@@ -88,24 +77,24 @@ export class FollowUnfollowComponent implements
   }
 
   follow() {
-    this.queryString = followQuery;
+    this.queryString = 'follow';
     this.rs.exec(this.elem);
   }
 
   unfollow() {
-    this.queryString = unfollowQuery;
+    this.queryString = 'unfollow';
     this.rs.exec(this.elem);
   }
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<FollowUnfollowRes>(this.apiPath, {
-      query: this.queryString,
-      variables: {
+      inputs: {
         input: {
           followerId: this.followerId,
           publisherId: this.publisherId
         }
-      }
+      },
+      extraInfo: { action: this.queryString }
     })
       .toPromise();
 

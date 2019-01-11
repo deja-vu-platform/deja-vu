@@ -103,7 +103,7 @@ export class RegisterUserComponent
   }
 
   async dvOnExec(): Promise<void> {
-    const variables = {
+    const inputs = {
       input: {
         id: this.id,
         username: this.usernameControl.value,
@@ -113,13 +113,14 @@ export class RegisterUserComponent
     let user;
     if (this.signIn) {
       const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-        query: `mutation RegisterAndSignIn($input: RegisterInput!) {
-          registerAndSignIn(input: $input) {
+        inputs: inputs,
+        extraInfo: {
+          action: 'login',
+          returnFields: `
             user { id, username }
             token
-          }
-        }`,
-        variables: variables
+          `
+        }
       })
       .toPromise();
 
@@ -131,13 +132,14 @@ export class RegisterUserComponent
 
     } else {
       const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-        query: `mutation Register($input: RegisterInput!) {
-          register(input: $input) {
+        inputs: inputs,
+        extraInfo: {
+          action: 'register-only',
+          returnFields: `
             id,
             username
-          }
-        }`,
-        variables: variables
+          `
+        }
       })
       .toPromise();
 

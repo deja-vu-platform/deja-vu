@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import {
@@ -23,6 +25,53 @@ class GroupValidation {
     groups: mongodb.Collection<GroupDoc>, id: string): Promise<GroupDoc> {
     return Validation.existsOrFail(groups, id, 'Group');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'add-to-group': (extraInfo) => `
+    mutation AddToGroup($groupId: ID!, $id: ID!) {
+      addMember(groupId: $groupId, id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-group': (extraInfo) => `
+    mutation CreateGroup($input: CreateGroupInput!) {
+      createGroup (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'join-leave': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'join':
+        return `
+          mutation JoinGroup($groupId: ID!, $id: ID!) {
+            addMember(groupId: $groupId, id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'leave':
+        return `
+          mutation LeaveGroup($groupId: ID!, $id: ID!) {
+            removeMember(groupId: $groupId, id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'is-in-group':
+        return `
+          query JoinLeave($id: ID!) {
+            group(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-groups': (extraInfo) => `
+    query ShowGroups($input: GroupsInput!) {
+      groups(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-members': (extraInfo) => `
+    query ShowMembers($input: MembersInput!) {
+      members(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(group: GroupDoc | null) {
@@ -193,6 +242,7 @@ const groupCliche: ClicheServer = new ClicheServerBuilder('group')
 
     return groups.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

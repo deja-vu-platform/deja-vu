@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { GroupModule } from './group/group.module';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 
 
 @NgModule({
@@ -14,7 +14,8 @@ import { GATEWAY_URL } from 'dv-core';
   ],
   imports: [
     BrowserModule,
-    GroupModule
+    GroupModule,
+    DvModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]

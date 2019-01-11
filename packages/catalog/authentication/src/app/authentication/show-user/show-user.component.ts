@@ -55,12 +55,13 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
     if (this.canEval()) {
       this.gs.get<{ data: any }>(this.apiPath, {
         params: {
-          query: `query {
-            userById(id: "${this.id}") {
+          inputs: { id: this.id },
+          extraInfo: {
+            returnFields: `
               id
               username
-            }
-          }`
+            `
+          }
         }
       })
         .subscribe((res) => {

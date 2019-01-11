@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, 
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
   ViewChild
 } from '@angular/core';
 
@@ -93,13 +93,11 @@ export class EditMessageComponent implements
 
     this.gs.get<LoadMessageRes>(this.apiPath, {
       params: {
-        query: `
-        query {
-          message(id: "${this.id}") {
-            content
-          }
+        inputs: { id: this.id },
+        extraInfo: {
+          action: 'load',
+          returnFields: 'content'
         }
-        `
       }
     })
       .subscribe((res) => {
@@ -124,16 +122,14 @@ export class EditMessageComponent implements
 
   async dvOnExec(): Promise<Boolean> {
     const res = await this.gs.post<EditMessageRes>(this.apiPath, {
-      query: `mutation EditMessage($input: EditMessageInput!) {
-            editMessage(input: $input)
-          }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           publisherId: this.publisherId,
           content: this.contentControl.value
         }
-      }
+      },
+      extraInfo: { action: 'edit' }
     })
       .toPromise();
 

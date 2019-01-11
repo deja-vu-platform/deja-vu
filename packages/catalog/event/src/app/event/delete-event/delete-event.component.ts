@@ -22,7 +22,7 @@ export class DeleteEventComponent implements OnInit, OnExec, OnExecSuccess {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -32,9 +32,7 @@ export class DeleteEventComponent implements OnInit, OnExec, OnExecSuccess {
   dvOnExec() {
     this.gs
       .post('/graphql', {
-        query: `mutation {
-          deleteEvent (id: "${this.id}")
-        }`
+        inputs: { id: this.id }
       })
       .toPromise();
   }

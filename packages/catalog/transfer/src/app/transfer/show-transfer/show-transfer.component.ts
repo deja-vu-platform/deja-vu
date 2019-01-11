@@ -77,26 +77,27 @@ OnChanges {
         '' : ' { id, count }';
       this.gs.get<TransferRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              transfer(id: "${this.id}") {
-                ${this.showId ? 'id' : ''}
-                ${this.showFromId ? 'fromId' : ''}
-                ${this.showToId ? 'toId' : ''}
-                ${this.showAmount ? `amount ${selection}` : ''}
-              }
-            }
-          `
+          inputs: {
+            id: this.id
+          },
+          extraInfo: {
+            returnFields: `
+              ${this.showId ? 'id' : ''}
+              ${this.showFromId ? 'fromId' : ''}
+              ${this.showToId ? 'toId' : ''}
+              ${this.showAmount ? `amount ${selection}` : ''}
+            `
+          }
         }
       })
-        .subscribe((res) => {
-          if (res.errors) {
-            throw new Error(_.map(res.errors, 'message')
-              .join());
-          }
-          this.transfer = res.data.transfer;
-          this.loadedTransfer.emit(this.transfer);
-        });
+      .subscribe((res) => {
+        if (res.errors) {
+          throw new Error(_.map(res.errors, 'message')
+            .join());
+        }
+        this.transfer = res.data.transfer;
+        this.loadedTransfer.emit(this.transfer);
+      });
     }
   }
 

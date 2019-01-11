@@ -42,12 +42,7 @@ export class CreateSeriesComponent implements OnExec, OnInit {
   async dvOnExec(): Promise<void> {
     const res = await this.gs
       .post<{data: any}>('/graphql', {
-        query: `mutation CreateSeries($input: CreateSeriesInput!) {
-          createSeries(input: $input) {
-            id
-          }
-        }`,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             events: _.zipWith(
@@ -57,7 +52,8 @@ export class CreateSeriesComponent implements OnExec, OnInit {
               return evt;
             })
           }
-        }
+        },
+        extraInfo: { returnFields: 'id' }
       })
      .toPromise();
   }

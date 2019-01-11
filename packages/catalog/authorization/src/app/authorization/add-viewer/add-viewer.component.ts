@@ -53,12 +53,7 @@ export class AddViewerComponent implements
   dvOnExec() {
     this.gs
       .post(this.apiPath, {
-        query: `
-          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
-            addViewerToResource (input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             viewerId: this.viewerId

@@ -55,17 +55,13 @@ export class AddRemoveViewerComponent implements OnInit {
     }
     this.gs.get<CanViewRes>(this.apiPath, {
       params: {
-        query: `
-          query CanView($input: PrincipalResourceInput!) {
-            canView(input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             principalId: this.viewerId,
             resourceId: this.resourceId
           }
-        }
+        },
+        extraInfo: { action: 'view' }
       }
     })
       .subscribe((res) => {
@@ -77,20 +73,15 @@ export class AddRemoveViewerComponent implements OnInit {
     if (!this.gs) {
       return;
     }
-    const action = this.getActionToTake();
     this.gs
       .post<{ data: any }>(this.apiPath, {
-        query: `
-          mutation ${action.mutation}($input: ${action.input}!){
-            ${action.name} (input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             id: this.resourceId,
             viewerId: this.viewerId
           }
-        }
+        },
+        extraInfo: { action: this.getActionToTake() }
       })
       .toPromise();
   }
@@ -104,19 +95,6 @@ export class AddRemoveViewerComponent implements OnInit {
   }
 
   private getActionToTake() {
-    const addViewerAction = {
-      mutation: 'AddViewerToResource',
-      input: 'AddViewerToResourceInput',
-      name: 'addViewerToResource'
-    };
-
-    const removeViewerAction = {
-      mutation: 'RemoveViewerFromResource',
-      input: 'RemoveViewerFromResourceInput',
-      name: 'removeViewerFromResource'
-    };
-
-    return this.canViewResource ? removeViewerAction : addViewerAction;
+    return this.canViewResource ? 'remove' : 'add';
   }
-
 }

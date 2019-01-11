@@ -55,15 +55,14 @@ export class ChooseAndShowSeriesComponent implements OnInit {
       this.gs
         .get<SeriesRes>('/graphql', {
           params: {
-            query: `
-              query {
-                series {
-                  id,
-                  startsOn,
-                  endsOn
-                }
-              }
-            `
+            extraInfo: {
+              action: 'all-series',
+              returnFields: `
+                id
+                startsOn
+                endsOn
+              `
+            }
           }
         })
         .pipe(map((res: SeriesRes) => res.data.series))
@@ -82,20 +81,18 @@ export class ChooseAndShowSeriesComponent implements OnInit {
     this.gs
       .get<OneSeriesRes>('/graphql', {
         params: {
-          query: `
-            query {
-              oneSeries(id: "${selectedSeries.id}") {
-                events {
-                  id,
-                  startDate,
-                  endDate,
-                  series {
-                    id
-                  }
-                }
+          inputs: { id: selectedSeries.id },
+          extraInfo: {
+            action: 'one-series',
+            returnFields: `
+              events {
+                id
+                startDate
+                endDate
+                series { id }
               }
-            }
-          `
+            `
+          }
         }
       })
       .pipe(map((res: OneSeriesRes) => res.data.oneSeries.events))

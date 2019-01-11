@@ -95,10 +95,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-        query: `mutation ChangePassword($input: ChangePasswordInput!) {
-          changePassword(input: $input)
-        }`,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             oldPassword: this.oldPasswordControl.value,

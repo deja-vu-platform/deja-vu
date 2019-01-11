@@ -85,19 +85,15 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateTaskResponse>('/graphql', {
-      query: `mutation CreateTask($input: CreateTaskInput!) {
-        createTask(input: $input) {
-          id
-        }
-      }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           assignerId: this.assignerId,
           assigneeId: this.assigneeControl.value,
           dueDate: this.dueDateControl.value
         }
-      }
+      },
+      extraInfo: { returnFields: 'id' }
     })
     .toPromise();
 

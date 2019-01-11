@@ -31,7 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-weekly-series.component.css']
 })
 export class CreateWeeklySeriesComponent
-implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
+  implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() save = true;
@@ -65,7 +65,7 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -87,18 +87,14 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   dvOnExec(): Promise<any> {
     if (this.save) {
       return this.gs
-        .post<{data: any}>('/graphql', {
-          query: `mutation CreateSeries($input: CreateSeriesInput!) {
-            createSeries(input: $input) {
-              id
-            }
-          }`,
-          variables: {
+        .post<{ data: any }>('/graphql', {
+          inputs: {
             input: {
               id: this.id ? this.id : '',
               events: this._seriesEvents
             }
-          }
+          },
+          extraInfo: { returnFields: 'id' }
         })
         .toPromise();
     }

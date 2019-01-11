@@ -57,11 +57,8 @@ export class CreateLabelComponent implements
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateLabelRes>(this.apiPath, {
-      query: `mutation {
-          createLabel(id: "${this.id}") {
-            id
-          }
-        }`
+        inputs: { id: this.id },
+        extraInfo: { returnFields: 'id' }
     })
       .toPromise();
 

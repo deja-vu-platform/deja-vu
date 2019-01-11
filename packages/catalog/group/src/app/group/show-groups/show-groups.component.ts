@@ -67,19 +67,17 @@ OnChanges {
       this.gs
         .get<{data: {groups: Group[]}}>('/graphql', {
           params: {
-            query: `
-              query Groups($input: GroupsInput!) {
-                groups(input: $input) {
-                  id
-                  ${this.loadMembers ? 'memberIds' : ''}
-                }
-              }
-            `,
-            variables: JSON.stringify({
+            inputs: JSON.stringify({
               input: {
                 withMemberId: this.withMemberId
               }
-            })
+            }),
+            extraInfo: {
+              returnFields: `
+                id
+                ${this.loadMembers ? 'memberIds' : ''}
+              `
+            }
           }
         })
         .subscribe((res) => {

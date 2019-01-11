@@ -32,6 +32,7 @@ interface RequestOptions {
 }
 
 interface GatewayRequest {
+  readonly fullActionName: string;
   readonly from: ActionPath;
   readonly reqId: string;
   readonly runId?: string | undefined;
@@ -79,6 +80,7 @@ export class RequestProcessor {
     if (gatewayRequest.path) {
       url += gatewayRequest.path;
     }
+    url +=  `/${gatewayRequest.fullActionName}`;
     let clicheReq = request(gatewayRequest.method, url);
     if (gatewayRequest.options) {
       if (gatewayRequest.options.params) {
@@ -110,12 +112,14 @@ export class RequestProcessor {
   private static NewReqFor(msg: string, gcr: GatewayToClicheRequest)
     : GatewayToClicheRequest {
     return _
-      .assign({}, gcr, { path: `/dv/${gcr.reqId}/${msg}` + gcr.path });
+      .assign({}, gcr, {
+        path: `/dv-${gcr.fullActionName}/${gcr.reqId}/${msg}` + gcr.path });
   }
 
   private static BuildGatewayRequest(req): GatewayRequest {
     return {
       from: ActionPath.fromString(req.query.from),
+      fullActionName: req.query.fullActionName,
       reqId: uuid(),
       runId: req.query.runId,
       path: req.query.path,

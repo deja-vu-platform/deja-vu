@@ -89,17 +89,13 @@ implements OnInit, OnExecSuccess, OnExecFailure {
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation CreateGroup($input: CreateGroupInput!) {
-        createGroup(input: $input) {
-          id
-        }
-      }`,
-      variables: {
+      inputs: {
         input: {
           id: this.id,
           initialMemberIds: this.membersAutocomplete.value
         }
-      }
+      },
+      extraInfo: { returnFields: 'id' }
     })
     .toPromise();
   }
