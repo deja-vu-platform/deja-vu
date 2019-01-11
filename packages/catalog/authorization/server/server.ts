@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import {
@@ -26,6 +28,78 @@ class ResourceValidation {
     id: string): Promise<ResourceDoc> {
     return Validation.existsOrFail(resources, id, 'Resource');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'add-remove-viewer': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'add':
+        return `
+          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
+            addViewerToResource(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'remove':
+        return `
+          mutation RemoveViewerFromResource($input: RemoveViewerFromResourceInput!) {
+            removeViewerFromResource(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'view':
+        return `
+          query CanView($input: PrincipalResourceInput!) {
+            canView(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'add-viewer': (extraInfo) => `
+    mutation AddViewerToResource($input: AddViewerToResourceInput!) {
+      addViewerToResource(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'can-edit': (extraInfo) => `
+    query CanEdit($input: PrincipalResourceInput!) {
+      canEdit(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'can-view': (extraInfo) => `
+    query CanView($input: PrincipalResourceInput!) {
+      canView(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-resource': (extraInfo) => `
+    mutation CreateResource($input: CreateResourceInput!) {
+      createResource (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-resource': (extraInfo) => `
+    mutation DeleteResource($id: ID!) {
+      deleteResource (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'remove-viewer': (extraInfo) => `
+    mutation RemoveViewerFromResource($input: RemoveViewerFromResourceInput!) {
+      removeViewerFromResource(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-owner': (extraInfo) => `
+    query ShowOwner($resourceId: ID!) {
+      owner(resourceId: $resourceId) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-resource': (extraInfo) => `
+    query ShowResource($id: ID!) {
+      resource(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-resources': (extraInfo) => `
+    query ShowResources($input: ResourcesInput!) {
+      resources(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: ResourceDoc | null) {
@@ -314,6 +388,7 @@ const authorizationCliche: ClicheServer =
         resources.createIndex({ id: 1, ownerId: 1 }, { unique: true })
       ]);
     })
+    .actionRequestTable(actionRequestTable)
     .resolvers(resolvers)
     .build();
 

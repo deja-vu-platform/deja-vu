@@ -48,12 +48,7 @@ export class CanEditComponent implements OnInit, OnChanges, OnExec {
     }
     this.gs.get<CanEditRes>(this.apiPath, {
       params: {
-        query: `
-          query CanEdit($input: PrincipalResourceInput!) {
-            canEdit(input: $input)
-          }
-        `,
-        variables: JSON.stringify({
+        inputs: JSON.stringify({
           input: {
             principalId: this.principalId,
             resourceId: this.resourceId

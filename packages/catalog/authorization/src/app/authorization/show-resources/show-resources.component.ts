@@ -68,19 +68,13 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<ResourcesRes>(this.apiPath, {
         params: {
-          query: `
-            query Resources($input: ResourcesInput!) {
-              resources(input: $input) {
-                id
-              }
-            }
-          `,
-          variables: JSON.stringify({
+          inputs: JSON.stringify({
             input: {
               createdBy: this.createdBy,
               viewableBy: this.viewableBy
             }
-          })
+          }),
+          extraInfo: { returnFields: 'id' }
         }
       })
       .subscribe((res: ResourcesRes) => {

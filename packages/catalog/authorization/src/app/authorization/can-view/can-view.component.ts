@@ -56,12 +56,7 @@ export class CanViewComponent implements OnInit, OnChanges, OnExec {
     }
     this.gs.get<CanViewRes>(this.apiPath, {
       params: {
-        query: `
-          query CanView($input: PrincipalResourceInput!) {
-            canView(input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             principalId: this.principalId,
             resourceId: this.resourceId
