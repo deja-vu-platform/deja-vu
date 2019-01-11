@@ -23,7 +23,7 @@ export interface RequestOptions {
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
 export const OF_ATTR = 'dvOf';
-export const ALIAS_ATTR = 'dvAliazs';
+export const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
 const SUCCESS = 200;
 
