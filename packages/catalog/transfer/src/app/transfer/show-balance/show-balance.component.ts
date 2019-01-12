@@ -75,14 +75,13 @@ OnInit, OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const selection = this.balanceType === 'money' ? '' : ' { id, count }';
+      const selection = this.balanceType === 'money' ? '' : 'id, count';
       this.gs.get<BalanceRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-             balance(accountId: "${this.accountId}") ${selection}
-            }
-          `
+          inputs: {
+            accountId: this.accountId
+          },
+          extraInfo: { returnFields: selection }
         }
       })
       .subscribe((res) => {

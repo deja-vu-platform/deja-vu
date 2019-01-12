@@ -71,12 +71,7 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   async dvOnExec(): Promise<void> {
     const res = await this.gs
       .post<{data: any}>('/graphql', {
-        query: `mutation CreateEvent($input: CreateEventInput!) {
-          createEvent(input: $input) {
-            id
-          }
-        }`,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             startDate: toUnixTime(
@@ -84,7 +79,8 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
             endDate: toUnixTime(
               this.endsOnControl.value, this.endTimeControl.value)
           }
-        }
+        },
+        extraInfo: { returnFields: 'id' }
       })
      .toPromise();
   }

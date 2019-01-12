@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -13,7 +15,8 @@ import {
   CommentInput,
   CommentsInput,
   CreateCommentInput,
-  EditCommentInput
+  EditCommentInput,
+  DeleteCommentInput
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
@@ -23,6 +26,42 @@ class CommentValidation {
     comments: mongodb.Collection<CommentDoc>, id: string): Promise<CommentDoc> {
     return Validation.existsOrFail(comments, id, 'Comment');
   }
+}
+
+const actionRequestTable: ActionRequestTable = {
+  'create-comment': (extraInfo) => `
+    mutation CreateComment($input: CreateCommentInput!) {
+      createComment (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-comment': (extraInfo) => `
+    mutation DeleteComment($input: DeleteCommentInput!) {
+      deleteComment (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'edit-comment': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'edit':
+        return `
+          mutation EditComment($input: EditCommentInput!) {
+            editComment (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Comment($id: ID!) {
+            comment(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-comments': (extraInfo) => `
+    query ShowComments($input: CommentsInput!) {
+      comments(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: CommentDoc | null) {
@@ -128,7 +167,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         const updateOp = { $set: { content: input.content } };
-        const notPendingResourceFilter = {
+        const notPendingCommentFilter = {
           id: input.id,
           pending: { $exists: false }
         };
@@ -139,7 +178,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const pendingUpdateObj = await comments
               .updateOne(
-                notPendingResourceFilter,
+                notPendingCommentFilter,
                 {
                   $set: {
                     pending: {
@@ -156,7 +195,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const updateObj = await comments
-              .updateOne(notPendingResourceFilter, updateOp);
+              .updateOne(notPendingCommentFilter, updateOp);
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
             }
@@ -166,6 +205,64 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await comments.updateOne(
               reqIdPendingFilter,
               { ...updateOp, $unset: { pending: '' } });
+
+            return undefined;
+          case 'abort':
+            await comments.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
+      },
+
+      deleteComment: async (_root, { input }: { input: DeleteCommentInput },
+        context: Context) => {
+        const comment = await CommentValidation.commentExistsOrFails(
+          comments, input.id);
+
+        if (comment.authorId !== input.authorId) {
+          throw new Error('Only the author of the comment can edit it.');
+        }
+
+        const notPendingCommentFilter = {
+          id: input.id,
+          pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await CommentValidation.commentExistsOrFails(comments, input.id);
+            const pendingUpdateObj = await comments.updateOne(
+              notPendingCommentFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'delete-comment'
+                  }
+                }
+              });
+
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await CommentValidation.commentExistsOrFails(comments, input.id);
+            const res = await comments
+              .deleteOne({ id: input.id, pending: { $exists: false } });
+
+            if (res.deletedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await comments.deleteOne(reqIdPendingFilter);
 
             return undefined;
           case 'abort':
@@ -187,6 +284,7 @@ const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

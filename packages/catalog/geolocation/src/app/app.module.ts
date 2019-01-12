@@ -5,7 +5,7 @@ import {
   GEOLOCATION_CONFIG, GeolocationModule
 } from './geolocation/geolocation.module';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 
 import { AppComponent } from './app.component';
 
@@ -15,7 +15,8 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    GeolocationModule
+    GeolocationModule,
+    DvModule
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },

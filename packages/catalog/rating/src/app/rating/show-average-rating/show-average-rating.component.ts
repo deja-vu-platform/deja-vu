@@ -63,14 +63,13 @@ OnInit, OnChanges {
     if (this.canEval()) {
       this.gs.get<AverageRatingForInputRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              averageRatingForTarget(targetId: "${this.targetId}") {
-                rating,
-                count
-              }
-            }
-          `
+          inputs: { targetId: this.targetId },
+          extraInfo: {
+            returnFields: `
+              rating
+              count
+            `
+          }
         }
       })
       .subscribe((res) => {

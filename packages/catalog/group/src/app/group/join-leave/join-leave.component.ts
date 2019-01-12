@@ -49,14 +49,14 @@ export class JoinLeaveComponent implements OnExec, OnInit {
     }
     this.gs.get<{ data: any }>('/graphql', {
       params: {
-        query: `
-          query {
-            group(id: "${this.groupId}") {
-              id
-              memberIds
-            }
-          }
-        `
+        inputs: { id: this.groupId },
+        extraInfo: {
+          action: 'is-in-group',
+          returnFields: `
+            id
+            memberIds
+          `
+        }
       }
     })
       .subscribe((res) => {
@@ -69,28 +69,35 @@ export class JoinLeaveComponent implements OnExec, OnInit {
     if (!this.gs) {
       return;
     }
-    const action = this.inGroup ? 'removeMember' : 'addMember';
-    this.gs
-      .post<{ data: { groups: Group } }>('/graphql', {
-        query: `
-          mutation {
-            ${action}(
-              groupId: "${this.group.id}", id: "${this.memberId}")
-          }
-        `
-      })
-      .subscribe((res) => {
-        if (this.inGroup) {
-          _.remove(this.group.memberIds, this.memberId);
-          this.inGroup = false;
-        } else {
-          this.group.memberIds.push(this.memberId);
-          this.inGroup = true;
-        }
-      });
+    this.gs.post<{ data: { groups: Group } }>('/graphql', {
+      inputs: {
+        groupId: this.group.id,
+        id: this.memberId
+      },
+      extraInfo: { action: this.getActionToTake() }
+    })
+      .toPromise();
+  }
+
+  dvOnExecSuccess() {
+    if (this.inGroup) {
+      _.remove(this.group.memberIds, this.memberId);
+      this.inGroup = false;
+    } else {
+      this.group.memberIds.push(this.memberId);
+      this.inGroup = true;
+    }
+  }
+
+  dvOnExecFailure(reason: Error) {
+    console.log(reason.message);
   }
 
   private groupContains(group: Group, memberId: string) {
     return this.group ? _.includes(group!.memberIds, memberId) : false;
+  }
+
+  private getActionToTake() {
+    return this.inGroup ? 'leave' : 'join';
   }
 }

@@ -71,19 +71,13 @@ export class ShowRatingComponent implements
     if (this.canEval()) {
       this.gs.get<RatingRes>(this.apiPath, {
         params: {
-          query: `
-            query Rating($input: RatingInput!) {
-              rating(input: $input) {
-                rating
-              }
-            }
-          `,
-          variables: {
+          inputs: JSON.stringify({
             input: {
               bySourceId: this.sourceId,
               ofTargetId: this.targetId
             }
-          }
+          }),
+          extraInfo: { returnFields: 'rating' }
         }
       })
         .subscribe((res) => {

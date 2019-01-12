@@ -60,18 +60,12 @@ OnInit, OnChanges {
     if (this.canEval()) {
       this.gs.get<RatingsRes>(this.apiPath, {
         params: {
-          query: `
-            query Ratings($input: RatingsInput!) {
-              ratings(input: $input) {
-                rating
-              }
-            }
-          `,
-          variables: {
+          inputs: JSON.stringify({
             input: {
               ofTargetId: this.targetId
             }
-          }
+          }),
+          extraInfo: { returnFields: 'rating' }
         }
       })
       .subscribe((res) => {

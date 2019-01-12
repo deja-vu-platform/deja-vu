@@ -86,17 +86,14 @@ export class RateTargetComponent implements
     }
 
     this.gs.post<SetRatingRes>(this.apiPath, {
-      query: `mutation SetRating($input: SetRatingInput!) {
-            setRating(input: $input)
-          }
-        `,
-      variables: {
+      inputs: {
         input: {
           sourceId: this.sourceId,
           targetId: this.targetId,
           newRating: this.ratingValue
         }
-      }
+      },
+      extraInfo: { action: 'set' }
     })
       .subscribe((res) => {
         this.rating.emit(this.ratingValue);
@@ -121,18 +118,15 @@ export class RateTargetComponent implements
     if (this.canEval()) {
       this.gs.get<RatingRes>(this.apiPath, {
         params: {
-          query: `
-            query Rating($input: RatingInput!) {
-              rating(input: $input) {
-                rating
-              }
-            }
-          `,
-          variables: {
+          inputs: JSON.stringify({
             input: {
               bySourceId: this.sourceId,
               ofTargetId: this.targetId
             }
+          }),
+          extraInfo: {
+            action: 'load',
+            returnFields: 'rating'
           }
         }
       })

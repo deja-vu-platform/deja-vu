@@ -36,9 +36,7 @@ export class DeleteResourceComponent implements OnInit, OnExec {
   dvOnExec() {
     this.gs
       .post(this.apiPath, {
-        query: `mutation {
-          deleteResource (id: "${this.id}")
-        }`
+        inputs: { id: this.id }
       })
       .toPromise();
   }

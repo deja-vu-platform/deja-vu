@@ -57,7 +57,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -75,22 +75,24 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
     }
     this.gs.get<TaskRes>('/graphql', {
       params: {
-        query: `
-          query {
-            task(id: "${this.id}") {
-              id
-              assigneeId
-              dueDate
-            }
-          }
-        `
+        inputs: { id: this.id },
+        extraInfo: {
+          action: 'load',
+          returnFields: `
+            id
+            assigneeId
+            dueDate
+          `
+        }
       }
     })
-    .pipe(map((res: TaskRes) => res.data.task))
-    .subscribe((task: Task) => {
-      this.assignee.setValue(task.assigneeId);
-      this.dueDate.setValue(task.dueDate);
-    });
+      .pipe(map((res: TaskRes) => res.data.task))
+      .subscribe((task: Task) => {
+        if (task) {
+          this.assignee.setValue(task.assigneeId);
+          this.dueDate.setValue(task.dueDate);
+        }
+      });
   }
 
 
@@ -99,19 +101,17 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
   }
 
   async dvOnExec(): Promise<string> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation UpdateTask($input: UpdateTaskInput!) {
-        updateTask(input: $input)
-      }`,
-      variables: {
+    const res = await this.gs.post<{ data: any }>('/graphql', {
+      inputs: {
         input: {
           id: this.id,
           assigneeId: this.assignee.value,
           dueDate: this.dueDate.value
         }
-      }
+      },
+      extraInfo: { action: 'update' }
     })
-    .toPromise();
+      .toPromise();
 
     return res.data.updateTask.id;
   }

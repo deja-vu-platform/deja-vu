@@ -61,12 +61,13 @@ OnInit {
       this.gs.get<{
         data: {event: { startDate: number, endDate: number }}}>('/graphql', {
         params: {
-          query: ` query {
-            event(id: "${this.id}") {
-              startDate,
+          inputs: { id: this.id },
+          extraInfo: {
+            returnFields: `
+              startDate
               endDate
-            }
-          }`
+            `
+          }
         }
       })
       .subscribe((obj) => {

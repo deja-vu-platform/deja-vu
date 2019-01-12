@@ -56,11 +56,8 @@ export class CreatePublisherComponent implements
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreatePublisherRes>(this.apiPath, {
-      query: `mutation {
-          createPublisher(id: "${this.id}") {
-            id
-          }
-        }`
+      inputs: { id: this.id },
+      extraInfo: { returnFields: 'id' }
     })
       .toPromise();
 

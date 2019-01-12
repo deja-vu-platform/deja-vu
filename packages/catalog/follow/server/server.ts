@@ -1,9 +1,11 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
-  Context
+  Context,
+  getReturnFields
 } from 'cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
@@ -19,6 +21,75 @@ import {
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
+const actionRequestTable: ActionRequestTable = {
+  'create-message': (extraInfo) => `
+    mutation CreateMessage($input: CreateMessageInput!) {
+      createMessage (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-publisher': (extraInfo) => `
+    mutation CreatePublisher($id: ID!) {
+      createPublisher(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'edit-message': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'load':
+        return `
+          query EditMessage($id: ID!) {
+            message(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'edit':
+        return `
+          mutation EditMessage($input: EditMessageInput!) {
+            editMessage(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'follow-unfollow': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'follow':
+        return `
+          mutation FollowUnfollow($input: FollowUnfollowInput!) {
+            follow(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'unfollow':
+        return `
+          mutation FollowUnfollow($input: FollowUnfollowInput!) {
+            unfollow(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'is-follower':
+        return `
+          query FollowUnfollow($input: FollowUnfollowInput!) {
+            isFollowing(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-followers': (extraInfo) => `
+    query ShowFollowers($input: FollowersInput!) {
+      followers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-messages': (extraInfo) => `
+    query ShowMessages($input: MessagesInput!) {
+      messages(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-publishers': (extraInfo) => `
+    query ShowPublishers($input: PublishersInput!) {
+      publishers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
+}
 
 function isPendingCreate(doc: PublisherDoc | null) {
   return _.get(doc, 'pending.type') === 'create-publisher';
@@ -449,6 +520,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
       publishers.createIndex({ 'messages.id': 1 }, { unique: true })
     ]);
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

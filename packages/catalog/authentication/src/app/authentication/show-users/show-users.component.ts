@@ -64,17 +64,15 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{ data: { users: User[] } }>(this.apiPath, {
           params: {
-            query: `
-              query Users($input: UsersInput!) {
-                users(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showUsername ? 'username' : ''}
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showUsername ? 'username' : ''}
+              `
             }
           }
         })

@@ -21,7 +21,7 @@ export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
-  @Input() withMemberId: string | undefined;
+  @Input() withMemberId = '';
 
   // Show rules
   @Input() showId = true;
@@ -67,18 +67,16 @@ OnChanges {
       this.gs
         .get<{data: {groups: Group[]}}>('/graphql', {
           params: {
-            query: `
-              query Groups($input: GroupsInput!) {
-                groups(input: $input) {
-                  id
-                  ${this.loadMembers ? 'memberIds' : ''}
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 withMemberId: this.withMemberId
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                id
+                ${this.loadMembers ? 'memberIds' : ''}
+              `
             }
           }
         })

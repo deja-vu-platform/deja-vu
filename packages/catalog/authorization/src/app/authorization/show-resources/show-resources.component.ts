@@ -28,6 +28,7 @@ interface ResourcesRes {
 })
 export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  @Input() createdBy: string;
   @Input() viewableBy: string;
   @Input() showResource: Action = {
     type: <Type<Component>> ShowResourceComponent
@@ -67,18 +68,13 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<ResourcesRes>(this.apiPath, {
         params: {
-          query: `
-            query Resources($input: ResourcesInput!) {
-              resources(input: $input) {
-                id
-              }
-            }
-          `,
-          variables: {
+          inputs: JSON.stringify({
             input: {
+              createdBy: this.createdBy,
               viewableBy: this.viewableBy
             }
-          }
+          }),
+          extraInfo: { returnFields: 'id' }
         }
       })
       .subscribe((res: ResourcesRes) => {
@@ -89,6 +85,6 @@ OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.viewableBy);
+    return !!(this.gs && (this.viewableBy || this.createdBy));
   }
 }

@@ -55,15 +55,14 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<ResourceRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              resource(id: "${this.id}") {
-                id,
-                ownerId,
-                viewerIds
-              }
-            }
-          `
+          inputs: { id: this.id },
+          extraInfo: {
+            returnFields: `
+              id
+              ownerId
+              viewerIds
+            `
+          }
         }
       })
       .subscribe((res) => {

@@ -1,14 +1,15 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
+  getReturnFields,
   Validation
 } from 'cliche-server';
 import {
   CreateMarkerInput,
-  Marker,
   MarkerDoc,
   MarkersInput
 } from './schema';
@@ -25,14 +26,32 @@ class MarkerValidation {
   }
 }
 
-function markerDocToMarker(markerDoc: MarkerDoc): Marker {
-  return {
-    id: markerDoc.id,
-    title: markerDoc.title,
-    mapId: markerDoc.mapId,
-    longitude: markerDoc.location.coordinates[0],
-    latitude: markerDoc.location.coordinates[1]
-  };
+const actionRequestTable: ActionRequestTable = {
+  'show-marker': (extraInfo) => `
+    query ShowMarker($id: ID!) {
+      marker(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-marker': (extraInfo) => `
+    mutation CreateMarker($input: CreateMarkerInput!) {
+      createMarker (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-marker': (extraInfo) => `
+    mutation DeleteMarker($id: ID!) {
+      deleteMarker (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'display-map': (extraInfo) => `
+    query DisplayMap($input: MarkersInput!) {
+      markers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-markers': (extraInfo) => `
+    query ShowMarkers($input: MarkersInput!) {
+      markers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 }
 
 function isPendingCreate(doc: MarkerDoc | null) {
@@ -50,7 +69,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           throw new Error(`Marker ${id} does not exist`);
         }
 
-        return markerDocToMarker(marker);
+        return marker;
       },
 
       markers: (_root, { input }: { input: MarkersInput }) => {
@@ -181,6 +200,7 @@ const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
         { unique: true, sparse: true })
     ]);
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

@@ -13,6 +13,9 @@ import {
   AddViewerComponent
 } from './add-viewer/add-viewer.component';
 import {
+  AddRemoveViewerComponent
+} from './add-remove-viewer/add-remove-viewer.component';
+import {
   CanEditComponent
 } from './can-edit/can-edit.component';
 import {
@@ -24,6 +27,9 @@ import {
 import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
+import {
+  RemoveViewerComponent
+} from './remove-viewer/remove-viewer.component';
 import {
   ShowOwnerComponent
 } from './show-owner/show-owner.component';
@@ -38,8 +44,10 @@ import { API_PATH } from './authorization.config';
 
 
 const allComponents = [
-  AddViewerComponent, CanEditComponent, CanViewComponent,
-  CreateResourceComponent, DeleteResourceComponent, ShowOwnerComponent,
+  AddViewerComponent, AddRemoveViewerComponent,
+  CanEditComponent, CanViewComponent,
+  CreateResourceComponent, DeleteResourceComponent,
+  RemoveViewerComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent
 ];
 
@@ -51,7 +59,7 @@ const allComponents = [
     FormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
-  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
+  providers: [{ provide: API_PATH, useValue: '/graphql' }],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL, DvModule } from 'dv-core';
 import { AppComponent } from './app.component';
 import { FollowModule } from './follow/follow.module';
 
@@ -12,7 +12,8 @@ import { FollowModule } from './follow/follow.module';
   ],
   imports: [
     BrowserModule,
-    FollowModule
+    FollowModule,
+    DvModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]

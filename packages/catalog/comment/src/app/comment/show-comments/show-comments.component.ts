@@ -22,8 +22,8 @@ interface CommentsRes {
 export class ShowCommentsComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
-  @Input() byAuthorId: string | undefined;
-  @Input() ofTargetId: string | undefined;
+  @Input() byAuthorId = '';
+  @Input() ofTargetId = '';
 
   // Show rules
   /* What fields of the comment to show. These are passed as input
@@ -62,21 +62,19 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
       this.gs
         .get<CommentsRes>(this.apiPath, {
           params: {
-            query: `
-              query Comments($input: CommentsInput!) {
-                comments(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showAuthorId ? 'authorId' : ''}
-                  ${this.showTargetId ? 'targetId' : ''}
-                  ${this.showContent ? 'content' : ''}
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 byAuthorId: this.byAuthorId,
                 ofTargetId: this.ofTargetId
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showAuthorId ? 'authorId' : ''}
+                ${this.showTargetId ? 'targetId' : ''}
+                ${this.showContent ? 'content' : ''}
+              `
             }
           }
         })

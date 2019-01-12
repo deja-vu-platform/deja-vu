@@ -61,12 +61,7 @@ export class DeleteResourceComponent implements OnInit, OnChanges, OnExec {
 
     return this.gs
       .post<DeleteResourceRes>(this.apiPath, {
-        query: `
-          mutation DeleteResource($input: DeleteResourceInput!) {
-            deleteResource(input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             resourceId: this.resourceId,
             allocationId: this.allocationId

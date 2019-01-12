@@ -71,20 +71,18 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{ data: { events: GraphQlEvent[] } }>(this.apiPath, {
           params: {
-            query: `
-              query Events($input: EventsInput!) {
-                events(input: $input) {
-                  id
-                  startDate
-                  endDate
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 startDate: this.startDateFilter,
                 endDate: this.endDateFilter
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                id
+                startDate
+                endDate
+              `
             }
           }
         })

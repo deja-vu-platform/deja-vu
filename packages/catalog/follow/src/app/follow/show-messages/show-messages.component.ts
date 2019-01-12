@@ -22,7 +22,7 @@ interface MessagesRes {
   styleUrls: ['./show-messages.component.css']
 })
 export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   // Fetch rules
   // If undefined then the fetched messages are not filtered by that property
   @Input() ofPublishersFollowedById: string | undefined;
@@ -35,7 +35,7 @@ OnChanges {
   @Input() showContent = true;
 
   @Input() showMessage: Action = {
-    type: <Type<Component>>ShowMessageComponent
+    type: <Type<Component>> ShowMessageComponent
   };
   @Input() noMessagesToShowText = 'No messages to show';
   messages: Message[] = [];
@@ -73,19 +73,17 @@ OnChanges {
       this.gs
         .get<MessagesRes>(this.apiPath, {
           params: {
-            query: `
-              query Messages($input: MessagesInput!) {
-                messages(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showContent ? 'content' : ''}
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 ofPublishersFollowedById: this.ofPublishersFollowedById,
                 byPublisherId: this.byPublisherId
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showContent ? 'content' : ''}
+              `
             }
           }
         })

@@ -292,6 +292,11 @@
   dependencies:
     tslib "^1.7.1"
 
+"@asymmetrik/ngx-leaflet@^4.0.1":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-4.0.0.tgz#9e8b991b13e433de8bf3d3163aea02e5e1658f1d"
+  integrity sha512-DT+uOaysb01Egmhd58ftR6BOKI0JD7Uwt8/g6uRthFKGjWwmnOpmXJpPa2eF/lEhl2DAHx61XqJK2t/fmIlmJA==
+
 "@lerna/add@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-3.4.1.tgz#d41068317e30f530df48220d256b5e79690b1877"
@@ -851,6 +856,16 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@mapbox/corslite@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@mapbox/corslite/-/corslite-0.0.7.tgz#29f5b6a188ba946e514bdf0b6401ed4fbe13a39e"
+  integrity sha1-KfW2oYi6lG5RS98LZAHtT74To54=
+
+"@mapbox/polyline@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@mapbox/polyline/-/polyline-0.2.0.tgz#6e25980744aa22331f94b645a542c02d3fcfee97"
+  integrity sha1-biWYB0SqIjMflLZFpULALT/P7pc=
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -1037,7 +1052,14 @@
   dependencies:
     "@types/jasmine" "*"
 
-"@types/leaflet@^1.2.14":
+"@types/leaflet-routing-machine@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@types/leaflet-routing-machine/-/leaflet-routing-machine-3.2.1.tgz#13f4a2c44efbf0f461b5704323eefca3dfaed1bf"
+  integrity sha512-HNjUDxWCpMcSpj26Ev7IAKYNJvhW7I5sVhpXlv9KRwYBqlASS6sXcteYOukbCZfccbUOEMWuwzqFvn7f/D1hiw==
+  dependencies:
+    "@types/leaflet" "*"
+
+"@types/leaflet@*", "@types/leaflet@^1.2.14":
   version "1.2.14"
   resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.2.14.tgz#912bcacdc2cfa62787573a27ca617ffb67f89614"
   integrity sha512-acP2w5DygY0V7bwmjFmaen5I2iBl8RkWx9kon1IJA7k9mNFgBb6702WApjZSrM4AG1ucJVxFcTlS6nr4HvahEw==
@@ -6510,6 +6532,20 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
+leaflet-control-geocoder@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/leaflet-control-geocoder/-/leaflet-control-geocoder-1.6.0.tgz#d42dd715bcf16943b94f944ebbf4e95f17c6626c"
+  integrity sha512-ZKrnAukj2o0AwyKwjh506LgCXGYzKpExw6b8HURzNhopWdkQdYTTIIH/uXkgd9fsoI4GgMFpWjACOEavAyhlGA==
+
+leaflet-routing-machine@^3.2.12:
+  version "3.2.12"
+  resolved "https://registry.yarnpkg.com/leaflet-routing-machine/-/leaflet-routing-machine-3.2.12.tgz#9e4aef008321b0227cf894d829c3b4c1f13e4e13"
+  integrity sha512-HLde58G1YtD9xSIzZavJ6BPABZaV1hHeGst8ouhzuxmSC3s32NVtADT+njbIUMW1maHRCrsgTk/E4hz5QH7FrA==
+  dependencies:
+    "@mapbox/corslite" "0.0.7"
+    "@mapbox/polyline" "^0.2.0"
+    osrm-text-instructions "^0.13.2"
+
 leaflet@^1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.3.4.tgz#7f006ea5832603b53d7269ef5c595fd773060a40"
@@ -8000,6 +8036,11 @@ osenv@0, osenv@^0.1.4, osenv@^0.1.5:
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
+
+osrm-text-instructions@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/osrm-text-instructions/-/osrm-text-instructions-0.13.2.tgz#c7e483477028b95fd06469bcd72f5443adc8a59e"
+  integrity sha512-J6DJp0P7bB6/F8U8GBdIL8S+igMkRLgBP6e4pQ2NP8syMh+sREz4zCK79jV7XajtsS54Grl93y0my6OUp68cMg==
 
 p-defer@^1.0.0:
   version "1.0.0"

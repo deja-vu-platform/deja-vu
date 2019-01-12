@@ -1,6 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter,
-  Inject, Input, OnInit, Output
+  Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
@@ -8,8 +7,6 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
-
-import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';
 
@@ -42,7 +39,7 @@ export class AddViewerComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -56,12 +53,7 @@ export class AddViewerComponent implements
   dvOnExec() {
     this.gs
       .post(this.apiPath, {
-        query: `
-          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
-            addViewerToResource (input: $input)
-          }
-        `,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             viewerId: this.viewerId

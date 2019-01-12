@@ -1,0 +1,125 @@
+{
+  "name": "rendezvous",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "comment": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
+      }
+    },
+    "event": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
+      }
+    },
+    "geolocation": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": true,
+        "mapType": "leaflet"
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true
+      }
+    },
+    "label": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
+      }
+    },
+    "eventDetails": {
+      "name": "property",
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "EventDetails",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "additionalInfo": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "userProfile": {
+      "name": "property",
+      "config": {
+        "wsPort": 3010,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "UserProfile",
+          "type": "object",
+          "properties": {
+              "firstName": {
+                "type": "string"
+              },
+              "middleName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "phoneNumber": {
+                "type": "string"
+              },
+              "zipCode": {
+                "type": "number"
+              },
+              "majors": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+          },
+          "required": ["firstName", "lastName", "zipCode", "email"]
+        }
+      }
+    }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "rendezvous-root"}
+      ]
+    }
+  },
+  "routes": [
+    { "path": "main", "action": "rendezvous-main" },
+    { "path": "login", "action": "rendezvous-login" },
+    { "path": "register", "action": "rendezvous-register" },
+    { "path": "event-details", "action": "rendezvous-show-event-details" },
+    { "path": "create-event", "action": "rendezvous-create-event" },
+    { "path": "profile", "action": "rendezvous-show-user-profile" },
+    { "path": "edit-profile", "action": "rendezvous-edit-user-profile" },
+    { "path": "", "action": "rendezvous-main" }
+  ]
+}

@@ -82,13 +82,11 @@ OnChanges {
       this.gs
         .get<{data: {object: Object}}>(this.apiPath, {
           params: {
-            query: `
-              query {
-                object(id: "${this.id}") {
-                  ${this.properties.join('\n')}
-                }
-              }
-            `
+            inputs: { id: this.id },
+            extraInfo: {
+              action: 'object',
+              returnFields: `${this.properties.join('\n')}`
+            }
           }
         })
         .subscribe((res) => {
@@ -102,14 +100,13 @@ OnChanges {
     const res = await this.gs
       .get<{data: {properties: Property[]}}>(this.apiPath, {
         params: {
-          query: `
-            query {
-              properties {
-                name
-                schema
-              }
-            }
-          `
+          extraInfo: {
+            action: 'properties',
+            returnFields: `
+              name
+              schema
+            `
+          }
         }
       })
       .toPromise();

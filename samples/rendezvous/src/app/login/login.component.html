@@ -1,0 +1,24 @@
+<div class="index">
+  <div class="panel panel-default" id="login_panel">
+    <div class="panel-heading">
+      <h3>Rendezvous</h3>
+    </div>
+    <div class="panel-body">
+      <h4 style="margin-top: 0px;">Login</h4>
+      <dv-tx>
+        <authentication-sign-in
+          id="loginForm">
+        </authentication-sign-in>
+        <dv-callback defaultHref="/main" [onExecSuccess]="true"
+            [hidden]="true"></dv-callback>
+      </dv-tx>
+      <p class="authLink">Coming soon: Recover forgotten password.</p>
+    </div>
+  </div>
+
+  <div style='text-align: center'>
+    <dv-link class="authLink" type="button" href="/register">
+      Create account.
+    </dv-link>
+  </div>
+</div>

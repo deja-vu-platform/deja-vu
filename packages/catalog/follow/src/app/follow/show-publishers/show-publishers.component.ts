@@ -24,14 +24,14 @@ interface PublishersRes {
   styleUrls: ['./show-publishers.component.css']
 })
 export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   // Fetch rules
   // If undefined, fetch all publishers.
   // Else, fetch the publishers of the given follower.
   @Input() followedById: string | undefined;
 
   @Input() showPublisher: Action = {
-    type: <Type<Component>>ShowPublisherComponent
+    type: <Type<Component>> ShowPublisherComponent
   };
 
   // Presentation text
@@ -72,24 +72,16 @@ OnChanges {
   }
 
   async dvOnEval(): Promise<void> {
-    console.log('trying eval');
     if (this.canEval()) {
-      console.log('evalling');
       this.gs
         .get<PublishersRes>(this.apiPath, {
           params: {
-            query: `
-              query Publishers($input: PublishersInput!) {
-                publishers(input: $input) {
-                  id
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 followedById: this.followedById
               }
-            }
+            }),
+            extraInfo: { returnFields: 'id' }
           }
         })
         .subscribe((res) => {

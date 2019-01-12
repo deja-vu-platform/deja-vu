@@ -25,7 +25,7 @@ interface ItemsRes {
   styleUrls: ['./show-items.component.css']
 })
 export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   // A list of itemIds to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -82,14 +82,9 @@ OnChanges {
           .toPromise())
         .value());
 
-      this.gs
-        .get<ItemsRes>(this.apiPath, {
+      this.gs.get<ItemsRes>(this.apiPath, {
           params: {
-            query: `
-                query {
-                  items(input: { })
-                }
-              `
+            inputs: JSON.stringify({ input: { } })
           }
         })
         .subscribe((res) => {

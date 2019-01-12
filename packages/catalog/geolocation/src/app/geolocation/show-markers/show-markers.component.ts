@@ -68,21 +68,19 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
           params: {
-            query: `
-              query Markers($input: MarkersInput!) {
-                markers(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showTitle ? 'title' : ''}
-                  ${this.showLatLong ? 'latitude' : ''}
-                  ${this.showLatLong ? 'longitude' : ''}
-                  ${this.showMapId ? 'mapId' : ''}
-                }
-              }
-            `,
-            variables: {
+            inputs: JSON.stringify({
               input: {
                 ofMapId: this.ofMapId
               }
+            }),
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showTitle ? 'title' : ''}
+                ${this.showLatLong ? 'latitude' : ''}
+                ${this.showLatLong ? 'longitude' : ''}
+                ${this.showMapId ? 'mapId' : ''}
+              `
             }
           }
         })

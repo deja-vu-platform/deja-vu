@@ -80,17 +80,17 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-      query: `mutation SignIn($input: SignInInput!) {
-        signIn(input: $input) {
-          token,
-          user { id, username }
-        }
-      }`,
-      variables: {
+      inputs: {
         input: {
           username: this.usernameControl.value,
           password: this.passwordControl.value
         }
+      },
+      extraInfo: {
+        returnFields: `
+          token,
+          user { id, username }
+        `
       }
     })
     .toPromise();

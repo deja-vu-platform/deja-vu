@@ -49,7 +49,7 @@ interface LabelsRes {
   ]
 })
 export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
-OnExec, OnInit, ControlValueAccessor, Validator {
+  OnExec, OnInit, ControlValueAccessor, Validator {
   @Input() initialValue;
   @Input() showLabel = {
     type: ShowLabelComponent
@@ -98,21 +98,17 @@ OnExec, OnInit, ControlValueAccessor, Validator {
   async dvOnExec(): Promise<void> {
     this.gs.get<ItemsRes>(this.apiPath, {
       params: {
-        query: `
-          query Items($input: ItemsInput!) {
-            items (input: $input)
-          }
-        `,
-        variables: {
+        inputs: JSON.stringify({
           input: {
             labelIds: this.selectedLabelIds
           }
-        }
+        }),
+        extraInfo: { action: 'items' }
       }
     })
-    .subscribe((res) => {
-      this.searchResultItems.emit(res.data.items);
-    });
+      .subscribe((res) => {
+        this.searchResultItems.emit(res.data.items);
+      });
   }
 
   loadLabels() {
@@ -125,18 +121,16 @@ OnExec, OnInit, ControlValueAccessor, Validator {
     if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
-          query: `
-            query {
-              labels (input: { }) {
-                id
-              }
-            }
-          `
+          inputs: JSON.stringify({ input: {} }),
+          extraInfo: {
+            action: 'labels',
+            returnFields: 'id'
+          }
         }
       })
-      .subscribe((res) => {
-        this.labels = res.data.labels;
-      });
+        .subscribe((res) => {
+          this.labels = res.data.labels;
+        });
     }
   }
 

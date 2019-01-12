@@ -25,7 +25,7 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   // Fetch rules
   // If undefined then the fetched labels are not filtered by that property
-  @Input() itemId: string | undefined;
+  @Input() itemId = '';
 
   @Input() showLabel: Action = {
     type: <Type<Component>>ShowLabelComponent
@@ -66,18 +66,12 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
-          query: `
-              query Labels($input: LabelsInput!) {
-                labels(input: $input) {
-                  id
-                }
-              }
-            `,
-          variables: {
+          inputs: JSON.stringify({
             input: {
               itemId: this.itemId
             }
-          }
+          }),
+          extraInfo: { returnFields: 'id' }
         }
       })
         .subscribe((res) => {

@@ -55,10 +55,7 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
     const token = this.authenticationService.getToken();
     this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
       params: {
-        query: `query Verify($input: VerifyInput!) {
-          verify(input: $input)
-        }`,
-        variables: {
+        inputs: {
           input: {
             id: this.id,
             token: token
