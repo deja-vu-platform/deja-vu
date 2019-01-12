@@ -3,20 +3,20 @@
 
   <div class="main">
     <div class="container">
-      <hackernews.show-post id=$id loggedInUser=hackernews.navbar.user />
+      <hackernews.show-post id=$id loggedInUser=hackernews.navbar.loggedInUser />
 
       <dv.if condition=hackernews.show-post.loadedPost>
         <div class="write-comment-container">
           <hr class="post-separator" />
 
           <comment.create-comment
-            authorId=hackernews.navbar.user ?
-              hackernews.navbar.user.username : ''
+            authorId=hackernews.navbar.loggedInUser ?
+              hackernews.navbar.loggedInUser.username : ''
             buttonLabel="Add comment"
-            showOptionToSubmit=!!hackernews.navbar.user
+            showOptionToSubmit=!!hackernews.navbar.loggedInUser
             targetId=$id />
 
-          <dv.if condition=!hackernews.navbar.user>
+          <dv.if condition=!hackernews.navbar.loggedInUser>
             <dv.callback-link class="black-link" href="/login">
               Add comment
             </dv.callback-link>
@@ -27,7 +27,7 @@
           <comment.show-comments
             ofTargetId=$id
             showComment=<hackernews.show-comment
-            comment=$comment loggedInUser=hackernews.navbar.user /> />
+            comment=$comment loggedInUser=hackernews.navbar.loggedInUser /> />
         </div>
       </dv.if>
     </div>
