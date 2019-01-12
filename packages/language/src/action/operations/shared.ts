@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 
 export const DV_ACTION = 'dv.action';
 export const DV_ACTION_NAME_ATTR = 'name';
+export const NAV_SPLIT_REGEX = /(?:\.|\?\.)/;
 
 export function isInput(name: string) {
   return _.startsWith(name, '$');

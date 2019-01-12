@@ -3,19 +3,22 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import {
-  ActionStEntry, ActionSymbolTable, ClicheStEntry, InputStEntry, EntryKind,
-  OutputStEntry, SymbolTable, ActionSymbolTableStEntry
+  ActionStEntry, ActionSymbolTable, ActionSymbolTableStEntry, AppOutputStEntry,
+  ClicheStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
 } from '../symbolTable';
 
 import * as _ from 'lodash';
-import { NgComponentBuilder, NgField } from './builders/ng-component.builder';
+import {
+  NgComponentBuilder, NgField, NgOutput
+} from './builders/ng-component.builder';
 
-import { saveUsedActions } from './operations/save-used-actions.operation';
-import { saveInputs } from './operations/save-inputs.operation';
-import { toNgTemplate } from './operations/to-ng-template.operation';
-import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { getActionName } from './operations/get-action-name.operation';
+import { saveInputs } from './operations/save-inputs.operation';
+import { saveOutputs } from './operations/save-outputs.operation';
+import { saveUsedActions } from './operations/save-used-actions.operation';
+import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { classNameToNgField } from './operations/shared';
+import { toNgTemplate } from './operations/to-ng-template.operation';
 
 const ohm = require('ohm-js');
 
@@ -78,10 +81,13 @@ export class ActionCompiler {
    * @param appName the name of the application the action is part of
    * @param actionContents the contents of the action to compile
    * @param symbolTable the symbol table to update
+   * @param style the CSS for the action
    *
    * @return the compiled action object
    */
-  compile(appName: string, actionContents: string, symbolTable: SymbolTable)
+  compile(
+    appName: string, actionContents: string, symbolTable: SymbolTable,
+    style?: string)
     : CompiledAction {
     const thisActionSymbolTable: ActionSymbolTable = {};
     const actionInputs: CompiledAction[] = [];
@@ -91,9 +97,10 @@ export class ActionCompiler {
       .addOperation('saveUsedActions', saveUsedActions(thisActionSymbolTable))
       .addOperation('saveUsedOutputs', saveUsedOutputs(thisActionSymbolTable))
       .addOperation('saveInputs', saveInputs(thisActionSymbolTable))
+      .addOperation('saveOutputs', saveOutputs(thisActionSymbolTable))
       .addOperation(
         'toNgTemplate', toNgTemplate(
-          appName, thisActionSymbolTable, actionInputs));
+          appName, thisActionSymbolTable, actionInputs, symbolTable));
 
     const matchResult = this.grammar.match(actionContents);
     if (matchResult.failed()) {
@@ -108,6 +115,7 @@ export class ActionCompiler {
     });
     s.saveUsedOutputs();
     s.saveInputs();
+    s.saveOutputs();
     const ngTemplate = s.toNgTemplate();
 
     const className = ActionCompiler.GetClassName(thisActionName);
@@ -134,9 +142,16 @@ export class ActionCompiler {
         name: classNameToNgField(actionInput.className),
         value: actionInput.className
       }));
+    const appOutputFields = _.map(
+      ActionCompiler.FilterKind('app-output', thisActionSymbolTable),
+      (appOutputEntry: AppOutputStEntry): NgOutput => ({
+        name: appOutputEntry.ngOutputField,
+        expr: appOutputEntry.expr
+      }));
     const ngComponent = ngComponentBuilder
+      .withStyle(style)
       .addInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
-      .addOutputs(ActionCompiler.GetNgFields('output', thisActionSymbolTable))
+      .addOutputs(appOutputFields)
       .addFields(fields)
       .addFields(actionInputFields)
       .withActionImports(

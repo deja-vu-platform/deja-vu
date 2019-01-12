@@ -1,4 +1,5 @@
 import { ActionCompiler, CompiledAction } from './action.compiler';
+import { SymbolTable } from '../symbolTable';
 
 
 describe('ActionCompiler', () => {
@@ -33,13 +34,73 @@ describe('ActionCompiler', () => {
     expect(compiledAction.ngTemplate)
       .toMatch('Hello');
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
     expect(compiledAction.ngComponent)
       .toMatch(`selector: "${appName}-action-with-html-only"`);
   });
 
+  it('should compile action with exprs', () => {
+    const actionName = 'action-with-exprs';
+    const st: SymbolTable = {
+      foo: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="${actionName}">
+        <foo.action
+          obj={a: "hi", b: 3 + 2, c: 'hello'}
+          numberArray=[1, 2]
+          objArray=[{a: 1}, {b: 2}]
+          conditional=!((2 + 2) === 5) ? "b" : "c" />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch('dv.action');
+    expect(compiledAction.ngTemplate)
+      .toMatch('hi');
+  });
+
+  it('should compile action with dv.if', () => {
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <dv.if condition=true class="col-md-2 main">
+          <h1>Hello</h1>
+        </dv.if>
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .toMatch('Hello');
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\*ngIf="true"/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv\.if/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv-if/);
+  });
+
   it('should compile action with actions', () => {
     const heading = 'Group meeting organizer';
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      event: {
+        kind: 'cliche'
+      },
+      allocator: {
+        kind: 'cliche'
+      }
+    };
     const action =  `
       <dv.action name="home">
         <div class="container main">
@@ -79,14 +140,23 @@ describe('ActionCompiler', () => {
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(heading);
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
   });
 
   it('should compile action accessing member of output', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      allocator: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="show-group-meeting">
         <property.choose-object
@@ -96,7 +166,7 @@ describe('ActionCompiler', () => {
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(/\(currentConsumer\)=".+=\$event"/);
     const outputField = compiledAction.ngTemplate
@@ -105,30 +175,103 @@ describe('ActionCompiler', () => {
       .toMatch(outputField);
   });
 
-  /* TODO
   it('should compile action with output', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      }
+    };
     const action = `
-      <dv.action name="action-with-outputs" objects$=property.show-objects.objects>
+      <dv.action name="action-with-outputs"
+        objects$=property.show-objects.objects>
         <property.show-objects hidden=true />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
-  }); */
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('new EventEmitter');
+    expect(compiledAction.ngComponent)
+      .toMatch(/import .* EventEmitter .*/);
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+  });
+
+  it('should compile action with output expr', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="action-with-output-expr"
+        objects$=property.show-objects.objects.length + 1>
+        <property.show-objects hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+    expect(compiledAction.ngComponent)
+      .toMatch(/\+ 1/);
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+  });
+
+  it('should compile action with output expr', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="action-with-output-expr"
+        objects$=property.show-objects.objects.length + 1>
+        <property.show-objects hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+
+    expect(compiledAction.ngComponent)
+      .toMatch('@Output()');
+    expect(compiledAction.ngComponent)
+      .toMatch('emit');
+    expect(compiledAction.ngComponent)
+      .toMatch(/\+ 1/);
+  });
 
   it('should compile action with input', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="action-with-input">
         <property.show-objects hidden=true object=$supply />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
 
     expect(compiledAction.ngTemplate)
       .toMatch(/\[hidden]="true"/);
   });
 
   it('should compile action with action input', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="home">
         <event.choose-and-show-series
@@ -138,7 +281,7 @@ describe('ActionCompiler', () => {
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
     expect(compiledAction.ngTemplate)
@@ -152,6 +295,11 @@ describe('ActionCompiler', () => {
   });
 
   it('should compile action with html action input', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="home">
         <event.choose-and-show-series
@@ -161,7 +309,7 @@ describe('ActionCompiler', () => {
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
     expect(compiledAction.ngTemplate)
@@ -172,19 +320,27 @@ describe('ActionCompiler', () => {
 
   it('should compile action with action input ' +
     'that uses context inputs', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      },
+      foo: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="home">
         <foo.action />
         <event.choose-and-show-series
           showEvent=
-            <morg.show-group-meeting
+            <${appName}.show-group-meeting
               groupMeeting=foo.action.someValue />
           noEventsToShowText="No meetings to show"
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
     expect(compiledAction.ngTemplate)
@@ -207,7 +363,8 @@ describe('ActionCompiler', () => {
     expect(actionInput.ngTemplate)
       .toMatch(inputField);
 
-    const inputsObjRegex = new RegExp(`{\\s*"${inputField}":\\s*([^}\\s]*)\\s*}`);
+    const inputsObjRegex = new RegExp(
+      `{\\s*${inputField}:\\s*([^}\\s]*)\\s*}`);
 
     expect(compiledAction.ngTemplate)
       .toMatch(inputsObjRegex);
@@ -218,16 +375,134 @@ describe('ActionCompiler', () => {
       .toMatch(`${outputField}=`);
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch('capture__');
+  });
+
+  it('should compile action with action input ' +
+    'that uses context inputs', () => {
+    const st: SymbolTable = {
+      scoring: {
+        kind: 'cliche'
+      },
+      foo: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="home">
+        <foo.navbar />
+        <div>
+          <scoring.show-targets-by-score
+            showTarget=<foo.show-post
+            loggedInUser=foo.navbar.loggedInUser />
+          >
+          </scoring.show-targets-by-score>
+        </div>
+      </dv.action>`;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showTarget]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`inputs`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    const actionInput = compiledAction.actionInputs[0];
+    expect(actionInput.ngTemplate)
+      .toMatch(`show-post`);
+    const inputRegex = /@Input\(\)\s+(.*);/;
+    expect(actionInput.ngComponent)
+      .toMatch(inputRegex);
+
+    const inputField = actionInput.ngComponent
+      .match(inputRegex)[1];
+    expect(actionInput.ngTemplate)
+      .toMatch(inputField);
+
+    const inputsObjRegex = new RegExp(
+      `{\\s*${inputField}:\\s*([^}\\s]*)\\s*}`);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch(inputsObjRegex);
+
+    const outputField = compiledAction.ngTemplate
+      .match(inputsObjRegex)[1];
+    expect(compiledAction.ngTemplate)
+      .toMatch(`${outputField}=`);
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
+
+    expect(compiledAction.ngTemplate)
+      .toMatch('capture__');
+  });
+
+  it('should compile action with action input ' +
+    'that shadows context inputs', () => {
+    const st: SymbolTable = {
+      scoring: {
+        kind: 'cliche'
+      },
+      foo: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="home">
+        <foo.navbar />
+        <div>
+          <scoring.show-targets-by-score
+            showTarget=<div>
+              <foo.navbar />
+              <foo.show-post
+               loggedInUser=foo.navbar.loggedInUser />
+               </div>
+          >
+          </scoring.show-targets-by-score>
+        </div>
+      </dv.action>`;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showTarget]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    const actionInput = compiledAction.actionInputs[0];
+    expect(actionInput.ngTemplate)
+      .toMatch(`navbar`);
+    expect(actionInput.ngTemplate)
+      .toMatch(`show-post`);
+    expect(actionInput.ngComponent)
+      .not
+      .toMatch('@Input()');
+
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch('capture__');
   });
 
   it('should compile action with action input ' +
     'that maps outputs', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="home">
         <event.choose-and-show-series
           showEvent=
-            <dv.action meeting$=morg.show-group-meeting.shownGroupMeeting>
-              <morg.show-group-meeting
+            <dv.action meeting$=${appName}.show-group-meeting.shownGroupMeeting>
+              <${appName}.show-group-meeting
                 groupMeeting=$event
                 groupMeetings=$events />
             </dv.action>
@@ -236,7 +511,7 @@ describe('ActionCompiler', () => {
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
-      .compile(appName, action, {});
+      .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(`[showEvent]`);
     expect(compiledAction.ngTemplate)
@@ -246,12 +521,20 @@ describe('ActionCompiler', () => {
   });
 
   it('should compile action with an alias', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      foo: {
+        kind: 'cliche'
+      }
+    };
     const action = `
       <dv.action name="action-with-alias">
         <property.show-objects as prop hidden=true />
         <foo.show stuff=prop.objects />
       </dv.action>
     `;
-    actionCompiler.compile(appName, action, {});
+    actionCompiler.compile(appName, action, st);
   });
 });

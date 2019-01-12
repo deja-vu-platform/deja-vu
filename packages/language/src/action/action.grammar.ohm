@@ -35,25 +35,30 @@ Action {
   Expr
     = UnExpr -- un
     | BinExpr -- bin
+    | TerExpr -- ter
     | MemberExpr -- member
     | Literal -- literal
     | input -- input
     | Element -- element
+    | "(" Expr ")" -- parens
 
   UnExpr
-    = "not" Expr -- not
+    = "!" Expr -- not
 
   BinExpr
     = Expr "+" Expr -- plus
     | Expr "-" Expr -- minus
-    | Expr "and" Expr -- and
-    | Expr "or" Expr -- or
+    | Expr "&&" Expr -- and
+    | Expr "||" Expr -- or
+    | Expr "===" Expr -- is
 
-  MemberExpr = (name | input) ("." name)+
+  TerExpr = Expr "?" Expr ":" Expr
+
+  MemberExpr = (name | input) (nav name)+
 
   Literal
     = number -- number
-    | "\"" (~"\"" any)* "\"" -- text
+    | quote (~quote any)* quote -- text
     | "true" -- true
     | "false" -- false
     | "{" ListOf<PropAssignment, ","> "}" -- obj
@@ -66,6 +71,8 @@ Action {
   input = "$" name
   output = name "$"
 
+  quote = "\"" | "\'"
+  nav = "." | "?."
   space := whitespace | lineTerminator | comment
   whitespace = "\t"
              | "\x0B"    -- verticalTab

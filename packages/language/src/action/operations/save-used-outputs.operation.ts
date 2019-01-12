@@ -1,5 +1,5 @@
 import { ActionSymbolTable, pretty, StEntry } from '../../symbolTable';
-import { isInput } from './shared';
+import { isInput, NAV_SPLIT_REGEX } from './shared';
 
 import * as _ from 'lodash';
 
@@ -36,8 +36,8 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       attributes.saveUsedOutputs(),
     Attribute: (_attributeName, _eq, expr) => expr.saveUsedOutputs(),
 
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => {
       // We need to figure out if the action input is using an output from this
@@ -49,10 +49,17 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       element.saveUsedOutputs();
       throwErrorOnSymbolNotFound = true;
     },
+    Expr_parens: (_op, expr, _cp) => expr.saveUsedOutputs(),
 
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    BinExpr_is: binOpRecurse,
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
+      cond.saveUsedOutputs();
+      ifTrue.saveUsedOutputs();
+      ifFalse.saveUsedOutputs();
+    },
     MemberExpr: (nameOrInputNode, _dot, namesNode) =>  {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
@@ -60,7 +67,8 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       if (isInput(nameOrInput)) {
         return;
       }
-      const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+      const [ clicheOrActionAlias, ...rest ] = _
+        .split(fullMemberAccess, NAV_SPLIT_REGEX);
       if (!_.has(symbolTable, clicheOrActionAlias)) {
         if (throwErrorOnSymbolNotFound) {
           throw new Error(
@@ -75,13 +83,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
         case 'cliche':
           const clicheName = clicheOrActionAlias;
           const [ actionName, output ] = rest;
-          if (!_.has(stEntry, `symbolTable.${actionName}`)) {
+          if (!_.has(stEntry, [ 'symbolTable', actionName ])) {
             throw new Error(
               `${clicheName}.${actionName} not found in ` +
               `symbol table ${pretty(symbolTable)}`);
           }
           _.set(
-            stEntry.symbolTable[actionName], `symbolTable.${output}`,
+            stEntry.symbolTable[actionName], [ 'symbolTable', output ],
             { kind: 'output' });
           break;
         case 'action':
@@ -97,9 +105,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Literal_text: (_openQuote, _text, _closeQuote) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
     Literal_obj: (_openCb, propAssignments, _closeCb) =>
-      propAssignments.saveUsedOutputs(),
-    Literal_array: (_openSb, exprs, _closeSb) => exprs.saveUsedOutputs(),
+      propAssignments.asIteration()
+        .saveUsedOutputs(),
+    Literal_array: (_openSb, exprs, _closeSb) =>
+      exprs.asIteration()
+        .saveUsedOutputs(),
     Content_element: (element) => element.saveUsedOutputs(),
-    Content_text: (_text) => {}
+    Content_text: (_text) => {},
+    PropAssignment: (_name, _c, expr) => expr.saveUsedOutputs()
   };
 }

@@ -1,7 +1,7 @@
 import { ActionSymbolTable, pretty } from '../../symbolTable';
 
 import * as _ from 'lodash';
-import { isInput } from "../../action/operations/shared";
+import { isInput, NAV_SPLIT_REGEX } from '../../action/operations/shared';
 
 
 export interface InputFromContext {
@@ -41,34 +41,54 @@ export function capturesToInputs(
       `${attributes.capturesToInputs().join(' ')} ${close.sourceString}`,
     Attribute: (attributeName, eq, expr) =>
       attributeName.sourceString + eq.sourceString + expr.capturesToInputs(),
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
 
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => element.sourceString,
 
+    Expr_parens: (op, expr, cp) => op.sourceString +
+      expr.capturesToInputs() + cp.sourceString,
+
     UnExpr_not: (not, expr) => `${not.sourceString}${expr.capturesToInputs()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
+    BinExpr_is: binOpRecurse,
+
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
+      `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +
+      ifFalse.capturesToInputs(),
 
     MemberExpr: (nameOrInputNode, restNode, _rest) => {
       const nameOrInput = nameOrInputNode.sourceString;
+      const rest = restNode.sourceString;
       if (isInput(nameOrInput)) {
         return nameOrInput + restNode.sourceString;
       } else {
         const name = nameOrInput;
         if (_.has(symbolTable, name)) {
-          return name + restNode.sourceString;
-        } else if (_.has(context, name)) {
-          const field = name + restNode.sourceString;
+          const stEntry = _.get(symbolTable, name);
+          if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
+            const action = rest.slice(1)
+              .split(NAV_SPLIT_REGEX)[0];
+            if (_.has(symbolTable, [ name, 'symbolTable', action ])) {
+              return name + rest;
+            }
+          } else if (stEntry.kind === 'action') {
+            return name + rest;
+          } else {
+            throw new Error(`Unexpected entry type for ${pretty(stEntry)}`);
+          }
+        }
+        if (_.has(context, name)) {
+          const field = name + rest;
           const input = captureToInput(field);
           inputsFromContext.push({ input: input, field: field });
 
           return input;
-        } else {
-          throw new Error(`${name} not found in ` +
-            `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
         }
+        throw new Error(`${name} (${name + rest}) not found in ` +
+          `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
       }
     },
     Literal_number: (number) => number.sourceString,
@@ -78,11 +98,13 @@ export function capturesToInputs(
     Literal_false: (falseNode) => falseNode.sourceString,
     Literal_obj: (openCb, propAssignments, closeCb) =>
       openCb.sourceString +
-      propAssignments.capturesToInputs().join(', ') +
+      propAssignments.capturesToInputs()
+        .join(', ') +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
       openSb.sourceString +
-      exprs.capturesToInputs().join(', ') +
+      exprs.capturesToInputs()
+        .join(', ') +
       closeSb.sourceString,
     Content_element: (element) => element.capturesToInputs(),
     Content_text: (text) => text.sourceString,

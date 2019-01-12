@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from 'fs';
-import * as path from 'path';
 import * as glob from 'glob';
+import * as path from 'path';
 
 import * as _ from 'lodash';
-import { SymbolTable } from '../symbolTable';
 import { ActionCompiler } from '../action/action.compiler';
+import { SymbolTable } from '../symbolTable';
 import { NgAppBuilder } from './builders/ng-app.builder';
 
 
@@ -101,7 +101,9 @@ export class AppCompiler {
     const usedCliches: string[] = _
       .chain(dvConfig.usedCliches)
       .toPairs()
-      .map(([clicheAlias, clicheConfig]) => _.get(clicheConfig, 'name', clicheAlias))
+      .map(([clicheAlias, clicheConfig]) =>
+        _.get(clicheConfig, 'name', clicheAlias))
+      .uniq()
       .value();
 
     const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
@@ -129,17 +131,28 @@ export class AppCompiler {
       dvConfig.actions.app : undefined;
     const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
     for (const actionFilePath of htmlFilesToParse) {
-      const actionContents = readFileSync(
-        path.join(this.projectDir, actionFilePath), 'utf8');
-      const compiledAction = this.actionCompiler.compile(
-        dvConfig.name, actionContents, this.symbolTable);
-      ngAppBuilder.addComponent(
-        compiledAction.name, compiledAction.className,
-        compiledAction.ngComponent, compiledAction.ngTemplate);
-      for (const actionInput of compiledAction.actionInputs) {
+      try {
+        const actionContents = readFileSync(
+          path.join(this.projectDir, actionFilePath), 'utf8');
+
+        const actionStylePath = path.join(this.projectDir,
+          _.replace(actionFilePath, '.html', '.css'));
+        const actionStyle = existsSync(actionStylePath) ?
+          readFileSync(actionStylePath, 'utf8') : '';
+
+        const compiledAction = this.actionCompiler.compile(
+          dvConfig.name, actionContents, this.symbolTable, actionStyle);
         ngAppBuilder.addComponent(
-          actionInput.name, actionInput.className,
-          actionInput.ngComponent, actionInput.ngTemplate);
+          compiledAction.name, compiledAction.className,
+          compiledAction.ngComponent, compiledAction.ngTemplate);
+        for (const actionInput of compiledAction.actionInputs) {
+          ngAppBuilder.addComponent(
+            actionInput.name, actionInput.className,
+            actionInput.ngComponent, actionInput.ngTemplate);
+        }
+      } catch (e) {
+        console.error(`Error in action ${actionFilePath}`);
+        throw e;
       }
     }
 

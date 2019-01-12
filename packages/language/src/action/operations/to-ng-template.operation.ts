@@ -1,10 +1,10 @@
 import {
   ActionStEntry,
-  ActionSymbolTable,
+  ActionSymbolTable, ClicheStEntry,
   InputStEntry,
   OutputStEntry,
   pretty,
-  StEntry
+  StEntry, SymbolTable
 } from '../../symbolTable';
 
 import {
@@ -26,21 +26,31 @@ import { ActionCompiler, CompiledAction } from '../action.compiler';
 
 function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {
-  const [ clicheOrActionAlias, ...rest ] = _.split(fullMemberAccess, '.');
+  const clicheOrActionAlias = _
+    .split(fullMemberAccess, '.', 1)[0];
   const stEntry: StEntry = symbolTable[clicheOrActionAlias];
   let clicheName: string, actionName: string, output: string;
   let alias: string | undefined;
-  let memberAccesses: string[];
+  let memberAccesses: string;
   switch (stEntry.kind) {
     case 'cliche':
       clicheName = clicheOrActionAlias;
-      [ actionName, output, ...memberAccesses ] = rest;
+      [ actionName, output ] = fullMemberAccess
+        .slice(clicheOrActionAlias.length + 1)
+        .split('.', 2);
+      memberAccesses = fullMemberAccess
+        .slice(clicheOrActionAlias.length + actionName.length +
+          output.length + 2);
       break;
     case 'action':
       clicheName = stEntry.of;
       actionName = stEntry.actionName;
       alias = clicheOrActionAlias;
-      [ output, ...memberAccesses ] = rest;
+      output = fullMemberAccess
+        .slice(clicheOrActionAlias.length + 1)
+        .split('.', 1)[0];
+      memberAccesses = fullMemberAccess
+        .slice(clicheOrActionAlias.length + output.length + 1);
       break;
     default:
       throw new Error(`Unexpected entry ${stEntry.kind}`);
@@ -49,34 +59,32 @@ function nonInputMemberAccessToField(
   const outputField = outputToNgField(
     clicheName, actionName, output, alias);
 
-  const memberAccessStr = _.isEmpty(memberAccesses) ?
-    '' : `.${_.join(memberAccesses, '.')}`;
-
-  return `${outputField}${memberAccessStr}`;
+  return `${outputField}${memberAccesses}`;
 }
 
 
 export function toNgTemplate(
   appName: string, symbolTable: ActionSymbolTable,
-  actionInputs: CompiledAction[]) {
+  actionInputs: CompiledAction[], context: SymbolTable) {
   const tagTransform = (open, elementName, attrs, close): string => {
-    const transformedElementName = elementName.toNgTemplate();
-    const transformedActionName = _.split(transformedElementName, ' ', 1)[0];
+    let transformedElementName = elementName.toNgTemplate();
+    let transformedActionName = _.split(transformedElementName, ' ', 1)[0];
     const tagIsNgComponent = isNgComponent(transformedActionName);
-    let attrsString;
+    let outputs = [];
     if (tagIsNgComponent && transformedActionName !== 'dv-action') {
       const maybeAlias: string[] | null = transformedElementName
         .match(/dvAlias="(.*)"/);
       const alias = (maybeAlias !== null) ? maybeAlias[1] : undefined;
 
-      const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(transformedActionName, symbolTable, alias);
+      const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(
+        transformedActionName, symbolTable, alias);
       if (actionEntry === undefined) {
         assert.fail(
           `No entries for ${transformedActionName}, alias ${alias}` +
           ` symbol table ${pretty(symbolTable)}`);
       }
 
-      const outputs = _
+      outputs = _
         .map(actionEntry.symbolTable,
           (outputEntry: OutputStEntry, outputKey: string) => {
             assert.ok(
@@ -93,15 +101,41 @@ export function toNgTemplate(
             return `(${outputKey})="${ngOutputField}=$event"`;
           });
 
-      attrsString = _
-        .join(_.concat(attrs.toNgTemplate(), outputs), ' ');
-    } else {
-      attrsString = attrs.sourceString;
+      const clicheAlias = _.split(transformedActionName, '-', 1)[0];
+      if (clicheAlias !== 'dv' && clicheAlias !== appName) {
+        const clicheContextEntry = context[clicheAlias];
+        if (clicheContextEntry === undefined) {
+          throw new Error(`Cliché ${clicheAlias} not found`);
+        }
+        assert.ok(clicheContextEntry.kind === 'cliche',
+          `Unexpected entry type ${clicheContextEntry.kind} ` +
+          `for cliche ${clicheAlias}`);
+        const clicheName = (<ClicheStEntry>clicheContextEntry).clicheName;
+        if (clicheName !== clicheAlias) {
+          const elemRest = transformedElementName
+            .slice(transformedElementName.indexOf('-'));
+          transformedElementName = clicheName + elemRest +
+            ` dvOf="${clicheAlias}"`;
+          const actionRest = transformedActionName
+            .slice(transformedActionName.indexOf('-'));
+          transformedActionName = clicheName + actionRest;
+        }
+      }
     }
+
+    let attrsString = _
+      .join(_.concat(attrs.toNgTemplate(), outputs), ' ');
+
+    if (transformedActionName === 'dv-if') {
+      transformedActionName = 'div';
+      transformedElementName = transformedElementName.replace('dv-if ', 'div ');
+      attrsString = attrsString.replace('[condition]=', '*ngIf=');
+    }
+
 
     // Close void elements
     const closeStr = (tagIsNgComponent && close.sourceString === '/>') ?
-      `></${transformedElementName}>` : close.sourceString;
+      `></${transformedActionName}>` : close.sourceString;
 
     return open.sourceString +
       transformedElementName + ' ' +
@@ -110,7 +144,7 @@ export function toNgTemplate(
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpRecurse = (leftExpr, op, rightExpr) =>
-    `${leftExpr.toNgTemplate()} ${op} ${rightExpr.saveUsedOutputs()}`;
+    `${leftExpr.toNgTemplate()} ${op.sourceString} ${rightExpr.toNgTemplate()}`;
 
   return {
     Element: (element): string => element.toNgTemplate(),
@@ -120,22 +154,41 @@ export function toNgTemplate(
       if (_.startsWith(startTagNg, '<dv-action')) {
         return content;
       }
+
       return startTagNg + content + endTag.toNgTemplate();
     },
     StartTag: tagTransform,
-    EndTag: (open, elementName, close): string =>
-      open.sourceString + elementName.toNgTemplate() + close.sourceString,
-    VoidElement: tagTransform,
-    Attribute: (attributeNameNode, eq, expr) => {
-      // If we got to this point we know that this is an attribute of an
-      // action => with the exception of the html class attribute, the attr
-      // should be converted to an ng input
-      const attributeName = attributeNameNode.sourceString;
-      const newAttributeName = (attributeName === 'class') ?
-        attributeName : `[${attributeNameToInput(attributeName)}]`;
+    EndTag: (open, elementNameNode, close): string => {
+      let elementName = elementNameNode.toNgTemplate();
+      if (isNgComponent(elementName)) {
+        const clicheAlias = _.split(elementName, '-', 1)[0];
+        if (clicheAlias !== 'dv' && clicheAlias !== appName) {
+          const clicheContextEntry = context[clicheAlias];
+          if (clicheContextEntry === undefined) {
+            throw new Error(`Cliché ${clicheAlias} not found`);
+          }
+          assert.ok(clicheContextEntry.kind === 'cliche',
+            `Unexpected entry type ${clicheContextEntry.kind} ` +
+            `for cliche ${clicheAlias}`);
+          const clicheName = (<ClicheStEntry> clicheContextEntry).clicheName;
+          if (clicheName !== clicheAlias) {
+            const rest = elementName
+              .slice(elementName.indexOf('-'));
+            elementName = clicheName + rest;
+          }
+        }
 
-      return `${newAttributeName}${eq.sourceString}"${expr.toNgTemplate()}"`;
+        if (elementName.trim() === 'dv-if') {
+          elementName = 'div';
+        }
+      }
+
+      return open.sourceString + elementName + close.sourceString;
     },
+    VoidElement: tagTransform,
+    Attribute: (attributeNameNode, _eq, expr) =>
+      `[${attributeNameToInput(attributeNameNode.sourceString)}]=` +
+        `"${expr.toNgTemplate()}"`,
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),
     ElementName_action: (actionNameMaybeAlias) =>
@@ -151,16 +204,24 @@ export function toNgTemplate(
       return `${transformedActionName} ${dvAlias}`;
     },
     Alias: (_as, alias) => alias.sourceString,
-    Expr_un: recurse, Expr_bin: recurse, Expr_member: recurse,
-    Expr_literal: recurse,
+    Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
+    Expr_member: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.toNgTemplate(),
-    Expr_element: transformActionInput(appName, symbolTable, actionInputs),
+    Expr_element: transformActionInput(
+      appName, symbolTable, actionInputs, context),
+    Expr_parens: (_op, expr, _cp) => `(${expr.toNgTemplate()})`,
+
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
     BinExpr_or: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
+    BinExpr_is: (leftExpr, _is, rightExpr) =>
+      `${leftExpr.toNgTemplate()} === ${rightExpr.toNgTemplate()}`,
+    TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
+      `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
+      ifFalse.toNgTemplate(),
     MemberExpr: (nameOrInputNode, _dot, namesNode) => {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
@@ -172,16 +233,25 @@ export function toNgTemplate(
       return nonInputMemberAccessToField(fullMemberAccess, symbolTable);
     },
 
-    Literal_number: (number) => number.sourceString,
+    Literal_number: (numberNode) => numberNode.sourceString,
     Literal_text: (_openQuote, text, _closeQuote) =>
       '\'' + text.sourceString + '\'',
     Literal_true: (trueNode) => trueNode.sourceString,
     Literal_false: (falseNode) => falseNode.sourceString,
     Literal_obj: (openCb, propAssignments, closeCb) =>
-      openCb.sourceString + propAssignments.toNgTemplate() +
+      openCb.sourceString +
+      propAssignments
+        .asIteration()
+        .toNgTemplate()
+        .join(', ') +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
-      openSb.sourceString + exprs.saveUsedOutputs() + closeSb.sourceString,
+      openSb.sourceString +
+      exprs
+        .asIteration()
+        .toNgTemplate()
+        .join(', ') +
+      closeSb.sourceString,
     input: (sbNode, inputNameNode) => {
       const input = `${sbNode.sourceString}${inputNameNode.sourceString}`;
       const inputEntry = <InputStEntry> symbolTable[input];
@@ -189,20 +259,23 @@ export function toNgTemplate(
         inputEntry !== undefined,
         `Didn't find input ${input} in ${pretty(symbolTable)}`);
       assert.ok(
-        inputEntry.kind === 'input', `Unexpected entry kind ${inputEntry.kind}`);
+        inputEntry.kind === 'input',
+        `Unexpected entry kind ${inputEntry.kind}`);
       const ngInputField = inputToNgField(input);
       if (!_.has(inputEntry, 'ngInputField')) {
         inputEntry.ngInputField = ngInputField;
       }
 
       return ngInputField;
-    }
+    },
+    PropAssignment: (name, _c, expr) =>
+      `${name.sourceString}: ${expr.toNgTemplate()}`
   };
 }
 
 function transformActionInput(
   appName: string, symbolTable: ActionSymbolTable,
-  actionInputs: CompiledAction[]) {
+  actionInputs: CompiledAction[], context: SymbolTable) {
 
   return (element) => {
     const actionInputCompiler = new ActionInputCompiler();
@@ -212,7 +285,7 @@ function transformActionInput(
     const actionCompiler = new ActionCompiler();
 
     const compiledAction = actionCompiler
-      .compile(appName, compiledActionInput.action, {});
+      .compile(appName, compiledActionInput.action, context);
 
     actionInputs.push(compiledAction);
 
@@ -226,7 +299,7 @@ function transformActionInput(
 
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
-        `"${k}": ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
+        `${k}: ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 
     return `{

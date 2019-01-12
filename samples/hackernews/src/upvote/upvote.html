@@ -1,0 +1,35 @@
+<dv.action name="upvote">
+  <dv.if condition=$id>
+    <dv.if condition=$isPost>
+      <dv.tx as hackernews-upvote-post>
+        <authentication.authenticate
+          id=$loggedInUser?.id hidden=true />
+        <scoringposts.create-score
+          buttonDisabled=$disabled || !$loggedInUser
+          class="upvote-button"
+          newScoreSavedText=""
+          showOptionToInputValue=false
+          sourceId=$loggedInUser?.username
+          submitMatIconName="arrow_drop_up"
+          targetId=$id
+          value=1 />
+      </dv.tx>
+    </dv.if>
+    <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
+    <dv.if condition=!$isPost>
+      <dv.tx as hackernews-upvote-comment>
+        <authentication.authenticate
+          id=$loggedInUser?.id hidden=true />
+        <scoringcomments.create-score
+          buttonDisabled=$disabled || !$loggedInUser
+          class="upvote-button"
+          newScoreSavedText=""
+          showOptionToInputValue=false
+          sourceId=$loggedInUser?.username
+          submitMatIconName="arrow_drop_up"
+          targetId=$id
+          value="1" />
+      </dv.tx>
+    </dv.if>
+  </dv.if>
+</dv.action>

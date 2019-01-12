@@ -1,6 +1,6 @@
 {
   "name": "hackernews",
-  "watch": true,
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -55,13 +55,6 @@
         "wsPort": 3006,
         "oneToOneScoring": true
       }
-    }
-  },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "hackernews-root"}
-      ]
     }
   },
   "routes": [

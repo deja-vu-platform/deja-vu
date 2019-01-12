@@ -1,4 +1,4 @@
-<div *ngIf="user">
+<ng-container *ngIf="user">
   <div *ngIf="showId">{{user.id}}</div>
-  <div *ngIf="showUsername">{{user.username}}</div>
-</div>
+  <div *ngIf="showUsername" class="authentication-show-user-username">{{user.username}}</div>
+</ng-container>

@@ -1,10 +1,12 @@
-import * as path from 'path'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import {
+  copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync
+} from 'fs';
+import * as path from 'path';
 
 import * as _ from 'lodash';
 
+import { spawnSync } from 'child_process';
 import * as rimraf from 'rimraf';
-import { spawnSync } from "child_process";
 
 
 interface Dependency {
@@ -47,13 +49,14 @@ interface CacheRecordDiff {
  * Builder for Angular applications
  */
 export class NgAppBuilder {
+  private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
+  private static readonly cacheRecordFile = '.dvcache';
+
   private readonly dependencies: Dependency[] = [];
   private readonly components: Component[] = [];
   private readonly routes: Route[] = [];
   private globalStyle = '';
   private faviconPath: string | undefined;
-  private static readonly blueprintsPath = path.join(__dirname, 'blueprints');
-  private static readonly cacheRecordFile = '.dvcache';
 
   private static Replace(
     srcFile: string, srcExt: string, dstDir: string,
@@ -65,12 +68,12 @@ export class NgAppBuilder {
       writeFileSync(dst, readFileSync(src, 'utf8'));
     } else {
       const regex = new RegExp(Object.keys(replaceMap)
-        .map(key => `@@${key}`)
+        .map((key) => `@@${key}`)
         .join('|'), 'gi');
       writeFileSync(
         dst,
         readFileSync(src, 'utf8')
-          .replace(regex, matched => replaceMap[matched.substring(2)]));
+          .replace(regex, (matched) => replaceMap[matched.substring(2)]));
     }
   }
 
@@ -81,7 +84,7 @@ export class NgAppBuilder {
   private static DiffCacheRecord(
     prev: CacheRecord | undefined, curr: CacheRecord): CacheRecordDiff {
     const diff = {};
-    _.each(_.keys(curr), key => {
+    _.each(_.keys(curr), (key) => {
       diff[`${key}Changed`] = (prev !== undefined) ?
         NgAppBuilder.ObjectCompare(prev[key], curr[key]) !== 0 : true;
       diff[`prev${_.capitalize(key)}`] = _.get(prev, key);
@@ -92,7 +95,8 @@ export class NgAppBuilder {
   }
 
   private static ObjectCompare(a: any, b: any): number {
-    return JSON.stringify(a).localeCompare(JSON.stringify(b));
+    return JSON.stringify(a)
+      .localeCompare(JSON.stringify(b));
   }
 
   private static InstallDependencies(cacheDir: string) {
@@ -136,14 +140,14 @@ export class NgAppBuilder {
   /**
    * Uses the file at the given path for the app favicon
    */
-  setFavicon(path: string) {
-    this.faviconPath = path;
+  setFavicon(faviconPath: string) {
+    this.faviconPath = faviconPath;
 
     return this;
   }
 
-  addRoute(path: string, selector: string) {
-    this.routes.push({ path: path, selector: selector });
+  addRoute(route: string, selector: string) {
+    this.routes.push({ path: route, selector: selector });
 
     return this;
   }
@@ -246,7 +250,9 @@ export class NgAppBuilder {
       NgAppBuilder.Replace('.angular-cli', 'json', cacheDir, replaceMap);
     }
     // | dvconfig.json
-    writeFileSync(path.join(cacheDir, 'dvconfig.json'), this.dvConfigContents);
+    const newDvConfigContents = JSON.stringify(
+      _.omit(JSON.parse(this.dvConfigContents), 'type'), null, 2);
+    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContents);
 
     // | src/
     // | | index.html
