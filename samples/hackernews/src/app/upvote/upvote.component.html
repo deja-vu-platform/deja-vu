@@ -1,6 +1,6 @@
 <div *ngIf="id">
   <div *ngIf="isPost">
-    <dv-tx>
+    <dv-tx dvAlias="hackernews-upvote-post">
       <authentication-authenticate
         [id]="loggedInUser?.id" [hidden]="true">
       </authentication-authenticate>
@@ -20,9 +20,8 @@
   </div>
   <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
   <div *ngIf="!isPost">
-    <dv-tx>
+    <dv-tx dvAlias="hackernews-upvote-comment">
       <authentication-authenticate
-        dvAlias="scoringcomments-authenticate"
         [id]="loggedInUser?.id" [hidden]="true">
       </authentication-authenticate>
       <scoring-create-score
