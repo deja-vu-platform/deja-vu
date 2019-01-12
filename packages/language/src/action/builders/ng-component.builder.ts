@@ -104,8 +104,10 @@ export class NgComponentBuilder {
     }, {});
 
     const allUsedFields: Set<string> = new Set(_.keys(usedFieldToOutputInfo));
-    const inputFields = _.map(
-      this.inputs,  (input: string) => `@Input() ${input};`);
+    const inputFields = _.map(this.inputs, (input: string) =>
+      `@Input() ${input};`);
+    const inputParams = _.map(this.inputs, (input: string) =>
+      `this.${input} = this.${input} || params.get('${input}');`);
     const fields = _.map(this.fields, (field: NgField) =>
       ((allUsedFields.has(field.name) ?
         `private _${field.name}` :
@@ -115,10 +117,12 @@ export class NgComponentBuilder {
                 .slice(1, -1)};` :
         ';')));
     const actionImports = _.join(this.actionImportStatements, '\n');
+    const noInputs = _.isEmpty(inputFields);
     return `
-      import { Component } from '@angular/core';
-      ${_.isEmpty(inputFields) ?
-        '' : 'import { Input } from \'@angular/core\';'}
+      import { Component, OnInit } from '@angular/core';
+      ${noInputs ? '' :
+      'import { Input } from \'@angular/core\';\n' +
+      'import { ActivatedRoute } from \'@angular/router\';'}
       ${_.isEmpty(outputFields) ?
         '' : 'import { Output, EventEmitter } from \'@angular/core\';'}
       ${actionImports}
@@ -128,10 +132,19 @@ export class NgComponentBuilder {
         templateUrl: "${this.templateUrl}",
         styles: [\`${this.style}\`]
       })
-      export class ${this.className} {
+      export class ${this.className} ${noInputs ? '' : 'implements OnInit '}{
         ${outputFields.join('\n  ')}
         ${inputFields.join('\n  ')}
         ${fields.join('\n  ')}
+
+        ${noInputs ? '' :
+        `constructor(private route: ActivatedRoute) {}
+
+        ngOnInit() {
+          this.route.paramMap.subscribe(params => {
+            ${inputParams.join('\n  ')}
+          });
+        }`}
 
         ${[...allUsedFields].map((usedField: string) => `
         get ${usedField}() {
