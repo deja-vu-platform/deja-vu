@@ -60,12 +60,13 @@
     "packages/catalog/*",
     "samples/chorestar",
     "samples/hackernews",
-    "samples/hackernews-new",
-    "samples/hackernews-new/.dv",
+    "samples/hackernews/.dv",
     "samples/morg",
     "samples/morg/.dv",
     "samples/potluck",
     "samples/mapmit",
+    "samples/mapmit/.dv",
+    "samples/mapmit-old",
     "samples/rendezvous",
     "designer"
   ]
