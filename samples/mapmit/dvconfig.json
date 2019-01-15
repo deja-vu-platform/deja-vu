@@ -1,5 +1,6 @@
 {
   "name": "mapmit",
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -62,13 +63,6 @@
           "required": ["title", "description"]
         }
       }
-    }
-  },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "mapmit-root"}
-      ]
     }
   },
   "routes": [
