@@ -2,8 +2,7 @@
 *A WYSIWYG application builder for Déjà Vu*
 
 ## Development
-- `yarn start` -- start the app (`http://localhost:4200/`)
-- `yarn lint` -- check & fix code quality
+Run the app with `yarn dev` or `yarn prod`. The former gives you hot reloading while the latter allows you to interact with the filesystem.
 
 ## Production
 This is still a work in progress. One cannot yet build a working app with it.

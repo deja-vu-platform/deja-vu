@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "yarn prod",
+    "dev": "concurrently \"ng serve\" \"electron ./electron.dev.js\"",
+    "prod": "ng build --base-href ./ && electron ./electron.prod.js",
     "test": "ng test -sm=false",
     "lint": "ng lint --type-check --fix",
     "e2e": "ng e2e"
@@ -61,6 +61,7 @@
     "@types/lodash": "^4.14.96",
     "@types/node": "~6.0.60",
     "codelyzer": "^4.0.1",
+    "electron": "^4.0.1",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~2.0.0",
