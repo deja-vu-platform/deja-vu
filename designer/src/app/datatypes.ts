@@ -1,116 +1,192 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/compiler/src/core';
+import * as _ from 'lodash';
 
-import * as uuidv4 from 'uuid/v4';
+// names should be HTML safe (TODO)
 
-import { cliches } from './cliche.module';
-
-export interface Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any };
+export interface ActionDefinition {
+  name: string;
+  readonly inputs: string[]; // TODO: input type
+  readonly outputs: string[];
 }
 
-export interface Row {
-  readonly id: string;
-  readonly widgets: Widget[];
-}
-
-export class BaseWidget implements Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any } = {};
-  readonly clicheName: string;
-  readonly widgetName: string;
+export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
+}
 
-  constructor(clicheName: string, widgetName: string) {
-    this.id = uuidv4();
-    this.base = true;
-    this.clicheName = clicheName;
-    this.widgetName = widgetName;
-    try {
-      this.component = cliches[clicheName].components[widgetName];
-    } catch (e) {
-      this.component = undefined;
-    }
-    if (!this.component) {
-      throw new Error(
-        `Component for widget ${widgetName} in cliché ${clicheName} not found.`
-      );
-    }
+export class AppActionDefinition implements ActionDefinition {
+  name: string;
+  readonly inputs: string[] = []; // TODO: input type
+  readonly outputs: string[] = [];
+  private _rows: Row[] = [];
+  // TODO: styling options
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  get rows() {
+    _.remove(this._rows, (row) => row.actions.length === 0);
+
+    return this._rows;
+  }
+
+  toHTML() {
+    let html = `<dv.action name="${this.name}">\n`;
+    _.forEach(this.rows, (row) => {
+      html += row.toHTML() + '\n';
+    });
+    html += `</dv.action>`;
+
+    return html;
   }
 }
 
-export class TextWidget extends BaseWidget {
-  data: { [key: string]: any, content: '' };
-  constructor() {
-    super('Déjà Vu', 'Text');
+export class Row {
+  readonly actions: ActionInstance[] = [];
+  // TODO: Flex Settings;
+
+  constructor() {}
+
+  toHTML() {
+    let html = '\t<div class="dvd-row">\n';
+    _.forEach(this.actions, (action) => {
+      html += action.toHTML();
+    });
+    html += `\t</div>\n`;
+
+    return html;
   }
 
-  set content(newContent) {
-    this.data.content = newContent;
-  }
-
-  get content() {
-    return this.data.content;
-  }
-}
-
-export class ComposedWidget implements Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any } = {};
-  readonly rows: Row[] = [];
-
-  constructor() {
-    this.id = uuidv4();
-    this.base = false;
-  }
-
-  addWidget(widget: Widget, rowID?: string) {
-    const row = this.rows.find((r) => r.id === rowID);
-    if (row) {
-      row.widgets.push(widget);
+  addAction(action: ActionInstance, index?: number) {
+    if (index === undefined) {
+      this.actions.push(action);
     } else {
-      this.rows.push({ id: uuidv4(), widgets: [widget] });
+      this.actions.splice(index, 0, action);
     }
-
-    return widget;
   }
 
-  removeWidget(widgetID: string): Widget {
-    const { rowIndex, widgetIndex } = this.findWidget(widgetID);
-    if (rowIndex === -1 || widgetIndex === -1) { return null; }
-    const [widget] = this.rows[rowIndex].widgets.splice(widgetIndex, 1);
-    if (this.rows[rowIndex].widgets.length === 0) {
-      this.rows.splice(rowIndex, 1);
-    }
-
-    return widget;
+  removeAction(index: number): ActionInstance {
+    return this.actions.splice(index, 1)[0];
   }
 
-  private findWidget(
-    widgetID: string
-  ): { rowIndex: number, widgetIndex: number } {
-    for (let rowIdx = 0; rowIdx < this.rows.length; rowIdx += 1) {
-      const row = this.rows[rowIdx];
-      for (let widgetIdx = 0; widgetIdx < row.widgets.length; widgetIdx += 1) {
-        const widget = row.widgets[widgetIdx];
-        if (widget.id === widgetID) {
-          return { rowIndex: rowIdx, widgetIndex: widgetIdx };
-        }
-      }
-    }
+  // to do a move within row, do remove and then add
+}
 
-    return { rowIndex: -1 , widgetIndex: -1 };
+export class ActionInstance {
+  readonly of: ActionDefinition;
+  readonly from: App | ClicheInstance;
+  readonly inputSettings: { [inputName: string]: any } = {};
+
+  constructor(of: ActionDefinition) {
+    this.of = of;
+  }
+
+  toHTML(): string {
+    let html = `\t\t<${this.from.name}.${this.of.name}\n`;
+    _.forEach(this.inputSettings, (val, key) => {
+      html += `\t\t\t${key}="${val}"\n`; // TODO: non-string vals
+    });
+    html += `\t\t/>\n`;
+
+    return html;
   }
 }
 
-export interface Cliche {
+export interface ClicheDefinition {
   readonly name: string;
-  readonly components: ClicheComponents;
+  readonly actions: ClicheActionDefinition[];
+  // TODO: config options
 }
 
-export interface ClicheComponents {
-  [componentName: string]: Component;
+export class ClicheInstance {
+  readonly name: string;
+  readonly of: ClicheDefinition;
+  readonly config: { [s: string]: any };
+
+  constructor(name: string, of: ClicheDefinition) {
+    this.name = name;
+    this.of = of;
+  }
+
+  get actions() {
+    return this.of.actions;
+  }
+}
+
+export class App {
+  name: string;
+  readonly actions: AppActionDefinition[] = [];
+  readonly pages: AppActionDefinition[] = []; // subset of actions
+  homepage: AppActionDefinition; // member of pages
+  readonly cliches: ClicheInstance[] = [];
+
+  constructor(name: string) {
+    this.name = name;
+    this.actions = [new AppActionDefinition('new-action-1')];
+    this.pages = [...this.actions];
+    this.homepage = this.pages[0];
+  }
+
+  export(): void {
+    this.actions.forEach((action) => {
+      console.log(`src/${action.name}/${action.name}.html`);
+      console.log(action.toHTML());
+    });
+    // TODO: convert tabs to spaces
+    // TODO: save to files
+  }
+
+  /**
+   * Generate package.json for the app
+   * TODO: non-default version, author, repo, etc.
+   */
+  toPackageJSON() {
+    return JSON.stringify({
+      name: this.name,
+      version: '0.0.1',
+      scripts: {
+        start: 'dv serve'
+      },
+      private: true,
+      devDependencies: {
+        'dv-cli': '0.0.1'
+      },
+      repository: 'github:spderosso/dejavu',
+      license: 'MIT',
+      bugs: {
+        url: 'https://github.com/spderosso/dejavu/issues'
+      },
+      homepage: 'https://github.com/spderosso/dejavu#readme'
+    }, null, '\t');
+  }
+
+  toDVConfigJSON() {
+    const basePort = 3000;
+    const clichePortOffset = 2;
+
+    return JSON.stringify({
+      name: this.name,
+      type: 'app',
+      gateway: {
+        config: {
+          wsPort: basePort
+        }
+      },
+      usedCliches: _.reduce(this.cliches, (obj, cliche, idx) => (
+        (obj[cliche.name] = {
+          name: cliche.of.name,
+          config: {
+            wsPort: basePort + clichePortOffset + idx,
+            ...cliche.config
+          }
+        }) && obj // mutate and then return obj
+      ), {}),
+      routes: [
+        { path: '', action: this.homepage.name },
+        ..._.map(this.pages, (page) => (
+          { path: page.name, action: page.name }
+        ))
+      ]
+    }, null, '\t');
+  }
 }

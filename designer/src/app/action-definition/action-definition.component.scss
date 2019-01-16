@@ -1,3 +1,9 @@
+#main-view {
+  width: 100%;
+  background: darkgray;
+  padding: 16px;
+}
+
 #page {
   width: 100%;
   min-height: 100vh;
@@ -18,7 +24,6 @@ app-row:first-child {
 }
 
 app-row:last-child {
-  flex: 1;
   border-bottom: none;
   display: flex;
   flex: 1;

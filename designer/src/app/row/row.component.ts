@@ -7,5 +7,6 @@ import { Row } from '../datatypes';
   styleUrls: ['./row.component.scss']
 })
 export class RowComponent {
-  @Input() row: Row = { id: '', widgets: [] };
+  @Input() row = new Row(); // we always show an extra row
+  @Input() rowNum = -1;
 }

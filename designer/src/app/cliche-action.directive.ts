@@ -1,9 +1,9 @@
 import { Directive, ViewContainerRef } from '@angular/core';
 
 @Directive({
-  selector: '[propertyAppWidget]'
+  selector: '[propertyClicheAction]'
 })
-export class WidgetDirective {
+export class ClicheActionDirective {
 
   constructor(public viewContainerRef: ViewContainerRef) { }
 

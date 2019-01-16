@@ -1,8 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatExpansionModule, MatListModule } from '@angular/material';
 
-import { ClicheListComponent } from '../cliche-list/cliche-list.component';
-import { WidgetListComponent } from '../widget-list/widget-list.component';
 import { SideMenuComponent } from './side-menu.component';
 
 describe('SideMenuComponent', () => {
@@ -12,9 +10,7 @@ describe('SideMenuComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        SideMenuComponent,
-        ClicheListComponent,
-        WidgetListComponent
+        SideMenuComponent
       ],
       imports: [
         MatExpansionModule,

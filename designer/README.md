@@ -2,8 +2,8 @@
 *A WYSIWYG application builder for Déjà Vu*
 
 ## Development
-- `npm start` -- start the app (`http://localhost:4200/`)
-- `npm run lint` -- check & fix code quality
+- `yarn start` -- start the app (`http://localhost:4200/`)
+- `yarn lint` -- check & fix code quality
 
 ## Production
 This is still a work in progress. One cannot yet build a working app with it.

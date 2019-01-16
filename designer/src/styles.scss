@@ -15,12 +15,6 @@ body {
   margin: 0;
 }
 
-/* Apparently we can't easlily make dragula not clone or drag.
-Hacky solution: hide the clone a la The Prestige. */
-.page-row > .mat-list-item {
-  display: none;
-}
-
 /* Ensure text boxes do not get squished */
 .ql-container {
   min-width: 300px;

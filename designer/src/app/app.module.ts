@@ -11,32 +11,30 @@ import { DvModule, GATEWAY_URL } from 'dv-core';
 import { ClicheModule } from './cliche.module';
 import { MatModule } from './mat.module';
 
-import { WidgetDirective } from './widget.directive';
+import { ClicheActionDirective } from './cliche-action.directive';
 
+import {
+  ActionDefinitionComponent
+} from './action-definition/action-definition.component';
+import {
+  ActionInstanceComponent
+} from './action-instance/action-instance.component';
 import { AppComponent } from './app.component';
-import { ClicheListComponent } from './cliche-list/cliche-list.component';
-import { MainViewComponent } from './main-view/main-view.component';
-import { PageComponent } from './page/page.component';
 import { RowComponent } from './row/row.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
-import { WidgetListComponent } from './widget-list/widget-list.component';
-import { WidgetComponent } from './widget/widget.component';
 
 @NgModule({
   declarations: [
+    ActionDefinitionComponent,
+    ActionInstanceComponent,
     AppComponent,
-    MainViewComponent,
-    SideMenuComponent,
-    TopBarComponent,
-    ClicheListComponent,
-    WidgetListComponent,
-    PageComponent,
-    WidgetDirective,
-    WidgetComponent,
     RowComponent,
-    TextComponent
+    SideMenuComponent,
+    TextComponent,
+    TopBarComponent,
+    ClicheActionDirective
   ],
   imports: [
     BrowserModule,
