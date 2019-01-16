@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DragulaModule } from 'ng2-dragula';
+import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
 import { DvModule, GATEWAY_URL } from 'dv-core';
@@ -42,6 +43,7 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     FormsModule,
     MatModule,
     DragulaModule.forRoot(),
+    NgxElectronModule,
     QuillModule,
     DvModule,
     ClicheModule

@@ -48,11 +48,11 @@ export class Row {
   constructor() {}
 
   toHTML() {
-    let html = '\t<div class="dvd-row">\n';
+    let html = '  <div class="dvd-row">\n';
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
     });
-    html += `\t</div>\n`;
+    html += `  </div>\n`;
 
     return html;
   }
@@ -82,11 +82,11 @@ export class ActionInstance {
   }
 
   toHTML(): string {
-    let html = `\t\t<${this.from.name}.${this.of.name}\n`;
+    let html = `    <${this.from.name}.${this.of.name}\n`;
     _.forEach(this.inputSettings, (val, key) => {
-      html += `\t\t\t${key}="${val}"\n`; // TODO: non-string vals
+      html += `      ${key}="${val}"\n`; // TODO: non-string vals
     });
-    html += `\t\t/>\n`;
+    html += `    />\n`;
 
     return html;
   }
@@ -157,7 +157,7 @@ export class App {
         url: 'https://github.com/spderosso/dejavu/issues'
       },
       homepage: 'https://github.com/spderosso/dejavu#readme'
-    }, null, '\t');
+    }, null, '  ');
   }
 
   toDVConfigJSON() {
@@ -182,11 +182,11 @@ export class App {
         }) && obj // mutate and then return obj
       ), {}),
       routes: [
-        { path: '', action: this.homepage.name },
+        { path: '', action: `${this.name}-${this.homepage.name}` },
         ..._.map(this.pages, (page) => (
-          { path: page.name, action: page.name }
+          { path: page.name, action: `${this.name}-${page.name}` }
         ))
       ]
-    }, null, '\t');
+    }, null, '  ');
   }
 }

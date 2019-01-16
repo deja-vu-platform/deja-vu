@@ -2,10 +2,10 @@
 *A WYSIWYG application builder for Déjà Vu*
 
 ## Development
-Run the app with `yarn dev` or `yarn prod`. The former gives you hot reloading while the latter allows you to interact with the filesystem.
+Run `yarn start` to open the app with hot reloading.
 
 ## Production
-This is still a work in progress. One cannot yet build a working app with it.
+Run `yarn prod` to open a built version of the app. Currently the production build fails due to issues in the clichés so this is not a true production version.
 
 ## How to add a cliché
 1. Add to `package.json` and install.

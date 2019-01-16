@@ -292,7 +292,7 @@
   dependencies:
     tslib "^1.7.1"
 
-"@asymmetrik/ngx-leaflet@^4.0.1":
+"@asymmetrik/ngx-leaflet@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-4.0.0.tgz#9e8b991b13e433de8bf3d3163aea02e5e1658f1d"
   integrity sha512-DT+uOaysb01Egmhd58ftR6BOKI0JD7Uwt8/g6uRthFKGjWwmnOpmXJpPa2eF/lEhl2DAHx61XqJK2t/fmIlmJA==
@@ -7714,6 +7714,13 @@ ng2-dragula@^2.1.0:
   dependencies:
     "@types/dragula" "^2.1.34"
     dragula "^3.7.2"
+
+ngx-electron@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/ngx-electron/-/ngx-electron-2.1.1.tgz#69077a0d4e1b33cb58ab8e53c22c14038974825e"
+  integrity sha512-XCr/tiVR9J1SLbxy8TB0LjVzwahwYZCsHhFmng7pjsKUByWVkzDcvxo1EE+rR2MlHjE5jKmP3JH5qeLONdSAtw==
+  dependencies:
+    tslib "^1.9.0"
 
 ngx-quill@^3.6.0:
   version "3.6.0"
