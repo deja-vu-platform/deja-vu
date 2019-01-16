@@ -9,11 +9,12 @@
           <h2>Groups I Own</h2>
           <group.show-groups
             withMemberId=mapmit.nav-bar.loggedInUser.id
-            showGroup=<mapmit.show-groups
+            showGroup=<mapmit.show-group
               group=$group
               loggedInUserId=mapmit.nav-bar.loggedInUser.id
               createdByUser=mapmit.nav-bar.loggedInUser />
-          />
+          >
+          </group.show-groups>
         </div>
       </div>
     </div>
@@ -25,11 +26,12 @@
           <h2>Groups I'm In</h2>
           <group.show-groups
             withMemberId=mapmit.nav-bar.loggedInUser.id
-            showGroup=<mapmit.show-groups
+            showGroup=<mapmit.show-group
               group=$group
               loggedInUserId=mapmit.nav-bar.loggedInUser.id
               isMemberOf=mapmit.nav-bar.loggedInUser />
-          />
+          >
+          </group.show-groups>
         </div>
       </div>
     </div>

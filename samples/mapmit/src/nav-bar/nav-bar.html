@@ -1,8 +1,8 @@
 <dv.action name="nav-bar" loggedInUser$=authentication.logged-in.user>
   <dv.tx as mapmit-auth-check>
     <authentication.logged-in />
-    <dv.redirect href="/login" params={ callback: $callback }
-      onEvalFailure=true />
+    <!-- <dv.redirect href="/login" params={ callback: $callback }
+      onEvalFailure=true /> -->
   </dv.tx>
 
   <nav class="navbar">

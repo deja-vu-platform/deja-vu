@@ -11,7 +11,9 @@
     </dv.if>
 
     <dv.if condition=!$loggedInUser>
-      <event.show-events showEvent=<mapmit.show-event-info id=$id /> />
+      <event.show-events showEvent=<mapmit.show-event-info id=$id />
+      >
+      </event.show-events>
     </dv.if>
   </div>
 </dv.action>

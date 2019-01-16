@@ -292,7 +292,7 @@
   dependencies:
     tslib "^1.7.1"
 
-"@asymmetrik/ngx-leaflet@^4.0.1":
+"@asymmetrik/ngx-leaflet@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-4.0.0.tgz#9e8b991b13e433de8bf3d3163aea02e5e1658f1d"
   integrity sha512-DT+uOaysb01Egmhd58ftR6BOKI0JD7Uwt8/g6uRthFKGjWwmnOpmXJpPa2eF/lEhl2DAHx61XqJK2t/fmIlmJA==
