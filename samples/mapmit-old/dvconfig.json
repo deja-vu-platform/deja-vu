@@ -1,0 +1,82 @@
+{
+  "name": "mapmit",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "event": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
+      }
+    },
+    "geolocation": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true,
+        "mapType": "leaflet"
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": true
+      }
+    },
+    "eventInfo": {
+      "name": "property",
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "EventInfo",
+          "type": "object",
+          "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "roomNumber": {
+                "type": "string"
+              },
+              "locationDescription": {
+                "type": "string"
+              }
+          },
+          "required": ["title", "description"]
+        }
+      }
+    }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "mapmit-root"}
+      ]
+    }
+  },
+  "routes": [
+    { "path": "home", "action": "mapmit-home" },
+    { "path": "signup", "action": "mapmit-signup" },
+    { "path": "login", "action": "mapmit-login" },
+    { "path": "my-events", "action": "mapmit-show-my-events" },
+    { "path": "create-event", "action": "mapmit-create-event" },
+    { "path": "my-groups", "action": "mapmit-show-my-groups" }
+  ]
+}

@@ -123,10 +123,11 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   setLeafletMarkers() {
     if (this.markers) {
       this.layers = this.markers.map((m: Marker) => {
+        const popupText = m.title ? m.title : `${m.latitude}, ${m.longitude}`;
         return L.marker([m.latitude, m.longitude], {
           icon: this._markerIcon
         })
-          .bindPopup(`<b>${m.title}</b>`);
+          .bindPopup(`<b>${popupText}</b>`);
       });
     }
   }

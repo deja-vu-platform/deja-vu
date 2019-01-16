@@ -1,19 +1,19 @@
-<div class="blue-background">
-  <div class="container login-signup-container blue-background">
-    <div class="panel panel-default login-register-panel">
-      <div class="panel-body">
-        <img class="logo-img" src='https://s3.amazonaws.com/mapmit/logo.png' />
-        <dv-tx>
-          <authentication-sign-in
-            class="username-password-container">
-          </authentication-sign-in>
-          <dv-link href="/home" [hidden]="true"></dv-link>
-        </dv-tx>
-        <div class="switch-login-register">
-          Don't have an account yet? Sign up 
-          <dv-link href="/signup" class="signup-link">here</dv-link>.
+<dv.action name="login">
+  <div class="blue-background">
+    <div class="container login-signup-container blue-background">
+      <div class="panel panel-default login-register-panel">
+        <div class="panel-body">
+          <img class="logo-img" src='https://s3.amazonaws.com/mapmit/logo.png' />
+          <dv.tx>
+            <authentication.sign-in class="username-password-container" />
+            <dv.callback defaultHref="/home" onExecSuccess=true hidden=true />
+          </dv.tx>
+          <div class="switch-login-register">
+            Don't have an account yet? Sign up
+            <dv.link href="/signup" class="signup-link">here</dv.link>.
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</dv.action>

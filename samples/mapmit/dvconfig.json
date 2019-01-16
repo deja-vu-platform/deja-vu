@@ -38,7 +38,7 @@
         "reinitDbOnStartup": true
       }
     },
-    "eventInfo": {
+    "property": {
       "name": "property",
       "config": {
         "wsPort": 3007,
@@ -71,6 +71,7 @@
     { "path": "login", "action": "mapmit-login" },
     { "path": "my-events", "action": "mapmit-show-my-events" },
     { "path": "create-event", "action": "mapmit-create-event" },
-    { "path": "my-groups", "action": "mapmit-show-my-groups" }
+    { "path": "my-groups", "action": "mapmit-show-my-groups" },
+    { "path": "", "action": "mapmit-home" }
   ]
 }

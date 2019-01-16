@@ -1,24 +1,17 @@
-<div class="container-fluid event-card-container">
-  <div *ngIf="user">
-    <authorization-show-resources
-      [viewableBy]="user?.id"
-      [showResource]="{
-        type: showEventInfo, tag: 'mapmit-show-event-info',
-        inputMap: { id: 'eventId' },
-        inputs: { loggedInUserId: user?.id }
-      }"
-      noResourcesText="No events to show">
-    </authorization-show-resources>
-    <authentication-authenticate [id]="user?.id" [hidden]="true">
-    </authentication-authenticate>
-  </div>
+<dv.action name="show-events">
+  <div class="container-fluid event-card-container">
+    <dv.if condition=$loggedInUser>
+      <authorization.show-resources
+        noResourcesText="No events to show"
+        viewableBy=$loggedInUser.id
+        showResource=<mapmit.show-event-info
+          id=$id
+          loggedInUserId=$loggedInUser.id />
+      />
+    </dv.if>
 
-  <div *ngIf="!user">
-    <event-show-events
-      [showEvent]="{
-        type: showEventInfo, tag: 'mapmit-show-event-info',
-        inputMap: { event: 'event' }
-      }">
-    </event-show-events>
+    <dv.if condition=!$loggedInUser>
+      <event.show-events showEvent=<mapmit.show-event-info id=$id /> />
+    </dv.if>
   </div>
-</div>
+</dv.action>

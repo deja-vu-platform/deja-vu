@@ -1,12 +1,15 @@
-<mapmit-nav-bar (loggedInUser)="user=$event"></mapmit-nav-bar>
+<dv.action name="show-my-events">
+  <mapmit.nav-bar callback="/my-events" />
 
-<div class="events-container">
-  <div class="events-panel panel panel-default">
-    <div class="events-header-row">
-      <h2 class="my-events-header">My Events</h2>
-      <dv-link href="/create-event" class="btn btn-blue create-event-btn">Create Event</dv-link>
+  <div class="events-container">
+    <div class="events-panel panel panel-default">
+      <div class="events-header-row">
+        <h2 class="my-events-header">My Events</h2>
+        <dv.link href="/create-event" class="btn btn-blue create-event-btn">
+          Create Event</dv.link>
+      </div>
+
+      <mapmit.show-events loggedInUser=mapmit.nav-bar.loggedInUser />
     </div>
-
-    <mapmit-show-events [user]="user"></mapmit-show-events>
   </div>
-</div>
+</dv.action>

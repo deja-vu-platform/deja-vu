@@ -1,43 +1,37 @@
-<mapmit-nav-bar (loggedInUser)="user=$event"></mapmit-nav-bar>
+<dv.action name="show-my-groups">
+  <mapmit.nav-bar callback="/my-groups" />
 
-<div id="my-groups-column-container">
+  <div id="my-groups-column-container">
+    <div class="my-groups-column" id="my-groups-column-left">
+      <!-- Show groups owned by user -->
+      <div class="panel panel-default">
+        <div class="panel-body groups-panel-body">
+          <h2>Groups I Own</h2>
+          <group.show-groups
+            withMemberId=mapmit.nav-bar.loggedInUser.id
+            showGroup=<mapmit.show-groups
+              group=$group
+              loggedInUserId=mapmit.nav-bar.loggedInUser.id
+              createdByUser=mapmit.nav-bar.loggedInUser />
+          />
+        </div>
+      </div>
+    </div>
 
-  <div class="my-groups-column" id="my-groups-column-left">
-    <!-- Show groups owned by user -->
-    <div class="panel panel-default">
-      <div class="panel-body groups-panel-body">
-        <h2>Groups I Own</h2>
-        <group-show-groups 
-          dvAlias="groups-owned-by-user"
-          [withMemberId]="user?.id" 
-          [showMembers]="false"
-          [showGroup]="{
-            type: showGroup, tag: 'mapmit-show-group',
-            inputMap: { group: 'group' },
-            inputs: { loggedInUserId: user?.id, createdByUser: user?.id }
-          }">
-        </group-show-groups>
+      <!-- Show groups for which the user is a member -->
+    <div class="my-groups-column" id="my-groups-column-right">
+      <div class="panel panel-default">
+        <div class="panel-body groups-panel-body">
+          <h2>Groups I'm In</h2>
+          <group.show-groups
+            withMemberId=mapmit.nav-bar.loggedInUser.id
+            showGroup=<mapmit.show-groups
+              group=$group
+              loggedInUserId=mapmit.nav-bar.loggedInUser.id
+              isMemberOf=mapmit.nav-bar.loggedInUser />
+          />
+        </div>
       </div>
     </div>
   </div>
-
-    <!-- Show groups for which the user is a member -->
-  <div class="my-groups-column" id="my-groups-column-right">
-    <div class="panel panel-default">
-      <div class="panel-body groups-panel-body">
-        <h2>Groups I'm In</h2>
-        <group-show-groups 
-          dvAlias="groups-user-is-member-of"
-          [withMemberId]="user?.id" 
-          [showMembers]="false"
-          [showGroup]="{
-            type: showGroup, tag: 'mapmit-show-group',
-            inputMap: { group: 'group' },
-            inputs: { loggedInUserId: user?.id, isMemberOf: user?.id }
-          }">
-        </group-show-groups>
-      </div>
-    </div>
-  </div>
-  
-</div>
+</dv.action>
