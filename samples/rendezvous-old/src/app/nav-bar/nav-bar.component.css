@@ -1,0 +1,9 @@
+#returnToMain {
+  width: 100%;
+  background-color: #ffa599;
+  border-bottom: 1px solid #B3594D;
+  height: 30px;
+  text-align: center;
+  padding-top: 5px;
+  cursor: pointer;
+}

@@ -67,6 +67,8 @@
     "samples/potluck",
     "samples/mapmit",
     "samples/rendezvous",
+    "samples/rendezvous/.dv",
+    "samples/rendezvous-old",
     "designer"
   ]
 }
