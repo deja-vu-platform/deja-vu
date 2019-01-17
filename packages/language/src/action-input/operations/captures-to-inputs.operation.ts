@@ -53,7 +53,7 @@ export function capturesToInputs(
     UnExpr_not: (not, expr) => `${not.sourceString}${expr.capturesToInputs()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-    BinExpr_is: binOpRecurse,
+    BinExpr_equal: binOpRecurse, BinExpr_nequal: binOpRecurse,
 
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +

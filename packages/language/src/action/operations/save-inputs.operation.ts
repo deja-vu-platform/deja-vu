@@ -29,7 +29,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     UnExpr_not: (_not, expr) => expr.saveInputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-    BinExpr_is: binOpRecurse,
+    BinExpr_equal: binOpRecurse, BinExpr_nequal: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveInputs();
       ifTrue.saveInputs();

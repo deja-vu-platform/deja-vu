@@ -217,8 +217,10 @@ export function toNgTemplate(
       `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
     BinExpr_or: (leftExpr, _and, rightExpr) =>
       `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
-    BinExpr_is: (leftExpr, _is, rightExpr) =>
+    BinExpr_equal: (leftExpr, _equal, rightExpr) =>
       `${leftExpr.toNgTemplate()} === ${rightExpr.toNgTemplate()}`,
+    BinExpr_nequal: (leftExpr, _nequal, rightExpr) =>
+      `${leftExpr.toNgTemplate()} !== ${rightExpr.toNgTemplate()}`,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
       ifFalse.toNgTemplate(),

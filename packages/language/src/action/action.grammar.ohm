@@ -50,7 +50,8 @@ Action {
     | Expr "-" Expr -- minus
     | Expr "&&" Expr -- and
     | Expr "||" Expr -- or
-    | Expr "===" Expr -- is
+    | Expr "===" Expr -- equal
+    | Expr "!==" Expr -- nequal
 
   TerExpr = Expr "?" Expr ":" Expr
 
