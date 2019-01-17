@@ -10,50 +10,58 @@
     "authentication": {
       "name": "authentication",
       "config": {
-        "wsPort": 3002
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
       }
     },
     "authorization": {
       "name": "authorization",
       "config": {
-        "wsPort": 3003
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
       }
     },
     "comment": {
       "name": "comment",
       "config": {
-        "wsPort": 3004
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
       }
     },
     "event": {
       "name": "event",
       "config": {
-        "wsPort": 3005
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
       }
     },
     "geolocation": {
       "name": "geolocation",
       "config": {
         "wsPort": 3006,
-        "mapType": "leaflet"
+        "mapType": "leaflet",
+        "reinitDbOnStartup": true
       }
     },
     "group": {
       "name": "group",
       "config": {
-        "wsPort": 3007
+        "wsPort": 3007,
+        "reinitDbOnStartup": true
       }
     },
     "label": {
       "name": "label",
       "config": {
-        "wsPort": 3008
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
       }
     },
     "eventdetails": {
       "name": "property",
       "config": {
         "wsPort": 3009,
+        "reinitDbOnStartup": true,
         "schema": {
           "title": "EventDetails",
           "type": "object",
@@ -72,6 +80,7 @@
       "name": "property",
       "config": {
         "wsPort": 3010,
+        "reinitDbOnStartup": true,
         "schema": {
           "title": "UserProfile",
           "type": "object",

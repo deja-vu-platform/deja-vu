@@ -1,4 +1,4 @@
-<dv.action name="nav-bar" loggedInUser$=authentication.logged-in.user>
+<dv.action name="navbar" loggedInUser$=authentication.logged-in.user>
   <dv.tx as rendezvous-auth-check>
     <authentication.logged-in />
     <dv.if condition=$redirectParams>
@@ -14,11 +14,12 @@
         style="margin-right: 50px;" class="btn button btn-info" href="/main">
         <mat-icon>arrow_back</mat-icon>
       </dv.link> -->
-      <dv.link type="button" id="back"
-        style="margin-right: 50px;" class="btn button btn-info" href="/main">
-        Back
+      <dv.link href="/main">
+        <button type="button" id="back" style="margin-right: 50px;"
+          class="btn button btn-info">
+          <i class="material-icons">arrow_back</i>
+        </button>
       </dv.link>
-
     </div>
   </dv.if>
 
@@ -26,10 +27,11 @@
     <div style="text-align:center">
       <div class="inline">
         <dv.if condition=$showProfileButton>
-          <dv.link type="button" class="btn button"
-            style="margin: 0px; width: 100%;" href="/profile"
-            params={ id: authentication.logged-in.user.id }>
-            My Profile
+          <dv.link href="/profile" params={ id: authentication.logged-in.user.id }>
+            <button type="button" class="btn button"
+              style="margin: 0px; width: 100%;">
+              My Profile
+            </button>
           </dv.link>
         </dv.if>
 

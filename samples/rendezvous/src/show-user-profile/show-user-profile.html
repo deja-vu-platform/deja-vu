@@ -1,10 +1,8 @@
 <dv.action name="show-user-profile">
-  <userprofile.show-object id=$id hidden=true />
-
-  <rendezvous.nav-bar showProfileButton=false
-    redirectParams={ callback: '/profile' } />
-
   <div class="index">
+    <userprofile.show-object id=$id hidden=true />
+    <rendezvous.navbar showProfileButton=false redirectParams={ callback: "/profile" } />
+
     <dv.if condition=!$id>Need to provide an id.</dv.if>
 
     <dv.if condition=$id class="reset_password">
@@ -13,16 +11,17 @@
           <!-- Username -->
           <div style="flex-grow:1;">
             <h4 style="margin-top:15px;">
-              <rendezvous.show-member-name id=$id>
+              <rendezvous.show-member-name id=$id />
             </h4>
           </div>
 
           <!-- Edit Profile -->
-          <dv.if condition=$id === rendezvous.nav-bar.loggedInUser.id
+          <dv.if condition=$id === rendezvous.navbar.loggedInUser.id
             style="margin-top:10px;">
-            <dv.link href="/edit-profile" class="btn button" type="button"
-              id="edit-prof-btn">
-              Edit Profile
+            <dv.link href="/edit-profile">
+              <button class="btn button" type="button" id="edit-prof-btn">
+                Edit Profile
+              </button>
             </dv.link>
           </dv.if>
         </div>
@@ -34,7 +33,7 @@
             <tr>
               <th>Email</th>
               <td>
-                <userprofile.show-object showOnly=['email']
+                <userprofile.show-object showOnly=["email"]
                   object=userprofile.show-object.loadedObject />
               </td>
             </tr>
@@ -43,7 +42,7 @@
             <tr>
               <th>Phone</th>
               <td>
-                <userprofile.show-object showOnly=['phoneNumber']
+                <userprofile.show-object showOnly=["phoneNumber"]
                   object=userprofile.show-object.loadedObject />
               </td>
             </tr>
@@ -53,7 +52,7 @@
               <th>Majors</th>
               <td>
                 <p style="white-space:pre; margin-bottom:0px;">
-                  <userprofile.show-object showOnly=['majors']
+                  <userprofile.show-object showOnly=["majors"]
                     object=userprofile.show-object.loadedObject />
                 </p>
               </td>
@@ -63,7 +62,7 @@
             <tr>
               <th>Location</th>
               <td>
-                <userprofile.show-object showOnly=['zipCode']
+                <userprofile.show-object showOnly=["zipCode"]
                   object=userprofile.show-object.loadedObject />
               </td>
             </tr>

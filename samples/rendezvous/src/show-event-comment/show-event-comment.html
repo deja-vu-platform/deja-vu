@@ -9,7 +9,7 @@
           <button class="displayButtons inoine btn btn info" type="button"
             style="background-color: #ffa599; border-color: #ddd;
                   margin-left: 5px;">
-            <span class="badge" style='color: black;'>
+            <span class="badge" style="color: black;">
               <rendezvous.show-member-name id=$comment?.authorId />
             </span>
           </button>
@@ -19,20 +19,19 @@
               border: 1px solid #CC9088; overflow: hidden;">
           <!-- TODO: timestamp -->
 
-          <p id="timePost" style='white-space:pre; margin-left: 15px; color: #6b6b6b;'>
+          <p id="timePost" style="white-space:pre; margin-left: 15px; color: #6b6b6b;">
             Timestamp coming soon!
           </p>
 
           <!-- Delete Comment -->
           <dv.if condition=$comment?.authorId === $loggedInUserId>
             <dv.tx>
-              <p style='text-align: right; margin-top: -30px;'>
+              <p style="text-align: right; margin-top: -30px;">
                 <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
                 <authentication.authenticate id=$loggedInUserId hidden=true />
               </p>
             </dv.tx>
           </dv.if>
-
 
           <!-- Show Comment Content -->
           <comment.show-comment comment=$comment showId=false

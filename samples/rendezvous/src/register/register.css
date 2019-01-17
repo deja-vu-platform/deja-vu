@@ -1,5 +1,24 @@
-.registration_pages{
+.registration_pages {
   width: 75%;
   padding-top: 25px;
   margin: 0 auto;
+}
+
+.panel-heading {
+  background-color: #ffa599;
+}
+
+#heading {
+  text-align: center;
+}
+
+.panel-body {
+  padding: 15px;
+  text-align: center;
+}
+
+#finish-button {
+  float: right;
+  margin-right: 10px;
+  margin-top: 0px;
 }

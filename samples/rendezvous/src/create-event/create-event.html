@@ -1,6 +1,6 @@
 <dv.action name="create-event">
   <div class="index">
-    <rendezvous.nav-bar redirectParams={ callback: '/create-event' } />
+    <rendezvous.navbar redirectParams={ callback: "/create-event" } />
 
     <div class="new_event">
       <div class="panel panel-default">
@@ -14,7 +14,7 @@
               Hosted By
               <span class="badge" style="color: black; margin-left: 5px;">
                 <rendezvous.show-member-name
-                  user=rendezvous.nav-bar.loggedInUser />
+                  user=rendezvous.navbar.loggedInUser />
               </span>
             </button>
           </div>
@@ -29,17 +29,17 @@
 
             <table id="event_info" class="table">
               <tr>
-                <!-- Location -->
-                <td rowspan="2" style="width: 30%">
+                <!-- Location: rowspan 2 -->
+                <td style="width: 30%">
                   <div class="form-group">
                     <p>Location</p>
                     <div id="map_new_event">
                       <geolocation.create-marker
                         id=dv.id.id
                         mapId="mainMapId"
-                        title=geolocation.display-map?.title
-                        latitude=geolocation.display-map?.latitude
-                        longitude=geolocation.display-map?.longitude
+                        title=geolocation.display-map.newMarker.title
+                        latitude=geolocation.display-map.newMarker.latitude
+                        longitude=geolocation.display-map.newMarker.longitude
                         showOptionToSubmit=false />
                     </div>
                     <div class="guidelines" style="margin-top: 3px; width: 100%;">
@@ -81,13 +81,13 @@
               id=dv.id.id
               showOptionToAddMembers=false
               showOptionToSubmit=false
-              memberIds= [rendezvous.nav-bar.loggedInUser.id]
+              memberIds= [rendezvous.navbar.loggedInUser.id]
               hidden=true />
 
             <authorization.create-resource id=dv.id.id
-              ownerId=rendezvous.nav-bar.loggedInUser.id hidden=true />
+              ownerId=rendezvous.navbar.loggedInUser.id hidden=true />
             <authentication.authenticate
-              id=rendezvous.nav-bar.loggedInUser.id hidden=true />
+              id=rendezvous.navbar.loggedInUser.id hidden=true />
 
             <!-- Cancel and Create Buttons -->
             <div style="float:right;">
@@ -99,12 +99,13 @@
                 hidden=true />
             </div>
             <div style="float:right;">
-              <dv.link href="/main" type="button" class="btn button btn-info"
-                id="back" style="margin-top: 10px; width: 80px;">
-                Cancel
+              <dv.link href="/main">
+                <button type="button" class="btn button btn-info" id="back"
+                  style="margin-top: 10px; width: 80px;">
+                  Cancel
+                </button>
               </dv.link>
             </div>
-
           </dv.tx>
         </div>
       </div>

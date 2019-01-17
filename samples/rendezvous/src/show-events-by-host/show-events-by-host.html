@@ -1,8 +1,6 @@
 <dv.action name="show-events-by-host">
   <authorization.show-resources
     createdBy=$loggedInUserId
-    showResource=<rendezvous.show-event-summary id=$id
-    noResourcesText="You haven't created any events yet" />
-  >
-  </authorization.show-resources>
+    noResourcesText="You have not created any events yet"
+    showResource=<rendezvous.show-event-summary id=$id /> />
 </dv.action>

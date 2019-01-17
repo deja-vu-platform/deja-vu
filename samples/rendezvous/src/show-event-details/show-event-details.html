@@ -1,6 +1,6 @@
 <dv.action name="show-event-details">
   <div class="index">
-    <rendezvous.nav-bar />
+    <rendezvous.navbar />
     <eventdetails.show-object id=$eventId hidden=true />
     <authorization.show-owner resourceId=$eventId hidden=true />
 
@@ -8,7 +8,8 @@
       <div class="panel panel-default">
         <div class="panel-heading eventName" style="background-color: #ffa599;">
           <!-- Event Title -->
-          <eventdetails.show-object object=eventdetails.show-object.loadedObject showOnly=['title'] />
+          <eventdetails.show-object object=eventdetails.show-object.loadedObject
+            showOnly=["title"] />
         </div>
 
         <div class="panel-body" style="padding: 15px;">
@@ -40,9 +41,11 @@
             <div id="attendeesDiv" style="display: block; margin-top: 50px;">
               <!-- List of Attendees -->
               <p>Attendees</p>
-              <div class="panel-body" style="background-color: #FFEFEE; border: 1px solid #CC9088">
-                <group.show-members inGroupId=$eventId showMember=<rendezvous.show-member-name id=$id />
-                >
+              <div class="panel-body"
+                style="background-color: #FFEFEE; border: 1px solid #CC9088">
+                <group.show-members inGroupId=$eventId
+                  showMember=<rendezvous.show-member-name id=$id />
+                  >
                 </group.show-members>
               </div>
             </div>
@@ -68,14 +71,18 @@
           <div class="event_details">
             <!-- Additional Info -->
             <p> Event Description</p>
-            <div id="shw-pst" style="background-color: #FFEFEE; border: 1px solid #CC9088">
-              <eventdetails.show-object object=eventdetails.show-object.loadedObject showOnly=['additionInfo'] />
+            <div id="shw-pst"
+              style="background-color: #FFEFEE; border: 1px solid #CC9088">
+              <eventdetails.show-object
+                object=eventdetails.show-object.loadedObject
+                showOnly=["additionInfo"] />
             </div>
           </div>
 
-          <dv.if condition=rendezvous.nav-bar.loggedInUser.id===authorization.show-owner.ownerId>
+          <dv.if condition=rendezvous.navbar.loggedInUser.id===authorization.show-owner.ownerId>
             <!-- TODO: Edit Event -->
-            <div class="inline btn-group form-group" style="display: inline-block; float: right; margin-top: 10px;">
+            <div class="inline btn-group form-group"
+              style="display: inline-block; float: right; margin-top: 10px;">
               <button class="btn button">Coming Soon: Edit Event</button>
             </div>
 
@@ -85,12 +92,14 @@
           </dv.if>
 
           <!-- Join Group if already not in it -->
-          <dv.if condition=rendezvous.nav-bar.loggedInUser.id !==authorization.show-owner.ownerId>
+          <dv.if condition=rendezvous.navbar.loggedInUser.id !==authorization.show-owner.ownerId>
             <div class="inline btn-group form-group" id="jn-lv-grp">
               <dv.tx as rendezvous-join-leave>
-                <authorization.add-remove-viewer resourceId=$eventId viewerId=rendezvous.nav-bar.loggedInUser.id hidden=true />
+                <authorization.add-remove-viewer resourceId=$eventId
+                  viewerId=rendezvous.navbar.loggedInUser.id hidden=true />
 
-                <group.join-leave groupId=$eventId memberId=rendezvous.nav-bar.loggedInUser.id />
+                <group.join-leave groupId=$eventId
+                  memberId=rendezvous.navbar.loggedInUser.id />
               </dv.tx>
             </div>
           </dv.if>
@@ -103,15 +112,17 @@
               <tr id="add-comment-row">
                 <th id="add-comment">
                   <dv.tx as rendezvous-event-comment>
-                    <comment.create-comment authorId=rendezvous.nav-bar.loggedInUser.id targetId=$eventId inputLabel="Post a new comment"
+                    <comment.create-comment
+                      authorId=rendezvous.navbar.loggedInUser.id
+                      targetId=$eventId inputLabel="Post a new comment"
                       buttonLabel="Post" />
                   </dv.tx>
                 </th>
               </tr>
-              <comment.show-comments ofTargetId=$eventId showComment=<rendezvous.show-event-comment comment=$comment
-                loggedInUserId=rendezvous.nav-bar.loggedInUser.id />
-              >
-              </comment-show-comments>
+              <comment.show-comments ofTargetId=$eventId
+                showComment=<rendezvous.show-event-comment
+                  comment=$comment
+                  loggedInUserId=rendezvous.navbar.loggedInUser.id /> />
             </tbody>
           </table>
         </div>
