@@ -1,0 +1,61 @@
+<div id="import-cliche">
+  <h1>Import Cliche</h1>
+  <form
+    #importClicheForm="ngForm"
+    (ngSubmit)="save(importClicheForm)">
+    <mat-form-field>
+      <mat-select
+        required
+        name="cliche"
+        #ngFormCliche="ngModel"
+        placeholder="Cliché"
+        [(ngModel)]="of"
+        (selectionChange)="onSelectCliche($event)"
+      >
+        <mat-option
+          *ngFor="let clicheDefinition of clicheDefinitions"
+          [value]="clicheDefinition"
+        >
+          {{clicheDefinition.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input
+        matInput
+        required
+        name="name"
+        #ngFormName="ngModel"
+        placeholder="Alias"
+        [(ngModel)]="name"
+      >
+    </mat-form-field>
+
+    <mat-form-field>
+      <textarea
+        matInput
+        name="config"
+        #ngFormConfig="ngModel"
+        placeholder="Config (JSON)"
+        [(ngModel)]="configString"
+        [errorStateMatcher]="jsonValidator"
+      >
+      </textarea>
+    </mat-form-field>
+    <div class="buttons">
+      <button
+        mat-button
+        color="warn"
+        type="button"
+        (click)="cancel()"
+      >Cancel</button>
+      <button
+        mat-button
+        color="primary"
+        type="submit"
+        [disabled]="!validate(importClicheForm)"
+      >Import</button>
+    </div>
+  </form>
+</div>

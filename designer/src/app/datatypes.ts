@@ -101,7 +101,7 @@ export interface ClicheDefinition {
 export class ClicheInstance {
   readonly name: string;
   readonly of: ClicheDefinition;
-  readonly config: { [s: string]: any };
+  readonly config: { [s: string]: any } = {};
 
   constructor(name: string, of: ClicheDefinition) {
     this.name = name;

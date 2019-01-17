@@ -1,6 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material';
+
 import { designerCliche } from '../cliche.module';
 import { ActionDefinition, App } from '../datatypes';
+import { ImportClicheComponent, DialogData } from '../import-cliche/import-cliche.component';
+
 
 interface ActionCollection {
   name: string;
@@ -8,6 +12,7 @@ interface ActionCollection {
 }
 
 const NUM_CONSTANT_COLLECTIONS = 2;
+
 
 @Component({
   selector: 'app-side-menu',
@@ -18,6 +23,8 @@ export class SideMenuComponent implements OnInit {
   @Input() app: App;
   // need consistent object to return
   private _actionCollections: ActionCollection[];
+
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit() {
     this._actionCollections = [designerCliche, this.app];
@@ -34,5 +41,15 @@ export class SideMenuComponent implements OnInit {
     );
 
     return this._actionCollections;
+  }
+
+  importCliche() {
+    const data: DialogData = {
+      app: this.app
+    };
+    this.dialog.open(ImportClicheComponent, {
+      width: '50vw',
+      data
+    });
   }
 }

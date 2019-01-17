@@ -1,0 +1,17 @@
+#import-cliche {
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+textarea {
+  font-family: monospace;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}

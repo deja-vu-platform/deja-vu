@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
-import * as _ from 'lodash';
 import { DragulaService } from 'ng2-dragula';
 import { filter } from 'rxjs/operators';
 
-import { clicheDefinitions, designerCliche } from './cliche.module';
+import { designerCliche } from './cliche.module';
 import {
   ActionInstance,
   App,
   ClicheDefinition,
-  ClicheInstance,
   Row
 } from './datatypes';
 
@@ -26,10 +24,6 @@ export class AppComponent {
   // dragula needs to be configured at the top level
   constructor(private dragulaService: DragulaService) {
     this.configureDragula();
-    // instantiate each cliche once (TODO: dynamic instantiations)
-    _.forEach(clicheDefinitions, (of) => {
-      this.app.cliches.push(new ClicheInstance(of.name, of));
-    });
   }
 
   configureDragula() {

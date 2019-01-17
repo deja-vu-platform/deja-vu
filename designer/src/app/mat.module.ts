@@ -4,7 +4,9 @@ import {
   MatButtonModule,
   MatExpansionModule,
   MatIconModule,
+  MatInputModule,
   MatListModule,
+  MatSelectModule,
   MatToolbarModule
 } from '@angular/material';
 
@@ -12,7 +14,9 @@ const modules = [
   MatButtonModule,
   MatExpansionModule,
   MatIconModule,
+  MatInputModule,
   MatListModule,
+  MatSelectModule,
   MatToolbarModule
 ];
 
