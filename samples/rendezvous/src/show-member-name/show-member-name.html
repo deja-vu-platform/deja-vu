@@ -1,1 +1,8 @@
-<authentication-show-user [id]="id">
+<dv.action name="show-member-name">
+  <dv.if condition=$user>
+    <authentication.show-user user=$user showId=false />
+  </dv.if>
+  <dv.if condition=!$user && $id>
+    <authentication.show-user id=$id showId=false />
+  </dv.if>
+</dv.action>

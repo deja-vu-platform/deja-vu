@@ -1,7 +1,8 @@
-<comment-show-comments
-  [showComment]="{
-    type: showEventComment, tag: 'rendezvous-show-event-comment',
-    inputMap: { comment: 'comment' },
-    inputs: { loggedInUserId: user?.id }
-  }"
-></comment-show-comments>
+<dv.action name="show-event-comments">
+  <comment.show-comments
+    showComment=<rendezvous.show-event-comment
+      comment=$comment
+      loggedInUserId=$loggedInUserId />
+  >
+  </comment.show-comments>
+</dv.action>

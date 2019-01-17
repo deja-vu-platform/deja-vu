@@ -50,7 +50,7 @@
         "wsPort": 3008
       }
     },
-    "eventDetails": {
+    "eventdetails": {
       "name": "property",
       "config": {
         "wsPort": 3009,
@@ -68,7 +68,7 @@
         }
       }
     },
-    "userProfile": {
+    "userprofile": {
       "name": "property",
       "config": {
         "wsPort": 3010,

@@ -1,10 +1,7 @@
-<authorization-show-resources
-  [viewableBy]="user?.id"
-  [showResource]="{
-    type: showEventSummary, tag: 'rendezvous-show-event-summary',
-    inputMap: { id: 'eventId' }
-  }"
-  noResourcesText="You haven't joined any events yet">
-</authorization-show-resources>
-<authentication-authenticate [id]="user?.id" [hidden]="true">
-</authentication-authenticate>
+<dv.action name="show-events-by-attendee">
+  <authorization.show-resources viewableBy=$loggedInUserId
+    showResource=<rendezvous.show-event-summary id=$id
+    noResourcesText="You haven't joined any events yet" />
+  >
+  </authorization.show-resources>
+</dv.action>

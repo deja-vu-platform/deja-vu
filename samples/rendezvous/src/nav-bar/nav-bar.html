@@ -1,45 +1,46 @@
-<dv-tx>
-  <authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
-  </authentication-logged-in>
+<dv.action name="nav-bar" loggedInUser$=authentication.logged-in.user>
+  <dv.tx as rendezvous-auth-check>
+    <authentication.logged-in />
+    <dv.if condition=$redirectParams>
+      <dv.redirect href="/login" params=$redirectParams onEvalFailure=true />
+    </dv.if>
+  </dv.tx>
 
-  <dv-redirect *ngIf="redirectParams" href="/login" [params]="redirectParams"
-    [onEvalFailure]="true">
-  </dv-redirect>
-</dv-tx>
+  <dv.if condition=$showTitle>
+    <div id="returnToMain">R E N D E Z V O U S</div>
+    <div class="inline" style="float: left;">
+      <!-- TODO: material -->
+      <!-- <dv.link mat-icon-button type="button" id="back"
+        style="margin-right: 50px;" class="btn button btn-info" href="/main">
+        <mat-icon>arrow_back</mat-icon>
+      </dv.link> -->
+      <dv.link type="button" id="back"
+        style="margin-right: 50px;" class="btn button btn-info" href="/main">
+        Back
+      </dv.link>
 
-<div *ngIf="showTitle">
-  <div id="returnToMain">R E N D E Z V O U S</div>
-  <div class="inline" style="float: left;">
-    <dv-link
-      mat-icon-button
-      type="button"
-      id="back" style="margin-right: 50px;"
-      class="btn button btn-info"
-      href="/main">
-      <mat-icon>arrow_back</mat-icon>
-    </dv-link>
-  </div>
-</div>
+    </div>
+  </dv.if>
 
-<div style="float:right;">
-  <div style="text-align:center">
-    <div class="inline">
-      <dv-link *ngIf="showProfileButton"
-        type="button"
-        class="btn button"
-        style="margin: 0px; width: 100%;"
-        href="/profile"
-        [params]="{ id: user?.id }">
-        My Profile
-      </dv-link>
-      <dv-tx>
-        <authentication-sign-out
-          class="btn button"
-          style="margin: 0px; margin-top: 10px; width: 100%;"
-          buttonLabel="Logout">
-        </authentication-sign-out>
-        <dv-link href="/login" [hidden]="true"></dv-link>
-      </dv-tx>
+  <div style="float:right;">
+    <div style="text-align:center">
+      <div class="inline">
+        <dv.if condition=$showProfileButton>
+          <dv.link type="button" class="btn button"
+            style="margin: 0px; width: 100%;" href="/profile"
+            params={ id: authentication.logged-in.user.id }>
+            My Profile
+          </dv.link>
+        </dv.if>
+
+        <dv.tx as rendezvous-sign-out>
+          <authentication.sign-out
+            class="btn button"
+            style="margin: 0px; margin-top: 10px; width: 100%;"
+            buttonLabel="Logout" />
+          <dv.link href="/login" hidden=true />
+        </dv.tx>
+      </div>
     </div>
   </div>
-</div>
+</dv.action>

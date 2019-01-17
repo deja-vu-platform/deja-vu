@@ -1,51 +1,44 @@
-<tr>
-  <td class="show-comment">
-    <div
-      class="panel-body"
-      style="background-color: #FFEFEE;
-            border: 1px solid #CC9088;
-            overflow: hidden;">
-
-      <!-- Show Comment Author -->
-      <div>
-        <button class="displayButtons inoine btn btn info" type="button"
-        style="background-color: #ffa599; border-color: #ddd;
-               margin-left: 5px;">
-          <span class="badge" style='color: black;'>
-            <authentication-show-user [id]="comment?.authorId">
-            </authentication-show-user>
-          </span>
-        </button>
-      </div>
-
+<dv.action name="show-event-comment">
+  <tr>
+    <td class="show-comment">
       <div class="panel-body" style="background-color: #FFEFEE;
-        border: 1px solid #CC9088; overflow: hidden;">
-        <!-- TODO: timestamp -->
+                  border: 1px solid #CC9088; overflow: hidden;">
 
-        <p id="timePost"
-          style='white-space:pre; margin-left: 15px; color: #6b6b6b;'>
-          Timestamp coming soon!
-        </p>
+        <!-- Show Comment Author -->
+        <div>
+          <button class="displayButtons inoine btn btn info" type="button"
+            style="background-color: #ffa599; border-color: #ddd;
+                  margin-left: 5px;">
+            <span class="badge" style='color: black;'>
+              <rendezvous.show-member-name id=$comment?.authorId />
+            </span>
+          </button>
+        </div>
 
-        <!-- Delete Comment -->
-        <dv-tx>
-          <p style='text-align: right; margin-top: -30px;'>
-            <comment-delete-comment
-              *ngIf="comment?.authorId === loggedInUserId"
-              [id]="comment?.id"
-              [authorId]="loggedInUserId">
-            </comment-delete-comment>
+        <div class="panel-body" style="background-color: #FFEFEE;
+              border: 1px solid #CC9088; overflow: hidden;">
+          <!-- TODO: timestamp -->
+
+          <p id="timePost" style='white-space:pre; margin-left: 15px; color: #6b6b6b;'>
+            Timestamp coming soon!
           </p>
-        </dv-tx>
 
-        <!-- Show Comment Content -->
-        <comment-show-comment
-          [comment]="comment"
-          [showId]="false"
-          [showAuthorId]="false"
-          [showTargetId]="false">
-        </comment-show-comment>
+          <!-- Delete Comment -->
+          <dv.if condition=$comment?.authorId === $loggedInUserId>
+            <dv.tx>
+              <p style='text-align: right; margin-top: -30px;'>
+                <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
+                <authentication.authenticate id=$loggedInUserId hidden=true />
+              </p>
+            </dv.tx>
+          </dv.if>
+
+
+          <!-- Show Comment Content -->
+          <comment.show-comment comment=$comment showId=false
+            showAuthorId=false showTargetId=false />
+        </div>
       </div>
-    </div>
-  </td>
-</tr>
+    </td>
+  </tr>
+</dv.action>
