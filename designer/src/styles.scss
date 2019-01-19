@@ -19,3 +19,8 @@ body {
 .ql-container {
   min-width: 300px;
 }
+
+/* add class mat-small to mat button to make it fit content */
+.mat-button.mat-small {
+  min-width: 1%;
+}

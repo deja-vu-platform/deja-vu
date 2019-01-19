@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { DragulaService } from 'ng2-dragula';
 import { filter } from 'rxjs/operators';
 
-import { designerCliche } from './cliche.module';
+import { clicheDefinitions, designerCliche } from './cliche.module';
 import {
   ActionInstance,
   App,
   ClicheDefinition,
+  ClicheInstance,
   Row
 } from './datatypes';
 
@@ -22,7 +23,10 @@ export class AppComponent {
   openAction = this.app.homepage;
 
   // dragula needs to be configured at the top level
-  constructor(private dragulaService: DragulaService) {
+  constructor(
+    private dragulaService: DragulaService,
+    private zone: NgZone
+  ) {
     this.configureDragula();
   }
 
@@ -63,11 +67,19 @@ export class AppComponent {
       throw new Error('Support for nested App Actions is not yet implemented');
     }
 
-    const source: ClicheDefinition = sourceName === designerCliche.name
-      ? designerCliche
-      : this.app.cliches.find((c) => c.name === sourceName).of;
+    const source: ClicheDefinition | ClicheInstance =
+      sourceName === designerCliche.name
+        ? designerCliche
+        : this.app.cliches.find((c) => c.name === sourceName);
     const actionDefinition = source.actions.find((a) => a.name === actionName);
 
-    return new ActionInstance(actionDefinition);
+    return new ActionInstance(actionDefinition, source);
+  }
+
+  load(appJSON: string) {
+    this.zone.run(() => {
+      this.app = App.fromJSON(appJSON, clicheDefinitions);
+      this.openAction = this.app.homepage;
+    });
   }
 }

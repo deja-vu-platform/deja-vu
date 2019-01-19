@@ -1,8 +1,20 @@
 <mat-toolbar id="top-bar" color="primary">
   <h1>Déjà Vu Designer</h1>
   <div class="buttons">
-    <button mat-button (click)="exportApp()">
+    <button mat-button class="mat-small" (click)="open()">
+      <mat-icon>folder_open</mat-icon>
+    </button>
+    <button mat-button class="mat-small" (click)="save()">
+      <mat-icon>save</mat-icon>
+    </button>
+    <button mat-button class="mat-small" (click)="export()">
       <mat-icon>publish</mat-icon>
     </button>
   </div>
+  <input
+    #fileInput
+    type="file"
+    style="display:none"
+    (change)="onUpload($event)"
+  >
 </mat-toolbar>

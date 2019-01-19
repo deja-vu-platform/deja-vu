@@ -1,4 +1,11 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 
 import { App } from '../datatypes';
@@ -10,37 +17,66 @@ import { App } from '../datatypes';
 })
 export class TopBarComponent {
   @Input() app: App;
+  @Output() load = new EventEmitter<string>();
+  @ViewChild('fileInput') fileInput: ElementRef;
   fs: any;
 
   constructor(private _electronService: ElectronService) {
     this.fs = this._electronService.remote.require('fs');
   }
 
-  exportApp() {
+  private makeAppDirectory(callback: (pathToDir: string) => void) {
     this.fs.mkdir('../designer-apps', (e1) => {
       if (e1 && e1.code !== 'EEXIST') { throw e1; }
       const appRoot = `../designer-apps/${this.app.name}`;
       this.fs.mkdir(appRoot, (e2) => {
-        const packageJSON = this.app.toPackageJSON();
-        this.fs.writeFile(`${appRoot}/package.json`, packageJSON, (e3) => {
-          if (e3) { throw e3; }
-        });
-        const dVConfigJSON = this.app.toDVConfigJSON();
-        this.fs.writeFile(`${appRoot}/dvconfig.json`, dVConfigJSON, (e3) => {
-          if (e3) { throw e3; }
-        });
-        this.app.actions.forEach((action) => {
-          const actionRoot = `${appRoot}/${action.name}`;
-          this.fs.mkdir(actionRoot, (e3) => {
-            if (e3 && e3.code !== 'EEXIST') { throw e3; }
-            const fileName = `${actionRoot}/${action.name}.html`;
-            const html = action.toHTML();
-            this.fs.writeFile(fileName, html, (e4) => {
-              if (e4) { throw e4; }
-            });
+        if (e2 && e2.code !== 'EEXIST') { throw e2; }
+        callback(appRoot);
+      });
+    });
+  }
+
+  save() {
+    this.makeAppDirectory((appRoot) => {
+      const designerSave = this.app.toJSON();
+      this.fs.writeFile(`${appRoot}/designer-save.json`, designerSave, (e) => {
+        if (e) { throw e; }
+      });
+    });
+  }
+
+  export() {
+    this.makeAppDirectory((appRoot) => {
+      const packageJSON = this.app.toPackageJSON();
+      this.fs.writeFile(`${appRoot}/package.json`, packageJSON, (e1) => {
+        if (e1) { throw e1; }
+      });
+      const dVConfigJSON = this.app.toDVConfigJSON();
+      this.fs.writeFile(`${appRoot}/dvconfig.json`, dVConfigJSON, (e1) => {
+        if (e1) { throw e1; }
+      });
+      this.app.actions.forEach((action) => {
+        const actionRoot = `${appRoot}/${action.name}`;
+        this.fs.mkdir(actionRoot, (e1) => {
+          if (e1 && e1.code !== 'EEXIST') { throw e1; }
+          const fileName = `${actionRoot}/${action.name}.html`;
+          const html = action.toHTML();
+          this.fs.writeFile(fileName, html, (e2) => {
+            if (e2) { throw e2; }
           });
         });
       });
+    });
+  }
+
+  open() {
+    this.fileInput.nativeElement.click();
+  }
+
+  onUpload(fileInput) {
+    this.fs.readFile(fileInput.target.files[0].path, 'utf8', (e, data) => {
+      if (e) { throw e; }
+      this.load.emit(data);
     });
   }
 }

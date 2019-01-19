@@ -3,7 +3,10 @@ import { MatDialog } from '@angular/material';
 
 import { designerCliche } from '../cliche.module';
 import { ActionDefinition, App } from '../datatypes';
-import { ImportClicheComponent, DialogData } from '../import-cliche/import-cliche.component';
+import {
+  DialogData,
+  ImportClicheComponent
+} from '../import-cliche/import-cliche.component';
 
 
 interface ActionCollection {

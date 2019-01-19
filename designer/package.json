@@ -31,6 +31,7 @@
     "core-js": "^2.4.1",
     "dv-core": "0.0.1",
     "dv-gateway": "0.0.1",
+    "electron-is-dev": "^1.0.1",
     "event": "0.0.1",
     "follow": "0.0.1",
     "geolocation": "0.0.1",

@@ -74,11 +74,15 @@ export class Row {
 
 export class ActionInstance {
   readonly of: ActionDefinition;
-  readonly from: App | ClicheInstance;
+  readonly from: App | ClicheInstance | ClicheDefinition;
   readonly inputSettings: { [inputName: string]: any } = {};
 
-  constructor(of: ActionDefinition) {
+  constructor(
+    of: ActionDefinition,
+    from: App | ClicheInstance | ClicheDefinition
+  ) {
     this.of = of;
+    this.from = from;
   }
 
   toHTML(): string {
@@ -127,13 +131,64 @@ export class App {
     this.homepage = this.pages[0];
   }
 
-  export(): void {
-    this.actions.forEach((action) => {
-      console.log(`src/${action.name}/${action.name}.html`);
-      console.log(action.toHTML());
+  static fromJSON(
+    jsonString: string,
+    clicheDefinitions: ClicheDefinition[]
+  ): App {
+    const appJSON = JSON.parse(jsonString);
+
+    const app = new App(appJSON.name);
+
+    // clear default action
+    app.actions.pop();
+    app.pages.pop();
+
+    appJSON.cliches.forEach((ci) => {
+      const of = clicheDefinitions.find((cd) => cd.name === ci.of.name);
+      const clicheInstance = new ClicheInstance(ci.name, of);
+      Object.assign(clicheInstance.config, ci.config);
+      app.cliches.push(clicheInstance);
     });
-    // TODO: convert tabs to spaces
-    // TODO: save to files
+
+    appJSON.actions.forEach((aad) => {
+      const actionDef = new AppActionDefinition(aad.name);
+      actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
+      actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      aad._rows.forEach((r) => {
+        const row = new Row();
+        r.actons.forEach((ai) => {
+          const fromInstance = app.cliches.find((c) => c.name === ai.from.name);
+          const from = fromInstance ? fromInstance.of : app;
+          // TODO: this will fail unless app actions are topo sorted
+          const of = (<ActionDefinition[]>from.actions)
+            .find((a) => a.name === ai.of.name);
+          const actionInst = new ActionInstance(of, fromInstance || app);
+          Object.assign(actionInst.inputSettings, ai.inputSettings);
+          row.actions.push(actionInst);
+        });
+        actionDef.rows.push(row);
+      });
+      app.actions.push(actionDef);
+    });
+
+    appJSON.pages.forEach((p) => {
+      const page = app.actions.find((a) => a.name === p);
+      app.pages.push(page);
+    });
+
+    app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
+
+    return app;
+  }
+
+  toJSON(): string {
+    return JSON.stringify({
+      name: this.name,
+      actions: this.actions,
+      pages: this.pages.map((p) => p.name),
+      homepage: this.homepage.name,
+      cliches: this.cliches
+    });
   }
 
   /**
