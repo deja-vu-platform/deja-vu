@@ -104,7 +104,7 @@ export class ActionInstance {
   toHTML(): string {
     // text widget is just plain HTML static content
     if (this.of.name === 'text' && this.from.name === 'dv-d') {
-      return this.data;
+      return `<div>${this.data}</div>`;
     }
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
@@ -227,6 +227,8 @@ export class App {
     });
 
     app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
+
+    console.log(app);
 
     return app;
   }

@@ -59,9 +59,20 @@ export class TopBarComponent {
         const actionRoot = `${appRoot}/${action.name}`;
         this.fs.mkdir(actionRoot, (e1) => {
           if (e1 && e1.code !== 'EEXIST') { throw e1; }
-          const fileName = `${actionRoot}/${action.name}.html`;
-          const html = action.toHTML();
-          this.fs.writeFile(fileName, html, (e2) => {
+          let html = action.toHTML();
+          let imageNum = 0;
+          html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
+            imageNum += 1;
+            const pngFileName = `img-${imageNum}.png`;
+            const pngFilePath = `${actionRoot}/${pngFileName}`;
+            this.fs.writeFile(pngFilePath, data, 'base64', (e2) => {
+              if (e2) { throw e2; }
+            });
+
+            return `"${pngFileName}"`; // relative reference
+          });
+          const htmlFilePath = `${actionRoot}/${action.name}.html`;
+          this.fs.writeFile(htmlFilePath, html, (e2) => {
             if (e2) { throw e2; }
           });
         });
