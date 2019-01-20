@@ -102,6 +102,11 @@ export class ActionInstance {
   }
 
   toHTML(): string {
+    // text widget is just plain HTML static content
+    if (this.of.name === 'text' && this.from.name === 'dv-d') {
+      return this.data;
+    }
+
     let html = `    <${this.from.name}.${this.of.name}\n`;
     _.forEach(this.inputSettings, (val, key) => {
       html += `      ${key}="${val}"\n`; // TODO: non-string vals
