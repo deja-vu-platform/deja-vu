@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 import { DragulaService } from 'ng2-dragula';
 import { filter } from 'rxjs/operators';
 
@@ -25,7 +26,8 @@ export class AppComponent {
   // dragula needs to be configured at the top level
   constructor(
     private dragulaService: DragulaService,
-    private zone: NgZone
+    private zone: NgZone,
+    private snackBar: MatSnackBar
   ) {
     this.configureDragula();
   }
@@ -80,6 +82,9 @@ export class AppComponent {
     this.zone.run(() => {
       this.app = App.fromJSON(appJSON, clicheDefinitions, designerCliche);
       this.openAction = this.app.homepage;
+      this.snackBar.open('Save has been loaded.', 'dismiss', {
+        duration: 2500
+      });
     });
   }
 }

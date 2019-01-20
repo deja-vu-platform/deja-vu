@@ -228,8 +228,6 @@ export class App {
 
     app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
 
-    console.log(app);
-
     return app;
   }
 

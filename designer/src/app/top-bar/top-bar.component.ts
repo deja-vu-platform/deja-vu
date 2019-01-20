@@ -3,12 +3,17 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  NgZone,
   Output,
   ViewChild
 } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
 import { App } from '../datatypes';
+
+const NUM_CONFIG_FILES = 2;
+const SNACKBAR_DURATION = 2500;
 
 @Component({
   selector: 'app-top-bar',
@@ -21,7 +26,15 @@ export class TopBarComponent {
   @ViewChild('fileInput') fileInput: ElementRef;
   fs: any;
 
-  constructor(private _electronService: ElectronService) {
+  saving = false;
+  exporting = false;
+  opening = false;
+
+  constructor(
+    private _electronService: ElectronService,
+    private snackBar: MatSnackBar,
+    private zone: NgZone
+  ) {
     this.fs = this._electronService.remote.require('fs');
   }
 
@@ -36,25 +49,56 @@ export class TopBarComponent {
     });
   }
 
+  private showSnackBar(message: string) {
+    this.zone.run(() => {
+      this.snackBar.open(message, 'dismiss', {
+        duration: SNACKBAR_DURATION
+      });
+    });
+  }
+
   save() {
+    this.saving = true;
     this.makeAppDirectory((appRoot) => {
       const designerSave = JSON.stringify(this.app);
       this.fs.writeFile(`${appRoot}/designer-save.json`, designerSave, (e) => {
+        this.saving = false;
+        this.showSnackBar(e ?
+          'Save failed.' :
+          'Your work has been saved.'
+        );
         if (e) { throw e; }
       });
     });
   }
 
   export() {
+    this.exporting = true;
     this.makeAppDirectory((appRoot) => {
       const packageJSON = this.app.toPackageJSON();
-      this.fs.writeFile(`${appRoot}/package.json`, packageJSON, (e1) => {
-        if (e1) { throw e1; }
-      });
-      const dVConfigJSON = this.app.toDVConfigJSON();
-      this.fs.writeFile(`${appRoot}/dvconfig.json`, dVConfigJSON, (e1) => {
-        if (e1) { throw e1; }
-      });
+      let numFilesToWrite = this.app.actions.length + NUM_CONFIG_FILES;
+      let numFilesWritten = 0;
+      let exportError = false;
+      const writeCallback = (e) => {
+        numFilesWritten += 1;
+        if (e) {
+          exportError = true;
+          throw e;
+        }
+        if (numFilesWritten === numFilesToWrite) {
+          this.exporting = false;
+          const message = exportError ?
+            'Export failed.' :
+            'Your app has been exported.';
+          this.showSnackBar(exportError ?
+            'Export failed.' :
+            'Your app has been exported.'
+          );
+        }
+      };
+      this.fs.writeFile(`${appRoot}/package.json`, packageJSON, writeCallback);
+      const configJSON = this.app.toDVConfigJSON();
+      this.fs.writeFile(`${appRoot}/dvconfig.json`, configJSON, writeCallback);
       this.app.actions.forEach((action) => {
         const actionRoot = `${appRoot}/${action.name}`;
         this.fs.mkdir(actionRoot, (e1) => {
@@ -63,18 +107,15 @@ export class TopBarComponent {
           let imageNum = 0;
           html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
             imageNum += 1;
+            numFilesToWrite += 1;
             const pngFileName = `img-${imageNum}.png`;
             const pngFilePath = `${actionRoot}/${pngFileName}`;
-            this.fs.writeFile(pngFilePath, data, 'base64', (e2) => {
-              if (e2) { throw e2; }
-            });
+            this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
 
             return `"${pngFileName}"`; // relative reference
           });
           const htmlFilePath = `${actionRoot}/${action.name}.html`;
-          this.fs.writeFile(htmlFilePath, html, (e2) => {
-            if (e2) { throw e2; }
-          });
+          this.fs.writeFile(htmlFilePath, html, writeCallback);
         });
       });
     });
@@ -85,8 +126,13 @@ export class TopBarComponent {
   }
 
   onUpload(fileInput) {
+    this.opening = true;
     this.fs.readFile(fileInput.target.files[0].path, 'utf8', (e, data) => {
-      if (e) { throw e; }
+      this.opening = false;
+      if (e) {
+        this.showSnackBar('Could not open file.');
+        throw e;
+      }
       this.load.emit(data);
     });
   }
