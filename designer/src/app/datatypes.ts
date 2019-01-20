@@ -39,6 +39,15 @@ export class AppActionDefinition implements ActionDefinition {
 
     return html;
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      inputs: this.inputs,
+      outputs: this.outputs,
+      rows: this.rows.map((row) => row.toJSON())
+    };
+  }
 }
 
 export class Row {
@@ -55,6 +64,12 @@ export class Row {
     html += `  </div>\n`;
 
     return html;
+  }
+
+  toJSON() {
+    return {
+      actions: this.actions.map((action) => action.toJSON())
+    };
   }
 
   addAction(action: ActionInstance, index?: number) {
@@ -76,6 +91,7 @@ export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
   readonly inputSettings: { [inputName: string]: any } = {};
+  data?: any; // currently only used for the text widget
 
   constructor(
     of: ActionDefinition,
@@ -93,6 +109,19 @@ export class ActionInstance {
     html += `    />\n`;
 
     return html;
+  }
+
+  toJSON() {
+    const json = {
+      of: this.of.name,
+      from: this.from.name,
+      inputSettings: this.inputSettings
+    };
+    if (this.data) {
+      json['data'] = this.data;
+    }
+
+    return json;
   }
 }
 
@@ -115,6 +144,14 @@ export class ClicheInstance {
   get actions() {
     return this.of.actions;
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      of: this.of.name,
+      config: this.config
+    };
+  }
 }
 
 export class App {
@@ -133,7 +170,8 @@ export class App {
 
   static fromJSON(
     jsonString: string,
-    clicheDefinitions: ClicheDefinition[]
+    clicheDefinitions: ClicheDefinition[],
+    designerCliche: ClicheDefinition
   ): App {
     const appJSON = JSON.parse(jsonString);
 
@@ -144,7 +182,7 @@ export class App {
     app.pages.pop();
 
     appJSON.cliches.forEach((ci) => {
-      const of = clicheDefinitions.find((cd) => cd.name === ci.of.name);
+      const of = clicheDefinitions.find((cd) => cd.name === ci.of);
       const clicheInstance = new ClicheInstance(ci.name, of);
       Object.assign(clicheInstance.config, ci.config);
       app.cliches.push(clicheInstance);
@@ -154,16 +192,23 @@ export class App {
       const actionDef = new AppActionDefinition(aad.name);
       actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
       actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
-      aad._rows.forEach((r) => {
+      aad.rows.forEach((r) => {
         const row = new Row();
-        r.actons.forEach((ai) => {
-          const fromInstance = app.cliches.find((c) => c.name === ai.from.name);
-          const from = fromInstance ? fromInstance.of : app;
+        r.actions.forEach((ai) => {
+          const from = [
+            ...app.cliches,
+            app,
+            designerCliche
+          ].find((c) => c.name === ai.from);
+          // const from = fromInstance ? fromInstance.of : app;
           // TODO: this will fail unless app actions are topo sorted
           const of = (<ActionDefinition[]>from.actions)
-            .find((a) => a.name === ai.of.name);
-          const actionInst = new ActionInstance(of, fromInstance || app);
+            .find((a) => a.name === ai.of);
+          const actionInst = new ActionInstance(of, from);
           Object.assign(actionInst.inputSettings, ai.inputSettings);
+          if (ai.data) {
+            actionInst.data = ai.data;
+          }
           row.actions.push(actionInst);
         });
         actionDef.rows.push(row);
@@ -181,14 +226,14 @@ export class App {
     return app;
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON() {
+    return {
       name: this.name,
-      actions: this.actions,
+      actions: this.actions.map((action) => action.toJSON()),
       pages: this.pages.map((p) => p.name),
       homepage: this.homepage.name,
       cliches: this.cliches
-    });
+    };
   }
 
   /**

@@ -38,7 +38,7 @@ export class TopBarComponent {
 
   save() {
     this.makeAppDirectory((appRoot) => {
-      const designerSave = this.app.toJSON();
+      const designerSave = JSON.stringify(this.app);
       this.fs.writeFile(`${appRoot}/designer-save.json`, designerSave, (e) => {
         if (e) { throw e; }
       });

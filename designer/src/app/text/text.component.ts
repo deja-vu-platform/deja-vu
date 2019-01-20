@@ -12,6 +12,6 @@ export class TextComponent {
   constructor() { }
 
   onContentChanged({ html }) {
-    this.actionInstance['content'] = html;
+    this.actionInstance['data'] = html;
   }
 }

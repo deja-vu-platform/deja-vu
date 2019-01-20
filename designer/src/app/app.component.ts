@@ -78,7 +78,7 @@ export class AppComponent {
 
   load(appJSON: string) {
     this.zone.run(() => {
-      this.app = App.fromJSON(appJSON, clicheDefinitions);
+      this.app = App.fromJSON(appJSON, clicheDefinitions, designerCliche);
       this.openAction = this.app.homepage;
     });
   }
