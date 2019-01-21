@@ -5,6 +5,7 @@
   "scripts": {
     "start": "concurrently \"ng serve\" \"electron ./electron.dev.js\"",
     "prod": "ng build --base-href ./ && electron ./electron.prod.js",
+    "serve": "ng serve",
     "test": "ng test -sm=false",
     "lint": "ng lint --type-check --fix",
     "e2e": "ng e2e"

@@ -24,6 +24,7 @@ export class TopBarComponent {
   @Input() app: App;
   @Output() load = new EventEmitter<string>();
   @ViewChild('fileInput') fileInput: ElementRef;
+  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   fs: any;
 
   saving = false;
@@ -35,7 +36,9 @@ export class TopBarComponent {
     private snackBar: MatSnackBar,
     private zone: NgZone
   ) {
-    this.fs = this._electronService.remote.require('fs');
+    if (this._electronService.remote) {
+      this.fs = this._electronService.remote.require('fs');
+    }
   }
 
   private makeAppDirectory(callback: (pathToDir: string) => void) {
@@ -59,17 +62,31 @@ export class TopBarComponent {
 
   save() {
     this.saving = true;
-    this.makeAppDirectory((appRoot) => {
-      const designerSave = JSON.stringify(this.app);
-      this.fs.writeFile(`${appRoot}/designer-save.json`, designerSave, (e) => {
-        this.saving = false;
-        this.showSnackBar(e ?
-          'Save failed.' :
-          'Your work has been saved.'
-        );
-        if (e) { throw e; }
-      });
+    const designerSave = JSON.stringify(this.app);
+    const saveFn = this.fs ? this.saveElectron : this.saveBrowser;
+    saveFn(designerSave, (error) => {
+      this.saving = false;
+      this.showSnackBar(error ?
+        'Save failed.' :
+        'Your work has been saved.'
+      );
+      if (error) { throw error; }
     });
+  }
+
+  private saveElectron = (data: string, callback: (error: any) => void) => {
+    this.makeAppDirectory((appRoot) => {
+      this.fs.writeFile(`${appRoot}/designer-save.json`, data, callback);
+    });
+  }
+
+  private saveBrowser = (data: string, callback: (error: any) => void) => {
+    data = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
+    const dlAnchorElm = this.downloadAnchor.nativeElement;
+    dlAnchorElm.setAttribute('href', data);
+    dlAnchorElm.setAttribute('download', 'designer-save.json');
+    dlAnchorElm.click();
+    callback(null);
   }
 
   export() {
@@ -127,13 +144,31 @@ export class TopBarComponent {
 
   onUpload(fileInput) {
     this.opening = true;
-    this.fs.readFile(fileInput.target.files[0].path, 'utf8', (e, data) => {
+    const file: File = fileInput.target.files[0];
+    const openFn = this.fs ? this.openElectron : this.openBrowser;
+    openFn(file, (error, data) => {
       this.opening = false;
-      if (e) {
+      if (error) {
         this.showSnackBar('Could not open file.');
-        throw e;
+        throw error;
       }
       this.load.emit(data);
     });
+  }
+
+  private openElectron = (
+    file: File,
+    callback: (error: any, data: string) => void
+  ) => {
+    this.fs.readFile(file.path, 'utf8', callback);
+  }
+
+  private openBrowser = (
+    file: File,
+    callback: (error: any, data: string) => void
+  ) => {
+    const reader = new FileReader();
+    reader.onloadend = () => callback(null, <string>reader.result);
+    reader.readAsText(file);
   }
 }

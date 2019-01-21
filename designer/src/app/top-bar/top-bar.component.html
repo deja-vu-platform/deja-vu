@@ -23,16 +23,13 @@
       mat-button
       class="mat-small"
       (click)="export()"
-      [disabled]="exporting"
+      [disabled]="!this.fs || exporting"
       matTooltip="Export"
     >
       <mat-icon>publish</mat-icon>
     </button>
   </div>
-  <input
-    #fileInput
-    type="file"
-    style="display:none"
-    (change)="onUpload($event)"
-  >
+  <!-- invisible elements needed for rather hacky reasons -->
+  <input #fileInput type="file"(change)="onUpload($event)">
+  <a #downloadAnchor></a>
 </mat-toolbar>
