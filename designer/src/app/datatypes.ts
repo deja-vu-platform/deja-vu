@@ -90,7 +90,7 @@ export class Row {
 export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
-  readonly inputSettings: { [inputName: string]: any } = {};
+  readonly inputSettings: { [inputName: string]: string } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
@@ -108,8 +108,8 @@ export class ActionInstance {
     }
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
-    _.forEach(this.inputSettings, (val, key) => {
-      html += `      ${key}="${val}"\n`; // TODO: non-string vals
+    _.forEach(this.inputSettings, (valStr, key) => {
+      html += `      ${key}=${valStr}\n`;
     });
     html += `    />\n`;
 

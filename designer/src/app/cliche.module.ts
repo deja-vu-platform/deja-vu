@@ -64,15 +64,18 @@ function clicheDefinitionFromModule(
         name: CamelToKebab(component.name
           .slice(0, componentSuffix.length * -1)),
         component,
-        inputs: [], // TODO
-        outputs: [] // TODO
+        inputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Input'
+        ))),
+        outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Output'
+        )))
       }))
   };
 }
 
 export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
-
 
 // built-in components are added manually
 export const designerCliche: ClicheDefinition = {

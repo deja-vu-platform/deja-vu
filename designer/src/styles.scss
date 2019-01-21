@@ -24,3 +24,12 @@ body {
 .mat-button.mat-small {
   min-width: 1%;
 }
+
+/* prevent interaction with dynamically-rendered components */
+.action-instance * {
+  pointer-events: none;
+}
+
+.action-instance quill-editor * {
+  pointer-events: auto;
+}

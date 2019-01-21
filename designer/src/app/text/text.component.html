@@ -1,6 +1,7 @@
-<quill-editor
-  *ngIf="actionInstance"
+<quill-editor #editor
+  *ngIf="actionInstance && modules"
   theme="bubble"
   [ngModel]="actionInstance.data"
+  [modules]="modules"
   (onContentChanged)="onContentChanged($event)"
 ></quill-editor>
