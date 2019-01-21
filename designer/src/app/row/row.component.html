@@ -14,7 +14,7 @@
       [matMenuTriggerFor]="menu"
     >
       <app-action-instance [actionInstance]="action"></app-action-instance>
-      <mat-menu #menu="matMenu">
+      <mat-menu #menu="matMenu" [overlapTrigger]="false">
         <div class="popup-menu" (click)="$event.stopPropagation()">
           <mat-form-field *ngFor="let input of action.of.inputs">
             <input
