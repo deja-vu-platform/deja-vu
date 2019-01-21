@@ -10,7 +10,7 @@ import {
 import { MatSnackBar } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
-import { App } from '../datatypes';
+import { App, AppActionDefinition } from '../datatypes';
 
 const NUM_CONFIG_FILES = 2;
 const SNACKBAR_DURATION = 2500;
@@ -22,7 +22,9 @@ const SNACKBAR_DURATION = 2500;
 })
 export class TopBarComponent {
   @Input() app: App;
+  @Input() openAction: AppActionDefinition;
   @Output() load = new EventEmitter<string>();
+  @Output() changeAction = new EventEmitter<AppActionDefinition>();
   @ViewChild('fileInput') fileInput: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   fs: any;
@@ -41,6 +43,23 @@ export class TopBarComponent {
     }
   }
 
+  onSelectAction() {
+    this.changeAction.emit(this.openAction);
+  }
+
+  createAction = () => {
+    const name = `new-action-${this.app.actions.length + 1}`;
+    this.app.actions.push(new AppActionDefinition(name));
+  }
+
+  private showSnackBar(message: string) {
+    this.zone.run(() => {
+      this.snackBar.open(message, 'dismiss', {
+        duration: SNACKBAR_DURATION
+      });
+    });
+  }
+
   private makeAppDirectory(callback: (pathToDir: string) => void) {
     this.fs.mkdir('../designer-apps', (e1) => {
       if (e1 && e1.code !== 'EEXIST') { throw e1; }
@@ -48,14 +67,6 @@ export class TopBarComponent {
       this.fs.mkdir(appRoot, (e2) => {
         if (e2 && e2.code !== 'EEXIST') { throw e2; }
         callback(appRoot);
-      });
-    });
-  }
-
-  private showSnackBar(message: string) {
-    this.zone.run(() => {
-      this.snackBar.open(message, 'dismiss', {
-        duration: SNACKBAR_DURATION
       });
     });
   }

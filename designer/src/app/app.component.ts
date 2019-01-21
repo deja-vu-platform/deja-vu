@@ -7,6 +7,7 @@ import { clicheDefinitions, designerCliche } from './cliche.module';
 import {
   ActionInstance,
   App,
+  AppActionDefinition,
   ClicheDefinition,
   ClicheInstance,
   Row
@@ -86,5 +87,9 @@ export class AppComponent {
         duration: 2500
       });
     });
+  }
+
+  onActionChanged(openAction: AppActionDefinition) {
+    this.openAction = openAction;
   }
 }
