@@ -1,6 +1,11 @@
 <div id="app" class="flex">
   <div class="flex dir-col grow">
-    <app-top-bar [app]="app" (load)="load($event)"></app-top-bar>
+    <app-top-bar
+      [app]="app"
+      [openAction]="openAction"
+      (load)="load($event)"
+      (changeAction)="onActionChanged($event)"
+    ></app-top-bar>
     <app-action-definition class="grow scroll" [openAction]="openAction">
     </app-action-definition>
   </div>

@@ -2,10 +2,19 @@
   border-bottom: 1px solid black;
 }
 
-.buttons {
-  margin-left: auto;
+#create-action {
+  width: 100%;
+  font-size: inherit;
+  /* consistent with other items in select */
+  line-height: 3em;
+  height: 3em;
+  text-align: left;
 }
 
-input, a {
-  display: none;
+#create-action * {
+  font-size: inherit;
+}
+
+.right {
+  margin-left: auto;
 }

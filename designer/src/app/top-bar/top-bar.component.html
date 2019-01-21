@@ -1,6 +1,31 @@
-<mat-toolbar id="top-bar" color="primary">
-  <h1>Déjà Vu Designer</h1>
-  <div class="buttons">
+<mat-toolbar class="mat-toolbar" id="top-bar">
+  <mat-form-field>
+    <mat-select
+      name="action"
+      [(ngModel)]="openAction"
+      (selectionChange)="onSelectAction($event)"
+    >
+      <button
+        mat-raised-button
+        id="create-action"
+        color="primary"
+        (click)="createAction()"
+      >
+        <mat-icon>add_circle</mat-icon> Create Action
+      </button>
+      <mat-option
+        *ngFor="let action of app.actions"
+        [value]="action"
+      >
+        {{action.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="right">
+    <mat-form-field>
+      <input matInput name="appName" [(ngModel)]="app.name">
+    </mat-form-field>
     <button
       mat-button
       class="mat-small"
@@ -29,7 +54,10 @@
       <mat-icon>publish</mat-icon>
     </button>
   </div>
-  <!-- invisible elements needed for rather hacky reasons -->
+</mat-toolbar>
+
+<!-- invisible elements needed for rather hacky reasons -->
+<div style="display:none">
   <input #fileInput type="file"(change)="onUpload($event)">
   <a #downloadAnchor></a>
-</mat-toolbar>
+</div>
