@@ -29,7 +29,15 @@ body {
 .action-instance * {
   pointer-events: none;
 }
-
+/* don't prevent interaction with quill editor */
 .action-instance quill-editor * {
   pointer-events: auto;
+}
+
+.ql-bubble .ql-toolbar button:hover .text-button-text {
+  color: white;
+}
+.ql-bubble .ql-toolbar button .text-button-text {
+  color: rgb(204, 204, 204);
+  white-space: nowrap;
 }

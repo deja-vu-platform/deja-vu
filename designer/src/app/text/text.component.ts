@@ -4,7 +4,6 @@ import { ActionInstance } from '../datatypes';
 
 export const modules = {
   toolbar: [
-    // default elements
     ['bold', 'italic', 'underline', 'strike'],
     ['blockquote', 'code-block'],
     [{ header: 1 }, { header: 2 }],
@@ -19,9 +18,7 @@ export const modules = {
     [{ font: [] }],
     [{ align: [] }],
     ['clean'],
-    ['link', 'image', 'video'],
-    // custom elements
-    ['output']
+    ['link', 'image', 'video', 'output']
   ],
   output: {
     containerSelector: '.ql-output'

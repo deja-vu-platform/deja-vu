@@ -8,11 +8,13 @@ interface QuillInstance {
 }
 
 export class Output {
-  container: Element;
+  container: HTMLElement;
 
   constructor(private quill: QuillInstance, options: Config) {
-    this.container = document.querySelector(options.containerSelector);
-    this.container.textContent = 'Action Output';
+    this.container = <HTMLElement>document
+      .querySelector(options.containerSelector);
+    this.container.innerHTML =
+      '<span class="text-button-text">Action Output</span>';
 
     this.container.addEventListener('click', (e) => {
       e.preventDefault();
