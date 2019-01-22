@@ -23,7 +23,7 @@ interface ControlGroup {
 
 
 class JSONValidator extends ErrorStateMatcher {
-  constructor(private icc: ImportClicheComponent) {
+  constructor(private icc: ConfigureClicheComponent) {
     super();
   }
 
@@ -49,18 +49,18 @@ class JSONValidator extends ErrorStateMatcher {
 
 
 @Component({
-  selector: 'app-import-cliche',
-  templateUrl: './import-cliche.component.html',
-  styleUrls: ['./import-cliche.component.scss']
+  selector: 'app-configure-cliche',
+  templateUrl: './configure-cliche.component.html',
+  styleUrls: ['./configure-cliche.component.scss']
 })
-export class ImportClicheComponent implements OnInit {
+export class ConfigureClicheComponent implements OnInit {
   of: ClicheDefinition;
   name: string;
   configString: string;
   jsonValidator: JSONValidator;
 
   constructor(
-    public dialogRef: MatDialogRef<ImportClicheComponent>,
+    public dialogRef: MatDialogRef<ConfigureClicheComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.jsonValidator = new JSONValidator(this);

@@ -8,15 +8,15 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ImportClicheComponent } from './import-cliche.component';
+import { ConfigureClicheComponent } from './configure-cliche.component';
 
-describe('ImportClicheComponent', () => {
-  let component: ImportClicheComponent;
-  let fixture: ComponentFixture<ImportClicheComponent>;
+describe('ConfigureClicheComponent', () => {
+  let component: ConfigureClicheComponent;
+  let fixture: ComponentFixture<ConfigureClicheComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ImportClicheComponent ],
+      declarations: [ ConfigureClicheComponent ],
       imports: [
         BrowserAnimationsModule,
         FormsModule,
@@ -32,7 +32,7 @@ describe('ImportClicheComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ImportClicheComponent);
+    fixture = TestBed.createComponent(ConfigureClicheComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

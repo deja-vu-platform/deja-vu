@@ -1,8 +1,8 @@
 <div id="import-cliche">
-  <h1>Import Cliché</h1>
+  <h1>Configure Cliché</h1>
   <form
-    #importClicheForm="ngForm"
-    (ngSubmit)="save(importClicheForm)">
+    #configureClicheForm="ngForm"
+    (ngSubmit)="save(configureClicheForm)">
     <mat-form-field>
       <mat-select
         required
@@ -61,7 +61,7 @@
         mat-button
         color="primary"
         type="submit"
-        [disabled]="!validate(importClicheForm)"
+        [disabled]="!validate(configureClicheForm)"
       >{{ data.cliche ? 'Save' : 'Import' }}</button>
     </div>
   </form>

@@ -2,11 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { designerCliche } from '../cliche.module';
-import { ActionDefinition, App, ClicheInstance } from '../datatypes';
 import {
-  DialogData,
-  ImportClicheComponent
-} from '../import-cliche/import-cliche.component';
+  ConfigureClicheComponent,
+  DialogData
+} from '../configure-cliche/configure-cliche.component';
+import { ActionDefinition, App, ClicheInstance } from '../datatypes';
 
 
 interface ActionCollection {
@@ -50,7 +50,7 @@ export class SideMenuComponent implements OnInit {
     const data: DialogData = {
       app: this.app
     };
-    this.dialog.open(ImportClicheComponent, {
+    this.dialog.open(ConfigureClicheComponent, {
       width: '50vw',
       data
     });
@@ -61,7 +61,7 @@ export class SideMenuComponent implements OnInit {
       app: this.app,
       cliche
     };
-    this.dialog.open(ImportClicheComponent, {
+    this.dialog.open(ConfigureClicheComponent, {
       width: '50vw',
       data
     });
