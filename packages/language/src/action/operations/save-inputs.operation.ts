@@ -28,8 +28,14 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
 
     UnExpr_not: (_not, expr) => expr.saveInputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
+    BinExpr_mul: binOpRecurse, BinExpr_div: binOpRecurse,
+    BinExpr_mod: binOpRecurse,
+
+    BinExpr_lt: binOpRecurse, BinExpr_gt: binOpRecurse,
+    BinExpr_le: binOpRecurse, BinExpr_ge: binOpRecurse,
+
+    BinExpr_eq: binOpRecurse, BinExpr_notEq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-    BinExpr_is: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveInputs();
       ifTrue.saveInputs();
@@ -39,11 +45,15 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     MemberExpr: binOpRecurse,
 
     Literal_number: (_number) => {},
-    Literal_text: (_openQuote, _text, _closeQuote) => {},
+    Literal_text: (_stringLiteral) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
-    Literal_obj: (_openCb, propAssignments, _closeCb) => propAssignments
-      .asIteration()
-      .saveInputs(),
+    Literal_obj: (objLiteral) => objLiteral.saveInputs(),
+    ObjectLiteral_noTrailingComma: (_openCb, propAssignments, _closeCb) =>
+      propAssignments.asIteration()
+        .saveInputs(),
+    ObjectLiteral_trailingComma: (_openCb, propAssignments, _comma, _closeCb) =>
+      propAssignments.asIteration()
+        .saveInputs(),
     Literal_array: (_openSb, exprs, _closeSb) => exprs
       .asIteration()
       .saveInputs(),

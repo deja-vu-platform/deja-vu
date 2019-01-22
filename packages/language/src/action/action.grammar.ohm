@@ -1,7 +1,7 @@
 Action {
   Element
     = NormalElement -- normal
-    | VoidElement -- void
+    | VoidElement   -- void
 
   // Normal Element
   NormalElement = StartTag Content* EndTag
@@ -14,15 +14,15 @@ Action {
   Attribute = AttributeName "=" Expr
 
   Content
-    = Text -- text
+    = Text    -- text
     | Element -- element
   Text = (~"<" ~">" any)+
   ElementName
    = ActionNameMaybeAlias -- action
-   | name -- html
+   | name                 -- html
   AttributeName
     = output -- output
-    | name -- name
+    | name   -- name
   ActionNameMaybeAlias = actionName Alias?
   Alias = "as" name
   actionName = name "." name
@@ -33,36 +33,78 @@ Action {
 
   // Exprs
   Expr
-    = UnExpr -- un
-    | BinExpr -- bin
-    | TerExpr -- ter
-    | MemberExpr -- member
-    | Literal -- literal
-    | input -- input
-    | Element -- element
+    = UnExpr       -- un
+    | BinExpr      -- bin
+    | TerExpr      -- ter
+    | MemberExpr   -- member
+    | Literal      -- literal
+    | input        -- input
+    | Element      -- element
     | "(" Expr ")" -- parens
 
   UnExpr
     = "!" Expr -- not
 
   BinExpr
-    = Expr "+" Expr -- plus
-    | Expr "-" Expr -- minus
-    | Expr "&&" Expr -- and
-    | Expr "||" Expr -- or
-    | Expr "===" Expr -- is
+    = Expr "+" Expr   -- plus
+    | Expr "-" Expr   -- minus
+    | Expr "*" Expr   -- mul
+    | Expr "/" Expr   -- div
+    | Expr "%" Expr   -- mod
+    // Relational Expr
+    | Expr "lt" Expr   -- lt
+    | Expr "gt" Expr   -- gt
+    | Expr "lt=" Expr  -- le
+    | Expr "gt=" Expr  -- ge
+    // Equality Expr
+    | Expr "===" Expr -- eq
+    | Expr "!==" Expr -- notEq
+    // Logical Expr
+    | Expr "&&" Expr  -- and
+    | Expr "||" Expr  -- or
 
   TerExpr = Expr "?" Expr ":" Expr
 
   MemberExpr = (name | input) (nav name)+
 
   Literal
-    = number -- number
-    | quote (~quote any)* quote -- text
-    | "true" -- true
-    | "false" -- false
-    | "{" ListOf<PropAssignment, ","> "}" -- obj
+    = decimalLiteral            -- number
+    | stringLiteral             -- text
+    | "true"                    -- true
+    | "false"                   -- false
+    | ObjectLiteral             -- obj
     | "[" ListOf<Expr, ","> "]" -- array
+
+  ObjectLiteral
+    = "{" ListOf<PropAssignment, ","> "}"             -- noTrailingComma
+    | "{" NonemptyListOf<PropAssignment, ","> "," "}" -- trailingComma
+
+  // from es5 Ohm example
+  decimalLiteral
+    = decimalIntLiteral "." decimalDigit* exponentPart -- bothParts
+    |                   "." decimalDigit+ exponentPart -- decimalsOnly
+    | decimalIntLiteral                   exponentPart -- integerOnly
+
+  decimalIntLiteral
+    = nonZeroDigit decimalDigit*  -- nonZero
+    | "0"                         -- zero
+  decimalDigit = "0".."9"
+  nonZeroDigit = "1".."9"
+
+  exponentPart
+    = exponentIndicator signedInt -- present
+    |                             -- absent
+  exponentIndicator = "e" | "E"
+  signedInt
+    = "+" decimalDigit* -- positive
+    | "-" decimalDigit* -- negative
+    | decimalDigit+     -- noSign
+
+  stringLiteral
+    = "\"" doubleStringChar* "\"" -- doubleQuote
+    | "'" singleStringChar* "'"   -- singleQuote
+  doubleStringChar = ~("\"") any
+  singleStringChar = ~("'") any
 
   PropAssignment = name ":" Expr
 
@@ -71,7 +113,6 @@ Action {
   input = "$" name
   output = name "$"
 
-  quote = "\"" | "\'"
   nav = "." | "?."
   space := whitespace | lineTerminator | comment
   whitespace = "\t"

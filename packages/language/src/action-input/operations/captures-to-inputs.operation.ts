@@ -52,8 +52,14 @@ export function capturesToInputs(
 
     UnExpr_not: (not, expr) => `${not.sourceString}${expr.capturesToInputs()}`,
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
+    BinExpr_mul: binOpRecurse, BinExpr_div: binOpRecurse,
+    BinExpr_mod: binOpRecurse,
+
+    BinExpr_lt: binOpRecurse, BinExpr_gt: binOpRecurse,
+    BinExpr_le: binOpRecurse, BinExpr_ge: binOpRecurse,
+
+    BinExpr_eq: binOpRecurse, BinExpr_notEq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-    BinExpr_is: binOpRecurse,
 
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +
@@ -91,12 +97,17 @@ export function capturesToInputs(
           `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
       }
     },
-    Literal_number: (number) => number.sourceString,
-    Literal_text: (openQuote, text, closeQuote) =>
-      openQuote.sourceString + text.sourceString + closeQuote.sourceString,
+    Literal_number: (num) => num.sourceString,
+    Literal_text: (stringLiteral) => stringLiteral.sourceString,
     Literal_true: (trueNode) => trueNode.sourceString,
     Literal_false: (falseNode) => falseNode.sourceString,
-    Literal_obj: (openCb, propAssignments, closeCb) =>
+    Literal_obj: (objLiteral) => objLiteral.capturesToInputs(),
+    ObjectLiteral_noTrailingComma: (openCb, propAssignments, closeCb) =>
+      openCb.sourceString +
+      propAssignments.capturesToInputs()
+        .join(', ') +
+      closeCb.sourceString,
+    ObjectLiteral_trailingComma: (openCb, propAssignments, _comma, closeCb) =>
       openCb.sourceString +
       propAssignments.capturesToInputs()
         .join(', ') +
