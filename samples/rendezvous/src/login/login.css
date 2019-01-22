@@ -14,3 +14,11 @@
   text-decoration:underline;
   color: #B3594D;
 }
+
+#loginTitle {
+  margin-top: 0px;
+}
+
+#createAccount {
+  text-align: center;
+}

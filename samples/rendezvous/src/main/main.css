@@ -57,3 +57,11 @@
   padding-left: 0;
   padding-right: 0;
 }
+
+#create-event-button {
+  text-align: right;
+}
+
+h4 {
+  text-align: center;
+}

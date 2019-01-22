@@ -1,0 +1,26 @@
+.panel-body {
+  background-color: #FFEFEE;
+  border: 1px solid #CC9088;
+  overflow: hidden;
+}
+
+#comment-author-body {
+  background-color: #ffa599;
+  border-color: #ddd;
+  margin-left: 5px;
+}
+
+.badge {
+  color: black;
+}
+
+#timestamp {
+  white-space:pre;
+  margin-left: 15px;
+  color: #6b6b6b;
+}
+
+#delete-comment-button {
+  text-align: right;
+  margin-top: -30px;
+}

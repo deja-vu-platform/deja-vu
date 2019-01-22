@@ -1,32 +1,27 @@
 <dv.action name="show-event-comment">
   <tr>
     <td class="show-comment">
-      <div class="panel-body" style="background-color: #FFEFEE;
-                  border: 1px solid #CC9088; overflow: hidden;">
+      <div class="panel-body">
 
         <!-- Show Comment Author -->
         <div>
-          <button class="displayButtons inoine btn btn info" type="button"
-            style="background-color: #ffa599; border-color: #ddd;
-                  margin-left: 5px;">
-            <span class="badge" style="color: black;">
+          <button class="displayButtons inline btn btn info" type="button">
+            <span class="badge">
               <rendezvous.show-member-name id=$comment?.authorId />
             </span>
           </button>
         </div>
 
-        <div class="panel-body" style="background-color: #FFEFEE;
-              border: 1px solid #CC9088; overflow: hidden;">
+        <div class="panel-body">
           <!-- TODO: timestamp -->
-
-          <p id="timePost" style="white-space:pre; margin-left: 15px; color: #6b6b6b;">
+          <p id="timestamp">
             Timestamp coming soon!
           </p>
 
           <!-- Delete Comment -->
           <dv.if condition=$comment?.authorId === $loggedInUserId>
             <dv.tx>
-              <p style="text-align: right; margin-top: -30px;">
+              <p>
                 <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
                 <authentication.authenticate id=$loggedInUserId hidden=true />
               </p>

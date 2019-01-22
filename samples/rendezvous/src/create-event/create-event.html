@@ -1,28 +1,27 @@
 <dv.action name="create-event">
   <div class="index">
-    <rendezvous.navbar redirectParams={ callback: "/create-event" } />
+    <rendezvous.navbar showTitle=true showProfileButton=true/>
 
     <div class="new_event">
       <div class="panel panel-default">
-        <div class="panel-heading" style="background-color: #ffa599;">
+        <div class="panel-heading" id="create-event-heading">
           Create Event
         </div>
-        <div class="panel-body" style="padding: 15px;">
-
-          <div style="float: left; margin-top: 4px;">
+        <div class="panel-body">
+          <div id="host-display">
             <button type="button" class="displayButtons btn btn-info">
               Hosted By
-              <span class="badge" style="color: black; margin-left: 5px;">
+              <span class="badge" id="host-name">
                 <rendezvous.show-member-name
-                  user=rendezvous.navbar.loggedInUser />
+                  id=rendezvous.navbar.loggedInUserId />
               </span>
             </button>
           </div>
 
-          <geolocation.display-map
+          <!-- <geolocation.display-map
             id="mainMapId"
             showLoadedMarkers=false
-            showDirectionsControl=false />
+            showDirectionsControl=false /> -->
           <dv.tx>
             <dv.id />
             <dv.status savedText="Event created" />
@@ -30,26 +29,30 @@
             <table id="event_info" class="table">
               <tr>
                 <!-- Location: rowspan 2 -->
-                <td style="width: 30%">
+                <td>
                   <div class="form-group">
                     <p>Location</p>
                     <div id="map_new_event">
-                      <geolocation.create-marker
+                      <!-- <geolocation.create-marker
                         id=dv.id.id
                         mapId="mainMapId"
                         title=geolocation.display-map.newMarker.title
                         latitude=geolocation.display-map.newMarker.latitude
                         longitude=geolocation.display-map.newMarker.longitude
+                        showOptionToSubmit=false /> -->
+                      <geolocation.create-marker
+                        id=dv.id.id
+                        mapId="mainMapId"
                         showOptionToSubmit=false />
                     </div>
-                    <div class="guidelines" style="margin-top: 3px; width: 100%;">
+                    <div class="guidelines">
                       (must be within 50 miles of current location)
                     </div>
                   </div>
                 </td>
 
                 <!-- Event -->
-                <td style="width: 30%">
+                <td>
                   <p>Date & Time</p>
                   <event.create-event id=dv.id.id showOptionToSubmit=false />
                 </td>
@@ -81,27 +84,23 @@
               id=dv.id.id
               showOptionToAddMembers=false
               showOptionToSubmit=false
-              memberIds= [rendezvous.navbar.loggedInUser.id]
+              memberIds= [rendezvous.navbar.loggedInUserId]
               hidden=true />
 
             <authorization.create-resource id=dv.id.id
-              ownerId=rendezvous.navbar.loggedInUser.id hidden=true />
+              ownerId=rendezvous.navbar.loggedInUserId hidden=true />
             <authentication.authenticate
-              id=rendezvous.navbar.loggedInUser.id hidden=true />
+              id=rendezvous.navbar.loggedInUserId hidden=true />
 
             <!-- Cancel and Create Buttons -->
-            <div style="float:right;">
-              <dv.button id="create"
-                style="margin-top: 10px; margin-left: 10px; width: 80px;">
-                Create!
-              </dv.button>
+            <div class="cc-buttons">
+              <dv.button id="create">Create!</dv.button>
               <dv.link href="/event-details" params={ id: dv.id.id }
                 hidden=true />
             </div>
-            <div style="float:right;">
+            <div class="cc-buttons">
               <dv.link href="/main">
-                <button type="button" class="btn button btn-info" id="back"
-                  style="margin-top: 10px; width: 80px;">
+                <button type="button" class="btn button btn-info" id="back">
                   Cancel
                 </button>
               </dv.link>

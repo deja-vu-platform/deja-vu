@@ -14,15 +14,14 @@
 
     <div class="panel-body">
       <!-- Number of attendees -->
-      <button class="displayButtons btn btn-info" style="width:100%">
+      <button class="displayButtons btn btn-info" id="num-attendees">
         Attendees
-        <span class="badge" style="color: black; margin-left: 5px;">
+        <span class="badge">
           <group.show-members inGroupId=$id showMembersList=false />
         </span>
       </button>
 
-      <table class="event_info event_display table"
-        style="margin-top: 10px; margin-bottom: 0px;">
+      <table class="event_info event_display table" id="event-summary-table">
 
         <!-- Location -->
         <tr>

@@ -5,8 +5,8 @@
         <h3>Rendezvous</h3>
       </div>
       <div class="panel-body">
-        <h4 style="margin-top: 0px;">Login</h4>
-        <div id="loginForm">
+        <h4 id="loginTitle">Login</h4>
+        <div>
           <dv.tx>
             <authentication.sign-in />
             <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div style="text-align: center">
+    <div id="createAccount">
       <dv.link href="/register">
         <button type="button" class="authLink">Create account.</button>
       </dv.link>

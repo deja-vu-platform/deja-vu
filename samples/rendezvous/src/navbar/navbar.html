@@ -1,45 +1,33 @@
-<dv.action name="navbar" loggedInUser$=authentication.logged-in.user>
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
   <dv.tx as rendezvous-auth-check>
     <authentication.logged-in />
-    <dv.if condition=$redirectParams>
-      <dv.redirect href="/login" params=$redirectParams onEvalFailure=true />
-    </dv.if>
+    <dv.redirect href="/login" onEvalFailure=true />
   </dv.tx>
 
   <dv.if condition=$showTitle>
     <div id="returnToMain">R E N D E Z V O U S</div>
-    <div class="inline" style="float: left;">
-      <!-- TODO: material -->
-      <!-- <dv.link mat-icon-button type="button" id="back"
-        style="margin-right: 50px;" class="btn button btn-info" href="/main">
-        <mat-icon>arrow_back</mat-icon>
-      </dv.link> -->
+    <div class="inline left">
       <dv.link href="/main">
-        <button type="button" id="back" style="margin-right: 50px;"
-          class="btn button btn-info">
+        <button type="button" id="back" class="btn button btn-info">
           <i class="material-icons">arrow_back</i>
         </button>
       </dv.link>
     </div>
   </dv.if>
 
-  <div style="float:right;">
-    <div style="text-align:center">
+  <div class="right">
+    <div class="center">
       <div class="inline">
         <dv.if condition=$showProfileButton>
           <dv.link href="/profile" params={ id: authentication.logged-in.user.id }>
-            <button type="button" class="btn button"
-              style="margin: 0px; width: 100%;">
+            <button type="button" class="btn button">
               My Profile
             </button>
           </dv.link>
         </dv.if>
 
         <dv.tx as rendezvous-sign-out>
-          <authentication.sign-out
-            class="btn button"
-            style="margin: 0px; margin-top: 10px; width: 100%;"
-            buttonLabel="Logout" />
+          <authentication.sign-out class="btn button" buttonLabel="Logout" />
           <dv.link href="/login" hidden=true />
         </dv.tx>
       </div>
