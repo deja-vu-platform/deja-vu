@@ -1,4 +1,12 @@
 <mat-toolbar class="mat-toolbar" id="top-bar">
+  <button
+    mat-button
+    id="edit-action"
+    class="mat-small"
+    (click)="editAction()"
+  >
+    <mat-icon>more_vert</mat-icon>
+  </button>
   <mat-form-field>
     <mat-select
       name="action"

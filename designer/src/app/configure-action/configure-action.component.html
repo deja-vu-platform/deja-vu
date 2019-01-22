@@ -1,0 +1,40 @@
+<div id="configure-action">
+  <h1>Configure Action</h1>
+  <form
+    #configureActionForm="ngForm"
+    (ngSubmit)="save(configureActionForm)">
+
+    <mat-form-field>
+      <input
+        matInput
+        required
+        name="name"
+        #ngFormName="ngModel"
+        placeholder="Name"
+        [(ngModel)]="name"
+      >
+    </mat-form-field>
+
+    <div class="buttons">
+      <button
+        mat-button
+        type="button"
+        (click)="cancel()"
+      >Cancel</button>
+      <button
+        mat-button
+        *ngIf="data.action"
+        color="warn"
+        type="button"
+        (click)="delete()"
+        [disabled]="data.app.actions.length === 1"
+      >Delete</button>
+      <button
+        mat-button
+        color="primary"
+        type="submit"
+        [disabled]="!validate(configureActionForm)"
+      >Save</button>
+    </div>
+  </form>
+</div>
