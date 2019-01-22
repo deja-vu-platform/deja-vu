@@ -6,3 +6,7 @@
   float: right;
   display: inline-block;
 }
+
+.create-event-btn a {
+  color: white;
+}

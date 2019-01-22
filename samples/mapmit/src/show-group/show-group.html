@@ -6,7 +6,8 @@
 
       <dv.if condition=$createdByUser &&
         $loggedInUserId === authorization.show-owner.ownerId>
-        <group.show-group group=$group showMembers=true />
+        <group.show-group group=$group
+          showMember=<authentication.show-user id=$id/> />
 
         <dv.tx as mapmit-join-leave-group-owned-by-user>
           <group.join-leave class="btn btn-default remove-from-group-btn"
@@ -30,7 +31,7 @@
         </dv.tx>
       </dv.if>
 
-      <dv.if condition="isMemberOf">
+      <dv.if condition=$isMemberOf>
         <group.show-group group=$group showMembers=false />
         <dv.tx as mapmit-join-leave-group-user-is-member-of>
           <authentication.authenticate id=$loggedInUserId hidden=true />

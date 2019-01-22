@@ -1,15 +1,15 @@
-<dv.action name="nav-bar" loggedInUser$=authentication.logged-in.user>
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
   <dv.tx as mapmit-auth-check>
     <authentication.logged-in />
-    <!-- <dv.redirect href="/login" params={ callback: $callback }
-      onEvalFailure=true /> -->
+    <dv.redirect href="/login" onEvalFailure=true />
   </dv.tx>
 
   <nav class="navbar">
     <div id="navbar-left">
-      <div id="home-link" class="navbar-item right-bar">
-        <dv.link href="/home" class="homepage">Home</dv.link>
-      </div>
+      <dv.link class="navbar-item right-bar" href="/home">
+        Home
+      </dv.link>
+
       <div id="show-my-events" class="navbar-item right-bar">
         <dv.link href="/my-events" class="myevents">My Events</dv.link>
       </div>
@@ -22,7 +22,9 @@
       <div id="navbar-right">
         <div id="welcome-user" class="navbar-item">
           <span>
-            Logged in as: {{authentication.logged-in.user.username}}
+            Logged in as:
+            <authentication.show-user
+              user=authentication.logged-in.user showId=false />
           </span>
         </div>
         <div id="logout" class="navbar-item">

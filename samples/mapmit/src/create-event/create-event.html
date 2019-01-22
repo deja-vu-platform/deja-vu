@@ -1,14 +1,14 @@
 <dv.action name="create-event">
-  <mapmit.nav-bar callback="/create-event"/>
+  <mapmit.navbar />
 
   <div class="events-container">
     <div class="events-panel panel panel-default">
       <h2 class="create-event-header">Create an Event!</h2>
 
-      <geolocation.display-map
+      <!-- <geolocation.display-map
         id="homeMapId"
         showLoadedMarkers=false
-        showDirectionsControl=false />
+        showDirectionsControl=false /> -->
 
       <dv.tx as mapmit-create-event-form>
         <dv.id />
@@ -20,12 +20,8 @@
 
         <!-- Location -->
         <div class="create-event-input">
-          <geolocation.create-marker
-            id=dv.id.id
+          <geolocation.create-marker id=dv.id.id
             mapId="homeMapId"
-            title=geolocation.display-map?.title
-            latititude=geolocation.display-map?.latitude
-            longitude=geolocation.display-map?.longitude
             showOptionToSubmit=false />
         </div>
 
@@ -40,7 +36,7 @@
         <!-- Instead, we will assume a 1-1 mapping between group and event -->
         <group.create-group
           id=dv.id.id
-          memberIds=[mapmit.nav-bar.loggedInUser.id]
+          memberIds=[mapmit.navbar.loggedInUserId]
           showOptionToAddMembers=false
           showOptionToSubmit=false
           hidden=true />
@@ -53,8 +49,9 @@
           </div>
           <div class="save-button">
             <authorization.create-resource id=dv.id.id
-              ownerId=mapmit.nav-bar.loggedInUser.id hidden=true />
-            <authentication.authenticate id=mapmit.nav-bar.loggedInUser.id
+              ownerId=mapmit.navbar.loggedInUserId
+              hidden=true />
+            <authentication.authenticate id=mapmit.navbar.loggedInUserId
               hidden=true />
             <dv.button class='btn btn-default btn-blue event-submit-btn'>
               Save Event

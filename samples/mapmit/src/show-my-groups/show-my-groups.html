@@ -1,5 +1,5 @@
 <dv.action name="show-my-groups">
-  <mapmit.nav-bar callback="/my-groups" />
+  <mapmit.navbar />
 
   <div id="my-groups-column-container">
     <div class="my-groups-column" id="my-groups-column-left">
@@ -8,11 +8,11 @@
         <div class="panel-body groups-panel-body">
           <h2>Groups I Own</h2>
           <group.show-groups
-            withMemberId=mapmit.nav-bar.loggedInUser.id
+            withMemberId=mapmit.navbar.loggedInUserId
             showGroup=<mapmit.show-group
               group=$group
-              loggedInUserId=mapmit.nav-bar.loggedInUser.id
-              createdByUser=mapmit.nav-bar.loggedInUser />
+              loggedInUserId=mapmit.navbar.loggedInUserId
+              createdByUser=mapmit.navbar.loggedInUserId />
           >
           </group.show-groups>
         </div>
@@ -25,11 +25,11 @@
         <div class="panel-body groups-panel-body">
           <h2>Groups I'm In</h2>
           <group.show-groups
-            withMemberId=mapmit.nav-bar.loggedInUser.id
+            withMemberId=mapmit.navbar.loggedInUserId
             showGroup=<mapmit.show-group
               group=$group
-              loggedInUserId=mapmit.nav-bar.loggedInUser.id
-              isMemberOf=mapmit.nav-bar.loggedInUser />
+              loggedInUserId=mapmit.navbar.loggedInUserId
+              isMemberOf=mapmit.navbar.loggedInUserId />
           >
           </group.show-groups>
         </div>

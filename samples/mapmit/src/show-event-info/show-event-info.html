@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <dv.if condition=$loggedInUserId === authorization.show-owner.ownerId>
+        <dv.if condition=authorization.show-owner.ownerId === $loggedInUserId>
           <div class="edit-cancel-event-btn-container">
             <dv.tx>
               <!-- Edit/ Delete Buttons -->

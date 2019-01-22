@@ -1,5 +1,5 @@
 <dv.action name="show-my-events">
-  <mapmit.nav-bar callback="/my-events" />
+  <mapmit.navbar />
 
   <div class="events-container">
     <div class="events-panel panel panel-default">
@@ -9,7 +9,14 @@
           Create Event</dv.link>
       </div>
 
-      <mapmit.show-events loggedInUser=mapmit.nav-bar.loggedInUser />
+      <div class="container-fluid event-card-container">
+        <authorization.show-resources
+          noResourcesText="No events to show"
+          viewableBy=mapmit.navbar.loggedInUserId
+          showResource=<mapmit.show-event-info
+            id=$id
+            loggedInUserId=mapmit.navbar.loggedInUserId /> />
+      </div>
     </div>
   </div>
 </dv.action>

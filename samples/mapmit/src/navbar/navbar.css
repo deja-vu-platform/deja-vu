@@ -14,6 +14,7 @@
 
 .navbar-item a {
   color: white;
+  text-decoration: none;
 }
 
 .navbar-logo-img {
