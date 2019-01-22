@@ -7,9 +7,13 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
+import {
+  ConfigureActionComponent,
+  DialogData
+} from '../configure-action/configure-action.component';
 import { App, AppActionDefinition } from '../datatypes';
 
 const NUM_CONFIG_FILES = 2;
@@ -36,7 +40,8 @@ export class TopBarComponent {
   constructor(
     private _electronService: ElectronService,
     private snackBar: MatSnackBar,
-    private zone: NgZone
+    private zone: NgZone,
+    private dialog: MatDialog
   ) {
     if (this._electronService.remote) {
       this.fs = this._electronService.remote.require('fs');
@@ -48,8 +53,24 @@ export class TopBarComponent {
   }
 
   createAction = () => {
-    const name = `new-action-${this.app.actions.length + 1}`;
-    this.app.actions.push(new AppActionDefinition(name));
+    const data: DialogData = {
+      app: this.app
+    };
+    this.dialog.open(ConfigureActionComponent, {
+      width: '50vw',
+      data
+    });
+  }
+
+  editAction() {
+    const data: DialogData = {
+      app: this.app,
+      action: this.openAction
+    };
+    this.dialog.open(ConfigureActionComponent, {
+      width: '50vw',
+      data
+    });
   }
 
   private showSnackBar(message: string) {

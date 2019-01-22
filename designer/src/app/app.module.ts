@@ -22,6 +22,9 @@ import {
 } from './action-instance/action-instance.component';
 import { AppComponent } from './app.component';
 import {
+  ConfigureActionComponent
+} from './configure-action/configure-action.component';
+import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
 import { RowComponent } from './row/row.component';
@@ -34,6 +37,7 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     ActionDefinitionComponent,
     ActionInstanceComponent,
     AppComponent,
+    ConfigureActionComponent,
     ConfigureClicheComponent,
     RowComponent,
     SideMenuComponent,
@@ -56,6 +60,10 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [TextComponent, ConfigureClicheComponent]
+  entryComponents: [
+    ConfigureActionComponent,
+    ConfigureClicheComponent,
+    TextComponent
+  ]
 })
 export class AppModule { }
