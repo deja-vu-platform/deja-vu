@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WidgetComponent } from '../widget/widget.component';
+import {
+  ActionInstanceComponent
+} from '../action-instance/action-instance.component';
 import { RowComponent } from './row.component';
 
 describe('RowComponent', () => {
@@ -11,7 +13,7 @@ describe('RowComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         RowComponent,
-        WidgetComponent
+        ActionInstanceComponent
       ]
     })
     .compileComponents();

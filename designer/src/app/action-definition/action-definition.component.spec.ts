@@ -1,28 +1,28 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PageComponent } from '../page/page.component';
+import {
+  ActionInstanceComponent
+} from '../action-instance/action-instance.component';
 import { RowComponent } from '../row/row.component';
-import { WidgetComponent } from '../widget/widget.component';
-import { MainViewComponent } from './main-view.component';
+import { ActionDefinitionComponent } from './action-definition.component';
 
-describe('MainViewComponent', () => {
-  let component: MainViewComponent;
-  let fixture: ComponentFixture<MainViewComponent>;
+describe('ActionDefinitionComponent', () => {
+  let component: ActionDefinitionComponent;
+  let fixture: ComponentFixture<ActionDefinitionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MainViewComponent,
-        PageComponent,
+        ActionDefinitionComponent,
         RowComponent,
-        WidgetComponent
+        ActionInstanceComponent
       ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MainViewComponent);
+    fixture = TestBed.createComponent(ActionDefinitionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

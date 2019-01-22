@@ -1,3 +1,35 @@
 <mat-toolbar id="top-bar" color="primary">
   <h1>Déjà Vu Designer</h1>
+  <div class="buttons">
+    <button
+      mat-button
+      class="mat-small"
+      (click)="open()"
+      [disabled]="opening"
+      matTooltip="Open"
+    >
+      <mat-icon>folder_open</mat-icon>
+    </button>
+    <button
+      mat-button
+      class="mat-small"
+      (click)="save()"
+      [disabled]="saving"
+      matTooltip="Save"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
+    <button
+      mat-button
+      class="mat-small"
+      (click)="export()"
+      [disabled]="!this.fs || exporting"
+      matTooltip="Export"
+    >
+      <mat-icon>publish</mat-icon>
+    </button>
+  </div>
+  <!-- invisible elements needed for rather hacky reasons -->
+  <input #fileInput type="file"(change)="onUpload($event)">
+  <a #downloadAnchor></a>
 </mat-toolbar>
