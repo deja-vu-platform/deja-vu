@@ -117,10 +117,10 @@ export class ConfigureClicheComponent implements OnInit {
     )) {
       this.data.app.actions.forEach((ad) => {
         ad.rows.forEach((r) => {
-          _.remove(r.actions, (ai) => ai.from.name === this.data.cliche.name);
+          _.remove(r.actions, (ai) => ai.from === this.data.cliche);
         });
       });
-      _.remove(this.data.app.cliches, (c) => c.name === this.data.cliche.name);
+      _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
       this.dialogRef.close();
     }
   }
