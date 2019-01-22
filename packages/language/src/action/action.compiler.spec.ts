@@ -53,7 +53,8 @@ describe('ActionCompiler', () => {
           obj={a: "hi", b: 3 + 2, c: 'hello'}
           numberArray=[1, 2]
           objArray=[{a: 1}, {b: 2}]
-          conditional=!((2 + 2) === 5) ? "b" : "c" />
+          conditional=!((2 + 2) === 5) ? "b" : "c"
+          otherConditional=2 lt 5 ? 3/2 : 1*2.3 />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
@@ -63,6 +64,28 @@ describe('ActionCompiler', () => {
       .toMatch('dv.action');
     expect(compiledAction.ngTemplate)
       .toMatch('hi');
+  });
+
+  it('should handle strings correctly', () => {
+    const st: SymbolTable = {
+      foo: {
+        kind: 'cliche'
+      }
+    };
+    const actionName = 'action-strings';
+    const action = `
+      <dv.action name="${actionName}">
+        <foo.action dq="hello" sq='hello' sqInDq="you're" />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .not.toMatch('dv.action');
+    expect(compiledAction.ngTemplate)
+      .toMatch('\"\'hello\'\"');
+    expect(compiledAction.ngTemplate)
+      .toMatch(/"'you\\\'re'"/);
   });
 
   it('should compile action with dv.if', () => {
