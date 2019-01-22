@@ -143,7 +143,7 @@ export function toNgTemplate(
       closeStr;
   };
   const recurse = (expr) => expr.toNgTemplate();
-  const binOpRecurse = (leftExpr, op, rightExpr) =>
+  const binOpToStr = (leftExpr, op, rightExpr) =>
     `${leftExpr.toNgTemplate()} ${op.sourceString} ${rightExpr.toNgTemplate()}`;
 
   return {
@@ -212,15 +212,17 @@ export function toNgTemplate(
     Expr_parens: (_op, expr, _cp) => `(${expr.toNgTemplate()})`,
 
     UnExpr_not: (_not, expr) => `!${expr.toNgTemplate()}`,
-    BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
-    BinExpr_and: (leftExpr, _and, rightExpr) =>
-      `${leftExpr.toNgTemplate()} && ${rightExpr.toNgTemplate()}`,
-    BinExpr_or: (leftExpr, _and, rightExpr) =>
-      `${leftExpr.toNgTemplate()} || ${rightExpr.toNgTemplate()}`,
-    BinExpr_equal: (leftExpr, _equal, rightExpr) =>
-      `${leftExpr.toNgTemplate()} === ${rightExpr.toNgTemplate()}`,
-    BinExpr_nequal: (leftExpr, _nequal, rightExpr) =>
-      `${leftExpr.toNgTemplate()} !== ${rightExpr.toNgTemplate()}`,
+
+    BinExpr_plus: binOpToStr, BinExpr_minus: binOpToStr,
+    BinExpr_mul: binOpToStr, BinExpr_div: binOpToStr,
+    BinExpr_mod: binOpToStr,
+
+    BinExpr_lt: binOpToStr, BinExpr_gt: binOpToStr,
+    BinExpr_le: binOpToStr, BinExpr_ge: binOpToStr,
+
+    BinExpr_eq: binOpToStr, BinExpr_neq: binOpToStr,
+    BinExpr_and: binOpToStr, BinExpr_or: binOpToStr,
+
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
       ifFalse.toNgTemplate(),
@@ -236,11 +238,28 @@ export function toNgTemplate(
     },
 
     Literal_number: (numberNode) => numberNode.sourceString,
-    Literal_text: (_openQuote, text, _closeQuote) =>
-      '\'' + text.sourceString + '\'',
+    Literal_text: (stringLiteral) => stringLiteral.toNgTemplate(),
+    stringLiteral_doubleQuote: (_oq, text, _cq) =>
+      // We are going to be wrapping text in double quotes, so we need to escape
+      // unescaped double quotes (in addition to unescaped single quotes)
+      '\'' + text.sourceString
+        .replace(/([^\\])"/g, '$1\\"')
+        .replace(/([^\\])'/g, '$1\\\'') + '\'',
+    stringLiteral_singleQuote: (_oq, text, _cq) =>
+      '\'' + text.sourceString
+        .replace(/([^\\])"/g, '$1\\"')
+        .replace(/([^\\])'/g, '$1\\\'') + '\'',
     Literal_true: (trueNode) => trueNode.sourceString,
     Literal_false: (falseNode) => falseNode.sourceString,
-    Literal_obj: (openCb, propAssignments, closeCb) =>
+    Literal_obj: (objLiteral) => objLiteral.toNgTemplate(),
+    ObjectLiteral_noTrailingComma: (openCb, propAssignments, closeCb) =>
+      openCb.sourceString +
+      propAssignments
+        .asIteration()
+        .toNgTemplate()
+        .join(', ') +
+      closeCb.sourceString,
+    ObjectLiteral_trailingComma: (openCb, propAssignments, _comma, closeCb) =>
       openCb.sourceString +
       propAssignments
         .asIteration()

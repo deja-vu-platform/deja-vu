@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 export function getActionName() {
   const invalidActionNameValue = 'the value of the action name should be text';
   const err = (_expr) => { throw new Error(invalidActionNameValue); };
+
   return {
     Element: (element) => element.getActionName(),
     NormalElement: (startTag, _content, _endTag) => startTag.getActionName(),
@@ -21,6 +22,7 @@ export function getActionName() {
 
         return attrValues[0];
       }
+
       return null;
     },
     ElementName_action: (actionNameMaybeAlias): string | null =>
@@ -31,18 +33,21 @@ export function getActionName() {
       if (name.sourceString === DV_ACTION_NAME_ATTR) {
         return expr.getActionName();
       }
+
       return null;
     },
     Expr_un: err, Expr_bin: err, Expr_ter: err, Expr_input: err,
     Expr_element: err,
     Expr_literal: (literal) => literal.getActionName(),
     Literal_number: err, Literal_true: err, Literal_false: err,
-    Literal_obj: (_openCb, _props, _closeCb) => {
+    Literal_obj: (_objLiteral) => {
       throw new Error(invalidActionNameValue);
     },
     Literal_array: (_openSb, _exprs, _closeSb) => {
       throw new Error(invalidActionNameValue);
     },
-    Literal_text: (_openQuote, text, _closeQuote) => text.sourceString
+    Literal_text: (stringLiteral) => stringLiteral.getActionName(),
+    stringLiteral_doubleQuote: (_oq, text, _cq) => text.sourceString,
+    stringLiteral_singleQuote: (_oq, text, _cq) => text.sourceString
   };
 }

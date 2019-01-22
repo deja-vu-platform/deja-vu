@@ -53,8 +53,14 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
 
     UnExpr_not: (_not, expr) => expr.saveUsedOutputs(),
     BinExpr_plus: binOpRecurse, BinExpr_minus: binOpRecurse,
+    BinExpr_mul: binOpRecurse, BinExpr_div: binOpRecurse,
+    BinExpr_mod: binOpRecurse,
+
+    BinExpr_lt: binOpRecurse, BinExpr_gt: binOpRecurse,
+    BinExpr_le: binOpRecurse, BinExpr_ge: binOpRecurse,
+
+    BinExpr_eq: binOpRecurse, BinExpr_neq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-    BinExpr_equal: binOpRecurse, BinExpr_nequal: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveUsedOutputs();
       ifTrue.saveUsedOutputs();
@@ -102,9 +108,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     },
 
     Literal_number: (_number) => {},
-    Literal_text: (_openQuote, _text, _closeQuote) => {},
+    Literal_text: (_stringLiteral) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},
-    Literal_obj: (_openCb, propAssignments, _closeCb) =>
+    Literal_obj: (objLiteral) => objLiteral.saveUsedOutputs(),
+    ObjectLiteral_noTrailingComma: (_openCb, propAssignments, _closeCb) =>
+      propAssignments.asIteration()
+        .saveUsedOutputs(),
+    ObjectLiteral_trailingComma: (_openCb, propAssignments, _comma, _closeCb) =>
       propAssignments.asIteration()
         .saveUsedOutputs(),
     Literal_array: (_openSb, exprs, _closeSb) =>
