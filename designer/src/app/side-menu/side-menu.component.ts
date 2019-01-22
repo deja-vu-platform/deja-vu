@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { designerCliche } from '../cliche.module';
-import { ActionDefinition, App } from '../datatypes';
+import { ActionDefinition, App, ClicheInstance } from '../datatypes';
 import {
   DialogData,
   ImportClicheComponent
@@ -49,6 +49,17 @@ export class SideMenuComponent implements OnInit {
   importCliche() {
     const data: DialogData = {
       app: this.app
+    };
+    this.dialog.open(ImportClicheComponent, {
+      width: '50vw',
+      data
+    });
+  }
+
+  editCliche(cliche: ClicheInstance) {
+    const data: DialogData = {
+      app: this.app,
+      cliche
     };
     this.dialog.open(ImportClicheComponent, {
       width: '50vw',

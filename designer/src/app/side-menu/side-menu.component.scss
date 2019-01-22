@@ -5,6 +5,24 @@
   text-align: center;
 }
 
-button {
+#import-cliche {
   margin-top: 16px;
+}
+
+button.more {
+  padding: 0;
+  margin-right: 8px;
+}
+
+mat-panel-title {
+  align-items: center;
+}
+
+mat-expansion-panel-header {
+  padding-left: 16px;
+}
+
+.spacer {
+  display: inline-block;
+  width: 32px;
 }

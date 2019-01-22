@@ -3,6 +3,15 @@
     <mat-expansion-panel *ngFor="let collection of actionCollections">
       <mat-expansion-panel-header>
         <mat-panel-title>
+          <button
+            mat-button
+            class="mat-small more"
+            *ngIf="collection.config"
+            (click)="$event.stopPropagation(); editCliche(collection);"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <span class="spacer" *ngIf="!collection.config"></span>
           {{collection.name}}
         </mat-panel-title>
       </mat-expansion-panel-header>
@@ -19,6 +28,7 @@
   </mat-accordion>
   <button
     mat-raised-button
+    id="import-cliche"
     color="primary"
     (click)="importCliche()"
   >Import Cliché</button>

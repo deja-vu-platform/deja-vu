@@ -137,7 +137,7 @@ export interface ClicheDefinition {
 }
 
 export class ClicheInstance {
-  readonly name: string;
+  name: string;
   readonly of: ClicheDefinition;
   readonly config: { [s: string]: any } = {};
 

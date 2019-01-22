@@ -1,5 +1,5 @@
 <div id="import-cliche">
-  <h1>Import Cliche</h1>
+  <h1>Import Cliché</h1>
   <form
     #importClicheForm="ngForm"
     (ngSubmit)="save(importClicheForm)">
@@ -11,6 +11,7 @@
         placeholder="Cliché"
         [(ngModel)]="of"
         (selectionChange)="onSelectCliche($event)"
+        [disabled]="data.cliche"
       >
         <mat-option
           *ngFor="let clicheDefinition of clicheDefinitions"
@@ -46,16 +47,22 @@
     <div class="buttons">
       <button
         mat-button
-        color="warn"
         type="button"
         (click)="cancel()"
       >Cancel</button>
       <button
         mat-button
+        *ngIf="data.cliche"
+        color="warn"
+        type="button"
+        (click)="delete()"
+      >Delete</button>
+      <button
+        mat-button
         color="primary"
         type="submit"
         [disabled]="!validate(importClicheForm)"
-      >Import</button>
+      >{{ data.cliche ? 'Save' : 'Import' }}</button>
     </div>
   </form>
 </div>

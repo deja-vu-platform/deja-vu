@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import {
   ErrorStateMatcher,
@@ -6,6 +6,7 @@ import {
   MatDialogRef,
   MatSelectChange
 } from '@angular/material';
+import * as _ from 'lodash';
 
 import { clicheDefinitions } from '../cliche.module';
 import { App, ClicheDefinition, ClicheInstance } from '../datatypes';
@@ -13,6 +14,7 @@ import { App, ClicheDefinition, ClicheInstance } from '../datatypes';
 
 export interface DialogData {
   app: App;
+  cliche?: ClicheInstance;
 }
 
 interface ControlGroup {
@@ -51,7 +53,7 @@ class JSONValidator extends ErrorStateMatcher {
   templateUrl: './import-cliche.component.html',
   styleUrls: ['./import-cliche.component.scss']
 })
-export class ImportClicheComponent {
+export class ImportClicheComponent implements OnInit {
   of: ClicheDefinition;
   name: string;
   configString: string;
@@ -62,6 +64,14 @@ export class ImportClicheComponent {
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.jsonValidator = new JSONValidator(this);
+  }
+
+  ngOnInit() {
+    if (this.data.cliche) {
+      this.of = this.data.cliche.of;
+      this.name = this.data.cliche.name;
+      this.configString = JSON.stringify(this.data.cliche.config);
+    }
   }
 
   get clicheDefinitions() {
@@ -82,11 +92,35 @@ export class ImportClicheComponent {
 
   save(form: ControlGroup) {
     if (this.validate(form)) {
-      const clicheInstance = new ClicheInstance(this.name, this.of);
+      let clicheInstance: ClicheInstance;
+      if (this.data.cliche) {
+        clicheInstance = this.data.cliche;
+        clicheInstance.name = this.name;
+        _.forEach(clicheInstance.config, (v, key) => {
+          delete clicheInstance.config[key];
+        });
+      } else {
+        clicheInstance = new ClicheInstance(this.name, this.of);
+        this.data.app.cliches.push(clicheInstance);
+      }
       if (this.configString) { // guaranteed to be valid JSON of object
         Object.assign(clicheInstance.config, JSON.parse(this.configString));
       }
-      this.data.app.cliches.push(clicheInstance);
+      this.dialogRef.close();
+    }
+  }
+
+  delete() {
+    if (window.confirm(
+      'Are you sure you want to remove this Cliché? ' +
+      'Any of its actions that you are using will be removed as well.'
+    )) {
+      this.data.app.actions.forEach((ad) => {
+        ad.rows.forEach((r) => {
+          _.remove(r.actions, (ai) => ai.from.name === this.data.cliche.name);
+        });
+      });
+      _.remove(this.data.app.cliches, (c) => c.name === this.data.cliche.name);
       this.dialogRef.close();
     }
   }
