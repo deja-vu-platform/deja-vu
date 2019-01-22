@@ -15,6 +15,28 @@
       >
     </mat-form-field>
 
+    <div class="mat-form-field">
+      <mat-checkbox *ngIf="!home" name="page" [(ngModel)]="page">
+        Page
+      </mat-checkbox>
+      <button
+        mat-button
+        *ngIf="!home && page && data.action"
+        color="accent"
+        (click)="makeHomepage()"
+      >
+        Make Homepage
+      </button>
+      <span *ngIf="home" class="message">Homepage</span>
+    </div>
+
+    <div class="mat-form-field">
+      <mat-checkbox name="transaction" [(ngModel)]="transaction">
+        Transaction
+      </mat-checkbox>
+    </div>
+
+
     <div class="buttons">
       <button
         mat-button
@@ -27,7 +49,7 @@
         color="warn"
         type="button"
         (click)="delete()"
-        [disabled]="data.app.actions.length === 1"
+        [disabled]="data.app.actions.length === 1 || data.app.homepage === data.action"
       >Delete</button>
       <button
         mat-button

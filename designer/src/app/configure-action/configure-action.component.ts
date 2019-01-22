@@ -5,7 +5,7 @@ import {
 } from '@angular/material';
 import * as _ from 'lodash';
 
-import { ActionDefinition, App, AppActionDefinition } from '../datatypes';
+import { App, AppActionDefinition } from '../datatypes';
 
 interface ControlGroup {
   form: { valid: boolean };
@@ -13,7 +13,7 @@ interface ControlGroup {
 
 export interface DialogData {
   app: App;
-  action?: ActionDefinition;
+  action?: AppActionDefinition;
 }
 
 @Component({
@@ -23,6 +23,9 @@ export interface DialogData {
 })
 export class ConfigureActionComponent implements OnInit {
   name: string;
+  page: boolean;
+  home: boolean;
+  transaction: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<ConfigureActionComponent>,
@@ -32,7 +35,27 @@ export class ConfigureActionComponent implements OnInit {
   ngOnInit() {
     if (this.data.action) {
       this.name = this.data.action.name;
+      this.page = this.actionIsPage();
+      this.home = this.data.app.homepage === this.data.action;
     }
+  }
+
+  actionIsPage(action?: AppActionDefinition): boolean {
+    action = action ? action : this.data.action;
+
+    return this.data.app.pages.includes(action);
+  }
+
+  makeActionPage(action?: AppActionDefinition) {
+    action = action ? action : this.data.action;
+    if (!this.actionIsPage(action)) {
+      this.data.app.pages.push(action);
+    }
+  }
+
+  makeActionNotPage(action?: AppActionDefinition) {
+    action = action ? action : this.data.action;
+    _.remove(this.data.app.pages, (p) => p === action);
   }
 
   validate(form: ControlGroup) {
@@ -56,12 +79,28 @@ export class ConfigureActionComponent implements OnInit {
   }
 
   save() {
+    let action: AppActionDefinition;
+
     if (this.data.action) {
-      this.data.action.name = this.name;
+      action = this.data.action;
+      action.name = this.name;
     } else {
-      this.data.app.actions.push(new AppActionDefinition(this.name));
+      action = new AppActionDefinition(this.name);
+      this.data.app.actions.push(action);
     }
+
+    if (this.page) {
+      this.makeActionPage(action);
+    } else {
+      this.makeActionNotPage(action);
+    }
+
     this.dialogRef.close();
+  }
+
+  makeHomepage() {
+    this.makeActionPage();
+    this.data.app.homepage = this.data.action;
   }
 
 }
