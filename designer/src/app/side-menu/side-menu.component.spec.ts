@@ -1,5 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatExpansionModule, MatListModule } from '@angular/material';
+import {
+  MatDialogModule,
+  MatExpansionModule,
+  MatIconModule,
+  MatListModule
+} from '@angular/material';
 
 import { SideMenuComponent } from './side-menu.component';
 
@@ -13,7 +18,9 @@ describe('SideMenuComponent', () => {
         SideMenuComponent
       ],
       imports: [
+        MatDialogModule,
         MatExpansionModule,
+        MatIconModule,
         MatListModule
       ]
     })

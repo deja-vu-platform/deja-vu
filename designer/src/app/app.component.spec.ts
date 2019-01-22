@@ -1,9 +1,13 @@
 import { async, TestBed } from '@angular/core/testing';
 import {
+  MatDialogModule,
   MatExpansionModule,
+  MatIconModule,
   MatListModule,
+  MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
+import { ElectronService } from 'ngx-electron';
 
 import {
   ActionDefinitionComponent
@@ -28,9 +32,15 @@ describe('AppComponent', () => {
         RowComponent
       ],
       imports: [
-        MatToolbarModule,
+        MatDialogModule,
         MatExpansionModule,
-        MatListModule
+        MatIconModule,
+        MatListModule,
+        MatSnackBarModule,
+        MatToolbarModule
+      ],
+      providers: [
+        ElectronService
       ]
     })
     .compileComponents();
