@@ -34,7 +34,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     BinExpr_lt: binOpRecurse, BinExpr_gt: binOpRecurse,
     BinExpr_le: binOpRecurse, BinExpr_ge: binOpRecurse,
 
-    BinExpr_eq: binOpRecurse, BinExpr_notEq: binOpRecurse,
+    BinExpr_eq: binOpRecurse, BinExpr_neq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveInputs();

@@ -58,7 +58,7 @@ Action {
     | Expr "gt=" Expr  -- ge
     // Equality Expr
     | Expr "===" Expr -- eq
-    | Expr "!==" Expr -- notEq
+    | Expr "!==" Expr -- neq
     // Logical Expr
     | Expr "&&" Expr  -- and
     | Expr "||" Expr  -- or

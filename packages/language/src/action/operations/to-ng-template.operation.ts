@@ -220,7 +220,7 @@ export function toNgTemplate(
     BinExpr_lt: binOpToStr, BinExpr_gt: binOpToStr,
     BinExpr_le: binOpToStr, BinExpr_ge: binOpToStr,
 
-    BinExpr_eq: binOpToStr, BinExpr_notEq: binOpToStr,
+    BinExpr_eq: binOpToStr, BinExpr_neq: binOpToStr,
     BinExpr_and: binOpToStr, BinExpr_or: binOpToStr,
 
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
