@@ -1,6 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  ViewChild
+  Component, ElementRef, Input, OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
@@ -14,8 +13,6 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
-
-import { Marker } from '../shared/geolocation.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 const LATITUDE_LIMIT = 90;
@@ -61,8 +58,6 @@ export class CreateMarkerComponent implements
   @Input() longitudeLabel = 'Longitude';
   @Input() newMarkerSavedText = 'New marker saved';
   @Input() showOptionToSubmit = true;
-
-  @Output() marker: EventEmitter<Marker> = new EventEmitter<Marker>();
 
   @ViewChild(FormGroupDirective) form;
   titleControl = new FormControl('');
@@ -112,15 +107,7 @@ export class CreateMarkerComponent implements
             mapId: this.mapId
           }
         },
-        extraInfo: {
-          returnFields: `
-            id
-            title
-            latitude
-            longitude
-            mapId
-          `
-        }
+        extraInfo: { returnFields: 'id' }
       })
       .toPromise();
 
@@ -128,14 +115,6 @@ export class CreateMarkerComponent implements
       throw new Error(_.map(res.errors, 'message')
         .join());
     }
-
-    this.marker.emit({
-      id: res.data.createMarker.id,
-      title: res.data.createMarker.title,
-      latitude: res.data.createMarker.latitude,
-      longitude: res.data.createMarker.longitude,
-      mapId: res.data.createMarker.mapId
-    });
   }
 
   dvOnExecSuccess() {
