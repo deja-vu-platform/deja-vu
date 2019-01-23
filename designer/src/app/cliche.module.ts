@@ -17,7 +17,6 @@ import * as transfer from 'transfer';
 
 import { ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';
-import { CamelToKebab } from './utils';
 
 // TODO: import platform actions (e.g. button, link, etc.)
 
@@ -61,7 +60,7 @@ function clicheDefinitionFromModule(
     actions: Object.values(importedModule)
       .filter((f) => _.isString(f.name) && f.name.endsWith(componentSuffix))
       .map((component) => ({
-        name: CamelToKebab(component.name
+        name: _.kebabCase(component.name
           .slice(0, componentSuffix.length * -1)),
         component,
         inputs: [], // TODO
