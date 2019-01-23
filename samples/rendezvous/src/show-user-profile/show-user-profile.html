@@ -1,11 +1,15 @@
 <dv.action name="show-user-profile">
   <div class="index">
-    <userprofile.show-object id=$id hidden=true />
     <rendezvous.navbar showProfileButton=false />
 
-    <dv.if condition=!$id>Need to provide an id.</dv.if>
+    <dv.if condition=$id>
+      <userprofile.show-object id=$id hidden=true />
+    </dv.if>
+    <dv.if condition=!$id>
+      <userprofile.show-object id=rendezvous.navbar.loggedInUserId hidden=true />
+    </dv.if>
 
-    <dv.if condition=$id class="reset_password">
+    <div class="reset_password">
       <div class="panel panel-default messagePanel">
         <div class="panel-heading panel-heading-background">
           <!-- Username -->
@@ -67,6 +71,6 @@
           </table>
         </div>
       </div>
-    </dv.if>
+    </div>
   </div>
 </dv.action>
