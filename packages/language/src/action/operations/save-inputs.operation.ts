@@ -36,10 +36,6 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
 
     BinExpr_eq: binOpRecurse, BinExpr_neq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-<<<<<<< HEAD
-    BinExpr_equal: binOpRecurse, BinExpr_nequal: binOpRecurse,
-=======
->>>>>>> 349a33397e55e44adfdf5795dc36d1f01c064ad0
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveInputs();
       ifTrue.saveInputs();
