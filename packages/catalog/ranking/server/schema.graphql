@@ -1,0 +1,26 @@
+type Ranking {
+  id: ID!
+  sourceId: ID
+  targetId: ID!
+  rank: Float!
+}
+
+type Target {
+  id: ID!
+  rank: Float!
+}
+
+input CreateRankingInput {
+  id: ID
+  sourceId: ID
+  targets: [Target!]
+}
+
+type Query {
+  ranking(id :ID!): [Ranking!]
+  targetRankings(targetIds: [ID!]): [Target!]
+}
+
+type Mutation {
+  createRanking(input: CreateRankingInput!): [Ranking!]
+}
