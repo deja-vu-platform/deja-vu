@@ -1,4 +1,5 @@
 import { Component } from '@angular/compiler/src/core';
+import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 
 // names should be HTML safe (TODO)
@@ -28,6 +29,12 @@ export class AppActionDefinition implements ActionDefinition {
     _.remove(this._rows, (row) => row.actions.length === 0);
 
     return this._rows;
+  }
+
+  contains(actionDefinition: ActionDefinition) {
+    return this.rows.some((r) =>
+      r.actions.some((a) => a.of === actionDefinition)
+    );
   }
 
   toHTML() {
@@ -94,10 +101,10 @@ export class ActionInstance {
   data?: any; // currently only used for the text widget
 
   constructor(
-    of: ActionDefinition,
+    ofAction: ActionDefinition,
     from: App | ClicheInstance | ClicheDefinition
   ) {
-    this.of = of;
+    this.of = ofAction;
     this.from = from;
   }
 
@@ -141,9 +148,9 @@ export class ClicheInstance {
   readonly of: ClicheDefinition;
   readonly config: { [s: string]: any } = {};
 
-  constructor(name: string, of: ClicheDefinition) {
+  constructor(name: string, ofCliche: ClicheDefinition) {
     this.name = name;
-    this.of = of;
+    this.of = ofCliche;
   }
 
   get actions() {
@@ -161,8 +168,8 @@ export class ClicheInstance {
 
 export class App {
   name: string;
-  readonly actions: AppActionDefinition[] = [];
-  readonly pages: AppActionDefinition[] = []; // subset of actions
+  readonly actions: AppActionDefinition[];
+  readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
   readonly cliches: ClicheInstance[] = [];
 
@@ -187,8 +194,8 @@ export class App {
     app.pages.pop();
 
     appJSON.cliches.forEach((ci) => {
-      const of = clicheDefinitions.find((cd) => cd.name === ci.of);
-      const clicheInstance = new ClicheInstance(ci.name, of);
+      const ofCliche = clicheDefinitions.find((cd) => cd.name === ci.of);
+      const clicheInstance = new ClicheInstance(ci.name, ofCliche);
       Object.assign(clicheInstance.config, ci.config);
       app.cliches.push(clicheInstance);
     });
@@ -205,11 +212,9 @@ export class App {
             app,
             designerCliche
           ].find((c) => c.name === ai.from);
-          // const from = fromInstance ? fromInstance.of : app;
-          // TODO: this will fail unless app actions are topo sorted
-          const of = (<ActionDefinition[]>from.actions)
+          const ofAction = (<ActionDefinition[]>from.actions)
             .find((a) => a.name === ai.of);
-          const actionInst = new ActionInstance(of, from);
+          const actionInst = new ActionInstance(ofAction, from);
           Object.assign(actionInst.inputSettings, ai.inputSettings);
           if (ai.data) {
             actionInst.data = ai.data;
@@ -231,10 +236,27 @@ export class App {
     return app;
   }
 
+  private tsortActions(): AppActionDefinition[] {
+    const graph = new graphlib.Graph();
+    this.actions.forEach((a) => graph.setNode(a.name));
+    this.actions.forEach((a1) => {
+      this.actions.forEach((a2) => {
+        if (a1.contains(a2)) {
+          graph.setEdge(a1.name, a2.name);
+        }
+      });
+    });
+
+    return graphlib.alg.topsort(graph)
+      .reverse()
+      .map((name) => this.actions.find((a) => a.name === name));
+  }
+
   toJSON() {
     return {
       name: this.name,
-      actions: this.actions.map((action) => action.toJSON()),
+      actions: this.tsortActions()
+        .map((action) => action.toJSON()),
       pages: this.pages.map((p) => p.name),
       homepage: this.homepage.name,
       cliches: this.cliches

@@ -27,7 +27,7 @@ const SNACKBAR_DURATION = 2500;
 export class TopBarComponent {
   @Input() app: App;
   @Input() openAction: AppActionDefinition;
-  @Output() load = new EventEmitter<string>();
+  @Output() load = new EventEmitter<string>(true); // async
   @Output() changeAction = new EventEmitter<AppActionDefinition>();
   @ViewChild('fileInput') fileInput: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;

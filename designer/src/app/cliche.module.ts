@@ -66,6 +66,7 @@ function clicheDefinitionFromModule(
         inputs: [], // TODO
         outputs: [] // TODO
       }))
+      .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };
 }
 

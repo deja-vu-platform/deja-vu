@@ -14,8 +14,6 @@ interface ActionCollection {
   actions: ActionDefinition[];
 }
 
-const NUM_CONSTANT_COLLECTIONS = 2;
-
 
 @Component({
   selector: 'app-side-menu',
@@ -30,11 +28,12 @@ export class SideMenuComponent implements OnInit {
   constructor(private dialog: MatDialog) {}
 
   ngOnInit() {
-    this._actionCollections = [designerCliche, this.app];
+    this._actionCollections = [designerCliche];
   }
 
   get actionCollections(): ActionCollection[] {
-    this._actionCollections.splice(NUM_CONSTANT_COLLECTIONS);
+    this._actionCollections.splice(1);
+    this._actionCollections.push(this.app);
     this._actionCollections.push.apply(
       this._actionCollections,
       this.app.cliches

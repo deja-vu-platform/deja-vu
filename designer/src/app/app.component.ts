@@ -5,13 +5,13 @@ import { filter } from 'rxjs/operators';
 
 import { clicheDefinitions, designerCliche } from './cliche.module';
 import {
+  ActionDefinition,
   ActionInstance,
   App,
   AppActionDefinition,
   ClicheDefinition,
   ClicheInstance,
-  Row,
-  ActionDefinition
+  Row
 } from './datatypes';
 
 
