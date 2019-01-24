@@ -15,13 +15,13 @@
         <div class="panel-body">
           <!-- TODO: timestamp -->
           <p id="timestamp">
-            Timestamp coming soon!
+            | Timestamp coming soon!
           </p>
 
           <!-- Delete Comment -->
           <dv.if condition=$comment?.authorId === $loggedInUserId>
             <dv.tx>
-              <p>
+              <p id="delete-comment-button">
                 <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
                 <authentication.authenticate id=$loggedInUserId hidden=true />
               </p>
@@ -29,8 +29,8 @@
           </dv.if>
 
           <!-- Show Comment Content -->
-          <comment.show-comment comment=$comment showId=false
-            showAuthorId=false showTargetId=false />
+          | <comment.show-comment comment=$comment showId=false
+              showAuthorId=false showTargetId=false />
         </div>
       </div>
     </td>
