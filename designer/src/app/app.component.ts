@@ -10,7 +10,8 @@ import {
   AppActionDefinition,
   ClicheDefinition,
   ClicheInstance,
-  Row
+  Row,
+  ActionDefinition
 } from './datatypes';
 
 
@@ -66,15 +67,13 @@ export class AppComponent {
   }
 
   newWidget(sourceName: string, actionName: string): ActionInstance {
-    if (sourceName === this.app.name) {
-      throw new Error('Support for nested App Actions is not yet implemented');
-    }
-
-    const source: ClicheDefinition | ClicheInstance =
-      sourceName === designerCliche.name
-        ? designerCliche
-        : this.app.cliches.find((c) => c.name === sourceName);
-    const actionDefinition = source.actions.find((a) => a.name === actionName);
+    const source: App | ClicheDefinition | ClicheInstance = [
+      this.app,
+      designerCliche,
+      ...this.app.cliches
+    ].find((s) => s.name === sourceName);
+    const actionDefinition = (<ActionDefinition[]>source.actions)
+      .find((a) => a.name === actionName);
 
     return new ActionInstance(actionDefinition, source);
   }
