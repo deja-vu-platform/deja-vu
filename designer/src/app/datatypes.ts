@@ -225,6 +225,7 @@ export class App {
       });
       app.actions.push(actionDef);
     });
+    app.actions.sort((aad1, aad2) => aad1.name < aad2.name ? -1 : 1);
 
     appJSON.pages.forEach((p) => {
       const page = app.actions.find((a) => a.name === p);

@@ -86,7 +86,8 @@ export class ConfigureActionComponent implements OnInit {
       action.name = this.name;
     } else {
       action = new AppActionDefinition(this.name);
-      this.data.app.actions.push(action);
+      const insertIdx = _.sortedIndexBy(this.data.app.actions, action, 'name');
+      this.data.app.actions.splice(insertIdx, 0, action);
     }
 
     if (this.page) {
