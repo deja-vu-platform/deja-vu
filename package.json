@@ -68,6 +68,8 @@
     "samples/mapmit/.dv",
     "samples/mapmit-old",
     "samples/rendezvous",
-    "designer"
+    "designer",
+    "designer-apps/*",
+    "designer-apps/*/.dv"
   ]
 }

@@ -1,116 +1,297 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/compiler/src/core';
+import * as _ from 'lodash';
 
-import * as uuidv4 from 'uuid/v4';
+// names should be HTML safe (TODO)
 
-import { cliches } from './cliche.module';
-
-export interface Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any };
+export interface ActionDefinition {
+  name: string;
+  readonly inputs: string[]; // TODO: input type
+  readonly outputs: string[];
 }
 
-export interface Row {
-  readonly id: string;
-  readonly widgets: Widget[];
-}
-
-export class BaseWidget implements Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any } = {};
-  readonly clicheName: string;
-  readonly widgetName: string;
+export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
+}
 
-  constructor(clicheName: string, widgetName: string) {
-    this.id = uuidv4();
-    this.base = true;
-    this.clicheName = clicheName;
-    this.widgetName = widgetName;
-    try {
-      this.component = cliches[clicheName].components[widgetName];
-    } catch (e) {
-      this.component = undefined;
-    }
-    if (!this.component) {
-      throw new Error(
-        `Component for widget ${widgetName} in cliché ${clicheName} not found.`
-      );
-    }
+export class AppActionDefinition implements ActionDefinition {
+  name: string;
+  readonly inputs: string[] = []; // TODO: input type
+  readonly outputs: string[] = [];
+  private _rows: Row[] = [];
+  // TODO: styling options
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  get rows() {
+    _.remove(this._rows, (row) => row.actions.length === 0);
+
+    return this._rows;
+  }
+
+  toHTML() {
+    let html = `<dv.action name="${this.name}">\n`;
+    _.forEach(this.rows, (row) => {
+      html += row.toHTML() + '\n';
+    });
+    html += `</dv.action>`;
+
+    return html;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      inputs: this.inputs,
+      outputs: this.outputs,
+      rows: this.rows.map((row) => row.toJSON())
+    };
   }
 }
 
-export class TextWidget extends BaseWidget {
-  data: { [key: string]: any, content: '' };
-  constructor() {
-    super('Déjà Vu', 'Text');
+export class Row {
+  readonly actions: ActionInstance[] = [];
+  // TODO: Flex Settings;
+
+  constructor() {}
+
+  toHTML() {
+    let html = '  <div class="dvd-row">\n';
+    _.forEach(this.actions, (action) => {
+      html += action.toHTML();
+    });
+    html += `  </div>\n`;
+
+    return html;
   }
 
-  set content(newContent) {
-    this.data.content = newContent;
+  toJSON() {
+    return {
+      actions: this.actions.map((action) => action.toJSON())
+    };
   }
 
-  get content() {
-    return this.data.content;
-  }
-}
-
-export class ComposedWidget implements Widget {
-  readonly id: string;
-  readonly base: boolean;
-  readonly data: { [key: string]: any } = {};
-  readonly rows: Row[] = [];
-
-  constructor() {
-    this.id = uuidv4();
-    this.base = false;
-  }
-
-  addWidget(widget: Widget, rowID?: string) {
-    const row = this.rows.find((r) => r.id === rowID);
-    if (row) {
-      row.widgets.push(widget);
+  addAction(action: ActionInstance, index?: number) {
+    if (index === undefined) {
+      this.actions.push(action);
     } else {
-      this.rows.push({ id: uuidv4(), widgets: [widget] });
+      this.actions.splice(index, 0, action);
     }
-
-    return widget;
   }
 
-  removeWidget(widgetID: string): Widget {
-    const { rowIndex, widgetIndex } = this.findWidget(widgetID);
-    if (rowIndex === -1 || widgetIndex === -1) { return null; }
-    const [widget] = this.rows[rowIndex].widgets.splice(widgetIndex, 1);
-    if (this.rows[rowIndex].widgets.length === 0) {
-      this.rows.splice(rowIndex, 1);
-    }
-
-    return widget;
+  removeAction(index: number): ActionInstance {
+    return this.actions.splice(index, 1)[0];
   }
 
-  private findWidget(
-    widgetID: string
-  ): { rowIndex: number, widgetIndex: number } {
-    for (let rowIdx = 0; rowIdx < this.rows.length; rowIdx += 1) {
-      const row = this.rows[rowIdx];
-      for (let widgetIdx = 0; widgetIdx < row.widgets.length; widgetIdx += 1) {
-        const widget = row.widgets[widgetIdx];
-        if (widget.id === widgetID) {
-          return { rowIndex: rowIdx, widgetIndex: widgetIdx };
-        }
-      }
+  // to do a move within row, do remove and then add
+}
+
+export class ActionInstance {
+  readonly of: ActionDefinition;
+  readonly from: App | ClicheInstance | ClicheDefinition;
+  readonly inputSettings: { [inputName: string]: any } = {};
+  data?: any; // currently only used for the text widget
+
+  constructor(
+    of: ActionDefinition,
+    from: App | ClicheInstance | ClicheDefinition
+  ) {
+    this.of = of;
+    this.from = from;
+  }
+
+  toHTML(): string {
+    // text widget is just plain HTML static content
+    if (this.of.name === 'text' && this.from.name === 'dv-d') {
+      return `<div>${this.data}</div>`;
     }
 
-    return { rowIndex: -1 , widgetIndex: -1 };
+    let html = `    <${this.from.name}.${this.of.name}\n`;
+    _.forEach(this.inputSettings, (val, key) => {
+      html += `      ${key}="${val}"\n`; // TODO: non-string vals
+    });
+    html += `    />\n`;
+
+    return html;
+  }
+
+  toJSON() {
+    const json = {
+      of: this.of.name,
+      from: this.from.name,
+      inputSettings: this.inputSettings
+    };
+    if (this.data) {
+      json['data'] = this.data;
+    }
+
+    return json;
   }
 }
 
-export interface Cliche {
+export interface ClicheDefinition {
   readonly name: string;
-  readonly components: ClicheComponents;
+  readonly actions: ClicheActionDefinition[];
+  // TODO: config options
 }
 
-export interface ClicheComponents {
-  [componentName: string]: Component;
+export class ClicheInstance {
+  name: string;
+  readonly of: ClicheDefinition;
+  readonly config: { [s: string]: any } = {};
+
+  constructor(name: string, of: ClicheDefinition) {
+    this.name = name;
+    this.of = of;
+  }
+
+  get actions() {
+    return this.of.actions;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      of: this.of.name,
+      config: this.config
+    };
+  }
+}
+
+export class App {
+  name: string;
+  readonly actions: AppActionDefinition[] = [];
+  readonly pages: AppActionDefinition[] = []; // subset of actions
+  homepage: AppActionDefinition; // member of pages
+  readonly cliches: ClicheInstance[] = [];
+
+  constructor(name: string) {
+    this.name = name;
+    this.actions = [new AppActionDefinition('new-action-1')];
+    this.pages = [...this.actions];
+    this.homepage = this.pages[0];
+  }
+
+  static fromJSON(
+    jsonString: string,
+    clicheDefinitions: ClicheDefinition[],
+    designerCliche: ClicheDefinition
+  ): App {
+    const appJSON = JSON.parse(jsonString);
+
+    const app = new App(appJSON.name);
+
+    // clear default action
+    app.actions.pop();
+    app.pages.pop();
+
+    appJSON.cliches.forEach((ci) => {
+      const of = clicheDefinitions.find((cd) => cd.name === ci.of);
+      const clicheInstance = new ClicheInstance(ci.name, of);
+      Object.assign(clicheInstance.config, ci.config);
+      app.cliches.push(clicheInstance);
+    });
+
+    appJSON.actions.forEach((aad) => {
+      const actionDef = new AppActionDefinition(aad.name);
+      actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
+      actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      aad.rows.forEach((r) => {
+        const row = new Row();
+        r.actions.forEach((ai) => {
+          const from = [
+            ...app.cliches,
+            app,
+            designerCliche
+          ].find((c) => c.name === ai.from);
+          // const from = fromInstance ? fromInstance.of : app;
+          // TODO: this will fail unless app actions are topo sorted
+          const of = (<ActionDefinition[]>from.actions)
+            .find((a) => a.name === ai.of);
+          const actionInst = new ActionInstance(of, from);
+          Object.assign(actionInst.inputSettings, ai.inputSettings);
+          if (ai.data) {
+            actionInst.data = ai.data;
+          }
+          row.actions.push(actionInst);
+        });
+        actionDef.rows.push(row);
+      });
+      app.actions.push(actionDef);
+    });
+
+    appJSON.pages.forEach((p) => {
+      const page = app.actions.find((a) => a.name === p);
+      app.pages.push(page);
+    });
+
+    app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
+
+    return app;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      actions: this.actions.map((action) => action.toJSON()),
+      pages: this.pages.map((p) => p.name),
+      homepage: this.homepage.name,
+      cliches: this.cliches
+    };
+  }
+
+  /**
+   * Generate package.json for the app
+   * TODO: non-default version, author, repo, etc.
+   */
+  toPackageJSON() {
+    return JSON.stringify({
+      name: this.name,
+      version: '0.0.1',
+      scripts: {
+        start: 'dv serve'
+      },
+      private: true,
+      devDependencies: {
+        'dv-cli': '0.0.1'
+      },
+      repository: 'github:spderosso/dejavu',
+      license: 'MIT',
+      bugs: {
+        url: 'https://github.com/spderosso/dejavu/issues'
+      },
+      homepage: 'https://github.com/spderosso/dejavu#readme'
+    }, null, '  ');
+  }
+
+  toDVConfigJSON() {
+    const basePort = 3000;
+    const clichePortOffset = 2;
+
+    return JSON.stringify({
+      name: this.name,
+      type: 'app',
+      gateway: {
+        config: {
+          wsPort: basePort
+        }
+      },
+      usedCliches: _.reduce(this.cliches, (obj, cliche, idx) => (
+        (obj[cliche.name] = {
+          name: cliche.of.name,
+          config: {
+            wsPort: basePort + clichePortOffset + idx,
+            ...cliche.config
+          }
+        }) && obj // mutate and then return obj
+      ), {}),
+      routes: [
+        { path: '', action: `${this.name}-${this.homepage.name}` },
+        ..._.map(this.pages, (page) => (
+          { path: page.name, action: `${this.name}-${page.name}` }
+        ))
+      ]
+    }, null, '  ');
+  }
 }

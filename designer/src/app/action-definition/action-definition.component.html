@@ -1,0 +1,10 @@
+<div id="main-view">
+  <div id="page" *ngIf="openAction">
+    <app-row
+      *ngFor="let row of openAction.rows; let i = index"
+      [row]="row"
+      [rowNum]="i"
+    ></app-row>
+    <app-row></app-row>
+  </div>
+</div>
