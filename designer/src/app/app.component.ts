@@ -49,8 +49,14 @@ export class AppComponent {
         const toRowIdx = parseInt(target['dataset'].index, 10);
         const toRow = this.openAction.rows[toRowIdx] || new Row();
         if (source.classList.contains('action-list')) {
-          const { source: sourceName, action: actionName } = el['dataset'];
-          action = this.newWidget(sourceName, actionName);
+          const {
+            source: sourceName,
+            action: actionName,
+            disabled
+          } = el['dataset'];
+          if (disabled !== 'true') {
+            action = this.newWidget(sourceName, actionName);
+          }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);
           const actionIdx = parseInt(el['dataset'].index, 10);
@@ -59,9 +65,11 @@ export class AppComponent {
           return; // TODO: refactor to make better use of RxJS
         }
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        toRow.addAction(action);
-        if (toRowIdx === -1) {
-          this.openAction.rows.push(toRow);
+        if (action) {
+          toRow.addAction(action);
+          if (toRowIdx === -1) {
+            this.openAction.rows.push(toRow);
+          }
         }
       });
   }

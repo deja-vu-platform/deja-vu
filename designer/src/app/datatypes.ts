@@ -31,9 +31,18 @@ export class AppActionDefinition implements ActionDefinition {
     return this._rows;
   }
 
-  contains(actionDefinition: ActionDefinition) {
+  contains(actionDefinition: ActionDefinition, deep?: boolean) {
+    if (actionDefinition === this) { return true; }
+
     return this.rows.some((r) =>
-      r.actions.some((a) => a.of === actionDefinition)
+      r.actions.some((a) => (
+        a.of === actionDefinition
+        || (
+          deep
+          && a.of['contains']
+          && (<AppActionDefinition>a.of).contains(actionDefinition, true)
+        )
+      ))
     );
   }
 

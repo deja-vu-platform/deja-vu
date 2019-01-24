@@ -6,7 +6,12 @@ import {
   ConfigureClicheComponent,
   DialogData
 } from '../configure-cliche/configure-cliche.component';
-import { ActionDefinition, App, ClicheInstance } from '../datatypes';
+import {
+  ActionDefinition,
+  App,
+  AppActionDefinition,
+  ClicheInstance
+} from '../datatypes';
 
 
 interface ActionCollection {
@@ -22,6 +27,7 @@ interface ActionCollection {
 })
 export class SideMenuComponent implements OnInit {
   @Input() app: App;
+  @Input() openAction: AppActionDefinition;
   // need consistent object to return
   private _actionCollections: ActionCollection[];
 

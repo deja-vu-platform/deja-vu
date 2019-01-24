@@ -26,3 +26,8 @@ mat-expansion-panel-header {
   display: inline-block;
   width: 32px;
 }
+
+mat-list-item[data-disabled="true"] {
+  color: gray;
+  cursor: not-allowed;
+}
