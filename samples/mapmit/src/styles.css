@@ -13,6 +13,14 @@ body {
   background-color: #f5f8fa;
 }
 
+.navbar-item a {
+  color: white;
+}
+
+.create-event-btn a {
+  color: white;
+}
+
 .logo-img {
   width: 80%;
   margin-bottom: 10px;
@@ -26,7 +34,6 @@ body {
 
 .login-signup-container {
   text-align: center;
-  padding-top: 100px;
 }
 
 .username-password-container {
@@ -39,7 +46,8 @@ body {
 .blue-background {
   width: 100%;
   height: 100%;
-  padding-top: 70px;
+  padding-top: 15%;
+  padding-bottom: 25%;
   background-color: #75C7CE;
 }
 

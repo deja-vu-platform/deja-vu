@@ -18,21 +18,17 @@
       </div>
     </div>
 
-    <dv.if condition=authentication.logged-in.user>
-      <div id="navbar-right">
-        <div id="welcome-user" class="navbar-item">
-          <span>
-            Logged in as:
-            <authentication.show-user
-              user=authentication.logged-in.user showId=false />
-          </span>
-        </div>
-        <div id="logout" class="navbar-item">
-          <dv.tx as mapmit-sign-out>
-            <authentication.sign-out />
-            <dv.link href="/login" hidden=true />
-          </dv.tx>
-        </div>
+    <dv.if condition=authentication.logged-in.user id="navbar-right">
+      <div id="welcome-user" class="navbar-item">
+        <span class="inline">Logged in as: <authentication.show-user
+            user=authentication.logged-in.user showId=false />
+        </span>
+      </div>
+      <div id="logout" class="navbar-item">
+        <dv.tx as mapmit-sign-out>
+          <authentication.sign-out />
+          <dv.link href="/login" hidden=true />
+        </dv.tx>
       </div>
     </dv.if>
 
