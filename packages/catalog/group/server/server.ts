@@ -90,7 +90,7 @@ async function addOrRemoveMember(
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 
-  const notPendingGroupFilter = {
+  const notPendingGroupIdFilter = {
     id: groupId,
     pending: { $exists: false }
   };
@@ -99,7 +99,7 @@ async function addOrRemoveMember(
     case 'vote':
       await GroupValidation.groupExistsOrFail(groups, groupId);
       const pendingUpdateObj = await groups.updateOne(
-        notPendingGroupFilter,
+        notPendingGroupIdFilter,
         {
           $set: {
             pending: {
@@ -115,7 +115,7 @@ async function addOrRemoveMember(
       return true;
     case undefined:
       await GroupValidation.groupExistsOrFail(groups, groupId);
-      const updateObj = await groups.updateOne(notPendingGroupFilter, updateOp);
+      const updateObj = await groups.updateOne(notPendingGroupIdFilter, updateOp);
       if (updateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }
@@ -235,12 +235,13 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
       addMember: (_root, { groupId, id }, context: Context) =>
         addOrRemoveMember(groups, groupId, id, 'add-member', context),
+
       removeMember: (_root, { groupId, id }, context: Context) =>
         addOrRemoveMember(groups, groupId, id, 'remove-member', context),
+
       deleteGroup: async (_root, { id }, context: Context) => {
-        const notPendingGroupFilter = {
-          id: id,
-          pending: { $exists: false }
+        const notPendingGroupIdFilter = {
+          id: id, pending: { $exists: false }
         };
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
@@ -248,7 +249,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case 'vote':
             await GroupValidation.groupExistsOrFail(groups, id);
             const pendingUpdateObj = await groups.updateOne(
-              notPendingGroupFilter,
+              notPendingGroupIdFilter,
               {
                 $set: {
                   pending: {
@@ -266,7 +267,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await GroupValidation.groupExistsOrFail(groups, id);
             const res = await groups
-              .deleteOne({ id: id, pending: { $exists: false } });
+              .deleteOne(notPendingGroupIdFilter);
 
             if (res.deletedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);

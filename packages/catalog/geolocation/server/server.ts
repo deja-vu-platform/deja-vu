@@ -138,7 +138,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       deleteMarker: async (_root, { id }, context: Context) => {
-        const notPendingResourceFilter = {
+        const notPendingMarkerIdFilter = {
           id: id,
           pending: { $exists: false }
         };
@@ -148,7 +148,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case 'vote':
             await MarkerValidation.markerExistsOrFail(markers, id);
             const pendingUpdateObj = await markers.updateOne(
-              notPendingResourceFilter,
+              notPendingMarkerIdFilter,
               {
                 $set: {
                   pending: {
@@ -166,7 +166,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await MarkerValidation.markerExistsOrFail(markers, id);
             const res = await markers
-              .deleteOne({ id: id, pending: { $exists: false } });
+              .deleteOne(notPendingMarkerIdFilter);
 
             if (res.deletedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
