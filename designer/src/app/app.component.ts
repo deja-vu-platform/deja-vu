@@ -22,7 +22,7 @@ import {
   viewProviders: [DragulaService]
 })
 export class AppComponent {
-  app = new App('newapp'); // TODO: create new or load from saved
+  app = new App('newapp');
   openAction = this.app.homepage;
 
   // dragula needs to be configured at the top level
@@ -62,7 +62,7 @@ export class AppComponent {
           const actionIdx = parseInt(el['dataset'].index, 10);
           action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
         } else {
-          return; // TODO: refactor to make better use of RxJS
+          return;
         }
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
         if (action) {

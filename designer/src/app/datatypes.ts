@@ -2,7 +2,7 @@ import { Component } from '@angular/compiler/src/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 
-// names should be HTML safe (TODO)
+// names should be HTML safe (TODO: ensure this)
 
 export interface ActionDefinition {
   name: string;
@@ -131,7 +131,7 @@ export class ActionInstance {
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
     _.forEach(this.inputSettings, (val, key) => {
-      html += `      ${key}="${val}"\n`; // TODO: non-string vals
+      html += `      ${key}=${val}\n`;
     });
     html += `    />\n`;
 
@@ -263,7 +263,6 @@ export class App {
         }
       });
     });
-    console.log(graph);
 
     return graphlib.alg.topsort(graph)
       .reverse()
