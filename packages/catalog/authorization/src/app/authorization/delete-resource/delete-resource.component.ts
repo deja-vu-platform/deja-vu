@@ -16,7 +16,7 @@ import { API_PATH } from '../authorization.config';
   styleUrls: ['./delete-resource.component.css']
 })
 export class DeleteResourceComponent implements OnInit, OnExec {
-  @Input() id;
+  @Input() id: string;
 
   private gs: GatewayService;
 
@@ -29,7 +29,7 @@ export class DeleteResourceComponent implements OnInit, OnExec {
     this.rs.register(this.elem, this);
   }
 
-  deleteEvent() {
+  deleteResource() {
     this.rs.exec(this.elem);
   }
 

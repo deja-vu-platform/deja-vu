@@ -253,11 +253,10 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       deleteEvent: async (_root, { id }, context: Context) => {
         const isPartOfSeries: boolean = await events
           .findOne({ id: id }, { projection: { _id: 1 }}) === null;
-        const notPendingEventsFilter = {
-          'events.id': id, pending: { $exists: false }
-        };
+        const notPendingEventsFilter = { pending: { $exists: false } };
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
         if (isPartOfSeries) {
+          _.set(notPendingEventsFilter, 'events.id', id);
           const updateOp = { $pull: { events: { id: id } } };
 
           switch (context.reqType) {
@@ -305,10 +304,12 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           // https://github.com/Microsoft/TypeScript/issues/19423
           return undefined;
         } else {
+          _.set(notPendingEventsFilter, 'id', id);
+
           switch (context.reqType) {
             case 'vote':
               await EventValidation.eventExistsOrFail(events, id);
-              const pendingUpdateObj = await series.updateOne(
+              const pendingUpdateObj = await events.updateOne(
                 notPendingEventsFilter,
                 {
                   $set: {

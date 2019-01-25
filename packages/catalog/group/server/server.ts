@@ -38,6 +38,11 @@ const actionRequestTable: ActionRequestTable = {
       createGroup (input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'delete-group': (extraInfo) => `
+    mutation DeleteGroup($id: ID!) {
+      deleteGroup (id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'join-leave': (extraInfo) => {
     switch (extraInfo.action) {
       case 'join':
@@ -85,7 +90,7 @@ async function addOrRemoveMember(
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 
-  const notPendingGroupFilter = {
+  const notPendingGroupIdFilter = {
     id: groupId,
     pending: { $exists: false }
   };
@@ -94,7 +99,7 @@ async function addOrRemoveMember(
     case 'vote':
       await GroupValidation.groupExistsOrFail(groups, groupId);
       const pendingUpdateObj = await groups.updateOne(
-        notPendingGroupFilter,
+        notPendingGroupIdFilter,
         {
           $set: {
             pending: {
@@ -110,7 +115,7 @@ async function addOrRemoveMember(
       return true;
     case undefined:
       await GroupValidation.groupExistsOrFail(groups, groupId);
-      const updateObj = await groups.updateOne(notPendingGroupFilter, updateOp);
+      const updateObj = await groups.updateOne(notPendingGroupIdFilter, updateOp);
       if (updateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }
@@ -230,8 +235,58 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
       addMember: (_root, { groupId, id }, context: Context) =>
         addOrRemoveMember(groups, groupId, id, 'add-member', context),
+
       removeMember: (_root, { groupId, id }, context: Context) =>
-        addOrRemoveMember(groups, groupId, id, 'remove-member', context)
+        addOrRemoveMember(groups, groupId, id, 'remove-member', context),
+
+      deleteGroup: async (_root, { id }, context: Context) => {
+        const notPendingGroupIdFilter = {
+          id: id, pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await GroupValidation.groupExistsOrFail(groups, id);
+            const pendingUpdateObj = await groups.updateOne(
+              notPendingGroupIdFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'delete-group'
+                  }
+                }
+              });
+
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await GroupValidation.groupExistsOrFail(groups, id);
+            const res = await groups
+              .deleteOne(notPendingGroupIdFilter);
+
+            if (res.deletedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await groups.deleteOne(reqIdPendingFilter);
+
+            return undefined;
+          case 'abort':
+            await groups.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
+      }
     }
   };
 }

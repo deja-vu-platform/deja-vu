@@ -1,0 +1,22 @@
+<dv.action name="show-my-events">
+  <mapmit.navbar />
+
+  <div class="events-container">
+    <div class="events-panel panel panel-default">
+      <div class="events-header-row">
+        <h2 class="my-events-header">My Events</h2>
+        <dv.link href="/create-event" class="btn btn-blue create-event-btn">
+          Create Event</dv.link>
+      </div>
+
+      <div class="container-fluid event-card-container">
+        <authorization.show-resources
+          noResourcesText="No events to show"
+          viewableBy=mapmit.navbar.loggedInUserId
+          showResource=<mapmit.show-event-info
+            id=$id
+            loggedInUserId=mapmit.navbar.loggedInUserId /> />
+      </div>
+    </div>
+  </div>
+</dv.action>

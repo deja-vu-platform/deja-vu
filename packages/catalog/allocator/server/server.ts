@@ -246,12 +246,15 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           }
         };
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+        const notPendingAllocationIdFilter = {
+          id: allocationId, pending: { $exists: false }
+        }
         switch (context.reqType) {
           case 'vote':
             await AllocationValidation.allocationExistsOrFail(
               allocations, allocationId);
             const pendingUpdateObj = await allocations.updateOne(
-              { id: allocationId, pending: { $exists: false } },
+              notPendingAllocationIdFilter,
               {
                 $set: {
                   pending: {
@@ -270,7 +273,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await AllocationValidation.allocationExistsOrFail(
               allocations, allocationId);
             const updateObj = await allocations.updateOne(
-              { id: allocationId, pending: { $exists: false } }, updateOp);
+              notPendingAllocationIdFilter, updateOp);
 
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);

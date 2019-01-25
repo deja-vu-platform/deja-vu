@@ -1,0 +1,71 @@
+<dv.action name="show-event-info">
+  <property.show-object id=$id hidden=true />
+  <authorization.show-owner resourceId=$id hidden=true />
+
+  <div class="row event-card-row">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <!-- Title -->
+          <property.show-object
+            class="bold bigger-text"
+            object=property.show-object.loadedObject
+            showOnly=['title'] />
+        </div>
+
+        <div class="panel-body">
+          <!-- Host -->
+          <div>
+            <span class="italic">Host:</span>
+            <authentication.show-user id=authorization.show-owner.ownerId />
+          </div>
+
+          <!-- Description -->
+          <div>
+            <span class="italic">Description:</span>
+            <property.show-object
+              object=property.show-object.loadedObject
+              showOnly=['description'] />
+          </div>
+
+          <!-- Date + Time -->
+          <div>
+            <span class="italic">Time:</span>
+            <event.show-event id=$id />
+          </div>
+
+          <!-- Location + Room Number -->
+          <div>
+            <span class="italic">Room Number:</span>
+            <property.show-object
+              object=property.show-object.loadedObject
+              showOnly=['roomNumber'] />
+
+            <span class="italic">Location Description:</span>
+            <property.show-object
+              object=property.show-object.loadedObject
+              showOnly=['locationDescription'] />
+          </div>
+        </div>
+
+        <dv.if condition=authorization.show-owner.ownerId === $loggedInUserId>
+          <div class="edit-cancel-event-btn-container">
+            <dv.tx>
+              <!-- Edit/ Delete Buttons -->
+              <!-- TODO: Edit Button -->
+
+              <authorization.delete-resource id=$id hidden=true />
+              <geolocation.delete-marker id=$id hidden=true />
+              <event.delete-event id=$id hidden=true />
+              <group.delete-group id=$id hidden=true />
+              <authentication.authenticate id=$loggedInUserId hidden=true />
+              <dv.button class="edit-event-btn">Delete Event</dv.button>
+              <dv.callback defaultHref="/my-events" onExecSuccess=true
+                hidden=true />
+            </dv.tx>
+          </div>
+        </dv.if>
+      </div>
+    </div>
+  </div>
+</dv.action>

@@ -65,6 +65,8 @@
     "samples/morg/.dv",
     "samples/potluck",
     "samples/mapmit",
+    "samples/mapmit/.dv",
+    "samples/mapmit-old",
     "samples/rendezvous",
     "designer",
     "designer-apps/*",

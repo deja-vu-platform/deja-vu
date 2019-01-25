@@ -167,7 +167,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         const updateOp = { $set: { content: input.content } };
-        const notPendingCommentFilter = {
+        const notPendingCommentIdFilter = {
           id: input.id,
           pending: { $exists: false }
         };
@@ -178,7 +178,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const pendingUpdateObj = await comments
               .updateOne(
-                notPendingCommentFilter,
+                notPendingCommentIdFilter,
                 {
                   $set: {
                     pending: {
@@ -195,7 +195,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const updateObj = await comments
-              .updateOne(notPendingCommentFilter, updateOp);
+              .updateOne(notPendingCommentIdFilter, updateOp);
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
             }
@@ -226,7 +226,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           throw new Error('Only the author of the comment can edit it.');
         }
 
-        const notPendingCommentFilter = {
+        const notPendingCommentIdFilter = {
           id: input.id,
           pending: { $exists: false }
         };
@@ -236,7 +236,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case 'vote':
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const pendingUpdateObj = await comments.updateOne(
-              notPendingCommentFilter,
+              notPendingCommentIdFilter,
               {
                 $set: {
                   pending: {
@@ -254,7 +254,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await CommentValidation.commentExistsOrFails(comments, input.id);
             const res = await comments
-              .deleteOne({ id: input.id, pending: { $exists: false } });
+              .deleteOne(notPendingCommentIdFilter);
 
             if (res.deletedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
