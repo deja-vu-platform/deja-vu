@@ -6,15 +6,18 @@ import {
   ConfigureClicheComponent,
   DialogData
 } from '../configure-cliche/configure-cliche.component';
-import { ActionDefinition, App, ClicheInstance } from '../datatypes';
+import {
+  ActionDefinition,
+  App,
+  AppActionDefinition,
+  ClicheInstance
+} from '../datatypes';
 
 
 interface ActionCollection {
   name: string;
   actions: ActionDefinition[];
 }
-
-const NUM_CONSTANT_COLLECTIONS = 2;
 
 
 @Component({
@@ -24,17 +27,19 @@ const NUM_CONSTANT_COLLECTIONS = 2;
 })
 export class SideMenuComponent implements OnInit {
   @Input() app: App;
+  @Input() openAction: AppActionDefinition;
   // need consistent object to return
   private _actionCollections: ActionCollection[];
 
   constructor(private dialog: MatDialog) {}
 
   ngOnInit() {
-    this._actionCollections = [designerCliche, this.app];
+    this._actionCollections = [designerCliche];
   }
 
   get actionCollections(): ActionCollection[] {
-    this._actionCollections.splice(NUM_CONSTANT_COLLECTIONS);
+    this._actionCollections.splice(1);
+    this._actionCollections.push(this.app);
     this._actionCollections.push.apply(
       this._actionCollections,
       this.app.cliches

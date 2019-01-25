@@ -1,4 +1,5 @@
 import { Component } from '@angular/compiler/src/core';
+import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 
 // names should be HTML safe (TODO)
@@ -18,6 +19,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly inputs: string[] = []; // TODO: input type
   readonly outputs: string[] = [];
   private _rows: Row[] = [];
+  transaction = false;
   // TODO: styling options
 
   constructor(name: string) {
@@ -30,11 +32,30 @@ export class AppActionDefinition implements ActionDefinition {
     return this._rows;
   }
 
+  contains(actionDefinition: ActionDefinition, deep = false) {
+    return this.rows.some((r) =>
+      r.actions.some((a) => (
+        a.of === actionDefinition
+        || (
+          deep
+          && a.of['contains']
+          && (<AppActionDefinition>a.of).contains(actionDefinition, true)
+        )
+      ))
+    );
+  }
+
   toHTML() {
     let html = `<dv.action name="${this.name}">\n`;
+    if (this.transaction) {
+      html += `<dv.tx>\n`;
+    }
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
+    if (this.transaction) {
+      html += `</dv.tx>\n`;
+    }
     html += `</dv.action>`;
 
     return html;
@@ -45,7 +66,8 @@ export class AppActionDefinition implements ActionDefinition {
       name: this.name,
       inputs: this.inputs,
       outputs: this.outputs,
-      rows: this.rows.map((row) => row.toJSON())
+      rows: this.rows.map((row) => row.toJSON()),
+      transaction: this.transaction
     };
   }
 }
@@ -94,17 +116,17 @@ export class ActionInstance {
   data?: any; // currently only used for the text widget
 
   constructor(
-    of: ActionDefinition,
+    ofAction: ActionDefinition,
     from: App | ClicheInstance | ClicheDefinition
   ) {
-    this.of = of;
+    this.of = ofAction;
     this.from = from;
   }
 
   toHTML(): string {
     // text widget is just plain HTML static content
     if (this.of.name === 'text' && this.from.name === 'dv-d') {
-      return `<div>${this.data}</div>`;
+      return `    <div>${this.data}</div>\n`;
     }
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
@@ -141,9 +163,9 @@ export class ClicheInstance {
   readonly of: ClicheDefinition;
   readonly config: { [s: string]: any } = {};
 
-  constructor(name: string, of: ClicheDefinition) {
+  constructor(name: string, ofCliche: ClicheDefinition) {
     this.name = name;
-    this.of = of;
+    this.of = ofCliche;
   }
 
   get actions() {
@@ -160,9 +182,9 @@ export class ClicheInstance {
 }
 
 export class App {
-  name: string;
-  readonly actions: AppActionDefinition[] = [];
-  readonly pages: AppActionDefinition[] = []; // subset of actions
+  name: string; // no dashes
+  readonly actions: AppActionDefinition[];
+  readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
   readonly cliches: ClicheInstance[] = [];
 
@@ -187,8 +209,8 @@ export class App {
     app.pages.pop();
 
     appJSON.cliches.forEach((ci) => {
-      const of = clicheDefinitions.find((cd) => cd.name === ci.of);
-      const clicheInstance = new ClicheInstance(ci.name, of);
+      const ofCliche = clicheDefinitions.find((cd) => cd.name === ci.of);
+      const clicheInstance = new ClicheInstance(ci.name, ofCliche);
       Object.assign(clicheInstance.config, ci.config);
       app.cliches.push(clicheInstance);
     });
@@ -197,6 +219,7 @@ export class App {
       const actionDef = new AppActionDefinition(aad.name);
       actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
       actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      actionDef.transaction = aad.transaction;
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
@@ -205,11 +228,9 @@ export class App {
             app,
             designerCliche
           ].find((c) => c.name === ai.from);
-          // const from = fromInstance ? fromInstance.of : app;
-          // TODO: this will fail unless app actions are topo sorted
-          const of = (<ActionDefinition[]>from.actions)
+          const ofAction = (<ActionDefinition[]>from.actions)
             .find((a) => a.name === ai.of);
-          const actionInst = new ActionInstance(of, from);
+          const actionInst = new ActionInstance(ofAction, from);
           Object.assign(actionInst.inputSettings, ai.inputSettings);
           if (ai.data) {
             actionInst.data = ai.data;
@@ -220,6 +241,7 @@ export class App {
       });
       app.actions.push(actionDef);
     });
+    app.actions.sort((aad1, aad2) => aad1.name < aad2.name ? -1 : 1);
 
     appJSON.pages.forEach((p) => {
       const page = app.actions.find((a) => a.name === p);
@@ -231,10 +253,28 @@ export class App {
     return app;
   }
 
+  private tsortActions(): AppActionDefinition[] {
+    const graph = new graphlib.Graph();
+    this.actions.forEach((a) => graph.setNode(a.name));
+    this.actions.forEach((a1) => {
+      this.actions.forEach((a2) => {
+        if (a1.contains(a2)) {
+          graph.setEdge(a1.name, a2.name);
+        }
+      });
+    });
+    console.log(graph);
+
+    return graphlib.alg.topsort(graph)
+      .reverse()
+      .map((name) => this.actions.find((a) => a.name === name));
+  }
+
   toJSON() {
     return {
       name: this.name,
-      actions: this.actions.map((action) => action.toJSON()),
+      actions: this.tsortActions()
+        .map((action) => action.toJSON()),
       pages: this.pages.map((p) => p.name),
       homepage: this.homepage.name,
       cliches: this.cliches

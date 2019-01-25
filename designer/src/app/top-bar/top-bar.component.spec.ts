@@ -1,6 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import {
+  MatDialogModule,
   MatIconModule,
+  MatSelectModule,
   MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
@@ -16,7 +19,10 @@ describe('TopBarComponent', () => {
     TestBed.configureTestingModule({
       declarations: [TopBarComponent],
       imports: [
+        FormsModule,
+        MatDialogModule,
         MatIconModule,
+        MatSelectModule,
         MatSnackBarModule,
         MatToolbarModule
       ],

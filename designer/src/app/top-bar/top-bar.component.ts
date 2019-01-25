@@ -7,13 +7,19 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
-import { App } from '../datatypes';
+import {
+  ConfigureActionComponent,
+  DialogData
+} from '../configure-action/configure-action.component';
+import { App, AppActionDefinition } from '../datatypes';
 
-const NUM_CONFIG_FILES = 2;
+const NUM_CONST_FILES = 3;
 const SNACKBAR_DURATION = 2500;
+const STYLES = `@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";`;
 
 @Component({
   selector: 'app-top-bar',
@@ -22,7 +28,9 @@ const SNACKBAR_DURATION = 2500;
 })
 export class TopBarComponent {
   @Input() app: App;
-  @Output() load = new EventEmitter<string>();
+  @Input() openAction: AppActionDefinition;
+  @Output() load = new EventEmitter<string>(true); // async
+  @Output() changeAction = new EventEmitter<AppActionDefinition>();
   @ViewChild('fileInput') fileInput: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   fs: any;
@@ -34,11 +42,45 @@ export class TopBarComponent {
   constructor(
     private _electronService: ElectronService,
     private snackBar: MatSnackBar,
-    private zone: NgZone
+    private zone: NgZone,
+    private dialog: MatDialog
   ) {
     if (this._electronService.remote) {
       this.fs = this._electronService.remote.require('fs');
     }
+  }
+
+  onSelectAction() {
+    this.changeAction.emit(this.openAction);
+  }
+
+  createAction = () => {
+    const data: DialogData = {
+      app: this.app
+    };
+    this.dialog.open(ConfigureActionComponent, {
+      width: '50vw',
+      data
+    });
+  }
+
+  editAction() {
+    const data: DialogData = {
+      app: this.app,
+      action: this.openAction
+    };
+    this.dialog.open(ConfigureActionComponent, {
+      width: '50vw',
+      data
+    });
+  }
+
+  private showSnackBar(message: string) {
+    this.zone.run(() => {
+      this.snackBar.open(message, 'dismiss', {
+        duration: SNACKBAR_DURATION
+      });
+    });
   }
 
   private makeAppDirectory(callback: (pathToDir: string) => void) {
@@ -48,14 +90,6 @@ export class TopBarComponent {
       this.fs.mkdir(appRoot, (e2) => {
         if (e2 && e2.code !== 'EEXIST') { throw e2; }
         callback(appRoot);
-      });
-    });
-  }
-
-  private showSnackBar(message: string) {
-    this.zone.run(() => {
-      this.snackBar.open(message, 'dismiss', {
-        duration: SNACKBAR_DURATION
       });
     });
   }
@@ -92,8 +126,8 @@ export class TopBarComponent {
   export() {
     this.exporting = true;
     this.makeAppDirectory((appRoot) => {
-      const packageJSON = this.app.toPackageJSON();
-      let numFilesToWrite = this.app.actions.length + NUM_CONFIG_FILES;
+      // count callbacks (since fs isn't promise-based)
+      let numFilesToWrite = this.app.actions.length + NUM_CONST_FILES;
       let numFilesWritten = 0;
       let exportError = false;
       const writeCallback = (e) => {
@@ -104,35 +138,40 @@ export class TopBarComponent {
         }
         if (numFilesWritten === numFilesToWrite) {
           this.exporting = false;
-          const message = exportError ?
-            'Export failed.' :
-            'Your app has been exported.';
           this.showSnackBar(exportError ?
             'Export failed.' :
             'Your app has been exported.'
           );
         }
       };
+
+      const packageJSON = this.app.toPackageJSON();
       this.fs.writeFile(`${appRoot}/package.json`, packageJSON, writeCallback);
       const configJSON = this.app.toDVConfigJSON();
       this.fs.writeFile(`${appRoot}/dvconfig.json`, configJSON, writeCallback);
-      this.app.actions.forEach((action) => {
-        const actionRoot = `${appRoot}/${action.name}`;
-        this.fs.mkdir(actionRoot, (e1) => {
-          if (e1 && e1.code !== 'EEXIST') { throw e1; }
-          let html = action.toHTML();
-          let imageNum = 0;
-          html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
-            imageNum += 1;
-            numFilesToWrite += 1;
-            const pngFileName = `img-${imageNum}.png`;
-            const pngFilePath = `${actionRoot}/${pngFileName}`;
-            this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
 
-            return `"${pngFileName}"`; // relative reference
+      this.fs.mkdir(`${appRoot}/src`, (e1) => {
+        if (e1 && e1.code !== 'EEXIST') { throw e1; }
+        this.fs.writeFile(`${appRoot}/src/styles.css`, STYLES, writeCallback);
+
+        this.app.actions.forEach((action) => {
+          const actionRoot = `${appRoot}/src/${action.name}`;
+          this.fs.mkdir(actionRoot, (e2) => {
+            if (e2 && e2.code !== 'EEXIST') { throw e2; }
+            let html = action.toHTML();
+            let imageNum = 0;
+            html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
+              imageNum += 1;
+              numFilesToWrite += 1;
+              const pngFileName = `img-${imageNum}.png`;
+              const pngFilePath = `${actionRoot}/${pngFileName}`;
+              this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
+
+              return `"${pngFileName}"`; // relative reference
+            });
+            const htmlFilePath = `${actionRoot}/${action.name}.html`;
+            this.fs.writeFile(htmlFilePath, html, writeCallback);
           });
-          const htmlFilePath = `${actionRoot}/${action.name}.html`;
-          this.fs.writeFile(htmlFilePath, html, writeCallback);
         });
       });
     });

@@ -5,8 +5,10 @@ import { filter } from 'rxjs/operators';
 
 import { clicheDefinitions, designerCliche } from './cliche.module';
 import {
+  ActionDefinition,
   ActionInstance,
   App,
+  AppActionDefinition,
   ClicheDefinition,
   ClicheInstance,
   Row
@@ -20,7 +22,7 @@ import {
   viewProviders: [DragulaService]
 })
 export class AppComponent {
-  app = new App('new-app'); // TODO: create new or load from saved
+  app = new App('newapp'); // TODO: create new or load from saved
   openAction = this.app.homepage;
 
   // dragula needs to be configured at the top level
@@ -47,8 +49,14 @@ export class AppComponent {
         const toRowIdx = parseInt(target['dataset'].index, 10);
         const toRow = this.openAction.rows[toRowIdx] || new Row();
         if (source.classList.contains('action-list')) {
-          const { source: sourceName, action: actionName } = el['dataset'];
-          action = this.newWidget(sourceName, actionName);
+          const {
+            source: sourceName,
+            action: actionName,
+            disabled
+          } = el['dataset'];
+          if (disabled !== 'true') {
+            action = this.newWidget(sourceName, actionName);
+          }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);
           const actionIdx = parseInt(el['dataset'].index, 10);
@@ -57,23 +65,23 @@ export class AppComponent {
           return; // TODO: refactor to make better use of RxJS
         }
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        toRow.addAction(action);
-        if (toRowIdx === -1) {
-          this.openAction.rows.push(toRow);
+        if (action) {
+          toRow.addAction(action);
+          if (toRowIdx === -1) {
+            this.openAction.rows.push(toRow);
+          }
         }
       });
   }
 
   newWidget(sourceName: string, actionName: string): ActionInstance {
-    if (sourceName === this.app.name) {
-      throw new Error('Support for nested App Actions is not yet implemented');
-    }
-
-    const source: ClicheDefinition | ClicheInstance =
-      sourceName === designerCliche.name
-        ? designerCliche
-        : this.app.cliches.find((c) => c.name === sourceName);
-    const actionDefinition = source.actions.find((a) => a.name === actionName);
+    const source: App | ClicheDefinition | ClicheInstance = [
+      this.app,
+      designerCliche,
+      ...this.app.cliches
+    ].find((s) => s.name === sourceName);
+    const actionDefinition = (<ActionDefinition[]>source.actions)
+      .find((a) => a.name === actionName);
 
     return new ActionInstance(actionDefinition, source);
   }
@@ -86,5 +94,9 @@ export class AppComponent {
         duration: 2500
       });
     });
+  }
+
+  onActionChanged(openAction: AppActionDefinition) {
+    this.openAction = openAction;
   }
 }

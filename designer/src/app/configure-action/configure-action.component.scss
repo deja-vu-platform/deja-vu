@@ -1,0 +1,23 @@
+#configure-action {
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+mat-checkbox {
+  margin-right: 8px;
+}
+
+.message {
+  display: inline-block;
+  font-style: italic;
+  margin-bottom: 8px;
+}

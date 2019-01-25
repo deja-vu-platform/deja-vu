@@ -24,8 +24,6 @@ export class ActionInstanceComponent implements OnInit {
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.of['component']) {
       this.loadClicheAction();
-    } else if (this.actionInstance) {
-      throw new Error('Support for nested App Actions is not implemented.');
     }
   }
 

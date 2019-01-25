@@ -20,6 +20,7 @@
           *ngFor="let action of collection.actions"
           [attr.data-source]="collection.name"
           [attr.data-action]="action.name"
+          [attr.data-disabled]="action.contains && (action.contains(openAction) || action === openAction)"
         >
           {{action.name}}
         </mat-list-item>

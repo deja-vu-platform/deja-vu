@@ -1,9 +1,11 @@
 import { async, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import {
   MatDialogModule,
   MatExpansionModule,
   MatIconModule,
   MatListModule,
+  MatSelectModule,
   MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
@@ -32,10 +34,12 @@ describe('AppComponent', () => {
         RowComponent
       ],
       imports: [
+        FormsModule,
         MatDialogModule,
         MatExpansionModule,
         MatIconModule,
         MatListModule,
+        MatSelectModule,
         MatSnackBarModule,
         MatToolbarModule
       ],
