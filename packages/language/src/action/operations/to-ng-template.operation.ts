@@ -24,6 +24,11 @@ import { ActionInputCompiler } from '../../action-input/action-input.compiler';
 import { ActionCompiler, CompiledAction } from '../action.compiler';
 
 
+// Some HTML attributes don't have corresponding properties. For these,
+// we need to avoid turning the attribute into a property.
+// TODO: find the complete list
+const ATTRS_NO_PROP = new Set(['colspan']);
+
 function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {
   const clicheOrActionAlias = _
@@ -61,7 +66,6 @@ function nonInputMemberAccessToField(
 
   return `${outputField}${memberAccesses}`;
 }
-
 
 export function toNgTemplate(
   appName: string, symbolTable: ActionSymbolTable,
@@ -186,9 +190,13 @@ export function toNgTemplate(
       return open.sourceString + elementName + close.sourceString;
     },
     VoidElement: tagTransform,
-    Attribute: (attributeNameNode, _eq, expr) =>
-      `[${attributeNameToInput(attributeNameNode.sourceString)}]=` +
-        `"${expr.toNgTemplate()}"`,
+    Attribute: (attributeNameNode, _eq, expr) => {
+      const attrName = attributeNameNode.sourceString;
+
+      return ATTRS_NO_PROP.has(attrName) ?
+        `${attrName}=${expr.sourceString}` :
+        `[${attributeNameToInput(attrName)}]="${expr.toNgTemplate()}"`;
+    },
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),
     ElementName_action: (actionNameMaybeAlias) =>
