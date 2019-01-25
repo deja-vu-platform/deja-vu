@@ -8,8 +8,11 @@
   <geolocation-create-marker mapId="markerMapId"
     [title]="selectedMarker?.title"
     [latitude]="selectedMarker?.latitude"
-    [longitude]="selectedMarker?.longitude">
+    [longitude]="selectedMarker?.longitude"
+    (marker)="m=$event">
   </geolocation-create-marker>
+  <h1>Show Marker</h1>
+  <geolocation-show-marker [marker]="m"></geolocation-show-marker>
   <h1>Show All Markers</h1>
   <geolocation-show-markers></geolocation-show-markers>
   <h1>Show Markers for Map <i>markerMapId</i></h1>
