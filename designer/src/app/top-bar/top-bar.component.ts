@@ -16,8 +16,10 @@ import {
 } from '../configure-action/configure-action.component';
 import { App, AppActionDefinition } from '../datatypes';
 
-const NUM_CONFIG_FILES = 2;
+const NUM_CONST_FILES = 3;
 const SNACKBAR_DURATION = 2500;
+const STYLES = `@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";`;
 
 @Component({
   selector: 'app-top-bar',
@@ -93,7 +95,6 @@ export class TopBarComponent {
   }
 
   save() {
-    console.log(this.app);
     this.saving = true;
     const designerSave = JSON.stringify(this.app);
     const saveFn = this.fs ? this.saveElectron : this.saveBrowser;
@@ -125,8 +126,8 @@ export class TopBarComponent {
   export() {
     this.exporting = true;
     this.makeAppDirectory((appRoot) => {
-      const packageJSON = this.app.toPackageJSON();
-      let numFilesToWrite = this.app.actions.length + NUM_CONFIG_FILES;
+      // count callbacks (since fs isn't promise-based)
+      let numFilesToWrite = this.app.actions.length + NUM_CONST_FILES;
       let numFilesWritten = 0;
       let exportError = false;
       const writeCallback = (e) => {
@@ -143,26 +144,34 @@ export class TopBarComponent {
           );
         }
       };
+
+      const packageJSON = this.app.toPackageJSON();
       this.fs.writeFile(`${appRoot}/package.json`, packageJSON, writeCallback);
       const configJSON = this.app.toDVConfigJSON();
       this.fs.writeFile(`${appRoot}/dvconfig.json`, configJSON, writeCallback);
-      this.app.actions.forEach((action) => {
-        const actionRoot = `${appRoot}/${action.name}`;
-        this.fs.mkdir(actionRoot, (e1) => {
-          if (e1 && e1.code !== 'EEXIST') { throw e1; }
-          let html = action.toHTML();
-          let imageNum = 0;
-          html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
-            imageNum += 1;
-            numFilesToWrite += 1;
-            const pngFileName = `img-${imageNum}.png`;
-            const pngFilePath = `${actionRoot}/${pngFileName}`;
-            this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
 
-            return `"${pngFileName}"`; // relative reference
+      this.fs.mkdir(`${appRoot}/src`, (e1) => {
+        if (e1 && e1.code !== 'EEXIST') { throw e1; }
+        this.fs.writeFile(`${appRoot}/src/styles.css`, STYLES, writeCallback);
+
+        this.app.actions.forEach((action) => {
+          const actionRoot = `${appRoot}/src/${action.name}`;
+          this.fs.mkdir(actionRoot, (e2) => {
+            if (e2 && e2.code !== 'EEXIST') { throw e2; }
+            let html = action.toHTML();
+            let imageNum = 0;
+            html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
+              imageNum += 1;
+              numFilesToWrite += 1;
+              const pngFileName = `img-${imageNum}.png`;
+              const pngFilePath = `${actionRoot}/${pngFileName}`;
+              this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
+
+              return `"${pngFileName}"`; // relative reference
+            });
+            const htmlFilePath = `${actionRoot}/${action.name}.html`;
+            this.fs.writeFile(htmlFilePath, html, writeCallback);
           });
-          const htmlFilePath = `${actionRoot}/${action.name}.html`;
-          this.fs.writeFile(htmlFilePath, html, writeCallback);
         });
       });
     });
