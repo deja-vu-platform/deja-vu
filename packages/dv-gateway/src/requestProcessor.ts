@@ -68,6 +68,7 @@ interface GatewayToClicheRequest extends GatewayRequest {
 interface ClicheResponse<T> {
   readonly status: number;
   readonly text: T;
+  readonly index?: number;
 }
 
 type port = string;
@@ -89,10 +90,11 @@ class TxResponse {
    * Add a response to the batch.
    * A single response is sent once we have reached the batchSize
    */
-  add(status: number, text: string): void {
+  add(status: number, text: string, index?: number): void {
     this.responses.push({
       status,
-      text
+      text,
+      index
     });
 
     if (this.responses.length === this.batchSize) {
@@ -111,7 +113,8 @@ class TxResponse {
         .filter(({ status: s }) => s !== SUCCESS)
         .length === 0 ? SUCCESS : INTERNAL_SERVER_ERROR;
       body = this.responses
-        .map(({ text: t, status: s }) => ({ status: s, body: t }));
+        .sort((a, b) => a.index - b.index)
+        .map((response) => ({ status: response.status, body: response.text }));
     }
     this.res
       .status(status)
@@ -247,20 +250,22 @@ export class RequestProcessor {
     res: express.Response
   ): Promise<void> {
     if (!req.query.isTx) {
-      return this.doProcessRequest(req, new TxResponse(res, 1));
+      return this.doProcessRequest(req, new TxResponse(res, 1), 1);
     }
 
     const childRequests: ChildRequest[] = req.body;
     const txRes = new TxResponse(res, childRequests.length);
 
     return Promise
-      .all(childRequests.map((chReq) => this.doProcessRequest(chReq, txRes)))
+      .all(childRequests.map((chReq, index) =>
+        this.doProcessRequest(chReq, txRes, index)))
       .then(() => {});
   }
 
   private async doProcessRequest(
     req: express.Request | ChildRequest,
-    txRes: TxResponse
+    txRes: TxResponse,
+    index: number
   ): Promise<void> {
     if (!req.query.from) {
       txRes.add(INTERNAL_SERVER_ERROR, 'No from specified');
@@ -308,7 +313,7 @@ export class RequestProcessor {
     } else {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
-      txRes.add(clicheRes.status, clicheRes.text);
+      txRes.add(clicheRes.status, clicheRes.text, index);
     }
   }
 
