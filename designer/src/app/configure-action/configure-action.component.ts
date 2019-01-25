@@ -37,6 +37,7 @@ export class ConfigureActionComponent implements OnInit {
       this.name = this.data.action.name;
       this.page = this.actionIsPage();
       this.home = this.data.app.homepage === this.data.action;
+      this.transaction = this.data.action.transaction;
     }
   }
 
@@ -76,6 +77,7 @@ export class ConfigureActionComponent implements OnInit {
       });
     });
     _.remove(this.data.app.actions, (ad) => ad === this.data.action);
+    this.dialogRef.close();
   }
 
   save() {
@@ -95,6 +97,8 @@ export class ConfigureActionComponent implements OnInit {
     } else {
       this.makeActionNotPage(action);
     }
+
+    action.transaction = this.transaction;
 
     this.dialogRef.close();
   }

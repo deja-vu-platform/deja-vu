@@ -93,6 +93,7 @@ export class TopBarComponent {
   }
 
   save() {
+    console.log(this.app);
     this.saving = true;
     const designerSave = JSON.stringify(this.app);
     const saveFn = this.fs ? this.saveElectron : this.saveBrowser;
@@ -136,9 +137,6 @@ export class TopBarComponent {
         }
         if (numFilesWritten === numFilesToWrite) {
           this.exporting = false;
-          const message = exportError ?
-            'Export failed.' :
-            'Your app has been exported.';
           this.showSnackBar(exportError ?
             'Export failed.' :
             'Your app has been exported.'

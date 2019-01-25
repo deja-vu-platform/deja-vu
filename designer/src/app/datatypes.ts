@@ -19,6 +19,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly inputs: string[] = []; // TODO: input type
   readonly outputs: string[] = [];
   private _rows: Row[] = [];
+  transaction = false;
   // TODO: styling options
 
   constructor(name: string) {
@@ -31,9 +32,7 @@ export class AppActionDefinition implements ActionDefinition {
     return this._rows;
   }
 
-  contains(actionDefinition: ActionDefinition, deep?: boolean) {
-    if (actionDefinition === this) { return true; }
-
+  contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
       r.actions.some((a) => (
         a.of === actionDefinition
@@ -48,9 +47,15 @@ export class AppActionDefinition implements ActionDefinition {
 
   toHTML() {
     let html = `<dv.action name="${this.name}">\n`;
+    if (this.transaction) {
+      html += `<dv.tx>\n`;
+    }
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
+    if (this.transaction) {
+      html += `</dv.tx>\n`;
+    }
     html += `</dv.action>`;
 
     return html;
@@ -61,7 +66,8 @@ export class AppActionDefinition implements ActionDefinition {
       name: this.name,
       inputs: this.inputs,
       outputs: this.outputs,
-      rows: this.rows.map((row) => row.toJSON())
+      rows: this.rows.map((row) => row.toJSON()),
+      transaction: this.transaction
     };
   }
 }
@@ -120,7 +126,7 @@ export class ActionInstance {
   toHTML(): string {
     // text widget is just plain HTML static content
     if (this.of.name === 'text' && this.from.name === 'dv-d') {
-      return `<div>${this.data}</div>`;
+      return `    <div>${this.data}</div>\n`;
     }
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
@@ -176,7 +182,7 @@ export class ClicheInstance {
 }
 
 export class App {
-  name: string;
+  name: string; // no dashes
   readonly actions: AppActionDefinition[];
   readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
@@ -213,6 +219,7 @@ export class App {
       const actionDef = new AppActionDefinition(aad.name);
       actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
       actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      actionDef.transaction = aad.transaction;
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
@@ -256,6 +263,7 @@ export class App {
         }
       });
     });
+    console.log(graph);
 
     return graphlib.alg.topsort(graph)
       .reverse()

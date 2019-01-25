@@ -22,7 +22,7 @@ import {
   viewProviders: [DragulaService]
 })
 export class AppComponent {
-  app = new App('new-app'); // TODO: create new or load from saved
+  app = new App('newapp'); // TODO: create new or load from saved
   openAction = this.app.homepage;
 
   // dragula needs to be configured at the top level
