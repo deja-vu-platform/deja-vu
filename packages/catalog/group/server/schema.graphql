@@ -31,4 +31,5 @@ type Mutation {
   createGroup(input: CreateGroupInput!): Group
   addMember(groupId: ID!, id: ID!): Boolean
   removeMember(groupId: ID!, id: ID!): Boolean
+  deleteGroup(id: ID!): Boolean
 }

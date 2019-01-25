@@ -1,5 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatToolbarModule } from '@angular/material';
+import { FormsModule } from '@angular/forms';
+import {
+  MatDialogModule,
+  MatIconModule,
+  MatSelectModule,
+  MatSnackBarModule,
+  MatToolbarModule
+} from '@angular/material';
+import { ElectronService } from 'ngx-electron';
 
 import { TopBarComponent } from './top-bar.component';
 
@@ -10,7 +18,17 @@ describe('TopBarComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [TopBarComponent],
-      imports: [MatToolbarModule]
+      imports: [
+        FormsModule,
+        MatDialogModule,
+        MatIconModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        MatToolbarModule
+      ],
+      providers: [
+        ElectronService
+      ]
     })
     .compileComponents();
   }));

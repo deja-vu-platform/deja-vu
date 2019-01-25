@@ -2,4 +2,32 @@
   width: 264px; /* same as GSites */
   height: 100%;
   border-left: 1px solid black;
+  text-align: center;
+}
+
+#import-cliche {
+  margin-top: 16px;
+}
+
+button.more {
+  padding: 0;
+  margin-right: 8px;
+}
+
+mat-panel-title {
+  align-items: center;
+}
+
+mat-expansion-panel-header {
+  padding-left: 16px;
+}
+
+.spacer {
+  display: inline-block;
+  width: 32px;
+}
+
+mat-list-item[data-disabled="true"] {
+  color: gray;
+  cursor: not-allowed;
 }

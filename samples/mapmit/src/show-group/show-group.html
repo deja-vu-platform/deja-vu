@@ -1,0 +1,47 @@
+<dv.action name="show-group">
+  <authorization.show-owner resourceId=$group?.id hidden=true />
+
+  <div class="group-im-in">
+    <div class="group-im-in-container">
+
+      <dv.if condition=$createdByUser &&
+        $loggedInUserId === authorization.show-owner.ownerId>
+        <group.show-group group=$group
+          showMember=<authentication.show-user id=$id/> />
+
+        <dv.tx as mapmit-join-leave-group-owned-by-user>
+          <group.join-leave class="btn btn-default remove-from-group-btn"
+            group=$group memberId=$loggedInUserId />
+        </dv.tx>
+
+        <h5>Add User</h5>
+          <authentication.choose-user class="add-member-input"
+            showChooseButton=false />
+
+        <dv.tx>
+          <dv.status savedText="Member added to group" />
+          <group.add-to-group id=$group?.id showInput=false hidden=true
+            member=authentication.choose-user.selectedUser />
+          <authorization.add-viewer id=$group?.id hidden=true
+            viewer=authentication.choose-user.selectedUser />
+          <authentication.authenticate id=$loggedInUserId hidden=true />
+          <dv.button class="btn btn-blue add-member-btn vertical-align-top">
+            Add Member to Group
+          </dv.button>
+        </dv.tx>
+      </dv.if>
+
+      <dv.if condition=$isMemberOf>
+        <group.show-group group=$group showMembers=false />
+        <dv.tx as mapmit-join-leave-group-user-is-member-of>
+          <authentication.authenticate id=$loggedInUserId hidden=true />
+          <authorization.add-remove-viewer resourceId=$group?.id
+            viewerId=$loggedInUserId hidden=true/>
+          <group.join-leave class="btn btn-default remove-from-group-btn"
+            group=$group memberId=$loggedInUserId />
+        </dv.tx>
+      </dv.if>
+
+    </div>
+  </div>
+</dv.action>

@@ -2,76 +2,89 @@ import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import * as _ from 'lodash';
 
-import * as Allocator from 'allocator';
-import * as Authentication from 'authentication';
-import * as Authorization from 'authorization';
-import * as EventDV from 'event';
-import * as Follow from 'follow';
-import * as Geolocation from 'geolocation';
-import * as Group from 'group';
-import * as Passkey from 'passkey';
-import * as Property from 'property';
-import * as Rating from 'rating';
-import * as Task from 'task';
-import * as Transfer from 'transfer';
+import * as allocator from 'allocator';
+import * as authentication from 'authentication';
+import * as authorization from 'authorization';
+import * as event from 'event';
+import * as follow from 'follow';
+import * as geolocation from 'geolocation';
+import * as group from 'group';
+import * as passkey from 'passkey';
+import * as property from 'property';
+import * as rating from 'rating';
+import * as task from 'task';
+import * as transfer from 'transfer';
 
-import { Cliche, ClicheComponents } from './datatypes';
+import { ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';
 
-const importedCliches = {
-  Allocator,
-  Authentication,
-  Authorization,
-  Event: EventDV,
-  Follow,
-  Geolocation,
-  Group,
-  Passkey,
-  Property,
-  Rating,
-  Task,
-  Transfer
+// TODO: import platform actions (e.g. button, link, etc.)
+
+const importedCliches: { [name: string]: Object} = {
+  allocator,
+  authentication,
+  authorization,
+  event,
+  follow,
+  geolocation,
+  group,
+  passkey,
+  property,
+  rating,
+  task,
+  transfer
 };
 
-const componentSuffix = 'Component';
 
-function getNamedComponents(importedModule) {
-  const namedComponents: ClicheComponents = {};
-  Object.values(importedModule)
-    .filter((f) => _.isString(f['name']) && f['name'].endsWith(componentSuffix))
-    .forEach((c) => {
-      const componentName = c['name'].slice(0, componentSuffix.length * -1);
-      namedComponents[componentName] = c;
-    });
-
-  return namedComponents;
-}
-
-function getModule(importedModule) {
+// each imported Cliche Module has an Angular Module
+// which we need to import and export
+function getNgModule(importedModule: Object): any {
   return Object
     .entries(importedModule)
     .filter(([key]) => key.endsWith('Module'))[0][1];
 }
 
 const modules: any[] = Object.values(importedCliches)
-  .map(getModule);
+  .map(getNgModule);
 
-export const cliches: { [clicheName: string]: Cliche } = {};
 
-Object.entries(importedCliches)
-  .forEach(([name, clicheModule]) => {
-    const components = getNamedComponents(clicheModule);
-    const cliche = { name, components };
-    cliches[name] = cliche;
-});
+// create Cliche Definitions from imported Cliche Modules
+const componentSuffix = 'Component';
 
-// built-in components are loaded manually
-cliches['Déjà Vu'] = {
-  name: 'Déjà Vu',
-  components: {
-    Text: <Component>TextComponent
-  }
+function clicheDefinitionFromModule(
+  importedModule: Object,
+  name: string
+): ClicheDefinition {
+  return {
+    name,
+    actions: Object.values(importedModule)
+      .filter((f) => _.isString(f.name) && f.name.endsWith(componentSuffix))
+      .map((component) => ({
+        name: _.kebabCase(component.name
+          .slice(0, componentSuffix.length * -1)),
+        component,
+        inputs: [], // TODO
+        outputs: [] // TODO
+      }))
+      .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
+  };
+}
+
+export const clicheDefinitions = _
+  .map(importedCliches, clicheDefinitionFromModule);
+
+
+// built-in components are added manually
+export const designerCliche: ClicheDefinition = {
+  name: 'dv-d',
+  actions: [{
+    name: 'text',
+    component: <Component>TextComponent,
+    inputs: [],
+    outputs: []
+  }]
 };
+
 
 @NgModule({
   imports: [CommonModule].concat(modules),

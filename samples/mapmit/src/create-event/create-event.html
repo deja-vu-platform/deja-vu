@@ -1,0 +1,66 @@
+<dv.action name="create-event">
+  <mapmit.navbar />
+
+  <div class="events-container">
+    <div class="events-panel panel panel-default">
+      <h2 class="create-event-header">Create an Event!</h2>
+
+      <!-- <geolocation.display-map
+        id="homeMapId"
+        showLoadedMarkers=false
+        showDirectionsControl=false /> -->
+
+      <dv.tx as mapmit-create-event-form>
+        <dv.id />
+        <dv.status savedText="Event created" />
+        <!-- Title, Description, Room Number, Location Description -->
+        <div class="create-event-input">
+          <property.create-object id=dv.id.id showOptionToSubmit=false />
+        </div>
+
+        <!-- Location -->
+        <div class="create-event-input">
+          <geolocation.create-marker id=dv.id.id
+            mapId="homeMapId"
+            showOptionToSubmit=false />
+        </div>
+
+        <!-- Time + Date -->
+        <div class="create-event-input">
+          <event.create-event id=dv.id.id showOptionToSubmit=false />
+        </div>
+
+        <!-- Choose Group widget works but need to figure out how to
+               add allow people to view resource if eventId isn't given
+               and a group may be used for multiple events -->
+        <!-- Instead, we will assume a 1-1 mapping between group and event -->
+        <group.create-group
+          id=dv.id.id
+          memberIds=[mapmit.navbar.loggedInUserId]
+          showOptionToAddMembers=false
+          showOptionToSubmit=false
+          hidden=true />
+
+        <div class="event-btn-container">
+          <div class="cancel-button">
+            <dv.link href="/home" class="btn btn-default event-cancel-btn">
+              Cancel
+            </dv.link>
+          </div>
+          <div class="save-button">
+            <authorization.create-resource id=dv.id.id
+              ownerId=mapmit.navbar.loggedInUserId
+              hidden=true />
+            <authentication.authenticate id=mapmit.navbar.loggedInUserId
+              hidden=true />
+            <dv.button class='btn btn-default btn-blue event-submit-btn'>
+              Save Event
+            </dv.button>
+            <dv.callback defaultHref="/my-events" onExecSuccess=true
+              hidden=true />
+          </div>
+        </div>
+      </dv.tx>
+    </div>
+  </div>
+</dv.action>

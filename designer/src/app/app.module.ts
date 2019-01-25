@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DragulaModule } from 'ng2-dragula';
+import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
 import { DvModule, GATEWAY_URL } from 'dv-core';
@@ -11,32 +12,38 @@ import { DvModule, GATEWAY_URL } from 'dv-core';
 import { ClicheModule } from './cliche.module';
 import { MatModule } from './mat.module';
 
-import { WidgetDirective } from './widget.directive';
+import { ClicheActionDirective } from './cliche-action.directive';
 
+import {
+  ActionDefinitionComponent
+} from './action-definition/action-definition.component';
+import {
+  ActionInstanceComponent
+} from './action-instance/action-instance.component';
 import { AppComponent } from './app.component';
-import { ClicheListComponent } from './cliche-list/cliche-list.component';
-import { MainViewComponent } from './main-view/main-view.component';
-import { PageComponent } from './page/page.component';
+import {
+  ConfigureActionComponent
+} from './configure-action/configure-action.component';
+import {
+  ConfigureClicheComponent
+} from './configure-cliche/configure-cliche.component';
 import { RowComponent } from './row/row.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
-import { WidgetListComponent } from './widget-list/widget-list.component';
-import { WidgetComponent } from './widget/widget.component';
 
 @NgModule({
   declarations: [
+    ActionDefinitionComponent,
+    ActionInstanceComponent,
     AppComponent,
-    MainViewComponent,
-    SideMenuComponent,
-    TopBarComponent,
-    ClicheListComponent,
-    WidgetListComponent,
-    PageComponent,
-    WidgetDirective,
-    WidgetComponent,
+    ConfigureActionComponent,
+    ConfigureClicheComponent,
     RowComponent,
-    TextComponent
+    SideMenuComponent,
+    TextComponent,
+    TopBarComponent,
+    ClicheActionDirective
   ],
   imports: [
     BrowserModule,
@@ -44,6 +51,7 @@ import { WidgetComponent } from './widget/widget.component';
     FormsModule,
     MatModule,
     DragulaModule.forRoot(),
+    NgxElectronModule,
     QuillModule,
     DvModule,
     ClicheModule
@@ -52,6 +60,10 @@ import { WidgetComponent } from './widget/widget.component';
     { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [TextComponent]
+  entryComponents: [
+    ConfigureActionComponent,
+    ConfigureClicheComponent,
+    TextComponent
+  ]
 })
 export class AppModule { }

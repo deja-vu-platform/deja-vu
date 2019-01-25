@@ -1,13 +1,8 @@
-/* good for black */
-/* @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";*/
-/* @import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
-/*
-@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
-*/
-/*@import "~@angular/material/prebuilt-themes/purple-green.css";*/
-
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 
 md-icon {
   font-family: 'Material Icons' !important;
@@ -16,6 +11,14 @@ md-icon {
 body {
   font-family: 'Raleway', sans-serif;
   background-color: #f5f8fa;
+}
+
+.navbar-item a {
+  color: white;
+}
+
+.create-event-btn a {
+  color: white;
 }
 
 .logo-img {
@@ -31,7 +34,6 @@ body {
 
 .login-signup-container {
   text-align: center;
-  padding-top: 100px;
 }
 
 .username-password-container {
@@ -44,7 +46,8 @@ body {
 .blue-background {
   width: 100%;
   height: 100%;
-  padding-top: 70px;
+  padding-top: 15%;
+  padding-bottom: 25%;
   background-color: #75C7CE;
 }
 

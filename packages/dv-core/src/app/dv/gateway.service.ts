@@ -52,7 +52,7 @@ interface ChildResponse {
 }
 
 
-const headers = new HttpHeaders({'Content-type': 'application/json'});
+const headers = new HttpHeaders({ 'Content-type': 'application/json' });
 
 
 /**
@@ -129,7 +129,7 @@ export class TxRequest {
               }
               this.subjects[i].complete();
             });
-        });
+          });
     }
   }
 
@@ -140,7 +140,7 @@ export class TxRequest {
 
 
 export class GatewayService {
-  static txBatches: { [txId: string]: TxRequest} = {};
+  static txBatches: { [txId: string]: TxRequest } = {};
 
   fromStr: string;
 
@@ -154,7 +154,7 @@ export class GatewayService {
   }
 
   private static GetTag(node): string {
-   return node.nodeName.toLowerCase();
+    return node.nodeName.toLowerCase();
   }
 
   private static IsAction(node): boolean {
@@ -187,7 +187,7 @@ export class GatewayService {
     const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
       if (GatewayService.IsAction(node)) {
-       seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
+        seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
       }
 
       const classAttr = GatewayService.GetAttribute(node, CLASS_ATTR);

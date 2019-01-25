@@ -218,7 +218,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         _root,
         { input }: { input: AddViewerToResourceInput }, context: Context) => {
         const updateOp = { $push: { viewerIds: input.viewerId } };
-        const notPendingResourceFilter = {
+        const notPendingResourceIdFilter = {
           id: input.id,
           pending: { $exists: false }
         };
@@ -229,7 +229,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await ResourceValidation.resourceExistsOrFail(resources, input.id);
             const pendingUpdateObj = await resources
               .updateOne(
-                notPendingResourceFilter,
+                notPendingResourceIdFilter,
                 {
                   $set: {
                     pending: {
@@ -246,7 +246,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await ResourceValidation.resourceExistsOrFail(resources, input.id);
             const updateObj = await resources
-              .updateOne(notPendingResourceFilter, updateOp);
+              .updateOne(notPendingResourceIdFilter, updateOp);
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
             }
@@ -273,7 +273,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         { input }: { input: RemoveViewerFromResourceInput },
         context: Context) => {
         const updateOp = { $pull: { viewerIds: input.viewerId } };
-        const notPendingResourceFilter = {
+        const notPendingResourceIdFilter = {
           id: input.id,
           pending: { $exists: false }
         };
@@ -284,7 +284,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             await ResourceValidation.resourceExistsOrFail(resources, input.id);
             const pendingUpdateObj = await resources
               .updateOne(
-                notPendingResourceFilter,
+                notPendingResourceIdFilter,
                 {
                   $set: {
                     pending: {
@@ -301,7 +301,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await ResourceValidation.resourceExistsOrFail(resources, input.id);
             const updateObj = await resources
-              .updateOne(notPendingResourceFilter, updateOp);
+              .updateOne(notPendingResourceIdFilter, updateOp);
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
             }
@@ -324,9 +324,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       deleteResource: async (_root, { id }, context: Context) => {
-        const notPendingResourceFilter = {
-          id: id,
-          pending: { $exists: false }
+        const notPendingResourceIdFilter = {
+          id: id, pending: { $exists: false }
         };
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
@@ -334,7 +333,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case 'vote':
             await ResourceValidation.resourceExistsOrFail(resources, id);
             const pendingUpdateObj = await resources.updateOne(
-              notPendingResourceFilter,
+              notPendingResourceIdFilter,
               {
                 $set: {
                   pending: {
@@ -352,7 +351,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           case undefined:
             await ResourceValidation.resourceExistsOrFail(resources, id);
             const res = await resources
-              .deleteOne({ id: id, pending: { $exists: false } });
+              .deleteOne(notPendingResourceIdFilter);
 
             if (res.deletedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);

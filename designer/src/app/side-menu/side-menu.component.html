@@ -1,3 +1,36 @@
 <div id="side-menu">
-  <app-cliche-list [cliches]="cliches"></app-cliche-list>
+  <mat-accordion id="cliche-list" *ngIf="app">
+    <mat-expansion-panel *ngFor="let collection of actionCollections">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <button
+            mat-button
+            class="mat-small more"
+            *ngIf="collection.config"
+            (click)="$event.stopPropagation(); editCliche(collection);"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <span class="spacer" *ngIf="!collection.config"></span>
+          {{collection.name}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-list class="action-list" dragula="action">
+        <mat-list-item
+          *ngFor="let action of collection.actions"
+          [attr.data-source]="collection.name"
+          [attr.data-action]="action.name"
+          [attr.data-disabled]="action.contains && (action.contains(openAction) || action === openAction)"
+        >
+          {{action.name}}
+        </mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <button
+    mat-raised-button
+    id="import-cliche"
+    color="primary"
+    (click)="importCliche()"
+  >Import Cliché</button>
 </div>

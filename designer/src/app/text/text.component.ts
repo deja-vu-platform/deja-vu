@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { ActionInstance } from '../datatypes';
 
 @Component({
   selector: 'app-text',
@@ -6,12 +7,11 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./text.component.scss']
 })
 export class TextComponent {
-  // type is TextWidget but this would create a circular dependency
-  @Input() widget: any = { content: '' };
+  @Input() actionInstance: ActionInstance;
 
   constructor() { }
 
   onContentChanged({ html }) {
-    this.widget.content = html;
+    this.actionInstance['data'] = html;
   }
 }

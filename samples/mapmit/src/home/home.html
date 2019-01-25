@@ -1,0 +1,23 @@
+<dv.action name="home">
+  <mapmit.navbar />
+
+  <div id="homepage-container">
+    <div id="homepage-left">
+      <h2>Coming Soon: Search for events!</h2>
+    </div>
+    <div id="homepage-right">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- <geolocation.display-map
+            id="homeMapId"
+            showSearchControl=false
+            showDirectionsControl=false /> -->
+
+          <div class="container-fluid event-card-container">
+            <event.show-events showEvent=<mapmit.show-event-info id=$event?.id /> />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

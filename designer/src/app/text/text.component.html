@@ -1,5 +1,6 @@
 <quill-editor
+  *ngIf="actionInstance"
   theme="bubble"
-  [ngModel]="widget.content"
+  [ngModel]="actionInstance.data"
   (onContentChanged)="onContentChanged($event)"
 ></quill-editor>

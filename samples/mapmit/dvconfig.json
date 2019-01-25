@@ -1,5 +1,6 @@
 {
   "name": "mapmit",
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -37,7 +38,7 @@
         "reinitDbOnStartup": true
       }
     },
-    "eventInfo": {
+    "property": {
       "name": "property",
       "config": {
         "wsPort": 3007,
@@ -64,19 +65,13 @@
       }
     }
   },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "mapmit-root"}
-      ]
-    }
-  },
   "routes": [
     { "path": "home", "action": "mapmit-home" },
     { "path": "signup", "action": "mapmit-signup" },
     { "path": "login", "action": "mapmit-login" },
     { "path": "my-events", "action": "mapmit-show-my-events" },
     { "path": "create-event", "action": "mapmit-create-event" },
-    { "path": "my-groups", "action": "mapmit-show-my-groups" }
+    { "path": "my-groups", "action": "mapmit-show-my-groups" },
+    { "path": "", "action": "mapmit-home" }
   ]
 }

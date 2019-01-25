@@ -88,6 +88,19 @@ describe('ActionCompiler', () => {
       .toMatch(/"'you\\\'re'"/);
   });
 
+  it('should handle attrs that don\'t have corresponding properties', () => {
+    const actionName = 'action-attrs';
+    const action = `
+      <dv.action name="${actionName}">
+        <table><tr><td colspan="2">Hi</td></tr></table>
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, {});
+    expect(compiledAction.ngTemplate)
+      .toMatch('colspan="2"');
+  });
+
   it('should compile action with dv.if', () => {
     const actionName = 'action-with-if';
     const action = `
