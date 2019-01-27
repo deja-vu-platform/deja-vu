@@ -1,8 +1,0 @@
-{
-  "extends": "../../tslint.ng.base.json",
-  "rules": {
-    "component-selector": [
-      "rendezvous"
-    ]
-  }
-}
