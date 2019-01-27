@@ -309,7 +309,7 @@ export class RequestProcessor {
      */
     if (RequestProcessor.HasRunId(gatewayRequest) && actionPath.isDvTx()) {
       await this.txCoordinator.processMessage(
-        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes);
+        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes, index);
     } else {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
@@ -406,8 +406,8 @@ export class RequestProcessor {
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>, txRes?: TxResponse) => {
-        txRes!.add(payload.status, payload.text);
+        payload: ClicheResponse<string>, txRes?: TxResponse, index?: number) => {
+        txRes!.add(payload.status, payload.text, index);
       },
 
       getCohorts: (actionPathId: string): string[] => {
