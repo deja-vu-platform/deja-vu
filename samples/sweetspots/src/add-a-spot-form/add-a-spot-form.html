@@ -1,0 +1,22 @@
+<div id="add-a-spot-form">
+  <h2 id="add-a-spot">Add a spot:</h2>
+  <br />
+  <a href="/">&lt; Back to home</a>
+  <br />
+  <br />
+  <form>
+    <dv-widget name="CreateMarkerTitle" of="Geolocation"></dv-widget>
+    <dv-widget name="AttachLabels" of="Label"></dv-widget>
+    <!-- TODO: Make Floor Work -->
+    <div class="form-group">
+      <label class="sr-only" for="floor">Longitude</label>
+      <input class="form-control" type="number" max="999" min="-99" step="1"
+        name="floor" placeholder="Floor (Dummy Field)">
+    </div>
+    <div>Dummy Rating:</div>
+    <dv-widget name="RateTarget" of="Rating"></dv-widget>
+    <div>Dummy Review:</div>
+    <dv-widget name="NewCommentText" of="Comment"></dv-widget>
+    <dv-widget name="CreateMarkerButton" of="Geolocation"></dv-widget>
+  </form>
+</div>

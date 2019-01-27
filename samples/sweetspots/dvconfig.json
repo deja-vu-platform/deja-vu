@@ -1,0 +1,99 @@
+{
+  "name": "sweetspots",
+  "type": "app",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "name": "authentication",
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "name": "authorization",
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "comment": {
+      "name": "comment",
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
+      }
+    },
+    "rating": {
+      "name": "rating",
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
+      }
+    },
+    "geolocation": {
+      "name": "geolocation",
+      "config": {
+        "wsPort": 3006,
+        "mapType": "leaflet",
+        "reinitDbOnStartup": true
+      }
+    },
+    "follow": {
+      "name": "follow",
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true
+      }
+    },
+    "label": {
+      "name": "label",
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
+      }
+    },
+    "spotdetails": {
+      "name": "property",
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "SpotDetails",
+          "type": "object",
+          "properties": {
+            "floor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "reputation" : {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3010,
+        "oneToOneScoring": true
+      }
+    },
+    "reviewscore" : {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3011,
+        "oneToOneScoring": true
+      }
+    }
+  },
+  "routes": [
+    { "path": "login", "action": "sweetspots-login" },
+    { "path": "main", "action": "sweetspots-main" },
+    { "path": "profile", "action": "sweetspots-profile" },
+    { "path": "register", "action": "sweetspots-register" },
+    { "path": "spot-details", "action": "sweetspots-spot-details" },
+    { "path": "", "action": "sweetspots-main" }
+  ]
+}

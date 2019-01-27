@@ -1,0 +1,27 @@
+<dv-widget name="NavBarWithoutSearch"></dv-widget>
+
+<div class="col-md-6">
+  <h1>{{spot.name}}</h1>
+  <div style="height:400px;width:400px;">
+    <dv-widget name="DisplayMap" of="Geolocation"></dv-widget>
+    <dv-widget name="OverlayMarker" of="Geolocation"></dv-widget>
+  </div>
+  <dv-widget name="DeleteMarker" of="Geolocation"></dv-widget>
+  <dv-widget name="ShowAverageRating" of="Rating"></dv-widget>
+  <dv-widget name="ShowLabels" of="Label"></dv-widget>
+  <dv-widget name="FollowUnfollow" of="Follow"></dv-widget>
+  <button class="btn btn-danger" name="report-spot">
+    Coming Soon: Report
+  </button>
+  <h6>Coming Soon: Coordinates of spots.</h6>
+</div>
+
+<div class="col-md-6">
+  <h2>Reviews</h2>
+  <dv-widget name="ShowComments" of="Comment"></dv-widget>
+  <!-- TODO: New Review (can't do just comment/rating) -->
+  <dv-widget name="RateTarget" of="Rating"></dv-widget>
+  <dv-widget name="NewComment" of="Comment"></dv-widget>
+  <h6>Coming Soon: Vote reviews up or down.</h6>
+  <h6>Coming Soon: Only one review per user.</h6>
+</div>
