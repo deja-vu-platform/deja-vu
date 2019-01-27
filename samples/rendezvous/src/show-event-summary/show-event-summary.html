@@ -5,10 +5,12 @@
     <div class="panel-heading">
       <!-- Event Title -->
       <!-- TODO: remove link once visible in marker popup -->
-      <eventdetails.show-object object=eventdetails.show-object.loadedObject
-        showOnly=["title"] />
-      <dv.link href="/event-details" params={ eventId: $id }>
-        Go to event details
+      <eventdetails.show-object class="inline-block"
+        object=eventdetails.show-object.loadedObject
+        showOnly=["title"] /> |
+      <dv.link class="inline-block" href="/event-details"
+        params={ eventId: $id }>
+        Details
       </dv.link>
     </div>
 

@@ -1,6 +1,6 @@
 <dv.action name="show-event-details">
   <div class="index">
-    <rendezvous.navbar />
+    <rendezvous.navbar showProfileButton=true />
     <eventdetails.show-object id=$eventId hidden=true />
     <authorization.show-owner resourceId=$eventId hidden=true />
 
@@ -17,10 +17,12 @@
             <!-- Host -->
             Hosted By
             <span class="badge userBadge">
-              <rendezvous.show-member-name id=authorization.show-owner.ownerId />
+              <rendezvous.show-member-name class="inline-block"
+                id=authorization.show-owner.ownerId /> |
             </span>
-            <dv.link href="/profile" params={ id: authorization.show-owner.ownerId }>
-              Go to profile
+            <dv.link class="inline-block" href="/profile"
+              params={ id: authorization.show-owner.ownerId }>
+              Profile
             </dv.link>
           </div>
 
@@ -86,7 +88,7 @@
         </dv.if>
 
         <!-- Join Group if already not in it -->
-        <dv.if condition=rendezvous.navbar.loggedInUserId !==authorization.show-owner.ownerId>
+        <dv.if condition=rendezvous.navbar.loggedInUserId !== authorization.show-owner.ownerId>
           <div class="inline btn-group form-group" id="jn-lv-grp">
             <dv.tx as rendezvous-join-leave>
               <authorization.add-remove-viewer resourceId=$eventId
