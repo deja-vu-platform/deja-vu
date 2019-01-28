@@ -18,6 +18,9 @@ import {
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
+interface LabelConfig extends Config {
+  initialLabelIds: LabelDoc[];
+}
 
 function standardizeLabel(id: string): string {
   return id.trim()
@@ -76,7 +79,7 @@ function isPendingCreate(doc: LabelDoc | null) {
   return _.get(doc, 'pending.type') === 'create-label';
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
+function resolvers(db: mongodb.Db, _config: LabelConfig): object {
   const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
 
   return {
@@ -277,13 +280,17 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 }
 
 const labelCliche: ClicheServer = new ClicheServerBuilder('label')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
+  .initDb(async (db: mongodb.Db, _config: LabelConfig): Promise<any> => {
     const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
+    await labels.createIndex({ id: 1 }, { unique: true, sparse: true });
+    await labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
+    if (!_.isEmpty(_config.initialLabelIds)) {
+      return labels.insertMany(_.map(_config.initialLabelIds, (id) => {
+        return { id: id };
+      }));
+    }
 
-    return Promise.all([
-      labels.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      labels.createIndex({ id: 1, itemIds: 1 }, { unique: true })
-    ]);
+    return Promise.resolve();
   })
   .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
