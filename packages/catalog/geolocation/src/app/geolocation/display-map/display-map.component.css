@@ -1,3 +1,7 @@
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
+
 .map {
   height: 500px;
   padding: 0;
