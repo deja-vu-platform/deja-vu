@@ -64,18 +64,18 @@
   display: block;
 }
 
-#attendeesDiv {
+#attendees-panel {
   display: block;
   margin-top: 50px;
 }
 
-#attendeesDiv li {
+#attendees-panel li {
   display: inline-block;
   padding: 0;
   margin-right: 10px;
 }
 
-#attendeesDiv show-member {
+#attendees-panel show-member {
   color: black;
   margin-left: 5px;
   background-color: white;
@@ -92,7 +92,7 @@
   border-radius: 10px;
 }
 
-#attendeesDiv ul {
+#attendees-panel ul {
   margin: 0;
 }
 
@@ -104,6 +104,11 @@
 #show-post {
   background-color: #FFEFEE;
   border: 1px solid #CC9088;
+}
+
+#interests-panel{
+  float: left;
+  margin-top: 4px;
 }
 
 /* makes labels show as a plain comma-separated list */

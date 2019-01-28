@@ -1,5 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -22,17 +23,20 @@ interface LabelsRes {
   styleUrls: ['./show-labels.component.css']
 })
 export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   // Fetch rules
-  // If undefined then the fetched labels are not filtered by that property
-  @Input() itemId = '';
+  @Input() itemId: string | undefined;
+
+  // Presentation inputs
+  @Input() noLabelsToShowText = 'No labels to show';
 
   @Input() showLabel: Action = {
     type: <Type<Component>>ShowLabelComponent
   };
 
-  @Input() noLabelsToShowText = 'No labels to show';
-  labels: Label[] = [];
+  @Output() labels = new EventEmitter<Label[]>();
+
+  _labels: Label[] = [];
 
   showLabels;
   private gs: GatewayService;
@@ -75,7 +79,8 @@ OnChanges {
         }
       })
         .subscribe((res) => {
-          this.labels = res.data.labels;
+          this._labels = res.data.labels;
+          this.labels.emit(this._labels);
         });
     }
   }

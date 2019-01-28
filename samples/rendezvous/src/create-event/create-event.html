@@ -1,6 +1,9 @@
 <dv.action name="create-event">
   <div class="index">
-    <rendezvous.navbar showTitle=true showProfileButton=true/>
+    <rendezvous.navbar showTitle=true showProfileButton=true />
+
+    <!-- TODO: Uncomment when max cohorts in tx problem resolved -->
+    <!-- <relevantinterests.show-labels hidden=true /> -->
 
     <div class="new-event">
       <div class="panel panel-default">
@@ -58,23 +61,22 @@
                 </td>
               </tr>
 
-              <!--
-                - Uncomment below when restriction of number of cliches resolved.
-                - TODO: Choose from list of tags
-              -->
+              <!-- TODO: Uncomment when max cohorts in tx problem resolved -->
               <!-- <tr>
                 <td>
                   <p>Tags</p>
-                  <br>
-                  <div class="btn-group" style="padding-top: 0px;">
-                    <label.attach-labels itemId=dv.id.id />
+                  <div id="tags">
+                    <relevantinterests.attach-labels itemId=dv.id.id
+                      labels=relevantinterests.show-labels.labels
+                      showOptionToSubmit=false />
                   </div>
                 </td>
               </tr> -->
+
             </table>
 
             <!-- Event Title + Additional Info -->
-            <div class="event_details">
+            <div class="event-details">
               <p>Event Details</p>
               <eventdetails.create-object id=dv.id.id showOptionToSubmit=false />
             </div>
