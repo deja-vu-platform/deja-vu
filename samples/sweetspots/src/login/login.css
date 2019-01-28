@@ -1,0 +1,14 @@
+.authentication-sign-in button {
+  width: 100%;
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+.authentication-sign-in button:hover {
+  width: 100%;
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+

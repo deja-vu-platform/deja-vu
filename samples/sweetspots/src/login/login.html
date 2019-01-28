@@ -1,5 +1,11 @@
-<div id="content" class="center text-font form-signin">
-  <h2 class="form-signin-heading">Welcome to Sweet Spots!</h2>
-  <dv-widget name="SignInWithRedirect" of="StandardAuthentication"></dv-widget>
-  <a href="/">Want a read-only version of Sweet Spots?</a>
-</div>
+<dv.action name="login">
+  <div id="content" class="center text-font form-signin">
+    <h2 class="form-signin-heading">Welcome to Sweet Spots!</h2>
+    <dv.tx>
+      <authentication.sign-in />
+      <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
+    </dv.tx>
+    Don't have an account? <dv.link href="/register"> Sign up here!</dv.link> <br /> <br />
+    <dv.link href="/">Want a read-only version of Sweet Spots? </dv.link>
+  </div>
+</dv.action>
