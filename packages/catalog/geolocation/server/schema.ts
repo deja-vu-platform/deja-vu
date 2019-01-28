@@ -32,4 +32,7 @@ export interface CreateMarkerInput {
 
 export interface MarkersInput {
   ofMapId?: string;
+  centerLat?: number;
+  centerLng?: number;
+  radius?: number; // in miles
 }

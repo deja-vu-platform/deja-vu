@@ -43,14 +43,19 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   // Required
   @Input() id: string;
 
-  // If not provided, all markers will be loaded
+  // If not provided, all markers associated with `id` will be loaded
   get markers() { return this._markers; }
   @Input() set markers(markers: Marker[]) {
     this._markers = markers;
   }
 
-  @Input() start: Location; // N/A for Google Maps
-  @Input() end: Location;   // N/A for Google Maps
+  // Filter points by radius in miles
+  @Input() center: Location | undefined;
+  @Input() radius: number | undefined;
+
+  // Used to show directions between two points
+  @Input() start: Location | undefined; // N/A for Google Maps
+  @Input() end: Location | undefined;   // N/A for Google Maps
 
   // Presentation Inputs
   @Input() showLoadedMarkers = true;
@@ -233,12 +238,16 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      const filter = { ofMapId: this.id };
+      if (this.center && this.radius) {
+        filter['centerLat'] = this.center.latitude;
+        filter['centerLng'] = this.center.longitude;
+        filter['radius'] = this.radius;
+      }
       this.gs
         .get<{ data: { markers: Marker[] } }>(this.apiPath, {
           params: {
-            inputs: JSON.stringify({
-              input: { ofMapId: this.id }
-            }),
+            inputs: JSON.stringify({ input: filter }),
             extraInfo: {
               returnFields: `
                 title
@@ -258,6 +267,10 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   private canEval(): boolean {
-    return !!(this.id && this.gs);
+    if (this.center || this.radius) {
+      return !!(this.id && this.gs && this.center && this.radius);
+    } else {
+      return !!(this.id && this.gs);
+    }
   }
 }

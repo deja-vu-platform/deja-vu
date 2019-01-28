@@ -52,10 +52,16 @@ const actionRequestTable: ActionRequestTable = {
       markers(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: MarkerDoc | null) {
   return _.get(doc, 'pending.type') === 'create-marker';
+}
+
+function milesToRadian(miles: number) {
+  const earthRadiusInMiles = 3963.2;
+
+  return miles / earthRadiusInMiles;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -77,14 +83,22 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         if (input.ofMapId) {
           // Get markers by map
           filter['mapId'] = input.ofMapId;
-
-          return markers.find(filter)
-            .toArray();
-        } else {
-          // Get all markers
-          return markers.find(filter)
-            .toArray();
         }
+
+        if (input.centerLat && input.centerLng && input.radius) {
+          // Get markers within a given radius (in miles)
+          filter['location'] = {
+            $geoWithin: {
+              $centerSphere: [
+                [input.centerLng, input.centerLat],
+                milesToRadian(input.radius)
+              ]
+            }
+          };
+        }
+
+        return markers.find(filter)
+          .toArray();
       }
     },
 
