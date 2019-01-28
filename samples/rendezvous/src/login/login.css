@@ -1,11 +1,11 @@
-#login_panel {
+#login-panel {
   width: 400px;
   margin: 0 auto;
   text-align: center;
   margin-top: 200px;
 }
 
-.authLink {
+.auth-link {
   background:none;
   border:none;
   padding: 0;
@@ -15,10 +15,10 @@
   color: #B3594D;
 }
 
-#loginTitle {
+#login-title {
   margin-top: 0px;
 }
 
-#createAccount {
+#create-account {
   text-align: center;
 }

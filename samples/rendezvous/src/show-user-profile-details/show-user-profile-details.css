@@ -11,18 +11,18 @@ table {
   text-align: center;
 }
 
-.reset_password{
+.reset-password{
   padding-top: 200px;
   margin: 0 auto;
 }
 
-.messagePanel {
+.message-panel {
   width: 500px;
   margin: 0 auto;
   text-align: center;
 }
 
-#edit-prof-btn {
+#edit-profile-button {
   margin-left:0;
   margin-top:0;
 }

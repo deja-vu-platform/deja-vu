@@ -1,4 +1,4 @@
-.eventName {
+.event-name {
   font-size: 24px;
   padding-left: 10px;
   background-color: #ffa599;
@@ -10,13 +10,13 @@
   margin-bottom: 20px;
 }
 
-#jn-lv-grp {
+#join-leave-group {
   float: left;
   margin-top: 30px;
   margin-left: 0px;
 }
 
-#jn-lv-grp button {
+#join-leave-group button {
   padding: 6px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -101,17 +101,17 @@
   border: 1px solid #CC9088;
 }
 
-#shw-pst {
+#show-post {
   background-color: #FFEFEE;
   border: 1px solid #CC9088;
 }
 
 /* makes labels show as a plain comma-separated list */
-#rlvnt-intrsts ul {
+#relevant-interests ul {
   padding: 0 !important;
   margin: 0;
 }
-#rlvnt-intrsts li {
+#relevant-interests li {
   background: none;
   color: black;
   font-size: 12;
@@ -120,11 +120,11 @@
   margin-right: 2px;
   padding: 0;
 }
-#rlvnt-intrsts li:after {
+#relevant-interests li:after {
   content: ",";
   margin-left: -3px;
 }
-#rlvnt-intrsts li:last-child:after {
+#relevant-interests li:last-child:after {
   content: "";
 }
 
