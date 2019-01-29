@@ -19,18 +19,14 @@
             </button>
           </div>
 
-          <!-- <geolocation.display-map
-            id="mainMapId"
-            showLoadedMarkers=false
-            showDirectionsControl=false /> -->
           <dv.tx>
             <dv.id />
             <dv.status savedText="Event created" />
 
             <table id="event-info" class="table">
               <tr>
-                <!-- Location: rowspan 2 -->
-                <td>
+                <!-- Location -->
+                <td rowspan="2">
                   <div class="form-group">
                     <p>Location</p>
                     <div id="map_new-event">
@@ -45,6 +41,10 @@
                         id=dv.id.id
                         mapId="mainMapId"
                         showOptionToSubmit=false />
+                      <!-- <geolocation.display-map
+                        id="mainMapId"
+                        showLoadedMarkers=false
+                        showDirectionsControl=false /> -->
                     </div>
                     <div class="guidelines">
                       (must be within 50 miles of current location)
