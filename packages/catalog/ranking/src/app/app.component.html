@@ -1,3 +1,16 @@
 <div class="container">
   <h1>Ranking</h1>
+
+  <h2>Create ranking id alice</h2>
+  <ranking-create-ranking
+    id="alice"
+    [targetIds]="['apple', 'banana', 'carrot']"
+  ></ranking-create-ranking>
+
+  <h2>Show ranking id alice</h2>
+  <ranking-show-ranking id="alice"></ranking-show-ranking>
+
+  <h2>Show target rankings for targetIds apple and carrot</h2>
+  <ranking-show-target-rankings [targetIds]="['apple', 'carrot']">
+  </ranking-show-target-rankings>
 </div>
