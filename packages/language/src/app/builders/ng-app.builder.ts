@@ -221,6 +221,14 @@ export class NgAppBuilder {
       components: _
         .map(this.components, 'className')
         .join(', '),
+      assets: (_.isEmpty(this.dependencies) ? '' : ',\n') + _
+        .map(
+          this.dependencies,
+          (d: Dependency) => `{
+            "glob": "**/*", "input": "../node_modules/${d.name}/assets",
+            "output": "./assets/${d.name}/"
+          }`)
+        .join(',\n'),
       routes: _
         .map(
           this.routes,

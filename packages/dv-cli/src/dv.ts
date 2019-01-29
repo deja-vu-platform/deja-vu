@@ -44,15 +44,16 @@ export const ENTRY_FILE_PATH = 'public_api.ts';
 /**
  * ng-packagr constants
  * https://github.com/dherges/ng-packagr
- **/
+ */
 export const NG_PACKAGR = {
   configFilePath: 'ng-package.json',
   configFileContents: {
-    '$schema': path.join('.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
-    'lib': {
-      'entryFile': ENTRY_FILE_PATH
+    $schema: path.join(
+      '.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
+    lib: {
+      entryFile: ENTRY_FILE_PATH
     },
-    'dest': 'pkg'
+    dest: 'pkg'
   },
   npmScriptKey: 'packagr',
   npmScriptValue: 'ng-packagr -p ng-package.json'
@@ -65,7 +66,7 @@ export const DVCONFIG_FILE_PATH = 'dvconfig.json';
 
 /**
  * @return the name of the current project
- **/
+ */
 export function projectName(): string {
   const data = readFileOrFail(NG_CLI_CONFIG_FILE);
   return JSON.parse(data).project.name;
@@ -73,7 +74,7 @@ export function projectName(): string {
 
 /**
  * @return True if the current project is a cliché or False if it's an app
- **/
+ */
 export function isCliche(): boolean {
   return existsSync(NG_PACKAGR.configFilePath);
 }
@@ -150,12 +151,14 @@ export function buildFeCmd(watch: boolean, projectFolder?: string): string {
   if (watch) {
     return `chokidar src node_modules -c 'ng build'`;
   }
+
   return buildCmd('ng build', projectFolder);
 }
 
 export function buildServerCmd(watch: boolean, projectFolder?: string): string {
   const cpSchema = 'cp schema.graphql' + path.join('..', 'dist', 'server');
   const maybeWatch = watch ? '-w' : '';
+
   return buildCmd(`tsc ${maybeWatch} && ${cpSchema}`, projectFolder);
 }
 
@@ -192,6 +195,7 @@ export function concurrentlyCmd(...cmds: string[]): string {
   for (const cmd of cmds) {
     cmdStr += ` \"${cmd}\"`;
   }
+
   return `concurrently ${cmdStr}`;
 }
 
@@ -231,6 +235,7 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
     pkg.scripts[`dv-build-watch-${name}`] = buildFeCmd(true);
     pkg.scripts['concurrently'] = 'concurrently';
     pkg.scripts['tsc'] = 'tsc';
+
     return pkg;
   }, name);
 
@@ -258,6 +263,7 @@ export function actionTable(
         usedClicheConfig, 'name', alias)));
   const actionTable = getActionTable(
     config.name, process.cwd(), actionsConfig, Array.from(usedClicheNames));
+
   return JSON.stringify(actionTable, null, 2);
 }
 

@@ -5,13 +5,12 @@ import {
   ACTION_TABLE_FILE_NAME,
   actionTable,
   DvConfig,
-  DVCONFIG_FILE_PATH,
-  NG_PACKAGR,
+  DVCONFIG_FILE_PATH, NG_PACKAGR,
   npm,
   readFileOrFail,
-  updatePackage,
   writeFileOrFail
 } from '../dv';
+import { existsSync } from "fs";
 
 
 exports.command = 'package';
@@ -21,19 +20,18 @@ exports.handler = () => {
   console.log('Packaging cliche');
   npm(['run', `dv-package-${config.name}`]);
 
-  updatePackage((pkg) => {
-    if (_.has(pkg, 'peerDependencies.dv-gateway')) {
-      const newGatewayPath = path.join(
-        '..', pkg['peerDependencies']['dv-gateway'].slice('file:'.length));
-      pkg['peerDependencies']['dv-gateway'] = `file:${newGatewayPath}`;
-    }
-
-    return pkg;
-  }, NG_PACKAGR.configFileContents.dest);
-
+  const pkgDir = NG_PACKAGR.configFileContents.dest;
   writeFileOrFail(
-    path.join('pkg', ACTION_TABLE_FILE_NAME),
+    path.join(pkgDir, ACTION_TABLE_FILE_NAME),
     actionTable(config, _.get(config.actions, 'package')));
-  copySync(DVCONFIG_FILE_PATH, path.join('pkg', DVCONFIG_FILE_PATH));
+  copySync(DVCONFIG_FILE_PATH, path.join(pkgDir, DVCONFIG_FILE_PATH));
+
+  const assetsDir = path.join('src', 'app', config.name, 'assets');
+  if (existsSync(assetsDir)) {
+    console.log('Copying assets');
+    copySync(
+      assetsDir,
+      path.join(pkgDir, 'assets'));
+  }
   console.log('Done');
 };
