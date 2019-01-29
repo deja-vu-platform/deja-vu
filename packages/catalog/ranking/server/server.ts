@@ -57,10 +57,31 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
 
         const targetRankings = await rankings.aggregate([
           { $match: query },
-          { $group: { _id: '$targetId', rank: { $avg: '$rank' } } },
-          { $project: { id: "$_id", rank: 1 } }
+          { $group: { _id: '$targetId', avgRank: { $avg: '$rank' } } },
+          { $project: { id: "$_id", avgRank: 1 } }
         ])
-        .sort({ rank: 1 }).toArray();
+        .sort({ avgRank: 1 }).toArray();
+
+        // calculate the rankings of just the targetIds relative to each other
+        var nextRank = 1;
+        var nextRankCount = 1;
+        var prevRank;
+        for (var i = 0; i < targetRankings.length; i++) {
+          const target = targetRankings[i];
+          if (i === 0 || target['avgRank'] !== prevRank) {
+            // e.g. if there's a tie for rank 2 between 2 targets,
+            // they will both have rank 2.5 and the next target will be ranked 4
+            const tiedRank = (2 * nextRank + nextRankCount - 1)/(2 * nextRankCount);
+            for (var j = i - nextRankCount + 1; j <= i; j++) {
+              targetRankings[j]['rank'] = tiedRank;
+            }
+            nextRank += nextRankCount;
+            nextRankCount = 1;
+            prevRank = target['avgRank'];
+          } else {
+            nextRankCount++;
+          }
+        }
 
         return targetRankings;
       }
