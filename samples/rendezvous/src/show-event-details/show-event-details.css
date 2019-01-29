@@ -10,6 +10,15 @@
   margin-bottom: 20px;
 }
 
+.panel-body {
+  padding: 15px;
+}
+
+.panel-body-item {
+  float: left;
+  margin-top: 4px;
+}
+
 #join-leave-group {
   float: left;
   margin-top: 30px;
@@ -107,16 +116,15 @@
 }
 
 #interests-panel{
-  float: left;
   margin-top: 4px;
 }
 
 /* makes labels show as a plain comma-separated list */
-#relevant-interests ul {
+#relevantinterests-show-labels ul {
   padding: 0 !important;
   margin: 0;
 }
-#relevant-interests li {
+#relevantinterests-show-labels li {
   background: none;
   color: black;
   font-size: 12;
@@ -125,11 +133,11 @@
   margin-right: 2px;
   padding: 0;
 }
-#relevant-interests li:after {
+#relevantinterests-show-labels li:after {
   content: ",";
   margin-left: -3px;
 }
-#relevant-interests li:last-child:after {
+#relevantinterests-show-labels li:last-child:after {
   content: "";
 }
 

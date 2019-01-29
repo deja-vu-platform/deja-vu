@@ -73,7 +73,7 @@ const actionRequestTable: ActionRequestTable = {
       labels(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: LabelDoc | null) {
   return _.get(doc, 'pending.type') === 'create-label';
@@ -165,9 +165,12 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
         const bulkUpdateBaseOps = _.map(labelIds, (labelId) => {
           return {
             updateOne: {
-              filter: { id: labelId, pending: { $exists: false } }
-            },
-            upsert: true
+              filter: { id: labelId, pending: { $exists: false } },
+              update: {
+                $push: { itemIds: input.itemId }
+              },
+              upsert: true
+            }
           };
         });
 
@@ -198,14 +201,7 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
             return true;
 
           case undefined:
-            const bulkUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-              const newOp = _.cloneDeep(op);
-              _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
-
-              return newOp;
-            });
-
-            const result = await labels.bulkWrite(bulkUpdateOps);
+            const result = await labels.bulkWrite(bulkUpdateBaseOps);
             const modified = result.modifiedCount ? result.modifiedCount : 0;
             const upserted = result.upsertedCount ? result.upsertedCount : 0;
 

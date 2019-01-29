@@ -12,38 +12,35 @@
             showOnly=["title"] />
         </div>
 
-        <div class="panel-body" id="event-panel">
-          <div id="hostBadge">
-            <!-- Host -->
-            Hosted By
-            <span class="badge userBadge">
-              <rendezvous.show-member-name class="inline-block"
-                id=authorization.show-owner.ownerId /> |
-            </span>
-            <dv.link class="inline-block" href="/profile"
-              params={ id: authorization.show-owner.ownerId }>
-              Profile
-            </dv.link>
+        <div id="hostBadge">
+          <!-- Host -->
+          Hosted By
+          <span class="badge userBadge">
+            <rendezvous.show-member-name class="inline-block"
+              id=authorization.show-owner.ownerId /> |
+          </span>
+          <dv.link class="inline-block" href="/profile"
+            params={ id: authorization.show-owner.ownerId }>
+            Profile
+          </dv.link>
+        </div>
+
+        <div id="attendees-panel">
+          <!-- List of Attendees -->
+          <p>Attendees</p>
+          <div class="panel-body" id="attendees-body">
+            <group.show-members inGroupId=$eventId
+              showMember=<rendezvous.show-member-name id=$id /> />
           </div>
+        </div>
 
-          <!-- TODO: Uncomment when max cohorts in tx problem resolved -->
-          <!-- Relevant Interests -->
-          <!-- <div id="interests-panel">
-            Relevant Interests
-            <div class="panel-body" id="interests-body">
-              <relevantinterests.show-labels id="relevant-interests"
-                itemId=$eventId
-                noLabelsToShowText="No interests added for this event" />
-            </div>
-          </div> -->
-
-          <div id="attendees-panel">
-            <!-- List of Attendees -->
-            <p>Attendees</p>
-            <div class="panel-body" id="attendees-body">
-              <group.show-members inGroupId=$eventId
-                showMember=<rendezvous.show-member-name id=$id /> />
-            </div>
+        <!-- Relevant Interests -->
+        <div id="interests-panel">
+          Relevant Interests
+          <div class="panel-body" id="interests-body">
+            <relevantinterests.show-labels id="relevant-interests"
+              itemId=$eventId
+              noLabelsToShowText="No interests added for this event" />
           </div>
         </div>
 
