@@ -293,9 +293,9 @@
     tslib "^1.7.1"
 
 "@asymmetrik/ngx-leaflet@^4.0.1":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-4.0.0.tgz#9e8b991b13e433de8bf3d3163aea02e5e1658f1d"
-  integrity sha512-DT+uOaysb01Egmhd58ftR6BOKI0JD7Uwt8/g6uRthFKGjWwmnOpmXJpPa2eF/lEhl2DAHx61XqJK2t/fmIlmJA==
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-5.0.1.tgz#6efe7113a96941936b7eb906a2c17e36466884b4"
+  integrity sha512-0C/C1seJvXeOYp//yPrgi55v3yQ42JCFkMSAc/CuJCwMXlkGSfJ0Sd/yb/zY2ElhOknfIMJg68jVTbNxMqlz2Q==
 
 "@lerna/add@^3.4.1":
   version "3.4.1"
@@ -7469,7 +7469,7 @@ ng-packagr@^2.0.0, ng-packagr@^2.2.0:
     uglify-js "^3.3.20"
     update-notifier "^2.3.0"
 
-ng2-dragula@^2.1.0:
+ng2-dragula@^2.1.0, ng2-dragula@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ng2-dragula/-/ng2-dragula-2.1.1.tgz#350e78978b6f7e1ea0b16c61ba78161c84ec6386"
   integrity sha512-PSo6N2Ja894KDogVLLBI0Hzpylikay7L1hWqp+qQmW+qsNsNT9J/6J2Qim9XwGzK4VQZjAwBJaJjgJ/TijRkLQ==

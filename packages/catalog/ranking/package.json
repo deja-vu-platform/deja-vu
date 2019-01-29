@@ -18,6 +18,7 @@
     "ng": "ng"
   },
   "dependencies": {
+    "ng2-dragula": "^2.1.1",
     "uuid": "^3.2.1"
   },
   "peerDependencies": {
