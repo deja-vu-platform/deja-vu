@@ -10,10 +10,15 @@ type Target {
   rank: Float!
 }
 
+input TargetInput {
+  id: ID!
+  rank: Float!
+}
+
 input CreateRankingInput {
   id: ID
   sourceId: ID
-  targets: [Target!]
+  targets: [TargetInput!]
 }
 
 type Query {
