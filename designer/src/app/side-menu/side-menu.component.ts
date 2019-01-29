@@ -83,11 +83,11 @@ export class SideMenuComponent implements OnInit {
       })
       .afterClosed()
       .subscribe(({ event, cliche: newCliche }) => {
-        if (event === 'update' || event === 'delete') {
-          this.clicheRemoved.emit(origName);
-        }
         if (event === 'update') {
+          this.clicheRemoved.emit(origName);
           this.clicheAdded.emit(newCliche);
+        } else if (event === 'delete') {
+          this.clicheRemoved.emit(origName);
         }
       });
   }

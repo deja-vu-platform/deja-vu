@@ -28,6 +28,13 @@ const DV_CONFIG_FLAG = 'configFilePath';
 const ACTION_TABLE_FP = 'actionTable.json';
 
 
+export interface AppInfo {
+  dvConfig: DvConfig;
+  appActionTable: ActionTable;
+  distFolder: string;
+}
+
+
 /**
  * JSON.stringify with custom indentation
  */
@@ -41,19 +48,15 @@ function stringify(json: any) {
  */
 export function startGateway(
   gatewayConfig?: GatewayConfig,
-  dvConfig?: DvConfig,
-  appActionTable?: ActionTable,
-  distFolder?: string
+  info?: AppInfo
 ): RequestProcessor {
   if (!gatewayConfig) {
     gatewayConfig = Object.assign({}, DEFAULT_CONFIG);
   }
   const app = express();
-  const requestProcessor = new RequestProcessor(
-    gatewayConfig,
-    dvConfig,
-    appActionTable
-  );
+  const requestProcessor = info
+    ? new RequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
+    : new RequestProcessor(gatewayConfig);
 
   // Handle API requests
   app.use('/api', bodyParser.json(), async (req, res) => {
@@ -69,10 +72,10 @@ export function startGateway(
   });
 
   // serve the SPA
-  if (distFolder) {
-    app.use(express.static(path.join(distFolder, 'app')));
+  if (info) {
+    app.use(express.static(path.join(info.distFolder, 'app')));
     app.get('*', ({}, res) => {
-      res.sendFile(path.join(distFolder, 'app', 'index.html'));
+      res.sendFile(path.join(info.distFolder, 'app', 'index.html'));
     });
   }
 
@@ -82,8 +85,10 @@ export function startGateway(
     .then(() => {
       app.listen(port, async () => {
         console.log(`Running gateway on port ${port}`);
-        if (dvConfig) { console.log(`Using config ${stringify(dvConfig)}`); }
-        if (distFolder) { console.log(`Serving ${distFolder}/app`); }
+        if (info) {
+          console.log(`Using config ${stringify(info.dvConfig)}`);
+          console.log(`Serving ${info.distFolder}/app`);
+        }
       });
     });
 
@@ -110,7 +115,7 @@ function main() {
     );
   }
 
-  startGateway(gatewayConfig, dvConfig, appActionTable, distFolder);
+  startGateway(gatewayConfig, { dvConfig, appActionTable, distFolder });
 }
 
 // if executed from command line

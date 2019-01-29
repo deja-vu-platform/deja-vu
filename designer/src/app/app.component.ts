@@ -26,9 +26,14 @@ export class AppComponent {
   app = new App('newapp');
   openAction = this.app.homepage;
 
-  addCliche: (cliche: ClicheInstance) => void;
   nextPort = 3002;
   processes: {[name: string]: {kill: (s: string) => void }} = {};
+
+  // electron imports
+  requestProcessor: any;
+  path: any;
+  cp: any;
+  cli: any;
 
   constructor(
     private dragulaService: DragulaService,
@@ -106,32 +111,33 @@ export class AppComponent {
    */
   private startBackend() {
     if (this.electronService.remote) {
-      const path = this.electronService.remote.require('path');
-      const cp = this.electronService.remote.require('child_process');
       const gateway = this.electronService.remote.require('dv-gateway');
-      const cli = this.electronService.remote.require('dv-cli');
+      this.requestProcessor = gateway.startGateway();
 
-      const requestProcessor = gateway.startGateway();
+      // imports for addCliche
+      this.path = this.electronService.remote.require('path');
+      this.cp = this.electronService.remote.require('child_process');
+      this.cli = this.electronService.remote.require('dv-cli');
+    }
+  }
 
-      /**
-       * Start the cliche server
-       */
-      this.addCliche = (cliche) => {
-        requestProcessor.addCliche(cliche.of.name, this.nextPort, cliche.name);
-        const serverPath = path.join(path.dirname(
-          cli.locatePackage(cliche.of.name)), '..', 'server', 'server.js');
-        const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
-        const configStr = JSON.stringify(JSON.stringify(configObj));
-        let command = `node ${serverPath} --config ${configStr}`;
-        if (cliche.name !== cliche.of.name) {
-          command += ` --as ${cliche.name}`;
-        }
-        this.processes[cliche.name] = cp.spawn(command, [], { shell: true });
-        this.nextPort += 1;
-      };
-
-    } else {
-      this.addCliche = () => { };
+  /**
+   * Start the cliche server
+   */
+  addCliche(cliche: ClicheInstance) {
+    if (this.electronService.remote) {
+      this.requestProcessor
+        .addCliche(cliche.of.name, this.nextPort, cliche.name);
+      const serverPath = this.path.join(this.path.dirname(
+        this.cli.locatePackage(cliche.of.name)), '..', 'server', 'server.js');
+      const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
+      const configStr = JSON.stringify(JSON.stringify(configObj));
+      let command = `node ${serverPath} --config ${configStr}`;
+      if (cliche.name !== cliche.of.name) {
+        command += ` --as ${cliche.name}`;
+      }
+      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
+      this.nextPort += 1;
     }
   }
 

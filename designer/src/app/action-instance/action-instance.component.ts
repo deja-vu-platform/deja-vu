@@ -25,11 +25,11 @@ export class ActionInstanceComponent implements AfterViewInit {
     if (this.actionInstance && this.actionInstance.of['component']) {
       // cliche actions check DOM attrs which aren't there until afterViewInit
       // setTimeout is necessary to avoid angular change detection errors
-      setTimeout(this.loadClicheAction);
+      setTimeout(() => this.loadClicheAction());
     }
   }
 
-  loadClicheAction = () => {
+  loadClicheAction() {
     const { component } = <ClicheActionDefinition>this.actionInstance.of;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
@@ -39,6 +39,7 @@ export class ActionInstanceComponent implements AfterViewInit {
     componentRef.instance['actionInstance'] = this.actionInstance;
   }
 
+  // need to give the action the right fqtag
   get dvAlias() {
     return `${this.actionInstance.from.name}-${this.actionInstance.of.name}`;
   }
