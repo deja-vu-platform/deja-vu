@@ -142,9 +142,12 @@ export class TxRequest {
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
 
-  fromStr: string;
+  private _fromStr: string;
 
-  private static GetAttribute(node, attribute: string): string | undefined {
+  private static GetAttribute(
+    node: Element,
+    attribute: string
+  ): string | undefined {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
     if (node.hasAttribute(attribute)) {
       return node.getAttribute(attribute);
@@ -153,16 +156,20 @@ export class GatewayService {
     return undefined;
   }
 
-  private static GetTag(node): string {
+  private static GetTag(node: Element): string {
     return node.nodeName.toLowerCase();
   }
 
-  private static IsAction(node): boolean {
-    // No HTML tag has a hyphen
-    return _.includes(GatewayService.GetTag(node), '-');
+  private static IsAction(node: Element): boolean {
+    if (window['dv-designer']) {
+      return _.get(node, ['dataset', 'isaction']) === 'true';
+    } else {
+      // No HTML tag has a hyphen
+      return _.includes(GatewayService.GetTag(node), '-');
+    }
   }
 
-  private static GetFqTag(tag, dvAlias, dvOf): string {
+  private static GetFqTag(tag: string, dvAlias: string, dvOf: string): string {
     if (!_.isEmpty(dvAlias)) {
       return dvAlias;
     } else if (!_.isEmpty(dvOf)) {
@@ -181,15 +188,27 @@ export class GatewayService {
   }
 
   constructor(
-    private gatewayUrl: string, private http: HttpClient, renderer: Renderer2,
-    private from: ElementRef) {
-    let node = from.nativeElement;
+    private gatewayUrl: string,
+    private http: HttpClient,
+    private renderer: Renderer2,
+    private from: ElementRef
+  ) { }
+
+  /**
+   * Action path.
+   * For designer this can change so needs to be gen'd each time
+   */
+  get fromStr(): string {
+    if (!window['dv-designer'] && this._fromStr) {
+      return this._fromStr;
+    }
+
+    let node: Element = this.from.nativeElement;
     const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
       if (GatewayService.IsAction(node)) {
         seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
       }
-
       const classAttr = GatewayService.GetAttribute(node, CLASS_ATTR);
       let dvClass: string | null = null;
       if (!_.isEmpty(classAttr)) {
@@ -199,12 +218,17 @@ export class GatewayService {
         }
       }
       if (dvClass !== null) {
-        node = renderer.selectRootElement('.dv-' + dvClass);
+        node = this.renderer.selectRootElement('.dv-' + dvClass);
       } else {
-        node = renderer.parentNode(node);
+        node = this.renderer.parentNode(node);
       }
     }
-    this.fromStr = JSON.stringify(_.reverse(seenActionNodes));
+    const fromStr = JSON.stringify(_.reverse(seenActionNodes));
+    if (!window['dv-designer']) {
+      this._fromStr = fromStr;
+    }
+
+    return fromStr;
   }
 
   get<T>(path?: string, options?: RequestOptions) {
@@ -234,7 +258,7 @@ export class GatewayService {
     body?: string | Object,
     options?: RequestOptions
   ): Observable<T> {
-    console.log(`Sending get from ${this.getActionName()}`);
+    console.log(`Sending ${method} from ${this.getActionName()}`);
 
     const params = this.buildParams(path, options);
 

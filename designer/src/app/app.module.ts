@@ -9,7 +9,7 @@ import { QuillModule } from 'ngx-quill';
 
 import { DvModule, GATEWAY_URL } from 'dv-core';
 
-import { ClicheModule } from './cliche.module';
+import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';
 
 import { ClicheActionDirective } from './cliche-action.directive';
@@ -57,13 +57,16 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     ClicheModule
   ],
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' }
+    {
+      provide: GATEWAY_URL,
+      useValue: 'http://localhost:4200/api' // proxied to 3000
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [
     ConfigureActionComponent,
     ConfigureClicheComponent,
     TextComponent
-  ]
+  ].concat(dvCoreActions)
 })
 export class AppModule { }

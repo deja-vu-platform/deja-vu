@@ -1,8 +1,8 @@
 import {
+  AfterViewInit,
   Component,
   ComponentFactoryResolver,
   Input,
-  OnInit,
   Type,
   ViewChild
 } from '@angular/core';
@@ -15,19 +15,21 @@ import { ActionInstance, ClicheActionDefinition } from '../datatypes';
   templateUrl: './action-instance.component.html',
   styleUrls: ['./action-instance.component.scss']
 })
-export class ActionInstanceComponent implements OnInit {
+export class ActionInstanceComponent implements AfterViewInit {
   @Input() actionInstance: ActionInstance;
   @ViewChild(ClicheActionDirective) actionHost: ClicheActionDirective;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     if (this.actionInstance && this.actionInstance.of['component']) {
-      this.loadClicheAction();
+      // cliche actions check DOM attrs which aren't there until afterViewInit
+      // setTimeout is necessary to avoid angular change detection errors
+      setTimeout(this.loadClicheAction);
     }
   }
 
-  loadClicheAction() {
+  loadClicheAction = () => {
     const { component } = <ClicheActionDefinition>this.actionInstance.of;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
@@ -35,5 +37,9 @@ export class ActionInstanceComponent implements OnInit {
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent(componentFactory);
     componentRef.instance['actionInstance'] = this.actionInstance;
+  }
+
+  get dvAlias() {
+    return `${this.actionInstance.from.name}-${this.actionInstance.of.name}`;
   }
 }

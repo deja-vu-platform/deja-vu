@@ -71,7 +71,7 @@ interface ClicheResponse<T> {
   readonly index?: number;
 }
 
-type port = string;
+export type port = number;
 
 // https://stackoverflow.com/questions/985431
 const MAX_BROWSER_CONNECTIONS = 6;
@@ -128,6 +128,8 @@ export class RequestProcessor {
     GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
   private readonly actionHelper: ActionHelper;
   private readonly dstTable: { [cliche: string]: port };
+  private noApp = false;
+  private cohortActions: ActionTag[]; // for appless mode only
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
     if (node === undefined) {
@@ -212,29 +214,46 @@ export class RequestProcessor {
   }
 
   constructor(
-    dvConfig: DvConfig, config: GatewayConfig, appActionTable: ActionTable) {
-    const usedCliches = _
+    config: GatewayConfig,
+    dvConfig?: DvConfig,
+    appActionTable?: ActionTable
+  ) {
+    this.noApp = !dvConfig || !appActionTable;
+    // mapping of names(aliases) to ports
+    this.dstTable = !dvConfig ? {} : _.mapValues(
+      dvConfig.usedCliches,
+      (clicheConfig: DvConfig) => clicheConfig.config.wsPort
+    );
+    if (dvConfig && dvConfig.config) {
+      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
+    }
+    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
+
+    // names of the cliches used (not the aliases), repeats don't matter
+    const usedCliches: string[] = !dvConfig ? [] : _
       .chain(dvConfig.usedCliches)
       .toPairs()
       .map(([alias, usedClicheConfig]: [string, DvConfig]): string => _
           .get(usedClicheConfig, 'name', alias))
       .value();
     this.actionHelper = new ActionHelper(
-      appActionTable, usedCliches, dvConfig.routes);
-
-    const usedClicheServers = _
-      .mapValues(
-        dvConfig.usedCliches,
-        (clicheConfig: DvConfig) => clicheConfig.config.wsPort);
-    const thisServer = (dvConfig.config !== undefined) ?
-      { [dvConfig.name]: dvConfig.config.wsPort } : {};
-    this.dstTable = _.assign({}, usedClicheServers, thisServer);
-    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
+      usedCliches,
+      appActionTable,
+      dvConfig ? dvConfig.routes : undefined
+    );
 
     const txConfig = this.getTxConfig(config, this.actionHelper);
     this.txCoordinator = new TxCoordinator<
       GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
         txConfig);
+  }
+
+  /**
+   * Add a cliche (for appless mode for the designer)
+   */
+  addCliche(name: string, wsPort: port, alias?: string) {
+    this.actionHelper.addCliche(name);
+    this.dstTable[alias || name] = wsPort;
   }
 
   start(): Promise<void> {
@@ -255,6 +274,17 @@ export class RequestProcessor {
 
     const childRequests: ChildRequest[] = req.body;
     const txRes = new TxResponse(res, childRequests.length);
+
+    this.cohortActions = childRequests.map((chReq) => {
+      const actionPath = ActionPath.fromString(chReq.query.from);
+      const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+
+      return {
+        fqtag,
+        tag: fqtag,
+        inputs: {}
+      };
+    });
 
     return Promise
       .all(childRequests.map((chReq, index) =>
@@ -321,7 +351,7 @@ export class RequestProcessor {
     actionPath: ActionPath,
     matchingActions: ActionTag[],
     to: string | undefined,
-    toPort: string | undefined,
+    toPort: port | undefined,
     txRes: TxResponse
   ): boolean {
     if (_.isEmpty(matchingActions)) {
@@ -428,24 +458,25 @@ export class RequestProcessor {
         assert.ok(actionTagPath.length === actionPath.length(),
           'Expected the length of the path to match the action path ' +
           ` length but got ${stringify(actionTagPath)}`);
+
         const dvTxNode = actionTagPath[dvTxNodeIndex];
 
-        const cohortActions = _
-          .reject(dvTxNode.content, (action: ActionTag) => {
+        const cohortActions = (this.noApp && !dvTxNode.content)
+          ? this.cohortActions
+          : _.reject(dvTxNode.content, (action: ActionTag) => {
             return action.tag.split('-')[0] === 'dv' ||
               _.get(action.inputs, '[save]') === 'false' ||
               !actionHelper.shouldHaveExecRequest(action.tag);
           });
 
-        const cohorts = _
-          .map(cohortActions, (action: ActionTag) => {
-            const nodes = [
-              ..._.take(actionPath.nodes(), dvTxNodeIndex + 1), action.fqtag
-            ];
+        const cohorts = _.map(cohortActions, (action: ActionTag) => {
+          const nodes = [
+            ..._.take(actionPath.nodes(), dvTxNodeIndex + 1), action.fqtag
+          ];
 
-            return new ActionPath(nodes)
-              .serialize();
-          });
+          return new ActionPath(nodes)
+            .serialize();
+        });
 
         if (cohorts.length > MAX_BROWSER_CONNECTIONS) {
           throw new Error(

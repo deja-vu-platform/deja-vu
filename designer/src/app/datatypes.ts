@@ -125,7 +125,7 @@ export class ActionInstance {
 
   toHTML(): string {
     // text widget is just plain HTML static content
-    if (this.of.name === 'text' && this.from.name === 'dv-d') {
+    if (this.of.name === 'text' && this.from.name === 'dv') {
       return `    <div>${this.data}</div>\n`;
     }
 
@@ -198,7 +198,7 @@ export class App {
   static fromJSON(
     jsonString: string,
     clicheDefinitions: ClicheDefinition[],
-    designerCliche: ClicheDefinition
+    dvCliche: ClicheDefinition
   ): App {
     const appJSON = JSON.parse(jsonString);
 
@@ -226,7 +226,7 @@ export class App {
           const from = [
             ...app.cliches,
             app,
-            designerCliche
+            dvCliche
           ].find((c) => c.name === ai.from);
           const ofAction = (<ActionDefinition[]>from.actions)
             .find((a) => a.name === ai.of);

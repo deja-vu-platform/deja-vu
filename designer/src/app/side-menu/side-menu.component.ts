@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { designerCliche } from '../cliche.module';
+import { dvCliche } from '../cliche.module';
 import {
   ConfigureClicheComponent,
   DialogData
@@ -28,13 +28,15 @@ interface ActionCollection {
 export class SideMenuComponent implements OnInit {
   @Input() app: App;
   @Input() openAction: AppActionDefinition;
+  @Output() clicheAdded = new EventEmitter<ClicheInstance>();
+  @Output() clicheRemoved = new EventEmitter<string>();
   // need consistent object to return
   private _actionCollections: ActionCollection[];
 
   constructor(private dialog: MatDialog) {}
 
   ngOnInit() {
-    this._actionCollections = [designerCliche];
+    this._actionCollections = [dvCliche];
   }
 
   get actionCollections(): ActionCollection[] {
@@ -55,20 +57,38 @@ export class SideMenuComponent implements OnInit {
     const data: DialogData = {
       app: this.app
     };
-    this.dialog.open(ConfigureClicheComponent, {
-      width: '50vw',
-      data
-    });
+    this.dialog
+      .open(ConfigureClicheComponent, {
+        width: '50vw',
+        data
+      })
+      .afterClosed()
+      .subscribe(({ event, cliche }) => {
+        if (event === 'create') {
+          this.clicheAdded.emit(cliche);
+        }
+      });
   }
 
   editCliche(cliche: ClicheInstance) {
+    const origName = cliche.name;
     const data: DialogData = {
       app: this.app,
       cliche
     };
-    this.dialog.open(ConfigureClicheComponent, {
-      width: '50vw',
-      data
-    });
+    this.dialog
+      .open(ConfigureClicheComponent, {
+        width: '50vw',
+        data
+      })
+      .afterClosed()
+      .subscribe(({ event, cliche: newCliche }) => {
+        if (event === 'update' || event === 'delete') {
+          this.clicheRemoved.emit(origName);
+        }
+        if (event === 'update') {
+          this.clicheAdded.emit(newCliche);
+        }
+      });
   }
 }

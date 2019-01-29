@@ -1,10 +1,12 @@
 <!-- for some reason this can't be in *ngIf -->
-<ng-template propertyClicheAction></ng-template>
+<div [attr.data-isaction]="true" [attr.dvAlias]="dvAlias">
+  <ng-template propertyClicheAction></ng-template>
 
-<div *ngIf="actionInstance?.of?.rows">
-  <div *ngFor="let row of actionInstance.of.rows">
-    <div *ngFor="let action of row.actions">
-      <app-action-instance [actionInstance]="action"></app-action-instance>
+  <div *ngIf="actionInstance?.of?.rows">
+    <div *ngFor="let row of actionInstance.of.rows">
+      <div *ngFor="let action of row.actions">
+        <app-action-instance [actionInstance]="action"></app-action-instance>
+      </div>
     </div>
   </div>
 </div>

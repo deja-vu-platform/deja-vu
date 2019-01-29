@@ -87,7 +87,7 @@ export class ConfigureClicheComponent implements OnInit {
   }
 
   cancel() {
-    this.dialogRef.close();
+    this.dialogRef.close({ event: 'cancel' });
   }
 
   save(form: ControlGroup) {
@@ -106,7 +106,10 @@ export class ConfigureClicheComponent implements OnInit {
       if (this.configString) { // guaranteed to be valid JSON of object
         Object.assign(clicheInstance.config, JSON.parse(this.configString));
       }
-      this.dialogRef.close();
+      this.dialogRef.close({
+        event: this.data.cliche ? 'update' : 'create',
+        cliche: clicheInstance
+      });
     }
   }
 
@@ -121,7 +124,7 @@ export class ConfigureClicheComponent implements OnInit {
         });
       });
       _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
-      this.dialogRef.close();
+      this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
     }
   }
 
