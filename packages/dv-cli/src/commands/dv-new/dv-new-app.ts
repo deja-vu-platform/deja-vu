@@ -1,4 +1,4 @@
-import { ng, installAndConfigureGateway, APP_MODULE_PATH } from '../../dv';
+import { APP_MODULE_PATH, installAndConfigureGateway, ng } from '../../utils';
 
 
 exports.command = 'app <name> <pathToDv>';
@@ -16,4 +16,4 @@ exports.handler = ({ name, pathToDv }) => {
       - add "DvModule" to the imports array
       - every action that you load dynamically should be in entryComponents
      This will be automated in the future`);
-}
+};

@@ -7,7 +7,7 @@ import {
   startServerCmd,
   updateDvConfig,
   updatePackage
-} from '../dv';
+} from '../utils';
 
 import { existsSync } from 'fs';
 import * as path from 'path';

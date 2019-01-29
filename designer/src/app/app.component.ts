@@ -117,7 +117,7 @@ export class AppComponent {
       // imports for addCliche
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
-      this.cli = this.electronService.remote.require('dv-cli');
+      this.cli = this.electronService.remote.require('dv-cli/dist/utils');
     }
   }
 

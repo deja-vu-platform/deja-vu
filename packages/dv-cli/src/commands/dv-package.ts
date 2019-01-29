@@ -11,7 +11,7 @@ import {
   readFileOrFail,
   updatePackage,
   writeFileOrFail
-} from '../dv';
+} from '../utils';
 
 
 exports.command = 'package';

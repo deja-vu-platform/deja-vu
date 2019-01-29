@@ -1,6 +1,6 @@
-import * as path from 'path';
 import * as _ from 'lodash';
-import { ng, projectName, isCliche, modulePath } from '../../dv';
+import * as path from 'path';
+import { isCliche, modulePath, ng, projectName } from '../../utils';
 
 
 exports.command = 'action <name>';
@@ -16,8 +16,11 @@ exports.handler = ({ name }) => {
     `Edit ${modulePath(projName)}.ts:\n
        - add "${componentClassName(name)}" to the exports array\n
      This will be automated in the future`);
-}
+};
 
 function componentClassName(actionName: string): string {
-  return _.chain(actionName).camelCase().upperFirst().value() + 'Component';
+  return _.chain(actionName)
+    .camelCase()
+    .upperFirst()
+    .value() + 'Component';
 }

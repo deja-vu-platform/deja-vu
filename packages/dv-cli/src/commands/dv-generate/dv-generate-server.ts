@@ -1,10 +1,19 @@
-import * as path from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import * as path from 'path';
 import {
-  npm, writeFileOrFail, readFileOrFail, SERVER_SRC_FOLDER,
-  updateDvConfig, updatePackage, concurrentlyCmd, startServerCmd, buildFeCmd,
-  buildServerCmd, DVCONFIG_FILE_PATH, SERVER_DIST_FOLDER
-} from '../../dv';
+  buildFeCmd,
+  buildServerCmd,
+  concurrentlyCmd,
+  DVCONFIG_FILE_PATH,
+  npm,
+  readFileOrFail,
+  SERVER_DIST_FOLDER,
+  SERVER_SRC_FOLDER,
+  startServerCmd,
+  updateDvConfig,
+  updatePackage,
+  writeFileOrFail
+} from '../../utils';
 
 
 const SERVER_PATH = path.join(SERVER_SRC_FOLDER, 'server.ts');
@@ -42,15 +51,16 @@ exports.handler = () => {
   writeFileOrFail(SERVER_TSCONFIG_PATH, SERVER_TSCONFIG_BLUEPRINT);
 
   console.log('Update dvconfig.json');
-  updateDvConfig(dvConfig => {
+  updateDvConfig((dvConfig) => {
     dvConfig.config = { wsPort: 3001 };
     dvConfig.startServer = true;
+
     return dvConfig;
   });
 
   console.log('Add start and watch scripts to package.json');
   const name: string = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
-  updatePackage(pkg => {
+  updatePackage((pkg) => {
     pkg.scripts[`dv-build-${name}`] = buildFeCmd(false) + ' && ' +
       buildServerCmd(false, 'server');
     pkg.scripts[`dv-build-watch-${name}`] = concurrentlyCmd(
@@ -63,4 +73,4 @@ exports.handler = () => {
 
     return pkg;
   });
-}
+};

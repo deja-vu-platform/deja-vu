@@ -204,6 +204,7 @@ function getFqTag(
   if (dvAlias) {
     return dvAlias;
   }
+  // tslint:disable-next-line prefer-const
   let [clicheName, ...actionTagName] = tag.split('-');
   if (dvOf) { clicheName = dvOf; }
 
