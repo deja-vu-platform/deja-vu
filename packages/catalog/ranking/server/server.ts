@@ -101,7 +101,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
             });
           /* falls through */
           case undefined:
-            await rankings.insert(newRankings);
+            await rankings.insertMany(newRankings);
 
             return newRankings;
           case 'commit':
