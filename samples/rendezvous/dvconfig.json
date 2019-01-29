@@ -1,5 +1,6 @@
 {
   "name": "rendezvous",
+  "type": "app",
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -7,49 +8,60 @@
   },
   "usedCliches": {
     "authentication": {
+      "name": "authentication",
       "config": {
         "wsPort": 3002,
         "reinitDbOnStartup": true
       }
     },
     "authorization": {
+      "name": "authorization",
       "config": {
         "wsPort": 3003,
         "reinitDbOnStartup": true
       }
     },
     "comment": {
+      "name": "comment",
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": true
       }
     },
     "event": {
+      "name": "event",
       "config": {
         "wsPort": 3005,
         "reinitDbOnStartup": true
       }
     },
     "geolocation": {
+      "name": "geolocation",
       "config": {
         "wsPort": 3006,
-        "reinitDbOnStartup": true,
-        "mapType": "leaflet"
+        "mapType": "leaflet",
+        "reinitDbOnStartup": true
       }
     },
     "group": {
+      "name": "group",
       "config": {
         "wsPort": 3007,
         "reinitDbOnStartup": true
       }
     },
-    "label": {
+    "relevantinterests": {
+      "name": "label",
       "config": {
         "wsPort": 3008,
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": true,
+        "initialLabelIds": [
+          "Sports", "Music", "Food & Drink", "Outdoor", "Theatre",
+          "Culture & History"
+        ]
       }
     },
-    "eventDetails": {
+    "eventdetails": {
       "name": "property",
       "config": {
         "wsPort": 3009,
@@ -68,7 +80,7 @@
         }
       }
     },
-    "userProfile": {
+    "userprofile": {
       "name": "property",
       "config": {
         "wsPort": 3010,
@@ -103,13 +115,6 @@
           "required": ["firstName", "lastName", "zipCode", "email"]
         }
       }
-    }
-  },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "rendezvous-root"}
-      ]
     }
   },
   "routes": [

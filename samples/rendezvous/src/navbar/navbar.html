@@ -1,0 +1,36 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+  <dv.tx as rendezvous-auth-check>
+    <authentication.logged-in />
+    <dv.redirect href="/login" onEvalFailure=true />
+  </dv.tx>
+
+  <dv.if condition=$showTitle>
+    <div id="return-to-main">R E N D E Z V O U S</div>
+    <div class="inline left">
+      <dv.link href="/main">
+        <button type="button" id="back" class="btn button btn-info">
+          <i class="material-icons">arrow_back</i>
+        </button>
+      </dv.link>
+    </div>
+  </dv.if>
+
+  <div class="right">
+    <div class="center">
+      <div class="inline">
+        <dv.if condition=$showProfileButton>
+          <dv.link href="/profile">
+            <button type="button" class="btn button">
+              My Profile
+            </button>
+          </dv.link>
+        </dv.if>
+
+        <dv.tx as rendezvous-sign-out>
+          <authentication.sign-out class="btn button" buttonLabel="Logout" />
+          <dv.link href="/login" hidden=true />
+        </dv.tx>
+      </div>
+    </div>
+  </div>
+</dv.action>

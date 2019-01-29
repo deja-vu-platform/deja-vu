@@ -1,0 +1,24 @@
+#login-panel {
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 200px;
+}
+
+.auth-link {
+  background:none;
+  border:none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 10px;
+  text-decoration:underline;
+  color: #B3594D;
+}
+
+#login-title {
+  margin-top: 0px;
+}
+
+#create-account {
+  text-align: center;
+}

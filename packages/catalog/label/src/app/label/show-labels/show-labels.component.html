@@ -1,5 +1,5 @@
-<ul *ngIf="labels && labels.length > 0" class="list-group">
-  <li *ngFor="let label of labels" class="list-group-item">
+<ul *ngIf="_labels && _labels.length > 0" class="list-group">
+  <li *ngFor="let label of _labels" class="list-group-item">
     <dv-include
       [action]="showLabel"
       default-showLabel="{ tag: label-show-label }"
@@ -9,6 +9,6 @@
   </li>
 </ul>
 
-<div *ngIf="!labels || labels.length === 0">
+<div *ngIf="!_labels || _labels.length === 0">
   <span>{{noLabelsToShowText}}</span>
 </div>

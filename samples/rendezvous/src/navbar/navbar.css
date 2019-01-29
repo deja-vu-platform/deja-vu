@@ -1,0 +1,36 @@
+#return-to-main {
+  width: 100%;
+  background-color: #ffa599;
+  border-bottom: 1px solid #B3594D;
+  height: 30px;
+  text-align: center;
+  padding-top: 5px;
+  cursor: pointer;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.center {
+  text-align: center;
+}
+
+#back {
+  margin-right: 50px;
+}
+
+#profile-button {
+  margin: 0px;
+  width: 100%;
+}
+
+#auth-sign-out {
+  margin: 0px;
+  margin-top: 10px;
+  width: 100%;
+}
