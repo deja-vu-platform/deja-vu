@@ -252,9 +252,17 @@ export class NgAppBuilder {
       NgAppBuilder.Replace('.angular-cli', 'json', cacheDir, replaceMap);
     }
     // | dvconfig.json
-    const newDvConfigContents = JSON.stringify(
-      _.omit(JSON.parse(this.dvConfigContents), 'type'), null, 2);
-    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContents);
+    const newDvConfigContents = _
+      .assign({ gateway: { wsPort: 3000 } },
+        _.omit(JSON.parse(this.dvConfigContents), 'type'));
+    // choose wsPorts for the clichés that have no `wsPort` value
+    let clichePort = 3002;
+    newDvConfigContents['usedCliches'] = _
+      .mapValues(newDvConfigContents['usedCliches'], (uc) => _
+        .assign({ config: { wsPort: clichePort++ } }, uc));
+
+    const newDvConfigContentsStr = JSON.stringify(newDvConfigContents, null, 2);
+    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContentsStr);
 
     // | src/
     // | | index.html
