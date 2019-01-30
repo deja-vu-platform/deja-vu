@@ -1,6 +1,6 @@
 # Ranking
 
-Keep track of rankings
+Rank items
 
 ## Actions
 
