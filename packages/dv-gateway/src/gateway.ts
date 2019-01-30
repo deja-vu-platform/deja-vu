@@ -34,6 +34,14 @@ export interface AppInfo {
   distFolder: string;
 }
 
+export interface GatewayConfigOptions {
+  readonly dbHost?: string;
+  readonly dbPort?: number;
+  readonly wsPort?: number;
+  readonly dbName?: string;
+  readonly reinitDbOnStartup?: boolean;
+}
+
 
 /**
  * JSON.stringify with custom indentation
@@ -47,12 +55,11 @@ function stringify(json: any) {
  * The last three args are expected all or none.
  */
 export function startGateway(
-  gatewayConfig?: GatewayConfig,
+  gatewayConfigOptions?: GatewayConfigOptions,
   info?: AppInfo
 ): RequestProcessor {
-  if (!gatewayConfig) {
-    gatewayConfig = Object.assign({}, DEFAULT_CONFIG);
-  }
+  const gatewayConfig: GatewayConfig = Object
+    .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
   const app = express();
   const requestProcessor = info
     ? new RequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
@@ -104,12 +111,12 @@ function main() {
 
   const distFolder = path.join(process.cwd(), 'dist');
 
-  const gatewayConfig: GatewayConfig = Object.assign({}, DEFAULT_CONFIG);
+  let gatewayConfig: GatewayConfigOptions;
   let dvConfig: DvConfig;
   let appActionTable: ActionTable;
   if (dvConfigPath) {
     dvConfig = JSON.parse(readFileSync(dvConfigPath, 'utf8'));
-    Object.assign(gatewayConfig, dvConfig.gateway.config);
+    gatewayConfig = Object.assign({}, dvConfig.gateway.config);
     appActionTable = JSON.parse(
       readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')
     );
