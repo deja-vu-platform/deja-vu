@@ -9,7 +9,7 @@ import {
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../ranking.config';
-import { Ranking, Target } from '../shared/ranking.model';
+import { Ranking, TargetRank } from '../shared/ranking.model';
 
 
 @Component({
@@ -31,7 +31,7 @@ OnChanges {
     type: <Type<Component>> ShowTargetComponent
   };
 
-  targets: Target[];
+  targets: TargetRank[];
   showTargetRankings;
 
   private gs: GatewayService;
@@ -63,7 +63,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {targetRankings: Target[]}}>(this.apiPath, {
+      this.gs.get<{data: {targetRankings: TargetRank[]}}>(this.apiPath, {
         params: {
           inputs: {
             targetIds: this.targetIds

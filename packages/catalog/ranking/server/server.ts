@@ -11,7 +11,7 @@ import * as mongodb from 'mongodb';
 import {
   CreateRankingInput,
   RankingDoc,
-  Target
+  TargetRank
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
@@ -92,16 +92,16 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
       targetId: (ranking: RankingDoc) => ranking.targetId,
       rank: (ranking: RankingDoc) => ranking.rank
     },
-    Target: {
-      id: (target: Target) => target.id,
-      rank: (target: Target) => target.rank
+    TargetRank: {
+      id: (target: TargetRank) => target.id,
+      rank: (target: TargetRank) => target.rank
     },
     Mutation: {
       createRanking: async (
         _root, { input }: { input: CreateRankingInput }, context: Context) => {
         const rankingId = input.id ? input.id : uuid();
         const newRankings: RankingDoc[] = _.map(input.targets,
-          (target: Target) => {
+          (target: TargetRank) => {
             return {
               id: rankingId,
               sourceId: input.sourceId,

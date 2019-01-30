@@ -17,12 +17,12 @@ import * as _ from 'lodash';
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../ranking.config';
-import { Ranking, Target } from '../shared/ranking.model';
+import { Ranking, TargetRank } from '../shared/ranking.model';
 
 interface CreateRankingInput {
   id?: string;
   sourceId?: string;
-  targets: Target[];
+  targets: TargetRank[];
 }
 
 interface CreateRankingResponse {

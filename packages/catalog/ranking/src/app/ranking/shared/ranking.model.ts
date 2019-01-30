@@ -5,7 +5,7 @@ export interface Ranking {
   rank: number;
 }
 
-export interface Target {
+export interface TargetRank {
   id: string;
   rank: number;
 }

@@ -18,7 +18,7 @@ import {
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../ranking.config';
-import { Ranking, Target } from '../shared/ranking.model';
+import { Ranking, TargetRank } from '../shared/ranking.model';
 
 
 @Component({
@@ -44,7 +44,7 @@ OnChanges {
   };
 
   sourceId: string;
-  targets: Target[];
+  targets: TargetRank[];
   showRanking;
 
   private gs: GatewayService;

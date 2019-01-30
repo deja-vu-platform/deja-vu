@@ -5,12 +5,12 @@ type Ranking {
   rank: Float!
 }
 
-type Target {
+type TargetRank {
   id: ID!
   rank: Float!
 }
 
-input TargetInput {
+input TargetRankInput {
   id: ID!
   rank: Float!
 }
@@ -18,12 +18,12 @@ input TargetInput {
 input CreateRankingInput {
   id: ID
   sourceId: ID
-  targets: [TargetInput!]
+  targets: [TargetRankInput!]
 }
 
 type Query {
   ranking(id :ID!): [Ranking!]
-  targetRankings(targetIds: [ID!]): [Target!]
+  targetRankings(targetIds: [ID!]): [TargetRank!]
 }
 
 type Mutation {

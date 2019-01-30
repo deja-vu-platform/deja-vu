@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Target } from '../shared/ranking.model';
+import { TargetRank } from '../shared/ranking.model';
 
 
 @Component({
@@ -9,7 +9,7 @@ import { Target } from '../shared/ranking.model';
   styleUrls: ['./show-target.component.css']
 })
 export class ShowTargetComponent {
-  @Input() target: Target;
+  @Input() target: TargetRank;
 
   @Input() showId = true;
   @Input() showRank = true;

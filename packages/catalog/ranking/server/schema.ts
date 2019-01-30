@@ -1,4 +1,4 @@
-export interface Target {
+export interface TargetRank {
   id: string;
   rank: number;
 }
@@ -19,5 +19,5 @@ export interface PendingDoc {
 export interface CreateRankingInput {
   id: string | undefined;
   sourceId: string | undefined;
-  targets: Target[];
+  targets: TargetRank[];
 }
