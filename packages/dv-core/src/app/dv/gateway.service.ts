@@ -141,7 +141,6 @@ export class TxRequest {
 
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
-
   private _fromStr: string;
 
   private static GetAttribute(
@@ -158,15 +157,6 @@ export class GatewayService {
 
   private static GetTag(node: Element): string {
     return node.nodeName.toLowerCase();
-  }
-
-  private static IsAction(node: Element): boolean {
-    if (window['dv-designer']) {
-      return _.get(node, ['dataset', 'isaction']) === 'true';
-    } else {
-      // No HTML tag has a hyphen
-      return _.includes(GatewayService.GetTag(node), '-');
-    }
   }
 
   private static GetFqTag(tag: string, dvAlias: string, dvOf: string): string {
@@ -194,19 +184,27 @@ export class GatewayService {
     private from: ElementRef
   ) { }
 
-  /**
-   * Action path.
-   * For designer this can change so needs to be gen'd each time
-   */
-  get fromStr(): string {
-    if (!window['dv-designer'] && this._fromStr) {
-      return this._fromStr;
+  get fromStr() {
+    if (!this._fromStr) {
+      this._fromStr = this.generateFromStr();
     }
 
+    return this._fromStr;
+  }
+
+  isAction(node: Element): boolean {
+    // No HTML tag has a hyphen
+    return _.includes(GatewayService.GetTag(node), '-');
+  }
+
+  /**
+   * Action path.
+   */
+  generateFromStr(): string {
     let node: Element = this.from.nativeElement;
     const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
-      if (GatewayService.IsAction(node)) {
+      if (this.isAction(node)) {
         seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
       }
       const classAttr = GatewayService.GetAttribute(node, CLASS_ATTR);
@@ -223,12 +221,8 @@ export class GatewayService {
         node = this.renderer.parentNode(node);
       }
     }
-    const fromStr = JSON.stringify(_.reverse(seenActionNodes));
-    if (!window['dv-designer']) {
-      this._fromStr = fromStr;
-    }
 
-    return fromStr;
+    return JSON.stringify(_.reverse(seenActionNodes));
   }
 
   get<T>(path?: string, options?: RequestOptions) {
@@ -305,6 +299,28 @@ export class GatewayService {
 }
 
 
+export class DesignerGatewayService extends GatewayService {
+
+  constructor(
+    gatewayUrl: string,
+    http: HttpClient,
+    renderer: Renderer2,
+    from: ElementRef
+  ) {
+    super(gatewayUrl, http, renderer, from);
+  }
+
+  get fromStr() {
+    return this.generateFromStr();
+  }
+
+  isAction(node: Element): boolean {
+    return _.get(node, ['dataset', 'isaction']) === 'true';
+  }
+
+}
+
+
 @Injectable()
 export class GatewayServiceFactory {
   private readonly renderer: Renderer2;
@@ -325,7 +341,9 @@ export class GatewayServiceFactory {
   // might not be attached to the dom (thus making it impossible to find the
   // parents of the from element).
   // TODO: I think this is the problem but I should investigate more
-  for(from: ElementRef) {
-    return new GatewayService(this.gatewayUrl, this.http, this.renderer, from);
+  for(from: ElementRef): GatewayService {
+    const cls = window['dv-designer'] ? DesignerGatewayService : GatewayService;
+
+    return new cls(this.gatewayUrl, this.http, this.renderer, from);
   }
 }
