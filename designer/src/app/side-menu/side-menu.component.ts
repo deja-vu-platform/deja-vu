@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material';
 
 import { dvCliche } from '../cliche.module';
 import {
+  AfterClosedData,
   ConfigureClicheComponent,
   DialogData
 } from '../configure-cliche/configure-cliche.component';
@@ -53,25 +54,10 @@ export class SideMenuComponent implements OnInit {
     return this._actionCollections;
   }
 
-  importCliche() {
-    const data: DialogData = {
-      app: this.app
-    };
-    this.dialog
-      .open(ConfigureClicheComponent, {
-        width: '50vw',
-        data
-      })
-      .afterClosed()
-      .subscribe(({ event, cliche }) => {
-        if (event === 'create') {
-          this.clicheAdded.emit(cliche);
-        }
-      });
-  }
-
-  editCliche(cliche: ClicheInstance) {
-    const origName = cliche.name;
+  private openConfigureDialog(
+    then: (data: AfterClosedData) => void,
+    cliche?: ClicheInstance
+  ) {
     const data: DialogData = {
       app: this.app,
       cliche
@@ -82,13 +68,26 @@ export class SideMenuComponent implements OnInit {
         data
       })
       .afterClosed()
-      .subscribe(({ event, cliche: newCliche }) => {
-        if (event === 'update') {
-          this.clicheRemoved.emit(origName);
-          this.clicheAdded.emit(newCliche);
-        } else if (event === 'delete') {
-          this.clicheRemoved.emit(origName);
-        }
-      });
+      .subscribe(then);
+  }
+
+  importCliche() {
+    this.openConfigureDialog(({ event, cliche }) => {
+      if (event === 'create') {
+        this.clicheAdded.emit(cliche);
+      }
+    });
+  }
+
+  editCliche(cliche: ClicheInstance) {
+    const origName = cliche.name;
+    this.openConfigureDialog(({ event, cliche: newCliche }) => {
+      if (event === 'update') {
+        this.clicheRemoved.emit(origName);
+        this.clicheAdded.emit(newCliche);
+      } else if (event === 'delete') {
+        this.clicheRemoved.emit(origName);
+      }
+    }, cliche);
   }
 }

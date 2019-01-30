@@ -17,6 +17,11 @@ export interface DialogData {
   cliche?: ClicheInstance;
 }
 
+export interface AfterClosedData {
+  event: 'create' | 'delete' | 'update' | 'cancel';
+  cliche?: ClicheInstance;
+}
+
 interface ControlGroup {
   form: { valid: boolean };
 }
