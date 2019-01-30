@@ -1,6 +1,8 @@
 import {
   copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync
 } from 'fs';
+import { copySync } from 'fs-extra';
+
 import * as path from 'path';
 
 import * as _ from 'lodash';
@@ -221,14 +223,6 @@ export class NgAppBuilder {
       components: _
         .map(this.components, 'className')
         .join(', '),
-      assets: (_.isEmpty(this.dependencies) ? '' : ',\n') + _
-        .map(
-          this.dependencies,
-          (d: Dependency) => `{
-            "glob": "**/*", "input": "../node_modules/${d.name}/assets",
-            "output": "./assets/${d.name}/"
-          }`)
-        .join(',\n'),
       routes: _
         .map(
           this.routes,
@@ -310,7 +304,14 @@ export class NgAppBuilder {
     }
 
     // | assets/
-    // TODO
+    for (const d of this.dependencies) {
+      const clichePackageLocation = path.dirname(
+        require.resolve(path.join(d.name, 'package.json')));
+      const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+      if (existsSync(clicheAssets)) {
+        copySync(clicheAssets, assetsDir);
+      }
+    }
 
     if (installDependencies && diff.dependenciesChanged) {
       NgAppBuilder.InstallDependencies(cacheDir);

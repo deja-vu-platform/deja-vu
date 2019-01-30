@@ -10,8 +10,8 @@
       "assets": [
         {
           "glob": "**/*",
-          "input": "assets/leaflet/images",
-          "output": "leaflet/"
+          "input": "app/geolocation/assets/",
+          "output": "assets/geolocation/"
         },
         "assets",
         "favicon.ico"
@@ -24,7 +24,10 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "geolocation",
       "styles": [
-        "styles.css"
+        "styles.css",
+        "../../../../node_modules/leaflet/dist/leaflet.css",
+        "../../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css",
+        "../../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

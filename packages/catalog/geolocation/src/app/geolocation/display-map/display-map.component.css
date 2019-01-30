@@ -1,6 +1,9 @@
-@import "~leaflet/dist/leaflet.css";
-@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
-@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
+/* to run the cliche app you must comment out these imports */
+/* TODO: find correct way to import css that works for ng-packagr and the ng cli */
+@import "../../../node_modules/leaflet/dist/leaflet.css";
+@import "../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css";
+
 
 .map {
   height: 500px;

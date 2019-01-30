@@ -12,6 +12,6 @@ Locate points of interest
 - show-markers
 
 ## Notes
-To use Leaflet maps in your application, you must
-copy the geolocation assets directory
-(`./src/assets`) into `<app-name>/src/assets`.
+
+To run the cliché app you need to edit the css of `display-map`
+(see instructions in `src/app/geolocation/display-map/display-map.css`).
