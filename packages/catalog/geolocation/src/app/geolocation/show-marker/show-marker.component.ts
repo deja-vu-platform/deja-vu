@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -25,6 +26,8 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
   @Input() showTitle = true;
   @Input() showLatLong = true;
   @Input() showMapId = true;
+
+  @Output() loadedMarker = new EventEmitter<Marker | Location>();
 
   private gs: GatewayService;
 
@@ -73,6 +76,7 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
           const markerById = res.data.marker;
           if (markerById) {
             this.marker = res.data.marker;
+            this.loadedMarker.emit(this.marker);
           }
         });
     }
