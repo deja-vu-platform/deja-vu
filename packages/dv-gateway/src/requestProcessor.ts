@@ -24,11 +24,11 @@ const SUCCESS = 200;
 const INTERNAL_SERVER_ERROR = 500;
 
 
-interface Dict {
+export interface Dict {
   readonly [key: string]: string;
 }
 
-interface RequestOptions {
+export interface RequestOptions {
   readonly params?: Dict;
   readonly headers?: Dict;
 }
@@ -51,7 +51,7 @@ interface ChildRequest {
   query: Params;
 }
 
-interface GatewayRequest {
+export interface GatewayRequest {
   readonly fullActionName: string;
   readonly from: ActionPath;
   readonly reqId: string;
@@ -60,13 +60,13 @@ interface GatewayRequest {
   readonly options?: RequestOptions;
 }
 
-interface GatewayToClicheRequest extends GatewayRequest {
+export interface GatewayToClicheRequest extends GatewayRequest {
   readonly url: string;
   readonly method: string;
   readonly body: string;
 }
 
-interface ClicheResponse<T> {
+export interface ClicheResponse<T> {
   readonly status: number;
   readonly text: T;
   readonly index?: number;
@@ -77,12 +77,15 @@ export type port = number;
 // https://stackoverflow.com/questions/985431
 const MAX_BROWSER_CONNECTIONS = 6;
 
+function stringify(json: any) {
+  return JSON.stringify(json, undefined, JSON_INDENTATION);
+}
 
 /**
  * Class for batching transaction responses.
  * Also just sends a regular response for batchSize === 1
  */
-class TxResponse {
+export class TxResponse {
   private responses: ClicheResponse<string>[] = [];
 
   constructor(private res: express.Response, private batchSize: number) { }
@@ -125,11 +128,10 @@ class TxResponse {
 
 
 export class RequestProcessor {
-  private readonly txCoordinator: TxCoordinator<
+  protected readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
-  private readonly actionHelper: ActionHelper;
-  private readonly dstTable: { [cliche: string]: port };
-  private noApp = false;
+  protected readonly actionHelper: ActionHelper;
+  protected readonly dstTable: { [cliche: string]: port } = {};
   private cohortActions: ActionTag[]; // for appless mode only
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
@@ -214,37 +216,11 @@ export class RequestProcessor {
     return !(_.isEmpty(runId) || runId === 'null' || runId === 'undefined');
   }
 
-  constructor(
-    config: GatewayConfig,
-    dvConfig?: DvConfig,
-    appActionTable?: ActionTable
-  ) {
-    this.noApp = !dvConfig || !appActionTable;
-    // mapping of names(aliases) to ports
-    this.dstTable = !dvConfig ? {} : _.mapValues(
-      dvConfig.usedCliches,
-      (clicheConfig: DvConfig) => clicheConfig.config.wsPort
-    );
-    if (dvConfig && dvConfig.config) {
-      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
-    }
-    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
-
-    // names of the cliches used (not the aliases), repeats don't matter
-    const usedCliches: string[] = !dvConfig ? [] : _
-      .chain(dvConfig.usedCliches)
-      .toPairs()
-      .map(([alias, usedClicheConfig]: [string, DvConfig]): string => _
-          .get(usedClicheConfig, 'name', alias))
-      .value();
-    this.actionHelper = this.noApp
-      ? new ActionHelper()
-      : new AppActionHelper(usedCliches, appActionTable, dvConfig.routes);
-
+  constructor(config: GatewayConfig) {
+    this.actionHelper = new ActionHelper();
     const txConfig = this.getTxConfig(config, this.actionHelper);
-    this.txCoordinator = new TxCoordinator<
-      GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
-        txConfig);
+    this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
+      ClicheResponse<string>, TxResponse>(txConfig);
   }
 
   /**
@@ -267,23 +243,33 @@ export class RequestProcessor {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
+    if (req.query.isTx) {
+      const childRequests: ChildRequest[] = req.body;
+      this.cohortActions = childRequests.map((chReq) => {
+        const actionPath = ActionPath.fromString(chReq.query.from);
+        const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+
+        return {
+          fqtag,
+          tag: fqtag,
+          inputs: {}
+        };
+      });
+    }
+
+    return this._processRequest(req, res);
+  }
+
+  protected async _processRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
     if (!req.query.isTx) {
       return this.doProcessRequest(req, new TxResponse(res, 1), 1);
     }
 
     const childRequests: ChildRequest[] = req.body;
     const txRes = new TxResponse(res, childRequests.length);
-
-    this.cohortActions = childRequests.map((chReq) => {
-      const actionPath = ActionPath.fromString(chReq.query.from);
-      const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
-
-      return {
-        fqtag,
-        tag: fqtag,
-        inputs: {}
-      };
-    });
 
     return Promise
       .all(childRequests.map((chReq, index) =>
@@ -375,7 +361,7 @@ export class RequestProcessor {
     return true;
   }
 
-  private getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
+  protected getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
     TxConfig<GatewayToClicheRequest, ClicheResponse<string>, TxResponse> {
     return {
       dbHost: config.dbHost,
@@ -460,7 +446,7 @@ export class RequestProcessor {
 
         const dvTxNode = actionTagPath[dvTxNodeIndex];
 
-        const cohortActions = (this.noApp && !dvTxNode.content)
+        const cohortActions = (this.cohortActions && !dvTxNode.content)
           ? this.cohortActions
           : _.reject(dvTxNode.content, (action: ActionTag) => {
             return action.tag.split('-')[0] === 'dv' ||
@@ -496,7 +482,53 @@ export class RequestProcessor {
   }
 }
 
+export class AppRequestProcessor extends RequestProcessor {
+  protected readonly actionHelper: ActionHelper;
+  protected readonly txCoordinator: TxCoordinator<
+    GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
 
-function stringify(json: any) {
-  return JSON.stringify(json, undefined, JSON_INDENTATION);
+  constructor(
+    config: GatewayConfig,
+    dvConfig?: DvConfig,
+    appActionTable?: ActionTable
+  ) {
+    super(config);
+
+    _.forEach(dvConfig.usedCliches, (clicheConfig, name) => {
+      this.dstTable[name] = clicheConfig.config.wsPort;
+    });
+    if (dvConfig.config) {
+      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
+    }
+    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
+
+    // names of the cliches used (not the aliases), repeats don't matter
+    const usedCliches: string[] = _.map(
+      dvConfig.usedCliches,
+      (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
+    );
+
+    this.actionHelper = new AppActionHelper(
+      usedCliches, appActionTable, dvConfig.routes);
+
+    const txConfig = this.getTxConfig(config, this.actionHelper);
+    this.txCoordinator = new TxCoordinator<
+      GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
+        txConfig);
+  }
+
+  async processRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
+    this._processRequest(req, res);
+  }
+
+  /**
+   * NOT ALLOWED
+   */
+  addCliche() {
+    throw new Error('Cannot dyanmically add Cliche to app.');
+  }
+
 }

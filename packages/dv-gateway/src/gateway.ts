@@ -10,7 +10,7 @@ import * as path from 'path';
 
 import { ActionTable } from './actionHelper';
 import { DvConfig, GatewayConfig } from './gateway.model';
-import { RequestProcessor } from './requestProcessor';
+import { AppRequestProcessor, RequestProcessor } from './requestProcessor';
 
 
 const JSON_INDENTATION = 2;
@@ -62,7 +62,7 @@ export function startGateway(
     .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
   const app = express();
   const requestProcessor = info
-    ? new RequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
+    ? new AppRequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
     : new RequestProcessor(gatewayConfig);
 
   // Handle API requests

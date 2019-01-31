@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 
 
 const DV_TX_TAG = 'dv-tx';
+const INDENT_NUM_SPACES = 2;
+
 
 /**
  * A path of actions (represented by their fqtags). The first node is the root.
@@ -66,7 +68,7 @@ export class ActionPath {
   }
 
   toString(): string {
-    return JSON.stringify(this.path, null, 2);
+    return JSON.stringify(this.path, null, INDENT_NUM_SPACES);
   }
 
   private indexOf(tag: string): number | null {
