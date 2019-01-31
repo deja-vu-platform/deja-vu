@@ -17,7 +17,7 @@
         </dv.link>
       </div>
 
-      <div role="search" class="navbar-form navbar-left">
+      <div class="navbar-form navbar-left search">
         <dv.if condition=$showSearch>
           <label.search-items-by-labels class="navBarSearchForm"/>
         </dv.if>
@@ -25,7 +25,7 @@
 
       <dv.if condition=authentication.logged-in.user>
         <div class="navbar-form navbar-right">
-          <div role="toolbar" class="btn-toolbar">
+          <div class="btn-toolbar toolbar">
             <dv.tx as sweetspots-sign-out>
               <authentication.sign-out class="btn-danger" buttonLabel="Logout"/>
             </dv.tx>
@@ -43,7 +43,7 @@
 
       <dv.if condition=!authentication.logged-in.user>
         <div class="navbar-form navbar-right">
-          <div role="toolbar" class="btn-toolbar">
+          <div class="btn-toolbar toolbar">
             <dv.link href="/login" class="btn btn-primary">
               Login
             </dv.link>

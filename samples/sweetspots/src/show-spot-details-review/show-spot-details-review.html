@@ -17,7 +17,7 @@
     showScores=false
     totalLabel="Review score: " />
   <br />
-  <div role="toolbar" class="btn-toolbar">
+  <div class="btn-toolbar toolbar">
     <!-- TODO: Do not show if already voted on the review (scoring.has-voted) -->
     <dv.if condition=$loggedInUserId!==$rating.sourceId>
       <dv.tx as sweetspots-upvote-review>
@@ -31,7 +31,6 @@
         <authentication.authenticate id=$loggedInUserId hidden=true />
         <sweetspots.vote-review id=$rating.targetId
           loggedInUserId=$loggedInUserId
-          spotOwnerId=$spotOwnerId
           upvote=false />
           <!-- spotOwnerId=$spotOwnerId -->
       </dv.tx>
