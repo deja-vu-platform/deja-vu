@@ -1,0 +1,44 @@
+<dv.action name="show-user-profile-details">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 text-center">
+        <h1>
+          <authentication.show-user
+            id=$loggedInUserId
+            showId=false />&#39;s Profile (<reputation.show-target
+              id=$loggedInUserId
+              showId=false
+              showScores=false
+              totalLabel="Current Rep: " />)</h1>
+        <!-- TODO: overlay -->
+      </div>
+    </div>
+    <div class="row show-grid">
+      <div class="col-md-4">
+        <div class="text-center">
+          <h3>Posted Spots</h3>
+        </div>
+        <authorization.show-resources
+          createdBy=$loggedInUserId
+          noResourcesText="You haven't created any spots yet"
+          showResource=<sweetspots.show-spot id=$id /> />
+      </div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <h3>Your Reviews</h3>
+        </div>
+        <comment.show-comments authorId=$loggedInUserId
+          showComment=<sweetspots.show-review comment=$comment
+            loggedInUserId=$loggedInUserId /> />
+      </div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <h3>Favorite Spots</h3>
+        </div>
+        <follow.show-publishers followedById=$loggedInUserId
+          noPublishersToShowText="You have no favorites"
+          showPublisher=<sweetspots.show-favorite-spot id=$publisher.id /> />
+      </div>
+    </div>
+  </div>
+</dv.action>

@@ -1,0 +1,9 @@
+#location-pin-text {
+  text-align: center;
+  width: 350px;
+}
+
+#location-pin {
+  cursor:pointer;
+  cursor: hand;
+}

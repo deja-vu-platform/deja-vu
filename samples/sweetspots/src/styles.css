@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Mogra');
 
 /* @author Nishchal Bhandari */
-.resultPanel:hover {
-  box-shadow: 0px 0px 10px;
+.inline-block {
+  display: inline-block;
 }
 
 .loader {
@@ -17,46 +17,6 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-#back-to-login {
-  text-align: center;
-  margin:auto;
-}
-
-.sweet-spots-heading {
-  font-family: 'Mogra', cursive !important;
-  font-size: 32px !important;
-  color: #FFFFFF !important;
-}
-
-.sweet-spots-heading:visited {
-  color: #FFFFFF;
-  text-decoration: none;
-}
-
-p.navbar-text {
-  color: #FFFFFF !important;
-}
-
-.sweet-spots-heading:link {
-  color: #FFFFFF !important;
-  text-decoration: none !important;
-}
-
-.sweet-spots-heading:hover {
-  color: #FFFFFF !important;
-  text-decoration: none;
-}
-
-.sweet-spots-heading:active {
-  color: #FFFFFF !important;
-  text-decoration: none !important;
-}
-
-#nav-bar {
-  /* background-color: #E91E63; */
-  background-color: #f62459 !important;
 }
 
 .btn-primary {
@@ -108,55 +68,8 @@ html, body, main {
   background-color: #FFFCF9 !important;
 }
 
-#navBarSearchForm input[type=text] {
-  width:430px !important;
-}
-#left-main-div {
-  width: 400px;
-  float: left;
-  padding: 15px 15px 15px 15px;
-}
-.rating {
-    overflow: hidden;
-    display: inline-block;
-    font-size: 0;
-    position: relative;
-}
-.rating-input {
-    float: right;
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    margin: 0 0 0 -16px !important;
-    opacity: 0;
-}
-.rating:hover .rating-star:hover,
-.rating:hover .rating-star:hover ~ .rating-star,
-.rating-input:checked ~ .rating-star {
-    background-position: 0 0;
-}
-.rating-star,
-.rating:hover .rating-star {
-    position: relative;
-    float: right;
-    display: block;
-    width: 16px;
-    height: 16px;
-    background: url('http://kubyshkin.ru/samples/star-rating/star.png') 0 -16px;
-}
-
-#location-pin-text {
-    text-align: center;
-    width: 350px;
-}
-
-#location-pin {
-  cursor:pointer;
-  cursor: hand;
-}
-
-#add-a-spot {
-    text-align: center;
+sweetspots-add-a-spot, #add-a-spot {
+  text-align: center;
 }
 
 body {
@@ -205,10 +118,6 @@ body {
   border-top-right-radius: 0;
 }
 
-.post-button {
-  width: 100%;
-}
-
 .navbar-btn {
   margin-top: 0;
   margin-bottom: 0;
@@ -220,7 +129,7 @@ body {
 }
 
 /* override follow button css */
-follow-unfollow button.btn {
+follow-follow-unfollow button.btn {
   float: none!important;
   padding: 6px 12px;
   font-size: 14px;
@@ -236,14 +145,6 @@ follow-unfollow button.btn {
   height: calc(100vh - 105px);
 }
 
-/* prevent scroll bars in info windows */
-.mapInfoWindow {
-  line-height: 1.35;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 ul {
   list-style: none;
 }
-

@@ -1,0 +1,24 @@
+<dv.action name="show-review">
+  <h4>
+    <geolocation.show-marker class="inline-block"
+      id=$comment.targetId
+      showId=false
+      showLatLong=false
+      showMapId=false /> |
+    <dv.link href="/spot-details" params={ id: $id } class="inline-block">
+      Details
+    </dv.link>
+  </h4>
+  <span><rating.show-rating targetId=$comment.targetId sourceId=$loggedInUserId /></span>
+  <br />
+  <span><comment.show-comment comment=$comment
+      showId=false
+      showAuthorId=false
+      showTargetId=false /></span>
+  <br />
+  <span><reviewscore.show-target id=$id
+    showId=false
+    showScores=false
+    totalLabel="Contribution to rep: " />
+  </span>
+</dv.action>

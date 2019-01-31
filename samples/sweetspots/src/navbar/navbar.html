@@ -1,0 +1,59 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
+  searchResults$=label.search-items-by-labels.searchResultItems>
+
+  <dv.tx as sweetspots-auth-check>
+    <authentication.logged-in />
+    <dv.if condition=$accessRequired>
+      <dv.redirect href="/login" onEvalFailure=true />
+    </dv.if>
+  </dv.tx>
+
+  <nav id="nav-bar" class="navbar navbar-default">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <dv.link class="sweet-spots-heading navbar-brand" href="/main">
+          Sweet Spots
+        </dv.link>
+      </div>
+
+      <div role="search" class="navbar-form navbar-left">
+        <dv.if condition=$showSearch>
+          <label.search-items-by-labels class="navBarSearchForm"/>
+        </dv.if>
+      </div>
+
+      <dv.if condition=authentication.logged-in.user>
+        <div class="navbar-form navbar-right">
+          <div role="toolbar" class="btn-toolbar">
+            <dv.tx as sweetspots-sign-out>
+              <authentication.sign-out class="btn-danger" buttonLabel="Logout"/>
+            </dv.tx>
+            &nbsp;
+            <dv.link href="/profile" class="btn btn-info">
+              Profile
+            </dv.link>
+          </div>
+        </div>
+        <p class="navbar-text navbar-right">
+          Hello, <authentication.show-user user=authentication.logged-in.user
+            showId=false />! &nbsp;
+        </p>
+      </dv.if>
+
+      <dv.if condition=!authentication.logged-in.user>
+        <div class="navbar-form navbar-right">
+          <div role="toolbar" class="btn-toolbar">
+            <dv.link href="/login" class="btn btn-primary">
+              Login
+            </dv.link>
+            &nbsp;
+            <dv.link href="/register" class="btn btn-info">
+              Register
+            </dv.link>
+          </div>
+        </div>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

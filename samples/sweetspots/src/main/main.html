@@ -1,31 +1,33 @@
-<dv-widget name="NavBar"></dv-widget>
+<dv.action name="main">
+  <sweetspots.navbar showSearch=true accessRequired=false />
 
-<div id="left-main-div">
+  <div id="left-main-div">
+    <dv.if condition=sweetspots.navbar.loggedInUserId && !sweetspots.navbar.searchResults>
+      <dv.if condition=!geolocation.display-map.newMarker>
+        <sweetspots.add-a-spot />
+      </dv.if>
 
-  <!-- NOTE: below ngIf conditions will fail if a coordinate is 0 -->
-  <!-- however, such a precise click is highly unlikely -->
+      <dv.if condition=geolocation.display-map.newMarker>
+        <sweetspots.add-a-spot-form loggedInUserId=sweetspots.navbar.loggedInUserId/>
+      </dv.if>
+    </dv.if>
 
-  <!-- on page load, show a marker pic and tell user to click the map -->
-  <dv-widget
-    name="AddASpot"
-    *ngIf="(!new_spot.lat || !new_spot.lng) && !search_results.arr">
-  </dv-widget>
+    <dv.if condition=!sweetspots.navbar.loggedInUserId>
+        To use this feature, please sign in or register.
+    </dv.if>
 
-  <!-- once the map is clicked, show the new spot form -->
-  <dv-widget
-    name="AddASpotForm"
-    *ngIf="(new_spot.lat && new_spot.lng) && !search_results.arr">
-  </dv-widget>
-
-  <!-- TODO: put this into a widget once params can be passed through -->
-  <!-- HACK: change once array fields are supported -->
-  <div *ngIf="search_results.arr">
-    <dv-widget name="ShowSearchResults" of="Label"></dv-widget>
+    <div id="search-results">
+      <h3>Top Spots</h3>
+      <label.show-labels waitOn=sweetspots.navbar.searchResults
+        noItemsToShowText="No spots found. Try searching for something else."
+        showItem=<sweetspots.show-result-item id=$id /> />
+    </div>
   </div>
-</div>
 
-<div id="map-div">
-  <dv-widget name="DisplayMap" of="Geolocation"></dv-widget>
-  <dv-widget name="OverlayMarkers" of="Geolocation" *ngIf="!search_results.arr">
-  </dv-widget>
-</div>
+  <div id="map-div">
+    <!-- TODO: Only show spots from search results -->
+    <geolocation.display-map id="mainMapId"
+      showDirectionsControl=false />
+  </div>
+
+</dv.action>

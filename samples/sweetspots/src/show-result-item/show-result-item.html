@@ -1,0 +1,21 @@
+<dv.action name="show-result-item">
+  <div class="panel panel-default resultPanel">
+    <div class="panel-heading">
+      <geolocation.show-marker class="inline-block"
+        id=$id
+        showId=false
+        showLatLong=false
+        showMapId=false /> |
+      <dv.link href="/spot-details" params={ id: $id } class="inline-block">
+        Details
+      </dv.link>
+    </div>
+
+    <div class="panel-body">
+      <span>Category: <label.show-labels itemId=$id /></span>
+      <br />
+      <span><rating.show-average-rating targetId=$id showStars=false
+        showNumRatings=false/>/ 5</span>
+    </div>
+  </div>
+</dv.action>

@@ -68,10 +68,10 @@
     "samples/mapmit/.dv",
     "samples/rendezvous",
     "samples/rendezvous/.dv",
-    "samples/sweetspots ",
-    "samples/sweetspots /.dv",
     "designer",
     "designer-apps/*",
-    "designer-apps/*/.dv"
+    "designer-apps/*/.dv",
+    "samples/sweetspots",
+    "samples/sweetspots/.dv"
   ]
 }

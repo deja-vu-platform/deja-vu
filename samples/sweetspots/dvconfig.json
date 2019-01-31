@@ -57,7 +57,7 @@
         "reinitDbOnStartup": true
       }
     },
-    "spotdetails": {
+    "property": {
       "name": "property",
       "config": {
         "wsPort": 3009,
@@ -91,9 +91,9 @@
   "routes": [
     { "path": "login", "action": "sweetspots-login" },
     { "path": "main", "action": "sweetspots-main" },
-    { "path": "profile", "action": "sweetspots-profile" },
+    { "path": "profile", "action": "sweetspots-show-user-profile" },
     { "path": "register", "action": "sweetspots-register" },
-    { "path": "spot-details", "action": "sweetspots-spot-details" },
+    { "path": "spot-details", "action": "sweetspots-show-spot-details" },
     { "path": "", "action": "sweetspots-main" }
   ]
 }

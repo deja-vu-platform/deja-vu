@@ -1,0 +1,11 @@
+<dv.action name="show-user-profile">
+  <sweetspots.navbar showSearch=false accessRequired=true />
+
+  <dv.if condition=$id>
+    <sweetspots.show-user-profile-details id=$id />
+  </dv.if>
+  <dv.if condition=!$id>
+    <sweetspots.show-user-profile-details id=sweetspots.navbar.loggedInUserId />
+  </dv.if>
+
+</dv.action>
