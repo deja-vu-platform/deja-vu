@@ -1,9 +1,15 @@
 <div class="container">
-  <h1>Create comment by author <i>alice</i> for target <i>pizza</i></h1>
+  <h1>Create comment <i>commentId</i> by author <i>alice</i> for target
+    <i>pizza</i></h1>
   <comment-create-comment id="commentId" authorId="alice" targetId="pizza"
   (comment)="pizzaComment = $event"></comment-create-comment>
   <h1>Show comment</h1>
   <comment-show-comment [comment]="pizzaComment"></comment-show-comment>
+  <h1>Show comment <i>commentId</i></h1>
+  <comment-show-comment id="commentId"></comment-show-comment>
+  <h1>Show comment by author <i>alice</i> for target <i>pizza</i></h1>
+  <comment-show-comment authorId="alice" targetId="pizza">
+  </comment-show-comment>
   <h1>Show all comments</h1>
   <comment-show-comments></comment-show-comments>
   <h1>Show all comments by author <i>alice</i></h1>
