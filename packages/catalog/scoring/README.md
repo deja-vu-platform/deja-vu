@@ -2,6 +2,11 @@
 
 Keep track of scores
 
+## Configuration Options
+
+- `totalScoreFn`: the function body (written as a string) that calculates the total score based on the parameter scores, which is an array of scores with type number (default: adds all the scores in the array);
+- `oneToOneScoring`: if set to `true`, every `sourceId` can only give `targetId` a score once (default: `false`)
+
 ## Actions
 
 - create-score
