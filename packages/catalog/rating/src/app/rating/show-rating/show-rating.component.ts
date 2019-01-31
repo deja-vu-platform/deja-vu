@@ -1,12 +1,10 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnInit, Output, SimpleChanges, Type
+  Input, OnChanges, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from 'dv-core';
-
-import { take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
@@ -25,14 +23,19 @@ interface RatingRes {
 })
 export class ShowRatingComponent implements
   AfterViewInit, OnEval, OnInit, OnChanges {
-  // Either (`sourceId`, `targetId`) or `ratingIn` must be given. If
-  // `ratingIn` is given this rating is displayed
+  // Either (`sourceId`, `targetId`), `rating` or `ratingIn` must be given.
+  // If `rating` or `ratingIn` is given, this rating is displayed
   @Input() sourceId: string;
   @Input() targetId: string;
 
+  @Input() rating: Rating;
+
   @Input() ratingIn: number;
 
-  @Output() rating = new EventEmitter<number>();
+  // Presentation inputs
+  @Input() showStars = true;
+
+  @Output() loadedRating = new EventEmitter<Rating>();
 
   ratingValue: number;
   private gs: GatewayService;
@@ -58,9 +61,11 @@ export class ShowRatingComponent implements
    */
   loadRating() {
     if (this.ratingIn) {
+      setTimeout(() => this.ratingValue = this.ratingIn);
+    } else if (this.rating) {
       setTimeout(() => {
-        this.ratingValue = this.ratingIn;
-        this.rating.emit(this.ratingValue);
+        this.ratingValue = this.rating.rating;
+        this.loadedRating.emit(this.rating);
       });
     } else if (this.canEval()) {
       this.rs.eval(this.elem);
@@ -83,13 +88,14 @@ export class ShowRatingComponent implements
         .subscribe((res) => {
           if (res.data.rating) {
             this.ratingValue = res.data.rating.rating;
-            this.rating.emit(this.ratingValue);
+            this.loadedRating.emit(res.data.rating);
           }
         });
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.sourceId && this.targetId && !this.ratingIn);
+    return !!(this.gs && this.sourceId && this.targetId && !this.ratingIn &&
+      !this.rating);
   }
 }
