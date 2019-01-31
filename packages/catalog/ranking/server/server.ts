@@ -33,8 +33,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-target-rankings': (extraInfo) => `
-    query ShowTargetRankings($targetIds: [ID!]) {
-      targetRankings(targetIds: $targetIds) ${getReturnFields(extraInfo)}
+    query ShowTargetRankingsByAvg($targetIds: [ID!]) {
+      targetRankingsByAvg(targetIds: $targetIds) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -49,7 +49,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
           id: id, pending: { $exists: false }
         }).toArray();
       },
-      targetRankings: async (_root, { targetIds }) => {
+      targetRankingsByAvg: async (_root, { targetIds }) => {
         const query = {
           targetId: { $in: targetIds },
           pending: { $exists: false }

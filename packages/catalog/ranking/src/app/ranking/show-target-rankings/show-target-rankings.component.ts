@@ -63,7 +63,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {targetRankings: TargetRank[]}}>(this.apiPath, {
+      this.gs.get<{data: {targetRankingsByAvg: TargetRank[]}}>(this.apiPath, {
         params: {
           inputs: {
             targetIds: this.targetIds
@@ -77,7 +77,7 @@ OnChanges {
         }
       })
       .subscribe((res) => {
-        this.targets = res.data.targetRankings;
+        this.targets = res.data.targetRankingsByAvg;
       });
     }
   }
