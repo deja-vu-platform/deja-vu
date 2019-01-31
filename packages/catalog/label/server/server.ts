@@ -16,6 +16,7 @@ import {
   LabelDoc,
   LabelsInput
 } from './schema';
+
 import { v4 as uuid } from 'uuid';
 
 
@@ -70,7 +71,7 @@ const actionRequestTable: ActionRequestTable = {
       labels(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: LabelDoc | null) {
   return _.get(doc, 'pending.type') === 'create-label';
