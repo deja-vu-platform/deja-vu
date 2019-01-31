@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input } from '@angular/core';
 
-import { OF_ATTR } from './gateway.service';
+import { NodeUtils } from "./node.utils";
 
 @Directive({
   selector: '[dvOf]'
@@ -8,9 +8,9 @@ import { OF_ATTR } from './gateway.service';
 export class OfDirective {
   @Input('dvOf') ofValue: string;
 
-  constructor(private elem: ElementRef) {}
+  constructor(private _elem: ElementRef) {}
 
   ngOnInit() {
-    this.elem.nativeElement.setAttribute(OF_ATTR, this.ofValue);
+    NodeUtils.SetOfOfNode(this._elem.nativeElement, this.ofValue);
   }
 }

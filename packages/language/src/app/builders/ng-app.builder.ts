@@ -239,7 +239,9 @@ export class NgAppBuilder {
         .join(', '),
       modules: _
         .map(_.map(this.dependencies, 'name'), NgAppBuilder.DepToModule)
-        .join(', ')
+        .join(', '),
+      usedClichesConfig: JSON.stringify(
+        _.get(JSON.parse(this.dvConfigContents), 'usedCliches'))
     };
 
     // /
@@ -253,13 +255,13 @@ export class NgAppBuilder {
     }
     // | dvconfig.json
     const newDvConfigContents = _
-      .assign({ gateway: { wsPort: 3000 } },
+      .merge({ gateway: { config: { wsPort: 3000 } } },
         _.omit(JSON.parse(this.dvConfigContents), 'type'));
     // choose wsPorts for the clichés that have no `wsPort` value
     let clichePort = 3002;
     newDvConfigContents['usedCliches'] = _
       .mapValues(newDvConfigContents['usedCliches'], (uc) => _
-        .assign({ config: { wsPort: clichePort++ } }, uc));
+        .merge({ config: { wsPort: clichePort++ } }, uc));
 
     const newDvConfigContentsStr = JSON.stringify(newDvConfigContents, null, 2);
     writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContentsStr);
