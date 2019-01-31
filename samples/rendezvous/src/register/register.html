@@ -1,0 +1,31 @@
+<dv.action name="register">
+  <div class="index">
+
+    <dv.link href="/login">
+      <button class="btn button" type="button">Return to Login</button>
+    </dv.link>
+
+    <div class="registration-pages">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 id="heading">Registration</h3>
+        </div>
+        <div class="panel-body">
+          <div id="registrationForm">
+            <dv.tx>
+              <dv.id />
+              <userprofile.create-object id=dv.id.id showOptionToSubmit=false />
+              <authentication.register-user id=dv.id.id showOptionToSubmit=false />
+              <!-- TODO: Allow users to select a major from a list of majors -->
+              <!-- labels-choose-labels -->
+              <dv.button class="btn button">
+                Finish
+              </dv.button>
+              <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
+            </dv.tx>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

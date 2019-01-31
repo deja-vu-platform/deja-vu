@@ -74,9 +74,6 @@ export interface ClicheResponse<T> {
 
 export type port = number;
 
-// https://stackoverflow.com/questions/985431
-const MAX_BROWSER_CONNECTIONS = 6;
-
 function stringify(json: any) {
   return JSON.stringify(json, undefined, JSON_INDENTATION);
 }
@@ -172,7 +169,7 @@ export class RequestProcessor {
     if (!response) {
       console.error(
         `Got an undefined response for cliche request
-      ${JSON.stringify(clicheReq)}`);
+      ${stringify(clicheReq)}`);
     }
 
     return {
@@ -324,7 +321,7 @@ export class RequestProcessor {
      */
     if (RequestProcessor.HasRunId(gatewayRequest) && actionPath.isDvTx()) {
       await this.txCoordinator.processMessage(
-        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes);
+        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes, index);
     } else {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
@@ -421,8 +418,8 @@ export class RequestProcessor {
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>, txRes?: TxResponse) => {
-        txRes!.add(payload.status, payload.text);
+        payload: ClicheResponse<string>, txRes?: TxResponse, index?: number) => {
+        txRes!.add(payload.status, payload.text, index);
       },
 
       getCohorts: (actionPathId: string): string[] => {
@@ -463,13 +460,6 @@ export class RequestProcessor {
             .serialize();
         });
 
-        if (cohorts.length > MAX_BROWSER_CONNECTIONS) {
-          throw new Error(
-            `The max number of cohorts per tx is ` +
-            `${MAX_BROWSER_CONNECTIONS}. This limit will be removed in the ` +
-            `future.`);
-        }
-
         return cohorts;
       },
 
@@ -500,7 +490,7 @@ export class AppRequestProcessor extends RequestProcessor {
     if (dvConfig.config) {
       this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
     }
-    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
+    console.log(`Using dst table ${stringify(this.dstTable)}`);
 
     // names of the cliches used (not the aliases), repeats don't matter
     const usedCliches: string[] = _.map(

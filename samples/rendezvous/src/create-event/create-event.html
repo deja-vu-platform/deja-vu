@@ -1,0 +1,112 @@
+<dv.action name="create-event">
+  <div class="index">
+    <rendezvous.navbar showTitle=true showProfileButton=true />
+    <relevantinterests.show-labels hidden=true />
+
+    <div class="new-event">
+      <div class="panel panel-default">
+        <div class="panel-heading" id="create-event-heading">
+          Create Event
+        </div>
+        <div class="panel-body">
+          <div id="host-display">
+            <button type="button" class="display-buttons btn btn-info">
+              Hosted By
+              <span class="badge" id="host-name">
+                <rendezvous.show-member-name
+                  id=rendezvous.navbar.loggedInUserId />
+              </span>
+            </button>
+          </div>
+
+          <dv.tx>
+            <dv.id />
+            <dv.status savedText="Event created" />
+
+            <table id="event-info" class="table">
+              <tr>
+                <!-- Location -->
+                <td rowspan="2">
+                  <div class="form-group">
+                    <p>Location</p>
+                    <div id="map_new-event">
+                      <!-- <geolocation.create-marker
+                        id=dv.id.id
+                        mapId="mainMapId"
+                        title=geolocation.display-map.newMarker.title
+                        latitude=geolocation.display-map.newMarker.latitude
+                        longitude=geolocation.display-map.newMarker.longitude
+                        showOptionToSubmit=false /> -->
+                      <geolocation.create-marker
+                        id=dv.id.id
+                        mapId="mainMapId"
+                        showOptionToSubmit=false />
+                      <!-- <geolocation.display-map
+                        id="mainMapId"
+                        showLoadedMarkers=false
+                        showDirectionsControl=false /> -->
+                    </div>
+                    <div class="guidelines">
+                      (must be within 50 miles of current location)
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Event -->
+                <td>
+                  <p>Date & Time</p>
+                  <event.create-event id=dv.id.id showOptionToSubmit=false />
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <p>Tags</p>
+                  <div id="tags">
+                    <relevantinterests.attach-labels itemId=dv.id.id
+                      labels=relevantinterests.show-labels.labels
+                      showOptionToSubmit=false />
+                  </div>
+                </td>
+              </tr>
+
+            </table>
+
+            <!-- Event Title + Additional Info -->
+            <div class="event-details">
+              <p>Event Details</p>
+              <eventdetails.create-object id=dv.id.id showOptionToSubmit=false />
+            </div>
+
+            <!-- Create Group w/ Logged In User as a Member -->
+            <group.create-group
+              id=dv.id.id
+              showOptionToAddMembers=false
+              showOptionToSubmit=false
+              memberIds= [rendezvous.navbar.loggedInUserId]
+              hidden=true />
+
+            <authorization.create-resource id=dv.id.id
+              ownerId=rendezvous.navbar.loggedInUserId hidden=true />
+            <authentication.authenticate
+              id=rendezvous.navbar.loggedInUserId hidden=true />
+
+            <!-- Cancel and Create Buttons -->
+            <div class="cc-buttons">
+              <dv.button id="create">Create!</dv.button>
+              <dv.link href="/event-details" params={ id: dv.id.id }
+                hidden=true />
+            </div>
+            <div class="cc-buttons">
+              <dv.link href="/main">
+                <button type="button" class="btn button btn-info" id="back">
+                  Cancel
+                </button>
+              </dv.link>
+            </div>
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

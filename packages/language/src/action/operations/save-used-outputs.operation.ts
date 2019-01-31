@@ -61,7 +61,6 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
 
     BinExpr_eq: binOpRecurse, BinExpr_neq: binOpRecurse,
     BinExpr_and: binOpRecurse, BinExpr_or: binOpRecurse,
-
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) => {
       cond.saveUsedOutputs();
       ifTrue.saveUsedOutputs();

@@ -1,0 +1,45 @@
+#create-event-heading {
+  background-color: #ffa599;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+#host-display {
+  float: left;
+  margin-top: 4px;
+}
+
+#host-name {
+  color: black;
+  margin-left: 5px;
+}
+
+td {
+  width: 30%;
+}
+
+.guidelines {
+  margin-top: 3px;
+  width: 100%;
+}
+
+.cc-buttons {
+  float: right;
+}
+
+#create {
+  margin-top: 10px;
+  margin-left: 10px;
+  width: 80px;
+}
+
+#back {
+  margin-top: 10px;
+  width: 80px;
+}
+
+#tags {
+  padding-top: 0px;
+}

@@ -1,0 +1,177 @@
+.event-name {
+  font-size: 24px;
+  padding-left: 10px;
+  background-color: #ffa599;
+}
+
+.event-info-table {
+  background-color: #FFEFEE;
+  border: 1px solid #CC9088;
+  margin-bottom: 20px;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.panel-body-item {
+  float: left;
+  margin-top: 4px;
+}
+
+#join-leave-group {
+  float: left;
+  margin-top: 30px;
+  margin-left: 0px;
+}
+
+#join-leave-group button {
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  border: none;
+  background: #ffd0cc;
+}
+
+#add-comment {
+  border-color: #CC9088;
+  background-color: #F0F0F0;
+  padding: 15px;
+}
+
+.show-comment {
+  background-color: #FFEFEE;
+  padding: 15px;
+}
+
+#comment-table {
+  text-align: left;
+  border: 1px solid #CC9088;
+  margin-top: 0px;
+}
+
+#comment-table li {
+  width: 100%;
+  padding: 0;
+}
+
+#comment-table ul {
+  padding: 0;
+  margin: 0;
+}
+
+#comment-table tr {
+  display: block;
+}
+
+#add-comment-row {
+  display: table-row !important;
+}
+
+#comment-table td {
+  display: block;
+}
+
+#attendees-panel {
+  display: block;
+  margin-top: 50px;
+}
+
+#attendees-panel li {
+  display: inline-block;
+  padding: 0;
+  margin-right: 10px;
+}
+
+#attendees-panel show-member {
+  color: black;
+  margin-left: 5px;
+  background-color: white;
+  border: 1px solid #B3594D;
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 10px;
+}
+
+#attendees-panel ul {
+  margin: 0;
+}
+
+#attendees-body {
+  background-color: #FFEFEE;
+  border: 1px solid #CC9088;
+}
+
+#show-post {
+  background-color: #FFEFEE;
+  border: 1px solid #CC9088;
+}
+
+#interests-panel{
+  margin-top: 4px;
+}
+
+/* makes labels show as a plain comma-separated list */
+#relevantinterests-show-labels ul {
+  padding: 0 !important;
+  margin: 0;
+}
+#relevantinterests-show-labels li {
+  background: none;
+  color: black;
+  font-size: 12;
+  top: 0;
+  margin-left: 1px;
+  margin-right: 2px;
+  padding: 0;
+}
+#relevantinterests-show-labels li:after {
+  content: ",";
+  margin-left: -3px;
+}
+#relevantinterests-show-labels li:last-child:after {
+  content: "";
+}
+
+#event-panel {
+  padding: 15px;
+  overflow: auto;
+  margin-bottom: 15px;
+}
+
+#hostBadge {
+  float: left;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.userBadge {
+  color: black;
+  margin-left: 5px;
+}
+
+#edit-event-button {
+  display: inline-block;
+  float: right;
+  margin-top: 10px;
+}
+
+#event-host {
+  display: inline-block;
+  float: right;
+  margin-top: 37px;
+  margin-right: 15px;
+}
+
+#comment-title {
+  margin-top: 80px;
+  display: flex;
+}

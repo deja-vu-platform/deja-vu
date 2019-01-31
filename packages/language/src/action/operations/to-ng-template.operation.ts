@@ -27,7 +27,7 @@ import { ActionCompiler, CompiledAction } from '../action.compiler';
 // Some HTML attributes don't have corresponding properties. For these,
 // we need to avoid turning the attribute into a property.
 // TODO: find the complete list
-const ATTRS_NO_PROP = new Set(['colspan']);
+const ATTRS_NO_PROP = new Set(['colspan', 'rowspan']);
 
 function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {

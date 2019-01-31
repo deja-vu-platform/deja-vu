@@ -31,7 +31,7 @@ export interface TxConfig<Message, Payload, State = any> {
     causedAbort: boolean, msg?: Message, payload?: Payload,
     state?: State) => void;
   // `payload` is what got returned in `sendVoteToCohort`
-  sendToClient: (payload: Payload, state?: State) => void;
+  sendToClient: (payload: Payload, state?: State, index?: number) => void;
 
   onError: (error: Error, msg: Message, state?: State) => void;
   getCohorts: (cohortId: string) => string[];
@@ -111,16 +111,16 @@ export class TxCoordinator<Message, Payload, State = any> {
   }
 
   async processMessage(
-    txId: string, cohortId: string, msg: Message, state?: State)
+    txId: string, cohortId: string, msg: Message, state?: State, index?: number)
     : Promise<void> {
-    return this.doProcessMessage(txId, cohortId, msg, state)
+    return this.doProcessMessage(txId, cohortId, msg, state, index)
       .catch((e) => {
         this.config.onError(e, msg, state);
       });
   }
 
   private async doProcessMessage(
-    txId: string, cohortId: string, msg: Message, state?: State)
+    txId: string, cohortId: string, msg: Message, state?: State, index?: number)
     : Promise<void> {
     if (!this.txs) {
       throw new Error('TxCoordinator hasn\'t been started yet: call start()');
@@ -196,7 +196,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         log(
           'Not waiting anymore (tx committed). ' +
           `Send payload to client of cohort ${cohortId}`, txId);
-        this.config.sendToClient(vote.payload, state);
+        this.config.sendToClient(vote.payload, state, index);
       }, () => {
         log(
           'Not waiting anymore (tx aborted). ' +
@@ -214,7 +214,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
       log(`Tx committed. Send payload to client of cohort ${cohortId}`, txId);
-      this.config.sendToClient(vote.payload, state);
+      this.config.sendToClient(vote.payload, state, index);
       this.completed.emit(txId + '-commit');
       ret = Promise.all([
         this.completeTx(txId, true),

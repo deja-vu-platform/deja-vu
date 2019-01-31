@@ -1,0 +1,38 @@
+<dv.action name="show-event-comment">
+  <tr>
+    <td class="show-comment">
+      <div class="panel-body">
+
+        <!-- Show Comment Author -->
+        <div>
+          <button class="display-buttons inline btn btn info" type="button">
+            <span class="badge">
+              <rendezvous.show-member-name id=$comment?.authorId />
+            </span>
+          </button>
+        </div>
+
+        <div class="panel-body">
+          <!-- TODO: timestamp -->
+          <p id="timestamp">
+            Timestamp coming soon!
+          </p>
+
+          <!-- Delete Comment -->
+          <dv.if condition=$comment?.authorId === $loggedInUserId>
+            <dv.tx>
+              <p id="delete-comment-button">
+                <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
+                <authentication.authenticate id=$loggedInUserId hidden=true />
+              </p>
+            </dv.tx>
+          </dv.if>
+
+          <!-- Show Comment Content -->
+          <comment.show-comment comment=$comment
+            showId=false showAuthorId=false showTargetId=false />
+        </div>
+      </div>
+    </td>
+  </tr>
+</dv.action>
