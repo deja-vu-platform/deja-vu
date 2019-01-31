@@ -10,7 +10,8 @@ import {
   ActionHelper,
   ActionTable,
   ActionTag,
-  ActionTagPath
+  ActionTagPath,
+  AppActionHelper
 } from './actionHelper';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
@@ -236,11 +237,9 @@ export class RequestProcessor {
       .map(([alias, usedClicheConfig]: [string, DvConfig]): string => _
           .get(usedClicheConfig, 'name', alias))
       .value();
-    this.actionHelper = new ActionHelper(
-      usedCliches,
-      appActionTable,
-      dvConfig ? dvConfig.routes : undefined
-    );
+    this.actionHelper = this.noApp
+      ? new ActionHelper()
+      : new AppActionHelper(usedCliches, appActionTable, dvConfig.routes);
 
     const txConfig = this.getTxConfig(config, this.actionHelper);
     this.txCoordinator = new TxCoordinator<
