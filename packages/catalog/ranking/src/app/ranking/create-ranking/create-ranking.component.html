@@ -1,0 +1,34 @@
+<div *ngIf="targetIds" class="container">
+  <div *ngIf="showOptionToSubmit && save" class="form-group">
+    <div *ngIf="newRankingSaved">
+      <i class="material-icons">done</i>
+        {{newRankingSavedText}}
+    </div>
+    <mat-error *ngIf="newRankingError">
+      <i class="material-icons">report_problem</i>
+      {{newRankingError}}
+    </mat-error>
+  </div>
+
+  <div *ngIf="showTarget">
+    <ul class="list-group" [dragula]="dragContainer" [(dragulaModel)]="targetIds">
+      <li *ngFor="let targetId of targetIds; index as i" class="list-group-item">
+        <dv-include 
+          [action]="showTarget" 
+          [inputs]="{
+            id: targetId, showId: showTargetId, showRank: showTargetRank,
+            rankLabel: targetRankLabel, target: { id: targetId, rank: i + 1 }
+          }"
+          [parent]="createRanking"
+          default-showTarget="{ tag: ranking-show-target }">
+        </dv-include>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="showOptionToSubmit">
+    <button mat-button type="submit" (click)="onSubmit()">
+      {{buttonLabel}}
+    </button>
+  </div>
+</div>

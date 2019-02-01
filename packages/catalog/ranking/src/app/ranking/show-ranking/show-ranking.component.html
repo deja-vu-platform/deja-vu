@@ -1,0 +1,25 @@
+<div *ngIf="showId">
+  {{ranking?.id}}
+</div>
+<div *ngIf="showSourceId">
+  {{ranking?.sourceId}}
+</div>
+<div *ngIf="ranking?.targets" class="container">
+  <ul class="list-group">
+    <li *ngFor="let target of ranking.targets" class="list-group-item">
+      <dv-include 
+        [action]="showTarget" 
+        [inputs]="{
+          id: target.id, target: target, showId: showTargetId,
+          showRank: showTargetRank, rankLabel: targetRankLabel
+        }"
+        [parent]="showRanking"
+        default-showTarget="{ tag: ranking-show-target }">
+      </dv-include>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="ranking?.targets.length === 0">
+  {{noTargetsText}}
+</div>
