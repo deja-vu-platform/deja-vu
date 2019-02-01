@@ -56,7 +56,6 @@ function stringify(json: any) {
 
 /**
  * Start the gateway server.
- * The last three args are expected all or none.
  */
 export function startGateway(
   gatewayConfigOptions?: GatewayConfigOptions,
