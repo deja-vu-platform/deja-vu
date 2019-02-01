@@ -23,7 +23,7 @@ input CreateRankingInput {
 
 type Query {
   ranking(id :ID!): [Ranking!]
-  targetRankingsByAvg(targetIds: [ID!]): [TargetRank!]
+  fractionalRanking(targetIds: [ID!]): [TargetRank!]
 }
 
 type Mutation {

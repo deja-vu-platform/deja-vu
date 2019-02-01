@@ -9,16 +9,16 @@ import {
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../ranking.config';
-import { Ranking, TargetRank } from '../shared/ranking.model';
+import { TargetRank } from '../shared/ranking.model';
 
 
 @Component({
-  selector: 'ranking-show-target-rankings',
-  templateUrl: './show-target-rankings.component.html',
-  styleUrls: ['./show-target-rankings.component.css']
+  selector: 'ranking-show-fractional-ranking',
+  templateUrl: './show-fractional-ranking.component.html',
+  styleUrls: ['./show-fractional-ranking.component.css']
 })
-export class ShowTargetRankingsComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowFractionalRankingComponent
+implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() targetIds: string[];
 
   @Input() showTargetId = true;
@@ -63,7 +63,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {targetRankingsByAvg: TargetRank[]}}>(this.apiPath, {
+      this.gs.get<{data: {fractionalRanking: TargetRank[]}}>(this.apiPath, {
         params: {
           inputs: {
             targetIds: this.targetIds
@@ -77,7 +77,7 @@ OnChanges {
         }
       })
       .subscribe((res) => {
-        this.targets = res.data.targetRankingsByAvg;
+        this.targets = res.data.fractionalRanking;
       });
     }
   }

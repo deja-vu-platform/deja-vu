@@ -32,9 +32,9 @@ const actionRequestTable: ActionRequestTable = {
       ranking(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
-  'show-target-rankings': (extraInfo) => `
-    query ShowTargetRankingsByAvg($targetIds: [ID!]) {
-      targetRankingsByAvg(targetIds: $targetIds) ${getReturnFields(extraInfo)}
+  'show-fractional-ranking': (extraInfo) => `
+    query ShowFractionRanking($targetIds: [ID!]) {
+      fractionalRanking(targetIds: $targetIds) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -49,7 +49,10 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
           id: id, pending: { $exists: false }
         }).toArray();
       },
-      targetRankingsByAvg: async (_root, { targetIds }) => {
+      // In the future, all ranking strategies of ranking could be supported.
+      // For now, we only implement fractional ranking
+      // https://en.wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings
+      fractionalRanking: async (_root, { targetIds }) => {
         const query = {
           targetId: { $in: targetIds },
           pending: { $exists: false }
@@ -62,15 +65,20 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
         ])
         .sort({ avgRank: 1 }).toArray();
 
-        // calculate the rankings of just the targetIds relative to each other
+        // calculate the rankings of just the targetIds relative to each othe
+        // based on their average rankings
         let nextRank = 1;
         let nextRankCount = 1;
         let prevRank;
         for (let i = 0; i < targetRankings.length; i++) {
           const target = targetRankings[i];
           if (i === 0 || target['avgRank'] !== prevRank) {
+            // Here we calculate the fractional ranking,
             // e.g. if there's a tie for rank 2 between 2 targets,
             // they will both have rank 2.5 and the next target will be ranked 4
+            // where 2.5 is the average of the ordinal ranks 2 and 3.
+            // uses the formula (a+b)/(2*n) to get the sum from a, a+1, ..., b
+            // where b=a+n-1, a=nextRank, n=nextRankCount
             const tiedRank = (2 * nextRank + nextRankCount - 1)/(2 * nextRankCount);
             for (let j = i - nextRankCount + 1; j <= i; j++) {
               targetRankings[j]['rank'] = tiedRank;

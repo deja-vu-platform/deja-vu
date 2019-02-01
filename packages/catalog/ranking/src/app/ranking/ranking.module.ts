@@ -15,14 +15,14 @@ import {
 import { ShowRankingComponent } from './show-ranking/show-ranking.component';
 import { ShowTargetComponent } from './show-target/show-target.component';
 import {
-  ShowTargetRankingsComponent
-} from './show-target-rankings/show-target-rankings.component';
+  ShowFractionalRankingComponent
+} from './show-fractional-ranking/show-fractional-ranking.component';
 
 import { API_PATH } from './ranking.config';
 
 const allComponents = [
   CreateRankingComponent, ShowRankingComponent, ShowTargetComponent,
-  ShowTargetRankingsComponent
+  ShowFractionalRankingComponent
 ];
 
 @NgModule({
