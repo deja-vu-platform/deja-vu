@@ -11,6 +11,8 @@ import {
 } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
+import { DvModule } from 'dv-core';
+
 import {
   ActionDefinitionComponent
 } from './action-definition/action-definition.component';
@@ -34,6 +36,7 @@ describe('AppComponent', () => {
         RowComponent
       ],
       imports: [
+        DvModule,
         FormsModule,
         MatDialogModule,
         MatExpansionModule,

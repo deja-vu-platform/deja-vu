@@ -40,13 +40,13 @@ export class TopBarComponent {
   opening = false;
 
   constructor(
-    private _electronService: ElectronService,
+    private electronService: ElectronService,
     private snackBar: MatSnackBar,
     private zone: NgZone,
     private dialog: MatDialog
   ) {
-    if (this._electronService.remote) {
-      this.fs = this._electronService.remote.require('fs');
+    if (this.electronService.remote) {
+      this.fs = this.electronService.remote.require('fs');
     }
   }
 

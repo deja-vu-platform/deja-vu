@@ -6,9 +6,21 @@
       (load)="load($event)"
       (changeAction)="onActionChanged($event)"
     ></app-top-bar>
-    <app-action-definition class="grow scroll" [openAction]="openAction">
-    </app-action-definition>
+    <dv-tx *ngIf="openAction.transaction" class="grow scroll" [attr.data-isaction]="true">
+      <app-action-definition class="grow" [openAction]="openAction">
+      </app-action-definition>
+    </dv-tx>
+    <div *ngIf="!openAction.transaction" class="grow scroll">
+      <app-action-definition class="grow" [openAction]="openAction">
+      </app-action-definition>
+    </div>
   </div>
-  <app-side-menu [app]="app" [openAction]="openAction" class="scroll">
+  <app-side-menu
+    [app]="app"
+    [openAction]="openAction"
+    class="scroll"
+    (clicheAdded)="addCliche($event)"
+    (clicheRemoved)="removeCliche($event)"
+  >
   </app-side-menu>
 </div>

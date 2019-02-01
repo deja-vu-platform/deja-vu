@@ -54,11 +54,13 @@ export interface ActionInput {
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 const CONFIG_FILE_NAME = 'dvconfig.json';
 const DV_CORE_CLICHE = 'dv-core';
+const INDENT_NUM_SPACES = 2;
 
 
 export class ActionHelper {
   private readonly actionTable: ActionTable;
   private readonly actionsNoExecRequest: Set<string>;
+  private readonly noApp: boolean = false;
 
   /**
    *  @returns get the fully qualified tag for the given tag.
@@ -69,6 +71,7 @@ export class ActionHelper {
     if (dvAlias) {
       return dvAlias;
     }
+    // tslint:disable-next-line prefer-const
     let [clicheName, ...actionTagName] = tag.split('-');
     if (dvOf) { clicheName = dvOf; }
 
@@ -294,7 +297,8 @@ export class ActionHelper {
     }
     if (!_.has(actionTable, action.tag)) {
       const errMsg = `Action ${action.tag} doesn't exist in action table ` +
-        `with keys ${JSON.stringify(_.keys(actionTable), null, 2)}`;
+        `with keys ${JSON.stringify(
+          _.keys(actionTable), null, INDENT_NUM_SPACES)}`;
       throw new Error(errMsg);
     }
   }
@@ -302,33 +306,51 @@ export class ActionHelper {
   /**
    * Create a new action helper
    *
-   * @param appActionTable the action table for this app
    * @param usedCliches a list of the names of all cliches used (not their
    *                    aliases)
+   * @param appActionTable the action table for this app
    * @param routes the route information
    */
   constructor(
-    appActionTable: ActionTable, usedCliches: string[],
-    private readonly routes: { path: string, action: string }[] | undefined) {
-    const clicheActionTables: ActionTable[] = _.map(
-        _.uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
-    const dvCoreActionTable = ActionHelper.GetActionTableOfCliche(
-      DV_CORE_CLICHE);
-    const allActionsTable = _.assign(
-      {}, appActionTable, ...clicheActionTables, dvCoreActionTable);
+    usedCliches?: string[],
+    appActionTable?: ActionTable,
+    private readonly routes?: { path: string, action: string }[]
+  ) {
+    const clicheActionTables = _.map(_
+      .uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
+    const dvCoreActionTable = ActionHelper
+      .GetActionTableOfCliche(DV_CORE_CLICHE);
+    this.actionTable = _.assign(
+      {},
+      appActionTable || {},
+      ...clicheActionTables,
+      dvCoreActionTable
+    );
+
+    this.actionsNoExecRequest = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string) => _.get(
+        ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+
+    if (!appActionTable) {
+      this.noApp = true;
+
+      return;
+    }
 
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
     const usedActions = new Set<string>(_.keys(appActionTable));
     const saveUsedActions = (
-      actionAst: ActionAst | undefined, debugPath: string[]): void => {
+      actionAst: ActionAst | undefined,
+      debugPath: string[]
+    ): void => {
       _.each(actionAst, (action: ActionTag) => {
         const thisDebugPath = debugPath.slice();
         thisDebugPath.push(action.fqtag);
         usedActions.add(action.tag);
 
         try {
-          const actionContent = this.getContent(action, allActionsTable);
+          const actionContent = this.getContent(action);
           saveUsedActions(actionContent, thisDebugPath);
         } catch (e) {
           if (!_.has(e, 'actionPath')) {
@@ -341,8 +363,7 @@ export class ActionHelper {
 
     try {
       _.each(_.keys(appActionTable), (tag: string) => {
-        const content = this.getContent(
-          { fqtag: tag, tag: tag }, allActionsTable);
+        const content = this.getContent({ fqtag: tag, tag: tag });
         saveUsedActions(content, [ tag ]);
       });
     } catch (e) {
@@ -350,10 +371,18 @@ export class ActionHelper {
       throw e;
     }
 
-    this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
-    this.actionsNoExecRequest = new Set<string>(
-      _.flatMap(usedCliches, (cliche: string) => _.get(
-      ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+    this.actionTable = _.pick(this.actionTable, Array.from(usedActions));
+  }
+
+  /**
+   * Add a cliche's actions for shouldHaveExecRequest
+   * actionTable is not modified because this assumes you did not provide
+   *   an appActionTable in which case it is irrelevant
+   * Adding the same cliche a second time does nothing
+   */
+  addCliche(cliche: string) {
+    _.get(ActionHelper.GetActionsNoRequest(cliche), 'exec', <string[]>[])
+      .forEach((actionName) => this.actionsNoExecRequest.add(actionName));
   }
 
   /**
@@ -401,14 +430,20 @@ export class ActionHelper {
     // We assume here that the first tag in the action path is a simple tag
     // so that fqtag = tag (i.e., the root action is not aliased and it is not
     // from some cliche for which there's more than one instance of in the app)
+    if (this.noApp) {
+      return [_.map(actionPath.nodes(), (fqtag: string) => ({
+        fqtag,
+        tag: fqtag
+      }))];
+    }
+
     const firstTag = actionPath.first();
     if (!(firstTag in this.actionTable)) {
       return [];
     }
     const matchingNode: ActionTag = {
       fqtag: firstTag, tag: firstTag,
-      content: this.getContent(
-        { fqtag: firstTag, tag: firstTag }, this.actionTable)
+      content: this.getContent({ fqtag: firstTag, tag: firstTag })
     };
     if (actionPath.length() === 1 && firstTag in this.actionTable) {
       return [[ matchingNode ]] ;
@@ -431,7 +466,7 @@ export class ActionHelper {
     const matchingNodes: ActionTag[] = actionAst
       .filter((at) => at.fqtag === actionPath.first())
       .map((matchingNode) => _.assign(matchingNode, {
-        content: this.getContent(matchingNode, this.actionTable)
+        content: this.getContent(matchingNode)
       }));
 
     if (actionPath.length() === 1) {
@@ -449,10 +484,9 @@ export class ActionHelper {
 
   /**
    *  @param actionTag - the action tag to get the content from
-   *  @param actionTable - the action table to use to retrieve the content
    *  @returns the content for the given action tag
    */
-  private getContent(actionTag: ActionTag, actionTable: ActionTable)
+  private getContent(actionTag: ActionTag)
     : ActionAst | undefined {
     let ret: ActionAst | undefined;
     if (ActionHelper.IsDvIncludeAction(actionTag)) {
@@ -463,7 +497,7 @@ export class ActionHelper {
         ret = [];
       } else {
         // TODO: what will happen if we don't have this check?
-        ActionHelper.ActionExistsOrFail(includedActionTag, actionTable);
+        ActionHelper.ActionExistsOrFail(includedActionTag, this.actionTable);
         const childDvOf = ActionHelper
           .GetDvOfForChild(actionTag, includedActionTag);
 
@@ -502,8 +536,8 @@ export class ActionHelper {
           }
         }
       });
-      ActionHelper.ActionExistsOrFail(actionTag, actionTable);
-      ret = _.map(actionTable[actionTag.tag], (at: ActionTag) => {
+      ActionHelper.ActionExistsOrFail(actionTag, this.actionTable);
+      ret = _.map(this.actionTable[actionTag.tag], (at: ActionTag) => {
         const childActionTag = { ...at, context: childContext };
         childActionTag.dvOf = ActionHelper.GetDvOfForChild(
           actionTag, childActionTag);
@@ -520,7 +554,7 @@ export class ActionHelper {
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
-      const routeActions: ActionTag[] = this.getRouteActions(actionTable);
+      const routeActions: ActionTag[] = this.getRouteActions(this.actionTable);
       ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
@@ -528,7 +562,7 @@ export class ActionHelper {
   }
 
   toString() {
-    return JSON.stringify(this.actionTable, null, 2);
+    return JSON.stringify(this.actionTable, null, INDENT_NUM_SPACES);
   }
 
   /**

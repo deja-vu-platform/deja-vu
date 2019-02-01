@@ -1,4 +1,4 @@
-import { copySync } from 'fs-extra';
+import { copySync, existsSync } from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
 import {
@@ -9,8 +9,7 @@ import {
   npm,
   readFileOrFail,
   writeFileOrFail
-} from '../dv';
-import { existsSync } from "fs";
+} from '../utils';
 
 
 exports.command = 'package';

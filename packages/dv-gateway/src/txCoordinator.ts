@@ -245,7 +245,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     // acquire the tx lock to do `find`, get the expected cohorts, and `update`
     // atomically.
     const cohorts = _.map(
-      this.config.getCohorts(cohortId), (cohortId: string) => ({id: cohortId}));
+      this.config.getCohorts(cohortId), (id: string) => ({ id }));
     try { // https://jira.mongodb.org/browse/SERVER-14322
       // Look at the tx table and create one if there's no active tx for txId
       return (await this.txs!.findOneAndUpdate(

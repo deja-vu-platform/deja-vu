@@ -2,9 +2,7 @@
 *A WYSIWYG application builder for Déjà Vu*
 
 ## Development
-Run `yarn start` to host the app at `localhost:4200` and open it in Electron. If you'd rather use a browser, run `yarn serve` to host the app without starting Electron.
-
-The browser and Electron experiences are nearly identical, although Electron is the intended environment. Opening and saving projects works slightly differently in the browser, and exporting apps is currently an Electron-only feature.
+Run `yarn start` to host the app at `localhost:4200` and open it in Electron. If you'd rather use a browser, run `yarn serve` to host the app without starting Electron (some features will be disabled).
 
 ## Production
 Run `yarn prod` build the app and open it in Electron. Currently the production build fails due to issues in the clichés so this is a development build.

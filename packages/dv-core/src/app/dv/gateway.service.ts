@@ -139,31 +139,15 @@ export class TxRequest {
 
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
-
   fromStr: string;
 
   constructor(
-    private gatewayUrl: string, private http: HttpClient, renderer: Renderer2,
-    private from: ElementRef) {
-    let node = from.nativeElement;
-    const seenActionNodes: string[] = [];
-    while (node && node.getAttribute) {
-      if (NodeUtils.IsAction(node)) {
-        seenActionNodes.push(NodeUtils.GetFqTagOfNode(node));
-      }
-
-      let dvClass: string | null = null;
-      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
-        const match = /dv-parent-is-(.*)/i.exec(cssClass);
-        dvClass = match ? match[1] : null;
-      }
-      if (dvClass !== null) {
-        node = renderer.selectRootElement('.dv-' + dvClass);
-      } else {
-        node = renderer.parentNode(node);
-      }
-    }
-    this.fromStr = JSON.stringify(_.reverse(seenActionNodes));
+    private gatewayUrl: string,
+    private http: HttpClient,
+    private renderer: Renderer2,
+    private from: ElementRef
+  ) {
+    this.fromStr = this.generateFromStr();
   }
 
   get<T>(path?: string, options?: RequestOptions) {
@@ -187,13 +171,43 @@ export class GatewayService {
     );
   }
 
+  protected isAction(node: Element): boolean {
+    return NodeUtils.IsAction(node);
+  }
+
+  /**
+   * Action path.
+   */
+  protected generateFromStr(): string {
+    let node = this.from.nativeElement;
+    const seenActionNodes: string[] = [];
+    while (node && node.getAttribute) {
+      if (this.isAction(node)) {
+        seenActionNodes.push(NodeUtils.GetFqTagOfNode(node));
+      }
+
+      let dvClass: string | null = null;
+      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
+        const match = /dv-parent-is-(.*)/i.exec(cssClass);
+        dvClass = match ? match[1] : null;
+      }
+      if (dvClass !== null) {
+        node = this.renderer.selectRootElement('.dv-' + dvClass);
+      } else {
+        node = this.renderer.parentNode(node);
+      }
+    }
+
+    return JSON.stringify(_.reverse(seenActionNodes));
+  }
+
   private request<T>(
     method: Method,
     path?: string,
     body?: string | Object,
     options?: RequestOptions
   ): Observable<T> {
-    console.log(`Sending get from ${this.getActionName()}`);
+    console.log(`Sending ${method} from ${this.getActionName()}`);
 
     const params = this.buildParams(path, options);
 
@@ -240,6 +254,31 @@ export class GatewayService {
 }
 
 
+export class DesignerGatewayService extends GatewayService {
+
+  constructor(
+    gatewayUrl: string,
+    http: HttpClient,
+    renderer: Renderer2,
+    from: ElementRef
+  ) {
+    super(gatewayUrl, http, renderer, from);
+  }
+
+  protected isAction(node: Element): boolean {
+    return _.get(node, ['dataset', 'isaction']) === 'true';
+  }
+
+  get fromStr() {
+    return this.generateFromStr();
+  }
+
+  // necessary because GatewayService tries setting fromStr in the constructor
+  set fromStr(_s) { }
+
+}
+
+
 @Injectable()
 export class GatewayServiceFactory {
   private readonly renderer: Renderer2;
@@ -260,7 +299,9 @@ export class GatewayServiceFactory {
   // might not be attached to the dom (thus making it impossible to find the
   // parents of the from element).
   // TODO: I think this is the problem but I should investigate more
-  for(from: ElementRef) {
-    return new GatewayService(this.gatewayUrl, this.http, this.renderer, from);
+  for(from: ElementRef): GatewayService {
+    const cls = window['dv-designer'] ? DesignerGatewayService : GatewayService;
+
+    return new cls(this.gatewayUrl, this.http, this.renderer, from);
   }
 }

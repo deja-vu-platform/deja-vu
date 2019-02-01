@@ -1,9 +1,10 @@
 import { Component, NgZone } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { DragulaService } from 'ng2-dragula';
+import { ElectronService } from 'ngx-electron';
 import { filter } from 'rxjs/operators';
 
-import { clicheDefinitions, designerCliche } from './cliche.module';
+import { clicheDefinitions, dvCliche } from './cliche.module';
 import {
   ActionDefinition,
   ActionInstance,
@@ -22,19 +23,33 @@ import {
   viewProviders: [DragulaService]
 })
 export class AppComponent {
-  app = new App('newapp'); // TODO: create new or load from saved
+  app = new App('newapp');
   openAction = this.app.homepage;
 
-  // dragula needs to be configured at the top level
+  nextPort = 3002;
+  processes: {[name: string]: {kill: (s: string) => void }} = {};
+
+  // electron imports
+  requestProcessor: any;
+  path: any;
+  cp: any;
+  cli: any;
+
   constructor(
     private dragulaService: DragulaService,
     private zone: NgZone,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private electronService: ElectronService
   ) {
-    this.configureDragula();
+    window['dv-designer'] = true; // alters how cliche server finds actions
+    this.configureDragula(); // dragula needs to be configured at the top level
+    this.startBackend();
   }
 
-  configureDragula() {
+  /**
+   * Must run in constructor
+   */
+  private configureDragula() {
     this.dragulaService.createGroup('action', {
       copy: (el, source) => source.classList.contains('action-list'),
       accepts: (el, target) => target.classList.contains('dvd-row')
@@ -62,7 +77,7 @@ export class AppComponent {
           const actionIdx = parseInt(el['dataset'].index, 10);
           action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
         } else {
-          return; // TODO: refactor to make better use of RxJS
+          return;
         }
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
         if (action) {
@@ -74,10 +89,13 @@ export class AppComponent {
       });
   }
 
-  newWidget(sourceName: string, actionName: string): ActionInstance {
+  /**
+   * Generate a new Action Instance for the given action from the given cliche
+   */
+  private newWidget(sourceName: string, actionName: string): ActionInstance {
     const source: App | ClicheDefinition | ClicheInstance = [
       this.app,
-      designerCliche,
+      dvCliche,
       ...this.app.cliches
     ].find((s) => s.name === sourceName);
     const actionDefinition = (<ActionDefinition[]>source.actions)
@@ -86,9 +104,56 @@ export class AppComponent {
     return new ActionInstance(actionDefinition, source);
   }
 
+  /**
+   * Start the gateway, if we are in electron
+   * Also populates the addCliche method
+   * Must run in constructor
+   */
+  private startBackend() {
+    if (this.electronService.remote) {
+      const gateway = this.electronService.remote.require('dv-gateway');
+      this.requestProcessor = gateway.startGateway();
+
+      // imports for addCliche
+      this.path = this.electronService.remote.require('path');
+      this.cp = this.electronService.remote.require('child_process');
+      this.cli = this.electronService.remote.require('dv-cli/dist/utils');
+    }
+  }
+
+  /**
+   * Start the cliche server
+   */
+  addCliche(cliche: ClicheInstance) {
+    if (this.electronService.remote) {
+      this.requestProcessor
+        .addCliche(cliche.of.name, this.nextPort, cliche.name);
+      const serverPath = this.path.join(this.path.dirname(
+        this.cli.locatePackage(cliche.of.name)), '..', 'server', 'server.js');
+      const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
+      const configStr = JSON.stringify(JSON.stringify(configObj));
+      let command = `node ${serverPath} --config ${configStr}`;
+      if (cliche.name !== cliche.of.name) {
+        command += ` --as ${cliche.name}`;
+      }
+      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
+      this.nextPort += 1;
+    }
+  }
+
+  /**
+   * Stop the cliche server, if one is running
+   */
+  removeCliche(clicheName: string) {
+    const childProcess = this.processes[clicheName];
+    if (childProcess) {
+      childProcess.kill('SIGINT');
+    }
+  }
+
   load(appJSON: string) {
     this.zone.run(() => {
-      this.app = App.fromJSON(appJSON, clicheDefinitions, designerCliche);
+      this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
       this.openAction = this.app.homepage;
       this.snackBar.open('Save has been loaded.', 'dismiss', {
         duration: 2500
