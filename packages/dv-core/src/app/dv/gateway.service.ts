@@ -10,6 +10,7 @@ import { Subject } from 'rxjs/Subject';
 import { RUN_ID_ATTR } from './run.service';
 
 import * as _ from 'lodash';
+import { NodeUtils } from './node.utils';
 
 
 export interface Dict {
@@ -22,9 +23,6 @@ export interface RequestOptions {
 }
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
-export const OF_ATTR = 'dvOf';
-export const ALIAS_ATTR = 'dvAlias';
-const CLASS_ATTR = 'class';
 const SUCCESS = 200;
 
 export enum Method {
@@ -143,40 +141,6 @@ export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
   fromStr: string;
 
-  private static GetTag(node: Element): string {
-    return node.nodeName.toLowerCase();
-  }
-
-  private static GetAttribute(
-    node: Element,
-    attribute: string
-  ): string | undefined {
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
-    if (node.hasAttribute(attribute)) {
-      return node.getAttribute(attribute);
-    }
-
-    return undefined;
-  }
-
-  private static GetFqTag(tag: string, dvAlias: string, dvOf: string): string {
-    if (!_.isEmpty(dvAlias)) {
-      return dvAlias;
-    } else if (!_.isEmpty(dvOf)) {
-      return dvOf + tag.substring(tag.indexOf('-'));
-    } else {
-      return tag;
-    }
-  }
-
-  private static GetFqTagFromNode(node): string {
-    const tag = GatewayService.GetTag(node);
-    const dvAlias = GatewayService.GetAttribute(node, ALIAS_ATTR);
-    const dvOf = GatewayService.GetAttribute(node, OF_ATTR);
-
-    return GatewayService.GetFqTag(tag, dvAlias, dvOf);
-  }
-
   constructor(
     private gatewayUrl: string,
     private http: HttpClient,
@@ -208,27 +172,24 @@ export class GatewayService {
   }
 
   protected isAction(node: Element): boolean {
-    // No HTML tag has a hyphen
-    return _.includes(GatewayService.GetTag(node), '-');
+    return NodeUtils.IsAction(node);
   }
 
   /**
    * Action path.
    */
   protected generateFromStr(): string {
-    let node: Element = this.from.nativeElement;
+    let node = this.from.nativeElement;
     const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
       if (this.isAction(node)) {
-        seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
+        seenActionNodes.push(NodeUtils.GetFqTagOfNode(node));
       }
-      const classAttr = GatewayService.GetAttribute(node, CLASS_ATTR);
+
       let dvClass: string | null = null;
-      if (!_.isEmpty(classAttr)) {
-        for (const cssClass of classAttr!.split(' ')) {
-          const match = /dv-parent-is-(.*)/i.exec(cssClass);
-          dvClass = match ? match[1] : null;
-        }
+      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
+        const match = /dv-parent-is-(.*)/i.exec(cssClass);
+        dvClass = match ? match[1] : null;
       }
       if (dvClass !== null) {
         node = this.renderer.selectRootElement('.dv-' + dvClass);

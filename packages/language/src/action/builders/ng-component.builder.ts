@@ -118,6 +118,8 @@ export class NgComponentBuilder {
         ';')));
     const actionImports = _.join(this.actionImportStatements, '\n');
     const noInputs = _.isEmpty(inputFields);
+    this.style = this.style || '';
+
     return `
       import { Component, OnInit } from '@angular/core';
       ${noInputs ? '' :
