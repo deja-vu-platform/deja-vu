@@ -7469,7 +7469,7 @@ ng-packagr@^2.0.0, ng-packagr@^2.2.0:
     uglify-js "^3.3.20"
     update-notifier "^2.3.0"
 
-ng2-dragula@^2.1.0, ng2-dragula@^2.1.1:
+ng2-dragula@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ng2-dragula/-/ng2-dragula-2.1.1.tgz#350e78978b6f7e1ea0b16c61ba78161c84ec6386"
   integrity sha512-PSo6N2Ja894KDogVLLBI0Hzpylikay7L1hWqp+qQmW+qsNsNT9J/6J2Qim9XwGzK4VQZjAwBJaJjgJ/TijRkLQ==
