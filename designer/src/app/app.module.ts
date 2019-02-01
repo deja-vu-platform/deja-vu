@@ -59,7 +59,9 @@ import { TopBarComponent } from './top-bar/top-bar.component';
   providers: [
     {
       provide: GATEWAY_URL,
-      useValue: 'http://localhost:4200/api' // proxied to 3000
+      // the designer is served at 4200
+      // requests are proxied to the gateway running at 3000
+      useValue: 'http://localhost:4200/api'
     }
   ],
   bootstrap: [AppComponent],
