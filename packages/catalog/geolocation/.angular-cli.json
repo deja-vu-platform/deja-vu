@@ -24,10 +24,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "geolocation",
       "styles": [
-        "styles.css",
-        "../../../../node_modules/leaflet/dist/leaflet.css",
-        "../../../../node_modules/leaflet-routing-machine/dist/leaflet-routing-machine.css",
-        "../../../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"
+        "styles.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

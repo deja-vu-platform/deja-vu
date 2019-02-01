@@ -13,5 +13,11 @@ Locate points of interest
 
 ## Notes
 
-To run the cliché app you need to edit the css of `display-map`
-(see instructions in `src/app/geolocation/display-map/display-map.css`).
+To use this cliché in your app you need to add the following
+to `styles.css`:
+```
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
+```
+
