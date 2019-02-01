@@ -1,6 +1,8 @@
 import {
   copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync
 } from 'fs';
+import { copySync } from 'fs-extra';
+
 import * as path from 'path';
 
 import * as _ from 'lodash';
@@ -237,7 +239,9 @@ export class NgAppBuilder {
         .join(', '),
       modules: _
         .map(_.map(this.dependencies, 'name'), NgAppBuilder.DepToModule)
-        .join(', ')
+        .join(', '),
+      usedClichesConfig: JSON.stringify(
+        _.get(JSON.parse(this.dvConfigContents), 'usedCliches'))
     };
 
     // /
@@ -250,9 +254,17 @@ export class NgAppBuilder {
       NgAppBuilder.Replace('.angular-cli', 'json', cacheDir, replaceMap);
     }
     // | dvconfig.json
-    const newDvConfigContents = JSON.stringify(
-      _.omit(JSON.parse(this.dvConfigContents), 'type'), null, 2);
-    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContents);
+    const newDvConfigContents = _
+      .merge({ gateway: { config: { wsPort: 3000 } } },
+        _.omit(JSON.parse(this.dvConfigContents), 'type'));
+    // choose wsPorts for the clichés that have no `wsPort` value
+    let clichePort = 3002;
+    newDvConfigContents['usedCliches'] = _
+      .mapValues(newDvConfigContents['usedCliches'], (uc) => _
+        .merge({ config: { wsPort: clichePort++ } }, uc));
+
+    const newDvConfigContentsStr = JSON.stringify(newDvConfigContents, null, 2);
+    writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContentsStr);
 
     // | src/
     // | | index.html
@@ -302,7 +314,14 @@ export class NgAppBuilder {
     }
 
     // | assets/
-    // TODO
+    for (const d of this.dependencies) {
+      const clichePackageLocation = path.dirname(
+        require.resolve(path.join(d.name, 'package.json')));
+      const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+      if (existsSync(clicheAssets)) {
+        copySync(clicheAssets, assetsDir);
+      }
+    }
 
     if (installDependencies && diff.dependenciesChanged) {
       NgAppBuilder.InstallDependencies(cacheDir);
