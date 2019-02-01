@@ -1,8 +1,7 @@
 export interface Ranking {
   id: string;
   sourceId?: string;
-  targetId: string;
-  rank: number;
+  targets: TargetRank[];
 }
 
 export interface TargetRank {

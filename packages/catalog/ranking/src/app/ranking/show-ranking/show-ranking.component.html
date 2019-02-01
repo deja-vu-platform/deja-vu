@@ -1,12 +1,12 @@
 <div *ngIf="showId">
-  {{id}}
+  {{ranking?.id}}
 </div>
 <div *ngIf="showSourceId">
-  {{sourceId}}
+  {{ranking?.sourceId}}
 </div>
-<div *ngIf="targets" class="container">
+<div *ngIf="ranking?.targets" class="container">
   <ul class="list-group">
-    <li *ngFor="let target of targets" class="list-group-item">
+    <li *ngFor="let target of ranking.targets" class="list-group-item">
       <dv-include 
         [action]="showTarget" 
         [inputs]="{
@@ -20,6 +20,6 @@
   </ul>
 </div>
 
-<div *ngIf="!targets || targets.length === 0">
+<div *ngIf="ranking?.targets.length === 0">
   {{noTargetsText}}
 </div>

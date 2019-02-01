@@ -1,8 +1,7 @@
 type Ranking {
   id: ID!
   sourceId: ID
-  targetId: ID!
-  rank: Float!
+  targets: [TargetRank!]
 }
 
 type TargetRank {
@@ -22,10 +21,10 @@ input CreateRankingInput {
 }
 
 type Query {
-  ranking(id :ID!): [Ranking!]
+  ranking(id :ID!): Ranking!
   fractionalRanking(targetIds: [ID!]): [TargetRank!]
 }
 
 type Mutation {
-  createRanking(input: CreateRankingInput!): [Ranking!]
+  createRanking(input: CreateRankingInput!): Ranking!
 }

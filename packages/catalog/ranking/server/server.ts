@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import {
   CreateRankingInput,
+  Ranking,
   RankingDoc,
   TargetRank
 } from './schema';
@@ -39,15 +40,38 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
+function rankingDocsToRanking(rankingDocs: RankingDoc[]): Ranking {
+  if (rankingDocs.length === 0) {
+    throw new Error('Could not create Ranking object without targets');
+  }
+
+  return {
+    id: rankingDocs[0].id,
+    sourceId: rankingDocs[0].sourceId,
+    targets: rankingDocs.map((rankingDoc): TargetRank => {
+      return {
+        id: rankingDoc.targetId,
+        rank: rankingDoc.rank
+      };
+    })
+  };
+}
+
 function resolvers(db: mongodb.Db, _config: RankingConfig): object {
   const rankings: mongodb.Collection<RankingDoc> = db.collection('rankings');
 
   return {
     Query: {
       ranking: async (_root, { id }) => {
-        return await rankings.find({
+        const rankingDocs = await rankings.find({
           id: id, pending: { $exists: false }
         }).toArray();
+
+        if (rankingDocs.length === 0) {
+          throw new Error(`Ranking ${id} not found`);
+        }
+
+        return rankingDocsToRanking(rankingDocs);
       },
       // In the future, all ranking strategies of ranking could be supported.
       // For now, we only implement fractional ranking
@@ -95,10 +119,9 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
       }
     },
     Ranking: {
-      id: (ranking: RankingDoc) => ranking.id,
-      sourceId: (ranking: RankingDoc) => ranking.sourceId,
-      targetId: (ranking: RankingDoc) => ranking.targetId,
-      rank: (ranking: RankingDoc) => ranking.rank
+      id: (ranking: Ranking) => ranking.id,
+      sourceId: (ranking: Ranking) => ranking.sourceId,
+      targets: (ranking: Ranking) => ranking.targets,
     },
     TargetRank: {
       id: (target: TargetRank) => target.id,
@@ -108,7 +131,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
       createRanking: async (
         _root, { input }: { input: CreateRankingInput }, context: Context) => {
         const rankingId = input.id ? input.id : uuid();
-        const newRankings: RankingDoc[] = _.map(input.targets,
+        const rankingDocs: RankingDoc[] = _.map(input.targets,
           (target: TargetRank) => {
             return {
               id: rankingId,
@@ -118,11 +141,12 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
             }
           }
         );
+        const newRanking = rankingDocsToRanking(rankingDocs);
 
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
         switch (context.reqType) {
           case 'vote':
-            newRankings.forEach((ranking: RankingDoc) => {
+            rankingDocs.forEach((ranking: RankingDoc) => {
               ranking.pending = {
                 reqId: context.reqId,
                 type: 'create-ranking'
@@ -130,22 +154,22 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
             });
           /* falls through */
           case undefined:
-            await rankings.insertMany(newRankings);
+            await rankings.insertMany(rankingDocs);
 
-            return newRankings;
+            return newRanking;
           case 'commit':
             await rankings.update(
               reqIdPendingFilter,
               { $unset: { pending: '' } });
 
-            return newRankings;
+            return newRanking;
           case 'abort':
             await rankings.deleteMany(reqIdPendingFilter);
 
-            return newRankings;
+            return newRanking;
         }
 
-        return newRankings;
+        return newRanking;
       }
     }
   };

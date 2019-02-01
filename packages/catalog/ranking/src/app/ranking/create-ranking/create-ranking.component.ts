@@ -27,7 +27,7 @@ interface CreateRankingInput {
 
 interface CreateRankingResponse {
   data: { createRanking: Ranking };
-  errors: {message: string}[];
+  errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;

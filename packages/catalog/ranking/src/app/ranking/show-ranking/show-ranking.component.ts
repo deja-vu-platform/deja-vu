@@ -34,7 +34,7 @@ OnChanges {
   @Input() showSourceId = true;
   @Input() showTargetId = true;
   @Input() showTargetRank = true;
-  @Output() ranking = new EventEmitter<Ranking[]>();
+  @Output() loadedRanking = new EventEmitter<Ranking>();
 
   @Input() targetRankLabel = 'Rank: ';
   @Input() noTargetsText = 'No targets';
@@ -43,8 +43,7 @@ OnChanges {
     type: <Type<Component>> ShowTargetComponent
   };
 
-  sourceId: string;
-  targets: TargetRank[];
+  ranking: Ranking;
   showRanking;
 
   private gs: GatewayService;
@@ -76,7 +75,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {ranking: Ranking[]}}>(this.apiPath, {
+      this.gs.get<{data: {ranking: Ranking}}>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -85,24 +84,21 @@ OnChanges {
             returnFields: `
               ${this.showId ? 'id' : ''}
               ${this.showSourceId ? 'sourceId' : ''}
-              ${this.showTargetId ? 'targetId' : ''}
-              ${this.showTargetRank ? 'rank' : ''}
+              ${this.showTargetId || this.showTargetRank ?
+                `targets {
+                  ${this.showTargetId ? 'id' : ''}
+                  ${this.showTargetRank ? 'rank' : ''}
+                }` : ''
+              }
             `
           }
         }
       })
       .subscribe((res) => {
-        const ranking = res.data.ranking;
-        this.targets = ranking.map((ranking: Ranking) => {
-          return {
-            id: ranking.targetId,
-            rank: ranking.rank
-          }
-        });
-        if (ranking.length > 0) {
-          this.sourceId = ranking[0].sourceId;
+        if (res.data) {
+          this.ranking = res.data.ranking;
+          this.loadedRanking.emit(this.ranking);
         }
-        this.ranking.emit(ranking);
       });
     }
   }

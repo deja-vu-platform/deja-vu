@@ -3,6 +3,14 @@ export interface TargetRank {
   rank: number;
 }
 
+// client side ranking schema
+export interface Ranking {
+  id: string;
+  sourceId: string | undefined;
+  targets: TargetRank[];
+}
+
+// saved ranking schema
 export interface RankingDoc {
   id: string;
   sourceId: string | undefined;
