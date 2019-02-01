@@ -141,7 +141,11 @@ export class TxRequest {
 
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
-  private _fromStr: string;
+  fromStr: string;
+
+  private static GetTag(node: Element): string {
+    return node.nodeName.toLowerCase();
+  }
 
   private static GetAttribute(
     node: Element,
@@ -153,10 +157,6 @@ export class GatewayService {
     }
 
     return undefined;
-  }
-
-  private static GetTag(node: Element): string {
-    return node.nodeName.toLowerCase();
   }
 
   private static GetFqTag(tag: string, dvAlias: string, dvOf: string): string {
@@ -182,17 +182,32 @@ export class GatewayService {
     private http: HttpClient,
     private renderer: Renderer2,
     private from: ElementRef
-  ) { }
-
-  get fromStr() {
-    if (!this._fromStr) {
-      this._fromStr = this.generateFromStr();
-    }
-
-    return this._fromStr;
+  ) {
+    this.fromStr = this.generateFromStr();
   }
 
-  isAction(node: Element): boolean {
+  get<T>(path?: string, options?: RequestOptions) {
+    return this.request<T>(
+      Method.GET,
+      path,
+      undefined,
+      options
+    );
+  }
+
+  /**
+   * If the body is an Object it will be converted to JSON
+   */
+  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
+    return this.request<T>(
+      Method.POST,
+      path,
+      body,
+      options
+    );
+  }
+
+  protected isAction(node: Element): boolean {
     // No HTML tag has a hyphen
     return _.includes(GatewayService.GetTag(node), '-');
   }
@@ -200,7 +215,7 @@ export class GatewayService {
   /**
    * Action path.
    */
-  generateFromStr(): string {
+  protected generateFromStr(): string {
     let node: Element = this.from.nativeElement;
     const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
@@ -223,27 +238,6 @@ export class GatewayService {
     }
 
     return JSON.stringify(_.reverse(seenActionNodes));
-  }
-
-  get<T>(path?: string, options?: RequestOptions) {
-    return this.request<T>(
-      Method.GET,
-      path,
-      undefined,
-      options
-    );
-  }
-
-  /**
-   * If the body is an Object it will be converted to JSON
-   */
-  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
-    return this.request<T>(
-      Method.POST,
-      path,
-      body,
-      options
-    );
   }
 
   private request<T>(
@@ -310,13 +304,16 @@ export class DesignerGatewayService extends GatewayService {
     super(gatewayUrl, http, renderer, from);
   }
 
+  protected isAction(node: Element): boolean {
+    return _.get(node, ['dataset', 'isaction']) === 'true';
+  }
+
   get fromStr() {
     return this.generateFromStr();
   }
 
-  isAction(node: Element): boolean {
-    return _.get(node, ['dataset', 'isaction']) === 'true';
-  }
+  // necessary because GatewayService tries setting fromStr in the constructor
+  set fromStr(_s) { }
 
 }
 

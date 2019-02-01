@@ -123,12 +123,10 @@ export class TxResponse {
 }
 
 
-export class RequestProcessor {
-  protected readonly txCoordinator: TxCoordinator<
+export abstract class RequestProcessor {
+  private readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
-  protected readonly actionHelper: ActionHelper;
   protected readonly dstTable: { [cliche: string]: port } = {};
-  private cohortActions: ActionTag[]; // for appless mode only
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
     if (node === undefined) {
@@ -213,46 +211,19 @@ export class RequestProcessor {
   }
 
   constructor(config: GatewayConfig) {
-    this.actionHelper = new ActionHelper();
-    const txConfig = this.getTxConfig(config, this.actionHelper);
+    const txConfig = this.getTxConfig(config);
     this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
       ClicheResponse<string>, TxResponse>(txConfig);
   }
 
-  /**
-   * Add a cliche (for appless mode for the designer)
-   */
-  addCliche(name: string, wsPort: port, alias?: string) {
-    this.actionHelper.addCliche(name);
-    this.dstTable[alias || name] = wsPort;
-  }
-
   start(): Promise<void> {
-    return this.txCoordinator
-      .start()
-      .then((_unused) => {
-        console.log(`Using action table ${this.actionHelper}`);
-      });
+    return this.txCoordinator.start();
   }
 
   async processRequest(
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    if (req.query.isTx) {
-      const childRequests: ChildRequest[] = req.body;
-      this.cohortActions = childRequests.map((chReq) => {
-        const actionPath = ActionPath.fromString(chReq.query.from);
-        const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
-
-        return {
-          fqtag,
-          tag: fqtag,
-          inputs: {}
-        };
-      });
-    }
-
     return this._processRequest(req, res);
   }
 
@@ -273,6 +244,42 @@ export class RequestProcessor {
       .then(() => {});
   }
 
+  protected getActionFromPath(actionPath: ActionPath): ActionTag {
+    const fqtag = actionPath.nodes()[0];
+
+    return {
+      fqtag,
+      tag: fqtag
+    };
+  }
+
+  private validateRequest(
+    actionPath: ActionPath,
+    matchingAction: ActionTag,
+    to: string,
+    toPort: port,
+    txRes: TxResponse
+  ) {
+    if (!matchingAction) {
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid action path: ${actionPath}`
+      );
+
+      return false;
+    }
+    if (toPort === undefined) {
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   private async doProcessRequest(
     req: express.Request | ChildRequest,
     txRes: TxResponse,
@@ -287,14 +294,12 @@ export class RequestProcessor {
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
     const { runId, from: actionPath } = gatewayRequest;
-    const matchingActions = this.actionHelper.getMatchingActions(actionPath);
-    const to = RequestProcessor.ClicheOf(matchingActions[0]);
-    // `to` can be `undefined` but the `get` typings are wrong
-    // (`_.get(..., undefined)` -> `undefined)
-    const toPort: port | undefined = _.get(this.dstTable, <string> to);
+    const actionTag = this.getActionFromPath(actionPath);
+    const to = RequestProcessor.ClicheOf(actionTag);
+    const toPort: port | undefined = _.get(this.dstTable, to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!this.validateRequest(actionPath, matchingActions, to, toPort, txRes)) {
+    if (!this.validateRequest(actionPath, actionTag, to, toPort, txRes)) {
         return;
     }
 
@@ -328,36 +333,7 @@ export class RequestProcessor {
     }
   }
 
-  private validateRequest(
-    actionPath: ActionPath,
-    matchingActions: ActionTag[],
-    to: string | undefined,
-    toPort: port | undefined,
-    txRes: TxResponse
-  ): boolean {
-    if (_.isEmpty(matchingActions)) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid action path: ${actionPath}, my actionConfig is `
-          + this.actionHelper.toString()
-      );
-
-      return false;
-    }
-
-    if (toPort === undefined) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  protected getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
+  protected getTxConfig(config: GatewayConfig):
     TxConfig<GatewayToClicheRequest, ClicheResponse<string>, TxResponse> {
     return {
       dbHost: config.dbHost,
@@ -426,43 +402,18 @@ export class RequestProcessor {
 
       getCohorts: (actionPathId: string): string[] => {
         const actionPath: ActionPath = ActionPath.fromString(actionPathId);
-        assert.ok(
-          actionPath.isDvTx(),
+        assert.ok(actionPath.isDvTx(),
           `Getting cohorts of an action path that is not part of a ` +
           `dv-tx: ${actionPath}`);
         const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+        const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
 
-        const paths: ActionTagPath[] = actionHelper
-          .getMatchingPaths(actionPath);
-        // We know that the action path is a valid one because if otherwise the
-        // tx would have never been initiated in the first place
-        assert.ok(paths.length === 1,
-          `Expected 1 path but got ${stringify(paths)}`);
-        const actionTagPath: ActionTagPath = paths[0];
-        assert.ok(actionTagPath.length === actionPath.length(),
-          'Expected the length of the path to match the action path ' +
-          ` length but got ${stringify(actionTagPath)}`);
-
-        const dvTxNode = actionTagPath[dvTxNodeIndex];
-
-        const cohortActions = (this.cohortActions && !dvTxNode.content)
-          ? this.cohortActions
-          : _.reject(dvTxNode.content, (action: ActionTag) => {
-            return action.tag.split('-')[0] === 'dv' ||
-              _.get(action.inputs, '[save]') === 'false' ||
-              !actionHelper.shouldHaveExecRequest(action.tag);
-          });
-
-        const cohorts = _.map(cohortActions, (action: ActionTag) => {
-          const nodes = [
-            ..._.take(actionPath.nodes(), dvTxNodeIndex + 1), action.fqtag
-          ];
-
-          return new ActionPath(nodes)
-            .serialize();
-        });
-
-        return cohorts;
+        return _.map(cohortActions, (action: ActionTag) =>
+          new ActionPath([
+            ..._.take(actionPath.nodes(), dvTxNodeIndex + 1),
+            action.fqtag
+          ]).serialize()
+        );
       },
 
       onError: (
@@ -472,12 +423,16 @@ export class RequestProcessor {
       }
     };
   }
+
+  protected abstract getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[];
+
 }
 
 export class AppRequestProcessor extends RequestProcessor {
-  protected readonly actionHelper: ActionHelper;
-  protected readonly txCoordinator: TxCoordinator<
-    GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
+  private readonly actionHelper: ActionHelper;
 
   constructor(
     config: GatewayConfig,
@@ -502,25 +457,73 @@ export class AppRequestProcessor extends RequestProcessor {
 
     this.actionHelper = new ActionHelper(
       usedCliches, appActionTable, dvConfig.routes);
+  }
 
-    const txConfig = this.getTxConfig(config, this.actionHelper);
-    this.txCoordinator = new TxCoordinator<
-      GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
-        txConfig);
+  protected getActionFromPath(actionPath: ActionPath): ActionTag {
+    return this.actionHelper.getMatchingActions(actionPath)[0];
+  }
+
+  protected getCohortActions(actionPath: ActionPath, dvTxNodeIndex: number) {
+    const paths: ActionTagPath[] = this.actionHelper
+      .getMatchingPaths(actionPath);
+    // We know that the action path is a valid one because if otherwise the
+    // tx would have never been initiated in the first place
+    assert.ok(paths.length === 1,
+      `Expected 1 path but got ${stringify(paths)}`);
+    const actionTagPath: ActionTagPath = paths[0];
+    assert.ok(actionTagPath.length === actionPath.length(),
+      'Expected the length of the path to match the action path ' +
+      ` length but got ${stringify(actionTagPath)}`);
+
+    const dvTxNode = actionTagPath[dvTxNodeIndex];
+
+    return _.reject(dvTxNode.content, (action: ActionTag) =>
+      action.tag.split('-')[0] === 'dv'
+      || _.get(action.inputs, '[save]') === 'false'
+      || !this.actionHelper.shouldHaveExecRequest(action.tag)
+    );
+  }
+
+}
+
+export class DesignerRequestProcessor extends RequestProcessor {
+  private cohortActions: ActionTag[]; // for appless mode only
+
+  constructor(config: GatewayConfig) {
+    super(config);
+  }
+
+  /**
+   * Add a cliche (for appless mode for the designer)
+   */
+  addCliche(name: string, wsPort: port, alias?: string) {
+    this.dstTable[alias || name] = wsPort;
   }
 
   async processRequest(
     req: express.Request,
     res: express.Response
   ): Promise<void> {
+    if (req.query.isTx) {
+      const childRequests: ChildRequest[] = req.body;
+      this.cohortActions = childRequests.map((chReq) => {
+        const actionPath = ActionPath.fromString(chReq.query.from);
+        const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+
+        return {
+          fqtag,
+          tag: fqtag,
+          inputs: {}
+        };
+      });
+    }
     this._processRequest(req, res);
   }
 
-  /**
-   * NOT ALLOWED
-   */
-  addCliche() {
-    throw new Error('Cannot dyanmically add Cliche to app.');
+  protected getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[] {
+    return this.cohortActions;
   }
-
 }
