@@ -10,8 +10,7 @@ import {
   ActionHelper,
   ActionTable,
   ActionTag,
-  ActionTagPath,
-  AppActionHelper
+  ActionTagPath
 } from './actionHelper';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
@@ -418,7 +417,10 @@ export class RequestProcessor {
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>, txRes?: TxResponse, index?: number) => {
+        payload: ClicheResponse<string>,
+        txRes?: TxResponse,
+        index?: number
+      ) => {
         txRes!.add(payload.status, payload.text, index);
       },
 
@@ -498,7 +500,7 @@ export class AppRequestProcessor extends RequestProcessor {
       (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
     );
 
-    this.actionHelper = new AppActionHelper(
+    this.actionHelper = new ActionHelper(
       usedCliches, appActionTable, dvConfig.routes);
 
     const txConfig = this.getTxConfig(config, this.actionHelper);

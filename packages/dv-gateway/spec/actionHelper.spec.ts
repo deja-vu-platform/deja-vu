@@ -1,4 +1,4 @@
-import { ActionTable, AppActionHelper } from '../src/actionHelper';
+import { ActionHelper , ActionTable } from '../src/actionHelper';
 import { ActionPath } from '../src/actionPath';
 
 describe('ActionHelper', () => {
@@ -210,7 +210,7 @@ describe('ActionHelper', () => {
             }
           ]
         }
-      ]
+      ],
     };
     const usedCliches = [
       'authentication',
@@ -230,7 +230,7 @@ describe('ActionHelper', () => {
         action: 'chorestar-parent-home'
       }
     ];
-    const actionHelper = new AppActionHelper(usedCliches, actionTable, routes);
+    const actionHelper = new ActionHelper(actionTable, usedCliches, routes);
 
     const arrayActionPath = [
       'chorestar-root',
@@ -243,8 +243,6 @@ describe('ActionHelper', () => {
     ];
     const actionPath = new ActionPath(arrayActionPath);
     const matchingPaths = actionHelper.getMatchingPaths(actionPath);
-    const numExpectedPaths = 2;
-    expect(matchingPaths.length)
-      .toBe(numExpectedPaths);
+    expect(matchingPaths.length).toBe(2);
   });
 });

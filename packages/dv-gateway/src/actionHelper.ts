@@ -58,189 +58,16 @@ const INDENT_NUM_SPACES = 2;
 
 
 export class ActionHelper {
-  private readonly actionsNoExecRequest: Set<string> = new Set();
-
-  protected static GetClicheFolder(cliche: string): string {
-    // Cliches specify as a main their typings (so that when apps do `import
-    // 'cliche'` it works) . To get to their folder we need to go up a dir
-    return path.join(path.dirname(require.resolve(cliche)), '..');
-  }
-
-  /**
-   * @return the set of actions from the given cliche that are not expected to
-   * issue a request
-   */
-  private static GetActionsNoRequest(
-    cliche: string
-  ): { exec: string[] } | undefined {
-      const fp = path.join(
-        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
-
-    return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
-  }
-
-  constructor() { }
-
-  /**
-   * Add a cliche's actions for shouldHaveExecRequest
-   * actionTable is not modified because this assumes you did not provide
-   *   an appActionTable in which case it is irrelevant
-   * Adding the same cliche a second time does nothing
-   */
-  addCliche(cliche: string) {
-    _.get(ActionHelper.GetActionsNoRequest(cliche), 'exec', <string[]>[])
-      .forEach((actionName) => this.actionsNoExecRequest.add(actionName));
-  }
-
-  /**
-   * @returns true if the action given by `tag` is expected to do an exe
-   * request
-   */
-  shouldHaveExecRequest(tag: string): boolean {
-    return !this.actionsNoExecRequest.has(tag);
-  }
-
-  /**
-   * @returns true if the given action path is expected
-   */
-  actionPathIsValid(actionPath: ActionPath): boolean {
-    return !_.isEmpty(this.getMatchingActions(actionPath));
-  }
-
-  /**
-   * @returns the `ActionTag`s corresponding to the last node of the action path
-   */
-  getMatchingActions(actionPath: ActionPath): ActionTag[] {
-    return <ActionTag[]> _.map(this.getMatchingPaths(actionPath), _.last);
-  }
-
-  /**
-   * @returns the `ActionTag`s corresponding to the given action path
-   */
-  getMatchingPaths(actionPath: ActionPath): ActionTagPath[] {
-    return [_.map(actionPath.nodes(), (fqtag: string) => ({
-      fqtag,
-      tag: fqtag
-    }))];
-  }
-}
-
-export class AppActionHelper extends ActionHelper {
   private readonly actionTable: ActionTable;
-
-  /**
-   * @return the action table of the given cliche
-   */
-  private static GetActionTableOfCliche(cliche: string): ActionTable {
-    const fp = path.join(
-      ActionHelper.GetClicheFolder(cliche), ACTION_TABLE_FILE_NAME);
-
-    return JSON.parse(readFileSync(fp, 'utf8'));
-  }
-
-  /**
-   * @returns true if the given action is the built-in include action
-   */
-  private static IsDvIncludeAction(action: ActionTag) {
-    return action.tag === 'dv-include';
-  }
-
-  /**
-   *  Determine the included action tag from a `dv-include` action tag.
-   *
-   *  The `action` input of `dv-include` expects an `ActionInput` value. The
-   *  action author could have specified the action input value in two ways:
-   *    - by using an object literal in the HTML (<dv-include [action]="{...}">)
-   *    - by using a variable and a "default" hint (<dv-include [action]="foo"
-   *      default-foo="{...}"). Using a "variable + default hint" allows the
-   *      action author to use an input as the action value, but specify a
-   *      default one to be used if no action input is given. The default hint
-   *      is given with the `default-variableName` attribute. The value of this
-   *      attribute should be an `ActionInput` object. Also, if there's no
-   *      default action, the author can use the `no-default-variableName`
-   *      attribute.
-   *
-   *      (We need a hint because we only parse the HTML files so it's
-   *      impossible for us to tell what the default action input is when that
-   *      information is specified in the TypeScript file.)
-   *
-   *  @param includeActionTag - the action tag to get the included action from
-   *  @returns the included action tag or `null` if there is no included tag.
-   *    It is `null` if there is no default action and the user hasn't
-   *    provided one as input
-   */
-  private static GetIncludedActionTag(
-    includeActionTag: ActionTag
-  ): ActionTag | null {
-    const noActionErrorMsg = (cause: string) => `
-      Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
-      ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
-    `;
-
-    const unparsedActionExpr: string | undefined = _
-      .get(includeActionTag.inputs, '[action]');
-    if (_.isEmpty(unparsedActionExpr)) {
-      throw new Error(noActionErrorMsg('no action input'));
-    }
-
-    let actionInput: ActionInput | null;
-    try {
-      const actionExpr = AppActionHelper
-        .ParseActionExpr(unparsedActionExpr as string);
-      if (AppActionHelper.IsActionInput(actionExpr)) {
-        actionInput = actionExpr;
-      } else {
-        // need to figure out if we have one from the context
-        if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
-          const unparsedParentActionExpr = _
-            .get(includeActionTag.context, `[${actionExpr}]`);
-          const parentActionExpr = this.ParseActionExpr(
-            unparsedParentActionExpr as string);
-          actionInput = this.GetActionInput(
-            parentActionExpr, includeActionTag.context);
-        } else {
-          actionInput = this.GetActionInput(
-            actionExpr, _.get(includeActionTag, 'inputs'));
-        }
-      }
-    } catch (e) {
-      e.message = noActionErrorMsg(e.message);
-      throw e;
-    }
-
-    if (actionInput === null) {
-      return null;
-    }
-
-    const fqtag = AppActionHelper.GetFqTag(
-      actionInput.tag, actionInput.dvOf, actionInput.dvAlias);
-    const actionInputs: InputMap = <InputMap> _.get(actionInput, 'inputs', {});
-    const inputs = _.assign({},
-      // `actionInput.inputMap` could actually be `undefined` but the `invert`
-      // typings are wrong (`_.invert(undefined)` -> `undefined`)
-      _.mapValues(_.invert(<InputMap> actionInput.inputMap), (value) => {
-        return _.get(includeActionTag.context, value);
-      }),
-      actionInputs);
-
-    return {
-      fqtag: fqtag,
-      tag: actionInput.tag,
-      dvOf: actionInput.dvOf,
-      dvAlias: actionInput.dvAlias,
-      inputs: inputs,
-      context: {}
-    };
-  }
+  private readonly actionsNoExecRequest: Set<string>;
+  private readonly noApp: boolean = false;
 
   /**
    *  @returns get the fully qualified tag for the given tag.
    */
   private static GetFqTag(
-    tag: string,
-    dvOf: string | undefined,
-    dvAlias: string | undefined
-  ): string {
+    tag: string, dvOf: string | undefined,
+    dvAlias: string | undefined): string {
     if (dvAlias) {
       return dvAlias;
     }
@@ -280,9 +107,8 @@ export class AppActionHelper extends ActionHelper {
     return actionExpr;
   }
 
-  private static IsActionInput(
-    actionExpr: ActionInput | string
-  ): actionExpr is ActionInput {
+  private static IsActionInput(actionExpr: ActionInput | string)
+    : actionExpr is ActionInput {
     return _.isPlainObject(actionExpr) && _.has(actionExpr, 'tag');
   }
 
@@ -291,9 +117,8 @@ export class AppActionHelper extends ActionHelper {
    * defaultSpec depending on the value of expr
    */
   private static GetActionInput(
-    actionExpr: ActionInput | string,
-    defaultSpec: Object | undefined
-  ): ActionInput | null {
+    actionExpr: ActionInput | string, defaultSpec: Object | undefined)
+    : ActionInput | null {
     let actionInput: ActionInput;
     if (this.IsActionInput(actionExpr)) {
       actionInput = actionExpr;
@@ -316,6 +141,120 @@ export class AppActionHelper extends ActionHelper {
   }
 
   /**
+   *  Determine the included action tag from a `dv-include` action tag.
+   *
+   *  The `action` input of `dv-include` expects an `ActionInput` value. The
+   *  action author could have specified the action input value in two ways:
+   *    - by using an object literal in the HTML (<dv-include [action]="{...}">)
+   *    - by using a variable and a "default" hint (<dv-include [action]="foo"
+   *      default-foo="{...}"). Using a "variable + default hint" allows the
+   *      action author to use an input as the action value, but specify a
+   *      default one to be used if no action input is given. The default hint
+   *      is given with the `default-variableName` attribute. The value of this
+   *      attribute should be an `ActionInput` object. Also, if there's no
+   *      default action, the author can use the `no-default-variableName`
+   *      attribute.
+   *
+   *      (We need a hint because we only parse the HTML files so it's
+   *      impossible for us to tell what the default action input is when that
+   *      information is specified in the TypeScript file.)
+   *
+   *  @param includeActionTag - the action tag to get the included action from
+   *  @returns the included action tag or `null` if there is no included tag.
+   *    It is `null` if there is no default action and the user hasn't
+   *    provided one as input
+   */
+  private static GetIncludedActionTag(includeActionTag: ActionTag)
+    : ActionTag | null {
+    const noActionErrorMsg = (cause: string) => `
+      Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
+      ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
+    `;
+
+    const unparsedActionExpr: string | undefined = _
+      .get(includeActionTag.inputs, '[action]');
+    if (_.isEmpty(unparsedActionExpr)) {
+      throw new Error(noActionErrorMsg('no action input'));
+    }
+
+    let actionInput: ActionInput | null;
+    try {
+      const actionExpr = this.ParseActionExpr(unparsedActionExpr as string);
+      if (this.IsActionInput(actionExpr)) {
+        actionInput = actionExpr;
+      } else {
+        // need to figure out if we have one from the context
+        if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
+          const unparsedParentActionExpr = _
+            .get(includeActionTag.context, `[${actionExpr}]`);
+          const parentActionExpr = this.ParseActionExpr(
+            unparsedParentActionExpr as string);
+          actionInput = this.GetActionInput(
+            parentActionExpr, includeActionTag.context);
+        } else {
+          actionInput = this.GetActionInput(
+            actionExpr, _.get(includeActionTag, 'inputs'));
+        }
+      }
+    } catch (e) {
+      e.message = noActionErrorMsg(e.message);
+      throw e;
+    }
+
+    if (actionInput === null) {
+      return null;
+    }
+
+    const fqtag = ActionHelper.GetFqTag(
+      actionInput.tag, actionInput.dvOf, actionInput.dvAlias);
+    const actionInputs: InputMap = <InputMap> _.get(actionInput, 'inputs', {});
+    const inputs = _.assign({},
+      // `actionInput.inputMap` could actually be `undefined` but the `invert`
+      // typings are wrong (`_.invert(undefined)` -> `undefined`)
+      _.mapValues(_.invert(<InputMap> actionInput.inputMap), (value) => {
+        return _.get(includeActionTag.context, value);
+      }),
+      actionInputs);
+
+    return {
+      fqtag: fqtag,
+      tag: actionInput.tag,
+      dvOf: actionInput.dvOf,
+      dvAlias: actionInput.dvAlias,
+      inputs: inputs,
+      context: {}
+    };
+  }
+
+  /**
+   * @return the action table of the given cliche
+   */
+  private static GetActionTableOfCliche(cliche: string): ActionTable {
+    const fp = path.join(
+      ActionHelper.GetClicheFolder(cliche), ACTION_TABLE_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8'));
+  }
+
+  /**
+   * @return the set of actions from the given cliche that are not expected to
+   * issue a request
+   */
+  private static GetActionsNoRequest(cliche: string)
+    : { exec: string[] } | undefined {
+      const fp = path.join(
+        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
+  }
+
+  private static GetClicheFolder(cliche: string): string {
+    // Cliches specify as a main their typings (so that when apps do `import
+    // 'cliche'` it works) . To get to their folder we need to go up a dir
+    return path.join(path.dirname(require.resolve(cliche)), '..');
+  }
+
+  /**
    * @returns the cliche of the action represented by the given tag
    */
   private static ClicheOfTag(tag: string) {
@@ -323,17 +262,22 @@ export class AppActionHelper extends ActionHelper {
   }
 
   private static GetDvOfForChild(
-    actionTag: ActionTag,
-    childActionTag: ActionTag
-  ): string | undefined {
+    actionTag: ActionTag, childActionTag: ActionTag): string | undefined {
     if (
       !_.isEmpty(actionTag.dvOf) && _.isEmpty(childActionTag.dvOf) &&
-      AppActionHelper.ClicheOfTag(actionTag.tag) ===
-      AppActionHelper.ClicheOfTag(childActionTag.tag)) {
+      ActionHelper.ClicheOfTag(actionTag.tag) ===
+      ActionHelper.ClicheOfTag(childActionTag.tag)) {
       return actionTag.dvOf;
     }
 
     return childActionTag.dvOf;
+  }
+
+  /**
+   * @returns true if the given action is the built-in include action
+   */
+  private static IsDvIncludeAction(action: ActionTag) {
+    return action.tag === 'dv-include';
   }
 
   /**
@@ -344,9 +288,7 @@ export class AppActionHelper extends ActionHelper {
   }
 
   private static ActionExistsOrFail(
-    action: ActionTag,
-    actionTable: ActionTable
-  ) {
+    action: ActionTag, actionTable: ActionTable) {
     if (action.tag === 'router-outlet') {
       return;
     }
@@ -370,23 +312,30 @@ export class AppActionHelper extends ActionHelper {
    * @param routes the route information
    */
   constructor(
-    usedCliches: string[],
-    appActionTable: ActionTable,
-    private readonly routes: { path: string, action: string }[] = []
+    usedCliches?: string[],
+    appActionTable?: ActionTable,
+    private readonly routes?: { path: string, action: string }[]
   ) {
-    super();
-
-    usedCliches.forEach((c) => this.addCliche(c));
-    this.addCliche = (_c: string) => {
-      throw new Error('Cannot dyanmically add Cliche to app.');
-    };
-
-    const allActionsTable = _.assign(
+    const clicheActionTables = _.map(_
+      .uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
+    const dvCoreActionTable = ActionHelper
+      .GetActionTableOfCliche(DV_CORE_CLICHE);
+    this.actionTable = _.assign(
       {},
       appActionTable || {},
-      ..._.map(_.uniq(usedCliches), AppActionHelper.GetActionTableOfCliche),
-      AppActionHelper.GetActionTableOfCliche(DV_CORE_CLICHE)
+      ...clicheActionTables,
+      dvCoreActionTable
     );
+
+    this.actionsNoExecRequest = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string) => _.get(
+        ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+
+    if (!appActionTable) {
+      this.noApp = true;
+
+      return;
+    }
 
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
@@ -401,7 +350,7 @@ export class AppActionHelper extends ActionHelper {
         usedActions.add(action.tag);
 
         try {
-          const actionContent = this.getContent(action, allActionsTable);
+          const actionContent = this.getContent(action);
           saveUsedActions(actionContent, thisDebugPath);
         } catch (e) {
           if (!_.has(e, 'actionPath')) {
@@ -414,10 +363,7 @@ export class AppActionHelper extends ActionHelper {
 
     try {
       _.each(_.keys(appActionTable), (tag: string) => {
-        const content = this.getContent(
-          { fqtag: tag, tag: tag },
-          allActionsTable
-        );
+        const content = this.getContent({ fqtag: tag, tag: tag });
         saveUsedActions(content, [ tag ]);
       });
     } catch (e) {
@@ -425,9 +371,57 @@ export class AppActionHelper extends ActionHelper {
       throw e;
     }
 
-    this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
+    this.actionTable = _.pick(this.actionTable, Array.from(usedActions));
   }
 
+  /**
+   * Add a cliche's actions for shouldHaveExecRequest
+   * actionTable is not modified because this assumes you did not provide
+   *   an appActionTable in which case it is irrelevant
+   * Adding the same cliche a second time does nothing
+   */
+  addCliche(cliche: string) {
+    _.get(ActionHelper.GetActionsNoRequest(cliche), 'exec', <string[]>[])
+      .forEach((actionName) => this.actionsNoExecRequest.add(actionName));
+  }
+
+  /**
+   * @returns true if the action given by `tag` is expected to do an exe
+   * request
+   */
+  shouldHaveExecRequest(tag: string): boolean {
+    return !this.actionsNoExecRequest.has(tag);
+  }
+
+  /**
+   * @returns the `ActionTag` corresponding to the given action path
+   */
+  /*
+  getActionOrFail(actionPath: string[]): ActionTag {
+    const ret = this.getMatchingActions(actionPath);
+    if (_.isEmpty(ret)) {
+      throw new Error(`No action ${actionPath} found`);
+    }
+    if (ret.length > 1) {
+      throw new Error(`Found more than one matching action for ${actionPath}`);
+    }
+
+    return ret[0];
+  }*/
+
+  /**
+   * @returns true if the given action path is expected
+   */
+  actionPathIsValid(actionPath: ActionPath): boolean {
+    return !_.isEmpty(this.getMatchingActions(actionPath));
+  }
+
+  /**
+   * @returns the `ActionTag`s corresponding to the last node of the action path
+   */
+  getMatchingActions(actionPath: ActionPath): ActionTag[] {
+    return <ActionTag[]> _.map(this.getMatchingPaths(actionPath), _.last);
+  }
 
   /**
    * @returns the `ActionTag`s corresponding to the given action path
@@ -436,16 +430,20 @@ export class AppActionHelper extends ActionHelper {
     // We assume here that the first tag in the action path is a simple tag
     // so that fqtag = tag (i.e., the root action is not aliased and it is not
     // from some cliche for which there's more than one instance of in the app)
+    if (this.noApp) {
+      return [_.map(actionPath.nodes(), (fqtag: string) => ({
+        fqtag,
+        tag: fqtag
+      }))];
+    }
+
     const firstTag = actionPath.first();
     if (!(firstTag in this.actionTable)) {
       return [];
     }
     const matchingNode: ActionTag = {
       fqtag: firstTag, tag: firstTag,
-      content: this.getContent(
-        { fqtag: firstTag, tag: firstTag },
-        this.actionTable
-      )
+      content: this.getContent({ fqtag: firstTag, tag: firstTag })
     };
     if (actionPath.length() === 1 && firstTag in this.actionTable) {
       return [[ matchingNode ]] ;
@@ -453,10 +451,6 @@ export class AppActionHelper extends ActionHelper {
 
     return this._getMatchingPaths(actionPath.tail(), matchingNode.content)
       .map((matchingPath) => [ matchingNode, ...matchingPath ]);
-  }
-
-  toString() {
-    return JSON.stringify(this.actionTable, null, INDENT_NUM_SPACES);
   }
 
   private _getMatchingPaths(
@@ -472,7 +466,7 @@ export class AppActionHelper extends ActionHelper {
     const matchingNodes: ActionTag[] = actionAst
       .filter((at) => at.fqtag === actionPath.first())
       .map((matchingNode) => _.assign(matchingNode, {
-        content: this.getContent(matchingNode, this.actionTable)
+        content: this.getContent(matchingNode)
       }));
 
     if (actionPath.length() === 1) {
@@ -492,19 +486,19 @@ export class AppActionHelper extends ActionHelper {
    *  @param actionTag - the action tag to get the content from
    *  @returns the content for the given action tag
    */
-  private getContent(actionTag: ActionTag, actionTable: ActionTable)
+  private getContent(actionTag: ActionTag)
     : ActionAst | undefined {
     let ret: ActionAst | undefined;
-    if (AppActionHelper.IsDvIncludeAction(actionTag)) {
-      const includedActionTag: ActionTag | null = AppActionHelper
+    if (ActionHelper.IsDvIncludeAction(actionTag)) {
+      const includedActionTag: ActionTag | null = ActionHelper
         .GetIncludedActionTag(actionTag);
 
       if (includedActionTag === null) {
         ret = [];
       } else {
         // TODO: what will happen if we don't have this check?
-        AppActionHelper.ActionExistsOrFail(includedActionTag, actionTable);
-        const childDvOf = AppActionHelper
+        ActionHelper.ActionExistsOrFail(includedActionTag, this.actionTable);
+        const childDvOf = ActionHelper
           .GetDvOfForChild(actionTag, includedActionTag);
 
         const childActionTag = {
@@ -514,7 +508,7 @@ export class AppActionHelper extends ActionHelper {
         };
         ret = [ childActionTag ];
       }
-    } else if (AppActionHelper.IsDvTxAction(actionTag)) {
+    } else if (ActionHelper.IsDvTxAction(actionTag)) {
       ret = actionTag.content;
     } else {
       /**
@@ -532,20 +526,20 @@ export class AppActionHelper extends ActionHelper {
          */
         if (_.has(actionTag.context, inputValue)) {
           try {
-            const actionExpr = AppActionHelper.ParseActionExpr(
+            const actionExpr = ActionHelper.ParseActionExpr(
               actionTag.context![inputValue]);
             childContext![inputName] = JSON.stringify(
-              AppActionHelper.GetActionInput(actionExpr, actionTag.context));
+              ActionHelper.GetActionInput(actionExpr, actionTag.context));
           } catch (e) {
             // Do nothing. If the attempt to parse and obtain an action input
             // failed it means that it was not an action expr.
           }
         }
       });
-      AppActionHelper.ActionExistsOrFail(actionTag, actionTable);
-      ret = _.map(actionTable[actionTag.tag], (at: ActionTag) => {
+      ActionHelper.ActionExistsOrFail(actionTag, this.actionTable);
+      ret = _.map(this.actionTable[actionTag.tag], (at: ActionTag) => {
         const childActionTag = { ...at, context: childContext };
-        childActionTag.dvOf = AppActionHelper.GetDvOfForChild(
+        childActionTag.dvOf = ActionHelper.GetDvOfForChild(
           actionTag, childActionTag);
 
         return childActionTag;
@@ -560,11 +554,15 @@ export class AppActionHelper extends ActionHelper {
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
-      const routeActions: ActionTag[] = this.getRouteActions(actionTable);
+      const routeActions: ActionTag[] = this.getRouteActions(this.actionTable);
       ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
     return ret;
+  }
+
+  toString() {
+    return JSON.stringify(this.actionTable, null, INDENT_NUM_SPACES);
   }
 
   /**
@@ -584,5 +582,4 @@ export class AppActionHelper extends ActionHelper {
       };
     });
   }
-
 }
