@@ -2,6 +2,7 @@
   <div id="page" *ngIf="openAction">
     <app-row
       *ngFor="let row of openAction.rows; let i = index"
+      [openAction]="openAction"
       [row]="row"
       [rowNum]="i"
     ></app-row>
