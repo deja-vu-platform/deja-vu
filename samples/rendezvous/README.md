@@ -16,14 +16,15 @@ Team Winner Winner Chicken Dinner
 [Original App](http://rendezvous-6170.herokuapp.com/)
 
 ## Cliches Used
-- StandardAuthentication
 - Authentication
+- Authorization
 - Geolocation
 - Property
 - Event
 - Group
 - Label
 - Comment
+- Property (x2)
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
@@ -32,12 +33,10 @@ Team Winner Winner Chicken Dinner
 - User Phone Number (added with property, but can be verified with regex)
 - User ZIP code (added with property, but can be verified with regex)
 - User Major, Choose multiple from a list (labels from preset options)
-- Choose relevant interests from list (labels from preset options)
 - Password Recovery (authentication)
 - Timestamps for comments (comment)
 - Need MIT email to sign up (regex? email cliche for verification)
 - Events are hidden once they pass (Show events by date w/ current date)
 - Only show one event filter at a time (probably want some user scripting)
 - Recenter Button (probably won’t do)
-- Display map
 - Customize marker info window
