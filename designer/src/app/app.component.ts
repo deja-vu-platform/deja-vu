@@ -26,24 +26,30 @@ export class AppComponent {
   app = new App('newapp');
   openAction = this.app.homepage;
 
-  nextPort = 3002;
-  processes: {[name: string]: {kill: (s: string) => void }} = {};
-
-  // electron imports
-  requestProcessor: any;
-  path: any;
-  cp: any;
-  cli: any;
+  private nextPort = 3002;
+  private readonly processes: {[n: string]: {kill: (s: string) => void }} = {};
+  private readonly requestProcessor: any;
+  private readonly path: any;
+  private readonly cp: any;
+  private readonly cli: any;
 
   constructor(
-    private dragulaService: DragulaService,
-    private zone: NgZone,
-    private snackBar: MatSnackBar,
-    private electronService: ElectronService
+    private readonly dragulaService: DragulaService,
+    private readonly zone: NgZone,
+    private readonly snackBar: MatSnackBar,
+    private readonly electronService: ElectronService
   ) {
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
-    this.startBackend();
+    // start the backend
+    if (this.electronService.remote) {
+      const gateway = this.electronService.remote.require('dv-gateway');
+      this.requestProcessor = gateway.startGateway();
+      // imports for addCliche
+      this.path = this.electronService.remote.require('path');
+      this.cp = this.electronService.remote.require('child_process');
+      this.cli = this.electronService.remote.require('dv-cli/dist/utils');
+    }
   }
 
   /**
@@ -102,23 +108,6 @@ export class AppComponent {
       .find((a) => a.name === actionName);
 
     return new ActionInstance(actionDefinition, source);
-  }
-
-  /**
-   * Start the gateway, if we are in electron
-   * Also populates the addCliche method
-   * Must run in constructor
-   */
-  private startBackend() {
-    if (this.electronService.remote) {
-      const gateway = this.electronService.remote.require('dv-gateway');
-      this.requestProcessor = gateway.startGateway();
-
-      // imports for addCliche
-      this.path = this.electronService.remote.require('path');
-      this.cp = this.electronService.remote.require('child_process');
-      this.cli = this.electronService.remote.require('dv-cli/dist/utils');
-    }
   }
 
   /**

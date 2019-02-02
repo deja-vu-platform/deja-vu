@@ -19,11 +19,14 @@ import { ActionInstance, ClicheActionDefinition } from '../datatypes';
   styleUrls: ['./action-instance.component.scss']
 })
 export class ActionInstanceComponent implements AfterViewInit, OnDestroy {
-  @Input() actionInstance: ActionInstance;
-  @ViewChild(ClicheActionDirective) actionHost: ClicheActionDirective;
-  subscriptions: Subscription[] = [];
+  @Input() readonly actionInstance: ActionInstance;
+  @ViewChild(ClicheActionDirective)
+    private readonly actionHost: ClicheActionDirective;
+  private readonly subscriptions: Subscription[] = [];
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
+  constructor(
+    private readonly componentFactoryResolver: ComponentFactoryResolver
+  ) { }
 
   ngAfterViewInit() {
     if (this.actionInstance && this.actionInstance.of['component']) {

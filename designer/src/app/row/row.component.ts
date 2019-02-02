@@ -9,13 +9,14 @@ import { ActionInstance, AppActionDefinition, Row } from '../datatypes';
   styleUrls: ['./row.component.scss']
 })
 export class RowComponent implements OnDestroy {
-  @Input() openAction: AppActionDefinition;
-  @Input() row = new Row(); // we always show an extra row
-  @Input() rowNum = -1;
-  subscriptions: Subscription[] = [];
+  @Input() readonly openAction: AppActionDefinition;
+  @Input() readonly row = new Row(); // we always show an extra row
+  @Input() readonly rowNum = -1;
+  private subscriptions: Subscription[] = [];
 
   onMenuClosed(action: ActionInstance) {
     this.subscriptions.forEach((s) => s.unsubscribe());
+    this.subscriptions = [];
 
     action.of.inputs.forEach((input) => {
       const toSubject = action.io[input];

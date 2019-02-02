@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { dvCliche } from '../cliche.module';
@@ -26,19 +26,15 @@ interface ActionCollection {
   templateUrl: './side-menu.component.html',
   styleUrls: ['./side-menu.component.scss']
 })
-export class SideMenuComponent implements OnInit {
-  @Input() app: App;
-  @Input() openAction: AppActionDefinition;
-  @Output() clicheAdded = new EventEmitter<ClicheInstance>();
-  @Output() clicheRemoved = new EventEmitter<string>();
+export class SideMenuComponent {
+  @Input() readonly app: App;
+  @Input() readonly openAction: AppActionDefinition;
+  @Output() readonly clicheAdded = new EventEmitter<ClicheInstance>();
+  @Output() readonly clicheRemoved = new EventEmitter<string>();
   // need consistent object to return
-  private _actionCollections: ActionCollection[];
+  private readonly _actionCollections: ActionCollection[] = [dvCliche];
 
-  constructor(private dialog: MatDialog) {}
-
-  ngOnInit() {
-    this._actionCollections = [dvCliche];
-  }
+  constructor(private readonly dialog: MatDialog) {}
 
   get actionCollections(): ActionCollection[] {
     this._actionCollections.splice(1);

@@ -62,11 +62,11 @@ export class ConfigureClicheComponent implements OnInit {
   of: ClicheDefinition;
   name: string;
   configString: string;
-  jsonValidator: JSONValidator;
+  readonly jsonValidator: JSONValidator;
 
   constructor(
-    public dialogRef: MatDialogRef<ConfigureClicheComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
+    @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) {
     this.jsonValidator = new JSONValidator(this);
   }

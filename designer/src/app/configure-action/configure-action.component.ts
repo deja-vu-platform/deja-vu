@@ -32,11 +32,9 @@ export class ConfigureActionComponent implements OnInit {
   readonly ioTypes: ioType[] = ['Input', 'Output']; // fixed, not state
   readonly currentIO = { Input: <string[]>[], Output: <string[]>[] };
   readonly newIO = { Input: '', Output: '' };
-  readonly stagedAdds = { Input: <string[]>[], Output: <string[]>[] };
-  readonly stagedRemoves: string[] = [];
 
   constructor(
-    public readonly dialogRef: MatDialogRef<ConfigureActionComponent>,
+    private readonly dialogRef: MatDialogRef<ConfigureActionComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) { }
 
