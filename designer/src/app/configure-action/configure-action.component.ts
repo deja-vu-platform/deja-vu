@@ -16,6 +16,8 @@ export interface DialogData {
   action?: AppActionDefinition;
 }
 
+type ioType = 'Input' | 'Output';
+
 @Component({
   selector: 'app-configure-action',
   templateUrl: './configure-action.component.html',
@@ -27,9 +29,15 @@ export class ConfigureActionComponent implements OnInit {
   home: boolean;
   transaction: boolean;
 
+  readonly ioTypes: ioType[] = ['Input', 'Output']; // fixed, not state
+  readonly currentIO = { Input: <string[]>[], Output: <string[]>[] };
+  readonly newIO = { Input: '', Output: '' };
+  readonly stagedAdds = { Input: <string[]>[], Output: <string[]>[] };
+  readonly stagedRemoves: string[] = [];
+
   constructor(
-    public dialogRef: MatDialogRef<ConfigureActionComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    public readonly dialogRef: MatDialogRef<ConfigureActionComponent>,
+    @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) { }
 
   ngOnInit() {
@@ -38,6 +46,12 @@ export class ConfigureActionComponent implements OnInit {
       this.page = this.actionIsPage();
       this.home = this.data.app.homepage === this.data.action;
       this.transaction = this.data.action.transaction;
+      this.data.action.inputs.forEach((input) => {
+        this.currentIO.Input.push(input);
+      });
+      this.data.action.outputs.forEach((output) => {
+        this.currentIO.Output.push(output);
+      });
     }
   }
 
@@ -100,12 +114,46 @@ export class ConfigureActionComponent implements OnInit {
 
     action.transaction = this.transaction;
 
+    this.ioTypes.forEach((io) => {
+      const before: string[] = action[io.toLowerCase() + 's'];
+      const after = this.currentIO[io];
+      // remove all io not in form state from action state
+      _.remove(before, (ioName) => after.indexOf(ioName) === -1);
+      // add all io in form state but not action state
+      after.forEach((ioName) => {
+        if (before.indexOf(ioName) === -1) {
+          before.push(ioName);
+        }
+      });
+    });
+
     this.dialogRef.close();
   }
 
   makeHomepage() {
     this.makeActionPage();
     this.data.app.homepage = this.data.action;
+  }
+
+  /**
+   * you can delete the action
+   * as long as it is not the only action
+   * or the homepage
+   */
+  get canDelete() {
+    return (
+      this.data.app.actions.length > 1
+      && this.data.app.homepage !== this.data.action
+    );
+  }
+
+  removeIO(io: ioType, ioName: string) {
+    _.remove(this.currentIO[io], (s) => s === ioName);
+  }
+
+  addIO(io: ioType) {
+    this.currentIO[io].push(this.newIO[io]);
+    this.newIO[io] = '';
   }
 
 }

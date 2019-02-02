@@ -36,6 +36,48 @@
       </mat-checkbox>
     </div>
 
+    <ng-container *ngIf="data.action">
+      <div *ngFor="let ioType of ioTypes" class="mat-form-field">
+        <h2>{{ioType + 's'}}</h2>
+        <mat-list>
+          <mat-list-item *ngFor="let ioName of currentIO[ioType]">
+            <div>{{ioName}}</div>
+            <button
+              mat-button
+              color="warn"
+              class="mat-small"
+              (click)="removeIO(ioType, ioName)"
+              type="button"
+            >
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+  
+        <div style="display:flex;">
+          <mat-form-field style="flex:1;">
+            <input
+              matInput
+              [name]="ioType"
+              [placeholder]="'New ' + ioType"
+              [(ngModel)]="newIO[ioType]"
+            >
+          </mat-form-field>
+          <button
+            style="height:fit-content;margin:auto;"
+            mat-button
+            color="primary"
+            (click)="addIO(ioType)"
+            type="button"
+          >
+            Add {{ioType}}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+
+
 
     <div class="buttons">
       <button
@@ -49,7 +91,7 @@
         color="warn"
         type="button"
         (click)="delete()"
-        [disabled]="data.app.actions.length === 1 || data.app.homepage === data.action"
+        [disabled]="!canDelete"
       >Delete</button>
       <button
         mat-button
