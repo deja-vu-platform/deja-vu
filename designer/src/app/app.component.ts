@@ -70,7 +70,7 @@ export class AppComponent {
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            action = this.newWidget(sourceName, actionName);
+            action = this.newAction(sourceName, actionName);
           }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);
@@ -92,7 +92,7 @@ export class AppComponent {
   /**
    * Generate a new Action Instance for the given action from the given cliche
    */
-  private newWidget(sourceName: string, actionName: string): ActionInstance {
+  private newAction(sourceName: string, actionName: string): ActionInstance {
     const source: App | ClicheDefinition | ClicheInstance = [
       this.app,
       dvCliche,

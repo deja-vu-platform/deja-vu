@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Row } from '../datatypes';
+import { ActionInstance, Row } from '../datatypes';
 
 @Component({
   selector: 'app-row',
@@ -9,4 +9,10 @@ import { Row } from '../datatypes';
 export class RowComponent {
   @Input() row = new Row(); // we always show an extra row
   @Input() rowNum = -1;
+
+  onMenuClosed(action: ActionInstance) {
+    action.of.inputs.forEach((input) => {
+      action.io[input].next(action.inputSettings[input]);
+    });
+  }
 }
