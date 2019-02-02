@@ -1,8 +1,9 @@
 <dv.action name="main">
+  <!-- <sweetspots.navbar accessRequired=false /> -->
   <sweetspots.navbar showSearch=true accessRequired=false />
 
   <div id="left-main-div">
-    <dv.if condition=sweetspots.navbar.loggedInUserId && !sweetspots.navbar.searchResults>
+    <!-- <dv.if condition=sweetspots.navbar.loggedInUserId && !sweetspots.navbar.searchResults>
       <dv.if condition=!geolocation.display-map.newMarker>
         <sweetspots.add-a-spot />
       </dv.if>
@@ -21,13 +22,13 @@
       <label.show-items waitOn=sweetspots.navbar.searchResults
         noItemsToShowText="No spots found. Try searching for something else."
         showItem=<sweetspots.show-result-item id=$id /> />
-    </div>
+    </div> -->
   </div>
 
   <div id="map-div">
     <!-- TODO: Only show spots from search results -->
-    <geolocation.display-map id="mainMapId"
-      showDirectionsControl=false />
+    <!-- <geolocation.display-map id="mainMapId"
+      showDirectionsControl=false /> -->
   </div>
 
 </dv.action>

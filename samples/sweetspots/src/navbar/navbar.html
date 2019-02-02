@@ -1,5 +1,6 @@
-<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
-  searchResults$=label.search-items-by-labels.searchResultItems>
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+<!-- <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
+  searchResults$=label.search-items-by-labels.searchResultItems> -->
 
   <dv.tx as sweetspots-auth-check>
     <authentication.logged-in />
@@ -19,24 +20,28 @@
 
       <div class="navbar-form navbar-left search">
         <dv.if condition=$showSearch>
-          <label.search-items-by-labels class="navBarSearchForm"/>
+          <!-- TODO: Move search button to the right -->
+          <label.search-items-by-labels />
         </dv.if>
       </div>
 
       <dv.if condition=authentication.logged-in.user>
-        <div class="navbar-form navbar-right">
+        <div class="navbar-form navbar-right inline-block">
           <div class="btn-toolbar toolbar">
             <dv.tx as sweetspots-sign-out>
-              <authentication.sign-out class="btn-danger" buttonLabel="Logout"/>
+              <authentication.sign-out class="btn btn-danger"
+                buttonLabel="Logout"/>
             </dv.tx>
             &nbsp;
-            <dv.link href="/profile" class="btn btn-info">
-              Profile
+            <dv.link href="/profile"
+              class="mat-button btn btn-info profile-btn">
+              My Profile
             </dv.link>
           </div>
         </div>
-        <p class="navbar-text navbar-right">
-          Hello, <authentication.show-user user=authentication.logged-in.user
+        <p class="navbar-text navbar-right inline-block">
+          Hello, <authentication.show-user class="inline-block"
+            user=authentication.logged-in.user
             showId=false />! &nbsp;
         </p>
       </dv.if>

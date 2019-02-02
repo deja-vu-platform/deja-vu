@@ -1,13 +1,22 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
+
 @import url('https://fonts.googleapis.com/css?family=Mogra');
 
-/* @author Nishchal Bhandari */
+md-icon {
+  font-family: 'Material Icons' !important;
+}
+
 .inline-block {
   display: inline-block;
 }
 
 .loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -43,7 +52,7 @@
   color: #FFFFFF !important;
 }
 
-.btn-danger {
+.btn-danger, authentication-sign-out button.mat-button {
   background-color: #A52C4B !important;
   border-color: #A52C4B !important;
   color: #FFFFFF !important;
@@ -81,41 +90,16 @@ body {
   max-width: 330px;
   padding: 15px;
   margin: 0 auto;
+  text-align: center;
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
-  text-align: center;
 }
 
 .form-signin-heading {
   font-family: 'Mogra', cursive !important;
   color: #f62459;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 .navbar-btn {
@@ -128,7 +112,74 @@ body {
   margin-left: 0;
 }
 
-/* override follow button css */
+#map-div {
+  height: calc(100vh - 105px);
+}
+
+ul {
+  list-style: none;
+}
+
+authentication-register-user button.mat-button,
+authentication-sign-in button.mat-button {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+authentication-register-user button.mat-button:hover,
+authentication-sign-in button.mat-button:hover {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading a {
+  font-family: 'Mogra', cursive !important;
+  font-size: 32px !important;
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading a:visited {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.sweet-spots-heading a:link {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+.sweet-spots-heading a:hover {
+  color: #FFFFFF !important;
+  text-decoration: none;
+}
+
+.sweet-spots-heading a:active {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+dv-link.profile-btn {
+  padding-top: 5px;
+}
+
+.profile-btn a {
+  color: #FFFFFF;
+}
+
 follow-follow-unfollow button.btn {
   float: none!important;
   padding: 6px 12px;
@@ -140,11 +191,6 @@ follow-follow-unfollow button.btn {
   border-color: #4cae4c !important;
 }
 
-/* correctly limits height of map on main page */
-#map-div {
-  height: calc(100vh - 105px);
-}
-
-ul {
-  list-style: none;
+search-items-by-labels button.mat-button {
+  display: inline-block;
 }

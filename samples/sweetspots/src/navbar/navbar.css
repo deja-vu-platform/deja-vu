@@ -1,37 +1,7 @@
-.sweet-spots-heading {
-  font-family: 'Mogra', cursive !important;
-  font-size: 32px !important;
-  color: #FFFFFF !important;
-}
-
-.sweet-spots-heading:visited {
-  color: #FFFFFF;
-  text-decoration: none;
-}
-
 p.navbar-text {
   color: #FFFFFF !important;
 }
 
-.sweet-spots-heading:link {
-  color: #FFFFFF !important;
-  text-decoration: none !important;
-}
-
-.sweet-spots-heading:hover {
-  color: #FFFFFF !important;
-  text-decoration: none;
-}
-
-.sweet-spots-heading:active {
-  color: #FFFFFF !important;
-  text-decoration: none !important;
-}
-
 #nav-bar {
   background-color: #f62459 !important;
-}
-
-.navBarSearchForm .mat-form-field {
-  width:430px !important;
 }
