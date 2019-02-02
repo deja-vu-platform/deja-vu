@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule, MatMenuModule } from '@angular/material';
 
 import {
   ActionInstanceComponent
@@ -16,6 +18,11 @@ describe('ActionDefinitionComponent', () => {
         ActionDefinitionComponent,
         RowComponent,
         ActionInstanceComponent
+      ],
+      imports: [
+        FormsModule,
+        MatInputModule,
+        MatMenuModule
       ]
     })
     .compileComponents();

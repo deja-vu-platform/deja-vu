@@ -5,6 +5,7 @@ import {
   MatExpansionModule,
   MatIconModule,
   MatListModule,
+  MatMenuModule,
   MatSelectModule,
   MatSnackBarModule,
   MatToolbarModule
@@ -42,6 +43,7 @@ describe('AppComponent', () => {
         MatExpansionModule,
         MatIconModule,
         MatListModule,
+        MatMenuModule,
         MatSelectModule,
         MatSnackBarModule,
         MatToolbarModule
