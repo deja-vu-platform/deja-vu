@@ -19,6 +19,11 @@
             </button>
           </div>
 
+          <geolocation.display-map
+            id="mainMapId"
+            showLoadedMarkers=false
+            showDirectionsControl=false />
+
           <dv.tx>
             <dv.id />
             <dv.status savedText="Event created" />
@@ -30,21 +35,13 @@
                   <div class="form-group">
                     <p>Location</p>
                     <div id="map_new-event">
-                      <!-- <geolocation.create-marker
-                        id=dv.id.id
-                        mapId="mainMapId"
-                        title=geolocation.display-map.newMarker.title
-                        latitude=geolocation.display-map.newMarker.latitude
-                        longitude=geolocation.display-map.newMarker.longitude
-                        showOptionToSubmit=false /> -->
                       <geolocation.create-marker
                         id=dv.id.id
                         mapId="mainMapId"
+                        title=geolocation.display-map.newMarker?.title
+                        latitude=geolocation.display-map.newMarker?.latitude
+                        longitude=geolocation.display-map.newMarker?.longitude
                         showOptionToSubmit=false />
-                      <!-- <geolocation.display-map
-                        id="mainMapId"
-                        showLoadedMarkers=false
-                        showDirectionsControl=false /> -->
                     </div>
                     <div class="guidelines">
                       (must be within 50 miles of current location)
@@ -59,18 +56,20 @@
                 </td>
               </tr>
 
-              <tr>
-                <td>
-                  <p>Tags</p>
-                  <div id="tags">
-                    <relevantinterests.attach-labels itemId=dv.id.id
-                      labels=relevantinterests.show-labels.labels
-                      showOptionToSubmit=false />
-                  </div>
-                </td>
-              </tr>
+              <td>
+
+              </td>
 
             </table>
+
+            <div class="categories">
+              <p>Tags</p>
+              <div id="tags">
+                <relevantinterests.attach-labels itemId=dv.id.id
+                  labels=relevantinterests.show-labels.labels
+                  showOptionToSubmit=false />
+              </div>
+            </div>
 
             <!-- Event Title + Additional Info -->
             <div class="event-details">
@@ -98,10 +97,8 @@
                 hidden=true />
             </div>
             <div class="cc-buttons">
-              <dv.link href="/main">
-                <button type="button" class="btn button btn-info" id="back">
-                  Cancel
-                </button>
+              <dv.link href="/main" class="btn button btn-info" id="back">
+                Cancel
               </dv.link>
             </div>
           </dv.tx>

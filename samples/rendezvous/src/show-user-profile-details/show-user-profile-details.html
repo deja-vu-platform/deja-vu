@@ -13,10 +13,9 @@
 
         <!-- Edit Profile -->
         <dv.if condition=$id === $loggedInUserId>
-          <dv.link href="/edit-profile">
-            <button class="btn button" type="button" id="edit-profile-button">
-              Edit Profile
-            </button>
+          <dv.link href="/edit-profile" class="btn button"
+            id="edit-profile-button">
+            Edit Profile
           </dv.link>
         </dv.if>
       </div>
