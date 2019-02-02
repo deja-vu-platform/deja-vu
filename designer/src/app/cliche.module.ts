@@ -65,8 +65,12 @@ function clicheDefinitionFromModule(
         name: _.kebabCase(component.name
           .slice(0, componentSuffix.length * -1)),
         component,
-        inputs: [], // TODO
-        outputs: [] // TODO
+        inputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Input'
+        ))),
+        outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Output'
+        )))
       }))
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };

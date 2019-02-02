@@ -112,7 +112,7 @@ export class Row {
 export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
-  readonly inputSettings: { [inputName: string]: any } = {};
+  readonly inputSettings: { [inputName: string]: string } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
