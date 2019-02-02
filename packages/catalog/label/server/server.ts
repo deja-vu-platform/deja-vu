@@ -101,10 +101,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         if (input.labelIds) {
           // Items matching all labelIds
           const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-          matchQuery['id'] = {
-            $in: standardizedLabelIds,
-            pending: { $exists: false }
-          };
+          matchQuery['id'] = { $in: standardizedLabelIds };
+          matchQuery['pending'] = { $exists: false };
           groupQuery['initialSet'] = { $first: '$itemIds' };
           initialValue = '$initialSet';
           reduceOperator['$setIntersection'] = ['$$value', '$$this'];
@@ -217,6 +215,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
               const newOp = _.cloneDeep(op);
               _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+              _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
               _.set(newOp, 'updateOne.update.$unset', { pending: '' });
 
               return newOp;
@@ -230,7 +229,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
               const newOp = _.cloneDeep(op);
               _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
-              _.set(newOp, 'updateOne.update', { pending: '' });
+              _.set(newOp, 'updateOne.update.$unset', { pending: '' });
 
               return newOp;
             });

@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="searchForm" class="form-horizontal">
-  <div class="form-group">
+  <div class="form-group" class="inline-block">
     <mat-form-field>
       <!-- select multiple from list -->
       <mat-select placeholder={{searchPlaceholder}}
@@ -19,7 +19,7 @@
     </mat-form-field>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" class="inline-block">
     <button mat-button type="submit" [disabled]="!searchForm.valid">
       {{buttonLabel}}
     </button>
