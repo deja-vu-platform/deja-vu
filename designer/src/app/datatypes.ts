@@ -1,6 +1,7 @@
 import { Component } from '@angular/compiler/src/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
+import { BehaviorSubject } from 'rxjs';
 
 // names should be HTML safe (TODO: ensure this)
 
@@ -112,7 +113,8 @@ export class Row {
 export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
-  readonly inputSettings: { [inputName: string]: any } = {};
+  readonly inputSettings: { [inputName: string]: string } = {};
+  readonly io: { [name: string]: BehaviorSubject<any> } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
@@ -121,6 +123,9 @@ export class ActionInstance {
   ) {
     this.of = ofAction;
     this.from = from;
+    [...this.of.inputs, ...this.of.outputs].forEach((name) => {
+      this.io[name] = new BehaviorSubject(undefined);
+    });
   }
 
   toHTML(): string {

@@ -27,23 +27,23 @@ const STYLES = `@import "~@angular/material/prebuilt-themes/indigo-pink.css";
   styleUrls: ['./top-bar.component.scss']
 })
 export class TopBarComponent {
-  @Input() app: App;
-  @Input() openAction: AppActionDefinition;
-  @Output() load = new EventEmitter<string>(true); // async
-  @Output() changeAction = new EventEmitter<AppActionDefinition>();
-  @ViewChild('fileInput') fileInput: ElementRef;
-  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
-  fs: any;
+  @Input() readonly app: App;
+  @Input() readonly openAction: AppActionDefinition;
+  @Output() readonly load = new EventEmitter<string>(true); // async
+  @Output() readonly changeAction = new EventEmitter<AppActionDefinition>();
+  @ViewChild('fileInput') readonly fileInput: ElementRef;
+  @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
+  readonly fs: any;
 
   saving = false;
   exporting = false;
   opening = false;
 
   constructor(
-    private electronService: ElectronService,
-    private snackBar: MatSnackBar,
-    private zone: NgZone,
-    private dialog: MatDialog
+    private readonly electronService: ElectronService,
+    private readonly snackBar: MatSnackBar,
+    private readonly zone: NgZone,
+    private readonly dialog: MatDialog
   ) {
     if (this.electronService.remote) {
       this.fs = this.electronService.remote.require('fs');
