@@ -27,7 +27,6 @@ import {
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
-import { RowComponent } from './row/row.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
@@ -39,7 +38,6 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     AppComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    RowComponent,
     SideMenuComponent,
     TextComponent,
     TopBarComponent,

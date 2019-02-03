@@ -1,7 +1,6 @@
 import { Component } from '@angular/compiler/src/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
-import { BehaviorSubject } from 'rxjs';
 
 // names should be HTML safe (TODO: ensure this)
 
@@ -27,12 +26,20 @@ export class AppActionDefinition implements ActionDefinition {
     this.name = name;
   }
 
-  get rows() {
+  get rows(): Row[] {
     _.remove(this._rows, (row) => row.actions.length === 0);
 
     return this._rows;
   }
 
+  get children(): ActionInstance[] {
+    return (<ActionInstance[]>[]).concat(...this.rows.map((r) => r.actions));
+  }
+
+  /**
+   * Determines whether or not this contains an instance of an action
+   * @param deep false: A parent of B; true: A ancestor of B
+   */
   contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
       r.actions.some((a) => (
@@ -44,6 +51,23 @@ export class AppActionDefinition implements ActionDefinition {
         )
       ))
     );
+  }
+
+  /**
+   * Find the child action instance with given cliche and action name
+   * Returns undefined if none is found
+   * TODO: stop assuming each cliche x action combo is unique
+   */
+  findChild(
+    clicheName: string,
+    actionName: string
+  ): ActionInstance | undefined {
+    for (const row of this.rows) {
+      const action = row.actions.find((a) =>
+        a.from.name === clicheName && a.of.name === actionName
+      );
+      if (action) { return action; }
+    }
   }
 
   toHTML() {
@@ -71,6 +95,7 @@ export class AppActionDefinition implements ActionDefinition {
       transaction: this.transaction
     };
   }
+
 }
 
 export class Row {
@@ -114,7 +139,6 @@ export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
   readonly inputSettings: { [inputName: string]: string } = {};
-  readonly io: { [name: string]: BehaviorSubject<any> } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
@@ -123,9 +147,10 @@ export class ActionInstance {
   ) {
     this.of = ofAction;
     this.from = from;
-    [...this.of.inputs, ...this.of.outputs].forEach((name) => {
-      this.io[name] = new BehaviorSubject(undefined);
-    });
+  }
+
+  get fqtag() {
+    return `${this.from.name}-${this.of.name}`;
   }
 
   toHTML(): string {
