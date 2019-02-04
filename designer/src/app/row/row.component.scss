@@ -12,3 +12,12 @@
 .action:hover {
   border-color:rgba(16, 219, 255, .5);
 }
+
+.popup-menu {
+  height: 200px;
+  padding: 0 16px;
+}
+
+.popup-menu > mat-form-field {
+  width: 100%;
+}

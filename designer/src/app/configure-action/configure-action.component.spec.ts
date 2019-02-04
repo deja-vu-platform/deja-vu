@@ -4,7 +4,9 @@ import {
   MAT_DIALOG_DATA,
   MatCheckboxModule,
   MatDialogRef,
-  MatInputModule
+  MatIconModule,
+  MatInputModule,
+  MatListModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -21,7 +23,9 @@ describe('ConfigureActionComponent', () => {
         BrowserAnimationsModule,
         FormsModule,
         MatCheckboxModule,
-        MatInputModule
+        MatIconModule,
+        MatInputModule,
+        MatListModule
       ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },

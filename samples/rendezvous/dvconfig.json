@@ -50,11 +50,15 @@
         "reinitDbOnStartup": true
       }
     },
-    "label": {
+    "relevantinterests": {
       "name": "label",
       "config": {
         "wsPort": 3008,
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": true,
+        "initialLabelIds": [
+          "Sports", "Music", "Food & Drink", "Outdoor", "Theatre",
+          "Culture & History"
+        ]
       }
     },
     "eventdetails": {

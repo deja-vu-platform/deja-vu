@@ -5,11 +5,14 @@ import {
   MatExpansionModule,
   MatIconModule,
   MatListModule,
+  MatMenuModule,
   MatSelectModule,
   MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
+
+import { DvModule } from 'dv-core';
 
 import {
   ActionDefinitionComponent
@@ -34,11 +37,13 @@ describe('AppComponent', () => {
         RowComponent
       ],
       imports: [
+        DvModule,
         FormsModule,
         MatDialogModule,
         MatExpansionModule,
         MatIconModule,
         MatListModule,
+        MatMenuModule,
         MatSelectModule,
         MatSnackBarModule,
         MatToolbarModule

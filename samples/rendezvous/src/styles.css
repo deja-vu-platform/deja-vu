@@ -88,7 +88,7 @@ select {
   color: blue;
 }
 
-.selectButtons {
+.select-buttons {
   border: 0;
   background-color: #ffd0cc;
   color: black;
@@ -98,14 +98,14 @@ select {
   width: 50px;
 }
 
-.new_event{
+.new-event{
   width: 75%;
   font-family: 'Raleway', sans-serif;
   margin: 0 auto;
   margin-top: 50px;
 }
 
-.event_display {
+.event-display {
   width: 100%;
   padding-top: 20px;
   border-radius: 5px;
@@ -114,18 +114,18 @@ select {
   text-align: center;
 }
 
-.event_display table {
+.event-display table {
   border: 1px solid #CC9088;
 }
 
-.event_display td {
+.event-display td {
   border-top: 1px solid #CC9088;
 }
-.event_display td:first-child {
+.event-display td:first-child {
   border-top: none;
 }
 
-.event_display th {
+.event-display th {
   border: 1px solid #CC9088;
   background-color: #FFEFEE;
   text-align: center;
@@ -141,7 +141,7 @@ select {
   border: 1px solid #B3594D;
 }
 
-.displayButtons {
+.display-buttons {
   border: 1px solid #B3594D;
   background-color: #E18B7F;
   color: black;
@@ -155,7 +155,7 @@ select {
   padding: 1px;
 }
 
-#event_info{
+#event-info{
   width: 100%;
   padding-top: 20px;
   border-radius: 5px;
@@ -194,7 +194,7 @@ select {
 
 
 /* make place searchbox look like other inputs on page */
-#srch-fr-plc input {
+#search-for-place input {
   width: 100%;
   height: 34px;
   font-size: 14px;
@@ -208,7 +208,7 @@ select {
   margin-top: 0;
   outline: 1px;
 }
-#srch-fr-plc input:focus {
+#search-for-place input:focus {
   border-color: #66afe9;
   outline: 0;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);

@@ -4,48 +4,43 @@
     <eventdetails.show-object id=$eventId hidden=true />
     <authorization.show-owner resourceId=$eventId hidden=true />
 
-    <div class="new_event">
+    <div class="new-event">
       <div class="panel panel-default">
-        <div class="panel-heading eventName">
+        <div class="panel-heading event-name">
           <!-- Event Title -->
           <eventdetails.show-object object=eventdetails.show-object.loadedObject
             showOnly=["title"] />
         </div>
 
-        <div class="panel-body" id="event-panel">
-          <div id="hostBadge">
-            <!-- Host -->
-            Hosted By
-            <span class="badge userBadge">
-              <rendezvous.show-member-name class="inline-block"
-                id=authorization.show-owner.ownerId /> |
-            </span>
-            <dv.link class="inline-block" href="/profile"
-              params={ id: authorization.show-owner.ownerId }>
-              Profile
-            </dv.link>
+        <div id="hostBadge">
+          <!-- Host -->
+          Hosted By
+          <span class="badge userBadge">
+            <rendezvous.show-member-name class="inline-block"
+              id=authorization.show-owner.ownerId /> |
+          </span>
+          <dv.link class="inline-block" href="/profile"
+            params={ id: authorization.show-owner.ownerId }>
+            Profile
+          </dv.link>
+        </div>
+
+        <div id="attendees-panel">
+          <!-- List of Attendees -->
+          <p>Attendees</p>
+          <div class="panel-body" id="attendees-body">
+            <group.show-members inGroupId=$eventId
+              showMember=<rendezvous.show-member-name id=$id /> />
           </div>
+        </div>
 
-          <!-- Relevant Interests -->
-          <!-- Uncomment below when cliche restriction bug is resolved -->
-          <!-- <div style="float: left; margin-top: 4px;">
-                  <button type="button" class="displayButtons btn btn-info">
-                    Relevant Interests
-                    <span class="badge" style="color: black; margin-left: 5px;">
-                      <label.show-labels id="rlvnt-intrsts"
-                        itemId=$eventId
-                        noLabelsToShowText="No interests added for this event" />
-                    </span>
-                  </button>
-                </div> -->
-
-          <div id="attendeesDiv">
-            <!-- List of Attendees -->
-            <p>Attendees</p>
-            <div class="panel-body" id="attendees-body">
-              <group.show-members inGroupId=$eventId
-                showMember=<rendezvous.show-member-name id=$id /> />
-            </div>
+        <!-- Relevant Interests -->
+        <div id="interests-panel">
+          Relevant Interests
+          <div class="panel-body" id="interests-body">
+            <relevantinterests.show-labels id="relevant-interests"
+              itemId=$eventId
+              noLabelsToShowText="No interests added for this event" />
           </div>
         </div>
 
@@ -66,10 +61,10 @@
           </p>
         </div>
 
-        <div class="event_details">
+        <div class="event-details">
           <!-- Additional Info -->
           <p> Event Description</p>
-          <div id="shw-pst">
+          <div id="show-post">
             <eventdetails.show-object
               object=eventdetails.show-object.loadedObject
               showOnly=["additionalInfo"] />
@@ -89,12 +84,12 @@
 
         <!-- Join Group if already not in it -->
         <dv.if condition=rendezvous.navbar.loggedInUserId !== authorization.show-owner.ownerId>
-          <div class="inline btn-group form-group" id="jn-lv-grp">
+          <div class="inline btn-group form-group" id="join-leave-group">
             <dv.tx as rendezvous-join-leave>
               <authorization.add-remove-viewer resourceId=$eventId
                 viewerId=rendezvous.navbar.loggedInUserId hidden=true />
 
-              <group.join-leave groupId=$eventId
+              <group.join-leave class="btn button" groupId=$eventId
                 memberId=rendezvous.navbar.loggedInUserId />
             </dv.tx>
           </div>
@@ -103,7 +98,7 @@
         <div>
           <p id="comment-title">Comments</p>
         </div>
-        <table id="comment-table" class="event_info event_display table">
+        <table id="comment-table" class="event-info event-display table">
           <tbody>
             <tr id="add-comment-row">
               <th id="add-comment">

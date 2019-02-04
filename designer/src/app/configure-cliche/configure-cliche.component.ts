@@ -17,6 +17,11 @@ export interface DialogData {
   cliche?: ClicheInstance;
 }
 
+export interface AfterClosedData {
+  event: 'create' | 'delete' | 'update' | 'cancel';
+  cliche?: ClicheInstance;
+}
+
 interface ControlGroup {
   form: { valid: boolean };
 }
@@ -57,11 +62,11 @@ export class ConfigureClicheComponent implements OnInit {
   of: ClicheDefinition;
   name: string;
   configString: string;
-  jsonValidator: JSONValidator;
+  readonly jsonValidator: JSONValidator;
 
   constructor(
-    public dialogRef: MatDialogRef<ConfigureClicheComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
+    @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) {
     this.jsonValidator = new JSONValidator(this);
   }
@@ -87,7 +92,7 @@ export class ConfigureClicheComponent implements OnInit {
   }
 
   cancel() {
-    this.dialogRef.close();
+    this.dialogRef.close({ event: 'cancel' });
   }
 
   save(form: ControlGroup) {
@@ -106,7 +111,10 @@ export class ConfigureClicheComponent implements OnInit {
       if (this.configString) { // guaranteed to be valid JSON of object
         Object.assign(clicheInstance.config, JSON.parse(this.configString));
       }
-      this.dialogRef.close();
+      this.dialogRef.close({
+        event: this.data.cliche ? 'update' : 'create',
+        cliche: clicheInstance
+      });
     }
   }
 
@@ -121,7 +129,7 @@ export class ConfigureClicheComponent implements OnInit {
         });
       });
       _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
-      this.dialogRef.close();
+      this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
     }
   }
 

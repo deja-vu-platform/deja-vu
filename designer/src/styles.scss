@@ -24,3 +24,23 @@ body {
 .mat-button.mat-small {
   min-width: 1%;
 }
+
+/* prevent interaction with dynamically-rendered components */
+.action-instance * {
+  pointer-events: none;
+}
+/* don't prevent interaction with quill editor */
+.action-instance quill-editor * {
+  pointer-events: auto;
+}
+
+/* styles for custom quill buttons (don't have component) */
+.ql-bubble .ql-toolbar button:hover .text-button-text {
+  color: white;
+}
+.ql-bubble .ql-toolbar button .text-button-text {
+  color: rgb(204, 204, 204);
+}
+.text-button-text {
+  white-space: nowrap;
+}

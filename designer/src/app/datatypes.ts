@@ -1,8 +1,9 @@
 import { Component } from '@angular/compiler/src/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
+import { BehaviorSubject } from 'rxjs';
 
-// names should be HTML safe (TODO)
+// names should be HTML safe (TODO: ensure this)
 
 export interface ActionDefinition {
   name: string;
@@ -112,7 +113,8 @@ export class Row {
 export class ActionInstance {
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
-  readonly inputSettings: { [inputName: string]: any } = {};
+  readonly inputSettings: { [inputName: string]: string } = {};
+  readonly io: { [name: string]: BehaviorSubject<any> } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
@@ -121,17 +123,20 @@ export class ActionInstance {
   ) {
     this.of = ofAction;
     this.from = from;
+    [...this.of.inputs, ...this.of.outputs].forEach((name) => {
+      this.io[name] = new BehaviorSubject(undefined);
+    });
   }
 
   toHTML(): string {
     // text widget is just plain HTML static content
-    if (this.of.name === 'text' && this.from.name === 'dv-d') {
+    if (this.of.name === 'text' && this.from.name === 'dv') {
       return `    <div>${this.data}</div>\n`;
     }
 
     let html = `    <${this.from.name}.${this.of.name}\n`;
     _.forEach(this.inputSettings, (val, key) => {
-      html += `      ${key}="${val}"\n`; // TODO: non-string vals
+      html += `      ${key}=${val}\n`;
     });
     html += `    />\n`;
 
@@ -198,7 +203,7 @@ export class App {
   static fromJSON(
     jsonString: string,
     clicheDefinitions: ClicheDefinition[],
-    designerCliche: ClicheDefinition
+    dvCliche: ClicheDefinition
   ): App {
     const appJSON = JSON.parse(jsonString);
 
@@ -226,7 +231,7 @@ export class App {
           const from = [
             ...app.cliches,
             app,
-            designerCliche
+            dvCliche
           ].find((c) => c.name === ai.from);
           const ofAction = (<ActionDefinition[]>from.actions)
             .find((a) => a.name === ai.of);
@@ -263,7 +268,6 @@ export class App {
         }
       });
     });
-    console.log(graph);
 
     return graphlib.alg.topsort(graph)
       .reverse()

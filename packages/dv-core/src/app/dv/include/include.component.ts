@@ -5,7 +5,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { OF_ATTR } from '../gateway.service';
+import { NodeUtils } from "../node.utils";
 
 
 @Directive({
@@ -144,8 +144,8 @@ export class IncludeComponent implements AfterViewInit {
 
     this.componentRef = viewContainerRef.createComponent(componentFactory);
     if (this.action.dvOf) {
-      this.componentRef.location.nativeElement
-        .setAttribute(OF_ATTR, this.action.dvOf);
+      NodeUtils.SetOfOfNode(
+        this.componentRef.location.nativeElement, this.action.dvOf);
     }
 
     let shouldCallDetectChanges = false;

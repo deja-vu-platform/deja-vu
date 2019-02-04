@@ -1,10 +1,16 @@
-import {
-  ng, npm, writeFileOrFail, updatePackage,
-  NG_PACKAGR, ENTRY_FILE_PATH, modulePath,
-  JSON_SPACE, installAndConfigureGateway
-} from '../../dv';
-import * as path from 'path';
 import * as _ from 'lodash';
+import * as path from 'path';
+import {
+  ENTRY_FILE_PATH,
+  installAndConfigureGateway,
+  JSON_SPACE,
+  modulePath,
+  ng,
+  NG_PACKAGR,
+  npm,
+  updatePackage,
+  writeFileOrFail
+} from '../../utils';
 
 
 exports.command = 'cliche <name> <pathToDv>';
@@ -19,10 +25,11 @@ exports.handler = ({ name, pathToDv }) => {
   installAndConfigureGateway(name, pathToDv);
 
   console.log('Move angular to peerDependencies');
-  updatePackage(pkg => {
+  updatePackage((pkg) => {
     pkg.peerDependencies = _.assign(pkg.peerDependencies, pkg.dependencies);
     pkg.devDependencies = _.assign(pkg.devDependencies, pkg.dependencies);
     pkg.dependencies = {};
+
     return pkg;
   }, name);
 
@@ -40,11 +47,12 @@ exports.handler = ({ name, pathToDv }) => {
     `export * from \'${modulePath(name)}\';`);
 
   console.log('Add npm script to package');
-  updatePackage(pkg => {
+  updatePackage((pkg) => {
     pkg.scripts[NG_PACKAGR.npmScriptKey] = NG_PACKAGR.npmScriptValue;
     pkg.scripts[`dv-package-${name}`] = 'dv package';
     pkg.scripts[`dv-package-watch-${name}`] = (
       `chokidar src/app/${name} server -c 'npm run dv-package-${name}'`);
+
     return pkg;
   }, name);
-}
+};

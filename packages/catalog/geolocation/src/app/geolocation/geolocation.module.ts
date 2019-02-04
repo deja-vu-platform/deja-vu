@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { InjectionToken, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule
@@ -26,9 +26,8 @@ export {
   GetCurrentLocationComponent, ShowMarkerComponent, ShowMarkersComponent
 }
 
-import {
-  API_PATH, CONFIG, GeolocationConfig, GOOGLE_MAPS_API_KEY
-} from './geolocation.config';
+import { API_PATH, GOOGLE_MAPS_API_KEY } from './geolocation.config';
+
 
 const allComponents = [
   CreateMarkerComponent,
@@ -62,5 +61,3 @@ const allComponents = [
   entryComponents: allComponents
 })
 export class GeolocationModule { }
-
-export const GEOLOCATION_CONFIG: InjectionToken<GeolocationConfig> = CONFIG;

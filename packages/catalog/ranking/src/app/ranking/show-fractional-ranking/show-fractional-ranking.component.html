@@ -1,0 +1,19 @@
+<div *ngIf="targets" class="container">
+  <ul class="list-group">
+    <li *ngFor="let target of targets" class="list-group-item">
+      <dv-include 
+        [action]="showTarget" 
+        [inputs]="{
+          id: target.id, target: target, showId: showTargetId,
+          showRank: showTargetRank, rankLabel: targetRankLabel
+        }"
+        [parent]="showTargetRankings"
+        default-showTarget="{ tag: ranking-show-target }">
+      </dv-include>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!targets || targets.length === 0">
+  {{noTargetsText}}
+</div>

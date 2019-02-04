@@ -5,12 +5,10 @@
   </dv.tx>
 
   <dv.if condition=$showTitle>
-    <div id="returnToMain">R E N D E Z V O U S</div>
+    <div id="return-to-main">R E N D E Z V O U S</div>
     <div class="inline left">
-      <dv.link href="/main">
-        <button type="button" id="back" class="btn button btn-info">
-          <i class="material-icons">arrow_back</i>
-        </button>
+      <dv.link href="/main" id="back" class="btn button btn-info">
+        <i class="material-icons">arrow_back</i>
       </dv.link>
     </div>
   </dv.if>
@@ -19,15 +17,14 @@
     <div class="center">
       <div class="inline">
         <dv.if condition=$showProfileButton>
-          <dv.link href="/profile">
-            <button type="button" class="btn button">
-              My Profile
-            </button>
+          <dv.link href="/profile" class="btn button">
+            My Profile
           </dv.link>
         </dv.if>
 
         <dv.tx as rendezvous-sign-out>
-          <authentication.sign-out class="btn button" buttonLabel="Logout" />
+          <authentication.sign-out class="btn button"
+            buttonLabel="Logout" />
           <dv.link href="/login" hidden=true />
         </dv.tx>
       </div>

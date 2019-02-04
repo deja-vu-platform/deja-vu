@@ -1,4 +1,4 @@
-.eventName {
+.event-name {
   font-size: 24px;
   padding-left: 10px;
   background-color: #ffa599;
@@ -10,13 +10,22 @@
   margin-bottom: 20px;
 }
 
-#jn-lv-grp {
+.panel-body {
+  padding: 15px;
+}
+
+.panel-body-item {
+  float: left;
+  margin-top: 4px;
+}
+
+#join-leave-group {
   float: left;
   margin-top: 30px;
   margin-left: 0px;
 }
 
-#jn-lv-grp button {
+#join-leave-group button {
   padding: 6px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -64,18 +73,18 @@
   display: block;
 }
 
-#attendeesDiv {
+#attendees-panel {
   display: block;
   margin-top: 50px;
 }
 
-#attendeesDiv li {
+#attendees-panel li {
   display: inline-block;
   padding: 0;
   margin-right: 10px;
 }
 
-#attendeesDiv show-member {
+#attendees-panel show-member {
   color: black;
   margin-left: 5px;
   background-color: white;
@@ -92,7 +101,7 @@
   border-radius: 10px;
 }
 
-#attendeesDiv ul {
+#attendees-panel ul {
   margin: 0;
 }
 
@@ -101,17 +110,21 @@
   border: 1px solid #CC9088;
 }
 
-#shw-pst {
+#show-post {
   background-color: #FFEFEE;
   border: 1px solid #CC9088;
 }
 
+#interests-panel{
+  margin-top: 4px;
+}
+
 /* makes labels show as a plain comma-separated list */
-#rlvnt-intrsts ul {
+#relevantinterests-show-labels ul {
   padding: 0 !important;
   margin: 0;
 }
-#rlvnt-intrsts li {
+#relevantinterests-show-labels li {
   background: none;
   color: black;
   font-size: 12;
@@ -120,11 +133,11 @@
   margin-right: 2px;
   padding: 0;
 }
-#rlvnt-intrsts li:after {
+#relevantinterests-show-labels li:after {
   content: ",";
   margin-left: -3px;
 }
-#rlvnt-intrsts li:last-child:after {
+#relevantinterests-show-labels li:last-child:after {
   content: "";
 }
 

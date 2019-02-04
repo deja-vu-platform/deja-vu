@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "start": "concurrently \"ng serve\" \"electron ./electron.dev.js\"",
+    "start": "concurrently \"ng serve --proxy-config proxy.conf.json\" \"electron ./electron.dev.js\"",
     "prod": "ng build --base-href ./ && electron ./electron.prod.js",
     "serve": "ng serve",
     "test": "ng test -sm=false",

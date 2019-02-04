@@ -7,5 +7,5 @@ import { AppActionDefinition } from '../datatypes';
   styleUrls: ['./action-definition.component.scss']
 })
 export class ActionDefinitionComponent {
-  @Input() openAction: AppActionDefinition;
+  @Input() readonly openAction: AppActionDefinition;
 }

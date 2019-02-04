@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
+import * as minimist from 'minimist';
+
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import * as minimist from 'minimist';
 
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
+import { ActionTable } from './actionHelper';
 import { DvConfig, GatewayConfig } from './gateway.model';
-import { RequestProcessor } from './requestProcessor';
+import {
+  AppRequestProcessor,
+  DesignerRequestProcessor,
+  RequestProcessor
+} from './requestProcessor';
 
 
 const JSON_INDENTATION = 2;
@@ -22,63 +28,107 @@ const DEFAULT_CONFIG: GatewayConfig = {
   reinitDbOnStartup: true
 };
 
-const CONFIG_FLAG = 'configFilePath';
+const DV_CONFIG_FLAG = 'configFilePath';
 const ACTION_TABLE_FP = 'actionTable.json';
-const distFolder = path.join(process.cwd(), 'dist');
 
 
-function getFromArgs<T>(args, flag: string): T {
-  const filePath = args[flag];
-  if (!filePath) {
-    throw new Error(`No ${flag} given!`);
-  }
-  const ret: T = JSON.parse(readFileSync(filePath, 'utf8'));
-  console.log(`Using ${flag} ${stringify(ret)}`);
-
-  return ret;
+export interface AppInfo {
+  dvConfig: DvConfig;
+  appActionTable: ActionTable;
+  distFolder: string;
 }
 
-const argv = minimist(process.argv);
-const dvConfig: DvConfig = getFromArgs<DvConfig>(argv, CONFIG_FLAG);
-const config: GatewayConfig = { ...DEFAULT_CONFIG, ...dvConfig.gateway.config };
-const appActionTable = JSON.parse(
-  readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8'));
-
-const requestProcessor = new RequestProcessor(dvConfig, config, appActionTable);
-
-const app = express();
+export interface GatewayConfigOptions {
+  readonly dbHost?: string;
+  readonly dbPort?: number;
+  readonly wsPort?: number;
+  readonly dbName?: string;
+  readonly reinitDbOnStartup?: boolean;
+}
 
 
-// Handle API requests
-app.use('/api', bodyParser.json(), async (req, res) => {
-  try {
-    await requestProcessor.processRequest(req, res);
-  } catch (e) {
-    console.error(
-      `Something bad happened when processing req` +
-      ` ${JSON.stringify(req.query)}: ${e.stack}`);
-    res.status(INTERNAL_SERVER_ERROR)
-      .send();
-  }
-});
-
-// Serve SPA
-app.use(express.static(path.join(distFolder, 'app')));
-app.get('*', ({}, res) => {
-  res.sendFile(path.join(distFolder, 'app', 'index.html'));
-});
-
-// Listen
-const port = config.wsPort;
-requestProcessor.start()
-  .then(() => {
-    app.listen(port, async () => {
-      console.log(`Running gateway on port ${port}`);
-      console.log(`Using config ${stringify(dvConfig)}`);
-      console.log(`Serving ${distFolder}/app`);
-    });
-  });
-
+/**
+ * JSON.stringify with custom indentation
+ */
 function stringify(json: any) {
   return JSON.stringify(json, undefined, JSON_INDENTATION);
+}
+
+/**
+ * Start the gateway server.
+ */
+export function startGateway(
+  gatewayConfigOptions?: GatewayConfigOptions,
+  info?: AppInfo
+): RequestProcessor {
+  const gatewayConfig: GatewayConfig = Object
+    .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
+  const app = express();
+  const requestProcessor: RequestProcessor = info
+    ? new AppRequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
+    : new DesignerRequestProcessor(gatewayConfig);
+
+  // Handle API requests
+  app.use('/api', bodyParser.json(), async (req, res) => {
+    try {
+      await requestProcessor.processRequest(req, res);
+    } catch (e) {
+      console.error(
+        `Something bad happened when processing req` +
+        ` ${stringify(req.query)}: ${e.stack}`);
+      res.status(INTERNAL_SERVER_ERROR)
+        .send();
+    }
+  });
+
+  // serve the SPA
+  if (info) {
+    app.use(express.static(path.join(info.distFolder, 'app')));
+    app.get('*', ({}, res) => {
+      res.sendFile(path.join(info.distFolder, 'app', 'index.html'));
+    });
+  }
+
+  // Listen
+  const port = gatewayConfig.wsPort;
+  requestProcessor.start()
+    .then(() => {
+      app.listen(port, async () => {
+        console.log(`Running gateway on port ${port}`);
+        if (info) {
+          console.log(`Using config ${stringify(info.dvConfig)}`);
+          console.log(`Serving ${info.distFolder}/app`);
+        }
+      });
+    });
+
+  return requestProcessor;
+}
+
+/**
+ * For execution from the command line
+ */
+function main() {
+  const argv = minimist(process.argv);
+  const dvConfigPath = argv[DV_CONFIG_FLAG];
+
+  const distFolder = path.join(process.cwd(), 'dist');
+
+  let gatewayConfig: GatewayConfigOptions;
+  let dvConfig: DvConfig;
+  let appActionTable: ActionTable;
+  if (dvConfigPath) {
+    dvConfig = JSON.parse(readFileSync(dvConfigPath, 'utf8'));
+    gatewayConfig = Object.assign({}, dvConfig.gateway.config);
+    appActionTable = JSON.parse(
+      readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')
+    );
+  }
+
+  startGateway(gatewayConfig, { dvConfig, appActionTable, distFolder });
+}
+
+// if executed from command line
+if (require.main === module) {
+  main();
 }

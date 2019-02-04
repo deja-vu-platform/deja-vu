@@ -27,33 +27,33 @@
   overflow: scroll;
 }
 
-#all-evnts .row {
+#all-events .row {
   margin: 0;
 }
 
-#all-evnts li {
+#all-events li {
   padding: 0;
   margin: 10 0 10 0;
 }
 
-#evnts-by-hst ul {
+#events-by-host ul {
   padding-left: 0;
   list-style: none;
   margin-left: 0;
   margin-right: 0;
 }
 
-#evnts-by-hst .container {
+#events-by-host .container {
   width: 100%;
   padding: 0;
 }
 
-#shw-pst .row {
+#show-post .row {
   margin-left: 0;
   margin-right: 0;
 }
 
-#evnts-by-attnd .list-group-item {
+#events-by-attendee .list-group-item {
   padding-left: 0;
   padding-right: 0;
 }

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { DvModule, GATEWAY_URL } from 'dv-core';
+import { DvModule, USED_CLICHES_CONFIG, GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
 
@@ -20,9 +20,10 @@ const components = [ AppComponent, @@components ];
     @@modules
   ],
   entryComponents: components,
-  providers: [{
-    provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
-  }],
+  providers: [
+    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
+    { provide: USED_CLICHES_CONFIG, useValue: @@usedClichesConfig }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

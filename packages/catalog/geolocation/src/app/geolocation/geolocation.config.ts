@@ -8,4 +8,3 @@ export interface GeolocationConfig {
 }
 
 export const API_PATH = new InjectionToken<string>('api.path');
-export const CONFIG = new InjectionToken<GeolocationConfig>('config');

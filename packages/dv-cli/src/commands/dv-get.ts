@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { DVCONFIG_FILE_PATH, readFileOrFail } from '../dv';
+import { DVCONFIG_FILE_PATH, readFileOrFail } from '../utils';
 
 
 exports.command = 'get <key>';

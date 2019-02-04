@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import * as _ from 'lodash';
 
+import * as dv from 'dv-core';
+
 import * as allocator from 'allocator';
 import * as authentication from 'authentication';
 import * as authorization from 'authorization';
@@ -47,8 +49,8 @@ function getNgModule(importedModule: Object): any {
 const modules: any[] = Object.values(importedCliches)
   .map(getNgModule);
 
-
 // create Cliche Definitions from imported Cliche Modules
+importedCliches['dv'] = dv;
 const componentSuffix = 'Component';
 
 function clicheDefinitionFromModule(
@@ -63,8 +65,12 @@ function clicheDefinitionFromModule(
         name: _.kebabCase(component.name
           .slice(0, componentSuffix.length * -1)),
         component,
-        inputs: [], // TODO
-        outputs: [] // TODO
+        inputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Input'
+        ))),
+        outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
+          val[0].type.prototype.ngMetadataName === 'Output'
+        )))
       }))
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };
@@ -73,18 +79,15 @@ function clicheDefinitionFromModule(
 export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
 
-
-// built-in components are added manually
-export const designerCliche: ClicheDefinition = {
-  name: 'dv-d',
-  actions: [{
-    name: 'text',
-    component: <Component>TextComponent,
-    inputs: [],
-    outputs: []
-  }]
-};
-
+export const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+export const dvCoreActions = dvCliche.actions
+  .map(({ component: c }) => <any>c);
+dvCliche.actions.push(({
+  name: 'text',
+  component: <Component>TextComponent,
+  inputs: [],
+  outputs: []
+}));
 
 @NgModule({
   imports: [CommonModule].concat(modules),

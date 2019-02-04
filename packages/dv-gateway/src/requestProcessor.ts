@@ -23,11 +23,11 @@ const SUCCESS = 200;
 const INTERNAL_SERVER_ERROR = 500;
 
 
-interface Dict {
+export interface Dict {
   readonly [key: string]: string;
 }
 
-interface RequestOptions {
+export interface RequestOptions {
   readonly params?: Dict;
   readonly headers?: Dict;
 }
@@ -50,7 +50,7 @@ interface ChildRequest {
   query: Params;
 }
 
-interface GatewayRequest {
+export interface GatewayRequest {
   readonly fullActionName: string;
   readonly from: ActionPath;
   readonly reqId: string;
@@ -59,29 +59,29 @@ interface GatewayRequest {
   readonly options?: RequestOptions;
 }
 
-interface GatewayToClicheRequest extends GatewayRequest {
+export interface GatewayToClicheRequest extends GatewayRequest {
   readonly url: string;
   readonly method: string;
   readonly body: string;
 }
 
-interface ClicheResponse<T> {
+export interface ClicheResponse<T> {
   readonly status: number;
   readonly text: T;
   readonly index?: number;
 }
 
-type port = string;
+export type port = number;
 
-// https://stackoverflow.com/questions/985431
-const MAX_BROWSER_CONNECTIONS = 6;
-
+function stringify(json: any) {
+  return JSON.stringify(json, undefined, JSON_INDENTATION);
+}
 
 /**
  * Class for batching transaction responses.
  * Also just sends a regular response for batchSize === 1
  */
-class TxResponse {
+export class TxResponse {
   private responses: ClicheResponse<string>[] = [];
 
   constructor(private res: express.Response, private batchSize: number) { }
@@ -123,11 +123,10 @@ class TxResponse {
 }
 
 
-export class RequestProcessor {
+export abstract class RequestProcessor {
   private readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
-  private readonly actionHelper: ActionHelper;
-  private readonly dstTable: { [cliche: string]: port };
+  protected readonly dstTable: { [cliche: string]: port } = {};
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
     if (node === undefined) {
@@ -167,7 +166,7 @@ export class RequestProcessor {
     if (!response) {
       console.error(
         `Got an undefined response for cliche request
-      ${JSON.stringify(clicheReq)}`);
+      ${stringify(clicheReq)}`);
     }
 
     return {
@@ -211,41 +210,24 @@ export class RequestProcessor {
     return !(_.isEmpty(runId) || runId === 'null' || runId === 'undefined');
   }
 
-  constructor(
-    dvConfig: DvConfig, config: GatewayConfig, appActionTable: ActionTable) {
-    const usedCliches = _
-      .chain(dvConfig.usedCliches)
-      .toPairs()
-      .map(([alias, usedClicheConfig]: [string, DvConfig]): string => _
-          .get(usedClicheConfig, 'name', alias))
-      .value();
-    this.actionHelper = new ActionHelper(
-      appActionTable, usedCliches, dvConfig.routes);
-
-    const usedClicheServers = _
-      .mapValues(
-        dvConfig.usedCliches,
-        (clicheConfig: DvConfig) => clicheConfig.config.wsPort);
-    const thisServer = (dvConfig.config !== undefined) ?
-      { [dvConfig.name]: dvConfig.config.wsPort } : {};
-    this.dstTable = _.assign({}, usedClicheServers, thisServer);
-    console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
-
-    const txConfig = this.getTxConfig(config, this.actionHelper);
-    this.txCoordinator = new TxCoordinator<
-      GatewayToClicheRequest, ClicheResponse<string>, TxResponse>(
-        txConfig);
+  constructor(config: GatewayConfig) {
+    const txConfig = this.getTxConfig(config);
+    this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
+      ClicheResponse<string>, TxResponse>(txConfig);
   }
 
   start(): Promise<void> {
-    return this.txCoordinator
-      .start()
-      .then((_unused) => {
-        console.log(`Using action table ${this.actionHelper}`);
-      });
+    return this.txCoordinator.start();
   }
 
   async processRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
+    return this._processRequest(req, res);
+  }
+
+  protected async _processRequest(
     req: express.Request,
     res: express.Response
   ): Promise<void> {
@@ -262,6 +244,42 @@ export class RequestProcessor {
       .then(() => {});
   }
 
+  protected getActionFromPath(actionPath: ActionPath): ActionTag {
+    const fqtag = actionPath.nodes()[0];
+
+    return {
+      fqtag,
+      tag: fqtag
+    };
+  }
+
+  private validateRequest(
+    actionPath: ActionPath,
+    matchingAction: ActionTag,
+    to: string,
+    toPort: port,
+    txRes: TxResponse
+  ) {
+    if (!matchingAction) {
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid action path: ${actionPath}`
+      );
+
+      return false;
+    }
+    if (toPort === undefined) {
+      txRes.add(
+        INTERNAL_SERVER_ERROR,
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   private async doProcessRequest(
     req: express.Request | ChildRequest,
     txRes: TxResponse,
@@ -276,14 +294,12 @@ export class RequestProcessor {
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
     const { runId, from: actionPath } = gatewayRequest;
-    const matchingActions = this.actionHelper.getMatchingActions(actionPath);
-    const to = RequestProcessor.ClicheOf(matchingActions[0]);
-    // `to` can be `undefined` but the `get` typings are wrong
-    // (`_.get(..., undefined)` -> `undefined)
-    const toPort: port | undefined = _.get(this.dstTable, <string> to);
+    const actionTag = this.getActionFromPath(actionPath);
+    const to = RequestProcessor.ClicheOf(actionTag);
+    const toPort: port | undefined = _.get(this.dstTable, to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!this.validateRequest(actionPath, matchingActions, to, toPort, txRes)) {
+    if (!this.validateRequest(actionPath, actionTag, to, toPort, txRes)) {
         return;
     }
 
@@ -317,36 +333,7 @@ export class RequestProcessor {
     }
   }
 
-  private validateRequest(
-    actionPath: ActionPath,
-    matchingActions: ActionTag[],
-    to: string | undefined,
-    toPort: string | undefined,
-    txRes: TxResponse
-  ): boolean {
-    if (_.isEmpty(matchingActions)) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid action path: ${actionPath}, my actionConfig is `
-          + this.actionHelper.toString()
-      );
-
-      return false;
-    }
-
-    if (toPort === undefined) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  private getTxConfig(config: GatewayConfig, actionHelper: ActionHelper):
+  protected getTxConfig(config: GatewayConfig):
     TxConfig<GatewayToClicheRequest, ClicheResponse<string>, TxResponse> {
     return {
       dbHost: config.dbHost,
@@ -406,55 +393,27 @@ export class RequestProcessor {
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>, txRes?: TxResponse, index?: number) => {
+        payload: ClicheResponse<string>,
+        txRes?: TxResponse,
+        index?: number
+      ) => {
         txRes!.add(payload.status, payload.text, index);
       },
 
       getCohorts: (actionPathId: string): string[] => {
         const actionPath: ActionPath = ActionPath.fromString(actionPathId);
-        assert.ok(
-          actionPath.isDvTx(),
+        assert.ok(actionPath.isDvTx(),
           `Getting cohorts of an action path that is not part of a ` +
           `dv-tx: ${actionPath}`);
         const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+        const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
 
-        const paths: ActionTagPath[] = actionHelper
-          .getMatchingPaths(actionPath);
-        // We know that the action path is a valid one because if otherwise the
-        // tx would have never been initiated in the first place
-        assert.ok(paths.length === 1,
-          `Expected 1 path but got ${stringify(paths)}`);
-        const actionTagPath: ActionTagPath = paths[0];
-        assert.ok(actionTagPath.length === actionPath.length(),
-          'Expected the length of the path to match the action path ' +
-          ` length but got ${stringify(actionTagPath)}`);
-        const dvTxNode = actionTagPath[dvTxNodeIndex];
-
-        const cohortActions = _
-          .reject(dvTxNode.content, (action: ActionTag) => {
-            return action.tag.split('-')[0] === 'dv' ||
-              _.get(action.inputs, '[save]') === 'false' ||
-              !actionHelper.shouldHaveExecRequest(action.tag);
-          });
-
-        const cohorts = _
-          .map(cohortActions, (action: ActionTag) => {
-            const nodes = [
-              ..._.take(actionPath.nodes(), dvTxNodeIndex + 1), action.fqtag
-            ];
-
-            return new ActionPath(nodes)
-              .serialize();
-          });
-
-        if (cohorts.length > MAX_BROWSER_CONNECTIONS) {
-          throw new Error(
-            `The max number of cohorts per tx is ` +
-            `${MAX_BROWSER_CONNECTIONS}. This limit will be removed in the ` +
-            `future.`);
-        }
-
-        return cohorts;
+        return _.map(cohortActions, (action: ActionTag) =>
+          new ActionPath([
+            ..._.take(actionPath.nodes(), dvTxNodeIndex + 1),
+            action.fqtag
+          ]).serialize()
+        );
       },
 
       onError: (
@@ -464,9 +423,107 @@ export class RequestProcessor {
       }
     };
   }
+
+  protected abstract getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[];
+
 }
 
+export class AppRequestProcessor extends RequestProcessor {
+  private readonly actionHelper: ActionHelper;
 
-function stringify(json: any) {
-  return JSON.stringify(json, undefined, JSON_INDENTATION);
+  constructor(
+    config: GatewayConfig,
+    dvConfig?: DvConfig,
+    appActionTable?: ActionTable
+  ) {
+    super(config);
+
+    _.forEach(dvConfig.usedCliches, (clicheConfig, name) => {
+      this.dstTable[name] = clicheConfig.config.wsPort;
+    });
+    if (dvConfig.config) {
+      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
+    }
+    console.log(`Using dst table ${stringify(this.dstTable)}`);
+
+    // names of the cliches used (not the aliases), repeats don't matter
+    const usedCliches: string[] = _.map(
+      dvConfig.usedCliches,
+      (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
+    );
+
+    this.actionHelper = new ActionHelper(
+      usedCliches, appActionTable, dvConfig.routes);
+  }
+
+  protected getActionFromPath(actionPath: ActionPath): ActionTag {
+    return this.actionHelper.getMatchingActions(actionPath)[0];
+  }
+
+  protected getCohortActions(actionPath: ActionPath, dvTxNodeIndex: number) {
+    const paths: ActionTagPath[] = this.actionHelper
+      .getMatchingPaths(actionPath);
+    // We know that the action path is a valid one because if otherwise the
+    // tx would have never been initiated in the first place
+    assert.ok(paths.length === 1,
+      `Expected 1 path but got ${stringify(paths)}`);
+    const actionTagPath: ActionTagPath = paths[0];
+    assert.ok(actionTagPath.length === actionPath.length(),
+      'Expected the length of the path to match the action path ' +
+      ` length but got ${stringify(actionTagPath)}`);
+
+    const dvTxNode = actionTagPath[dvTxNodeIndex];
+
+    return _.reject(dvTxNode.content, (action: ActionTag) =>
+      action.tag.split('-')[0] === 'dv'
+      || _.get(action.inputs, '[save]') === 'false'
+      || !this.actionHelper.shouldHaveExecRequest(action.tag)
+    );
+  }
+
+}
+
+export class DesignerRequestProcessor extends RequestProcessor {
+  private cohortActions: ActionTag[]; // for appless mode only
+
+  constructor(config: GatewayConfig) {
+    super(config);
+  }
+
+  /**
+   * Add a cliche (for appless mode for the designer)
+   */
+  addCliche(name: string, wsPort: port, alias?: string) {
+    this.dstTable[alias || name] = wsPort;
+  }
+
+  async processRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
+    if (req.query.isTx) {
+      const childRequests: ChildRequest[] = req.body;
+      this.cohortActions = childRequests.map((chReq) => {
+        const actionPath = ActionPath.fromString(chReq.query.from);
+        const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+
+        return {
+          fqtag,
+          tag: fqtag,
+          inputs: {}
+        };
+      });
+    }
+    this._processRequest(req, res);
+  }
+
+  protected getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[] {
+    return this.cohortActions;
+  }
 }

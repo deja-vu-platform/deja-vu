@@ -1,8 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { designerCliche } from '../cliche.module';
+import { dvCliche } from '../cliche.module';
 import {
+  AfterClosedData,
   ConfigureClicheComponent,
   DialogData
 } from '../configure-cliche/configure-cliche.component';
@@ -25,17 +26,15 @@ interface ActionCollection {
   templateUrl: './side-menu.component.html',
   styleUrls: ['./side-menu.component.scss']
 })
-export class SideMenuComponent implements OnInit {
-  @Input() app: App;
-  @Input() openAction: AppActionDefinition;
+export class SideMenuComponent {
+  @Input() readonly app: App;
+  @Input() readonly openAction: AppActionDefinition;
+  @Output() readonly clicheAdded = new EventEmitter<ClicheInstance>();
+  @Output() readonly clicheRemoved = new EventEmitter<string>();
   // need consistent object to return
-  private _actionCollections: ActionCollection[];
+  private readonly _actionCollections: ActionCollection[] = [dvCliche];
 
-  constructor(private dialog: MatDialog) {}
-
-  ngOnInit() {
-    this._actionCollections = [designerCliche];
-  }
+  constructor(private readonly dialog: MatDialog) {}
 
   get actionCollections(): ActionCollection[] {
     this._actionCollections.splice(1);
@@ -51,24 +50,40 @@ export class SideMenuComponent implements OnInit {
     return this._actionCollections;
   }
 
-  importCliche() {
-    const data: DialogData = {
-      app: this.app
-    };
-    this.dialog.open(ConfigureClicheComponent, {
-      width: '50vw',
-      data
-    });
-  }
-
-  editCliche(cliche: ClicheInstance) {
+  private openConfigureDialog(
+    then: (data: AfterClosedData) => void,
+    cliche?: ClicheInstance
+  ) {
     const data: DialogData = {
       app: this.app,
       cliche
     };
-    this.dialog.open(ConfigureClicheComponent, {
-      width: '50vw',
-      data
+    this.dialog
+      .open(ConfigureClicheComponent, {
+        width: '50vw',
+        data
+      })
+      .afterClosed()
+      .subscribe(then);
+  }
+
+  importCliche() {
+    this.openConfigureDialog(({ event, cliche }) => {
+      if (event === 'create') {
+        this.clicheAdded.emit(cliche);
+      }
     });
+  }
+
+  editCliche(cliche: ClicheInstance) {
+    const origName = cliche.name;
+    this.openConfigureDialog(({ event, cliche: newCliche }) => {
+      if (event === 'update') {
+        this.clicheRemoved.emit(origName);
+        this.clicheAdded.emit(newCliche);
+      } else if (event === 'delete') {
+        this.clicheRemoved.emit(origName);
+      }
+    }, cliche);
   }
 }

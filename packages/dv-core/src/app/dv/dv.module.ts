@@ -28,6 +28,7 @@ import { StatusComponent } from './status/status.component';
 import { TxComponent } from './tx/tx.component';
 
 import { OfDirective } from './of.directive';
+import { ConfigService } from './config.service';
 
 
 const allComponents = [
@@ -48,7 +49,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
   declarations: [...allComponents, OfDirective],
-  providers: [ GatewayServiceFactory, RunService ],
+  providers: [ GatewayServiceFactory, RunService, ConfigService ],
   exports: [...allComponents, OfDirective]
 })
 export class DvModule { }

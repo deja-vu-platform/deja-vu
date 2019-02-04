@@ -1,8 +1,8 @@
 <dv.action name="show-user-profile-details">
   <userprofile.show-object id=$id hidden=true />
 
-  <div class="reset_password">
-    <div class="panel panel-default messagePanel">
+  <div class="reset-password">
+    <div class="panel panel-default message-panel">
       <div class="panel-heading panel-heading-background">
         <!-- Username -->
         <div id="username-body">
@@ -13,16 +13,15 @@
 
         <!-- Edit Profile -->
         <dv.if condition=$id === $loggedInUserId>
-          <dv.link href="/edit-profile">
-            <button class="btn button" type="button" id="edit-prof-btn">
-              Edit Profile
-            </button>
+          <dv.link href="/edit-profile" class="btn button"
+            id="edit-profile-button">
+            Edit Profile
           </dv.link>
         </dv.if>
       </div>
 
       <div class="panel-body" id="profile-panel">
-        <table class="event_info event_display table">
+        <table class="event-info event-display table">
           <!-- Email -->
           <tr>
             <th>Email</th>
