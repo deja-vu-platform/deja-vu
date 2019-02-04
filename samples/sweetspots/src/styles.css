@@ -176,7 +176,7 @@ dv-link.profile-btn {
   padding-top: 5px;
 }
 
-.profile-btn a {
+.profile-btn a, .login-btn a, .register-btn a {
   color: #FFFFFF;
 }
 

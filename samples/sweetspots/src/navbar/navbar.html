@@ -1,6 +1,6 @@
-<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
-<!-- <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
-  searchResults$=label.search-items-by-labels.searchResultItems> -->
+<!-- <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id> -->
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
+  searchResults$=label.search-items-by-labels.searchResultItems>
 
   <dv.tx as sweetspots-auth-check>
     <authentication.logged-in />
@@ -19,9 +19,9 @@
       </div>
 
       <div class="navbar-form navbar-left search">
-        <dv.if condition=$showSearch>
-          <label.search-items-by-labels />
-        </dv.if>
+        <!-- <dv.if condition=$showSearch> -->
+        <label.search-items-by-labels />
+        <!-- </dv.if> -->
       </div>
 
       <dv.if condition=authentication.logged-in.user>
@@ -48,11 +48,11 @@
       <dv.if condition=!authentication.logged-in.user>
         <div class="navbar-form navbar-right">
           <div class="btn-toolbar toolbar">
-            <dv.link href="/login" class="btn btn-primary">
+            <dv.link href="/login" class="mat-button btn btn-primary login-btn">
               Login
             </dv.link>
             &nbsp;
-            <dv.link href="/register" class="btn btn-info">
+            <dv.link href="/register" class="mat-button btn btn-info register-btn">
               Register
             </dv.link>
           </div>

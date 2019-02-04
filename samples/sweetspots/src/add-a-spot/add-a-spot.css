@@ -4,6 +4,9 @@
 }
 
 #location-pin {
-  cursor:pointer;
+  cursor: pointer;
   cursor: hand;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
