@@ -5,7 +5,7 @@ import {
 } from '@angular/material';
 import * as _ from 'lodash';
 
-import { App, AppActionDefinition } from '../datatypes';
+import { App, AppActionDefinition, IO } from '../datatypes';
 
 interface ControlGroup {
   form: { valid: boolean };
@@ -16,7 +16,7 @@ export interface DialogData {
   action?: AppActionDefinition;
 }
 
-type ioType = 'Input' | 'Output';
+type IOType = 'Input' | 'Output';
 
 @Component({
   selector: 'app-configure-action',
@@ -29,9 +29,8 @@ export class ConfigureActionComponent implements OnInit {
   home: boolean;
   transaction: boolean;
 
-  readonly ioTypes: ioType[] = ['Input', 'Output']; // fixed, not state
-  readonly currentIO = { Input: <string[]>[], Output: <string[]>[] };
-  readonly newIO = { Input: '', Output: '' };
+  readonly ioTypes: IOType[] = ['Input', 'Output']; // fixed, not state
+  readonly currentIO = { Input: <IO[]>[], Output: <IO[]>[] };
 
   constructor(
     private readonly dialogRef: MatDialogRef<ConfigureActionComponent>,
@@ -44,11 +43,10 @@ export class ConfigureActionComponent implements OnInit {
       this.page = this.actionIsPage();
       this.home = this.data.app.homepage === this.data.action;
       this.transaction = this.data.action.transaction;
-      this.data.action.inputs.forEach((input) => {
-        this.currentIO.Input.push(input);
-      });
-      this.data.action.outputs.forEach((output) => {
-        this.currentIO.Output.push(output);
+      this.ioTypes.forEach((ioType) => {
+        this.data.action[`${ioType.toLowerCase()}Settings`].forEach((io) => {
+          this.currentIO[ioType].push(Object.assign({}, io));
+        });
       });
     }
   }
@@ -112,15 +110,17 @@ export class ConfigureActionComponent implements OnInit {
 
     action.transaction = this.transaction;
 
-    this.ioTypes.forEach((io) => {
-      const before: string[] = action[io.toLowerCase() + 's'];
-      const after = this.currentIO[io];
+    this.ioTypes.forEach((ioType) => {
+      const before: IO[] = action[ioType.toLowerCase() + 'Settings'];
+      const after = this.currentIO[ioType];
       // remove all io not in form state from action state
-      _.remove(before, (ioName) => after.indexOf(ioName) === -1);
+      _.remove(before, (beforeIO) =>
+        after.find((afterIO) => afterIO.name === beforeIO.name)
+      );
       // add all io in form state but not action state
-      after.forEach((ioName) => {
-        if (before.indexOf(ioName) === -1) {
-          before.push(ioName);
+      after.forEach((afterIO) => {
+        if (!before.find((beforeIO) => beforeIO.name === afterIO.name)) {
+          before.push(afterIO);
         }
       });
     });
@@ -145,13 +145,12 @@ export class ConfigureActionComponent implements OnInit {
     );
   }
 
-  removeIO(io: ioType, ioName: string) {
-    _.remove(this.currentIO[io], (s) => s === ioName);
+  removeIO(ioType: IOType, index: number) {
+    this.currentIO[ioType].splice(index, 1);
   }
 
-  addIO(io: ioType) {
-    this.currentIO[io].push(this.newIO[io]);
-    this.newIO[io] = '';
+  addIO(ioType: IOType) {
+    this.currentIO[ioType].push({name: '', value: '' });
   }
 
 }

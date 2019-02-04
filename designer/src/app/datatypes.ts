@@ -15,16 +15,30 @@ export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
 }
 
+// tslint:disable-next-line interface-name
+export interface IO {
+  name: string;
+  value: string;
+}
+
 export class AppActionDefinition implements ActionDefinition {
   name: string;
-  readonly inputs: string[] = []; // TODO: input type
-  readonly outputs: string[] = [];
+  readonly inputSettings: IO[] = [];
+  readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
   // TODO: styling options
 
   constructor(name: string) {
     this.name = name;
+  }
+
+  get inputs(): string[] {
+    return this.inputSettings.map((io) => io.name);
+  }
+
+  get outputs(): string[] {
+    return this.outputSettings.map((io) => io.name);
   }
 
   get rows(): Row[] {
