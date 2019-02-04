@@ -41,14 +41,14 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     if (this.actionInstance && this.actionIO) {
-      this.scopeIO.setActionIO(this.actionInstance.fqtag, this.actionIO);
+      this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
     }
   }
 
   ngAfterViewInit() {
     if (this.actionInstance) {
       if (this.actionInstance.of instanceof AppActionDefinition) {
-        this.subscriptions = linkChildren(this.actionInstance.of, this.scopeIO);
+        this.subscriptions = linkChildren(this.actionInstance, this.scopeIO);
       } else {
         // setTimeout is necessary to avoid angular change detection errors
         setTimeout(() => this.loadClicheAction());

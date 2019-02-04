@@ -7,7 +7,7 @@
       <div *ngFor="let action of row.actions">
         <app-action-instance
           [actionInstance]="action"
-          [actionIO]="scopeIO.getActionIO(action.fqtag)"
+          [actionIO]="scopeIO.getActionIO(action)"
         >
         </app-action-instance>
       </div>

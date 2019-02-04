@@ -1,6 +1,7 @@
 import { Component } from '@angular/compiler/src/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
+import * as uuidv4 from 'uuid/v4';
 
 // names should be HTML safe (TODO: ensure this)
 
@@ -136,6 +137,7 @@ export class Row {
 }
 
 export class ActionInstance {
+  readonly id = uuidv4();
   readonly of: ActionDefinition;
   readonly from: App | ClicheInstance | ClicheDefinition;
   readonly inputSettings: { [inputName: string]: string } = {};
@@ -149,6 +151,7 @@ export class ActionInstance {
     this.from = from;
   }
 
+  // needed for action processing
   get fqtag() {
     return `${this.from.name}-${this.of.name}`;
   }

@@ -1,6 +1,10 @@
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { AppActionDefinition } from './datatypes';
+import {
+  ActionDefinition,
+  ActionInstance,
+  AppActionDefinition
+} from './datatypes';
 
 export class ActionIO {
   private readonly rep: { [ioName: string]: BehaviorSubject<any> } = {};
@@ -16,26 +20,24 @@ export class ActionIO {
 }
 
 export class ScopeIO {
-  private readonly rep: { [fqtag: string]: ActionIO } = {};
+  private readonly rep: { [actionID: string]: ActionIO } = {};
 
-  getSubject(fqtag: string, ioName: string): BehaviorSubject<any> {
-    if (!this.rep[fqtag]) {
-      this.rep[fqtag] = new ActionIO;
-    }
-
-    return this.rep[fqtag].getSubject(ioName);
+  setActionIO(action: ActionInstance, actionIO: ActionIO): void {
+    this.rep[action.id] = actionIO;
   }
 
-  getActionIO(fqtag: string): ActionIO {
-    if (!this.rep[fqtag]) {
-      this.rep[fqtag] = new ActionIO;
+  getActionIO(action: ActionInstance): ActionIO {
+    if (!this.rep[action.id]) {
+      this.setActionIO(action, new ActionIO());
     }
 
-    return this.rep[fqtag];
+    return this.rep[action.id];
   }
 
-  setActionIO(fqtag: string, actionIO: ActionIO): void {
-    this.rep[fqtag] = actionIO;
+  getSubject(action: ActionInstance, ioName: string): BehaviorSubject<any> {
+    const actionIO = this.getActionIO(action);
+
+    return actionIO.getSubject(ioName);
   }
 }
 
@@ -46,21 +48,43 @@ export class ScopeIO {
  * IMPORTANT: call in ngAfterViewInit
  */
 export function linkChildren(
-  parent: AppActionDefinition,
+  parentInstance: ActionInstance,
   scopeIO: ScopeIO
 ): Subscription[] {
+  let parentDefinition: AppActionDefinition;
+  if (parentInstance.of instanceof AppActionDefinition) {
+    parentDefinition = parentInstance.of;
+  } else {
+    throw new TypeError(
+      `Action Instance ${parentInstance.fqtag} is not of App Action`);
+  }
+
   const subscriptions: Subscription[] = [];
-  parent.children.forEach((child) => {
+  parentDefinition.children.forEach((child) => {
+    // todo: parent outputs
+
     child.of.inputs.forEach((input) => {
-      const toSubject = scopeIO.getSubject(child.fqtag, input);
+      const toSubject = scopeIO.getSubject(child, input);
       const inputStr = child.inputSettings[input];
 
       if (inputStr) {
         // if they specified an output (e.g. dv.gen-id.id) then subscribe
-        const [clicheN, actionN, outputN, ...objectPath] = inputStr.split('.');
-        const fromAction = parent.findChild(clicheN, actionN);
-        if (fromAction && fromAction.of.outputs.indexOf(outputN) >= 0) {
-          const sub = scopeIO.getSubject(fromAction.fqtag, outputN)
+        const [clicheN, actionN, ioN, ...objectPath] = inputStr.split('.');
+
+        let fromAction = parentDefinition.findChild(clicheN, actionN);
+        let fromSubjectList: 'inputs' | 'outputs';
+        if (fromAction) {
+          fromSubjectList = 'outputs';
+        } else if (
+          parentInstance.from.name === clicheN
+          && parentInstance.of.name === actionN
+        ) {
+          fromAction = parentInstance;
+          fromSubjectList = 'inputs';
+        }
+
+        if (fromAction && fromAction.of[fromSubjectList].indexOf(ioN) >= 0) {
+          const sub = scopeIO.getSubject(fromAction, ioN)
             .subscribe((val) => {
               toSubject.next(_.get(val, objectPath, val));
             });
@@ -68,8 +92,6 @@ export function linkChildren(
         } else {
           toSubject.next(inputStr); // just pass the string as-is
         }
-
-        // TODO: getting parent input
 
         // TODO: full expression support
 

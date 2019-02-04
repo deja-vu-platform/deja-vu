@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ActionInstance, AppActionDefinition, Row } from '../datatypes';
+import { ActionInstance, App, AppActionDefinition, Row } from '../datatypes';
 import { linkChildren, ScopeIO } from '../io';
 
 const emptyRow = new Row();
@@ -10,35 +10,39 @@ const emptyRow = new Row();
   templateUrl: './action-definition.component.html',
   styleUrls: ['./action-definition.component.scss']
 })
-export class ActionDefinitionComponent implements AfterViewInit, OnDestroy {
-  @Input() readonly openAction: AppActionDefinition;
+export class ActionDefinitionComponent {
+  @Input() app: App;
+  actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
   private readonly _rows: Row[] = [];
+
+  @Input()
+  set openAction(action: AppActionDefinition) {
+    this.actionInstance = new ActionInstance(action, this.app);
+    this.resetIO();
+  }
 
   get rows() {
     this._rows.length = 0;
     this._rows.push.apply(
       this._rows,
-      this.openAction.rows
+      (<AppActionDefinition>this.actionInstance.of).rows
     );
     this._rows.push(emptyRow);
 
     return this._rows;
   }
 
-  ngAfterViewInit() {
-    if (this.openAction) {
-      this.subscriptions = linkChildren(this.openAction, this.scopeIO);
-    }
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach((s) => s.unsubscribe());
-  }
-
   onMenuClosed(_action: ActionInstance) {
+    this.resetIO();
+  }
+
+  private resetIO() {
     this.subscriptions.forEach((s) => s.unsubscribe());
-    this.subscriptions = linkChildren(this.openAction, this.scopeIO);
+    this.subscriptions = linkChildren(
+      this.actionInstance,
+      this.scopeIO
+    );
   }
 }

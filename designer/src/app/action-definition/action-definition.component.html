@@ -1,5 +1,5 @@
 <div id="main-view">
-  <div id="page" *ngIf="openAction">
+  <div id="page" *ngIf="actionInstance">
     <div
       *ngFor="let row of rows; let rowNum = index"
       class="dvd-row"
@@ -15,7 +15,7 @@
         <div *ngIf="action.of.inputs.length === 0">
           <app-action-instance
             [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action.fqtag)"
+            [actionIO]="scopeIO.getActionIO(action)"
           >
           </app-action-instance>
         </div>
@@ -26,7 +26,7 @@
         >
           <app-action-instance
             [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action.fqtag)"
+            [actionIO]="scopeIO.getActionIO(action)"
           >
           </app-action-instance>
           <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
