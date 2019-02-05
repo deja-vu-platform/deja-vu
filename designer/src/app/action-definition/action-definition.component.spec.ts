@@ -5,7 +5,6 @@ import { MatInputModule, MatMenuModule } from '@angular/material';
 import {
   ActionInstanceComponent
 } from '../action-instance/action-instance.component';
-import { RowComponent } from '../row/row.component';
 import { ActionDefinitionComponent } from './action-definition.component';
 
 describe('ActionDefinitionComponent', () => {
@@ -16,7 +15,6 @@ describe('ActionDefinitionComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         ActionDefinitionComponent,
-        RowComponent,
         ActionInstanceComponent
       ],
       imports: [

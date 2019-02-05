@@ -24,6 +24,9 @@ body {
 .mat-button.mat-small {
   min-width: 1%;
 }
+.mat-button.mat-small-y {
+  line-height: 100%;
+}
 
 /* prevent interaction with dynamically-rendered components */
 .action-instance * {
