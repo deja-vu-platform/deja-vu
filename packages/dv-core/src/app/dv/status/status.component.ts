@@ -12,6 +12,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class StatusComponent
 implements OnInit, OnExecSuccess, OnExecFailure {
   @Input() savedText = 'Saved';
+  @Input() errorText: string; // Note: Only use if confident about the error
   saved = false;
   error: string = '';
 
@@ -30,6 +31,6 @@ implements OnInit, OnExecSuccess, OnExecFailure {
   }
 
   dvOnExecFailure(reason: Error) {
-    this.error = reason.message;
+    this.error = this.errorText ? this.errorText : reason.message;
   }
 }
