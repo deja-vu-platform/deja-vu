@@ -203,17 +203,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   onMapClick(e) {
-    let coords, title;
 
     if (this.mapType === 'leaflet') {
       const event: L.LeafletMouseEvent = e;
-      coords = event.latlng;
+      const coords = event.latlng;
 
       // Retrieve address from clicked location
       this._geocoder.reverse(coords,
         this._map.options.crs.scale(this._map.getZoom()), (results) => {
           const r = results[0];
-          title = r.html || r.name;
+          const title = r.html || r.name;
+
+          this.newMarker.emit(
+            this.generateMarker(coords.lat, coords.lng, r.name));
+
           if (this._geocodeMarker) {
             this._map.removeLayer(this._geocodeMarker);
           }
@@ -222,20 +225,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
             .addTo(this._map)
             .openPopup();
         });
-
     } else {
       const event: AgmMouseEvent = e;
-      coords = event.coords;
+      const coords = event.coords;
+      this.newMarker.emit(this.generateMarker(coords.lat, coords.lng));
     }
+  }
 
-    const m: Marker = {
+  private generateMarker(lat: number, lng: number, title?: string): Marker {
+    return {
       title: title,
-      latitude: coords.lat,
-      longitude: coords.lng,
+      latitude: lat,
+      longitude: lng,
       mapId: this.id
     };
-
-    this.newMarker.emit(m);
   }
 
   async dvOnEval(): Promise<void> {
