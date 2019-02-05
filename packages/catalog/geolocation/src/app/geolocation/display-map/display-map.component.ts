@@ -69,7 +69,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   @Input() lat = 42.36157;
   @Input() lng = -71.09067;
   @Input() zoom = 16;
-  @Input() maxZoom = 20;
+  @Input() maxZoom = 19;
   @Input() minZoom = 3;
 
   // Default Tile Provider for Leaflet: OpenStreetMaps

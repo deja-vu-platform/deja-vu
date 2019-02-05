@@ -1,6 +1,6 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="createCommentForm"
  class="form-horizontal">
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newCommentSaved" class="create-comment-success">
       <i class="material-icons">done</i>
       {{newCommentSavedText}}

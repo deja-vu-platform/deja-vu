@@ -6,7 +6,7 @@
         showId=false
         showLatLong=false
         showMapId=false /> |
-      <dv.link href="/spot-details" params={ id: $id } class="inline-block">
+      <dv.link class="inline-block" href="/spot-details" params={ id: $id }>
         Details
       </dv.link>
     </div>
@@ -14,8 +14,8 @@
     <div class="panel-body">
       <span>Category: <label.show-labels itemId=$id /></span>
       <br />
-      <span><rating.show-average-rating targetId=$id showStars=false
-        showNumRatings=false/>/ 5</span>
+      <!-- <span><rating.show-average-rating targetId=$id showStars=false
+        showNumRatings=false/>/ 5</span> -->
     </div>
   </div>
 </dv.action>

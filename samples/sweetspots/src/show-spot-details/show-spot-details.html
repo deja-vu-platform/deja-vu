@@ -4,6 +4,7 @@
 
   <authorization.show-owner resourceId=$id hidden=true />
   <geolocation.show-marker id=$id hidden=true />
+  <dv.redirect href="/main" onEvalFailure=true />
 
   <div class="container">
     <div class="row">
@@ -12,10 +13,10 @@
         <h1><geolocation.show-marker marker=geolocation.show-marker.loadedMarker
           showId=false showLatLong=false showMapId=false /></h1>
         <div style="height:400px;width:400px;">
-          <!-- <geolocation.display-map id="mainMapId"
+          <geolocation.display-map id="mainMapId"
             markers=[geolocation.show-marker.loadedMarker]
             showSearchControl=false
-            showDirectionsControl=false/> -->
+            showDirectionsControl=false/>
         </div>
 
         <!-- Delete Spot -->
@@ -23,13 +24,15 @@
         <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId>
           <dv.tx as sweetspots-delete-spot>
             <geolocation.delete-marker id=$id hidden=true />
+            <!-- TODO: negative numbers -->
             <!-- <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
               targetId=sweetspots.navbar.loggedInUserId
               value=-1 hidden=true /> -->
             <authorization.delete-resource id=$id hidden=true />
             <authentication.authenticate id=sweetspots.navbar.loggedInUserId
               hidden=true />
-            <comment.delete-comment class="btn-danger delete-spot" id=$id
+              <!-- TODO: comment.delete-target -->
+            <comment.delete-comment class="btn btn-danger delete-spot" id=$id
               authorId=sweetspots.navbar.loggedInUserId />
             <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
 
@@ -41,8 +44,8 @@
           </dv.tx>
         </dv.if>
 
-        <h5>Average Rating: <rating.show-average-rating targetId=$id showStars=false
-          showNumRatings=false/> out of 5</h5>
+        <!-- <h5>Average Rating: <rating.show-average-rating targetId=$id showStars=false
+          showNumRatings=false/> out of 5</h5> -->
 
         <div class="btn-toolbar toolbar">
           <!-- Favorite/ Unfavorite Spot -->
@@ -54,7 +57,7 @@
               followerId=sweetspots.navbar.loggedInUserId
               followButtonLabel="Favorite"
               unfollowButtonLabel="Unfavorite"
-              hidden=sweetspots.navbar.loggedInUserId />
+              hidden=!sweetspots.navbar.loggedInUserId />
           </dv.tx>
 
           <!-- TODO: Report Spot -->
@@ -78,27 +81,31 @@
       <div class="col-md-6">
         <h2>Reviews</h2>
         <hr />
-        <rating.show-ratings-by-target targetId=$id
+        <!-- <rating.show-ratings-by-target targetId=$id
           noRatingsToShowText="No reviews for this spot. Write one today!"
           showRating=<sweetspots.show-spot-details-review
             rating=$rating
-            loggedInUserId=sweetspots.navbar.loggedInUserId /> />
+            loggedInUserId=sweetspots.navbar.loggedInUserId /> /> -->
           <!-- spotOwnerId=authorization.show-owner.ownerId -->
 
         <div>
           <!-- TODO: Should only be able to write one review per spot -->
           <h4>Write a review:</h4>
           <dv.tx as sweetspots-write-review>
-            <dv.status>Review created!</dv.status>
+            <dv.status savedText="Review created!"
+              errorText="You already created a review for this spot!"/>
             <authentication.authenticate id=sweetspots.navbar.loggedInUserId
               hidden=true />
             <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
               targetId=authorization.show-owner.ownerId
               value=1
               hidden=true/>
-            <rating.rate-target sourceId=$loggedInUserId targetId=$id />
-            <comment.create-comment authorId=$loggedInUserId targetId=$id
-              inputLabel="" hidden=true />
+              <!-- TODO -->
+            <!-- <rating.rate-target sourceId=sweetspots.navbar.loggedInUserId
+              targetId=$id execOnClick=false /> -->
+            <comment.create-comment authorId=sweetspots.navbar.loggedInUserId
+              targetId=$id inputLabel=""
+              showOptionToSubmit=false />
             <dv.button class="btn btn-primary">Submit Review</dv.button>
             <dv.callback defaultHref="/spot-details" params={ id: $id }
               onExecSuccess=true hidden=true />
@@ -108,5 +115,4 @@
       </div>
     </div>
   </div>
-
 </dv.action>

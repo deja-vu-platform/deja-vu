@@ -4,9 +4,9 @@
   <dv.link href="/">&lt; Back to home</dv.link>
   <br />
   <br />
-  <dv.tx>
+  <dv.tx as sweetspots-create-spot>
     <dv.id />
-    <dv.status>New spot saved</dv.status>
+    <dv.status savedText="New spot saved"/>
     <geolocation.create-marker id=dv.id.id
       title=$marker?.title
       latitude=$marker?.latitude
@@ -14,13 +14,15 @@
       mapId="mainMapId"
       titleLabel="Name"
       showOptionToSubmit=false />
-    <!-- <label.attach-labels itemId=dv.id.id
+    <label.attach-labels itemId=dv.id.id
       inputLabel="Category"
       showOptionToSubmit=false />
     <property.create-object id=dv.id.id
       showOptionToSubmit=false />
     <p>Review</p>
-    <rating.rate-target sourceId=$loggedInUserId targetId=dv.id.id />
+    <!-- TODO: Fix once image can be loaded -->
+    <!-- <rating.rate-target sourceId=$loggedInUserId targetId=dv.id.id
+      execOnClick=false /> -->
     <comment.create-comment authorId=$loggedInUserId targetId=dv.id.id
       inputLabel=""
       showOptionToSubmit=false />
@@ -28,9 +30,10 @@
       targetId=$loggedInUserId
       value=1
       hidden=true />
-    <follow.create-publisher id=dv.id.id showOptionToSubmit=false />
+    <follow.create-publisher id=dv.id.id
+      showOptionToSubmit=false hidden=true />
     <authorization.create-resource id=dv.id.id
-      ownerId=$loggedInUserId hidden=true /> -->
+      ownerId=$loggedInUserId hidden=true />
     <authentication.authenticate id=$loggedInUserId hidden=true />
     <dv.button class="btn btn-primary">Submit spot</dv.button>
     <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />

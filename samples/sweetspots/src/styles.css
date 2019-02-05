@@ -1,3 +1,4 @@
+@import "~css-star-rating/dist/css/star-rating.min.css";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "~leaflet/dist/leaflet.css";
@@ -52,7 +53,9 @@ md-icon {
   color: #FFFFFF !important;
 }
 
-.btn-danger, authentication-sign-out button.mat-button {
+.btn-danger,
+authentication-sign-out button.mat-button,
+comment-delete-comment button.mat-button {
   background-color: #A52C4B !important;
   border-color: #A52C4B !important;
   color: #FFFFFF !important;
