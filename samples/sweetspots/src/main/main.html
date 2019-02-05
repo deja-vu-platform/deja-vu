@@ -9,7 +9,9 @@
       </dv.if>
 
       <dv.if condition=geolocation.display-map.newMarker>
-        <sweetspots.add-a-spot-form loggedInUserId=sweetspots.navbar.loggedInUserId/>
+        <sweetspots.add-a-spot-form
+          loggedInUserId=sweetspots.navbar.loggedInUserId
+          marker=geolocation.display-map.newMarker/>
       </dv.if>
     </dv.if>
 
