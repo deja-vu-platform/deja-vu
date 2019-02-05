@@ -1,11 +1,48 @@
 <div id="main-view">
-  <div id="page" *ngIf="openAction">
-    <app-row
-      *ngFor="let row of openAction.rows; let i = index"
-      [openAction]="openAction"
-      [row]="row"
-      [rowNum]="i"
-    ></app-row>
-    <app-row></app-row>
+  <div id="page" *ngIf="actionInstance">
+    <div
+      *ngFor="let row of rows; let rowNum = index"
+      class="dvd-row"
+      dragula="action"
+      [attr.data-index]="rowNum"
+    >
+      <div
+        *ngFor="let action of row.actions; let actionNum = index"
+        class="action"
+        [attr.data-index]="actionNum"
+      >
+        <!-- unfortunately we can't apply inputs conditionally -->
+        <div *ngIf="action.of.inputs.length === 0">
+          <app-action-instance
+            [actionInstance]="action"
+            [actionIO]="scopeIO.getActionIO(action)"
+          >
+          </app-action-instance>
+        </div>
+        <div
+          *ngIf="action.of.inputs.length > 0"
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="menu"
+        >
+          <app-action-instance
+            [actionInstance]="action"
+            [actionIO]="scopeIO.getActionIO(action)"
+          >
+          </app-action-instance>
+          <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
+            <div class="popup-menu" (click)="$event.stopPropagation()">
+              <mat-form-field *ngFor="let input of action.of.inputs">
+                <input
+                  matInput
+                  class="input-value"
+                  [placeholder]="input"
+                  [name]="input"
+                  [(ngModel)]="action.inputSettings[input]">
+              </mat-form-field>
+            </div>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

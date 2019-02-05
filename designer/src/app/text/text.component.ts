@@ -32,7 +32,7 @@ export const modules = {
   styleUrls: ['./text.component.scss']
 })
 export class TextComponent {
-  @Input() actionInstance: ActionInstance;
+  @Input() readonly actionInstance: ActionInstance;
   readonly modules = modules;
 
   onContentChanged({ html }) {
