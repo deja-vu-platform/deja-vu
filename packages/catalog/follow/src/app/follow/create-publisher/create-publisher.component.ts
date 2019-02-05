@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecFailure, OnExecSuccess,
-  OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';

@@ -19,6 +19,7 @@ import {
   PublisherDoc,
   PublishersInput
 } from './schema';
+
 import { v4 as uuid } from 'uuid';
 
 const actionRequestTable: ActionRequestTable = {
@@ -89,7 +90,7 @@ const actionRequestTable: ActionRequestTable = {
       publishers(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: PublisherDoc | null) {
   return _.get(doc, 'pending.type') === 'create-publisher';
