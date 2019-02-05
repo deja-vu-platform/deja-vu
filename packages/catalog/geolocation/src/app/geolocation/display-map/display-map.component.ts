@@ -16,6 +16,8 @@ declare let L;
 import { API_PATH, GeolocationConfig } from '../geolocation.config';
 import { Location, Marker } from '../shared/geolocation.model';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'geolocation-display-map',
@@ -127,7 +129,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   setLeafletMarkers() {
-    if (this.markers) {
+    if (!_.isEmpty(this.markers)) {
       this.layers = this.markers.map((m: Marker) => {
         const popupText = m.title ? m.title : `${m.latitude}, ${m.longitude}`;
 
@@ -136,6 +138,9 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
         })
           .bindPopup(`<b>${popupText}</b>`);
       });
+
+      this.bounds = (L.featureGroup(this.layers)).getBounds()
+        .pad(0.5);
     }
   }
 
