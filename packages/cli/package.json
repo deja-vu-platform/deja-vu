@@ -1,5 +1,5 @@
 {
-  "name": "dv-cli",
+  "name": "@dejavu-lang/cli",
   "version": "0.0.1",
   "description": "CLI tool for Déjà Vu",
   "bin": {
@@ -26,12 +26,12 @@
     "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
     "copyfiles": "^1.2.0",
-    "language": "0.0.1",
+    "@dejavu-lang/compiler": "0.0.1",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
   },
   "peerDependencies": {
-    "language": "0.0.1"
+    "@dejavu-lang/compiler": "0.0.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
