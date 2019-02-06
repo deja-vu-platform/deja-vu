@@ -5,7 +5,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';

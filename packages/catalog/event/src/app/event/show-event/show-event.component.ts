@@ -7,7 +7,7 @@ import {
   GatewayServiceFactory,
   OnEval,
   RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 import { Event, fromUnixTime } from '../../../../shared/data';
 
 

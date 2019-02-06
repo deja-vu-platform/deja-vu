@@ -1,11 +1,12 @@
 {
-  "name": "task",
+  "name": "@dejavu-lang/task",
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-task",
     "prepare": "npm run package",
     "package": "dv package",
+    "clean": "rm -rf dist pkg pkg.tgz",
     "test": "ng test",
     "lint": "tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
@@ -34,10 +35,10 @@
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
     "bootstrap": "^4.0.0",
-    "cliche-server": "0.0.1",
     "core-js": "^2.4.1",
-    "dv-core": "0.0.1",
-    "dv-gateway": "0.0.1",
+    "@dejavu-lang/cliche-server": "0.0.1",
+    "@dejavu-lang/core": "0.0.1",
+    "@dejavu-lang/gateway": "0.0.1",
     "lodash": "^4.17.5",
     "rxjs": "5.5.6",
     "zone.js": "^0.8.19"
@@ -65,13 +66,13 @@
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
-    "cliche-server": "0.0.1",
+    "@dejavu-lang/cliche-server": "0.0.1",
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
-    "dv-cli": "0.0.1",
-    "dv-core": "0.0.1",
-    "dv-gateway": "0.0.1",
+    "@dejavu-lang/cli": "0.0.1",
+    "@dejavu-lang/core": "0.0.1",
+    "@dejavu-lang/gateway": "0.0.1",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~2.0.0",
@@ -97,6 +98,6 @@
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
-  "types": "pkg/task.d.ts",
-  "main": "pkg/bundles/task.umd.js"
+  "types": "pkg/dejavu-lang-task.d.ts",
+  "main": "pkg/bundles/dejavu-lang-task.umd.js"
 }

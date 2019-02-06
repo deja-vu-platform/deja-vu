@@ -1,5 +1,5 @@
 {
-  "name": "dv-gateway",
+  "name": "@dejavu-lang/gateway",
   "version": "0.0.1",
   "description": "Gateway server for Déjà Vu",
   "scripts": {

@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { filter, take } from 'rxjs/operators';
 

@@ -136,7 +136,7 @@ export function updateJsonFile<T>(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node ' + path.join(locatePackage('dv-gateway')) +
+  return 'node ' + path.join(locatePackage('@dejavu-lang/gateway')) +
     ` --configFilePath ${configFilePath}`;
 }
 
@@ -188,16 +188,16 @@ export function concurrentlyCmd(...cmds: string[]): string {
 
 const PKGS_FOLDER = 'packages';
 const GATEWAY_PORT = 3000;
-const GATEWAY_FOLDER = path.join(PKGS_FOLDER, 'dv-gateway');
+const GATEWAY_FOLDER = path.join(PKGS_FOLDER, '@dejavu-lang/gateway');
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
 
-const CORE_FOLDER = path.join(PKGS_FOLDER, 'dv-core');
+const CORE_FOLDER = path.join(PKGS_FOLDER, '@dejavu-lang/core');
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it
 // is what serves the SPA
 export function installAndConfigureGateway(name: string, pathToDv: string) {
-  console.log('Install gateway and dv-core');
+  console.log('Install gateway and core');
   npm([
     'install', path.join('..', pathToDv, GATEWAY_FOLDER),
     path.join('..', pathToDv, CORE_FOLDER, NG_PACKAGR.configFileContents.dest),

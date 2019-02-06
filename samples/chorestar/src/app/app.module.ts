@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { DvModule, GATEWAY_URL } from 'dv-core';
+import { DvModule, GATEWAY_URL } from '@dejavu-lang/core';
 
 
 import { AppComponent } from './app.component';

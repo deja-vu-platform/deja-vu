@@ -21,7 +21,7 @@ import {
 
 import { StarRatingModule } from 'angular-star-rating';
 
-import { DvModule } from 'dv-core';
+import { DvModule } from '@dejavu-lang/core';
 
 import { API_PATH } from './rating.config';
 

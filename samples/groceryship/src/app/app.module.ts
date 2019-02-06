@@ -11,7 +11,7 @@ import {
 } from '@angular/material';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RouterModule } from '@angular/router';
-import { DvModule, GATEWAY_URL } from 'dv-core';
+import { DvModule, GATEWAY_URL } from '@dejavu-lang/core';
 
 import { AppComponent } from './app.component';
 import {

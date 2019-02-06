@@ -5,7 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, OnExecFailure,
   RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 import { take } from 'rxjs/operators';
 
 import { API_PATH } from '../rating.config';

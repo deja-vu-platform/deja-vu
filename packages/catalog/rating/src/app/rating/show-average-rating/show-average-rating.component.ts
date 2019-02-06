@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';

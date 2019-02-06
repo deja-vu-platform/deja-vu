@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import * as _ from 'lodash';
 
-import * as dv from 'dv-core';
+import * as dv from '@dejavu-lang/core';
 
 import * as allocator from 'allocator';
 import * as authentication from 'authentication';

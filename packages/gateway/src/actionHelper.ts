@@ -36,7 +36,7 @@ export interface ActionTable {
   readonly [tag: string]: ActionAst;
 }
 
-// From dv-core
+// From @dejavu-lang/core
 export interface FieldMap {
   [field: string]: string;
 }
@@ -53,7 +53,7 @@ export interface ActionInput {
 
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 const CONFIG_FILE_NAME = 'dvconfig.json';
-const DV_CORE_CLICHE = 'dv-core';
+const DV_CORE_CLICHE = '@dejavu-lang/core';
 const INDENT_NUM_SPACES = 2;
 
 

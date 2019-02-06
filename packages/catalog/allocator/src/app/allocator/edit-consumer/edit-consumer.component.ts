@@ -14,7 +14,7 @@ import {
   OnExecFailure,
   OnExecSuccess,
   RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';

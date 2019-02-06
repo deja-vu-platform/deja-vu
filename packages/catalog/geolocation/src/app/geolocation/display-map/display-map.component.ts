@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   ConfigService, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { MouseEvent as AgmMouseEvent } from '@agm/core';
 

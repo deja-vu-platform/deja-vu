@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 const yargs = require('yargs'); // tslint:disable-line no-var-requires
 
-import { AppCompiler } from 'language';
+import { AppCompiler } from '@dejavu-lang/compiler';
 
 import {
   ACTION_TABLE_FILE_NAME,

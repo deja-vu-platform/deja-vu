@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL } from '@dejavu-lang/core';
 import { AppComponent } from './app.component';
 import { PasskeyModule } from './passkey/passkey.module';
 

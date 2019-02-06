@@ -6,7 +6,7 @@ import {
   Config,
   Context,
   getReturnFields
-} from 'cliche-server';
+} from '@dejavu-lang/cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import { ObjectDoc } from './schema';

@@ -10,7 +10,7 @@ import {
 import {
   Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
 

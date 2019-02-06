@@ -7,7 +7,7 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { DvModule } from 'dv-core';
+import { DvModule } from '@dejavu-lang/core';
 
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { AgmCoreModule } from '@agm/core';

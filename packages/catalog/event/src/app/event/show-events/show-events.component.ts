@@ -5,7 +5,7 @@ import {
 
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { Event, GraphQlEvent, toEvent } from '../../../../shared/data';
 import { ShowEventComponent } from '../show-event/show-event.component';

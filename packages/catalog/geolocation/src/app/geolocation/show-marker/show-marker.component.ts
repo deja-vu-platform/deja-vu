@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { API_PATH } from '../geolocation.config';
 import { Location, Marker } from '../shared/geolocation.model';

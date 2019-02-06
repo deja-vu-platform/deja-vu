@@ -5,7 +5,7 @@ import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective, Validators
 } from '@angular/forms';
 
-import { OnExec, OnExecSuccess, RunService } from 'dv-core';
+import { OnExec, OnExecSuccess, RunService } from '@dejavu-lang/core';
 
 import { ItemCount } from '../shared/transfer.model';
 

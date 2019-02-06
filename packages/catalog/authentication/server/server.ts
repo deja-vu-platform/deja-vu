@@ -8,7 +8,7 @@ import {
   Context,
   getReturnFields,
   Validation
-} from 'cliche-server';
+} from '@dejavu-lang/cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';

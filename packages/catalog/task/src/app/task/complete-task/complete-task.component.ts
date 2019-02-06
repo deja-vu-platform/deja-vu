@@ -5,7 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 
 @Component({

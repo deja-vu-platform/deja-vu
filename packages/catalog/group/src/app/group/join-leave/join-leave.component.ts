@@ -2,7 +2,7 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import * as _ from 'lodash';
 

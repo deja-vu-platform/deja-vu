@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 
 import {
   Action, GatewayService, GatewayServiceFactory, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { properties, Property } from '../shared/property.model';
 

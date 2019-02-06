@@ -1,7 +1,7 @@
 {
-  "name": "language",
+  "name": "@dejavu-lang/compiler",
   "version": "0.0.1",
-  "description": "Déjà Vu language",
+  "description": "Déjà Vu compiler",
   "scripts": {
     "test": "jasmine-ts",
     "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",

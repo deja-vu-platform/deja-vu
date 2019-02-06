@@ -5,7 +5,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { AuthenticationService } from '../shared/authentication.service';
 

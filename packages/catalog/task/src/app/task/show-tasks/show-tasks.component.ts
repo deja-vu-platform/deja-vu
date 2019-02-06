@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 

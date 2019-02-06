@@ -3,7 +3,7 @@ import {
   EventEmitter, Input, OnInit, Output
 } from '@angular/core';
 
-import { RunService } from 'dv-core';
+import { RunService } from '@dejavu-lang/core';
 
 import { PasskeyService } from '../shared/passkey.service';
 

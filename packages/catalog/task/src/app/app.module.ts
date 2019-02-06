@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { TaskModule } from './task/task.module';
 
-import { GATEWAY_URL, DvModule } from 'dv-core';
+import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
 
 import { AppComponent } from './app.component';
 

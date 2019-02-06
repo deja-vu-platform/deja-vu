@@ -10,7 +10,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
-} from 'dv-core';
+} from '@dejavu-lang/core';
 
 import {
   ShowLabelComponent

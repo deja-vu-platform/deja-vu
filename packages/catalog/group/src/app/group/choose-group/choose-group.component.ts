@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
-import { Action } from 'dv-core';
+import { Action } from '@dejavu-lang/core';
 
 import { Group } from '../shared/group.model';
 import { ShowGroupComponent } from '../show-group/show-group.component';

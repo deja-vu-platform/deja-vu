@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { GATEWAY_URL, DvModule } from 'dv-core';
+import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
 import { AppComponent } from './app.component';
 import { CommentModule } from './comment/comment.module';
 
