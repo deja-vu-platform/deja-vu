@@ -58,7 +58,8 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   loadClicheAction() {
     // create component and add to DOM
-    const { component } = <ClicheActionDefinition>this.actionInstance.of;
+    const actionDefinition = <ClicheActionDefinition>this.actionInstance.of;
+    const { component } = actionDefinition;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
     const viewContainerRef = this.actionHost.viewContainerRef;
@@ -66,7 +67,7 @@ implements OnInit, AfterViewInit, OnDestroy {
     const componentRef = viewContainerRef.createComponent(componentFactory);
 
     // subscribe to outputs, storing last outputted value
-    this.actionInstance.of.outputs.forEach((output) => {
+    actionDefinition.outputs.forEach((output) => {
       this.subscriptions.push(
         (<EventEmitter<any>>componentRef.instance[output]).subscribe((val) => {
           this.actionIO.getSubject(output)
@@ -75,8 +76,19 @@ implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
+    // detect component inputs
+    // we only need to do this once per action definition
+    if (actionDefinition.actionInputs.length === 0) {
+      actionDefinition.inputs.forEach((input) => {
+        if (isComponent(componentRef.instance[input])) {
+          actionDefinition.actionInputs.push(input);
+        }
+      });
+    }
+
     // pass in inputs, and allow the value to be updated
-    this.actionInstance.of.inputs.forEach((input) => {
+    actionDefinition.inputs.forEach((input) => {
+      // give new values
       this.subscriptions.push(
         this.actionIO.getSubject(input)
           .subscribe((val) => {
@@ -103,4 +115,13 @@ implements OnInit, AfterViewInit, OnDestroy {
       && this.actionInstance.of.name === 'text'
     );
   }
+}
+
+function isComponent(inputValue: any) {
+  return (
+    _.isObject(inputValue)
+    && _.isFunction(inputValue.type)
+    && _.isString(inputValue.type.name)
+    && inputValue.type.name.endsWith('Component')
+  );
 }

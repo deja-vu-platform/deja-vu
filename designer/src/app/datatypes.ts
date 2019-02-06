@@ -13,6 +13,7 @@ export interface ActionDefinition {
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
+  readonly actionInputs: string[];
 }
 
 // tslint:disable-next-line interface-name

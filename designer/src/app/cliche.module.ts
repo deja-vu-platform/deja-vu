@@ -17,7 +17,7 @@ import * as rating from '@deja-vu/rating';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
-import { ClicheDefinition } from './datatypes';
+import { ClicheActionDefinition, ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';
 
 // TODO: import platform actions (e.g. button, link, etc.)
@@ -61,7 +61,7 @@ function clicheDefinitionFromModule(
     name,
     actions: Object.values(importedModule)
       .filter((f) => _.isString(f.name) && f.name.endsWith(componentSuffix))
-      .map((component) => ({
+      .map((component): ClicheActionDefinition => ({
         name: _.kebabCase(component.name
           .slice(0, componentSuffix.length * -1)),
         component,
@@ -70,7 +70,8 @@ function clicheDefinitionFromModule(
         ))),
         outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
           val[0].type.prototype.ngMetadataName === 'Output'
-        )))
+        ))),
+        actionInputs: []
       }))
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };
@@ -86,7 +87,8 @@ dvCliche.actions.push(({
   name: 'text',
   component: <Component>TextComponent,
   inputs: [],
-  outputs: []
+  outputs: [],
+  actionInputs: []
 }));
 
 @NgModule({
