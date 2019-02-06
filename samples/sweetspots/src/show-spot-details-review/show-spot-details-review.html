@@ -1,38 +1,45 @@
 <dv.action name="show-spot-details-review">
   Rating: <rating.show-rating class="inline-block"
-    rating=$rating showStars=false />
+    sourceId=$comment.authorId targetId=$comment.targetId showStars=false />
+
   <br />
-  <p>"<comment.show-comment class="inline-block"
-    targetId=$rating.targetId
-    authorId=$rating.sourceId />"</p>
-  By <authentication.show-user class="inline-block" id=$rating.sourceId /> |
-  <dv.link href="/profile" params={ id: $rating.sourceId }>Profile</dv.link> |
-  <reputation.show-target class="inline-block" id=$rating.sourceId
+
+  <p class="inline-block">"<comment.show-comment class="inline-block"
+    comment=$comment
+    showId=false showAuthorId=false showTargetId=false />"</p>
+
+  <br />
+
+  By <authentication.show-user class="inline-block" id=$comment.authorId /> |
+  <dv.link href="/profile" params={ id: $comment.authorId }>Profile</dv.link> |
+  <reputation.show-target class="inline-block" id=$comment.authorId
     showId=false
     showScores=false
     totalLabel="Rep: " />
+
   <br />
-  <reviewscore.show-target id=$rating.targetId
+
+  <reviewscore.show-target id=$comment.id
     showId=false
     showScores=false
     totalLabel="Review score: " />
+
   <br />
+
   <div class="btn-toolbar toolbar">
     <!-- TODO: Do not show if already voted on the review (scoring.has-voted) -->
-    <dv.if condition=$loggedInUserId!==$rating.sourceId>
+    <dv.if condition=$loggedInUserId !== $comment.authorId>
       <dv.tx as sweetspots-upvote-review>
         <authentication.authenticate id=$loggedInUserId hidden=true />
-        <sweetspots.vote-review id=$rating.targetId
+        <sweetspots.vote-review id=$comment.id
           loggedInUserId=$loggedInUserId
           upvote=true />
-          <!-- spotOwnerId=$spotOwnerId -->
       </dv.tx>
       <dv.tx as sweetspots-downvote-review>
         <authentication.authenticate id=$loggedInUserId hidden=true />
-        <sweetspots.vote-review id=$rating.targetId
+        <sweetspots.vote-review id=$comment.id
           loggedInUserId=$loggedInUserId
           upvote=false />
-          <!-- spotOwnerId=$spotOwnerId -->
       </dv.tx>
     </dv.if>
   </div>

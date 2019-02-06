@@ -4,7 +4,6 @@
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-
 @import url('https://fonts.googleapis.com/css?family=Mogra');
 
 md-icon {
@@ -73,14 +72,17 @@ comment-delete-comment button.mat-button {
   color: #FFFFFF !important;
 }
 
-html, body, main {
-  height:100%;
-  margin:0;
-  padding:0;
+html,
+body,
+main {
+  height: 100%;
+  margin: 0;
+  padding: 0;
   background-color: #FFFCF9 !important;
 }
 
-sweetspots-add-a-spot, #add-a-spot {
+sweetspots-add-a-spot,
+#add-a-spot {
   text-align: center;
 }
 
@@ -95,6 +97,7 @@ body {
   margin: 0 auto;
   text-align: center;
 }
+
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
@@ -179,12 +182,14 @@ dv-link.profile-btn {
   padding-top: 5px;
 }
 
-.profile-btn a, .login-btn a, .register-btn a {
+.profile-btn a,
+.login-btn a,
+.register-btn a {
   color: #FFFFFF;
 }
 
 follow-follow-unfollow button.btn {
-  float: none!important;
+  float: none !important;
   padding: 6px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -196,4 +201,8 @@ follow-follow-unfollow button.btn {
 
 search-items-by-labels button.mat-button {
   display: inline-block;
+}
+
+rating-rate-target .rating {
+  justify-content: start;
 }
