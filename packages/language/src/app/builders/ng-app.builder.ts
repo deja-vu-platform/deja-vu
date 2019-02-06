@@ -116,7 +116,7 @@ export class NgAppBuilder {
 
   constructor(
     private readonly appName: string,
-    private readonly dvConfigContents: string) {}
+    private readonly dvConfigContents: string) { }
 
   addDependency(name: string, version: string): NgAppBuilder {
     this.dependencies.push({ name: name, version: version });
@@ -212,7 +212,7 @@ export class NgAppBuilder {
         .map(
           this.components,
           (c: Component) =>
-            `import { ${c.className } } from './${c.name}/${c.name}.component'`)
+            `import { ${c.className} } from './${c.name}/${c.name}.component'`)
         .join(';\n'),
       moduleImports: _
         .map(
@@ -231,7 +231,7 @@ export class NgAppBuilder {
             if (c === undefined) {
               throw new Error(
                 `Action for route "${r.path}" (${r.selector}) not found\n` +
-              `Valid actions are: ${_.keys(selectorToComponent)}`);
+                `Valid actions are: ${_.keys(selectorToComponent)}`);
             }
 
             return `{ path: "${r.path}", component: ${c} }`;
@@ -318,8 +318,9 @@ export class NgAppBuilder {
       const clichePackageLocation = path.dirname(
         require.resolve(path.join(d.name, 'package.json')));
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+      const appAssetsDir = path.join(assetsDir, d.name);
       if (existsSync(clicheAssets)) {
-        copySync(clicheAssets, assetsDir);
+        copySync(clicheAssets, appAssetsDir);
       }
     }
 

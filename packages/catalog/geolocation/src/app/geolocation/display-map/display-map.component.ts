@@ -36,8 +36,8 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   private _markerIcon = L.icon({
     iconSize: [25, 41],
     iconAnchor: [13, 41],
-    iconUrl: 'assets/marker-icon.png',
-    shadowUrl: 'assets/marker-shadow.png'
+    iconUrl: 'assets/geolocation/marker-icon.png',
+    shadowUrl: 'assets/geolocation/marker-shadow.png'
   });
 
   // Required

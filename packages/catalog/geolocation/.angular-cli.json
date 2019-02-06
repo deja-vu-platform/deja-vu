@@ -11,7 +11,7 @@
         {
           "glob": "**/*",
           "input": "app/geolocation/assets/",
-          "output": "assets/"
+          "output": "assets/geolocation/"
         },
         "assets",
         "favicon.ico"
