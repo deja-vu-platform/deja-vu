@@ -22,8 +22,8 @@ interface CommentsRes {
 export class ShowCommentsComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
-  @Input() byAuthorId = '';
-  @Input() ofTargetId = '';
+  @Input() byAuthorId: string | undefined;
+  @Input() ofTargetId: string | undefined;
 
   // Show rules
   /* What fields of the comment to show. These are passed as input

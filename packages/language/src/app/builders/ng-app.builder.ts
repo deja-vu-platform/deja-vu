@@ -318,7 +318,8 @@ export class NgAppBuilder {
       const clichePackageLocation = path.dirname(
         require.resolve(path.join(d.name, 'package.json')));
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
-      const appAssetsDir = path.join(assetsDir, d.name);
+      const appAssetsDir = d.name === 'rating' ? assetsDir :
+        path.join(assetsDir, d.name);
       if (existsSync(clicheAssets)) {
         copySync(clicheAssets, appAssetsDir);
       }
