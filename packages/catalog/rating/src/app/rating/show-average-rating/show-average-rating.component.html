@@ -4,7 +4,7 @@
   </star-rating-comp>
 </div>
 <div *ngIf="!showStars && showValue">
-  {{ averageRatingValue }}
+  {{ averageRatingValue }} out of 5
 </div>
 <div *ngIf="showNumRatings">
   {{ ratingCountValue }} {{ ratingLabel }}{{ ratingCountValue !== 1 ? 's' : '' }}
