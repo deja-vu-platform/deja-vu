@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Core libraries of Déjà Vu",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "package": "dv package",
     "prepare": "npm run package",
