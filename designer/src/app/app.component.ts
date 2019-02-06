@@ -121,7 +121,8 @@ export class AppComponent {
       this.requestProcessor
         .addCliche(cliche.of.name, this.nextPort, cliche.name);
       const serverPath = this.path.join(this.path.dirname(
-        this.cli.locatePackage(cliche.of.name)), '..', 'server', 'server.js');
+        this.cli.locateClichePackage(cliche.of.name)),
+        '..', 'server', 'server.js');
       const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;

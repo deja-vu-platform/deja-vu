@@ -4,18 +4,18 @@ import * as _ from 'lodash';
 
 import * as dv from '@dejavu-lang/core';
 
-import * as allocator from 'allocator';
-import * as authentication from 'authentication';
-import * as authorization from 'authorization';
-import * as event from 'event';
-import * as follow from 'follow';
-import * as geolocation from 'geolocation';
-import * as group from 'group';
-import * as passkey from 'passkey';
-import * as property from 'property';
-import * as rating from 'rating';
-import * as task from 'task';
-import * as transfer from 'transfer';
+import * as allocator from '@dejavu-lang/allocator';
+import * as authentication from '@dejavu-lang/authentication';
+import * as authorization from '@dejavu-lang/authorization';
+import * as event from '@dejavu-lang/event';
+import * as follow from '@dejavu-lang/follow';
+import * as geolocation from '@dejavu-lang/geolocation';
+import * as group from '@dejavu-lang/group';
+import * as passkey from '@dejavu-lang/passkey';
+import * as property from '@dejavu-lang/property';
+import * as rating from '@dejavu-lang/rating';
+import * as task from '@dejavu-lang/task';
+import * as transfer from '@dejavu-lang/transfer';
 
 import { ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';

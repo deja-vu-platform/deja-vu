@@ -177,6 +177,10 @@ export function locatePackage(pkg: string) {
   return require.resolve(pkg);
 }
 
+export function locateClichePackage(pkg: string) {
+  return locatePackage(`@dejavu-lang/${pkg}`);
+}
+
 export function concurrentlyCmd(...cmds: string[]): string {
   let cmdStr = '';
   for (const c of cmds) {
