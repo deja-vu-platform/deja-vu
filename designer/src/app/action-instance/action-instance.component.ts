@@ -5,34 +5,54 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
+  OnInit,
   Type,
   ViewChild
 } from '@angular/core';
+import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
 import { ClicheActionDirective } from '../cliche-action.directive';
-import { ActionInstance, ClicheActionDefinition } from '../datatypes';
+import {
+  ActionInstance,
+  AppActionDefinition,
+  ClicheActionDefinition
+} from '../datatypes';
+import { ActionIO, linkChildren, ScopeIO } from '../io';
 
 @Component({
   selector: 'app-action-instance',
   templateUrl: './action-instance.component.html',
   styleUrls: ['./action-instance.component.scss']
 })
-export class ActionInstanceComponent implements AfterViewInit, OnDestroy {
-  @Input() readonly actionInstance: ActionInstance;
+export class ActionInstanceComponent
+implements OnInit, AfterViewInit, OnDestroy {
+
   @ViewChild(ClicheActionDirective)
     private readonly actionHost: ClicheActionDirective;
-  private readonly subscriptions: Subscription[] = [];
+  @Input() readonly actionInstance: ActionInstance;
+  @Input() private readonly actionIO: ActionIO;
+  private readonly scopeIO: ScopeIO = new ScopeIO();
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver
   ) { }
 
+  ngOnInit() {
+    if (this.actionInstance && this.actionIO) {
+      this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
+    }
+  }
+
   ngAfterViewInit() {
-    if (this.actionInstance && this.actionInstance.of['component']) {
-      // cliche actions check DOM attrs which aren't there until afterViewInit
-      // setTimeout is necessary to avoid angular change detection errors
-      setTimeout(() => this.loadClicheAction());
+    if (this.actionInstance) {
+      if (this.actionInstance.of instanceof AppActionDefinition) {
+        this.subscriptions = linkChildren(this.actionInstance, this.scopeIO);
+      } else {
+        // setTimeout is necessary to avoid angular change detection errors
+        setTimeout(() => this.loadClicheAction());
+      }
     }
   }
 
@@ -49,7 +69,8 @@ export class ActionInstanceComponent implements AfterViewInit, OnDestroy {
     this.actionInstance.of.outputs.forEach((output) => {
       this.subscriptions.push(
         (<EventEmitter<any>>componentRef.instance[output]).subscribe((val) => {
-          this.actionInstance.io[output].next(val);
+          this.actionIO.getSubject(output)
+            .next(val);
         })
       );
     });
@@ -57,11 +78,12 @@ export class ActionInstanceComponent implements AfterViewInit, OnDestroy {
     // pass in inputs, and allow the value to be updated
     this.actionInstance.of.inputs.forEach((input) => {
       this.subscriptions.push(
-        this.actionInstance.io[input].subscribe((val) => {
-          if (val !== undefined) {
-            componentRef.instance[input] = val;
-          }
-        })
+        this.actionIO.getSubject(input)
+          .subscribe((val) => {
+            if (val !== undefined) {
+              componentRef.instance[input] = val;
+            }
+          })
       );
     });
 
@@ -73,11 +95,6 @@ export class ActionInstanceComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach((s) => s.unsubscribe());
-  }
-
-  // need to give the action the right fqtag
-  get dvAlias() {
-    return `${this.actionInstance.from.name}-${this.actionInstance.of.name}`;
   }
 
   shouldPassActionInstance() {

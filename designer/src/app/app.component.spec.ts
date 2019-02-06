@@ -21,7 +21,6 @@ import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
 import { AppComponent } from './app.component';
-import { RowComponent } from './row/row.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
@@ -33,8 +32,7 @@ describe('AppComponent', () => {
         ActionInstanceComponent,
         AppComponent,
         TopBarComponent,
-        SideMenuComponent,
-        RowComponent
+        SideMenuComponent
       ],
       imports: [
         DvModule,

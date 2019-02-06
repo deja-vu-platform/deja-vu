@@ -27,11 +27,11 @@ export class AppComponent {
   openAction = this.app.homepage;
 
   private nextPort = 3002;
-  private readonly processes: {[n: string]: {kill: (s: string) => void }} = {};
-  private readonly requestProcessor: any;
-  private readonly path: any;
-  private readonly cp: any;
-  private readonly cli: any;
+  private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
+  private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
+  private readonly path: any; // path module
+  private readonly cp: any; // child_process module
+  private readonly cli: any; // dv-cli module
 
   constructor(
     private readonly dragulaService: DragulaService,
@@ -44,7 +44,7 @@ export class AppComponent {
     // start the backend
     if (this.electronService.remote) {
       const gateway = this.electronService.remote.require('dv-gateway');
-      this.requestProcessor = gateway.startGateway();
+      this.requestProcessor = gateway.startGateway(); // port 3000 default
       // imports for addCliche
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
@@ -67,7 +67,10 @@ export class AppComponent {
       )
       .subscribe(({ el, source, target }) => {
         let action: ActionInstance;
-        const toRowIdx = parseInt(target['dataset'].index, 10);
+        let toRowIdx = parseInt(target['dataset'].index, 10);
+        if (toRowIdx === this.openAction.rows.length) {
+          toRowIdx = -1;
+        }
         const toRow = this.openAction.rows[toRowIdx] || new Row();
         if (source.classList.contains('action-list')) {
           const {
