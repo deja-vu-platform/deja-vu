@@ -42,7 +42,16 @@
                   </mat-form-field>
                   <div *ngIf="action.of.actionInputs.indexOf(input) >= 0">
                     <!-- TODO: pass in action component -->
-                    {{ input }}
+                    <button
+                      mat-button
+                      class="replace-action"
+                      matTooltip="Replace Action"
+                    >
+                      <span class="name">{{ input + ':'}}</span>
+                      <span class="value">
+                        {{ action.inputSettings[input] || 'Default' }}
+                      </span>
+                    </button>
                   </div>
               </ng-container>
             </div>

@@ -48,3 +48,15 @@
 .popup-menu > mat-form-field {
   width: 100%;
 }
+
+button.replace-action {
+  width: 100%;
+  padding-left: 0;
+  text-align: left;
+  font-weight: normal;
+  font-size: 16px;
+}
+
+button.replace-action .name {
+  color: #757575;
+}
