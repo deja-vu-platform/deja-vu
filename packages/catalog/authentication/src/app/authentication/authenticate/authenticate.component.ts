@@ -5,7 +5,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { AuthenticationService } from '../shared/authentication.service';
 

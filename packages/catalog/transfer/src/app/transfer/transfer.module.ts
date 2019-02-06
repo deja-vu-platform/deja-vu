@@ -45,7 +45,7 @@ import {
 } from './show-transfers/show-transfers.component';
 export { ShowTransfersComponent };
 
-import { DvModule } from '@dejavu-lang/core';
+import { DvModule } from '@deja-vu/core';
 
 import { API_PATH, CONFIG, TransferConfig } from './transfer.config';
 

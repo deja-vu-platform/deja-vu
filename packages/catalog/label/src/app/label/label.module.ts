@@ -8,7 +8,7 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { DvModule } from '@dejavu-lang/core';
+import { DvModule } from '@deja-vu/core';
 
 import { AttachLabelsComponent } from './attach-labels/attach-labels.component';
 export { AttachLabelsComponent };

@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 import { Event } from '../../../../shared/data';
 
 import * as _ from 'lodash';

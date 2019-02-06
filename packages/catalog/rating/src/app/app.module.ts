@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { RatingModule } from './rating/rating.module';
 
-import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 
 @NgModule({
   declarations: [

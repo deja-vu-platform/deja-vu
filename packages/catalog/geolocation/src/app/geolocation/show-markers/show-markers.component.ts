@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { ShowMarkerComponent } from '../show-marker/show-marker.component';

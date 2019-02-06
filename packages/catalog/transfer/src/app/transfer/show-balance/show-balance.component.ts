@@ -13,7 +13,7 @@ import {
   GatewayServiceFactory,
   OnEval,
   RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH, CONFIG } from '../transfer.config';
 

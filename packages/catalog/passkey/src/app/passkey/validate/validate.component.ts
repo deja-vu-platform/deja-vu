@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import * as _ from 'lodash';
 

@@ -10,7 +10,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExecSuccess, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { PropertyRes, Property } from '../shared/property.model';
 

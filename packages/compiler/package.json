@@ -1,5 +1,5 @@
 {
-  "name": "@dejavu-lang/compiler",
+  "name": "@deja-vu/compiler",
   "version": "0.0.1",
   "description": "Déjà Vu compiler",
   "scripts": {

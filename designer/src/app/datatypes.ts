@@ -340,7 +340,7 @@ export class App {
       },
       private: true,
       devDependencies: {
-        '@dejavu-lang/cli': '0.0.1'
+        '@deja-vu/cli': '0.0.1'
       },
       repository: 'github:spderosso/dejavu',
       license: 'MIT',

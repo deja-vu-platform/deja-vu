@@ -14,7 +14,7 @@ import {
   OnExecSuccess,
   OnExec,
   RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';

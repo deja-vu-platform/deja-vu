@@ -10,7 +10,7 @@ import {
 import {
   Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
 

@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { take } from 'rxjs/operators';
 

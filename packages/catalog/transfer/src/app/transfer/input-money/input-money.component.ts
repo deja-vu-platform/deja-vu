@@ -6,7 +6,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { OnExecSuccess, RunService } from '@dejavu-lang/core';
+import { OnExecSuccess, RunService } from '@deja-vu/core';
 
 import { startWith } from 'rxjs/operators';
 

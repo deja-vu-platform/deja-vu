@@ -10,7 +10,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnExecFailure,
   OnExecSuccess, OnExec, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import * as _ from 'lodash';
 

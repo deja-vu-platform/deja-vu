@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DvModule, GATEWAY_URL } from '@dejavu-lang/core';
+import { DvModule, GATEWAY_URL } from '@deja-vu/core';
 
 import { AppComponent } from './app.component';
 import { LandingComponent } from './landing/landing.component';

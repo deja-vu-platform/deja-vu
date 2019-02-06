@@ -13,7 +13,7 @@ import {
   OnExecFailure,
   OnExecSuccess,
   RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import * as _ from 'lodash';
 

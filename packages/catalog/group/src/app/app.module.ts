@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { GroupModule } from './group/group.module';
 
-import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 
 
 @NgModule({

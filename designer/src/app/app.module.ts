@@ -7,7 +7,7 @@ import { DragulaModule } from 'ng2-dragula';
 import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
-import { DvModule, GATEWAY_URL } from '@dejavu-lang/core';
+import { DvModule, GATEWAY_URL } from '@deja-vu/core';
 
 import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';

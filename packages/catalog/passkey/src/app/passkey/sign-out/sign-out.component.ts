@@ -2,7 +2,7 @@ import {
   Component, ElementRef, Input, OnInit
 } from '@angular/core';
 
-import { OnExec, RunService } from '@dejavu-lang/core';
+import { OnExec, RunService } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 

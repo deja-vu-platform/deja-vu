@@ -36,7 +36,7 @@ export interface ActionTable {
   readonly [tag: string]: ActionAst;
 }
 
-// From @dejavu-lang/core
+// From @deja-vu/core
 export interface FieldMap {
   [field: string]: string;
 }
@@ -252,7 +252,7 @@ export class ActionHelper {
     // Cliches specify as a main their typings (so that when apps do `import
     // 'cliche'` it works) . To get to their folder we need to go up a dir
     return path.join(path.dirname(
-      require.resolve(`@dejavu-lang/${cliche}`)), '..');
+      require.resolve(`@deja-vu/${cliche}`)), '..');
   }
 
   /**

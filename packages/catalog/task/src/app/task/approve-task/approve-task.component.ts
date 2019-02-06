@@ -3,7 +3,7 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 
 @Component({

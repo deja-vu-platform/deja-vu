@@ -136,7 +136,7 @@ export function updateJsonFile<T>(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node ' + path.join(locatePackage('@dejavu-lang/gateway')) +
+  return 'node ' + path.join(locatePackage('@deja-vu/gateway')) +
     ` --configFilePath ${configFilePath}`;
 }
 
@@ -178,7 +178,7 @@ export function locatePackage(pkg: string) {
 }
 
 export function locateClichePackage(pkg: string) {
-  return locatePackage(`@dejavu-lang/${pkg}`);
+  return locatePackage(`@deja-vu/${pkg}`);
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {
@@ -192,10 +192,10 @@ export function concurrentlyCmd(...cmds: string[]): string {
 
 const PKGS_FOLDER = 'packages';
 const GATEWAY_PORT = 3000;
-const GATEWAY_FOLDER = path.join(PKGS_FOLDER, '@dejavu-lang/gateway');
+const GATEWAY_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/gateway');
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
 
-const CORE_FOLDER = path.join(PKGS_FOLDER, '@dejavu-lang/core');
+const CORE_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/core');
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it

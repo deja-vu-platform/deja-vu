@@ -1,7 +1,7 @@
 import {
   Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from '@dejavu-lang/core';
+import { Action, GatewayService, GatewayServiceFactory } from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../comment.config';

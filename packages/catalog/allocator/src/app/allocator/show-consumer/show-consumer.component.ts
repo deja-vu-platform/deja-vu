@@ -5,7 +5,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 

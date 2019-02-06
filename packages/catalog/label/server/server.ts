@@ -7,7 +7,7 @@ import {
   Context,
   getReturnFields,
   Validation
-} from '@dejavu-lang/cliche-server';
+} from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import {

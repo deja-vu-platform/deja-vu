@@ -1,6 +1,6 @@
 import { Component, OnInit, ElementRef, Renderer2, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { GatewayService, GATEWAY_URL } from '@dejavu-lang/core';
+import { GatewayService, GATEWAY_URL } from '@deja-vu/core';
 
 @Component({
   selector: 'cl-foo',

@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { LabelModule } from './label/label.module';
 
-import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 
 import { AppComponent } from './app.component';
 

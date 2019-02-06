@@ -4,7 +4,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import { User } from '../shared/authentication.model';
 

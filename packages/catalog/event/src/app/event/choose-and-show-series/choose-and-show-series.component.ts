@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, Type } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from '@dejavu-lang/core';
+import { Action, GatewayService, GatewayServiceFactory } from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { map } from 'rxjs/operators';

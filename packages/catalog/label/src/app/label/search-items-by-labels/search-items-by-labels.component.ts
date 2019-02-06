@@ -10,7 +10,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
-} from '@dejavu-lang/core';
+} from '@deja-vu/core';
 
 import {
   ShowLabelComponent

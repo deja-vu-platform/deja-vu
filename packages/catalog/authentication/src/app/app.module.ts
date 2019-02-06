@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { GATEWAY_URL, DvModule } from '@dejavu-lang/core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 import { AppComponent } from './app.component';
 import { AuthenticationModule } from './authentication/authentication.module';
 

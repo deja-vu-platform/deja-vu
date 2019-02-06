@@ -84,7 +84,7 @@ export class NgAppBuilder {
   }
 
   private static DepToPackage(dep: string) {
-    return `@dejavu-lang/${dep}`;
+    return `@deja-vu/${dep}`;
   }
 
   private static FindPackage(dep: string) {
