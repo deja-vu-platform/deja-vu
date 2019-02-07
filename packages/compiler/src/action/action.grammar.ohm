@@ -79,12 +79,15 @@ Action {
     = "{" ListOf<PropAssignment, ","> "}"             -- noTrailingComma
     | "{" NonemptyListOf<PropAssignment, ","> "," "}" -- trailingComma
 
-  // from es5 Ohm example
   decimalLiteral
-    = decimalIntLiteral "." decimalDigit* exponentPart -- bothParts
-    |                   "." decimalDigit+ exponentPart -- decimalsOnly
-    | decimalIntLiteral                   exponentPart -- integerOnly
+    = signedInt "." decimalDigit* exponentPart -- bothParts
+    |           "." decimalDigit+ exponentPart -- decimalsOnly
+    | signedInt                   exponentPart -- integerOnly
 
+  signedInt
+    = "+" decimalIntLiteral* -- positive
+    | "-" decimalIntLiteral* -- negative
+    | decimalIntLiteral+     -- noSign
   decimalIntLiteral
     = nonZeroDigit decimalDigit*  -- nonZero
     | "0"                         -- zero
@@ -95,10 +98,6 @@ Action {
     = exponentIndicator signedInt -- present
     |                             -- absent
   exponentIndicator = "e" | "E"
-  signedInt
-    = "+" decimalDigit* -- positive
-    | "-" decimalDigit* -- negative
-    | decimalDigit+     -- noSign
 
   stringLiteral
     = "\"" doubleStringChar* "\"" -- doubleQuote
