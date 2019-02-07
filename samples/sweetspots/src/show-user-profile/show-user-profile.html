@@ -1,12 +1,13 @@
 <dv.action name="show-user-profile">
-  <sweetspots.navbar accessRequired=true />
-  <!-- <sweetspots.navbar showSearch=false accessRequired=true /> -->
+  <sweetspots.navbar showSearch=false accessRequired=true />
 
   <dv.if condition=$id>
-    <sweetspots.show-user-profile-details id=$id />
+    <sweetspots.show-user-profile-details id=$id
+      loggedInUserId=sweetspots.navbar.loggedInUserId/>
   </dv.if>
   <dv.if condition=!$id>
-    <sweetspots.show-user-profile-details id=sweetspots.navbar.loggedInUserId />
+    <sweetspots.show-user-profile-details id=sweetspots.navbar.loggedInUserId
+      loggedInUserId=sweetspots.navbar.loggedInUserId />
   </dv.if>
 
 </dv.action>

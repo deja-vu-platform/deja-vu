@@ -1,6 +1,5 @@
-<!-- <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id> -->
 <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
-  searchResults$=label.search-items-by-labels.searchResultItems>
+  searchResults$=label.search-items-by-labels?.searchResultItems>
 
   <dv.tx as sweetspots-auth-check>
     <authentication.logged-in />
@@ -19,9 +18,9 @@
       </div>
 
       <div class="navbar-form navbar-left search">
-        <!-- <dv.if condition=$showSearch> -->
-        <label.search-items-by-labels />
-        <!-- </dv.if> -->
+        <dv.if condition=$showSearch>
+          <label.search-items-by-labels />
+        </dv.if>
       </div>
 
       <dv.if condition=authentication.logged-in.user>

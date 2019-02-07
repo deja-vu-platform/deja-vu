@@ -33,12 +33,14 @@
         <authentication.authenticate id=$loggedInUserId hidden=true />
         <sweetspots.vote-review id=$comment.id
           loggedInUserId=$loggedInUserId
+          spotOwnerId=$comment.authorId
           upvote=true />
       </dv.tx>
       <dv.tx as sweetspots-downvote-review>
         <authentication.authenticate id=$loggedInUserId hidden=true />
         <sweetspots.vote-review id=$comment.id
           loggedInUserId=$loggedInUserId
+          spotOwnerId=$comment.authorId
           upvote=false />
       </dv.tx>
     </dv.if>

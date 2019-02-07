@@ -518,7 +518,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
 
     return Promise.all([
       publishers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      publishers.createIndex({ 'messages.id': 1 }, { unique: true })
+      publishers.createIndex({ id: 1 , 'messages.id': 1 }, { unique: true })
     ]);
   })
   .actionRequestTable(actionRequestTable)

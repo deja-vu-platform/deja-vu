@@ -15,23 +15,19 @@ Team No REST for the Wicked
 [Original App](https://sweet-spots.herokuapp.com/)
 
 ## Cliches Used
-- StandardAuthentication
+- Authentication
 - Authorization
-- Geolocation
-- Rating
 - Comment
-- Label
 - Follow
+- Geolocation
+- Label
+- Property
+- Rating
+- Scoring (x2)
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
-- Delete spots (deletion, trivial and not worth spending research time on)
-- Floor (persisted field)
-- Up/Down Votes for Reviews (new cliche, probably)
-- User reputation (new cliche, probably)
-- Need both rating and comment for review (atomic forms)
-- Require all fields to create spot (atomic forms)
-- Click review author username to see profile (refactor ShowComment widget, or way to override its template)
-- Show spots by creator (could bind with post, but that’s a bit hacky, seems like ownership is a general issue)
-- Only one review per user (need to think about this more)
+- Delete spots -> comment-delete-target, label-delete-item, rating-delete-target, follow-delete-publisher, property-delete-object
 - Report spots (If a spot has been reported 10 more than the number of reviews it has (i.e. num(reports) > 10 + num(reviews)), the spot will automatically be deleted.)
+- If there are search results, only display those spots on the map -> let display-map/ show-markers accept markerIds
+- Timestamps -> log cliche

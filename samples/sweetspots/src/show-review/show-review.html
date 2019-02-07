@@ -9,16 +9,21 @@
       Details
     </dv.link>
   </h4>
-  <span><rating.show-rating targetId=$comment.targetId sourceId=$loggedInUserId hidden=true/></span>
+  <span>
+    <rating.show-rating targetId=$comment.targetId sourceId=$comment.authorId />
+  </span>
   <br />
-  <span><comment.show-comment comment=$comment
+  <span>
+    <comment.show-comment comment=$comment
       showId=false
       showAuthorId=false
-      showTargetId=false /></span>
+      showTargetId=false />
+    </span>
   <br />
-  <span><reviewscore.show-target id=$id
-    showId=false
-    showScores=false
-    totalLabel="Contribution to rep: " />
+  <span>
+    <reviewscore.show-target id=$comment.id
+      showId=false
+      showScores=false
+      totalLabel="Contribution to rep: " />
   </span>
 </dv.action>

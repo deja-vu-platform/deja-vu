@@ -1,11 +1,12 @@
 <dv.action name="show-user-profile-details">
   <div class="container">
     <div class="row">
-      <div class="col-md-6 offset-md-3 text-center">
+      <div class="col-md-12 text-center">
         <h1>
-          <authentication.show-user
+          <authentication.show-user class="inline-block"
             id=$loggedInUserId
             showId=false />&#39;s Profile (<reputation.show-target
+              class="inline-block"
               id=$loggedInUserId
               showId=false
               showScores=false
@@ -20,7 +21,7 @@
         </div>
         <authorization.show-resources
           createdBy=$loggedInUserId
-          noResourcesText="You haven't created any spots yet"
+          noResourcesText="You haven't created any spots yet."
           showResource=<sweetspots.show-spot id=$id /> />
       </div>
       <div class="col-md-4">
@@ -28,15 +29,15 @@
           <h3>Your Reviews</h3>
         </div>
         <comment.show-comments byAuthorId=$loggedInUserId
-          showComment=<sweetspots.show-review comment=$comment
-            loggedInUserId=$loggedInUserId /> />
+          noCommentsToShowText="You haven't reviewed any spots yet."
+          showComment=<sweetspots.show-review comment=$comment /> />
       </div>
       <div class="col-md-4">
         <div class="text-center">
           <h3>Favorite Spots</h3>
         </div>
         <follow.show-publishers followedById=$loggedInUserId
-          noPublishersToShowText="You have no favorites"
+          noPublishersToShowText="You have no favorite spots yet."
           showPublisher=<sweetspots.show-favorite-spot id=$publisher.id /> />
       </div>
     </div>
