@@ -1,10 +1,9 @@
-.inputs {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between
+.input-action {
+  width: 100%;
+  text-align: center;
+  max-height: 80vh;
 }
 
-.inputs mat-form-field {
-  margin-left: 8px;
-  margin-right: 8px;
+.set-inputs-container {
+  overflow-y: auto;
 }

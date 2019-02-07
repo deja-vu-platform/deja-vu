@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material';
 import {
   ActionCollection,
   ActionDefinition,
@@ -22,7 +22,6 @@ export class InputActionComponent {
   actionInstance: ActionInstance;
 
   constructor(
-    private readonly dialogRef: MatDialogRef<InputActionComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) {}
 

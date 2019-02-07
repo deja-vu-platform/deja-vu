@@ -31,30 +31,8 @@
           </app-action-instance>
           <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
             <div class="popup-menu" (click)="$event.stopPropagation()">
-              <ng-container *ngFor="let input of action.of.inputs">
-                  <mat-form-field *ngIf="action.of.actionInputs.indexOf(input) === -1">
-                    <input
-                      matInput
-                      class="input-value"
-                      [placeholder]="input"
-                      [name]="input"
-                      [(ngModel)]="action.inputSettings[input]">
-                  </mat-form-field>
-                  <div *ngIf="action.of.actionInputs.indexOf(input) >= 0">
-                    <!-- TODO: pass in action component -->
-                    <button
-                      mat-button
-                      class="replace-action"
-                      matTooltip="Replace Action"
-                      (click)="inputAction()"
-                    >
-                      <span class="name">{{ input + ':'}}</span>
-                      <span class="value">
-                        {{ action.inputSettings[input] || 'Default' }}
-                      </span>
-                    </button>
-                  </div>
-              </ng-container>
+              <app-set-inputs [app]="app" [actionInstance]="action">
+              </app-set-inputs>
             </div>
           </mat-menu>
         </div>

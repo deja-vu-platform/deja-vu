@@ -1,5 +1,5 @@
-<div style="width:100%;text-align:center">
-  <mat-form-field>
+<div class="input-action">
+  <mat-form-field *ngIf="data?.app"> 
     <mat-select
       name="action"
       placeholder="Replace With Action"
@@ -20,13 +20,11 @@
       </mat-optgroup>
     </mat-select>
   </mat-form-field>
-</div>
-<div *ngIf="actionInstance" class="inputs">
-  <mat-form-field *ngFor="let input of actionDefinition.inputs">
-    <input
-      matInput
-      [placeholder]="input"
-      [name]="input"
-      [(ngModel)]="actionInstance.inputSettings[input]">
-  </mat-form-field>
+  <div *ngIf="actionInstance" class="set-inputs-container">
+    <app-set-inputs
+      *ngIf="actionInstance"
+      [app]="data.app"
+      [actionInstance]="actionInstance"
+    ></app-set-inputs>
+  </div>
 </div>

@@ -27,23 +27,29 @@ import {
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
-import { InputActionComponent } from './input-action/input-action.component';
+import {
+  InputActionComponent
+} from './input-action/input-action.component';
+import {
+  SetInputsComponent
+} from './set-inputs/set-inputs.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
 @NgModule({
   declarations: [
+    ClicheActionDirective,
     ActionDefinitionComponent,
     ActionInstanceComponent,
     AppComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
+    InputActionComponent,
+    SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent,
-    ClicheActionDirective,
-    InputActionComponent
+    TopBarComponent
   ],
   imports: [
     BrowserModule,

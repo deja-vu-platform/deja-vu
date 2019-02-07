@@ -1,6 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatSelectModule
+} from '@angular/material';
 
 import { InputActionComponent } from './input-action.component';
+
+import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 
 describe('InputActionComponent', () => {
   let component: InputActionComponent;
@@ -8,7 +16,18 @@ describe('InputActionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InputActionComponent ]
+      declarations: [
+        InputActionComponent,
+        SetInputsComponent
+      ],
+      imports: [
+        FormsModule,
+        MatSelectModule
+      ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: MatDialogRef, useValue: {} }
+      ]
     })
     .compileComponents();
   }));
