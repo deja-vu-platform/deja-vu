@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { ClModule } from './cl/cl.module';
-import { GATEWAY_URL } from 'dv-core';
+import { GATEWAY_URL } from '@deja-vu/core';
 
 
 @NgModule({

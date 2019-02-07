@@ -1,5 +1,5 @@
 import { Component, Input, Type } from '@angular/core';
-import { Action } from 'dv-core';
+import { Action } from '@deja-vu/core';
 
 import {
   ShowItemCountComponent

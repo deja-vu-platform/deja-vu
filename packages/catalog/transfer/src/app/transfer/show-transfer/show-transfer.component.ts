@@ -13,7 +13,7 @@ import {
   GatewayServiceFactory,
   OnEval,
   RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 import { Transfer } from '../shared/transfer.model';
 import { API_PATH, CONFIG } from '../transfer.config';
 

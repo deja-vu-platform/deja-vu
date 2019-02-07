@@ -8,7 +8,7 @@ import {
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { DvModule } from 'dv-core';
+import { DvModule } from '@deja-vu/core';
 
 import {
   CreateMessageComponent

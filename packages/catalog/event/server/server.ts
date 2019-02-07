@@ -7,7 +7,7 @@ import {
   Context,
   getReturnFields,
   Validation
-} from 'cliche-server';
+} from '@deja-vu/cliche-server';
 import {
   CreateEventInput,
   CreateSeriesInput,

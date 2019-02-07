@@ -1,9 +1,8 @@
 {
-  "name": "dv-core",
+  "name": "@deja-vu/core",
   "version": "0.0.1",
   "description": "Core libraries of Déjà Vu",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "package": "dv package",
     "prepare": "npm run package",
@@ -31,7 +30,7 @@
     "@angular/material": "^5.2.1",
     "@angular/platform-browser": "^5.2.0",
     "@angular/router": "^5.2.9",
-    "dv-cli": "0.0.1",
+    "@deja-vu/cli": "0.0.1",
     "@types/uuid": "^3.4.3",
     "@types/lodash": "^4.14.96",
     "ng-packagr": "^2.0.0",
@@ -50,6 +49,6 @@
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
-  "types": "pkg/dv-core.d.ts",
-  "main": "pkg/bundles/dv-core.umd.js"
+  "types": "pkg/deja-vu-core.d.ts",
+  "main": "pkg/bundles/deja-vu-core.umd.js"
 }

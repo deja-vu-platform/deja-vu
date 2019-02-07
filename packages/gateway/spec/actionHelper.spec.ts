@@ -230,7 +230,7 @@ describe('ActionHelper', () => {
         action: 'chorestar-parent-home'
       }
     ];
-    const actionHelper = new ActionHelper(actionTable, usedCliches, routes);
+    const actionHelper = new ActionHelper(usedCliches, actionTable, routes);
 
     const arrayActionPath = [
       'chorestar-root',

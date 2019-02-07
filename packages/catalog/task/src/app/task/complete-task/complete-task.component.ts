@@ -5,7 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
   RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 
 @Component({

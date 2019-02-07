@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { GATEWAY_URL, DvModule } from 'dv-core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 import { EventModule } from './event/event.module';
 
 
