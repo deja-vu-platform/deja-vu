@@ -58,7 +58,20 @@
   "workspaces": [
     "packages/*",
     "packages/catalog/*",
+    "samples/chorestar",
+    "samples/hackernews",
+    "samples/hackernews/.dv",
+    "samples/morg",
+    "samples/morg/.dv",
+    "samples/potluck",
+    "samples/mapmit",
+    "samples/mapmit/.dv",
+    "samples/rendezvous",
+    "samples/rendezvous/.dv",
     "samples/sweetspots",
-    "samples/sweetspots/.dv"
+    "samples/sweetspots/.dv",
+    "designer",
+    "designer-apps/*",
+    "designer-apps/*/.dv"
   ]
 }

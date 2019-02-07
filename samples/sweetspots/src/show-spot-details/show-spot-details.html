@@ -24,10 +24,9 @@
         <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId>
           <dv.tx as sweetspots-delete-spot>
             <geolocation.delete-marker id=$id hidden=true />
-            <!-- TODO: negative numbers -->
-            <!-- <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
+            <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
               targetId=sweetspots.navbar.loggedInUserId
-              value=-1 hidden=true /> -->
+              value=-1 hidden=true />
             <authorization.delete-resource id=$id hidden=true />
             <authentication.authenticate id=sweetspots.navbar.loggedInUserId
               hidden=true />
