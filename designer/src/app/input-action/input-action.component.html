@@ -20,11 +20,13 @@
       </mat-optgroup>
     </mat-select>
   </mat-form-field>
-  <div *ngIf="actionInstance" class="set-inputs-container">
-    <app-set-inputs
-      *ngIf="actionInstance"
-      [app]="data.app"
-      [actionInstance]="actionInstance"
-    ></app-set-inputs>
-  </div>
+  <mat-dialog-content>
+    <div *ngIf="actionInstance" class="set-inputs-container">
+      <app-set-inputs
+        *ngIf="actionInstance"
+        [app]="data.app"
+        [actionInstance]="actionInstance"
+      ></app-set-inputs>
+    </div>
+  </mat-dialog-content>
 </div>

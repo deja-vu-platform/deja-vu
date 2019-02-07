@@ -2,12 +2,20 @@
   text-align: center;
 }
 
-form {
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+mat-dialog-content {
   display: flex;
   flex-direction: column;
 }
 
-.buttons {
+mat-dialog-actions {
   display: flex;
   justify-content: space-between;
 }
@@ -16,14 +24,10 @@ mat-checkbox {
   margin-right: 8px;
 }
 
-.message {
+.homepage {
   display: inline-block;
   font-style: italic;
   margin-bottom: 8px;
-}
-
-h2 {
-  font-size: 125%;
 }
 
 mat-list-item mat-form-field {

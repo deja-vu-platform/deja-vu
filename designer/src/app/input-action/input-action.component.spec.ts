@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
+  MatDialogModule,
   MatDialogRef,
   MatSelectModule
 } from '@angular/material';
@@ -22,6 +23,7 @@ describe('InputActionComponent', () => {
       ],
       imports: [
         FormsModule,
+        MatDialogModule,
         MatSelectModule
       ],
       providers: [

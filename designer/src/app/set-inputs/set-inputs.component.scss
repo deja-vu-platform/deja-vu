@@ -2,7 +2,7 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
-  gap: 8px;
+  column-gap: 16px;
 }
 
 button.replace-action {

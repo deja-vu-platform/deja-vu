@@ -14,11 +14,11 @@ export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
+  readonly actionInputs: string[];
 }
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
-  readonly actionInputs: string[];
 }
 
 // tslint:disable-next-line interface-name
@@ -33,6 +33,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
+  readonly actionInputs: string[] = []; // always
   // TODO: styling options
 
   constructor(name: string) {
