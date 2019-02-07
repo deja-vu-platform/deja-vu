@@ -2,11 +2,12 @@
   "name": "morg",
   "version": "0.0.1",
   "scripts": {
-    "start": "dv serve"
+    "start": "dv serve",
+    "clean": "rm -rf .dv"
   },
   "private": true,
   "devDependencies": {
-    "dv-cli": "0.0.1"
+    "@deja-vu/cli": "0.0.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",

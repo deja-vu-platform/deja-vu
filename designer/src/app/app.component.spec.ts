@@ -12,7 +12,7 @@ import {
 } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
 
-import { DvModule } from 'dv-core';
+import { DvModule } from '@deja-vu/core';
 
 import {
   ActionDefinitionComponent

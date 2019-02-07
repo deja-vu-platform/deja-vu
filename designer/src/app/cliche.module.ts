@@ -2,20 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import * as _ from 'lodash';
 
-import * as dv from 'dv-core';
+import * as dv from '@deja-vu/core';
 
-import * as allocator from 'allocator';
-import * as authentication from 'authentication';
-import * as authorization from 'authorization';
-import * as event from 'event';
-import * as follow from 'follow';
-import * as geolocation from 'geolocation';
-import * as group from 'group';
-import * as passkey from 'passkey';
-import * as property from 'property';
-import * as rating from 'rating';
-import * as task from 'task';
-import * as transfer from 'transfer';
+import * as allocator from '@deja-vu/allocator';
+import * as authentication from '@deja-vu/authentication';
+import * as authorization from '@deja-vu/authorization';
+import * as event from '@deja-vu/event';
+import * as follow from '@deja-vu/follow';
+import * as geolocation from '@deja-vu/geolocation';
+import * as group from '@deja-vu/group';
+import * as passkey from '@deja-vu/passkey';
+import * as property from '@deja-vu/property';
+import * as rating from '@deja-vu/rating';
+import * as task from '@deja-vu/task';
+import * as transfer from '@deja-vu/transfer';
 
 import { ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';

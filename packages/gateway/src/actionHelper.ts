@@ -36,7 +36,7 @@ export interface ActionTable {
   readonly [tag: string]: ActionAst;
 }
 
-// From dv-core
+// From @deja-vu/core
 export interface FieldMap {
   [field: string]: string;
 }
@@ -53,7 +53,7 @@ export interface ActionInput {
 
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 const CONFIG_FILE_NAME = 'dvconfig.json';
-const DV_CORE_CLICHE = 'dv-core';
+const DV_CORE_CLICHE = 'core';
 const INDENT_NUM_SPACES = 2;
 
 
@@ -251,7 +251,8 @@ export class ActionHelper {
   private static GetClicheFolder(cliche: string): string {
     // Cliches specify as a main their typings (so that when apps do `import
     // 'cliche'` it works) . To get to their folder we need to go up a dir
-    return path.join(path.dirname(require.resolve(cliche)), '..');
+    return path.join(path.dirname(
+      require.resolve(`@deja-vu/${cliche}`)), '..');
   }
 
   /**

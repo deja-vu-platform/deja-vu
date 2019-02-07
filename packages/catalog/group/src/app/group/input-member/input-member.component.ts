@@ -8,7 +8,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { OnExecSuccess, RunService } from 'dv-core';
+import { OnExecSuccess, RunService } from '@deja-vu/core';
 
 
 import { startWith } from 'rxjs/operators';

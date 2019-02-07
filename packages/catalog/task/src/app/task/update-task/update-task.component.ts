@@ -13,7 +13,7 @@ import {
   OnExecFailure,
   OnExecSuccess,
   RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 import { map } from 'rxjs/operators';
 

@@ -9,7 +9,7 @@ exports.handler = ({ name, pathToDv }) => {
   installAndConfigureGateway(name, pathToDv);
   console.log(
     `Edit ${APP_MODULE_PATH}:\n
-       - add "import { GATEWAY_URL, DvModule } from 'dv-core';"\n
+       - add "import { GATEWAY_URL, DvModule } from '@deja-vu/core';"\n
        - add "{
          provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
          }" to the providers array\n

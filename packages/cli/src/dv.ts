@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 const yargs = require('yargs'); // tslint:disable-line no-var-requires
 
-import { AppCompiler } from 'language';
+import { AppCompiler } from '@deja-vu/compiler';
 
 import {
   ACTION_TABLE_FILE_NAME,
@@ -13,7 +13,7 @@ import {
   cmd,
   DvConfig,
   DVCONFIG_FILE_PATH,
-  locatePackage,
+  locateClichePackage,
   readFileOrFail,
   startGatewayCmd,
   startServerCmd,
@@ -35,7 +35,7 @@ function startServerCmdOfUsedCliche(
   // Cliches specify as a main their typings (so that when apps do `import
   // 'cliche'` it works) . To get to their folder we need to go up a dir
   const serverDistFolder = path
-    .join(path.dirname(locatePackage(clicheFolder)), '..', 'server');
+    .join(path.dirname(locateClichePackage(clicheFolder)), '..', 'server');
   const configKey = `usedCliches.${alias}.config`;
   const asFlagValue = (alias !== cliche) ? alias : undefined;
 

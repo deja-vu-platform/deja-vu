@@ -136,7 +136,7 @@ export function updateJsonFile<T>(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node ' + path.join(locatePackage('dv-gateway')) +
+  return 'node ' + path.join(locatePackage('@deja-vu/gateway')) +
     ` --configFilePath ${configFilePath}`;
 }
 
@@ -177,6 +177,10 @@ export function locatePackage(pkg: string) {
   return require.resolve(pkg);
 }
 
+export function locateClichePackage(pkg: string) {
+  return locatePackage(`@deja-vu/${pkg}`);
+}
+
 export function concurrentlyCmd(...cmds: string[]): string {
   let cmdStr = '';
   for (const c of cmds) {
@@ -188,16 +192,16 @@ export function concurrentlyCmd(...cmds: string[]): string {
 
 const PKGS_FOLDER = 'packages';
 const GATEWAY_PORT = 3000;
-const GATEWAY_FOLDER = path.join(PKGS_FOLDER, 'dv-gateway');
+const GATEWAY_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/gateway');
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
 
-const CORE_FOLDER = path.join(PKGS_FOLDER, 'dv-core');
+const CORE_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/core');
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it
 // is what serves the SPA
 export function installAndConfigureGateway(name: string, pathToDv: string) {
-  console.log('Install gateway and dv-core');
+  console.log('Install gateway and core');
   npm([
     'install', path.join('..', pathToDv, GATEWAY_FOLDER),
     path.join('..', pathToDv, CORE_FOLDER, NG_PACKAGR.configFileContents.dest),

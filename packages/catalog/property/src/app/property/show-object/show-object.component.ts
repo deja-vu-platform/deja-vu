@@ -8,7 +8,7 @@ import {
   GatewayServiceFactory,
   OnEval,
   RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';

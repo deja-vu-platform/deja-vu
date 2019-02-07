@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { GATEWAY_URL, DvModule } from 'dv-core';
+import { GATEWAY_URL, DvModule } from '@deja-vu/core';
 
 import { AppComponent } from './app.component';
 import { ScoringModule } from './scoring/scoring.module';

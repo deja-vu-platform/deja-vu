@@ -6,7 +6,7 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { DvModule } from 'dv-core';
+import { DvModule } from '@deja-vu/core';
 
 import { CreateScoreComponent } from './create-score/create-score.component';
 import { ShowScoreComponent } from './show-score/show-score.component';

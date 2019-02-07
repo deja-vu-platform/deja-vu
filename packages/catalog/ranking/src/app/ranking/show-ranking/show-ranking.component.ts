@@ -13,7 +13,7 @@ import {
 
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
 
