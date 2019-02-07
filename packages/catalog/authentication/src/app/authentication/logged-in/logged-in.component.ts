@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef,
   EventEmitter, OnInit, Output
 } from '@angular/core';
-import { RunService } from 'dv-core';
+import { RunService } from '@deja-vu/core';
 
 import { AuthenticationService } from '../shared/authentication.service';
 

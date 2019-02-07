@@ -5,7 +5,7 @@ import {
 
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 import { User } from '../shared/authentication.model';
 import { ShowUserComponent } from '../show-user/show-user.component';

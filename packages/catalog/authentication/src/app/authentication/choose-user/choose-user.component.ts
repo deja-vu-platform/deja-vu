@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
-import { Action } from 'dv-core';
+import { Action } from '@deja-vu/core';
 
 import { ShowUserComponent } from '../show-user/show-user.component';
 

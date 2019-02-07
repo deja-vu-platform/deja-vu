@@ -4,7 +4,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 import { API_PATH } from '../scoring.config';
 import { Score } from '../shared/scoring.model';

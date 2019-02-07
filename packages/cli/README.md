@@ -11,7 +11,7 @@ To install you need to have node installed. Once you do, you can install the
 Déjà Vu CLI with:
 
 ```
-npm install -g dv-cli
+npm install -g @deja-vu/cli
 ```
 
 Interface

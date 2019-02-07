@@ -43,12 +43,12 @@ export class AppComponent {
     this.configureDragula(); // dragula needs to be configured at the top level
     // start the backend
     if (this.electronService.remote) {
-      const gateway = this.electronService.remote.require('dv-gateway');
+      const gateway = this.electronService.remote.require('@deja-vu/gateway');
       this.requestProcessor = gateway.startGateway(); // port 3000 default
       // imports for addCliche
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
-      this.cli = this.electronService.remote.require('dv-cli/dist/utils');
+      this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
     }
   }
 
@@ -121,7 +121,8 @@ export class AppComponent {
       this.requestProcessor
         .addCliche(cliche.of.name, this.nextPort, cliche.name);
       const serverPath = this.path.join(this.path.dirname(
-        this.cli.locatePackage(cliche.of.name)), '..', 'server', 'server.js');
+        this.cli.locateClichePackage(cliche.of.name)),
+        '..', 'server', 'server.js');
       const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;

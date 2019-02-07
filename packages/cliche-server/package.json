@@ -1,9 +1,8 @@
 {
-  "name": "cliche-server",
+  "name": "@deja-vu/cliche-server",
   "version": "0.0.1",
   "description": "The server class and its helpers for Déjà Vu cliches",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "package": "yarn run build",
     "prepare": "yarn run package",

@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../follow.config';

@@ -83,6 +83,16 @@ export class NgAppBuilder {
     return `${_.capitalize(dep)}Module`;
   }
 
+  private static DepToPackage(dep: string) {
+    return `@deja-vu/${dep}`;
+  }
+
+  private static FindPackage(dep: string) {
+    return path.dirname(
+      require.resolve(
+        path.join(NgAppBuilder.DepToPackage(dep), 'package.json')));
+  }
+
   private static DiffCacheRecord(
     prev: CacheRecord | undefined, curr: CacheRecord): CacheRecordDiff {
     const diff = {};
@@ -206,7 +216,8 @@ export class NgAppBuilder {
       dependencies: _
         .map(
           this.dependencies,
-          (d: Dependency) => `"${d.name}": "${d.version}"`)
+          (d: Dependency) =>
+            `"${NgAppBuilder.DepToPackage(d.name)}": "${d.version}"`)
         .join(',\n'),
       componentImports: _
         .map(
@@ -218,7 +229,8 @@ export class NgAppBuilder {
         .map(
           this.dependencies,
           (d: Dependency) =>
-            `import { ${NgAppBuilder.DepToModule(d.name)} } from '${d.name}'`)
+            `import { ${NgAppBuilder.DepToModule(d.name)} } from
+            '${NgAppBuilder.DepToPackage(d.name)}'`)
         .join(';\n'),
       components: _
         .map(this.components, 'className')
@@ -315,8 +327,7 @@ export class NgAppBuilder {
 
     // | assets/
     for (const d of this.dependencies) {
-      const clichePackageLocation = path.dirname(
-        require.resolve(path.join(d.name, 'package.json')));
+      const clichePackageLocation = NgAppBuilder.FindPackage(d.name);
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
       const appAssetsDir = path.join(assetsDir, d.name);
       if (existsSync(clicheAssets)) {

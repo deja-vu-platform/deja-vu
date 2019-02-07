@@ -1,6 +1,6 @@
 import { Component, Input, Type } from '@angular/core';
 
-import { Action } from 'dv-core';
+import { Action } from '@deja-vu/core';
 
 import { Group } from '../shared/group.model';
 import { ShowMemberComponent } from '../show-member/show-member.component';

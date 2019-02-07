@@ -9,7 +9,7 @@ import {
 import {
   Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 
 import * as _ from 'lodash';

@@ -3,7 +3,7 @@ import {
   ClicheServerBuilder,
   Config,
   Context
-} from 'cliche-server';
+} from '@deja-vu/cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';

@@ -7,7 +7,8 @@
     "bootstrap": "yarn install",
     "prepare": "yarn run package",
     "package": "lerna run package",
-    "clean": "lerna clean && rm -rf node_modules",
+    "test": "lerna run test",
+    "clean": "lerna clean && rm -rf node_modules && lerna run clean",
     "release": "lerna publish"
   },
   "devDependencies": {

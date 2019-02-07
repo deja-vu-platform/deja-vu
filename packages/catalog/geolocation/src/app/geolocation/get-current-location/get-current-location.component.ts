@@ -1,7 +1,7 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
-import { RunService } from 'dv-core';
+import { RunService } from '@deja-vu/core';
 
 import { Location } from '../shared/geolocation.model';
 

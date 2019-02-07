@@ -4,7 +4,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 import { API_PATH } from '../authorization.config';
 
 import * as _ from 'lodash';

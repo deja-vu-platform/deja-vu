@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
-    "clean": "rm -rf .dv/"
+    "clean": "rm -rf .dv"
   },
   "devDependencies": {
-    "dv-cli": "0.0.1"
+    "@deja-vu/cli": "0.0.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
