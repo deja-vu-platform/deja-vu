@@ -1,0 +1,270 @@
+// Enables climbers to log their climbs and for others to view the 
+// results in real-time.
+app LiveScorecard {
+    /** Neccessary Cliches **/
+    // Grants access to content based on permissions.
+    include access/Authorization [
+        Host for Principal
+    ] as HostAuthorization
+
+    include access/Authorization [
+        Climber for Principal
+    ] as ClimberAuthorization
+
+    include access/Authorization [
+        Spectator for Principal
+    ] as SpectatorAuthorization
+
+   include access/StandardAuthentication [
+        Host for User
+    ] as HostAuthentication
+
+    // Allows climbers and their 'buddies' to view and log climbs.
+    include access/PasskeyAuthentication [
+        Climber for Passkey
+    ] as ClimberAuthentication
+
+    // A spectator can view the live leaderboard using a competition code.
+    include access/PasskeyAuthentication [
+        Spectator for Passkey
+    ] as SpectatorAuthentication
+
+    // Competitions are created by a host. Climbers participate in them and
+    // spectators view their results.
+    include organization/Event [
+        Competition for Event,
+        ShowAndEditCompetition replacing ShowEvent in ShowEvents
+    ]
+
+    // Climbers have to complete climbs of various difficulties to score points.
+    include organization/Task [
+        Climb for Task,
+        Host for Assigner,
+        Climber for Assignee,
+        ShowAndLogClimb replacing ShowTask in ShowAllTasks,
+        ShowClimb replacing ShowTask in ShowAssignedTasks
+    ] 
+
+    // For every competition, there is a set of climbers.
+    include organization/Group [
+        Climber for Member,
+        Competition for Group
+    ] as CompetitionClimbers
+
+    // For every competition, there is a set of hosts.
+    include organization/Group [
+        Host for Member,
+        Competition for Group
+    ] as CompetitionHosts
+
+    /** Entities **/
+    data Host {
+        name: text,
+        username: text
+    }
+
+    data Climber {
+        name: text,
+        code: text
+    }
+
+    data Spectator {
+        code: text
+    }
+
+    data Competition { 
+        name: text,
+        code: text,
+        hosts: [Host],
+        climbers: [Climber]
+    }
+
+    // A climb is a task that is assigned by a host to all climbers
+    // in the competition.
+    // The name is the climb number set by hosts to make it easier for
+    // climbers to identify and log their climbs.
+    data Climb {
+        name: text
+    }
+
+    /** Widgets **/
+    // Displays the login form for Hosts.
+    main widget HostLogin {
+        on_host_ok: Widget = HostHome
+    }
+
+    // Displays the register form for Hosts.
+    widget HostRegister {
+        on_host_ok: Widget = HostHome
+    }  
+
+    // Displays buttons to choose appropriate login form.
+    widget Banner { }  
+
+    // Allows hosts to add competitions, climbers and other hosts.
+    // Also, allows hosts to view the leaderboard and add climbs.
+    widget HostHome {
+        host: Host,
+        new_competition: Competition,
+        new_spectator: Spectator
+    }
+
+    // Displays the navigation bar for Hosts.
+    widget HostNavBar { 
+        loggedInHost: Host,
+        on_signout_ok: Widget = HostLogin
+    }
+
+    // Displays the login form for Climbers. 
+    widget ClimberLogin {
+        on_climber_ok: Widget = ClimberHome
+    }
+
+    // Allows Climbers to view available climbs, log climbs and view the 
+    // leaderboard.
+    // Also, allows other climbers to use the buddy log.
+    widget ClimberHome {
+        climber: Climber,
+        climb: Climb
+    }
+
+    // Displays the navigation bar for Climbers.
+    // 'on_signout_ok' is decoupled from this widget to ensure that the page
+    // redirects correctly if BuddyLog is used. 
+    widget ClimberNavBar {
+        climber: Climber
+    }
+
+    // Displays the sign out button for Climbers. 
+    widget ClimberLogOut {
+        climber: Climber,
+        on_signout_ok: Widget = ClimberLogin
+    }
+
+    // Displays the sign in form for a guest Climber.
+    widget BuddyLogin {
+        buddy: Climber,
+        on_buddy_ok: Widget = BuddyHome
+    }
+
+    // Displays the navigation bar for the guest Climber.
+    widget BuddyNavBar {
+        buddy: Climber,
+        on_guest_signout_ok: Widget = ClimberHome
+    }
+    
+    // Similar to ClimberHome, but signing out returns it to the original 
+    // climber's account.
+    widget BuddyHome {
+        buddy: Climber,
+        climb: Climb
+    }
+
+    // Displays the sign in for for Spectators
+    widget SpectatorLogin {
+        on_spectator_ok: Widget = SpectatorHome
+    }
+
+    // Allows spectators to view the leaderboard.
+    widget SpectatorHome {
+        spectator: Spectator,
+        on_signout_ok: Widget = SpectatorLogin
+    }
+    
+    // A climber can only complete a climb after receiving approval by
+    // another climber, NOT a host or the climber him/herself.
+    widget ShowAndLogClimb {
+        task: Climb
+    }
+
+    // Allows the host to create a competition
+    widget AddCompetitionForm {
+        new_competition: Competition,
+        new_spectator: Spectator,
+        host: Host,
+        submit_ok: boolean
+    }
+
+    // A host can add other individuals to co-host the competition.
+    // The host can also view the other co-hosts for the competition.
+    widget ShowCompetitionHosts {
+        competition: Competition,
+        newHost: Host
+    }
+
+    // A host can view or add climbers to or of the competition.
+    widget ShowAndEditClimbers {
+        competition: Competition,
+        new_climber: Climber
+    }
+
+    
+
+    // A host can add a climber to the competition.
+    widget AddClimberForm {
+        new_climber: Climber,        
+        competition: Competition,
+        host: Host
+    }
+
+    // A host can view or add climbs to or of a competition.
+    widget ShowAndEditClimbs {
+        host: Host,
+        competition: Competition,
+        new_climbs: [Climb]
+    }
+
+    // Displays climb information.
+    widget ShowClimb {
+        host: Host,
+        climb: Climb
+    }
+
+    // A host can add a climb to a competition.
+    widget AddClimbForm {
+        new_climbs: [Climb],
+        host: Host,
+        competition: Competition
+    }
+
+    // Link to the listing of the competition's hosts.
+    widget LinkToHosts {
+        host: Host,
+        competition: Competition,
+        on_redirect: Widget = ShowCompetitionHosts
+    }
+
+    // Link to the listing of the competition's climbers.
+    widget LinkToClimbers {
+        competition: Competition,
+        on_redirect: Widget = ShowAndEditClimbers
+    }
+
+    // Link to the listing of the competition's climbs.
+    widget LinkToClimbs {
+        host: Host,
+        competition: Competition,
+        on_redirect: Widget = ShowAndEditClimbs
+    }
+
+    // Displays the details of the competition and allows the host
+    // to delete it.
+    widget ShowAndEditCompetition {
+        competition: Competition,
+        host: Host
+    }
+
+    /** Routes **/
+    buddy_home: route = {path: "buddy", widget: BuddyHome}
+    buddy_login: route = {path: "buddy-login", widget: BuddyLogin}
+    climber_login: route = {path: "climber-login", widget: ClimberLogin}
+    climber_home: route = {path: "climber", widget: ClimberHome}
+    host_login: route = {path: "host-login", widget: HostLogin}
+    host_register: route = {path: "host-register", widget: HostRegister}
+    host_home: route = {path: "host", widget: HostHome}
+    show_hosts: route = {path: "competition-hosts", widget: ShowCompetitionHosts}
+    show_participants: route = {path: "participants", widget: ShowAndEditClimbers}
+    show_climbs: route = {path: "climbs", widget: ShowAndEditClimbs}    
+    spectator_login: route = {path: "spectator-login", widget: SpectatorLogin}
+    spectator_home: route = {path: "spectator", widget: SpectatorHome}
+}
