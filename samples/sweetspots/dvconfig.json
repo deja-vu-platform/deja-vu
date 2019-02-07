@@ -1,11 +1,6 @@
 {
   "name": "sweetspots",
   "type": "app",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "authentication": {
       "name": "authentication",
