@@ -60,6 +60,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   @Input() end: Location | undefined;   // N/A for Google Maps
 
   // Presentation Inputs
+  @Input() showLoadedMarkers = true;
   @Input() showSearchControl = true;      // N/A for Google Maps
   @Input() showDirectionsControl = true;  // N/A for Google Maps
   @Input() streetViewControl = false;     // N/A for Leaflet
@@ -129,7 +130,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   setLeafletMarkers() {
-    if (!_.isEmpty(this.markers)) {
+    if (!_.isEmpty(this.markers) && this.showLoadedMarkers) {
       this.layers = this.markers.map((m: Marker) => {
         const popupText = m.title ? m.title : `${m.latitude}, ${m.longitude}`;
 
