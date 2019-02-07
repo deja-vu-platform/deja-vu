@@ -5,6 +5,11 @@ import * as uuidv4 from 'uuid/v4';
 
 // names should be HTML safe (TODO: ensure this)
 
+export interface ActionCollection {
+  name: string;
+  actions: ActionDefinition[];
+}
+
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
@@ -154,13 +159,13 @@ export class Row {
 export class ActionInstance {
   readonly id = uuidv4();
   readonly of: ActionDefinition;
-  readonly from: App | ClicheInstance | ClicheDefinition;
+  readonly from: ActionCollection;
   readonly inputSettings: { [inputName: string]: string } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
     ofAction: ActionDefinition,
-    from: App | ClicheInstance | ClicheDefinition
+    from: ActionCollection
   ) {
     this.of = ofAction;
     this.from = from;
@@ -230,18 +235,14 @@ export class ClicheInstance {
 }
 
 export class App {
+  static dvCliche: ActionCollection; // MUST POPULATE LATER
   name: string; // no dashes
   readonly actions: AppActionDefinition[];
   readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
   readonly cliches: ClicheInstance[] = [];
-
-  constructor(name: string) {
-    this.name = name;
-    this.actions = [new AppActionDefinition('new-action-1')];
-    this.pages = [...this.actions];
-    this.homepage = this.pages[0];
-  }
+  // need consistent object to return
+  private readonly _actionCollections: ActionCollection[] = [];
 
   static fromJSON(
     jsonString: string,
@@ -299,6 +300,14 @@ export class App {
     app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
 
     return app;
+  }
+
+  constructor(name: string) {
+    this.name = name;
+    this.actions = [new AppActionDefinition('new-action-1')];
+    this.pages = [...this.actions];
+    this.homepage = this.pages[0];
+    this._actionCollections.push(this);
   }
 
   private tsortActions(): AppActionDefinition[] {
@@ -380,5 +389,20 @@ export class App {
         ))
       ]
     }, null, '  ');
+  }
+
+  get actionCollections(): ActionCollection[] {
+    this._actionCollections.splice(0);
+    this._actionCollections.push(App.dvCliche);
+    this._actionCollections.push(this);
+    this._actionCollections.push.apply(
+      this._actionCollections,
+      this.cliches
+        .sort(({ name: nameA }, { name: nameB }) =>
+          nameA === nameB ? 0 : (nameA < nameB ? -1 : 1)
+        )
+    );
+
+    return this._actionCollections;
   }
 }

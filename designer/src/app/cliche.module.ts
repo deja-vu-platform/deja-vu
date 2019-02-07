@@ -17,7 +17,7 @@ import * as rating from '@deja-vu/rating';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
-import { ClicheActionDefinition, ClicheDefinition } from './datatypes';
+import { App, ClicheActionDefinition, ClicheDefinition } from './datatypes';
 import { TextComponent } from './text/text.component';
 
 // TODO: import platform actions (e.g. button, link, etc.)
@@ -81,6 +81,7 @@ export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
 
 export const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+App.dvCliche = dvCliche;
 export const dvCoreActions = dvCliche.actions
   .map(({ component: c }) => <any>c);
 dvCliche.actions.push(({

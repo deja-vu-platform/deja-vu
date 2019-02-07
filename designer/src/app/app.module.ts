@@ -27,6 +27,7 @@ import {
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
+import { InputActionComponent } from './input-action/input-action.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
@@ -41,7 +42,8 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     SideMenuComponent,
     TextComponent,
     TopBarComponent,
-    ClicheActionDirective
+    ClicheActionDirective,
+    InputActionComponent
   ],
   imports: [
     BrowserModule,
@@ -66,6 +68,7 @@ import { TopBarComponent } from './top-bar/top-bar.component';
   entryComponents: [
     ConfigureActionComponent,
     ConfigureClicheComponent,
+    InputActionComponent,
     TextComponent
   ].concat(dvCoreActions)
 })

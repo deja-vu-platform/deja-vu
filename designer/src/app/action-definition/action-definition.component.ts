@@ -1,6 +1,11 @@
 import { Component, Input } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs';
+
 import { ActionInstance, App, AppActionDefinition, Row } from '../datatypes';
+import {
+  DialogData, InputActionComponent
+} from '../input-action/input-action.component';
 import { linkChildren, ScopeIO } from '../io';
 
 const emptyRow = new Row();
@@ -16,6 +21,8 @@ export class ActionDefinitionComponent {
   readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
   private readonly _rows: Row[] = [];
+
+  constructor(private readonly dialog: MatDialog) { }
 
   @Input()
   set openAction(action: AppActionDefinition) {
@@ -36,6 +43,16 @@ export class ActionDefinitionComponent {
 
   onMenuClosed(_action: ActionInstance) {
     this.resetIO();
+  }
+
+  inputAction() {
+    const data: DialogData = {
+      app: this.app
+    };
+    this.dialog.open(InputActionComponent, {
+      width: '50vw',
+      data
+    });
   }
 
   private resetIO() {
