@@ -1,10 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit
+  Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec,
-  RunService
+  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -27,7 +26,7 @@ interface FollowUnfollowRes {
   styleUrls: ['./follow-unfollow.component.css']
 })
 export class FollowUnfollowComponent implements
-  OnInit, OnChanges, OnExec {
+  OnInit, OnChanges, OnExec, OnExecSuccess {
   @Input() followerId: string;
   @Input() publisherId: string;
 
@@ -60,7 +59,7 @@ export class FollowUnfollowComponent implements
     }
 
     this.gs
-      .get<{ data: any }>(this.apiPath, {
+      .get<IsFollowingRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -103,6 +102,10 @@ export class FollowUnfollowComponent implements
         .join());
     }
 
+  }
+
+  dvOnExecSuccess() {
+    this.followsPublisher = this.queryString === 'follow';
     this.queryString = '';
   }
 }

@@ -16,6 +16,7 @@ import {
   LabelDoc,
   LabelsInput
 } from './schema';
+
 import { v4 as uuid } from 'uuid';
 
 interface LabelConfig extends Config {
@@ -103,10 +104,8 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
         if (input.labelIds) {
           // Items matching all labelIds
           const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-          matchQuery['id'] = {
-            $in: standardizedLabelIds,
-            pending: { $exists: false }
-          };
+          matchQuery['id'] = { $in: standardizedLabelIds };
+          matchQuery['pending'] = { $exists: false };
           groupQuery['initialSet'] = { $first: '$itemIds' };
           initialValue = '$initialSet';
           reduceOperator['$setIntersection'] = ['$$value', '$$this'];
@@ -215,6 +214,7 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
             const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
               const newOp = _.cloneDeep(op);
               _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+              _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
               _.set(newOp, 'updateOne.update.$unset', { pending: '' });
 
               return newOp;
@@ -228,7 +228,7 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
             const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
               const newOp = _.cloneDeep(op);
               _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
-              _.set(newOp, 'updateOne.update', { pending: '' });
+              _.set(newOp, 'updateOne.update.$unset', { pending: '' });
 
               return newOp;
             });

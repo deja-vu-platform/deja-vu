@@ -1,9 +1,9 @@
 <ul *ngIf="itemIds && itemIds.length > 0" class="list-group">
-  <li *ngFor="let itemId of itemIds" class="list-group-item">
+  <li *ngFor="let id of itemIds" class="list-group-item">
     <dv-include
       [action]="showItem"
       default-showItem="{ tag: label-show-item }"
-      [inputs]="{id: itemId}"
+      [inputs]="{id: id}"
       [parent]="showItems">
     </dv-include>
   </li>

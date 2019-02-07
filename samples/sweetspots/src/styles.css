@@ -1,0 +1,208 @@
+@import "~css-star-rating/dist/css/star-rating.min.css";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
+@import url('https://fonts.googleapis.com/css?family=Mogra');
+
+md-icon {
+  font-family: 'Material Icons' !important;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-primary {
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-default {
+  background-color: #B31B41 !important;
+  border-color: #B31B41 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-default:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger,
+authentication-sign-out button.mat-button,
+comment-delete-comment button.mat-button {
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-info {
+  background-color: #00D9C0 !important;
+  border-color: #00D9C0 !important;
+  color: #FFFFFF !important;
+}
+
+html,
+body,
+main {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #FFFCF9 !important;
+}
+
+sweetspots-add-a-spot,
+#add-a-spot {
+  text-align: center;
+}
+
+body {
+  padding-bottom: 40px;
+  background-color: #FFFFFF;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+
+.form-signin-heading {
+  font-family: 'Mogra', cursive !important;
+  color: #f62459;
+}
+
+.navbar-btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.form-horizontal .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+#map-div {
+  height: calc(100vh - 105px);
+}
+
+ul {
+  list-style: none;
+}
+
+authentication-register-user button.mat-button,
+authentication-sign-in button.mat-button {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+authentication-register-user button.mat-button:hover,
+authentication-sign-in button.mat-button:hover {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading a {
+  font-family: 'Mogra', cursive !important;
+  font-size: 32px !important;
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading a:visited {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.sweet-spots-heading a:link {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+.sweet-spots-heading a:hover {
+  color: #FFFFFF !important;
+  text-decoration: none;
+}
+
+.sweet-spots-heading a:active {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+dv-link.profile-btn {
+  padding-top: 5px;
+}
+
+.profile-btn a,
+.login-btn a,
+.register-btn a {
+  color: #FFFFFF;
+}
+
+follow-follow-unfollow button.btn {
+  float: none !important;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  color: #fff !important;
+  background-color: #5cb85c !important;
+  border-color: #4cae4c !important;
+}
+
+search-items-by-labels button.mat-button {
+  display: inline-block;
+}
+
+rating-rate-target .rating {
+  justify-content: start;
+}

@@ -16,6 +16,8 @@ declare let L;
 import { API_PATH, GeolocationConfig } from '../geolocation.config';
 import { Location, Marker } from '../shared/geolocation.model';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'geolocation-display-map',
@@ -43,14 +45,19 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   // Required
   @Input() id: string;
 
-  // If not provided, all markers will be loaded
+  // If not provided, all markers associated with `id` will be loaded
   get markers() { return this._markers; }
   @Input() set markers(markers: Marker[]) {
     this._markers = markers;
   }
 
-  @Input() start: Location; // N/A for Google Maps
-  @Input() end: Location;   // N/A for Google Maps
+  // Filter points by radius in miles
+  @Input() center: Location | undefined;
+  @Input() radius: number | undefined;
+
+  // Used to show directions between two points
+  @Input() start: Location | undefined; // N/A for Google Maps
+  @Input() end: Location | undefined;   // N/A for Google Maps
 
   // Presentation Inputs
   @Input() showLoadedMarkers = true;
@@ -63,7 +70,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   @Input() lat = 42.36157;
   @Input() lng = -71.09067;
   @Input() zoom = 16;
-  @Input() maxZoom = 20;
+  @Input() maxZoom = 19;
   @Input() minZoom = 3;
 
   // Default Tile Provider for Leaflet: OpenStreetMaps
@@ -123,14 +130,18 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   setLeafletMarkers() {
-    if (this.markers) {
+    if (!_.isEmpty(this.markers) && this.showLoadedMarkers) {
       this.layers = this.markers.map((m: Marker) => {
         const popupText = m.title ? m.title : `${m.latitude}, ${m.longitude}`;
+
         return L.marker([m.latitude, m.longitude], {
           icon: this._markerIcon
         })
           .bindPopup(`<b>${popupText}</b>`);
       });
+
+      this.bounds = (L.featureGroup(this.layers)).getBounds()
+        .pad(0.5);
     }
   }
 
@@ -198,17 +209,20 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   onMapClick(e) {
-    let coords, title;
 
     if (this.mapType === 'leaflet') {
       const event: L.LeafletMouseEvent = e;
-      coords = event.latlng;
+      const coords = event.latlng;
 
       // Retrieve address from clicked location
       this._geocoder.reverse(coords,
         this._map.options.crs.scale(this._map.getZoom()), (results) => {
           const r = results[0];
-          title = r.html || r.name;
+          const title = r.html || r.name;
+
+          this.newMarker.emit(
+            this.generateMarker(coords.lat, coords.lng, r.name));
+
           if (this._geocodeMarker) {
             this._map.removeLayer(this._geocodeMarker);
           }
@@ -217,30 +231,34 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
             .addTo(this._map)
             .openPopup();
         });
-
     } else {
       const event: AgmMouseEvent = e;
-      coords = event.coords;
+      const coords = event.coords;
+      this.newMarker.emit(this.generateMarker(coords.lat, coords.lng));
     }
+  }
 
-    const m: Marker = {
+  private generateMarker(lat: number, lng: number, title?: string): Marker {
+    return {
       title: title,
-      latitude: coords.lat,
-      longitude: coords.lng,
+      latitude: lat,
+      longitude: lng,
       mapId: this.id
     };
-
-    this.newMarker.emit(m);
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      const filter = { ofMapId: this.id };
+      if (this.center && this.radius) {
+        filter['centerLat'] = this.center.latitude;
+        filter['centerLng'] = this.center.longitude;
+        filter['radius'] = this.radius;
+      }
       this.gs
         .get<{ data: { markers: Marker[] } }>(this.apiPath, {
           params: {
-            inputs: JSON.stringify({
-              input: { ofMapId: this.id }
-            }),
+            inputs: JSON.stringify({ input: filter }),
             extraInfo: {
               returnFields: `
                 title
@@ -260,6 +278,10 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   private canEval(): boolean {
-    return !!(this.id && this.gs);
+    if (this.center || this.radius) {
+      return !!(this.id && this.gs && this.center && this.radius);
+    } else {
+      return !!(this.id && this.gs);
+    }
   }
 }

@@ -6,12 +6,10 @@ import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
+import * as _ from 'lodash';
 import { filter, take } from 'rxjs/operators';
 
-import * as _ from 'lodash';
-
 import { API_PATH } from '../label.config';
-
 import { ShowItemComponent } from '../show-item/show-item.component';
 
 interface ItemsRes {
@@ -26,19 +24,19 @@ interface ItemsRes {
 })
 export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
-  // A list of itemIds to wait for
+  // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
   // Emits the field name that changes
   fieldChange = new EventEmitter<string>();
 
-  @Input() showItem: Action = {
-    type: <Type<Component>>ShowItemComponent
-  };
+  @Input() itemIds: string[] = [];
 
   @Input() noItemsToShowText = 'No items to show';
 
-  itemIds: string[] = [];
+  @Input() showItem: Action = {
+    type: <Type<Component>> ShowItemComponent
+  };
 
   showItems;
   private gs: GatewayService;
@@ -68,28 +66,28 @@ export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   loadItems() {
-    if (this.canEval()) {
-      this.rs.eval(this.elem);
-    }
+    this.rs.eval(this.elem);
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await Promise.all(_.chain(this.waitOn)
-        .filter((field) => !this[field])
-        .map((fieldToWaitFor) => this.fieldChange
-          .pipe(filter((field) => field === fieldToWaitFor), take(1))
-          .toPromise())
-        .value());
-
-      this.gs.get<ItemsRes>(this.apiPath, {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => !this[field])
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      } else {
+        this.gs.get<ItemsRes>(this.apiPath, {
           params: {
-            inputs: JSON.stringify({ input: { } })
+            inputs: JSON.stringify({ input: {} })
           }
         })
-        .subscribe((res) => {
-          this.itemIds = res.data.items;
-        });
+          .subscribe((res) => {
+            this.itemIds = res.data.items;
+          });
+      }
     }
   }
 

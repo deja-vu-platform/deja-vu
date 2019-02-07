@@ -329,7 +329,16 @@ export class NgAppBuilder {
     for (const d of this.dependencies) {
       const clichePackageLocation = NgAppBuilder.FindPackage(d.name);
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
-      const appAssetsDir = path.join(assetsDir, d.name);
+
+      /**
+       * Desired behaviour: Image assets for a cliche are found in
+       *    `assets/<cliche-name>/<img-file>`
+       * Problem: The library used to display stars in the rating cliche looks
+       *    for the image in `assets/images/<img-name>`
+       * Hack: Put rating's assets in `assets/` not `assets/rating/`
+       */
+      const appAssetsDir = d.name === 'rating' ? assetsDir :
+        path.join(assetsDir, d.name);
       if (existsSync(clicheAssets)) {
         copySync(clicheAssets, appAssetsDir);
       }

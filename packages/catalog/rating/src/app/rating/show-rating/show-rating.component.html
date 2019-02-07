@@ -1,3 +1,8 @@
-<star-rating-comp [readOnly]="true" [rating]="ratingValue" 
-  [showHalfStars]="true" [starType]="'svg'">
-</star-rating-comp>
+<div *ngIf="showStars">
+  <star-rating-comp [readOnly]="true" [rating]="ratingValue"
+    [showHalfStars]="true" [starType]="'svg'">
+  </star-rating-comp>
+</div>
+<div *ngIf="!showStars">
+  {{ ratingValue }} out of 5
+</div>

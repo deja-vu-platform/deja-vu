@@ -1,0 +1,12 @@
+<dv.action name="show-favorite-spot">
+  <h4>
+    <geolocation.show-marker class="inline-block"
+      id=$id
+      showId=false
+      showLatLong=false
+      showMapId=false /> |
+    <dv.link href="/spot-details" params={ id: $id } class="inline-block">
+      Details
+    </dv.link>
+  </h4>
+</dv.action>

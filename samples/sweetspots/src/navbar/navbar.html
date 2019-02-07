@@ -1,0 +1,61 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
+  searchResults$=label.search-items-by-labels.searchResultItems>
+
+  <dv.tx as sweetspots-auth-check>
+    <authentication.logged-in />
+    <dv.if condition=$accessRequired>
+      <dv.redirect href="/login" onEvalFailure=true />
+    </dv.if>
+  </dv.tx>
+
+  <nav id="nav-bar" class="navbar navbar-default">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <dv.link class="sweet-spots-heading navbar-brand" href="/main">
+          Sweet Spots
+        </dv.link>
+      </div>
+
+      <div class="navbar-form navbar-left search">
+        <label.search-items-by-labels hidden=!$showSearch />
+      </div>
+
+      <dv.if condition=authentication.logged-in.user>
+        <div class="navbar-form navbar-right inline-block">
+          <div class="btn-toolbar toolbar">
+            <dv.tx as sweetspots-sign-out>
+              <authentication.sign-out class="btn btn-danger"
+                buttonLabel="Logout"/>
+              <dv.link href="/login" hidden=true />
+            </dv.tx>
+            &nbsp;
+            <dv.link href="/profile"
+              class="mat-button btn btn-info profile-btn">
+              My Profile
+            </dv.link>
+          </div>
+        </div>
+        <p class="navbar-text navbar-right inline-block">
+          Hello, <authentication.show-user class="inline-block"
+            user=authentication.logged-in.user
+            showId=false />! &nbsp;
+        </p>
+      </dv.if>
+
+      <dv.if condition=!authentication.logged-in.user>
+        <div class="navbar-form navbar-right">
+          <div class="btn-toolbar toolbar">
+            <dv.link href="/login" class="mat-button btn btn-primary login-btn">
+              Login
+            </dv.link>
+            &nbsp;
+            <dv.link href="/register" class="mat-button btn btn-info register-btn">
+              Register
+            </dv.link>
+          </div>
+        </div>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

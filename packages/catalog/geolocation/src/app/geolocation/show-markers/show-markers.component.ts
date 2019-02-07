@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 
 import { ShowMarkerComponent } from '../show-marker/show-marker.component';
 
-import { Marker } from '../shared/geolocation.model';
+import { Location, Marker } from '../shared/geolocation.model';
 
 
 @Component({
@@ -19,11 +19,11 @@ import { Marker } from '../shared/geolocation.model';
 export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
   // Fetch rules
-  @Input() ofMapId = '';
+  @Input() ofMapId: string | undefined;
+  @Input() center: Location | undefined;
+  @Input() radius: number | undefined;
 
   // Show rules
-  /* What fields of the marker to show. These are passed as input
-     to `showMarker` */
   @Input() showId = true;
   @Input() showTitle = true;
   @Input() showLatLong = true;
@@ -65,14 +65,16 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      const filter = { ofMapId: this.ofMapId };
+      if (this.center && this.radius) {
+        filter['centerLat'] = this.center.latitude;
+        filter['centerLng'] = this.center.longitude;
+        filter['radius'] = this.radius;
+      }
       this.gs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
           params: {
-            inputs: JSON.stringify({
-              input: {
-                ofMapId: this.ofMapId
-              }
-            }),
+            inputs: JSON.stringify({ input: filter }),
             extraInfo: {
               returnFields: `
                 ${this.showId ? 'id' : ''}
@@ -91,6 +93,10 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    if (this.center || this.radius) {
+      return !!(this.gs && this.center && this.radius);
+    } else {
+      return !!(this.gs);
+    }
   }
 }

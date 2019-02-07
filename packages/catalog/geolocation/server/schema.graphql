@@ -16,6 +16,9 @@ input CreateMarkerInput {
 
 input MarkersInput {
   ofMapId: ID
+  centerLat: Float
+  centerLng: Float
+  radius: Float
 }
 
 type Query {

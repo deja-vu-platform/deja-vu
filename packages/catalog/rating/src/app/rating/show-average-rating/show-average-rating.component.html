@@ -1,4 +1,11 @@
-<star-rating-comp [showHalfStars]="true" [rating]="averageRatingValue"
-  [starType]="'svg'">
-</star-rating-comp>
-{{ ratingCountValue }} vote{{ ratingCountValue !== 1 ? 's' : '' }}
+<div *ngIf="showStars && showValue">
+  <star-rating-comp [showHalfStars]="true" [rating]="averageRatingValue"
+    [starType]="'svg'">
+  </star-rating-comp>
+</div>
+<div *ngIf="!showStars && showValue">
+  {{ averageRatingValue }} out of 5
+</div>
+<div *ngIf="showNumRatings">
+  {{ ratingCountValue }} {{ ratingLabel }}{{ ratingCountValue !== 1 ? 's' : '' }}
+</div>

@@ -23,6 +23,12 @@ export class ShowAverageRatingComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
   @Input() targetId: string;
 
+  @Input() ratingLabel = 'vote';
+
+  @Input() showValue = true;
+  @Input() showStars = true;
+  @Input() showNumRatings = true;
+
   @Output() averageRating = new EventEmitter<number>();
   averageRatingValue: number;
 

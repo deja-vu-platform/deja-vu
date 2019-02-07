@@ -1,0 +1,40 @@
+<dv.action name="add-a-spot-form">
+  <h2 id="add-a-spot">Add a spot:</h2>
+  <br />
+  <dv.link href="/">&lt; Back to home</dv.link>
+  <br />
+  <br />
+  <dv.tx as sweetspots-create-spot>
+    <dv.id />
+    <dv.status savedText="New spot saved"/>
+    <geolocation.create-marker id=dv.id.id
+      title=$marker?.title
+      latitude=$marker?.latitude
+      longitude=$marker?.longitude
+      mapId="mainMapId"
+      titleLabel="Name"
+      showOptionToSubmit=false />
+    <label.attach-labels itemId=dv.id.id
+      inputLabel="Category"
+      showOptionToSubmit=false />
+    <property.create-object id=dv.id.id
+      showOptionToSubmit=false />
+    <p>Review</p>
+    <rating.rate-target sourceId=$loggedInUserId targetId=dv.id.id
+      execOnClick=false />
+    <comment.create-comment authorId=$loggedInUserId targetId=dv.id.id
+      inputLabel=""
+      showOptionToSubmit=false />
+    <reputation.create-score sourceId=$loggedInUserId
+      targetId=$loggedInUserId
+      value=1
+      hidden=true />
+    <follow.create-publisher id=dv.id.id
+      showOptionToSubmit=false hidden=true />
+    <authorization.create-resource id=dv.id.id
+      ownerId=$loggedInUserId hidden=true />
+    <authentication.authenticate id=$loggedInUserId hidden=true />
+    <dv.button class="btn btn-primary">Submit spot</dv.button>
+    <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+  </dv.tx>
+</dv.action>

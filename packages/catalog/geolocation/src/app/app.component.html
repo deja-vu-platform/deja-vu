@@ -23,6 +23,8 @@
   <geolocation-get-current-location (location)="l=$event">
   </geolocation-get-current-location>
   <geolocation-show-marker [marker]="l"></geolocation-show-marker>
+  <h1>Show Markers within 5 miles</h1>
+  <geolocation-show-markers [center]="l" radius="5"></geolocation-show-markers>
 
   <!-- Create marker to delete -->
   <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>

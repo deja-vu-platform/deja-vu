@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnInit, Output, SimpleChanges, Type
+  Input, OnChanges, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, OnExecFailure,
@@ -33,6 +33,7 @@ export class RateTargetComponent implements
   sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
   targetIdChange = new EventEmitter<void>();
+  @Input() execOnClick = true;
 
   @Output() rating = new EventEmitter<number>();
 
@@ -67,7 +68,7 @@ export class RateTargetComponent implements
   setRating($event) {
     this.prevRatingValue = this.ratingValue;
     this.ratingValue = $event.rating;
-    this.rs.exec(this.elem);
+    if (this.execOnClick) { this.rs.exec(this.elem); }
   }
 
   /**
@@ -130,12 +131,12 @@ export class RateTargetComponent implements
           }
         }
       })
-      .subscribe((res) => {
-        if (res.data.rating) {
-          this.ratingValue = res.data.rating.rating;
-          this.rating.emit(this.ratingValue);
-        }
-      });
+        .subscribe((res) => {
+          if (res.data.rating) {
+            this.ratingValue = res.data.rating.rating;
+            this.rating.emit(this.ratingValue);
+          }
+        });
     }
   }
 

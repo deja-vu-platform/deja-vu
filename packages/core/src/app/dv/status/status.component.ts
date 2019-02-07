@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
-import { RunService, OnExecSuccess, OnExecFailure } from '../run.service';
+import { OnExecFailure, OnExecSuccess, RunService } from '../run.service';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -30,6 +30,6 @@ implements OnInit, OnExecSuccess, OnExecFailure {
   }
 
   dvOnExecFailure(reason: Error) {
-    this.error = reason.message;
+    this.error = eason.message;
   }
 }

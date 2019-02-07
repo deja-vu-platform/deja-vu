@@ -15,9 +15,10 @@ import {
   CommentInput,
   CommentsInput,
   CreateCommentInput,
-  EditCommentInput,
-  DeleteCommentInput
+  DeleteCommentInput,
+  EditCommentInput
 } from './schema';
+
 import { v4 as uuid } from 'uuid';
 
 
@@ -57,12 +58,30 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
+  'show-comment': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'comment-by-id':
+        return `
+          query ShowComment($id: ID!) {
+            comment(id: $id) ${getReturnFields(extraInfo)}
+          }
+      `;
+      case 'comment-by-author':
+        return `
+          query ShowComment($input: CommentInput!) {
+            commentByAuthorTarget(input: $input) ${getReturnFields(extraInfo)}
+          }
+      `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
   'show-comments': (extraInfo) => `
     query ShowComments($input: CommentsInput!) {
       comments(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: CommentDoc | null) {
   return _.get(doc, 'pending.type') === 'create-comment';

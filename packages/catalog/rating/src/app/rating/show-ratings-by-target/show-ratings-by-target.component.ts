@@ -65,7 +65,13 @@ OnInit, OnChanges {
               ofTargetId: this.targetId
             }
           }),
-          extraInfo: { returnFields: 'rating' }
+          extraInfo: {
+            returnFields: `
+              sourceId
+              targetId
+              rating
+            `
+          }
         }
       })
       .subscribe((res) => {

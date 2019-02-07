@@ -50,7 +50,7 @@ const actionRequestTable: ActionRequestTable = {
       ratings(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingUpdate(doc: RatingDoc | null) {
   return _.get(doc, 'pending.type') === 'update-rating';

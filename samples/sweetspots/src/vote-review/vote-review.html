@@ -1,0 +1,27 @@
+<dv.action name="vote-review">
+  <dv.tx>
+    <authentication.authenticate id=$loggedInUserId hidden=true />
+
+    <reviewscore.create-score
+      sourceId=$loggedInUserId
+      targetId=$id
+      value=$upvote ? 1 : -1
+      hidden=true />
+    <reputation.create-score
+      sourceId=$loggedInUserId
+      targetId=$spotOwnerId
+      value=$upvote ? 1 : -1
+      hidden=true />
+
+    <dv.if condition=$upvote>
+      <dv.button>Upvote</dv.button>
+      <dv.callback defaultHref="/spot-details" params={ id: $id }
+        onExecSuccess=true hidden=true />
+    </dv.if>
+    <dv.if condition=!$upvote>
+      <dv.button>Downvote</dv.button>
+      <dv.callback defaultHref="/spot-details" params={ id: $id }
+          onExecSuccess=true hidden=true />
+    </dv.if>
+  </dv.tx>
+</dv.action>

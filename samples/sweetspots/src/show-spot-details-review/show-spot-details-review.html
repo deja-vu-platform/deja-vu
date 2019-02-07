@@ -1,0 +1,48 @@
+<dv.action name="show-spot-details-review">
+  Rating: <rating.show-rating class="inline-block"
+    sourceId=$comment.authorId targetId=$comment.targetId showStars=false />
+
+  <br />
+
+  <p class="inline-block">"<comment.show-comment class="inline-block"
+    comment=$comment
+    showId=false showAuthorId=false showTargetId=false />"</p>
+
+  <br />
+
+  By <authentication.show-user class="inline-block" id=$comment.authorId /> |
+  <dv.link href="/profile" params={ id: $comment.authorId }>Profile</dv.link> |
+  <reputation.show-target class="inline-block" id=$comment.authorId
+    showId=false
+    showScores=false
+    totalLabel="Rep: " />
+
+  <br />
+
+  <reviewscore.show-target id=$comment.id
+    showId=false
+    showScores=false
+    totalLabel="Review score: " />
+
+  <br />
+
+  <div class="btn-toolbar toolbar">
+    <!-- TODO: Do not show if already voted on the review (scoring.has-voted) -->
+    <dv.if condition=$loggedInUserId !== $comment.authorId>
+      <dv.tx as sweetspots-upvote-review>
+        <authentication.authenticate id=$loggedInUserId hidden=true />
+        <sweetspots.vote-review id=$comment.id
+          loggedInUserId=$loggedInUserId
+          spotOwnerId=$comment.authorId
+          upvote=true />
+      </dv.tx>
+      <dv.tx as sweetspots-downvote-review>
+        <authentication.authenticate id=$loggedInUserId hidden=true />
+        <sweetspots.vote-review id=$comment.id
+          loggedInUserId=$loggedInUserId
+          spotOwnerId=$comment.authorId
+          upvote=false />
+      </dv.tx>
+    </dv.if>
+  </div>
+</dv.action>
