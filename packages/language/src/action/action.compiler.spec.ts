@@ -51,9 +51,9 @@ describe('ActionCompiler', () => {
       <dv.action name="${actionName}">
         <foo.action
           obj={a: "hi", b: 3 + 2, c: 'hello'}
-          numberArray=[1, 2]
+          numberArray=[1, -2.5]
           objArray=[{a: 1}, {b: 2}]
-          conditional=!((2 + 2) === 5) ? "b" : "c"
+          conditional=!((2 + 2e-10) === 5) ? "b" : "c"
           otherConditional=2 lt 5 ? 3/2 : 1*2.3 />
       </dv.action>
     `;
@@ -64,6 +64,10 @@ describe('ActionCompiler', () => {
       .toMatch('dv.action');
     expect(compiledAction.ngTemplate)
       .toMatch('hi');
+    expect(compiledAction.ngTemplate)
+      .toMatch('-2.5');
+    expect(compiledAction.ngTemplate)
+      .toMatch('2e-10');
   });
 
   it('should handle strings correctly', () => {
