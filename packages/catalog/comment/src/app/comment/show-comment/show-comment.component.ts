@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
-} from 'dv-core';
+} from '@deja-vu/core';
 
 import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
