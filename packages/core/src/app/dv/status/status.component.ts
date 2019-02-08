@@ -30,6 +30,6 @@ implements OnInit, OnExecSuccess, OnExecFailure {
   }
 
   dvOnExecFailure(reason: Error) {
-    this.error = eason.message;
+    this.error = reason.message;
   }
 }
