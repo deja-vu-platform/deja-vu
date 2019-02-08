@@ -37,6 +37,10 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
+import { ScopeIO } from './io';
+
+ScopeIO.actionInstanceComponent = ActionInstanceComponent;
+
 @NgModule({
   declarations: [
     ClicheActionDirective,
@@ -72,6 +76,7 @@ import { TopBarComponent } from './top-bar/top-bar.component';
   ],
   bootstrap: [AppComponent],
   entryComponents: [
+    ActionInstanceComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
     InputActionComponent,

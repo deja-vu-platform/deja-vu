@@ -18,7 +18,8 @@ import {
   AppActionDefinition,
   ClicheActionDefinition
 } from '../datatypes';
-import { ActionIO, linkChildren, ScopeIO } from '../io';
+import { ActionIO, ScopeIO} from '../io';
+
 
 @Component({
   selector: 'app-action-instance',
@@ -30,8 +31,8 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(ClicheActionDirective)
     private readonly actionHost: ClicheActionDirective;
-  @Input() readonly actionInstance: ActionInstance;
-  @Input() private readonly actionIO: ActionIO;
+  @Input() actionInstance: ActionInstance;
+  @Input() actionIO: ActionIO;
   private readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
 
@@ -48,7 +49,7 @@ implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     if (this.actionInstance) {
       if (this.actionInstance.of instanceof AppActionDefinition) {
-        this.subscriptions = linkChildren(this.actionInstance, this.scopeIO);
+        this.scopeIO.link(this.actionInstance);
       } else {
         // setTimeout is necessary to avoid angular change detection errors
         setTimeout(() => this.loadClicheAction());
@@ -107,6 +108,7 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach((s) => s.unsubscribe());
+    this.scopeIO.unlink();
   }
 
   shouldPassActionInstance() {

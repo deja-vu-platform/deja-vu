@@ -18,14 +18,19 @@ export class SetInputsComponent {
 
   constructor(private readonly dialog: MatDialog) { }
 
-  inputAction() {
+  inputAction(inputName: string) {
     const data: DialogData = {
       app: this.app
     };
-    this.dialog.open(InputActionComponent, {
+    const dialogRef = this.dialog.open(InputActionComponent, {
       width: '50vw',
       data
     });
+    dialogRef.afterClosed()
+      .subscribe(() => {
+        this.actionInstance.inputSettings[inputName] =
+          dialogRef.componentInstance.actionInstance;
+      });
   }
 
 

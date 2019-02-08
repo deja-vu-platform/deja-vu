@@ -18,18 +18,18 @@ export interface DialogData {
   styleUrls: ['./input-action.component.scss']
 })
 export class InputActionComponent {
-  actionDefinition: ActionDefinition;
+  selection: [ActionDefinition, ActionCollection];
   actionInstance: ActionInstance;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) {}
 
-  onSelectAction(actionCollection: ActionCollection) {
-    this.actionInstance = new ActionInstance(
-      this.actionDefinition,
-      actionCollection
-    );
+  onSelectAction() {
+    const [actionDefinition, actionCollection] = this.selection;
+    this.actionInstance = actionDefinition && actionCollection
+      ? new ActionInstance(actionDefinition, actionCollection)
+      : undefined;
   }
 
 }

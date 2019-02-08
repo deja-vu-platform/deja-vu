@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { map } from 'rxjs/operators';
 
 import {
   AfterClosedData,
@@ -40,6 +41,11 @@ export class SideMenuComponent {
         data
       })
       .afterClosed()
+      .pipe(
+        map((result?: AfterClosedData): AfterClosedData =>
+          result || { event: 'cancel'}
+        )
+      )
       .subscribe(then);
   }
 

@@ -1,8 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { Subscription } from 'rxjs';
 
-import { ActionInstance, App, AppActionDefinition, Row } from '../datatypes';
-import { linkChildren, ScopeIO } from '../io';
+import {
+  ActionInstance,
+  App,
+  AppActionDefinition,
+  Row
+} from '../datatypes';
+import { ScopeIO } from '../io';
 
 const emptyRow = new Row();
 
@@ -15,7 +19,6 @@ export class ActionDefinitionComponent {
   @Input() app: App;
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
-  private subscriptions: Subscription[] = [];
   private readonly _rows: Row[] = [];
 
   constructor() { }
@@ -23,7 +26,7 @@ export class ActionDefinitionComponent {
   @Input()
   set openAction(action: AppActionDefinition) {
     this.actionInstance = new ActionInstance(action, this.app);
-    this.resetIO();
+    this.scopeIO.link(this.actionInstance);
   }
 
   get rows() {
@@ -37,15 +40,8 @@ export class ActionDefinitionComponent {
     return this._rows;
   }
 
-  onMenuClosed(_action: ActionInstance) {
-    this.resetIO();
+  onMenuClosed() {
+    this.scopeIO.link(this.actionInstance);
   }
 
-  private resetIO() {
-    this.subscriptions.forEach((s) => s.unsubscribe());
-    this.subscriptions = linkChildren(
-      this.actionInstance,
-      this.scopeIO
-    );
-  }
 }

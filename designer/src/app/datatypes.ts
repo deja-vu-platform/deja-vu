@@ -161,7 +161,8 @@ export class ActionInstance {
   readonly id = uuidv4();
   readonly of: ActionDefinition;
   readonly from: ActionCollection;
-  readonly inputSettings: { [inputName: string]: string } = {};
+  // type is ActionInstance iff inputName in of.actionInputs
+  readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
   data?: any; // currently only used for the text widget
 
   constructor(

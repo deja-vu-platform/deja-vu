@@ -22,11 +22,11 @@
         mat-button
         class="replace-action"
         matTooltip="Replace Action"
-        (click)="inputAction()"
+        (click)="inputAction(input)"
       >
         <span class="name">{{ input + ':'}}</span>
         <span class="value">
-          {{ actionInstance.inputSettings[input] || 'Default' }}
+          {{ actionInstance.inputSettings[input]?.fqtag || 'Default' }}
         </span>
       </button>
     </div>

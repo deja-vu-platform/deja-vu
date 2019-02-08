@@ -3,8 +3,8 @@
     <mat-select
       name="action"
       placeholder="Replace With Action"
-      [(ngModel)]="actionDefinition"
-      (selectionChange)="onSelectAction(actionCollection)"
+      [(ngModel)]="selection"
+      (selectionChange)="onSelectAction()"
     >
       <mat-option [value]="undefined">-- Default --</mat-option>
       <mat-optgroup
@@ -13,7 +13,7 @@
       >
         <mat-option
           *ngFor="let action of actionCollection.actions"
-          [value]="action"
+          [value]="[action, actionCollection]"
         >
           {{action.name}}
         </mat-option>
