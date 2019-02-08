@@ -135,17 +135,17 @@ Below is a code excerpt of *HN*'s `submit-post`:
         <dv.tx>
           <dv.id />
           <authentication.authenticate
-            id=hn.navbar.loggedInUser.id hidden=true />
+            id=hackernews.navbar.loggedInUser.id hidden=true />
           <property.create-object
             buttonLabel="Submit"
             id=dv.id.id
-            initialValue={ author: hn.navbar.loggedInUser.username }
+            initialValue={ author: hackernews.navbar.loggedInUser.username }
             newObjectSavedText="Post submitted"
             showExclude=['author']
-            showOptionToSubmit=hn.navbar.loggedInUser />
+            showOptionToSubmit=hackernews.navbar.loggedInUser />
             
           <scoringposts.create-score
-            sourceId=hn.navbar.loggedInUser.username
+            sourceId=hackernews.navbar.loggedInUser.username
             targetId=dv.id.id
             value=0
             hidden=true />
