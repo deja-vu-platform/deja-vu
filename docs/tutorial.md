@@ -164,7 +164,7 @@ Below is a code excerpt of *HN*'s `submit-post`:
 `property`, and
 `create-score` of the `scoringposts` instance of *Scoring*; 
 and three built-in actions (which can be regarded as free-standing cliché actions): `dv.if`, which
-shows the enclosed content if the given condition is ture, `dv.gen-id`,
+shows the enclosed content if the given condition is true, `dv.gen-id`,
 which generates a unique ID, and `dv.tx`
 which synchronizes the actions it wraps (explained in more detail later).
 
@@ -291,10 +291,10 @@ view of the post entity; the effect when put together is to display a
 including its appearance, to be customized; thus the hidden parameter of
 `show-object` marks it as a hidden HTML element, so that it does not appear
 (even though the object data itself is still loaded, emitted as an output,
-and used in several parts of the view. (Any action can be hidden with `hidden=true`,
+and used in several parts of the view). (Any action can be hidden with `hidden=true`,
 but the action still runs as if it wasn't hidden, the only difference
-is that it won't be shown to the user (and as a result, the user won't be able
-to interact with it). All `show-*` actions of clichés follow
+is that it won't be shown to the user---and as a result, the user won't be able
+to interact with it.) All `show-*` actions of clichés follow
 this pattern: when loaded, the action evaluates and if an id was given
 it fetches the entity (e.g., the object, score) with the given id
 from its database and emits it as output.}
