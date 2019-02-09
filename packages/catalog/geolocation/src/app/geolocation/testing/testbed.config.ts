@@ -13,16 +13,16 @@ import {
 import { AgmCoreModule } from '@agm/core';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
-import { CreateMarkerComponent } from './create-marker/create-marker.component';
-import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
-import { DisplayMapComponent } from './display-map/display-map.component';
+import { CreateMarkerComponent } from '../create-marker/create-marker.component';
+import { DeleteMarkerComponent } from '../delete-marker/delete-marker.component';
+import { DisplayMapComponent } from '../display-map/display-map.component';
 import {
   GetCurrentLocationComponent
-} from './get-current-location/get-current-location.component';
-import { ShowMarkerComponent } from './show-marker/show-marker.component';
-import { ShowMarkersComponent } from './show-markers/show-markers.component';
+} from '../get-current-location/get-current-location.component';
+import { ShowMarkerComponent } from '../show-marker/show-marker.component';
+import { ShowMarkersComponent } from '../show-markers/show-markers.component';
 
-import { API_PATH } from './geolocation.config';
+import { API_PATH } from '../geolocation.config';
 
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';

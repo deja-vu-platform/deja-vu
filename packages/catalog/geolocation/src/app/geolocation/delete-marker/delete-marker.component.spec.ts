@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DeleteMarkerComponent } from './delete-marker.component';
 
-import { config } from '../testbed.config';
+import { config } from '../testing/testbed.config';
 
 
 describe('DeleteMarkerComponent', () => {

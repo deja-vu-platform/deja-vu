@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateMarkerComponent } from './create-marker.component';
 
-import { config } from '../testbed.config';
+import { config } from '../testing/testbed.config';
 
 
 describe('CreateMarkerComponent', () => {
