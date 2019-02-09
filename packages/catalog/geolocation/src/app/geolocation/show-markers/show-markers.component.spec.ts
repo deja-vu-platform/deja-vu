@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowMarkersComponent } from './show-markers.component';
 
+import { config } from '../testbed.config';
+
+
 describe('ShowMarkersComponent', () => {
   let component: ShowMarkersComponent;
   let fixture: ComponentFixture<ShowMarkersComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShowMarkersComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 
