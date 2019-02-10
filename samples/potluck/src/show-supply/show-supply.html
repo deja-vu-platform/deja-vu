@@ -1,58 +1,35 @@
-<div *ngIf="id" class="row">
-  <div class="col-md-4">
-    <property-show-object
-      dvOf="supply"
-      [id]="id"
-      [showOnly]="['item']">
-    </property-show-object>
-  </div>
-  <div class="col-md-4">
-    <transfer-show-transfer
-      [id]="id"
-      [showId]="false"
-      [showToId]="false">
-    </transfer-show-transfer>
-  </div>
-  <div class="col-md-4">
-    <property-show-object
-      dvOf="supply"
-      [id]="id"
-      [showOnly]="['item']">
-    </property-show-object>
-  </div>
-</div>
+<dv.action name="show-supply">
+  <dv.if condition=$id class="row">
+    <div class="col-md-4">
+      <supply.show-object id=$id showOnly=['item'] />
+    </div>
+    <div class="col-md-4">
+      <transfer.show-transfer id=$id showId=false showToId=false />
+    </div>
+    <div class="col-md-4">
+      <supply.show-object id=$id showOnly=['item'] />
+    </div>
+  </dv.if>
 
-<div *ngIf="supply" class="row">
-  <div class="col-md-4">
-    <div *ngIf="!useIdForObject">
-      <property-show-object
-        dvOf="supply" [object]="supply"
-        [showOnly]="['item']">
-      </property-show-object>
+  <dv.if condition=$supply class="row">
+    <div class="col-md-4">
+      <dv.if condition=!$useIdForObject>
+        <supply.show-object object=$supply showOnly=['item'] />
+      </dv.if>
+      <dv.if condition=$useIdForObject>
+        <supply.show-object id=$supply.id showOnly=['item'] />
+      </dv.if>
     </div>
-    <div *ngIf="useIdForObject">
-      <property-show-object
-        dvOf="supply" [id]="supply.id"
-        [showOnly]="['item']">
-      </property-show-object>
+    <div class="col-md-4">
+      <transfer.show-item-count itemCount=$supply showItemId=false />
     </div>
-  </div>
-  <div class="col-md-4">
-    <transfer-show-item-count [itemCount]="supply" [showItemId]="false">
-    </transfer-show-item-count>
-  </div>
-  <div class="col-md-4">
-    <div *ngIf="!useIdForObject">
-      <property-show-object
-        dvOf="supply" [object]="supply"
-        [showOnly]="['unit']">
-      </property-show-object>
+    <div class="col-md-4">
+      <dv.if condition=!$useIdForObject>
+        <supply.show-object object=$supply showOnly=['unit'] />
+      </dv.if>
+      <dv.if condition=$useIdForObject>
+        <supply.show-object id=$supply.id showOnly=['unit'] />
+      </dv.if>
     </div>
-    <div *ngIf="useIdForObject">
-      <property-show-object
-        dvOf="supply" [id]="supply.id"
-        [showOnly]="['unit']">
-      </property-show-object>
-    </div>
-  </div>
-</div>
+  </dv.if>
+</dv.action>

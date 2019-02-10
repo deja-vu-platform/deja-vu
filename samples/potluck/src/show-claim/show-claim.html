@@ -1,37 +1,23 @@
-<!--
-<market-show-transaction
-  [id]="id"
-  [hidden]="true"
-  (loadedTransaction)="claim=$event">
-</market-show-transaction>
--->
-<transfer-show-transfer
-  [id]="id"
-  [hidden]="true"
-  (loadedTransfer)="claim=$event">
-</transfer-show-transfer>
-<div class="row">
-  <div class="col-md-4">
-    <property-show-object
-      dvOf="supply"
-      [id]="claim?.good.id"
-      [showOnly]="['item']">
-    </property-show-object>
+<dv.action name="show-claim">
+  <transfer.show-transfer id=$id hidden=true />
+
+  <div class="row">
+    <div class="col-md-4">
+      <supply.show-object id=transfer.show-transfer.loadedTransfer.good.id
+        showOnly=['item'] />
+    </div>
+    <div class="col-md-4">
+      <transfer.show-transfer transfer=transfer.show-transfer.loadedTransfer
+        showId=false showFromId=false showToId=false />
+    </div>
+    <div class="col-md-4">
+      <supply.show-object id=transfer.show-transfer.loadedTransfer.good.id
+        showOnly=['unit'] />
+    </div>
   </div>
-  <div class="col-md-4">
-    {{claim?.quantity}}
-  </div>
-  <div class="col-md-4">
-    <property-show-object
-      dvOf="supply"
-      [id]="claim?.good.id"
-      [showOnly]="['unit']">
-    </property-show-object>
-  </div>
-</div>
 
 
-Claimed by
-<authentication-show-user
-  [id]="claim?.buyer.id">
-</authentication-show-user>
+  Claimed by
+  <authentication.show-user id=transfer.show-transfer.loadedTransfer.id
+    showId=false />
+</dv.action>

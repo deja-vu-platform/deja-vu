@@ -1,74 +1,48 @@
-<dv-tx>
-  <dv-id (id)="supplyId=$event"></dv-id>
+<dv.action name="create-supply">
+  <dv.tx>
+    <dv.id />
 
-  <div class="row">
-    <div class="col-md-12">
-      <property-create-property dvAlias="supply-item"
-        dvOf="supply"
-        name="item"
-        (value)="item=$event">
-      </property-create-property>
+    <div class="row">
+      <div class="col-md-12">
+        <supply.create-property as potluck-create-supply-item
+          name="item" />
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <transfer-create-item-count
-        [id]="supplyId"
-        [showOptionToInputItemId]="false"
-        [showOptionToCreate]="false"
-        (itemCount)="itemCount=$event">
-      </transfer-create-item-count>
-      <!--
-      <market-create-good
-        [id]="supplyId"
-        [marketId]="partyId"
-        [sellerId]="loggedInUserId"
-        [showOptionToInputPrice]="false"
-        [showOptionToInputSeller]="false"
-        [showOptionToSubmit]="false"
-        supplyLabel="Quantity"
-        [save]="save"
-        (good)="good=$event">
-      </market-create-good>
-      -->
+    <div class="row">
+      <div class="col-md-12">
+        <transfer.create-item-count id=dv.id.id
+          showOptionToInputItemId=false
+          showOptionToCreate=false />
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <property-create-property dvAlias="supply-unit"
-        dvOf="supply"
-        name="unit"
-        (value)="unit=$event">
-      </property-create-property>
+    <div class="row">
+      <div class="col-md-12">
+        <supply.create-property as potluck-create-supply-unit
+          name="unit" />
+      </div>
     </div>
-  </div>
-  <property-create-object
-    dvOf="supply"
-    [id]="supplyId"
-    [initialValue]="{ item: item, unit: unit }"
-    [hidden]="true"
-    [save]="save"
-    (object)="object=$event">
-  </property-create-object>
-  <!-- prob missing add to balance here -->
-  <div *ngIf="save">
-    <transfer-add-to-balance
-      [accountId]="partyId"
-      [amount]="itemCount"
-      [hidden]="true">
-    </transfer-add-to-balance>
-  </div>
+    <supply.create-object id=dv.id.id save=$save
+      initialValue={
+        item: potluck-create-supply-item.value,
+        unit: potluck-create-supply-unit.value
+      }
+      hidden=true />
+    <!-- prob missing add to balance here -->
+    <dv.if condition=$save>
+      <transfer.add-to-balance accountId=$id
+        amount=transfer.create-item-count.itemCount
+        hidden=true />
+    </dv.if>
 
-  <dv-merge
-    [sources]="[object, itemCount]"
-    (object)="outputAsSupply($event)">
-  </dv-merge>
+    <dv.merge sources=[supply.create-object.value,
+      transfer.create-item-count.itemCount] />
 
-  <div class="row">
-    <div class="col-md-12">
-      <dv-button>Add Supply</dv-button>
+    <div class="row">
+      <div class="col-md-12">
+        <dv.button>Add Supply</dv.button>
+      </div>
     </div>
-  </div>
-</dv-tx>
+  </dv.tx>
+</dv.action>

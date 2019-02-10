@@ -1,5 +1,6 @@
 {
   "name": "potluck",
+  "type": "app",
   "usedCliches": {
     "authentication": {
       "config": {
@@ -69,16 +70,10 @@
       }
     }
   },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "potluck-root"}
-      ]
-    }
-  },
   "routes": [
     { "path": "parties", "action": "potluck-show-parties" },
     { "path": "create-party", "action": "potluck-create-party" },
+    { "path": "login", "action": "potluck-landing" },
     { "path": "", "action": "potluck-landing" }
   ]
 }

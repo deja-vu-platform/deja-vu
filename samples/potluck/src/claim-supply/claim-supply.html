@@ -1,26 +1,20 @@
-<div class="row">
-  <div class="col-md-7">
-    <potluck-show-supply
-      [supply]="supply" [useIdForObject]="true">
-    </potluck-show-supply>
+<dv.action name="claim-supply">
+  <div class="row">
+    <div class="col-md-7">
+      <potluck.show-supply supply=$supply useIdForObject=true />
+    </div>
+    <div class="col-md-5">
+      <dv.tx>
+        <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
+          showOptionToInputFromId=false
+          showOptionToInputToId=false
+          buttonLabel="Claim"
+          newTransferSavedText="Supplies claimed"
+          inputAmount=<transfer.create-item-count id=$supply.id
+            showOptionToCreate=false
+            showOptionToInputItemId=false
+            emitOnRunOnly=false /> />
+      </dv.tx>
+    </div>
   </div>
-  <div class="col-md-5">
-    <transfer-create-transfer
-      [fromId]="partyId"
-      [toId]="loggedInUserId"
-      [inputAmount]="{
-        type: transferCreateItemCount,
-        tag: 'transfer-create-item-count',
-        outputMap: { amount: 'itemCountAsAmount' },
-        inputs: {
-          showOptionToCreate: false, showOptionToInputItemId: false,
-          id: supply.id, emitOnRunOnly: false
-        }
-      }"
-      [showOptionToInputFromId]="false"
-      [showOptionToInputToId]="false"
-      buttonLabel="Claim"
-      newTransferSavedText="Supplies claimed">
-    </transfer-create-transfer>
-  </div>
-</div>
+</dv.action>
