@@ -33,13 +33,12 @@ export class CreateItemCountComponent
   @Input() showOptionToInputItemId = true;
   @Input() showOptionToCreate = true;
 
-  @Input()
-  set id(value: string) {
+  @Input() set id(value: string) {
     this.idControl.setValue(value);
   }
 
   @ViewChild(FormGroupDirective) form;
-  createItemCountForm = this.builder.group({
+  createItemCountForm: FormGroup = this.builder.group({
     idControl: this.idControl,
     countControl: this.countControl
   });
@@ -80,7 +79,7 @@ export class CreateItemCountComponent
   emit() {
     const itemCountToEmit = _.cloneDeep(this.thisItemCount);
     this.itemCount.emit(itemCountToEmit);
-    this.itemCountAsAmount.emit([ itemCountToEmit ]);
+    this.itemCountAsAmount.emit([itemCountToEmit]);
   }
 
   dvOnExec() {

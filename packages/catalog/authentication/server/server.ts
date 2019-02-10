@@ -1,4 +1,3 @@
-import * as bcrypt from 'bcryptjs';
 import {
   ActionRequestTable,
   ClicheServer,
@@ -9,9 +8,11 @@ import {
   getReturnFields,
   Validation
 } from '@deja-vu/cliche-server';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
 import {
   ChangePasswordInput,
   RegisterInput,
@@ -21,7 +22,6 @@ import {
   UserDoc,
   VerifyInput
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
 
 // TODO: Update authentication.validate.ts if any changes made
@@ -166,7 +166,7 @@ const actionRequestTable: ActionRequestTable = {
       signIn (input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingRegister(user: UserDoc | null) {
   return _.get(user, 'pending.type') === 'register';
@@ -234,12 +234,14 @@ function verify(token: string, userId: string): boolean {
 
 function resolvers(db: mongodb.Db, _config: Config): object {
   const users: mongodb.Collection<UserDoc> = db.collection('users');
+
   return {
     Query: {
       users: () => users.find({ pending: { $exists: false } })
         .toArray(),
       user: async (_root, { username }) => {
-        const user: UserDoc | null = await users.findOne({ username: username });
+        const user: UserDoc | null = await users
+          .findOne({ username: username });
 
         return isPendingRegister(user) ? null : user;
       },

@@ -1,16 +1,14 @@
 import {
-  AfterViewInit, Component, ElementRef,
-  EventEmitter, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
 import { RunService } from '@deja-vu/core';
 
 import { AuthenticationService } from '../shared/authentication.service';
 
-import { User } from '../shared/authentication.model';
 
 @Component({
   selector: 'authentication-logged-in',
-  templateUrl: './logged-in.component.html',
+  templateUrl: './logged-in.component.html'
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();

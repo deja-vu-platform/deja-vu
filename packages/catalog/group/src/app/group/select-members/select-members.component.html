@@ -1,0 +1,26 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="selectMembersForm"
+  class="form-horizontal">
+  <div class="form-group" class="inline-block">
+    <mat-form-field>
+      <!-- select multiple from list -->
+      <mat-select placeholder={{selectMembersPlaceholder}}
+        [formControl]="selectMembersFormControl"
+        (selectionChange)="updateSelected($event.value)"
+        [required]="true" [value]="selectedMemberIds" multiple>
+        <mat-option *ngFor="let memberId of memberIds" [value]="memberId">
+          <dv-include [action]="showMember"
+            default-showMember="{ tag: group-show-member }"
+            [inputs]="{ id: memberId }"
+            [parent]="selectMembers">
+          </dv-include>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group" class="inline-block">
+    <button mat-button type="submit" [disabled]="!selectMembersForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

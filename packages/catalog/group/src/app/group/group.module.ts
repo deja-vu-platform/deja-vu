@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule
+  MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule,
+  MatSelectModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -20,6 +21,10 @@ import { InputMemberComponent } from './input-member/input-member.component';
 export { InputMemberComponent };
 import { JoinLeaveComponent } from './join-leave/join-leave.component';
 export { JoinLeaveComponent };
+import {
+  SelectMembersComponent
+} from './select-members/select-members.component';
+export { SelectMembersComponent };
 import { ShowGroupComponent } from './show-group/show-group.component';
 export { ShowGroupComponent };
 import { ShowGroupsComponent } from './show-groups/show-groups.component';
@@ -35,8 +40,8 @@ export { StageComponent };
 const allComponents = [
   AddToGroupComponent, ChooseGroupComponent, CreateGroupComponent,
   DeleteGroupComponent, InputMemberComponent, JoinLeaveComponent,
-  ShowGroupComponent, ShowGroupsComponent, ShowMemberComponent,
-  ShowMembersComponent, StageComponent
+  SelectMembersComponent, ShowGroupComponent, ShowGroupsComponent,
+  ShowMemberComponent, ShowMembersComponent, StageComponent
 ];
 
 
@@ -48,7 +53,8 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule
+    MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule,
+    MatSelectModule
   ],
   declarations: allComponents,
   exports: allComponents,

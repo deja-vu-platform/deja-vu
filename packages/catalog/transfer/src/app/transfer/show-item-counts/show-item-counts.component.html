@@ -1,8 +1,10 @@
 <ul *ngIf="itemCounts && itemCounts.length > 0" class="list-group">
   <li *ngFor="let itemCount of itemCounts" class="list-group-item">
-    <dv-include [action]="showItemCount" default-showItemCount="{ tag: transfer-show-item-count }"
-                [inputs]="{ itemCount: itemCount }"
-                [parent]="showItemCounts">
+    <dv-include
+      [action]="showItemCount"
+      default-showItemCount="{ tag: transfer-show-item-count }"
+      [inputs]="{ itemCount: itemCount }"
+      [parent]="showItemCounts">
     </dv-include>
 
     <!---
