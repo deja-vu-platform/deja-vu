@@ -2,15 +2,17 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ObjectAutocompleteComponent } from './object-autocomplete.component';
 
+import { buildConfig } from '../testing/testbed.config';
+
+
 describe('ObjectAutocompleteComponent', () => {
   let component: ObjectAutocompleteComponent;
   let fixture: ComponentFixture<ObjectAutocompleteComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ObjectAutocompleteComponent ]
-    })
-    .compileComponents();
+    const config = buildConfig({ data: { properties: null } }, null, {});
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

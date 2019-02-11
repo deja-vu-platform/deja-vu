@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DeleteEventComponent } from './delete-event.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('DeleteEventComponent', () => {
   let component: DeleteEventComponent;
   let fixture: ComponentFixture<DeleteEventComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ DeleteEventComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

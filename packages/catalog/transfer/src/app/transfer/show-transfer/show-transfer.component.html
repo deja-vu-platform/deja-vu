@@ -10,7 +10,7 @@
   {{transfer.toId}}
 </div>
 
-<div *ngIf="showAmount && transfer?.amount !== undefined">
+<div *ngIf="showAmount && transfer && transfer.amount !== undefined">
   <transfer-show-amount [amount]="transfer.amount">
   </transfer-show-amount>
 </div>

@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateScoreComponent } from './create-score.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreateScoreComponent', () => {
   let component: CreateScoreComponent;
   let fixture: ComponentFixture<CreateScoreComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreateScoreComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('CreateScoreComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

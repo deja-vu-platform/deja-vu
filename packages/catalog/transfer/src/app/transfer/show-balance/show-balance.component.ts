@@ -9,15 +9,18 @@ import {
 } from '@angular/core';
 import {
   Action,
+  ConfigService,
   GatewayService,
   GatewayServiceFactory,
   OnEval,
   RunService
 } from '@deja-vu/core';
 import { ShowAmountComponent } from '../show-amount/show-amount.component';
-import { API_PATH, CONFIG } from '../transfer.config';
+import { API_PATH } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
+
+import { TransferConfig } from '../transfer.config';
 
 
 interface BalanceRes {
@@ -28,7 +31,8 @@ interface BalanceRes {
 @Component({
   selector: 'transfer-show-balance',
   templateUrl: './show-balance.component.html',
-  styleUrls: ['./show-balance.component.css']
+  styleUrls: ['./show-balance.component.css'],
+  entryComponents: [ ShowAmountComponent ]
 })
 export class ShowBalanceComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
@@ -50,13 +54,14 @@ OnInit, OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath,
-    @Inject(CONFIG) config) {
-    this.balanceType = config.balanceType;
-  }
+    private cs: ConfigService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+
+    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
+      .balanceType;
   }
 
   ngAfterViewInit() {

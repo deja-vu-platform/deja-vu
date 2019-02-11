@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowAverageRatingComponent } from './show-average-rating.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowAverageRatingComponent', () => {
   let component: ShowAverageRatingComponent;
   let fixture: ComponentFixture<ShowAverageRatingComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowAverageRatingComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

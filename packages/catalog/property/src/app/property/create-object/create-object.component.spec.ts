@@ -2,15 +2,17 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateObjectComponent } from './create-object.component';
 
+import { buildConfig } from '../testing/testbed.config';
+
+
 describe('CreateObjectComponent', () => {
   let component: CreateObjectComponent;
   let fixture: ComponentFixture<CreateObjectComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreateObjectComponent ]
-    })
-    .compileComponents();
+    const config = buildConfig({ data: { properties: [] } }, null, {});
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

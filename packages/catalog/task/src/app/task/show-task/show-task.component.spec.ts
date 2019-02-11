@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowTaskComponent } from './show-task.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowTaskComponent', () => {
   let component: ShowTaskComponent;
   let fixture: ComponentFixture<ShowTaskComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowTaskComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('ShowTaskComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

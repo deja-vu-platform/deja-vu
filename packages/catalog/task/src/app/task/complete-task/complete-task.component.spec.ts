@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CompleteTaskComponent } from './complete-task.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CompleteTaskComponent', () => {
   let component: CompleteTaskComponent;
   let fixture: ComponentFixture<CompleteTaskComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CompleteTaskComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('CompleteTaskComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

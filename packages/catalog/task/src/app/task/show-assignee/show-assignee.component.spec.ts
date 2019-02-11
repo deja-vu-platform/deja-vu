@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowAssigneeComponent } from './show-assignee.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowAssigneeComponent', () => {
   let component: ShowAssigneeComponent;
   let fixture: ComponentFixture<ShowAssigneeComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowAssigneeComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('ShowAssigneeComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

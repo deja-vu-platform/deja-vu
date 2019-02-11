@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowResourcesComponent } from './show-resources.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowResourcesComponent', () => {
   let component: ShowResourcesComponent;
   let fixture: ComponentFixture<ShowResourcesComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShowResourcesComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

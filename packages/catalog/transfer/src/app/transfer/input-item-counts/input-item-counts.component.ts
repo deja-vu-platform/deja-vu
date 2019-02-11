@@ -36,7 +36,8 @@ import * as _ from 'lodash';
       useExisting: InputItemCountsComponent,
       multi: true
     }
-  ]
+  ],
+  entryComponents: [ CreateItemCountComponent, ShowItemCountComponent ]
 })
 export class InputItemCountsComponent
   implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {

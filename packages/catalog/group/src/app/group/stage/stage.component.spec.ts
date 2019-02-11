@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StageComponent } from './stage.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('StageComponent', () => {
   let component: StageComponent;
   let fixture: ComponentFixture<StageComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [StageComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

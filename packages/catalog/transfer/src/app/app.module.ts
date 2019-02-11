@@ -1,11 +1,20 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { GATEWAY_URL } from '@deja-vu/core';
+import { GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
 
 import { AppComponent } from './app.component';
 
-import { TRANSFER_CONFIG, TransferModule } from './transfer/transfer.module';
+import { TransferModule } from './transfer/transfer.module';
+
+const usedClichesConfig = {
+  transfer: {
+    config: {
+      balanceType: 'items'
+    }
+  }
+};
+
 
 @NgModule({
   declarations: [
@@ -17,7 +26,7 @@ import { TRANSFER_CONFIG, TransferModule } from './transfer/transfer.module';
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
-    { provide: TRANSFER_CONFIG, useValue: { balanceType: 'items' } }
+    { provide: USED_CLICHES_CONFIG, useValue: usedClichesConfig }
   ],
   bootstrap: [AppComponent]
 })

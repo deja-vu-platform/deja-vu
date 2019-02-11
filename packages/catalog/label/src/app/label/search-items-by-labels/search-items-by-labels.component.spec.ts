@@ -4,14 +4,15 @@ import {
   SearchItemsByLabelsComponent
 } from './search-items-by-labels.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('SearchItemsByLabelsComponent', () => {
   let component: SearchItemsByLabelsComponent;
   let fixture: ComponentFixture<SearchItemsByLabelsComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [SearchItemsByLabelsComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

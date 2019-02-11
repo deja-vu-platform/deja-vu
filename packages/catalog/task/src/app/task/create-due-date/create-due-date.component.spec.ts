@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateDueDateComponent } from './create-due-date.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreateDueDateComponent', () => {
   let component: CreateDueDateComponent;
   let fixture: ComponentFixture<CreateDueDateComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreateDueDateComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('CreateDueDateComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateAllocationComponent } from './create-allocation.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreateAllocationComponent', () => {
   let component: CreateAllocationComponent;
   let fixture: ComponentFixture<CreateAllocationComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreateAllocationComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

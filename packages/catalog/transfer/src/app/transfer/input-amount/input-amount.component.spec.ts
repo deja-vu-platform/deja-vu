@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InputAmountComponent } from './input-amount.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('InputAmountComponent', () => {
   let component: InputAmountComponent;
   let fixture: ComponentFixture<InputAmountComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ InputAmountComponent ]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 
