@@ -76,6 +76,7 @@
   "routes": [
     { "path": "login", "action": "listify-login" },
     { "path": "signup", "action": "listify-signup" },
+    { "path": "lists/create", "action": "listify-create-list" },
     { "path": "home/recent", "action": "listify-home-show-recent" },
     { "path": "home/trending", "action": "listify-home-show-trending" },
     { "path": "", "action": "listify-home-show-trending" }
