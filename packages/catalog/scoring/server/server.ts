@@ -11,6 +11,7 @@ import * as mongodb from 'mongodb';
 import {
   CreateScoreInput,
   ScoreDoc,
+  ShowScoreInput,
   Target
 } from './schema';
 import { v4 as uuid } from 'uuid';
@@ -34,8 +35,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-score': (extraInfo) => `
-    query ShowScore($id: ID!) {
-      score(id: $id) ${getReturnFields(extraInfo)}
+    query ShowScore($input: ShowScoreInput!) {
+      score(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-target': (extraInfo) => `
@@ -61,13 +62,35 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
   return {
     Query: {
-      score: async (_root, { id }) => {
-        const score = await scores.findOne({
-          id: id, pending: { $exists: false }
-        });
+      score: async (_root, { input }: { input: ShowScoreInput }) => {
+        // querying a score needs either an id, or a (sourceId, targetId) pair
+        // and that there is oneToOneScoring
+        if (_.isNil(input.id) &&
+          (_.isNil(input.sourceId) || _.isNil(input.targetId) ||
+            !config.oneToOneScoring)) {
+          throw new Error('Insufficient inputs to query a score');
+        }
+
+        let query;
+        if (_.isNil(input.id)) {
+          query = {
+            sourceId: input.sourceId,
+            targetId: input.targetId,
+            pending: { $exists: false }
+          }
+        } else {
+          query = {
+            id: input.id,
+            pending: { $exists: false }
+          }
+        }
+
+        const score = await scores.findOne(query);
 
         if (_.isNil(score) || isPendingCreate(score)) {
-          throw new Error(`Score ${id} not found`);
+          const scoreInfo = !_.isNil(input.id) ? input.id :
+            `with targetId: ${input.targetId}, sourceId: ${input.sourceId}`;
+          throw new Error(`Score ${scoreInfo} not found`);
         }
 
         return score;
