@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RemoveViewerComponent } from './remove-viewer.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('RemoveViewerComponent', () => {
   let component: RemoveViewerComponent;
   let fixture: ComponentFixture<RemoveViewerComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [RemoveViewerComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

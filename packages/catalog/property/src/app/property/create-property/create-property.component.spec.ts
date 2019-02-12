@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreatePropertyComponent } from './create-property.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreatePropertyComponent', () => {
   let component: CreatePropertyComponent;
   let fixture: ComponentFixture<CreatePropertyComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreatePropertyComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

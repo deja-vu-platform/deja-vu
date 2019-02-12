@@ -1,21 +1,27 @@
 import {
-  Component,
-  Inject,
-  Input} from '@angular/core';
+  Component, ElementRef, Inject, Input, OnInit
+} from '@angular/core';
 
-import { CONFIG } from '../transfer.config';
+import { ConfigService } from '@deja-vu/core';
+
+import { TransferConfig } from '../transfer.config';
+
 
 @Component({
   selector: 'transfer-show-amount',
   templateUrl: './show-amount.component.html',
   styleUrls: ['./show-amount.component.css']
 })
-export class ShowAmountComponent {
+export class ShowAmountComponent implements OnInit {
   @Input() amount: any;
 
   balanceType: 'money' | 'items';
 
-  constructor(@Inject(CONFIG) config) {
-    this.balanceType = config.balanceType;
+  constructor(
+    private elem: ElementRef, private cs: ConfigService) { }
+
+  ngOnInit() {
+    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
+      .balanceType;
   }
 }

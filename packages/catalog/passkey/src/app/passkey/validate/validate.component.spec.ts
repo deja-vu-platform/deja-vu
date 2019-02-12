@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ValidateComponent } from './validate.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ValidateComponent', () => {
   let component: ValidateComponent;
   let fixture: ComponentFixture<ValidateComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ValidateComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

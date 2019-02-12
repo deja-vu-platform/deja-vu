@@ -34,7 +34,8 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
       useExisting: StageComponent,
       multi: true
     }
-  ]
+  ],
+  entryComponents: [ InputMemberComponent, ShowMemberComponent ]
 })
 export class StageComponent
 implements OnInit, ControlValueAccessor, Validator {

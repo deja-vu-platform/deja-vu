@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowMessageComponent } from './show-message.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowMessageComponent', () => {
   let component: ShowMessageComponent;
   let fixture: ComponentFixture<ShowMessageComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShowMessageComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

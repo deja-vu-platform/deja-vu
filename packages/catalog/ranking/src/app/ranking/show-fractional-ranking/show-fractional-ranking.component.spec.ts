@@ -1,25 +1,29 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowFractionRankingComponent } from './show-fractional-ranking.component';
+import {
+  ShowFractionalRankingComponent
+} from './show-fractional-ranking.component';
 
-describe('ShowFractionRankingComponent', () => {
-  let component: ShowFractionRankingComponent;
-  let fixture: ComponentFixture<ShowFractionRankingComponent>;
+import { config } from '../testing/testbed.config';
+
+
+describe('ShowFractionalRankingComponent', () => {
+  let component: ShowFractionalRankingComponent;
+  let fixture: ComponentFixture<ShowFractionalRankingComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowFractionRankingComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowFractionRankingComponent);
+    fixture = TestBed.createComponent(ShowFractionalRankingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

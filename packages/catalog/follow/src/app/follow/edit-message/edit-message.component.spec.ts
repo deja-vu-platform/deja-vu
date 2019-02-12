@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditMessageComponent } from './edit-message.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('EditMessageComponent', () => {
   let component: EditMessageComponent;
   let fixture: ComponentFixture<EditMessageComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ EditMessageComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -21,6 +22,6 @@ describe('EditMessageComponent', () => {
 
   it('should create', () => {
     expect(component)
-    .toBeTruthy();
+      .toBeTruthy();
   });
 });
