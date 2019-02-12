@@ -455,8 +455,12 @@ export class AppRequestProcessor extends RequestProcessor {
       (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
     );
 
+    const routesWithSelectors = _.map(dvConfig.routes, (r) => ({
+      path: r.path,
+      action: `${dvConfig.name}-${r.action}`
+    }));
     this.actionHelper = new ActionHelper(
-      usedCliches, appActionTable, dvConfig.routes);
+      usedCliches, appActionTable, routesWithSelectors);
   }
 
   protected getActionFromPath(actionPath: ActionPath): ActionTag {

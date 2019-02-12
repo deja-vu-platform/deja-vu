@@ -1,28 +1,16 @@
 {
   "name": "morg",
   "type": "app",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "event": {
-      "name": "event",
-      "config": {
-        "wsPort": 3002
-      }
+      "name": "event"
     },
     "allocator": {
-      "name": "allocator",
-      "config": {
-        "wsPort": 3003
-      }
+      "name": "allocator"
     },
     "property": {
       "name": "property",
       "config": {
-        "wsPort": 3004,
         "initialObjects": [{"name": "Ben"}, {"name": "Alyssa"}],
         "schema": {
           "title": "Party",
@@ -38,6 +26,6 @@
     }
   },
   "routes": [
-    { "path": "", "action": "morg-home" }
+    { "path": "", "action": "home" }
   ]
 }
