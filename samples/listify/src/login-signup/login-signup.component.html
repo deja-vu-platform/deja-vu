@@ -1,4 +1,9 @@
 <dv.action name="login-signup">
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect href="/home/trending" onEvalSuccess=true />
+  </dv.tx>
+  
   <div class="login-container">
     <div class="row content">
       <div class="welcome-container">
