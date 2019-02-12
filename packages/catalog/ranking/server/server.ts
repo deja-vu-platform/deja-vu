@@ -91,7 +91,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
           { $match: query },
           {
             $group: {
-              _id: '$id',
+              _id: { id: '$id', sourceId: '$sourceId' },
               rankingDocs: { $push: '$$ROOT' }
             }
           }
@@ -210,7 +210,8 @@ const rankingCliche: ClicheServer<RankingConfig> =
         { unique: true, sparse: true } : {};
 
       return Promise.all([
-        rankings.createIndex({ id: 1, rank: 1 }, { unique: true, sparse: true }),
+        rankings.createIndex(
+          { id: 1, sourceId: 1, rank: 1 }, { unique: true, sparse: true }),
         rankings.createIndex(
           { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);
