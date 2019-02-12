@@ -1,0 +1,17 @@
+<dv.action name="profile-card">
+  <div class="card-container">
+    <div class="profile-card-filler"></div>
+    <img src="assets/profile-icon.svg" class="profile-image" />
+    <dv.if condition=$username><p class="username">@{{username}}</p></dv.if>
+    <div class="stats-container">
+      <div>
+        <p class="stats-header">Lists Created</p>
+        <p>TODO</p>
+      </div>
+      <dv.if condition=$rankingsSubmitted || $rankingsSubmitted === 0>
+        <p class="stats-header">Rankings Submitted</p>
+        <p>{{rankingsSubmitted}}</p>
+      </dv.if>
+    </div>
+  </div>
+</dv.action>

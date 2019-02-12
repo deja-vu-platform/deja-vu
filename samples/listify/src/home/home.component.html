@@ -1,0 +1,65 @@
+<dv.action name="home">
+  <listify.navbar />
+
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect
+      href="/login"
+      params={ callback: '/' }
+      onEvalFailure=true />
+  </dv.tx>
+
+  <div class="main">
+    <div class="container">
+      <div class="right-container">
+        <dv.if condition=listify.navbar.loggedInUser>
+          <ranking.show-rankings
+            sourceId=listify.navbar.loggedInUser.id hidden=true />
+          <listify.profile-card
+            username=listify.navbar.loggedInUser.username
+            rankingsSubmitted=ranking.show-rankings.loadedRankings?.length />
+        </dv.if>
+        <listify.legend />
+      </div>
+
+      <h2 class="tabs">
+        <dv.tx>
+          <dv.button>
+            <span className=$showTrending ? 'selected-tab' : ''>Trending</span>
+          </dv.button>
+          <dv.link href="/home/trending" />
+        </dv.tx>|
+        <dv.tx>
+          <dv.button>
+            <span className=!$showTrending ? 'selected-tab' : ''>Most Recent</span>
+          </dv.button>
+          <dv.link href="/home/recent" />
+        </dv.tx>
+      </h2>
+      <dv.if condition=$showTrending>
+        <scoring.show-targets-by-score
+          noTargetsText="No lists yet."
+          showAscending=false
+          showScores=false
+          showTarget=<listify.list-card
+            listScoring=$target id=$id
+            loggedInUser=listify.navbar.loggedInUser
+            showVote=true /> />
+      </dv.if>
+      <dv.if condition=!$showTrending>
+        Showing lists by timestmap not yet supported
+        <!-- TODO: log cliche -->
+      </dv.if>
+
+      <div>
+        <dv.tx>
+          <dv.button class="bottom-right-button">
+            <img src="assets/plus.svg" />
+          </dv.button>
+          <dv.callback defaultHref="/lists/create" onExecSuccess=true
+            hidden=true />
+        </dv.tx>
+      </div>
+    </div>
+  </div>
+</dv.action>
