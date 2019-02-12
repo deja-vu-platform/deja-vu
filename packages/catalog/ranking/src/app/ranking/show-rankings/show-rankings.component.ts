@@ -16,43 +16,49 @@ import {
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
+import { ShowRankingComponent } from '../show-ranking/show-ranking.component';
 
 import { API_PATH } from '../ranking.config';
 import { Ranking, TargetRank } from '../shared/ranking.model';
 
 
 @Component({
-  selector: 'ranking-show-ranking',
-  templateUrl: './show-ranking.component.html',
-  styleUrls: ['./show-ranking.component.css']
+  selector: 'ranking-show-rankings',
+  templateUrl: './show-rankings.component.html',
+  styleUrls: ['./show-rankings.component.css']
 })
-export class ShowRankingComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
-  @Input() id: string;
+export class ShowRankingsComponent
+implements AfterViewInit, OnEval, OnInit, OnChanges {
+  @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
-  @Input() ranking: Ranking;
+  @Input() targetId: string | undefined;
 
   @Input() showId = true;
   @Input() showSourceId = true;
   @Input() showTargetId = true;
   @Input() showTargetRank = true;
-  @Output() loadedRanking = new EventEmitter<Ranking>();
+  @Output() loadedRankings = new EventEmitter<Ranking[]>();
 
   @Input() targetRankLabel = 'Rank: ';
   @Input() noTargetsText = 'No targets';
+  @Input() noRankingsText = 'No rankings';
 
   @Input() showTarget: Action = {
     type: <Type<Component>> ShowTargetComponent
   };
+  @Input() showRanking: Action = {
+    type: <Type<Component>> ShowRankingComponent
+  };
 
-  showRanking;
+  rankings: Ranking[];
+  showRankings;
 
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath) {
-    this.showRanking = this;
+    this.showRankings = this;
   }
 
   ngOnInit() {
@@ -76,11 +82,12 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {ranking: Ranking}}>(this.apiPath, {
+      this.gs.get<{data: {rankings: Ranking[]}}>(this.apiPath, {
         params: {
           inputs: {
             id: this.id,
-            sourceId: this.sourceId
+            sourceId: this.sourceId,
+            targetId: this.targetId
           },
           extraInfo: {
             returnFields: `
@@ -98,14 +105,14 @@ OnChanges {
       })
       .subscribe((res) => {
         if (res.data) {
-          this.ranking = res.data.ranking;
-          this.loadedRanking.emit(this.ranking);
+          this.rankings = res.data.rankings;
+          this.loadedRankings.emit(this.rankings);
         }
       });
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.ranking && this.gs && this.id);
+    return !!(this.gs && (this.id || this.sourceId || this.targetId));
   }
 }

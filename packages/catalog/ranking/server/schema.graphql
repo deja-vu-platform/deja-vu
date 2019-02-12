@@ -21,7 +21,8 @@ input CreateRankingInput {
 }
 
 type Query {
-  ranking(id :ID!): Ranking!
+  ranking(id: ID!, sourceId: ID): Ranking!
+  rankings(id: ID, sourceId: ID, targetId: ID): [Ranking!]
   fractionalRanking(targetIds: [ID!]): [TargetRank!]
 }
 
