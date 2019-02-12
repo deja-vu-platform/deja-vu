@@ -127,6 +127,11 @@ export class AppCompiler {
       ngAppBuilder.setFavicon(faviconFile);
     }
 
+    const assetsDir = path.join(this.projectDir, 'src', 'assets');
+    if (existsSync(assetsDir)) {
+      ngAppBuilder.setAppAssetsDir(assetsDir);
+    }
+
     const actionsConfig = (dvConfig.actions !== undefined) ?
       dvConfig.actions.app : undefined;
     const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
