@@ -3,38 +3,32 @@
   "type": "app",
   "usedCliches": {
     "authentication": {
-      "name": "authentication",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "authorization": {
-      "name": "authorization",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "comment": {
-      "name": "comment",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "event": {
-      "name": "event",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "geolocation": {
-      "name": "geolocation",
       "config": {
         "mapType": "leaflet",
         "reinitDbOnStartup": true
       }
     },
     "group": {
-      "name": "group",
       "config": {
         "reinitDbOnStartup": true
       }

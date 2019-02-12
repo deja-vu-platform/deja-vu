@@ -2,14 +2,9 @@
   "name": "hackernews",
   "type": "app",
   "usedCliches": {
-    "authentication": {
-      "name": "authentication"
-    },
-    "comment": {
-      "name": "comment"
-    },
+    "authentication": {},
+    "comment": {},
     "property": {
-      "name": "property",
       "config": {
         "schema": {
           "title": "Post",
