@@ -2,14 +2,9 @@
   "name": "morg",
   "type": "app",
   "usedCliches": {
-    "event": {
-      "name": "event"
-    },
-    "allocator": {
-      "name": "allocator"
-    },
+    "event": {},
+    "allocator": {},
     "property": {
-      "name": "property",
       "config": {
         "initialObjects": [{"name": "Ben"}, {"name": "Alyssa"}],
         "schema": {

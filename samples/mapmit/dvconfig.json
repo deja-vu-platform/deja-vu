@@ -29,7 +29,6 @@
       }
     },
     "property": {
-      "name": "property",
       "config": {
         "reinitDbOnStartup": true,
         "schema": {
