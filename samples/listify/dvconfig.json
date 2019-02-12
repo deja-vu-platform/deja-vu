@@ -76,6 +76,10 @@
   "routes": [
     { "path": "login", "action": "listify-login" },
     { "path": "signup", "action": "listify-signup" },
+    { "path": "profile", "action": "listify-profile-rankings" },
+    { "path": "profile/rankings", "action": "listify-profile-rankings" },
+    { "path": "profile/lists", "action": "listify-profile-lists" },
+    { "path": "profile/list-invites", "action": "listify-profile-list-invites" },
     { "path": "lists/create", "action": "listify-create-list" },
     { "path": "lists/consensus", "action": "listify-view-list-rankings" },
     { "path": "lists/rankings/edit", "action": "listify-edit-list-rankings" },

@@ -1,0 +1,67 @@
+<dv.action name="profile">
+  <listify.navbar />
+
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect
+      href="/login"
+      onEvalFailure=true />
+  </dv.tx>
+
+  <div class="main">
+    <div class="container">
+      <dv.if class="right-container" condition=listify.navbar.loggedInUser>
+        <ranking.show-rankings
+          sourceId=listify.navbar.loggedInUser.id hidden=true />
+        <listify.profile-card
+          username=listify.navbar.loggedInUser.username
+          rankingsSubmitted=ranking.show-rankings.loadedRankings?.length/>
+      </dv.if>
+
+      <h2 class="tabs">
+        <dv.tx>
+          <dv.button>
+            <span className=$showYourRankings ? 'selected-tab' : ''>Your Rankings</span>
+          </dv.button>
+          <dv.link href="/profile/rankings" />
+        </dv.tx>|
+        <dv.tx>
+          <dv.button>
+            <span className=$showYourLists ? 'selected-tab' : ''>Your Lists</span>
+          </dv.button>
+          <dv.link href="/profile/lists" />
+        </dv.tx>|
+        <dv.tx>
+          <dv.button>
+            <span className=$showListsInvitedTo ? 'selected-tab' : ''>Lists Invited To</span>
+          </dv.button>
+          <dv.link href="/profile/list-invites" />
+        </dv.tx>
+      </h2>
+      <dv.if condition=$showYourRankings>
+        <ranking.show-rankings
+          sourceId=listify.navbar.loggedInUser?.id
+          showRanking=<listify.list-card
+            listScoring=$ranking id=$id
+            loggedInUser=listify.navbar.loggedInUser
+            showVote=false /> />
+      </dv.if>
+      <dv.if condition=$showYourLists>
+        TODO
+      </dv.if>
+      <dv.if condition=$showListsInvitedTo>
+        TODO
+      </dv.if>
+
+      <div>
+        <dv.tx>
+          <dv.button class="bottom-right-button">
+            <img src="assets/plus.svg" />
+          </dv.button>
+          <dv.callback defaultHref="/lists/create" onExecSuccess=true
+            hidden=true />
+        </dv.tx>
+      </div>
+    </div>
+  </div>
+</dv.action>
