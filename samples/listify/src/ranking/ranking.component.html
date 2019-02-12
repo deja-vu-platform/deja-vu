@@ -8,6 +8,8 @@
       onEvalFailure=true />
   </dv.tx>
 
+  <scoring.show-target id=$id hidden=true />
+
   <div class="main">
     <div class="container">
       <div class="right-container card-container">
@@ -22,7 +24,14 @@
         </dv.tx>
       </div>
 
-      <dv.if condition=listify.navbar.loggedInUser>
+      <dv.if condition=listify.navbar.loggedInUser &&
+        scoring.show-target.loadedTarget>
+        <listify.list-summary
+          id=$id
+          loggedInUser=listify.navbar.loggedInUser
+          listScoring=scoring.show-target.loadedTarget
+          showMarkers=true />
+
         <ranking.show-ranking
           showId=false
           showSourceId=false
