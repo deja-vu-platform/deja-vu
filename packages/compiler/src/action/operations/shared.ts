@@ -40,7 +40,7 @@ export function getStEntryForNgComponent(
 
 export function outputToNgField(
   clicheName: string, actionName: string, output: string, alias?: string) {
-  const aliasStr = (alias === undefined) ? '' : `__${alias}`;
+  const aliasStr = (alias === undefined) ? '' : `__${alias.replace(/-/g, '_')}`;
   const actionNameNoHyphens = actionName.replace(/-/g, '_');
 
   return `__ngOutput__${clicheName}__` +
