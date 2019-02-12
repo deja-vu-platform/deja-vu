@@ -30,3 +30,11 @@ h2 .selected-tab {
 .black-link a {
   color: black;
 }
+
+.navbar-brand a {
+  color: #E52F4F;
+}
+
+.authentication-show-user-username {
+  display: inline;
+}
