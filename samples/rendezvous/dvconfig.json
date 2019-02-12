@@ -1,44 +1,34 @@
 {
   "name": "rendezvous",
   "type": "app",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "authentication": {
       "name": "authentication",
       "config": {
-        "wsPort": 3002,
         "reinitDbOnStartup": true
       }
     },
     "authorization": {
       "name": "authorization",
       "config": {
-        "wsPort": 3003,
         "reinitDbOnStartup": true
       }
     },
     "comment": {
       "name": "comment",
       "config": {
-        "wsPort": 3004,
         "reinitDbOnStartup": true
       }
     },
     "event": {
       "name": "event",
       "config": {
-        "wsPort": 3005,
         "reinitDbOnStartup": true
       }
     },
     "geolocation": {
       "name": "geolocation",
       "config": {
-        "wsPort": 3006,
         "mapType": "leaflet",
         "reinitDbOnStartup": true
       }
@@ -46,14 +36,12 @@
     "group": {
       "name": "group",
       "config": {
-        "wsPort": 3007,
         "reinitDbOnStartup": true
       }
     },
     "relevantinterests": {
       "name": "label",
       "config": {
-        "wsPort": 3008,
         "reinitDbOnStartup": true,
         "initialLabelIds": [
           "Sports", "Music", "Food & Drink", "Outdoor", "Theatre",
@@ -64,7 +52,6 @@
     "eventdetails": {
       "name": "property",
       "config": {
-        "wsPort": 3009,
         "reinitDbOnStartup": true,
         "schema": {
           "title": "EventDetails",
@@ -83,7 +70,6 @@
     "userprofile": {
       "name": "property",
       "config": {
-        "wsPort": 3010,
         "reinitDbOnStartup": true,
         "schema": {
           "title": "UserProfile",
@@ -118,13 +104,13 @@
     }
   },
   "routes": [
-    { "path": "main", "action": "rendezvous-main" },
-    { "path": "login", "action": "rendezvous-login" },
-    { "path": "register", "action": "rendezvous-register" },
-    { "path": "event-details", "action": "rendezvous-show-event-details" },
-    { "path": "create-event", "action": "rendezvous-create-event" },
-    { "path": "profile", "action": "rendezvous-show-user-profile" },
-    { "path": "edit-profile", "action": "rendezvous-edit-user-profile" },
-    { "path": "", "action": "rendezvous-main" }
+    { "path": "main", "action": "main" },
+    { "path": "login", "action": "login" },
+    { "path": "register", "action": "register" },
+    { "path": "event-details", "action": "show-event-details" },
+    { "path": "create-event", "action": "create-event" },
+    { "path": "profile", "action": "show-user-profile" },
+    { "path": "edit-profile", "action": "edit-user-profile" },
+    { "path": "", "action": "main" }
   ]
 }
