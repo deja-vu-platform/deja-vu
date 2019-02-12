@@ -74,7 +74,7 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {targetsByScore: Target[]}}>(this.apiPath, {
         params: {
-          inputs: { asc: this.showAscending },
+          inputs: JSON.stringify({ asc: this.showAscending }),
           extraInfo: {
             returnFields: `
               id
