@@ -1,0 +1,32 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+h2 span {
+  display: block;
+  font-size: 1.4em;
+}
+
+h2 .mat-button {
+  padding: 0;
+}
+
+h2 .selected-tab {
+  color: rgb(74, 74, 74);
+}
+
+.tabs {
+  color: rgb(196, 191, 191);
+}
+
+.main {
+  margin-top: 56px; /* height of navbar */
+  padding: 15px 40px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.black-link a {
+  color: black;
+}

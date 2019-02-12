@@ -1,0 +1,81 @@
+{
+  "name": "listify",
+  "type": "app",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "name": "authentication",
+      "config": {
+        "wsPort": 3002
+      }
+    },
+    "group": {
+      "name": "group",
+      "config": {
+        "wsPort": 3003
+      }
+    },
+    "list": {
+      "name": "property",
+      "config": {
+        "wsPort": 3004,
+        "schema": {
+          "title": "List",
+          "type": "object",
+          "properties": {
+            "creator": {
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["creator", "locked", "name"]
+        }
+      }
+    },
+    "listoption": {
+      "name": "property",
+      "config": {
+        "wsPort": 3005,
+        "schema": {
+          "title": "List Option",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "ranking": {
+      "name": "ranking",
+      "config": {
+        "wsPort": 3006,
+        "oneToOneRanking": true
+      }
+    },
+    "scoring": {
+      "name": "scoring",
+      "config": {
+        "wsPort": 3007,
+        "oneToOneScoring": true
+      }
+    },
+    
+  },
+  "routes": [
+    { "path": "login", "action": "listify-login" },
+    { "path": "signup", "action": "listify-signup" },
+    { "path": "", "action": "listify-home-login" }
+  ]
+}
