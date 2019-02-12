@@ -11,16 +11,20 @@
        Voting has finished for this list.
       </dv.if>
       <dv.if condition=ranking.show-ranking.loadedRanking>
-        <dv.button>View Your Ranking</dv.button>
-        <dv.link href="TODO"
-          params={ id: ranking.show-ranking.loadedRanking.id } />
+        <dv.tx>
+          <dv.button>View Your Ranking</dv.button>
+          <dv.link href="/ranking"
+            params={ id: ranking.show-ranking.loadedRanking.id } />
+        </dv.tx>
       </dv.if>
       <dv.if condition=!ranking.show-ranking.loadedRanking &&
         !list.show-object.loadedObject?.locked>
-        <dv.button>Submit a Ranking</dv.button>
-        <dv.link
-          href="/lists/rankings/edit"
-          params={ id: $list.id } />
+        <dv.tx>
+          <dv.button>Submit a Ranking</dv.button>
+          <dv.link
+            href="/lists/rankings/edit"
+            params={ id: $list.id } />
+        </dv.tx>
       </dv.if>
     </span>
   </div>

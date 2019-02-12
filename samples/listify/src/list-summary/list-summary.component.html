@@ -1,9 +1,5 @@
 <dv.action name="list-summary">
   <list.show-object id=$listScoring?.id hidden=true />
-  <scoring.show-score
-    sourceId=$loggedInUser?.id
-    targetId=$listId
-    hidden=true />
 
   <dv.if condition=list.show-object.loadedObject && $listScoring>
 
@@ -28,7 +24,10 @@
         <div className="locked-list-marker"></div>
       </dv.if>
 
-      <ranking.show-ranking id=$listId sourceId=$loggedInUser?.id hidden=true />
+      <ranking.show-ranking
+        id=$listScoring.id
+        sourceId=$loggedInUser?.id
+        hidden=true />
       <dv.if class="inline-block" condition=ranking.show-ranking.loadedRanking>
         <div className="contributed-marker"></div>
       </dv.if>
