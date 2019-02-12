@@ -114,7 +114,8 @@ export class AppCompiler {
 
     if (dvConfig.routes !== undefined) {
       for (const route of dvConfig.routes) {
-        ngAppBuilder.addRoute(route.path, route.action);
+        const selector = `${appName}-${route.action}`;
+        ngAppBuilder.addRoute(route.path, selector);
       }
     }
     const globalStyleFile = path.join(this.projectDir, 'src', 'styles.css');

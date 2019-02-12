@@ -58,10 +58,10 @@
     }
   },
   "routes": [
-    { "path": "item", "action": "hackernews-show-post-details" },
-    { "path": "login", "action": "hackernews-login" },
-    { "path": "news", "action": "hackernews-home" },
-    { "path": "submit", "action": "hackernews-submit-post" },
-    { "path": "", "action": "hackernews-home" }
+    { "path": "item", "action": "show-post-details" },
+    { "path": "login", "action": "login" },
+    { "path": "news", "action": "home" },
+    { "path": "submit", "action": "submit-post" },
+    { "path": "", "action": "home" }
   ]
 }
