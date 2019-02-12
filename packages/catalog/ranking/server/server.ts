@@ -12,6 +12,7 @@ import {
   CreateRankingInput,
   Ranking,
   RankingDoc,
+  RankingsInput,
   TargetRank
 } from './schema';
 import { v4 as uuid } from 'uuid';
@@ -34,9 +35,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-rankings': (extraInfo) => `
-    query ShowRankings($id: ID, $sourceId: ID, $targetId: ID) {
-      rankings(id: $id, sourceId: $sourceId, targetId: $targetId)
-      ${getReturnFields(extraInfo)}
+    query ShowRankings($input: RankingsInput!) {
+      rankings(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-fractional-ranking': (extraInfo) => `
@@ -84,17 +84,9 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
 
         return rankingDocsToRanking(rankingDocs);
       },
-      rankings: async (_root, { id, sourceId, targetId }) => {
-        const query = { pending: { $exists: false } };
-        if (id) {
-          query['id'] = id;
-        }
-        if (sourceId) {
-          query['sourceId'] = sourceId;
-        }
-        if (targetId) {
-          query['targetId'] = targetId;
-        }
+      rankings: async (_root, { input }: { input: RankingsInput }) => {
+        const query = { ...input, pending: { $exists: false } };
+
         const groupedRankingDocs = await rankings.aggregate([
           { $match: query },
           {

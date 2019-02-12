@@ -85,9 +85,11 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
       this.gs.get<{data: {rankings: Ranking[]}}>(this.apiPath, {
         params: {
           inputs: {
-            id: this.id,
-            sourceId: this.sourceId,
-            targetId: this.targetId
+            input: {
+              id: this.id,
+              sourceId: this.sourceId,
+              targetId: this.targetId
+            }
           },
           extraInfo: {
             returnFields: `
