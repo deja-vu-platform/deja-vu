@@ -1,28 +1,16 @@
 {
   "name": "listify",
   "type": "app",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "authentication": {
-      "name": "authentication",
-      "config": {
-        "wsPort": 3002
-      }
+      "name": "authentication"
     },
     "group": {
-      "name": "group",
-      "config": {
-        "wsPort": 3003
-      }
+      "name": "group"
     },
     "list": {
       "name": "property",
       "config": {
-        "wsPort": 3004,
         "schema": {
           "title": "List",
           "type": "object",
@@ -44,7 +32,6 @@
     "listoption": {
       "name": "property",
       "config": {
-        "wsPort": 3005,
         "schema": {
           "title": "List Option",
           "type": "object",
@@ -60,14 +47,12 @@
     "ranking": {
       "name": "ranking",
       "config": {
-        "wsPort": 3006,
         "oneToOneRanking": true
       }
     },
     "scoring": {
       "name": "scoring",
       "config": {
-        "wsPort": 3007,
         "oneToOneScoring": true
       }
     } 
