@@ -18,7 +18,7 @@
     </mat-form-field>
   </div>
 
-  <div class="form-group" class="inline-block">
+  <div *ngIf="showOptionToSubmit" class="form-group inline-block">
     <button mat-button type="submit" [disabled]="!selectMembersForm.valid">
       {{buttonLabel}}
     </button>

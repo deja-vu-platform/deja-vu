@@ -1,6 +1,21 @@
-<dv.action name="create-supply">
+<dv.action name="create-supply" stagedSupply$=dv.merge.object>
   <dv.tx>
     <dv.id />
+
+    <!-- <div class="row">
+      <div class="col-md-12">
+        <transfer.create-item-count id=dv.id.id
+          showOptionToInputItemId=false
+          showOptionToCreate=false />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <supply.create-object id=dv.id.id save=$save
+          showOptionToSubmit=false />
+      </div>
+    </div> -->
 
     <div class="row">
       <div class="col-md-12">
@@ -23,12 +38,15 @@
           name="unit" />
       </div>
     </div>
+
     <supply.create-object id=dv.id.id save=$save
       initialValue={
         item: potluck-create-supply-item.value,
         unit: potluck-create-supply-unit.value
       }
       hidden=true />
+
+
     <!-- prob missing add to balance here -->
     <dv.if condition=$save>
       <transfer.add-to-balance accountId=$id
@@ -36,7 +54,7 @@
         hidden=true />
     </dv.if>
 
-    <dv.merge sources=[supply.create-object.value,
+    <dv.merge sources=[supply.create-object.object,
       transfer.create-item-count.itemCount] />
 
     <div class="row">

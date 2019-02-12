@@ -1,14 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
-  ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type
 } from '@angular/core';
 
 import {
-  FormBuilder, FormControl, FormGroup, FormGroupDirective
-} from '@angular/forms';
-
-import {
-  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  Action, GatewayService, GatewayServiceFactory, OnExecFailure,
   OnExecSuccess, RunService
 } from '@deja-vu/core';
 
@@ -25,20 +20,16 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-group.component.css']
 })
 export class CreateGroupComponent
-implements OnInit, OnExecSuccess, OnExecFailure {
-  @Input() id;
+  implements OnInit, OnExecSuccess, OnExecFailure {
+  @Input() id: string | undefined;
+  @Input() creatorId: string | undefined;
 
-  @Input()
-  set memberIds(value: string[] | undefined) {
-    if (value !== undefined) {
-      this.membersAutocomplete.setValue(value);
-    }
-  }
+  @Input() choices: string[];
 
-  @Input()
-  set members(value: { id: string }[] | undefined) {
+  @Input() memberIds: string[];
+  @Input() set members(value: { id: string }[] | undefined) {
     if (value !== undefined) {
-      this.membersAutocomplete.setValue(_.map(value, 'id'));
+      this.memberIds = _.map(value, 'id');
     }
   }
 
@@ -48,22 +39,11 @@ implements OnInit, OnExecSuccess, OnExecFailure {
     type: <Type<Component>> ShowMemberComponent
   };
 
-  @Input() stageHeader: Action | undefined;
-
   // Presentation inputs
-  @Input() memberAutocompletePlaceholder = 'Choose Member';
-  @Input() stageMemberButtonLabel = 'Add Member';
   @Input() buttonLabel = 'Create Group';
   @Input() newGroupSavedText = 'New Group saved';
 
   @Output() stagedMemberIds = new EventEmitter<string[]>();
-
-  @ViewChild(FormGroupDirective) form;
-
-  membersAutocomplete = new FormControl();
-  createGroupForm: FormGroup = this.builder.group({
-    membersAutocomplete: this.membersAutocomplete
-  });
 
   newGroupSaved = false;
   newGroupError: string;
@@ -72,11 +52,7 @@ implements OnInit, OnExecSuccess, OnExecFailure {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {
-    this.membersAutocomplete.valueChanges.subscribe((value) => {
-      this.stagedMemberIds.emit(value);
-    });
-  }
+    private rs: RunService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -88,16 +64,20 @@ implements OnInit, OnExecSuccess, OnExecFailure {
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
+    const initialMemberIds = this.creatorId ?
+      [this.creatorId, ...this.memberIds] : this.memberIds;
+    const res = await this.gs.post<{ data: any }>('/graphql', {
       inputs: {
         input: {
           id: this.id,
-          initialMemberIds: this.membersAutocomplete.value
+          initialMemberIds: initialMemberIds
         }
       },
       extraInfo: { returnFields: 'id' }
     })
-    .toPromise();
+      .toPromise();
+
+    this.stagedMemberIds.emit(this.memberIds);
   }
 
   dvOnExecSuccess() {
@@ -107,11 +87,6 @@ implements OnInit, OnExecSuccess, OnExecFailure {
       window.setTimeout(() => {
         this.newGroupSaved = false;
       }, SAVED_MSG_TIMEOUT);
-    }
-    // Can't do `this.form.reset();`
-    // See https://github.com/angular/material2/issues/4190
-    if (this.form) {
-      this.form.resetForm();
     }
   }
 

@@ -1,12 +1,11 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type, ViewChild
+  Component, EventEmitter, Input, Output, Type, ViewChild
 } from '@angular/core';
 import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective,
   NG_VALIDATORS, NG_VALUE_ACCESSOR
 } from '@angular/forms';
 
-import { GatewayServiceFactory, RunService } from '@deja-vu/core';
 
 import {
   ShowMemberComponent
@@ -44,6 +43,7 @@ export class SelectMembersComponent {
   // Presentation inputs
   @Input() selectMembersPlaceholder = 'Select members';
   @Input() buttonLabel = 'Confirm selection';
+  @Input() showOptionToSubmit = true;
 
   @Output() selected = new EventEmitter<string[]>();
 
@@ -62,7 +62,6 @@ export class SelectMembersComponent {
   updateSelected(selectedMemberIds: string[]) {
     this.selectedMemberIds = selectedMemberIds;
     this.selected.emit(this.selectedMemberIds);
-    console.log(this.selectedMemberIds);
   }
 
   onSubmit() { }

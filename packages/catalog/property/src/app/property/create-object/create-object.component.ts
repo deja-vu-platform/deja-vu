@@ -120,6 +120,7 @@ export class CreateObjectComponent
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
     }
+
     if (this.save) {
       const res = await this.gs
         .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
