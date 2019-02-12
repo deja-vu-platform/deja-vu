@@ -1,7 +1,8 @@
 <div *ngIf="stageEntity">
   <dv-include [action]="stageEntity"
               [outputs]="{ stage: 'stage' }"
-              [parent]="stageComponent">
+              [parent]="stageComponent"
+              no-default-stageEntity >
   </dv-include>
 </div>
 <div *ngIf="!stageEntity" class="row">
@@ -11,7 +12,10 @@
           class="form-horizontal">
 
       <div *ngIf="!stageEntity">
-        <dv-input-id formControlName="entityControl"></dv-input-id>
+        <dv-input-id
+          [entityName]="entityName"
+          formControlName="entityControl"
+        ></dv-input-id>
       </div>
       <button mat-button type="submit" [disabled]="!stageForm.valid">
         {{stageButtonLabel}}
@@ -36,7 +40,8 @@
           <div class="col-md-10">
             <div *ngIf="showEntity">
               <dv-include [action]="showEntity" [inputs]="{ entity: entity }"
-                          [parent]="stageComponent">
+                          [parent]="stageComponent"
+                          default-showEntity="{ tag: dv-show-entity }">
               </dv-include>
             </div>
             <div *ngIf="!showEntity">
