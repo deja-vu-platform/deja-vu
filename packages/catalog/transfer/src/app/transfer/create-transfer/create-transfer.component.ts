@@ -29,7 +29,8 @@ const SAVED_MSG_TIMEOUT = 3000;
 @Component({
   selector: 'transfer-create-transfer',
   templateUrl: './create-transfer.component.html',
-  styleUrls: ['./create-transfer.component.css']
+  styleUrls: ['./create-transfer.component.css'],
+  entryComponents: [ InputAmountComponent ]
 })
 export class CreateTransferComponent
 implements OnInit, OnExec, OnExecSuccess, OnExecFailure {

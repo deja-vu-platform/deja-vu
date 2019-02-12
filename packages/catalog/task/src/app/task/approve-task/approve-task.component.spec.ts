@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ApproveTaskComponent } from './approve-task.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ApproveTaskComponent', () => {
   let component: ApproveTaskComponent;
   let fixture: ComponentFixture<ApproveTaskComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ApproveTaskComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('ApproveTaskComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

@@ -3,44 +3,37 @@
   "type": "app",
   "usedCliches": {
     "authentication": {
-      "name": "authentication",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "authorization": {
-      "name": "authorization",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "comment": {
-      "name": "comment",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "rating": {
-      "name": "rating",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "geolocation": {
-      "name": "geolocation",
       "config": {
         "mapType": "leaflet",
         "reinitDbOnStartup": true
       }
     },
     "follow": {
-      "name": "follow",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "label": {
-      "name": "label",
       "config": {
         "reinitDbOnStartup": true,
         "initialLabelIds": [
@@ -49,7 +42,6 @@
       }
     },
     "property": {
-      "name": "property",
       "config": {
         "reinitDbOnStartup": true,
         "schema": {
@@ -77,11 +69,11 @@
     }
   },
   "routes": [
-    { "path": "login", "action": "sweetspots-login" },
-    { "path": "main", "action": "sweetspots-main" },
-    { "path": "profile", "action": "sweetspots-show-user-profile" },
-    { "path": "register", "action": "sweetspots-register" },
-    { "path": "spot-details", "action": "sweetspots-show-spot-details" },
-    { "path": "", "action": "sweetspots-main" }
+    { "path": "login", "action": "login" },
+    { "path": "main", "action": "main" },
+    { "path": "profile", "action": "show-user-profile" },
+    { "path": "register", "action": "register" },
+    { "path": "spot-details", "action": "show-spot-details" },
+    { "path": "", "action": "main" }
   ]
 }

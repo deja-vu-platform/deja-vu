@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowTasksComponent } from './show-tasks.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowTasksComponent', () => {
   let component: ShowTasksComponent;
   let fixture: ComponentFixture<ShowTasksComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowTasksComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

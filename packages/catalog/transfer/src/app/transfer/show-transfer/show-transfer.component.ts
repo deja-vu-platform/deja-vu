@@ -9,13 +9,15 @@ import {
 } from '@angular/core';
 
 import {
+  ConfigService,
   GatewayService,
   GatewayServiceFactory,
   OnEval,
   RunService
 } from '@deja-vu/core';
 import { Transfer } from '../shared/transfer.model';
-import { API_PATH, CONFIG } from '../transfer.config';
+import { API_PATH, TransferConfig } from '../transfer.config';
+
 
 import * as _ from 'lodash';
 
@@ -48,13 +50,14 @@ OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath,
-    @Inject(CONFIG) config) {
-    this.balanceType = config.balanceType;
-  }
+    private cs: ConfigService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+
+    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
+      .balanceType;
   }
 
   ngAfterViewInit() {

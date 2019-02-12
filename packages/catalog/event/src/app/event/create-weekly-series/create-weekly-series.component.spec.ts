@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateWeeklySeriesComponent } from './create-weekly-series.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreateWeeklySeriesComponent', () => {
   let component: CreateWeeklySeriesComponent;
   let fixture: ComponentFixture<CreateWeeklySeriesComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ CreateWeeklySeriesComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

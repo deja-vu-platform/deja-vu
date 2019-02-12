@@ -1,38 +1,40 @@
-<div *ngIf="showId">
-  {{task.id}}
-</div>
+<span *ngIf="task">
+  <div *ngIf="showId">
+    {{task.id}}
+  </div>
 
-<div *ngIf="showAssignee && task.assigneeId">
-  {{task.assigneeId}}
-</div>
-<div *ngIf="showAssignee && !task.assigneeId">
-  {{noAssigneeText}}
-</div>
+  <div *ngIf="showAssignee && task.assigneeId">
+    {{task.assigneeId}}
+  </div>
+  <div *ngIf="showAssignee && !task.assigneeId">
+    {{noAssigneeText}}
+  </div>
 
-<div *ngIf="showAssigner && task.assignerId">
-  {{task.assignerId}}
-</div>
-<div *ngIf="showAssigner && !task.assignerId">
-  {{noAssignerText}}
-</div>
+  <div *ngIf="showAssigner && task.assignerId">
+    {{task.assignerId}}
+  </div>
+  <div *ngIf="showAssigner && !task.assignerId">
+    {{noAssignerText}}
+  </div>
 
-<div *ngIf="showDueDate && task.dueDate">
-  {{task.dueDate | date: showDueDateFormat}}
-</div>
-<div *ngIf="showDueDate && !task.dueDate">
-  {{noDueDateText}}
-</div>
+  <div *ngIf="showDueDate && task.dueDate">
+    {{task.dueDate | date: showDueDateFormat}}
+  </div>
+  <div *ngIf="showDueDate && !task.dueDate">
+    {{noDueDateText}}
+  </div>
 
-<div *ngIf="showApproved && task.approved">
-  {{approvedText}}
-</div>
-<div *ngIf="showApproved && !task.approved">
-  {{notApprovedText}}
-</div>
+  <div *ngIf="showApproved && task.approved">
+    {{approvedText}}
+  </div>
+  <div *ngIf="showApproved && !task.approved">
+    {{notApprovedText}}
+  </div>
 
-<div *ngIf="showCompleted && task.completed">
-  {{completedText}}
-</div>
-<div *ngIf="showCompleted && !task.completed">
-  {{incompleteText}}
-</div>
+  <div *ngIf="showCompleted && task.completed">
+    {{completedText}}
+  </div>
+  <div *ngIf="showCompleted && !task.completed">
+    {{incompleteText}}
+  </div>
+</span>

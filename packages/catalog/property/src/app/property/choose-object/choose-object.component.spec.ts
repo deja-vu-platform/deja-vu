@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChooseObjectComponent } from './choose-object.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ChooseObjectComponent', () => {
   let component: ChooseObjectComponent;
   let fixture: ComponentFixture<ChooseObjectComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ChooseObjectComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
