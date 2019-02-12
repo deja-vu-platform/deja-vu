@@ -1,0 +1,34 @@
+<dv.action name="view-list-rankings">
+  <listify.navbar />
+
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect
+      href="/login"
+      params={ callback: '/home/trending' }
+      onEvalFailure=true />
+  </dv.tx>
+
+  <scoring.show-target id=$id hidden=true />
+  <group.show-members inGroupId=$id hidden=true />
+  <ranking.show-rankings id=$id hidden=true />
+
+  <dv.if class="main"
+    condition=scoring.show-target.loadedTarget && group.show-members.loadedMemberIds>
+    <div class="container">
+      <listify.ranking-info-card class="right-container"
+        list=scoring.show-target.loadedTarget
+        listVotes=ranking.show-rankings.loadedRankings?.length
+        loggedInUser=listify.navbar.loggedInUser />
+
+      <listify.list-summary
+        id=$id
+        loggedInUser=listify.navbar.loggedInUser
+        listScoring=scoring.show-target.loadedTarget />
+
+      <ranking.show-fractional-ranking
+        targetIds=group.show-members.loadedMemberIds
+        showTarget=<listify.list-option listOption=$target /> />
+    </div>
+  </dv.if>
+</dv.action>

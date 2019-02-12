@@ -1,0 +1,20 @@
+<dv.action name="list-option">
+  <div class="list-option-image">
+    <dv.if condition=$imageUrl><img src=$imageUrl /></dv.if>
+  </div>
+
+  <div class="list-option-name">
+    <div class="list-option-rank">
+      <ranking.show-target class="inline-block"
+        target=$listOption showId=false rankLabel="" />. 
+    </div>
+    <dv.tx as show-option>
+      <listoption.show-object class="inline-block"
+        id=$listOption.id showOnly=['name'] />
+    </dv.tx>
+  </div>
+
+  <div class="list-option-description">
+    <dv.if condition=$description>{{description}}</dv.if>
+  </div>
+</dv.action>
