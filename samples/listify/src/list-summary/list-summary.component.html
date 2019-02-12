@@ -19,17 +19,20 @@
     <div>
       <span class="list-card-creator">Created by <authentication.show-user id=list.show-object.loadedObject.creator showId=false /></span>
 
-      <dv.if class="inline-block"
-        condition=list.show-object.loadedObject.locked>
-        <div className="locked-list-marker"></div>
-      </dv.if>
+      <dv.if condition=$showMarkers>
+        <dv.if class="inline-block"
+          condition=list.show-object.loadedObject.locked>
+          <div className="locked-list-marker"></div>
+        </dv.if>
 
-      <ranking.show-ranking
-        id=$listScoring.id
-        sourceId=$loggedInUser?.id
-        hidden=true />
-      <dv.if class="inline-block" condition=ranking.show-ranking.loadedRanking>
-        <div className="contributed-marker"></div>
+
+        <ranking.show-ranking
+          id=$listScoring.id
+          sourceId=$loggedInUser?.id
+          hidden=true />
+        <dv.if class="inline-block" condition=ranking.show-ranking.loadedRanking>
+          <div className="contributed-marker"></div>
+        </dv.if>
       </dv.if>
 
       <dv.if class="inline-block"
