@@ -4,10 +4,10 @@
       <dv-include 
         [action]="showRanking" 
         [inputs]="{
-          ranking: ranking, showId: showId, showSourceId: showSourceId,
-          showTargetId: showTargetId, showTargetRank: showTargetRank,
-          targetRankLabel: targetRankLabel, noTargetsText: noTargetsText,
-          showTarget: showTarget
+          ranking: ranking, id: ranking?.id, showId: showId,
+          showSourceId: showSourceId, showTargetId: showTargetId,
+          showTargetRank: showTargetRank, targetRankLabel: targetRankLabel,
+          noTargetsText: noTargetsText, showTarget: showTarget
         }"
         [parent]="showRankings"
         default-showRanking="{ tag: ranking-show-ranking }">
