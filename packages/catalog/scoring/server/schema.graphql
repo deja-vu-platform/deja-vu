@@ -18,8 +18,14 @@ input CreateScoreInput {
   targetId: ID
 }
 
+input ShowScoreInput {
+  id: ID
+  sourceId: ID
+  targetId: ID
+}
+
 type Query {
-  score(id: ID!): Score
+  score(input: ShowScoreInput!): Score
   target(id: ID!): Target
   targetsByScore(asc: Boolean): [Target!]
 }

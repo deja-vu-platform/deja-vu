@@ -1,0 +1,27 @@
+.vote-button {
+  width: 30px;
+  height: 30px;
+}
+
+.vote-buttons {
+  display: grid;
+  float: right;
+  margin-right: 10px;
+}
+
+.vote-buttons .vote-count {
+  display: block;
+  margin-top: -5px;
+  margin-bottom: -5px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.vote-count-positive {
+  color: #66B110;
+}
+
+.vote-count-negative {
+  color: #E52F4F;
+}

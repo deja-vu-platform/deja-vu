@@ -1,0 +1,45 @@
+<dv.action name="ranking">
+  <listify.navbar />
+
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect
+      href="/login"
+      onEvalFailure=true />
+  </dv.tx>
+
+  <scoring.show-target id=$id hidden=true />
+
+  <div class="main">
+    <div class="container">
+      <div class="right-container card-container">
+        This was your ranking for this list.
+        <dv.tx>
+          <dv.button>View Consensus</dv.button>
+          <dv.link href='/lists/consensus' params={ id: $id } />
+        </dv.tx>
+        <dv.tx>
+          <dv.button>Edit Ranking</dv.button>
+          <dv.link href='TODO' params={ id: $id } />
+        </dv.tx>
+      </div>
+
+      <dv.if condition=listify.navbar.loggedInUser &&
+        scoring.show-target.loadedTarget>
+        <listify.list-summary
+          id=$id
+          loggedInUser=listify.navbar.loggedInUser
+          listScoring=scoring.show-target.loadedTarget
+          showMarkers=true />
+
+        <ranking.show-ranking
+          showId=false
+          showSourceId=false
+          id=$id
+          sourceId=listify.navbar.loggedInUser?.id
+          showTarget=<listify.list-option listOption=$target /> />
+      </dv.if>
+    </div>
+
+  </div>
+</dv.action>

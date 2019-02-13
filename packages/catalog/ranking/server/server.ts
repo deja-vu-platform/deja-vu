@@ -12,6 +12,7 @@ import {
   CreateRankingInput,
   Ranking,
   RankingDoc,
+  RankingsInput,
   TargetRank
 } from './schema';
 import { v4 as uuid } from 'uuid';
@@ -29,8 +30,13 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-ranking': (extraInfo) => `
-    query ShowRanking($id: ID!) {
-      ranking(id: $id) ${getReturnFields(extraInfo)}
+    query ShowRanking($id: ID!, $sourceId: ID) {
+      ranking(id: $id, sourceId: $sourceId) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-rankings': (extraInfo) => `
+    query ShowRankings($input: RankingsInput!) {
+      rankings(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-fractional-ranking': (extraInfo) => `
@@ -62,16 +68,37 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
 
   return {
     Query: {
-      ranking: async (_root, { id }) => {
-        const rankingDocs = await rankings.find({
-          id: id, pending: { $exists: false }
-        }).toArray();
+      ranking: async (_root, { id, sourceId }) => {
+        const query = { pending: { $exists: false } };
+        if (id) {
+          query['id'] = id;
+        }
+        if (sourceId) {
+          query['sourceId'] = sourceId;
+        }
+        const rankingDocs = await rankings.find(query).toArray();
 
         if (rankingDocs.length === 0) {
           throw new Error(`Ranking ${id} not found`);
         }
 
         return rankingDocsToRanking(rankingDocs);
+      },
+      rankings: async (_root, { input }: { input: RankingsInput }) => {
+        const query = { ...input, pending: { $exists: false } };
+
+        const groupedRankingDocs = await rankings.aggregate([
+          { $match: query },
+          {
+            $group: {
+              _id: { id: '$id', sourceId: '$sourceId' },
+              rankingDocs: { $push: '$$ROOT' }
+            }
+          }
+        ]).toArray() as any[]; // .aggregate() typing is wrong
+
+        return groupedRankingDocs.map(
+          group => rankingDocsToRanking(group.rankingDocs));
       },
       // In the future, all ranking strategies of ranking could be supported.
       // For now, we only implement fractional ranking
@@ -183,7 +210,8 @@ const rankingCliche: ClicheServer<RankingConfig> =
         { unique: true, sparse: true } : {};
 
       return Promise.all([
-        rankings.createIndex({ id: 1, rank: 1 }, { unique: true, sparse: true }),
+        rankings.createIndex(
+          { id: 1, sourceId: 1, rank: 1 }, { unique: true, sparse: true }),
         rankings.createIndex(
           { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);

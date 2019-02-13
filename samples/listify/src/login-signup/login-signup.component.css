@@ -1,0 +1,44 @@
+.login-container {
+  background-color: #1C2C38;
+  min-height: 100vh;
+  height: 100%;
+  /* horizontally center .content */
+  padding-top: calc(50vh - 200px);
+}
+
+.content {
+  background-color: white;
+  width: 60%;
+  max-width: 700px;
+  margin: auto;
+  height: 400px;
+  border-radius: 10px;
+}
+
+.welcome-container {
+  background-color: #C74D4D;
+  text-align: center;
+  color: white;
+  height: 100%;
+  display: inline-block;
+}
+
+.welcome-container h2 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-logo {
+  width: 100px;
+  height: 100px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+
+.form-container {
+  background-color: white;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 30px;
+  margin-left: 10px;
+}

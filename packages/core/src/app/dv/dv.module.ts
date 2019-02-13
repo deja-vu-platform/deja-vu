@@ -26,6 +26,7 @@ import { RunService } from './run.service';
 import { StageComponent } from './stage/stage.component';
 import { StatusComponent } from './status/status.component';
 import { TxComponent } from './tx/tx.component';
+import { ZipComponent } from './zip/zip.component';
 
 import { OfDirective } from './of.directive';
 import { ConfigService } from './config.service';
@@ -36,7 +37,7 @@ const allComponents = [
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
-  RedirectComponent
+  RedirectComponent, ZipComponent
 ];
 
 @NgModule({

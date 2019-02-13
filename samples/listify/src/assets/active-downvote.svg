@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="35px" height="20px" viewBox="0 0 35 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-1" transform="translate(-200.000000, -708.000000)" fill="#E52F4F">
+            <path d="M223.89675,734.709 L208.58275,719.405 C207.80575,718.629 207.80575,717.371 208.58275,716.595 L223.89675,701.291 C224.28475,700.903 224.91475,700.903 225.30275,701.291 L226.70875,702.696 C227.09675,703.084 227.09675,703.713 226.70875,704.101 L213.50275,717.297 C213.11475,717.685 213.11475,718.315 213.50275,718.702 L226.70875,731.899 C227.09675,732.287 227.09675,732.916 226.70875,733.304 L225.30275,734.709 C224.91475,735.097 224.28475,735.097 223.89675,734.709" id="Icon" transform="translate(217.499875, 718.000000) rotate(270.000000) translate(-217.499875, -718.000000) "></path>
+        </g>
+    </g>
+</svg>

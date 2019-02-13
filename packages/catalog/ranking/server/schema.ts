@@ -29,3 +29,9 @@ export interface CreateRankingInput {
   sourceId: string | undefined;
   targets: TargetRank[];
 }
+
+export interface RankingsInput {
+  id: string | undefined;
+  sourceId: string | undefined;
+  targetId: string | undefined;
+}
