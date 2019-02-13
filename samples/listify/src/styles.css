@@ -1,0 +1,104 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+h2 span {
+  display: block;
+  font-size: 1.4em;
+}
+
+h2 .mat-button {
+  padding: 0;
+}
+
+h2 .selected-tab {
+  color: rgb(74, 74, 74);
+}
+
+.tabs {
+  color: rgb(196, 191, 191);
+}
+
+.main {
+  margin-top: 56px; /* height of navbar */
+  padding: 15px 40px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.black-link a {
+  color: black;
+}
+
+.navbar-brand a {
+  color: #E52F4F;
+}
+
+.authentication-show-user-username {
+  display: inline;
+}
+
+.bottom-right-button img {
+  /* center img in button */
+  margin: auto;
+}
+
+.bottom-right-button .mat-button-wrapper {
+  display: inline-flex;
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  background: #66B110;
+  color: white;
+  border: none;
+}
+
+.profile-image {
+  background: #E52F4F;
+  height: 60px;
+  width: 60px;
+  padding: 10px;
+  float: left;
+  margin-top: -20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 10px
+}
+
+.locked-list-marker {
+  display: inline-block;
+  margin-left: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E52F4F;
+}
+
+.contributed-marker {
+  display: inline-block;
+  margin-left: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #66B110;
+}
+
+.right-container {
+  float: right;
+}
+
+.card-container {
+  margin-left: 40px;
+  margin-top: 40px;
+  margin-bottom: -20px;
+  width: 300px;
+
+  border-style: solid;
+  border-width: 1px;
+  border-color: #C4BFBF;
+  -webkit-border-radius: 5px;
+}

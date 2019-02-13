@@ -1,5 +1,14 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  OnChanges,
+  Output,
+  Type
 } from '@angular/core';
 
 import {
@@ -36,6 +45,8 @@ OnChanges {
   @Input() showScore: Action = {
     type: <Type<Component>> ShowScoreComponent
   };
+
+  @Output() loadedTarget = new EventEmitter<Target>();
 
   showTarget;
   private gs: GatewayService;
@@ -88,6 +99,7 @@ OnChanges {
       })
       .subscribe((res) => {
         this.target = res.data.target;
+        this.loadedTarget.emit(this.target);
       });
     }
   }

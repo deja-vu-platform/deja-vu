@@ -1,0 +1,17 @@
+<dv.action name="list-card">
+  <scoring.show-target
+    id=$id
+    showId=false
+    showScores=false
+    hidden=true />
+
+  <div>
+    <listify.list-summary
+      listScoring=$listScoring
+      loggedInUser=$loggedInUser
+      showVote=$showVote
+      showMarkers=true />
+
+    <dv.link href=$gotoOnClick params={ id: $id }>View</dv.link>
+  </div>
+</dv.action>

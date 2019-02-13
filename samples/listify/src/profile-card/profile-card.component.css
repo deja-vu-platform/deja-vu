@@ -1,0 +1,31 @@
+.profile-card-filler {
+  background: #C4BFBF;
+  width: 100%;
+  height: 80px;
+}
+
+.stats-container {
+  display: inline-block;
+  margin-top: 0;
+}
+
+.stats-container div {
+  display:inline-block;
+  margin-left: 20px;
+  text-align: center;
+}
+
+.stats-header {
+  margin-bottom: 0.5rem;
+}
+
+.username {
+  margin-left: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+
+p {
+  margin-top: 5px;
+}

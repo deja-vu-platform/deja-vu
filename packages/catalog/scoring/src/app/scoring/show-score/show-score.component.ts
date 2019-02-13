@@ -1,5 +1,13 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  OnChanges,
+  Output
 } from '@angular/core';
 
 import {
@@ -17,7 +25,9 @@ import { Score } from '../shared/scoring.model';
 })
 export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
-  @Input() id: string;
+  @Input() id: string | undefined;
+  @Input() sourceId: string | undefined;
+  @Input() targetId: string | undefined;
   @Input() score: Score;
 
   @Input() showId = true;
@@ -28,6 +38,8 @@ OnChanges {
   @Input() noValueText = 'No value';
   @Input() noSourceIdText = 'No source id';
   @Input() noTargetIdText = 'No target id';
+
+  @Output() loadedScore = new EventEmitter();
 
   private gs: GatewayService;
 
@@ -58,7 +70,13 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<{data: {score: Score}}>(this.apiPath, {
         params: {
-          inputs: { id: this.id },
+          inputs: {
+            input: {
+              id: this.id,
+              sourceId: this.sourceId,
+              targetId: this.targetId
+            }
+          },
           extraInfo: {
             returnFields: `
                 ${this.showId ? 'id' : ''}
@@ -71,11 +89,13 @@ OnChanges {
       })
       .subscribe((res) => {
         this.score = res.data.score;
+        this.loadedScore.emit(this.score);
       });
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.score && this.id);
+    const hasRightInputs = !!(this.id || (this.sourceId && this.targetId));
+    return this.gs && !this.score && hasRightInputs;
   }
 }

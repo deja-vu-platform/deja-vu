@@ -1,5 +1,13 @@
 import {
-  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  Type
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -24,6 +32,9 @@ OnChanges {
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
   };
+
+  @Output() loadedMemberIds = new EventEmitter<string[]>();
+
   memberIds: string[] = [];
 
   showMembers;
@@ -68,6 +79,7 @@ OnChanges {
         })
         .subscribe((res) => {
           this.memberIds = res.data.members;
+          this.loadedMemberIds.emit(this.memberIds);
         });
     }
   }

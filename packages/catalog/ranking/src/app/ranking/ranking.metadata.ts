@@ -14,6 +14,7 @@ import {
   CreateRankingComponent
 } from './create-ranking/create-ranking.component';
 import { ShowRankingComponent } from './show-ranking/show-ranking.component';
+import { ShowRankingsComponent } from './show-rankings/show-rankings.component';
 import { ShowTargetComponent } from './show-target/show-target.component';
 import {
   ShowFractionalRankingComponent
@@ -21,7 +22,7 @@ import {
 
 const allComponents = [
   CreateRankingComponent, ShowRankingComponent, ShowTargetComponent,
-  ShowFractionalRankingComponent
+  ShowFractionalRankingComponent, ShowRankingsComponent
 ];
 
 const metadata = {

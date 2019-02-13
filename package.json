@@ -62,6 +62,8 @@
     "samples/chorestar",
     "samples/hackernews",
     "samples/hackernews/.dv",
+    "samples/listify",
+    "samples/listify/.dv",
     "samples/morg",
     "samples/morg/.dv",
     "samples/potluck",

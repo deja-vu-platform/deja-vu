@@ -1,0 +1,69 @@
+{
+  "name": "listify",
+  "type": "app",
+  "usedCliches": {
+    "authentication": {},
+    "group": {},
+    "list": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "List",
+          "type": "object",
+          "properties": {
+            "creator": {
+              "type": "string"
+            },
+            "locked": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["creator", "locked", "name"]
+        }
+      }
+    },
+    "listoption": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "List Option",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "ranking": {
+      "config": {
+        "oneToOneRanking": true
+      }
+    },
+    "scoring": {
+      "config": {
+        "oneToOneScoring": true
+      }
+    } 
+  },
+  "routes": [
+    { "path": "login", "action": "login" },
+    { "path": "signup", "action": "signup" },
+    { "path": "profile", "action": "profile-rankings" },
+    { "path": "profile/rankings", "action": "profile-rankings" },
+    { "path": "profile/lists", "action": "profile-lists" },
+    { "path": "profile/list-invites", "action": "profile-list-invites" },
+    { "path": "ranking", "action": "ranking" },
+    { "path": "lists/create", "action": "create-list" },
+    { "path": "lists/consensus", "action": "view-list-rankings" },
+    { "path": "lists/rankings/edit", "action": "edit-list-rankings" },
+    { "path": "home/recent", "action": "home-show-recent" },
+    { "path": "home/trending", "action": "home-show-trending" },
+    { "path": "", "action": "home-show-trending" }
+  ]
+}
