@@ -7,10 +7,10 @@ import { RunService, OnExecSuccess } from '../run.service';
 
 
 @Component({
-  selector: 'dv-id',
-  templateUrl: './id.component.html'
+  selector: 'dv-gen-id',
+  templateUrl: './gen-id.component.html'
 })
-export class IdComponent implements OnInit, OnExecSuccess {
+export class GenIdComponent implements OnInit, OnExecSuccess {
   @Output() id = new EventEmitter<string>();
 
   constructor(

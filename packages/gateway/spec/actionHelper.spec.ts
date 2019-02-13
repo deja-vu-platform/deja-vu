@@ -58,8 +58,8 @@ describe('ActionHelper', () => {
           },
           content: [
             {
-              fqtag: 'dv-id',
-              tag: 'dv-id',
+              fqtag: 'dv-gen-id',
+              tag: 'dv-gen-id',
               inputs: {
                 '(id)': 'rewardId=$event'
               }
@@ -95,8 +95,8 @@ describe('ActionHelper', () => {
           },
           content: [
             {
-              fqtag: 'dv-id',
-              tag: 'dv-id',
+              fqtag: 'dv-gen-id',
+              tag: 'dv-gen-id',
               inputs: {
                 '(id)': 'childId=$event'
               }
