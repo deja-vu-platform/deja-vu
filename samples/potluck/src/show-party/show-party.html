@@ -1,7 +1,7 @@
 <dv.action name="show-party">
   <party.show-object id=$id hidden=true />
   <authorization.show-owner resourceId=$id hidden=true />
-  <transfer.show-balance accountId=$id hidden=true />
+  <!-- <transfer.show-balance accountId=$id hidden=true /> -->
 
 
   <div class="panel panel-default">
@@ -82,10 +82,11 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <transfer.show-item-counts
+                    <!-- <transfer.show-item-counts
                       itemCounts=transfer.show-balance.fetchedBalance
-                      showItemCount=<potluck.claim-supply id=$itemCount.id
-                        loggedInUserId=$loggedInUserId /> />
+                      showItemCount=<potluck.claim-supply
+                        supplyObj=$itemCount partyId=$id
+                        loggedInUserId=$loggedInUserId /> /> -->
                   </div>
                 </div>
                 <div class="row">

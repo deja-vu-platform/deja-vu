@@ -1,7 +1,7 @@
 <dv.action name="claim-supply">
   <div class="row">
     <div class="col-md-7">
-      <potluck.show-supply supplyObj=$supply useIdForObject=true />
+      <potluck.show-supply supplyObj=$supplyObj useIdForObject=true />
     </div>
     <div class="col-md-5">
       <dv.tx>
@@ -9,11 +9,30 @@
           showOptionToInputFromId=false
           showOptionToInputToId=false
           buttonLabel="Claim"
+          newTransferSavedText="Supplies claimed" />
+          <!-- <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
+          showOptionToInputFromId=false
+          showOptionToInputToId=false
+          buttonLabel="Claim"
           newTransferSavedText="Supplies claimed"
-          inputAmount=<transfer.create-item-count id=$supply.id
-            showOptionToCreate=false
-            showOptionToInputItemId=false
-            emitOnRunOnly=false /> />
+          inputAmount=
+            <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
+              <transfer.create-item-count id=$supplyObj?.id
+                showOptionToCreate=false
+                showOptionToInputItemId=false
+                emitOnRunOnly=false />
+            </dv.action> /> -->
+        <!-- <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
+          showOptionToInputFromId=false
+          showOptionToInputToId=false
+          buttonLabel="Claim"
+          newTransferSavedText="Supplies claimed"
+          inputAmount=<dv.action amount$=transfer.create-item-count.itemCountAsAmount>
+              <transfer.create-item-count id=$supplyObj?.id
+                showOptionToCreate=false
+                showOptionToInputItemId=false
+                emitOnRunOnly=false />
+            </dv.action> /> -->
       </dv.tx>
     </div>
   </div>

@@ -71,9 +71,9 @@
     }
   },
   "routes": [
-    { "path": "parties", "action": "potluck-show-parties" },
-    { "path": "create-party", "action": "potluck-create-party" },
-    { "path": "login", "action": "potluck-landing" },
-    { "path": "", "action": "potluck-landing" }
+    { "path": "parties", "action": "show-parties" },
+    { "path": "create-party", "action": "create-party" },
+    { "path": "login", "action": "landing" },
+    { "path": "", "action": "landing" }
   ]
 }
