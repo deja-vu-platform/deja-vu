@@ -95,7 +95,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
               rankingDocs: { $push: '$$ROOT' }
             }
           }
-        ]).toArray() as any[];
+        ]).toArray() as any[]; // .aggregate() typing is wrong
 
         return groupedRankingDocs.map(
           group => rankingDocsToRanking(group.rankingDocs));
