@@ -2,12 +2,8 @@
   "name": "listify",
   "type": "app",
   "usedCliches": {
-    "authentication": {
-      "name": "authentication"
-    },
-    "group": {
-      "name": "group"
-    },
+    "authentication": {},
+    "group": {},
     "list": {
       "name": "property",
       "config": {
@@ -45,13 +41,11 @@
       }
     },
     "ranking": {
-      "name": "ranking",
       "config": {
         "oneToOneRanking": true
       }
     },
     "scoring": {
-      "name": "scoring",
       "config": {
         "oneToOneScoring": true
       }
