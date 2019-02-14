@@ -80,20 +80,20 @@ class Morg {
                   <div class="col-md-12">
                     <property.show-objects hidden=true />
                     <dv.tx>
-                      <dv.id />
+                      <dv.gen-id />
                       <dv.status savedText="New group meeting series saved" />
-                      <dv.ids for=event.create-weekly-series.seriesEvents />
+                      <dv.gen-ids for=event.create-weekly-series.seriesEvents />
                       <event.create-weekly-series
                         save=false
                         showOptionToSubmit=false />
                       <event.create-series
-                        id=dv.id.id
+                        id=dv.gen-id.id
                         hidden=true
                         seriesEvents=event.create-weekly-series.seriesEvents
-                        seriesEventsIds=dv.ids.ids />
+                        seriesEventsIds=dv.gen-ids.ids />
                       <allocator.create-allocation hidden=true
-                        id=dv.id.id
-                        resourceIds=dv.ids.ids
+                        id=dv.gen-id.id
+                        resourceIds=dv.gen-ids.ids
                         consumerIds=property.show-objects.objectIds />
                       <dv.button>Create Group Meeting Series</dv.button>
                     </dv.tx>
@@ -171,4 +171,3 @@ describe('AppCompiler', () => {
   it('should generate a component per action', () => {
   });
 });
-

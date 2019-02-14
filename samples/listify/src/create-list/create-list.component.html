@@ -13,12 +13,12 @@
     <div class="container">
       <dv.if condition=listify.navbar.loggedInUser>
         <dv.tx>
-          <dv.id />
+          <dv.gen-id />
           <authentication.authenticate
             id=listify.navbar.loggedInUser.id hidden=true />
 
           <list.create-object
-            id=dv.id.id
+            id=dv.gen-id.id
             initialValue={
               creator: listify.navbar.loggedInUser.id,
               locked: false
@@ -28,23 +28,23 @@
           <!-- TODO: private/public lists; use authorization -->
 
           <dv.stage entityName="Enter a Suggestion" />
-          <dv.ids for=dv.stage.stagedEntities />
+          <dv.gen-ids for=dv.stage.stagedEntities />
           <dv.zip
-            inputs=[dv.ids.ids, dv.stage.stagedEntities]
+            inputs=[dv.gen-ids.ids, dv.stage.stagedEntities]
             fieldNames=['id', 'name'] />
           <listoption.create-objects objects=dv.zip.objects hidden=true />
 
           <group.create-group
-            id=dv.id.id
-            memberIds=dv.ids.ids
+            id=dv.gen-id.id
+            memberIds=dv.gen-ids.ids
             hidden=true />
           <!-- TODO: optional properties (info/description and url of photo) -->
 
           <!-- for trending lists -->
           <scoring.create-score
-            id=dv.id.id
-            sourceId=dv.id.id
-            targetId=dv.id.id
+            id=dv.gen-id.id
+            sourceId=dv.gen-id.id
+            targetId=dv.gen-id.id
             value=0
             hidden=true />
 
@@ -54,7 +54,7 @@
 
           <dv.link
             href="/lists/rankings/edit"
-            params={ id: dv.id.id }
+            params={ id: dv.gen-id.id }
             hidden=true />
         </dv.tx>
       </dv.if>

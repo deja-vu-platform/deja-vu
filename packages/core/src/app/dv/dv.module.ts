@@ -13,8 +13,8 @@ import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
 import { GatewayServiceFactory } from './gateway.service';
-import { IdComponent } from './id/id.component';
-import { IdsComponent } from './ids/ids.component';
+import { GenIdComponent } from './gen-id/gen-id.component';
+import { GenIdsComponent } from './gen-ids/gen-ids.component';
 import {
   IncludeComponent, IncludeDirective
 } from './include/include.component';
@@ -33,7 +33,7 @@ import { ConfigService } from './config.service';
 
 
 const allComponents = [
-  IdComponent, IdsComponent, TxComponent, IncludeComponent,
+  GenIdComponent, GenIdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
