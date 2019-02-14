@@ -77,16 +77,6 @@ implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
-    // detect component inputs
-    // we only need to do this once per action definition
-    if (actionDefinition.actionInputs.length === 0) {
-      actionDefinition.inputs.forEach((input) => {
-        if (isComponent(componentRef.instance[input])) {
-          actionDefinition.actionInputs.push(input);
-        }
-      });
-    }
-
     // pass in inputs, and allow the value to be updated
     actionDefinition.inputs.forEach((input) => {
       // give new values

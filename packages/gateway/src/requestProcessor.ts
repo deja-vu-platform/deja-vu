@@ -504,6 +504,14 @@ export class DesignerRequestProcessor extends RequestProcessor {
     this.dstTable[alias || name] = wsPort;
   }
 
+
+  /**
+   * Remove a cliche (for appless mode for the designer)
+   */
+  removeCliche(name: string, alias?: string) {
+    delete this.dstTable[alias || name];
+  }
+
   async processRequest(
     req: express.Request,
     res: express.Response

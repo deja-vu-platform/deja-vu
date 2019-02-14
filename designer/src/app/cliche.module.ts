@@ -53,6 +53,10 @@ const modules: any[] = Object.values(importedCliches)
 importedCliches['dv'] = dv;
 const componentSuffix = 'Component';
 
+function isComponent(f: any) {
+  return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
+}
+
 function clicheDefinitionFromModule(
   importedModule: Object,
   name: string
@@ -60,19 +64,41 @@ function clicheDefinitionFromModule(
   return {
     name,
     actions: Object.values(importedModule)
-      .filter((f) => _.isString(f.name) && f.name.endsWith(componentSuffix))
-      .map((component): ClicheActionDefinition => ({
-        name: _.kebabCase(component.name
-          .slice(0, componentSuffix.length * -1)),
-        component,
-        inputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
-          val[0].type.prototype.ngMetadataName === 'Input'
-        ))),
-        outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
-          val[0].type.prototype.ngMetadataName === 'Output'
-        ))),
-        actionInputs: []
-      }))
+      .filter(isComponent)
+      .map((component): ClicheActionDefinition => {
+        // get inputs and outputs
+        const inputs = [];
+        const outputs = [];
+        _.forEach(component.propDecorators, (val, key) => {
+          const type = val[0].type.prototype.ngMetadataName;
+          if (type === 'Input') {
+            inputs.push(key);
+          } else if (type === 'Output') {
+            outputs.push(key);
+          }
+        });
+
+        // detect action inputs
+        let instance;
+        try {
+          instance = new component();
+        } catch {
+          instance = {};
+          // TODO: figure out how to handle components that err on undef inputs
+        }
+        const actionInputs = inputs.filter((input) =>
+          isComponent(_.get(instance, [input, 'type']))
+        );
+
+        return {
+          name: _.kebabCase(component.name
+            .slice(0, componentSuffix.length * -1)),
+          component,
+          inputs,
+          outputs,
+          actionInputs
+        };
+      })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };
 }

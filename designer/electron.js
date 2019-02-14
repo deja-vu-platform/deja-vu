@@ -46,4 +46,18 @@ function startElectron(url, serveDelay = 0) {
   });
 }
 
-module.exports = startElectron;
+let state;
+
+function setState(newState) {
+  state = newState;
+}
+
+function getState() {
+  return state;
+}
+
+module.exports = {
+  startElectron,
+  setState,
+  getState,
+};

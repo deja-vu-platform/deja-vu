@@ -376,17 +376,6 @@ export class ActionHelper {
   }
 
   /**
-   * Add a cliche's actions for shouldHaveExecRequest
-   * actionTable is not modified because this assumes you did not provide
-   *   an appActionTable in which case it is irrelevant
-   * Adding the same cliche a second time does nothing
-   */
-  addCliche(cliche: string) {
-    _.get(ActionHelper.GetActionsNoRequest(cliche), 'exec', <string[]>[])
-      .forEach((actionName) => this.actionsNoExecRequest.add(actionName));
-  }
-
-  /**
    * @returns true if the action given by `tag` is expected to do an exe
    * request
    */

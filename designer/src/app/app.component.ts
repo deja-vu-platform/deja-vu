@@ -1,5 +1,6 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
+import * as _ from 'lodash';
 import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
 import { filter } from 'rxjs/operators';
@@ -22,12 +23,13 @@ import {
   styleUrls: ['./app.component.scss'],
   viewProviders: [DragulaService]
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   app = new App('newapp');
   openAction = this.app.homepage;
 
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
+  private readonly setElectronState: (state: any) => void;
   private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
   private readonly path: any; // path module
   private readonly cp: any; // child_process module
@@ -43,13 +45,89 @@ export class AppComponent {
     this.configureDragula(); // dragula needs to be configured at the top level
     // start the backend
     if (this.electronService.remote) {
-      const gateway = this.electronService.remote.require('@deja-vu/gateway');
-      this.requestProcessor = gateway.startGateway(); // port 3000 default
+      // we save the reqP to avoid needing to start and stop the gateway
+      const myElectron = this.electronService.remote.require('./electron.js');
+      this.requestProcessor = myElectron.getState();
+      if (!this.requestProcessor) {
+        const gateway = this.electronService.remote.require('@deja-vu/gateway');
+        this.requestProcessor = gateway.startGateway(); // port 3000 default
+        myElectron.setState(this.requestProcessor);
+      }
+
       // imports for addCliche
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
     }
+  }
+
+  ngOnDestroy() {
+    this.removeAllCliches();
+  }
+
+  /**
+   * Start the cliche server
+   */
+  addCliche(cliche: ClicheInstance) {
+    if (this.electronService.remote) {
+      this.requestProcessor
+        .addCliche(cliche.of.name, this.nextPort, cliche.name);
+      const serverPath = this.path.join(this.path.dirname(
+        this.cli.locateClichePackage(cliche.of.name)),
+        '..', 'server', 'server.js');
+      const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
+      const configStr = JSON.stringify(JSON.stringify(configObj));
+      let command = `node ${serverPath} --config ${configStr}`;
+      if (cliche.name !== cliche.of.name) {
+        command += ` --as ${cliche.name}`;
+      }
+      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
+      this.nextPort += 1;
+    }
+  }
+
+  /**
+   * Stop the cliche server, if one is running
+   */
+  removeCliche(clicheName: string) {
+    const childProcess = this.processes[clicheName];
+    if (childProcess) {
+      childProcess.kill('SIGINT');
+      delete this.processes[clicheName];
+    }
+    if (this.requestProcessor) {
+      this.requestProcessor.removeCliche(clicheName);
+    }
+  }
+
+  /**
+   * User selected a new action to edit
+   */
+  onActionChanged(openAction: AppActionDefinition) {
+    this.openAction = openAction;
+  }
+
+  /**
+   * Load an app from a save file
+   */
+  load(appJSON: string) {
+    this.zone.run(() => {
+      this.removeAllCliches();
+      this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
+      this.openAction = this.app.homepage;
+      this.snackBar.open('Save has been loaded.', 'dismiss', {
+        duration: 2500
+      });
+    });
+  }
+
+  /**
+   * Stop all cliche backends to avoid port collisions
+   */
+  private removeAllCliches() {
+    this.app.cliches.forEach((c) => {
+      this.removeCliche(c.name);
+    });
   }
 
   /**
@@ -111,50 +189,5 @@ export class AppComponent {
       .find((a) => a.name === actionName);
 
     return new ActionInstance(actionDefinition, source);
-  }
-
-  /**
-   * Start the cliche server
-   */
-  addCliche(cliche: ClicheInstance) {
-    if (this.electronService.remote) {
-      this.requestProcessor
-        .addCliche(cliche.of.name, this.nextPort, cliche.name);
-      const serverPath = this.path.join(this.path.dirname(
-        this.cli.locateClichePackage(cliche.of.name)),
-        '..', 'server', 'server.js');
-      const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
-      const configStr = JSON.stringify(JSON.stringify(configObj));
-      let command = `node ${serverPath} --config ${configStr}`;
-      if (cliche.name !== cliche.of.name) {
-        command += ` --as ${cliche.name}`;
-      }
-      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
-      this.nextPort += 1;
-    }
-  }
-
-  /**
-   * Stop the cliche server, if one is running
-   */
-  removeCliche(clicheName: string) {
-    const childProcess = this.processes[clicheName];
-    if (childProcess) {
-      childProcess.kill('SIGINT');
-    }
-  }
-
-  load(appJSON: string) {
-    this.zone.run(() => {
-      this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
-      this.openAction = this.app.homepage;
-      this.snackBar.open('Save has been loaded.', 'dismiss', {
-        duration: 2500
-      });
-    });
-  }
-
-  onActionChanged(openAction: AppActionDefinition) {
-    this.openAction = openAction;
   }
 }

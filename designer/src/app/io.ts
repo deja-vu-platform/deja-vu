@@ -58,19 +58,7 @@ export class ScopeIO {
     this.actionInstance = actionInstance;
 
     // child inputs (expression or action)
-    this.actionDefinition.children.forEach((child) => {
-      child.of.inputs.forEach((input) => {
-        const toSubject = this.getSubject(child, input);
-        const inputVal = child.inputSettings[input];
-        if (inputVal) {
-          if (_.isString(inputVal)) {
-            this.sendExpression(inputVal, toSubject);
-          } else {
-            this.sendAction(inputVal, toSubject);
-          }
-        }
-      });
-    });
+    this.actionDefinition.children.forEach((c) => this.sendInputs(c));
 
     // parent outputs (expression)
     this.actionDefinition.outputSettings.forEach((io) => {
@@ -98,6 +86,25 @@ export class ScopeIO {
   private unsubscribeAll() {
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.subscriptions = [];
+  }
+
+  /**
+   * Gets the action's input settings, resolves the values,
+   *   and sends them to the IO subjects
+   */
+  private sendInputs(action: ActionInstance) {
+    action.of.inputs.forEach((input) => {
+      const toSubject = this.getSubject(action, input);
+      const inputVal = action.inputSettings[input];
+      if (inputVal) {
+        if (_.isString(inputVal)) {
+          this.sendExpression(inputVal, toSubject);
+        } else {
+          this.sendInputs(inputVal);
+          this.sendAction(inputVal, toSubject);
+        }
+      }
+    });
   }
 
   /**
