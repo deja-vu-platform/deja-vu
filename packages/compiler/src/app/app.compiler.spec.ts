@@ -21,28 +21,13 @@ class Morg {
     return `
       {
         "name": "morg",
-        "gateway": {
-          "config": {
-            "wsPort": 3000
-          }
-        },
+        "type": "app",
         "usedCliches": {
-          "event": {
-            "name": "event",
-            "config": {
-              "wsPort": 3002
-            }
-          },
-          "allocator": {
-            "name": "allocator",
-            "config": {
-              "wsPort": 3003
-            }
-          },
+          "event": { },
+          "allocator": { },
           "property": {
             "name": "property",
             "config": {
-              "wsPort": 3004,
               "initialObjects": [{"name": "Ben"}, {"name": "Alyssa"}],
               "schema": {
                 "title": "Party",
@@ -58,7 +43,7 @@ class Morg {
           }
         },
         "routes": [
-          { "path": "", "action": "morg-home" }
+          { "path": "", "action": "home" }
         ]
       }
     `;
