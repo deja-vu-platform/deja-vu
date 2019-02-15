@@ -5,33 +5,33 @@
   <br />
   <br />
   <dv.tx as sweetspots-create-spot>
-    <dv.id />
+    <dv.gen-id />
     <dv.status savedText="New spot saved"/>
-    <geolocation.create-marker id=dv.id.id
+    <geolocation.create-marker id=dv.gen-id.id
       title=$marker?.title
       latitude=$marker?.latitude
       longitude=$marker?.longitude
       mapId="mainMapId"
       titleLabel="Name"
       showOptionToSubmit=false />
-    <label.attach-labels itemId=dv.id.id
+    <label.attach-labels itemId=dv.gen-id.id
       inputLabel="Category"
       showOptionToSubmit=false />
-    <property.create-object id=dv.id.id
+    <property.create-object id=dv.gen-id.id
       showOptionToSubmit=false />
     <p>Review</p>
-    <rating.rate-target sourceId=$loggedInUserId targetId=dv.id.id
+    <rating.rate-target sourceId=$loggedInUserId targetId=dv.gen-id.id
       execOnClick=false />
-    <comment.create-comment authorId=$loggedInUserId targetId=dv.id.id
+    <comment.create-comment authorId=$loggedInUserId targetId=dv.gen-id.id
       inputLabel=""
       showOptionToSubmit=false />
     <reputation.create-score sourceId=$loggedInUserId
       targetId=$loggedInUserId
       value=1
       hidden=true />
-    <follow.create-publisher id=dv.id.id
+    <follow.create-publisher id=dv.gen-id.id
       showOptionToSubmit=false hidden=true />
-    <authorization.create-resource id=dv.id.id
+    <authorization.create-resource id=dv.gen-id.id
       ownerId=$loggedInUserId hidden=true />
     <authentication.authenticate id=$loggedInUserId hidden=true />
     <dv.button class="btn btn-primary">Submit spot</dv.button>

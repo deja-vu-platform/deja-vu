@@ -7,10 +7,10 @@ import * as _ from 'lodash';
 
 
 @Component({
-  selector: 'dv-ids',
-  templateUrl: './ids.component.html'
+  selector: 'dv-gen-ids',
+  templateUrl: './gen-ids.component.html'
 })
-export class IdsComponent implements OnChanges {
+export class GenIdsComponent implements OnChanges {
   @Input() for: any[] = [];
   @Output() ids = new EventEmitter<string[]>();
 
