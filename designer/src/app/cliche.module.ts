@@ -69,6 +69,7 @@ function clicheDefinitionFromModule(
         // get inputs and outputs
         const inputs = [];
         const outputs = [];
+        const actionInputs = {};
         _.forEach(component.propDecorators, (val, key) => {
           const type = val[0].type.prototype.ngMetadataName;
           if (type === 'Input') {
@@ -86,9 +87,25 @@ function clicheDefinitionFromModule(
           instance = {};
           // TODO: figure out how to handle components that err on undef inputs
         }
-        const actionInputs = inputs.filter((input) =>
+
+        const actionInputNames = inputs.filter((input) =>
           isComponent(_.get(instance, [input, 'type']))
         );
+
+        if (actionInputNames.length > 0) {
+          const template: string = component.decorators[0].args[0].template;
+          const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
+          if (inputMapMatch) {
+            actionInputs[actionInputNames[0]] = inputMapMatch[1]
+              .split(',')
+              .map((s) => s
+                .split(':')[1]
+                .trim()
+              );
+          } else {
+            actionInputs[actionInputNames[0]] = [];
+          }
+        }
 
         return {
           name: _.kebabCase(component.name
@@ -115,7 +132,7 @@ dvCliche.actions.push(({
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: []
+  actionInputs: {}
 }));
 
 @NgModule({

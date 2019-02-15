@@ -14,7 +14,7 @@ export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
-  readonly actionInputs: string[];
+  readonly actionInputs: { [name: string]: string[] };
 }
 
 export interface ClicheActionDefinition extends ActionDefinition {
@@ -33,7 +33,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
-  readonly actionInputs: string[] = []; // always
+  readonly actionInputs: Readonly<{ [name: string]: string[] }> = {}; // always
   // TODO: styling options
 
   constructor(name: string) {

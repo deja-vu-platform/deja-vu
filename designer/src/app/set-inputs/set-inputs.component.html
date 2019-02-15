@@ -2,7 +2,7 @@
   <ng-container *ngFor="let input of actionInstance.of.inputs">
 
     <mat-form-field
-      *ngIf="actionInstance.of.actionInputs.indexOf(input) === -1"
+      *ngIf="!actionInstance.of.actionInputs[input]"
       class="expression-input"
     >
       <input
@@ -14,7 +14,7 @@
     </mat-form-field>
 
     <div
-      *ngIf="actionInstance.of.actionInputs.indexOf(input) >= 0"
+      *ngIf="actionInstance.of.actionInputs[input]"
       class="action-input"
     >
       <!-- TODO: pass in action component -->
