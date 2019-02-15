@@ -10,7 +10,7 @@ export interface InputFromContext {
 }
 
 function captureToInput(field: string) {
-  return `$capture__${_.replace(field, /\./g, '_')}`;
+  return `$capture__${_.replace(field, /\.|-/g, '_')}`;
 }
 
 /**
