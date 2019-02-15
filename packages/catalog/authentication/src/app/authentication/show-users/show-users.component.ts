@@ -68,8 +68,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
         .get<{ data: { users: User[] } }>(this.apiPath, {
           params: {
             inputs: JSON.stringify({
-              input: {
-              }
+              input: {}
             }),
             extraInfo: {
               returnFields: `

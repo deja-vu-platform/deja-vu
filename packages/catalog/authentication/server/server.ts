@@ -193,16 +193,13 @@ async function newUserDocOrFail(
 async function register(
   users: mongodb.Collection<UserDoc>, input: RegisterInput, context: Context) {
   const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  const newUser: UserDoc = await newUserDocOrFail(users, input);
+
   switch (context.reqType) {
     case 'vote':
-      const newUserVote: UserDoc = await newUserDocOrFail(users, input);
-      newUserVote.pending = { reqId: context.reqId, type: 'register' };
-
-      await users.insertOne(newUserVote);
-
-      return newUserVote;
+      newUser.pending = { reqId: context.reqId, type: 'register' };
+    /* falls through */
     case undefined:
-      const newUser: UserDoc = await newUserDocOrFail(users, input);
       await users.insertOne(newUser);
 
       return newUser;
@@ -216,7 +213,7 @@ async function register(
       return undefined;
   }
 
-  return undefined;
+  return newUser;
 }
 
 function sign(userId: string): string {
