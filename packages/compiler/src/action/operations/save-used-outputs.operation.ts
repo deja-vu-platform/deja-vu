@@ -91,9 +91,13 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
           const clicheName = clicheOrActionAlias;
           const [ actionName, output ] = rest;
           if (!_.has(stEntry, [ 'symbolTable', actionName ])) {
-            throw new Error(
-              `${clicheName}.${actionName} not found in ` +
-              `symbol table ${pretty(symbolTable)}`);
+            if (throwErrorOnSymbolNotFound) {
+              throw new Error(
+                `${clicheName}.${actionName} not found in ` +
+                `symbol table ${pretty(symbolTable)}`);
+            } else {
+              return;
+            }
           }
           _.set(
             stEntry.symbolTable[actionName], [ 'symbolTable', output ],
