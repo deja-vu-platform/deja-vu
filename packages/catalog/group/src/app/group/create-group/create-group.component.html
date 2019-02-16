@@ -1,4 +1,6 @@
-<form (ngSubmit)="onSubmit()" class="form-horizontal">
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createGroupForm"
+  class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newGroupSaved">
       <i class="material-icons">done</i>
@@ -10,15 +12,16 @@
     </mat-error>
   </div>
   <div *ngIf="showOptionToAddMembers" class="form-group">
-    <group-select-members
-      [memberIds]="choices"
+    <group-stage
+      [initialStageIds]="initialMemberIds"
+      [buttonLabel]="stageMemberButtonLabel"
       [showMember]="showMember" default-showMember="{tag: group-show-member }"
-      [showOptionToSubmit]="false"
-      (selected)="memberIds=$event">
-    </group-select-members>
+      [stageHeader]="stageHeader" no-default-stageHeader
+      formControlName="membersAutocomplete">
+    </group-stage>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit">
+    <button mat-button type="submit" [disabled]="!createGroupForm.valid">
       {{buttonLabel}}
     </button>
   </div>

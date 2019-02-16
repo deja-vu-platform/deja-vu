@@ -1,9 +1,10 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  AfterViewChecked, ChangeDetectorRef, Component, ElementRef, EventEmitter,
+  Input, OnInit, Output, ViewChild
 } from '@angular/core';
 import {
-  ControlValueAccessor, FormBuilder, FormControl, FormGroupDirective,
-  FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator
+  ControlValueAccessor, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator
 } from '@angular/forms';
 
 import * as _ from 'lodash';
@@ -29,7 +30,8 @@ import { OnExecSuccess, RunService } from '../run.service';
   ]
 })
 export class StageComponent
-  implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
+  implements OnInit, ControlValueAccessor, Validator, OnExecSuccess,
+  AfterViewChecked {
   // for staging
   @Input() initialStagedEntities: any[] = [];
   @Output() stagedEntities = new EventEmitter<any[]>();
@@ -54,11 +56,16 @@ export class StageComponent
 
   constructor(
     private builder: FormBuilder, private elem: ElementRef,
-    private rs: RunService) {}
+    private rs: RunService, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
     this.staged = this.initialStagedEntities;
+  }
+
+  ngAfterViewChecked() {
+    // https://github.com/angular/angular/issues/14748#issuecomment-307291715
+    this.cdRef.detectChanges();
   }
 
   onSubmit() {
@@ -96,7 +103,7 @@ export class StageComponent
     this.stagedEntities.subscribe(fn);
   }
 
-  registerOnTouched() {}
+  registerOnTouched() { }
 
   validate(_c: FormControl): ValidationErrors {
     return {};

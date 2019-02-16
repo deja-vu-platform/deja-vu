@@ -1,9 +1,14 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
+  ViewChild
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExecFailure,
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
+} from '@angular/forms';
+
+import {
+  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from '@deja-vu/core';
 
@@ -20,16 +25,20 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-group.component.css']
 })
 export class CreateGroupComponent
-  implements OnInit, OnExecSuccess, OnExecFailure {
+implements OnInit, OnExecSuccess, OnExecFailure {
   @Input() id: string | undefined;
-  @Input() creatorId: string | undefined;
 
-  @Input() choices: string[];
-
-  @Input() memberIds: string[];
-  @Input() set members(value: { id: string }[] | undefined) {
+  @Input()
+  set memberIds(value: string[] | undefined) {
     if (value !== undefined) {
-      this.memberIds = _.map(value, 'id');
+      this.membersAutocomplete.setValue(value);
+    }
+  }
+
+  @Input()
+  set members(value: { id: string }[] | undefined) {
+    if (value !== undefined) {
+      this.membersAutocomplete.setValue(_.map(value, 'id'));
     }
   }
 
@@ -39,11 +48,22 @@ export class CreateGroupComponent
     type: <Type<Component>> ShowMemberComponent
   };
 
+  @Input() stageHeader: Action | undefined;
+
   // Presentation inputs
+  @Input() memberAutocompletePlaceholder = 'Choose Member';
+  @Input() stageMemberButtonLabel = 'Add Member';
   @Input() buttonLabel = 'Create Group';
   @Input() newGroupSavedText = 'New Group saved';
 
   @Output() stagedMemberIds = new EventEmitter<string[]>();
+
+  @ViewChild(FormGroupDirective) form;
+
+  membersAutocomplete = new FormControl();
+  createGroupForm: FormGroup = this.builder.group({
+    membersAutocomplete: this.membersAutocomplete
+  });
 
   newGroupSaved = false;
   newGroupError: string;
@@ -52,7 +72,11 @@ export class CreateGroupComponent
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, private builder: FormBuilder) {
+    this.membersAutocomplete.valueChanges.subscribe((value) => {
+      this.stagedMemberIds.emit(value);
+    });
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -64,20 +88,16 @@ export class CreateGroupComponent
   }
 
   async dvOnExec(): Promise<void> {
-    const initialMemberIds = this.creatorId ?
-      [this.creatorId, ...this.memberIds] : this.memberIds;
-    const res = await this.gs.post<{ data: any }>('/graphql', {
+    const res = await this.gs.post<{data: any}>('/graphql', {
       inputs: {
         input: {
           id: this.id,
-          initialMemberIds: initialMemberIds
+          initialMemberIds: this.membersAutocomplete.value
         }
       },
       extraInfo: { returnFields: 'id' }
     })
-      .toPromise();
-
-    this.stagedMemberIds.emit(this.memberIds);
+    .toPromise();
   }
 
   dvOnExecSuccess() {
@@ -87,6 +107,11 @@ export class CreateGroupComponent
       window.setTimeout(() => {
         this.newGroupSaved = false;
       }, SAVED_MSG_TIMEOUT);
+    }
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
     }
   }
 

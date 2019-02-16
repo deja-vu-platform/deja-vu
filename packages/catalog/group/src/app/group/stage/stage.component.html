@@ -30,19 +30,17 @@
   <div class="col-md-12">
     <ul *ngIf="staged && staged.length > 0"
       class="list-group">
-      <li *ngFor="let id of staged" class="list-group-item">
-        <div class="row">
-          <div class="col-md-10">
-            <dv-include [action]="showMember" default-showMember="{ tag: group-show-member }"
-              [inputs]="{ id: id }"
-              [parent]="stageComponent">
-            </dv-include>
-          </div>
-          <div class="col-md-2">
-            <button mat-button (click)="unstage(id)" class="eject">
-              <i class="material-icons icon">eject</i>
-            </button>
-          </div>
+      <li *ngFor="let id of staged" class="list-group-item row">
+        <div class="col-md-10">
+          <dv-include [action]="showMember" default-showMember="{ tag: group-show-member }"
+            [inputs]="{ id: id }"
+            [parent]="stageComponent">
+          </dv-include>
+        </div>
+        <div class="col-md-2">
+          <button mat-button (click)="unstage(id)" class="eject">
+            <i class="material-icons icon">eject</i>
+          </button>
         </div>
       </li>
     </ul>

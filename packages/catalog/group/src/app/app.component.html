@@ -9,14 +9,9 @@
       </ul>
 
       <h1>Create Group of id <em>bens</em></h1>
-      <!-- <group-create-group id="bens"
+      <group-create-group id="bens"
         [memberAutocompletePlaceholder]="'Choose'"
         [stageMemberButtonLabel]="'Stage!'">
-       </group-create-group> -->
-
-       <group-create-group id="bens"
-          creatorId='roger'
-          [choices]="['alice','ben']">
         </group-create-group>
 
       <h1>Add Member to <em>bens</em></h1>
@@ -35,8 +30,7 @@
       <group-show-members inGroupId="bens"></group-show-members>
 
       <h1>Create group <em>bobs</em> with member <em>bob</em></h1>
-      <group-create-group id="bobs" [memberIds]="['bob']"
-        [showOptionToAddMembers]="false">
+      <group-create-group id="bobs" [memberIds]="['bob']">
       </group-create-group>
 
       <h1>Delete group <em>bobs</em></h1>

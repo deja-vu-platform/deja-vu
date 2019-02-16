@@ -85,7 +85,10 @@ OnChanges {
             inputs: { id: this.id },
             extraInfo: {
               action: 'object',
-              returnFields: `${this.properties.join('\n')}`
+              returnFields: `
+                id
+                ${this.properties.join('\n')}
+              `
             }
           }
         })
