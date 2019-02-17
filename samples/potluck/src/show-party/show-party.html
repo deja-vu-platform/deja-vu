@@ -1,8 +1,7 @@
 <dv.action name="show-party">
   <party.show-object id=$id hidden=true />
-  <authorization.show-owner resourceId=$id hidden=true />
-  <!-- <transfer.show-balance accountId=$id hidden=true /> -->
-
+  <authorization.show-resource id=$id hidden=true />
+  <transfer.show-balance accountId=$id hidden=true />
 
   <div class="panel panel-default">
     <div class="panel-body">
@@ -15,20 +14,22 @@
           <div class="top-space">
             <p>
               <i class="material-icons icon">event</i> Date:
-              <event.show-event id=$id />
+              <event.show-event id=$id class="inline-block" />
             </p>
             <p>
               <i class="material-icons icon">person</i> Host:
-              <authentication.show-user id=authorization.show-owner.ownerId />
+              <authentication.show-user
+                id=authorization.show-resource.fetchedResource?.ownerId
+                class="inline-block" />
             </p>
             <p>
               <i class="material-icons icon">location_on</i> Location:
               <party.show-object object=party.show-object.loadedObject
-                showOnly=['location'] />
+                showOnly=['location'] class="inline-block" />
             </p>
             <p>
               <party.show-object object=party.show-object.loadedObject
-                showOnly=['description'] />
+                showOnly=['description'] class="inline-block" />
             </p>
           </div>
         </div>
@@ -46,7 +47,7 @@
             </div>
           </div>
           <div class="row top-space">
-            <dv.if condition=authorization.show-owner.ownerId===$loggedInUserId>
+            <dv.if condition=authorization.show-resource.fetchedResource?.ownerId===$loggedInUserId>
               <authentication.choose-user showChooseButton=false
                 chooseSelectPlaceholder="Choose Guest"
                 addButtonLabel="Add to Guest List" />
@@ -82,15 +83,16 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <!-- <transfer.show-item-counts
+                    <transfer.show-item-counts
                       itemCounts=transfer.show-balance.fetchedBalance
                       showItemCount=<potluck.claim-supply
-                        supplyObj=$itemCount partyId=$id
-                        loggedInUserId=$loggedInUserId /> /> -->
+                        supplyObj=$itemCount
+                        party=authorization.show-resource.fetchedResource /> />
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
+                    <!-- seems to be a problem passing input to input -->
                     <transfer.show-transfers fromId=$id
                       noTransfersToShowText="No claims"
                       showTransfer=<potluck.show-claim id=$transfer.id /> />

@@ -24,31 +24,35 @@
             <div class="col-md-12">
               <div class="form-horizontal">
                 <dv.tx as potluck-create-party-form>
-                  <dv.id />
+                  <dv.gen-id />
                   <dv.status savedText="Party created" />
                   <div class="row">
                     <div class="col-md-5">
-                      <party.create-object id=dv.id.id showOptionToSubmit=false />
+                      <party.create-object id=dv.gen-id.id showOptionToSubmit=false />
                     </div>
                     <div class="col-md-5 offset-md-2">
-                      <event.create-event id=dv.id.id showOptionToSubmit=false />
+                      <event.create-event id=dv.gen-id.id showOptionToSubmit=false />
                     </div>
                   </div>
                   <hr class="divider" />
                   <div class="row">
                     <div class="col-md-5">
-                      <!-- cant do a show in a tx -->
-                      <!-- <group.create-group id=dv.id.id
+                      <dv.stage as potluck-add-to-guest-list
+                        stageEntity=
+                          <dv.action stage$=authentication.choose-user.selectedUser>
+                            <authentication.choose-user
+                              users=authentication.show-users.fetchedUsers
+                              chooseSelectPlaceholder="Choose Guest"
+                              addButtonLabel="Add to Guest List" />
+                          </dv.action>
+                        showEntity=<authentication.show-user user=$entity />
+                        stageHeader=<potluck.guest-list-header /> />
+                      <group.create-group
+                        id=dv.gen-id.id
                         showOptionToSubmit=false
-                        creatorId=potluck.navbar.loggedInUserId
-                        choices=authentication.show-users.fetchedUserIds
-                        showMember=<authentication.show-user id=$id
-                          showId=false /> /> -->
-                        <group.create-group id=dv.id.id
-                          showOptionToSubmit=false
-                          showOptionToAddMembers=false
-                          creatorId=potluck.navbar.loggedInUserId
-                          hidden=true />
+                        showOptionToAddMembers=false
+                        members=potluck-add-to-guest-list.stagedEntities
+                        hidden=true />
                     </div>
                     <div class="col-md-5 offset-md-2">
                       <!-- stage-objects -->
@@ -62,16 +66,16 @@
                     </div>
                   </div>
 
-                  <!-- <supply.create-objects objects=dv.stage.stagedEntities
+                  <supply.create-objects objects=dv.stage.stagedEntities
                     hidden=true />
-                  <transfer.add-to-balance accountId=dv.id.id
-                    amount=dv.stage.stagedEntities hidden=true /> -->
+                  <transfer.add-to-balance accountId=dv.gen-id.id
+                    amount=dv.stage.stagedEntities hidden=true />
 
 
-                  <authorization.create-resource id=dv.id.id
+                  <authorization.create-resource id=dv.gen-id.id
                     ownerId=potluck.navbar.loggedInUserId
+                    viewerIds=group.create-group.stagedMemberIds
                     hidden=true />
-                    <!-- viewerIds=group.create-group.stagedMemberIds  -->
 
                   <authentication.authenticate id=potluck.navbar.loggedInUserId
                     hidden=true />

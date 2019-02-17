@@ -1,38 +1,29 @@
 <dv.action name="claim-supply">
+  <authentication.logged-in />
+  <supply.show-object id=$supplyObj.id hidden=true />
+
   <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-12">
       <potluck.show-supply supplyObj=$supplyObj useIdForObject=true />
     </div>
-    <div class="col-md-5">
-      <dv.tx>
-        <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
-          showOptionToInputFromId=false
-          showOptionToInputToId=false
-          buttonLabel="Claim"
-          newTransferSavedText="Supplies claimed" />
-          <!-- <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <dv.tx as potluck-claim-party-supply>
+        <transfer.create-transfer fromId=$party?.id
+          toId=authentication.logged-in.user?.id
           showOptionToInputFromId=false
           showOptionToInputToId=false
           buttonLabel="Claim"
           newTransferSavedText="Supplies claimed"
           inputAmount=
             <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
-              <transfer.create-item-count id=$supplyObj?.id
+              <transfer.create-item-count
+                id=authentication.logged-in.user.id
                 showOptionToCreate=false
                 showOptionToInputItemId=false
                 emitOnRunOnly=false />
-            </dv.action> /> -->
-        <!-- <transfer.create-transfer fromId=$partyId toId=$loggedInUserId
-          showOptionToInputFromId=false
-          showOptionToInputToId=false
-          buttonLabel="Claim"
-          newTransferSavedText="Supplies claimed"
-          inputAmount=<dv.action amount$=transfer.create-item-count.itemCountAsAmount>
-              <transfer.create-item-count id=$supplyObj?.id
-                showOptionToCreate=false
-                showOptionToInputItemId=false
-                emitOnRunOnly=false />
-            </dv.action> /> -->
+            </dv.action> />
       </dv.tx>
     </div>
   </div>
