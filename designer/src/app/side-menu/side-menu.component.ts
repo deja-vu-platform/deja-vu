@@ -8,6 +8,7 @@ import {
   DialogData
 } from '../configure-cliche/configure-cliche.component';
 import {
+  ActionDefinition,
   App,
   AppActionDefinition,
   ClicheInstance
@@ -67,5 +68,15 @@ export class SideMenuComponent {
         this.clicheRemoved.emit(origName);
       }
     }, cliche);
+  }
+
+  disable(action: ActionDefinition) {
+    return (
+      action['contains']
+      && (
+        (<AppActionDefinition>action).contains(this.openAction, true)
+        || action === this.openAction
+      )
+    );
   }
 }

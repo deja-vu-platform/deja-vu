@@ -131,7 +131,8 @@ function clicheDefinitionFromModule(
 export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
 
-const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+const dvClicheIdx = clicheDefinitions.findIndex((cd) => cd.name === 'dv');
+const [dvCliche] = clicheDefinitions.splice(dvClicheIdx, 1);
 
 App.clicheDefinitions = clicheDefinitions;
 App.dvCliche = dvCliche;

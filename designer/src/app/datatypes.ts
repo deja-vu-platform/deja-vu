@@ -71,11 +71,9 @@ export class AppActionDefinition implements ActionDefinition {
   contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
       r.actions.some((a) => (
-        a.of === actionDefinition
-        || (
-          deep
-          && a.of['contains']
-          && (<AppActionDefinition>a.of).contains(actionDefinition, true)
+        a.isOrContains(actionDefinition, deep) ||
+        _.some(a.inputSettings, (v) =>
+          v && !_.isString(v) && v.isOrContains(actionDefinition, deep)
         )
       ))
     );
@@ -191,6 +189,18 @@ export class ActionInstance {
   // needed for action processing
   get fqtag() {
     return `${this.from.name}-${this.of.name}`;
+  }
+
+  isOrContains(actionDefinition: ActionDefinition, deep: boolean) {
+    return (
+      this.of === actionDefinition
+      || (
+        deep
+        && this.of['contains']
+        && (<AppActionDefinition>this.of)
+          .contains(actionDefinition, deep)
+      )
+    );
   }
 
   /**

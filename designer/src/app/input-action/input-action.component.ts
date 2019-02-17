@@ -1,16 +1,17 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import {
-  ActionCollection,
   ActionDefinition,
   ActionInstance,
-  App
+  App,
+  AppActionDefinition
 } from '../datatypes';
 
 // tslint:disable-next-line
 export interface DialogData {
   app: App;
-  actionInstance: ActionInstance; // existing setting
+  currentValue: ActionInstance; // existing setting
+  openAction: AppActionDefinition; // needed to prevent cycles
 }
 
 @Component({
@@ -25,11 +26,13 @@ export class InputActionComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) {
-    this.actionInstance = data.actionInstance;
-    this.selection = this.stringify([
-      this.actionInstance.of.name,
-      this.actionInstance.from.name
-    ]);
+    this.actionInstance = data.currentValue;
+    if (this.actionInstance) {
+      this.selection = this.stringify([
+        this.actionInstance.of.name,
+        this.actionInstance.from.name
+      ]);
+    }
   }
 
   onSelectAction() {
@@ -41,6 +44,16 @@ export class InputActionComponent {
 
   stringify(data: any): string {
     return JSON.stringify(data);
+  }
+
+  disable(action: ActionDefinition) {
+    return (
+      action['contains']
+      && (
+        (<AppActionDefinition>action).contains(this.data.openAction, true)
+        || action === this.data.openAction
+      )
+    );
   }
 
 }

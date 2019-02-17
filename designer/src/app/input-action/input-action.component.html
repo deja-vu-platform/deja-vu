@@ -14,6 +14,7 @@
         <mat-option
           *ngFor="let action of actionCollection.actions"
           [value]="stringify([action.name, actionCollection.name])"
+          [disabled]="disable(action)"
         >
           {{action.name}}
         </mat-option>
@@ -26,6 +27,7 @@
         *ngIf="actionInstance"
         [app]="data.app"
         [actionInstance]="actionInstance"
+        [openAction]="data.openAction"
       ></app-set-inputs>
     </div>
   </mat-dialog-content>

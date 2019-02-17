@@ -142,7 +142,6 @@ export class AppComponent implements OnDestroy {
         filter(({ el: e, source: s, target: t }) => e && s && t && (s !== t))
       )
       .subscribe(({ el, source, target }) => {
-        console.log(el, source, target);
         let action: ActionInstance;
         let toRowIdx = parseInt(target['dataset'].index, 10);
         if (toRowIdx === this.openAction.rows.length) {
@@ -157,7 +156,6 @@ export class AppComponent implements OnDestroy {
           } = el['dataset'];
           if (disabled !== 'true') {
             action = this.app.newActionInstanceByName(actionName, sourceName);
-            console.log(action);
           }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);

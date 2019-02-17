@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { ActionInstance, App } from '../datatypes';
+import { ActionInstance, App, AppActionDefinition } from '../datatypes';
 import {
   DialogData,
   InputActionComponent
@@ -15,14 +15,16 @@ import {
 export class SetInputsComponent {
   @Input() app: App;
   @Input() actionInstance: ActionInstance;
+  @Input() openAction: AppActionDefinition;
 
   constructor(private readonly dialog: MatDialog) { }
 
   inputAction(inputName: string) {
     const data: DialogData = {
       app: this.app,
-      actionInstance: <ActionInstance>this
-        .actionInstance.inputSettings[inputName]
+      currentValue: <ActionInstance>this
+        .actionInstance.inputSettings[inputName],
+      openAction: this.openAction
     };
     const dialogRef = this.dialog.open(InputActionComponent, {
       width: '50vw',

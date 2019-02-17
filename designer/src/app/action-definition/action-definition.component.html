@@ -32,7 +32,11 @@
           </app-action-instance>
           <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
             <div class="popup-menu" (click)="$event.stopPropagation()">
-              <app-set-inputs [app]="app" [actionInstance]="action">
+              <app-set-inputs
+                [app]="app"
+                [actionInstance]="action"
+                [openAction]="actionInstance.of"
+              >
               </app-set-inputs>
             </div>
           </mat-menu>
