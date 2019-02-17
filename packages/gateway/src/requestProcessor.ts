@@ -245,7 +245,7 @@ export abstract class RequestProcessor {
   }
 
   protected getActionFromPath(actionPath: ActionPath): ActionTag {
-    const fqtag = actionPath.nodes()[0];
+    const fqtag = _.last(actionPath.nodes());
 
     return {
       fqtag,
