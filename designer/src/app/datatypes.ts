@@ -435,6 +435,7 @@ export class App {
   /**
    * @param ofName name of action declared in app, imported cliche, or DV cliche
    * @param fromName name of cliche instance, or app, or the DV cliche
+   * @return a new action instance or undefined if the names do not resolve
    */
   newActionInstanceByName(ofName: string, fromName: string): ActionInstance {
     const fromSource = [
@@ -442,10 +443,14 @@ export class App {
       this,
       App.dvCliche
     ].find((c) => c.name === fromName);
-    const ofAction = (<ActionDefinition[]>fromSource.actions)
-      .find((a) => a.name === ofName);
 
-    return new ActionInstance(ofAction, fromSource);
+    const ofAction = fromSource
+      ? (<ActionDefinition[]>fromSource.actions).find((a) => a.name === ofName)
+      : undefined;
+
+    return ofAction
+      ? new ActionInstance(ofAction, fromSource)
+      : undefined;
   }
 
   /**

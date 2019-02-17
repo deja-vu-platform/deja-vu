@@ -10,6 +10,7 @@ import {
 // tslint:disable-next-line
 export interface DialogData {
   app: App;
+  actionInstance: ActionInstance; // existing setting
 }
 
 @Component({
@@ -18,18 +19,28 @@ export interface DialogData {
   styleUrls: ['./input-action.component.scss']
 })
 export class InputActionComponent {
-  selection: [ActionDefinition, ActionCollection];
+  selection = '[]'; // [ActionDefinition, ActionCollection]
   actionInstance: ActionInstance;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
-  ) {}
+  ) {
+    this.actionInstance = data.actionInstance;
+    this.selection = this.stringify([
+      this.actionInstance.of.name,
+      this.actionInstance.from.name
+    ]);
+  }
 
   onSelectAction() {
-    const [actionDefinition, actionCollection] = this.selection;
-    this.actionInstance = actionDefinition && actionCollection
-      ? new ActionInstance(actionDefinition, actionCollection)
-      : undefined;
+    const [ofName, fromName] =
+      JSON.parse(this.selection);
+    this.actionInstance =
+      this.data.app.newActionInstanceByName(ofName, fromName);
+  }
+
+  stringify(data: any): string {
+    return JSON.stringify(data);
   }
 
 }

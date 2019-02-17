@@ -20,7 +20,9 @@ export class SetInputsComponent {
 
   inputAction(inputName: string) {
     const data: DialogData = {
-      app: this.app
+      app: this.app,
+      actionInstance: <ActionInstance>this
+        .actionInstance.inputSettings[inputName]
     };
     const dialogRef = this.dialog.open(InputActionComponent, {
       width: '50vw',

@@ -6,14 +6,14 @@
       [(ngModel)]="selection"
       (selectionChange)="onSelectAction()"
     >
-      <mat-option [value]="undefined">-- Default --</mat-option>
+      <mat-option [value]="'[]'">-- Default --</mat-option>
       <mat-optgroup
         *ngFor="let actionCollection of data.app.actionCollections"
         [label]="actionCollection.name"
       >
         <mat-option
           *ngFor="let action of actionCollection.actions"
-          [value]="[action, actionCollection]"
+          [value]="stringify([action.name, actionCollection.name])"
         >
           {{action.name}}
         </mat-option>
