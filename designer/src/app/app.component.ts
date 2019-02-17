@@ -7,11 +7,9 @@ import { filter } from 'rxjs/operators';
 
 import { clicheDefinitions, dvCliche } from './cliche.module';
 import {
-  ActionDefinition,
   ActionInstance,
   App,
   AppActionDefinition,
-  ClicheDefinition,
   ClicheInstance,
   Row
 } from './datatypes';
@@ -114,6 +112,7 @@ export class AppComponent implements OnDestroy {
     this.zone.run(() => {
       this.removeAllCliches();
       this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
+      this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
       this.snackBar.open('Save has been loaded.', 'dismiss', {
         duration: 2500
@@ -157,7 +156,7 @@ export class AppComponent implements OnDestroy {
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            action = this.newAction(sourceName, actionName);
+            action = this.app.newActionInstanceByName(sourceName, actionName);
           }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);
@@ -174,20 +173,5 @@ export class AppComponent implements OnDestroy {
           }
         }
       });
-  }
-
-  /**
-   * Generate a new Action Instance for the given action from the given cliche
-   */
-  private newAction(sourceName: string, actionName: string): ActionInstance {
-    const source: App | ClicheDefinition | ClicheInstance = [
-      this.app,
-      dvCliche,
-      ...this.app.cliches
-    ].find((s) => s.name === sourceName);
-    const actionDefinition = (<ActionDefinition[]>source.actions)
-      .find((a) => a.name === actionName);
-
-    return new ActionInstance(actionDefinition, source);
   }
 }

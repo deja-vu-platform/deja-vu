@@ -310,12 +310,13 @@ export class ActionHelper {
    * @param usedCliches a list of the names of all cliches used (not their
    *                    aliases)
    * @param appActionTable the action table for this app
-   * @param routes the route information
+   * @param routeActionSelectors tags of actions that have a route
+   *   tag should be of form appname-action-name
    */
   constructor(
     usedCliches?: string[],
     appActionTable?: ActionTable,
-    private readonly routes?: { path: string, action: string }[]
+    private readonly routeActionSelectors?: string[]
   ) {
     const clicheActionTables = _.map(_
       .uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
@@ -559,15 +560,15 @@ export class ActionHelper {
    * @return a list of `ActionTag`s, one for each route
    */
   private getRouteActions(actionTable: ActionTable): ActionTag[] {
-    return _.map(this.routes, (route) => {
-      if (!_.has(actionTable, route.action)) {
-        throw new Error(`Route action ${route.action} doesn't exist`);
+    return _.map(this.routeActionSelectors, (action) => {
+      if (!_.has(actionTable, action)) {
+        throw new Error(`Route action ${action} doesn't exist`);
       }
 
       return {
-        fqtag: route.action,
-        tag: route.action,
-        content: actionTable[route.action],
+        fqtag: action,
+        tag: action,
+        content: actionTable[action],
         context: {}
       };
     });

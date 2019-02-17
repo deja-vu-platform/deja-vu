@@ -121,43 +121,41 @@ export class ScopeIO {
     toSubject: BehaviorSubject<any>,
     inInput?: { name: string, of: ActionInstance }
   ) {
-    const [clicheN, actionN, ioN, ...objectPath] = expr.split('.');
-    let ioNames: string[] = [];
+    let fromSubject: BehaviorSubject<any>;
+    let ioName: string;
+    let objectPath: string[];
 
-    // resolve action referenced in expression
-    let fromAction = (<AppActionDefinition>this.actionInstance.of)
-      .findChild(clicheN, actionN);
-    if (fromAction) {
-      // case 1: getting sibling action output
-      ioNames = fromAction.of.outputs;
-    } else if (
-      this.actionInstance.from.name === clicheN
-      && this.actionInstance.of.name === actionN
-    ) {
-      // case 2: getting parent input
-      fromAction = this.actionInstance;
-      ioNames = this.actionInstance.of.inputs;
-    }
-    if (
-      inInput
-      && inInput.of.from.name === clicheN
-      && inInput.of.of.name === actionN
-    ) {
-      // case 3: getting value that would have gone to replaced action
-      // note that the action input may belong to an action which is
-      // in this context, which is why this is not an "else if" check
-      fromAction = inInput.of;
-      ioNames = Object.keys(inInput.of.of.actionInputs[inInput.name]);
-    }
-
-    // resolve value of action referenced
-    if (fromAction && ioNames.indexOf(ioN) >= 0) {
-      const sub = this.getSubject(fromAction, ioN)
-        .subscribe((val) => {
-          toSubject.next(_.get(val, objectPath, val));
-        });
-      this.subscriptions.push(sub);
+    if (expr.startsWith('$')) {
+      // getting an input from above
+      [ioName, ...objectPath] = expr.split('.');
+      ioName = ioName.slice(1); // strip leading '$'
+      if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
+        // getting an input from within an action input
+        fromSubject = this.getSubject(inInput.of, ioName);
+      } else if (this.actionInstance.of.inputs.includes(ioName)) {
+        // getting an input from the parent
+        fromSubject = this.getSubject(this.actionInstance, ioName);
+      }
     } else {
+      // getting an output from a sibling
+      let clicheN: string;
+      let actionN: string;
+      [clicheN, actionN, ioName, ...objectPath] = expr.split('.');
+      const fromAction = (<AppActionDefinition>this.actionInstance.of)
+        .findChild(clicheN, actionN);
+      if (fromAction && fromAction.of.outputs.includes(ioName)) {
+        fromSubject = this.getSubject(fromAction, ioName);
+      }
+    }
+
+    if (fromSubject) {
+      // pass value from IO along
+      const subscription = fromSubject.subscribe((val) => {
+        toSubject.next(_.get(val, objectPath, val));
+      });
+      this.subscriptions.push(subscription);
+    } else {
+      // input did not resolve to IO; pass a constant
       // TODO: full expression support
       let val: any;
       try {
@@ -181,7 +179,7 @@ export class ScopeIO {
       inputs: {
         actionInstance: action,
         actionIO: this.getActionIO(action),
-        extraInputs: Object.values(inInput.of.of.actionInputs[inInput.name]),
+        extraInputs: inInput.of.of.actionInputs[inInput.name],
         extraInputsScope: this.getActionIO(inInput.of)
       }
     });

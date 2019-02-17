@@ -36,7 +36,7 @@ implements OnInit, AfterViewInit, OnDestroy {
   private readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
   // for when rendered in dv-include only
-  @Input() extraInputs?: string[];
+  @Input() extraInputs?: { [ioName: string]: string };
   @Input() extraInputsScope?: ActionIO;
 
   constructor(
@@ -47,9 +47,9 @@ implements OnInit, AfterViewInit, OnDestroy {
     if (this.actionInstance && this.actionIO) {
       this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
       if (this.extraInputs && this.extraInputsScope) {
-        this.extraInputs.forEach((ioName) => {
+        _.forEach(this.extraInputs, (thisProp, ioName) => {
           this.extraInputsScope.getSubject(ioName)
-            .next(this[ioName]);
+            .next(this[thisProp]);
         });
       }
     }

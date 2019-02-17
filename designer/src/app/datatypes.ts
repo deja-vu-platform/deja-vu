@@ -98,18 +98,26 @@ export class AppActionDefinition implements ActionDefinition {
     }
   }
 
-  toHTML() {
-    let html = `<dv.action name="${this.name}">\n`;
+  toHTML(): string {
+    let html = `<dv.action name="${this.name}"`;
+    const outputs = this.outputSettings.filter(({ value }) => !!value);
+    outputs.forEach(({ name, value }) => {
+      html += `\n  ${name}$=${value}`;
+    });
+    if (outputs.length > 0) {
+      html += '\n';
+    }
+    html += '>\n';
     if (this.transaction) {
-      html += `<dv.tx>\n`;
+      html += '<dv.tx>\n';
     }
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
     if (this.transaction) {
-      html += `</dv.tx>\n`;
+      html += '</dv.tx>\n';
     }
-    html += `</dv.action>`;
+    html += '</dv.action>';
 
     return html;
   }
@@ -117,10 +125,11 @@ export class AppActionDefinition implements ActionDefinition {
   toJSON() {
     return {
       name: this.name,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputSettings: this.inputSettings,
+      outputSettings: this.outputSettings,
       rows: this.rows.map((row) => row.toJSON()),
       transaction: this.transaction
+      // app actions do not have action inputs
     };
   }
 
@@ -132,7 +141,7 @@ export class Row {
 
   constructor() {}
 
-  toHTML() {
+  toHTML(): string {
     let html = '  <div class="dvd-row">\n';
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
@@ -184,17 +193,34 @@ export class ActionInstance {
     return `${this.from.name}-${this.of.name}`;
   }
 
-  toHTML(): string {
+  /**
+   * @param extraIndents should not be provided externally
+   */
+  toHTML(extraIndents = 0): string {
     // text widget is just plain HTML static content
     if (this.of.name === 'text' && this.from.name === 'dv') {
       return `    <div>${this.data}</div>\n`;
     }
 
-    let html = `    <${this.from.name}.${this.of.name}\n`;
+    const baseNumIndents = 4;
+    const xIdnt = '  '.repeat(extraIndents);
+
+    let html = `    <${this.from.name}.${this.of.name}`;
+
     _.forEach(this.inputSettings, (val, key) => {
-      html += `      ${key}=${val}\n`;
+      const strVal = _.isString(val)
+        ? val
+        : val.toHTML(extraIndents + 1)
+          .slice(baseNumIndents, -1); // strip leading indent and ending newline
+      html += `\n${xIdnt}      ${key}=${strVal}`;
     });
-    html += `    />\n`;
+
+    if (_.size(this.inputSettings) === 0) {
+      html += ' ';
+    } else {
+      html += `\n${xIdnt}    `;
+    }
+    html += '/>\n';
 
     return html;
   }
@@ -274,24 +300,16 @@ export class App {
 
     appJSON.actions.forEach((aad) => {
       const actionDef = new AppActionDefinition(aad.name);
-      actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
-      actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      actionDef.inputSettings
+        .push.apply(actionDef.inputSettings, aad.inputSettings);
+      actionDef.outputSettings
+        .push.apply(actionDef.outputSettings, aad.outputSettings);
       actionDef.transaction = aad.transaction;
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
-          const from = [
-            ...app.cliches,
-            app,
-            dvCliche
-          ].find((c) => c.name === ai.from);
-          const ofAction = (<ActionDefinition[]>from.actions)
-            .find((a) => a.name === ai.of);
-          const actionInst = new ActionInstance(ofAction, from);
-          Object.assign(actionInst.inputSettings, ai.inputSettings);
-          if (ai.data) {
-            actionInst.data = ai.data;
-          }
+          const actionInst = app.newActionInstanceByName(ai.of, ai.from);
+          app.setInputsFromJSON(actionInst, ai);
           row.actions.push(actionInst);
         });
         actionDef.rows.push(row);
@@ -391,9 +409,9 @@ export class App {
         }) && obj // mutate and then return obj
       ), {}),
       routes: [
-        { path: '', action: `${this.name}-${this.homepage.name}` },
+        { path: '', action: this.homepage.name },
         ..._.map(this.pages, (page) => (
-          { path: page.name, action: `${this.name}-${page.name}` }
+          { path: page.name, action: page.name }
         ))
       ]
     }, null, '  ');
@@ -412,5 +430,49 @@ export class App {
     );
 
     return this._actionCollections;
+  }
+
+  /**
+   * @param ofName name of action declared in app, imported cliche, or DV cliche
+   * @param fromName name of cliche instance, or app, or the DV cliche
+   */
+  newActionInstanceByName(ofName: string, fromName: string): ActionInstance {
+    const fromSource = [
+      ...this.cliches,
+      this,
+      App.dvCliche
+    ].find((c) => c.name === fromName);
+    const ofAction = (<ActionDefinition[]>fromSource.actions)
+      .find((a) => a.name === ofName);
+
+    return new ActionInstance(ofAction, fromSource);
+  }
+
+  /**
+   * @param actionInstance the action instance to mutate
+   * @param inputSettings JSON form of ActionInstance
+   */
+  private setInputsFromJSON(
+    actionInstance: ActionInstance,
+    actionInstanceObject: any
+  ) {
+    _.forEach(actionInstanceObject.inputSettings, (setting, name) => {
+      if (_.isString(setting)) {
+        actionInstance.inputSettings[name] = setting;
+      } else {
+        const inputtedAction = this.newActionInstanceByName(
+          setting.of,
+          setting.from
+        );
+        actionInstance.inputSettings[name] = inputtedAction;
+        this.setInputsFromJSON(
+          inputtedAction,
+          setting
+        );
+      }
+    });
+    if (actionInstanceObject.data) {
+      actionInstance.data = actionInstanceObject.data;
+    }
   }
 }
