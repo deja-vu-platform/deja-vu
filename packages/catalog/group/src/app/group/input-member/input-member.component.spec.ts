@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InputMemberComponent } from './input-member.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('InputMemberComponent', () => {
   let component: InputMemberComponent;
   let fixture: ComponentFixture<InputMemberComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [InputMemberComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

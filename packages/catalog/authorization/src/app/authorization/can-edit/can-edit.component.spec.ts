@@ -2,14 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CanEditComponent } from './can-edit.component';
 
+import { buildConfig } from '../testing/testbed.config';
+
+
 describe('CanEditComponent', () => {
   let component: CanEditComponent;
   let fixture: ComponentFixture<CanEditComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [CanEditComponent]
-    })
+    const config = buildConfig({ data: { canEdit: true } }, null, {});
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

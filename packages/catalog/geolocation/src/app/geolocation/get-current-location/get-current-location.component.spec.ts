@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GetCurrentLocationComponent } from './get-current-location.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('GetCurrentLocationComponent', () => {
   let component: GetCurrentLocationComponent;
   let fixture: ComponentFixture<GetCurrentLocationComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [GetCurrentLocationComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

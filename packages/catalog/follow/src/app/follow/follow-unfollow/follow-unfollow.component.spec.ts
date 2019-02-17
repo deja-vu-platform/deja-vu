@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FollowUnfollowComponent } from './follow-unfollow.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('FollowUnfollowComponent', () => {
   let component: FollowUnfollowComponent;
   let fixture: ComponentFixture<FollowUnfollowComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [FollowUnfollowComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

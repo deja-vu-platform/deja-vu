@@ -14,7 +14,7 @@
   "devDependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/cdk": "^5.2.1",
-    "@angular/cli": "1.6.7",
+    "@angular/cli": "^1.7.3",
     "@angular/common": "^5.2.0",
     "@angular/compiler": "^5.2.0",
     "@angular/compiler-cli": "^5.2.0",
@@ -62,6 +62,8 @@
     "samples/chorestar",
     "samples/hackernews",
     "samples/hackernews/.dv",
+    "samples/listify",
+    "samples/listify/.dv",
     "samples/morg",
     "samples/morg/.dv",
     "samples/potluck",

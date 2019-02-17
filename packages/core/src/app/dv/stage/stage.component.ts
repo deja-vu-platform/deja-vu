@@ -39,6 +39,7 @@ export class StageComponent
   @Input() showEntity: Action | undefined;
 
   // Presentation inputs
+  @Input() entityName = 'Entity';
   @Input() stageButtonLabel = 'Add';
 
   stageComponent = this;

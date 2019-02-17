@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreatePublisherComponent } from './create-publisher.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreatePublisherComponent', () => {
   let component: CreatePublisherComponent;
   let fixture: ComponentFixture<CreatePublisherComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [CreatePublisherComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

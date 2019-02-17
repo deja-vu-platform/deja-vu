@@ -2,14 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CanViewComponent } from './can-view.component';
 
+import { buildConfig } from '../testing/testbed.config';
+
+
 describe('CanViewComponent', () => {
   let component: CanViewComponent;
   let fixture: ComponentFixture<CanViewComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [CanViewComponent]
-    })
+    const config = buildConfig({ data: { canView: true } }, null, {});
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

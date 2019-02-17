@@ -23,3 +23,9 @@ export interface CreateScoreInput {
   sourceId: string;
   targetId: string;
 }
+
+export interface ShowScoreInput {
+  id?: string;
+  sourceId?: string;
+  targetId?: string;
+}

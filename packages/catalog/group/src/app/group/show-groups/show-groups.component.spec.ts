@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowGroupsComponent } from './show-groups.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowGroupsComponent', () => {
   let component: ShowGroupsComponent;
   let fixture: ComponentFixture<ShowGroupsComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShowGroupsComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

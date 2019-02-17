@@ -4,15 +4,16 @@ import {
   ChooseAndShowSeriesComponent
 } from './choose-and-show-series.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ChooseAndShowSeriesComponent', () => {
   let component: ChooseAndShowSeriesComponent;
   let fixture: ComponentFixture<ChooseAndShowSeriesComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ChooseAndShowSeriesComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AuthenticateComponent } from './authenticate.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('AuthenticateComponent', () => {
   let component: AuthenticateComponent;
   let fixture: ComponentFixture<AuthenticateComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ AuthenticateComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('AuthenticateComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

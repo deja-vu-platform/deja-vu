@@ -29,6 +29,8 @@ import { Ranking, TargetRank } from '../shared/ranking.model';
 export class ShowRankingComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   @Input() id: string;
+  @Input() sourceId: string | undefined;
+  @Input() ranking: Ranking;
 
   @Input() showId = true;
   @Input() showSourceId = true;
@@ -43,7 +45,6 @@ OnChanges {
     type: <Type<Component>> ShowTargetComponent
   };
 
-  ranking: Ranking;
   showRanking;
 
   private gs: GatewayService;
@@ -78,7 +79,8 @@ OnChanges {
       this.gs.get<{data: {ranking: Ranking}}>(this.apiPath, {
         params: {
           inputs: {
-            id: this.id
+            id: this.id,
+            sourceId: this.sourceId
           },
           extraInfo: {
             returnFields: `
@@ -104,6 +106,6 @@ OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.id);
+    return !!(!this.ranking && this.gs && this.id);
   }
 }

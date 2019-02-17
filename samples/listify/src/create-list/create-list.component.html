@@ -1,0 +1,63 @@
+<dv.action name="create-list">
+  <listify.navbar />
+
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect
+      href="/login"
+      params={ callback: '/lists/create' }
+      onEvalFailure=true />
+  </dv.tx>
+
+  <div class="main">
+    <div class="container">
+      <dv.if condition=listify.navbar.loggedInUser>
+        <dv.tx>
+          <dv.gen-id />
+          <authentication.authenticate
+            id=listify.navbar.loggedInUser.id hidden=true />
+
+          <list.create-object
+            id=dv.gen-id.id
+            initialValue={
+              creator: listify.navbar.loggedInUser.id,
+              locked: false
+            }
+            showExclude=['creator', 'locked']
+            showOptionToSubmit=false />
+          <!-- TODO: private/public lists; use authorization -->
+
+          <dv.stage entityName="Enter a Suggestion" />
+          <dv.gen-ids for=dv.stage.stagedEntities />
+          <dv.zip
+            inputs=[dv.gen-ids.ids, dv.stage.stagedEntities]
+            fieldNames=['id', 'name'] />
+          <listoption.create-objects objects=dv.zip.objects hidden=true />
+
+          <group.create-group
+            id=dv.gen-id.id
+            memberIds=dv.gen-ids.ids
+            hidden=true />
+          <!-- TODO: optional properties (info/description and url of photo) -->
+
+          <!-- for trending lists -->
+          <scoring.create-score
+            id=dv.gen-id.id
+            sourceId=dv.gen-id.id
+            targetId=dv.gen-id.id
+            value=0
+            hidden=true />
+
+          <dv.button class="bottom-right-button">
+            <img src="../assets/check.svg" />
+          </dv.button>
+
+          <dv.link
+            href="/lists/rankings/edit"
+            params={ id: dv.gen-id.id }
+            hidden=true />
+        </dv.tx>
+      </dv.if>
+    </div>
+  </div>
+</dv.action>

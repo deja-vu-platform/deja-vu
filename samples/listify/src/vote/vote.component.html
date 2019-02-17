@@ -1,0 +1,83 @@
+<dv.action name="vote">
+  <scoring.show-score
+    sourceId=$loggedInUser?.id
+    targetId=$listId
+    hidden=true />
+
+  <div class="vote-buttons">
+    <dv.tx as upvote>
+      <authentication.authenticate as upvoteAuth
+        id=$loggedInUser?.id hidden=true />
+      <dv.button>
+        <dv.if condition=scoring.show-score.loadedScore?.value === 1>
+          <img
+             className="vote-button upvote"
+             src="assets/active-upvote.svg"/>
+        </dv.if>
+        <dv.if condition=!scoring.show-score.loadedScore || scoring.show-score.loadedScore?.value !== 1>
+          <img
+             className="vote-button upvote"
+             src="assets/upvote.svg"/>
+        </dv.if>
+      </dv.button>
+
+      <!-- TODO: clicking on something already upvoted undoes the upvote -->
+      <scoring.create-score
+        buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
+        class="vote-button upvote"
+        newScoreSavedText=""
+        showOptionToInputValue=false
+        showOptionToSubmit=false
+        sourceId=$loggedInUser?.id
+        targetId=$listId
+        value=1 />
+      <!-- upvote action -->
+    </dv.tx>
+
+    <!-- show vote count only when it's nonzero -->
+    <scoring.show-target
+      id=$listId
+      showId=false
+      showScores=false
+      hidden=true />
+    <dv.if condition=scoring.show-target.loadedTarget?.total !== 0>
+      <p
+        className=scoring.show-target.loadedTarget?.total gt 0 ?
+        'vote-count vote-count-positive' : 'vote-count vote-count-negative' >
+          <scoring.show-target
+            totalLabel=""
+            target=scoring.show-target.loadedTarget
+            showId=false
+            showScores=false />
+      </p>
+    </dv.if>
+    
+    <dv.tx as downvote>
+      <authentication.authenticate as downvoteAuth
+        id=$loggedInUser?.id hidden=true />
+      <dv.button>
+        <dv.if condition=scoring.show-score.loadedScore?.value === -1>
+          <img
+             className="vote-button downvote"
+             src="assets/active-downvote.svg"/>
+        </dv.if>
+        <dv.if condition=!scoring.show-score.loadedScore || scoring.show-score.loadedScore?.value !== -1>
+          <img
+             className="vote-button downvote"
+             src="assets/downvote.svg"/>
+        </dv.if>
+      </dv.button>
+
+      <!-- TODO: clicking on something already downvoted undoes the downvote -->
+      <scoring.create-score
+        buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
+        class="vote-button downvote"
+        newScoreSavedText=""
+        showOptionToInputValue=false
+        showOptionToSubmit=false
+        sourceId=$loggedInUser?.id
+        targetId=$listId
+        value=-1 />
+    </dv.tx>
+  </div>
+</dv.action>

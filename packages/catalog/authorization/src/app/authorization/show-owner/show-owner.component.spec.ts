@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowOwnerComponent } from './show-owner.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowOwnerComponent', () => {
   let component: ShowOwnerComponent;
   let fixture: ComponentFixture<ShowOwnerComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ShowOwnerComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

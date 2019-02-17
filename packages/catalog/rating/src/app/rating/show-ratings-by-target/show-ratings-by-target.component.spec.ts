@@ -4,15 +4,16 @@ import {
   ShowRatingsByTargetComponent
 } from './show-ratings-by-target.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowRatingsByTargetComponent', () => {
   let component: ShowRatingsByTargetComponent;
   let fixture: ComponentFixture<ShowRatingsByTargetComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowRatingsByTargetComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

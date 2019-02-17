@@ -2,15 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShowTransfersComponent } from './show-transfers.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('ShowTransfersComponent', () => {
   let component: ShowTransfersComponent;
   let fixture: ComponentFixture<ShowTransfersComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ShowTransfersComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule(config)
+      .compileComponents();
   }));
 
   beforeEach(() => {

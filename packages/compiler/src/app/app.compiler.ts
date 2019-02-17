@@ -114,7 +114,8 @@ export class AppCompiler {
 
     if (dvConfig.routes !== undefined) {
       for (const route of dvConfig.routes) {
-        ngAppBuilder.addRoute(route.path, route.action);
+        const selector = `${appName}-${route.action}`;
+        ngAppBuilder.addRoute(route.path, selector);
       }
     }
     const globalStyleFile = path.join(this.projectDir, 'src', 'styles.css');
@@ -125,6 +126,11 @@ export class AppCompiler {
     const faviconFile = path.join(this.projectDir, 'favicon.ico');
     if (existsSync(faviconFile)) {
       ngAppBuilder.setFavicon(faviconFile);
+    }
+
+    const assetsDir = path.join(this.projectDir, 'src', 'assets');
+    if (existsSync(assetsDir)) {
+      ngAppBuilder.setAppAssetsDir(assetsDir);
     }
 
     const actionsConfig = (dvConfig.actions !== undefined) ?

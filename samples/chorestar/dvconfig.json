@@ -119,8 +119,8 @@
     }
   },
   "routes": [
-    {"path": "parent", "action": "chorestar-parent-home"},
-    {"path": "child", "action": "chorestar-child-home"},
-    {"path": "", "action": "chorestar-landing"}
+    {"path": "parent", "action": "parent-home"},
+    {"path": "child", "action": "child-home"},
+    {"path": "", "action": "landing"}
   ]
 }

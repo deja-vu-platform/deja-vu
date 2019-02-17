@@ -2,14 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateGroupComponent } from './create-group.component';
 
+import { config } from '../testing/testbed.config';
+
+
 describe('CreateGroupComponent', () => {
   let component: CreateGroupComponent;
   let fixture: ComponentFixture<CreateGroupComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [CreateGroupComponent]
-    })
+    TestBed.configureTestingModule(config)
       .compileComponents();
   }));
 

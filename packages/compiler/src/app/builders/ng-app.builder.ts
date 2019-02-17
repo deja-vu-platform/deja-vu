@@ -59,6 +59,7 @@ export class NgAppBuilder {
   private readonly routes: Route[] = [];
   private globalStyle = '';
   private faviconPath: string | undefined;
+  private appAssetsDir: string | undefined;
 
   private static Replace(
     srcFile: string, srcExt: string, dstDir: string,
@@ -158,6 +159,12 @@ export class NgAppBuilder {
     return this;
   }
 
+  setAppAssetsDir(appAssetsDir: string) {
+    this.appAssetsDir = appAssetsDir;
+
+    return this;
+  }
+
   addRoute(route: string, selector: string) {
     this.routes.push({ path: route, selector: selector });
 
@@ -198,6 +205,10 @@ export class NgAppBuilder {
       NgAppBuilder.Replace('app.component', 'html', appDir);
       // | assets/
       mkdirSync(assetsDir);
+    }
+
+    if (this.appAssetsDir) {
+      copySync(this.appAssetsDir, assetsDir);
     }
 
     const diff = this.updateCache(cacheDir);
@@ -329,6 +340,14 @@ export class NgAppBuilder {
     for (const d of this.dependencies) {
       const clichePackageLocation = NgAppBuilder.FindPackage(d.name);
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+
+      /**
+       * Desired behaviour: Image assets for a cliche are found in
+       *    `assets/<cliche-name>/<img-file>`
+       * Problem: The library used to display stars in the rating cliche looks
+       *    for the image in `assets/images/<img-name>`
+       * Hack: Put rating's assets in `assets/` not `assets/rating/`
+       */
       const appAssetsDir = d.name === 'rating' ? assetsDir :
         path.join(assetsDir, d.name);
       if (existsSync(clicheAssets)) {
