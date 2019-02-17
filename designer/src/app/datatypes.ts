@@ -269,7 +269,10 @@ export class ClicheInstance {
 }
 
 export class App {
-  static dvCliche: ActionCollection; // MUST POPULATE LATER
+  // populated in cliche.module.ts to avoid circular dependencies
+  static dvCliche: ActionCollection;
+  static clicheDefinitions: ClicheDefinition[];
+
   name: string; // no dashes
   readonly actions: AppActionDefinition[];
   readonly pages: AppActionDefinition[]; // subset of actions
@@ -278,11 +281,7 @@ export class App {
   // need consistent object to return
   private readonly _actionCollections: ActionCollection[] = [];
 
-  static fromJSON(
-    jsonString: string,
-    clicheDefinitions: ClicheDefinition[],
-    dvCliche: ClicheDefinition
-  ): App {
+  static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
 
     const app = new App(appJSON.name);
@@ -292,7 +291,7 @@ export class App {
     app.pages.pop();
 
     appJSON.cliches.forEach((ci) => {
-      const ofCliche = clicheDefinitions.find((cd) => cd.name === ci.of);
+      const ofCliche = App.clicheDefinitions.find((cd) => cd.name === ci.of);
       const clicheInstance = new ClicheInstance(ci.name, ofCliche);
       Object.assign(clicheInstance.config, ci.config);
       app.cliches.push(clicheInstance);
@@ -419,8 +418,8 @@ export class App {
 
   get actionCollections(): ActionCollection[] {
     this._actionCollections.splice(0);
-    this._actionCollections.push(App.dvCliche);
     this._actionCollections.push(this);
+    this._actionCollections.push(App.dvCliche);
     this._actionCollections.push.apply(
       this._actionCollections,
       this.cliches
@@ -438,11 +437,7 @@ export class App {
    * @return a new action instance or undefined if the names do not resolve
    */
   newActionInstanceByName(ofName: string, fromName: string): ActionInstance {
-    const fromSource = [
-      ...this.cliches,
-      this,
-      App.dvCliche
-    ].find((c) => c.name === fromName);
+    const fromSource = this.actionCollections.find((c) => c.name === fromName);
 
     const ofAction = fromSource
       ? (<ActionDefinition[]>fromSource.actions).find((a) => a.name === ofName)

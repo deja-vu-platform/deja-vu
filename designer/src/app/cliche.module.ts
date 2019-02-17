@@ -131,10 +131,14 @@ function clicheDefinitionFromModule(
 export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
 
-export const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+
+App.clicheDefinitions = clicheDefinitions;
 App.dvCliche = dvCliche;
+
 export const dvCoreActions = dvCliche.actions
   .map(({ component: c }) => <any>c);
+
 dvCliche.actions.push(({
   name: 'text',
   component: <Component>TextComponent,

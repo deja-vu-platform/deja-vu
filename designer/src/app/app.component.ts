@@ -5,7 +5,6 @@ import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
 import { filter } from 'rxjs/operators';
 
-import { clicheDefinitions, dvCliche } from './cliche.module';
 import {
   ActionInstance,
   App,
@@ -111,7 +110,7 @@ export class AppComponent implements OnDestroy {
   load(appJSON: string) {
     this.zone.run(() => {
       this.removeAllCliches();
-      this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
+      this.app = App.fromJSON(appJSON);
       this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
       this.snackBar.open('Save has been loaded.', 'dismiss', {
@@ -143,6 +142,7 @@ export class AppComponent implements OnDestroy {
         filter(({ el: e, source: s, target: t }) => e && s && t && (s !== t))
       )
       .subscribe(({ el, source, target }) => {
+        console.log(el, source, target);
         let action: ActionInstance;
         let toRowIdx = parseInt(target['dataset'].index, 10);
         if (toRowIdx === this.openAction.rows.length) {
@@ -156,7 +156,8 @@ export class AppComponent implements OnDestroy {
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            action = this.app.newActionInstanceByName(sourceName, actionName);
+            action = this.app.newActionInstanceByName(actionName, sourceName);
+            console.log(action);
           }
         } else if (source.classList.contains('dvd-row')) {
           const fromRowIdx = parseInt(source['dataset'].index, 10);
