@@ -12,7 +12,7 @@
         [attr.data-index]="actionNum"
       >
         <!-- unfortunately we can't apply inputs conditionally -->
-        <div *ngIf="action.of.inputs.length === 0">
+        <div *ngIf="action.of.inputs.length === 0" class="instance-container">
           <app-action-instance
             [actionInstance]="action"
             [actionIO]="scopeIO.getActionIO(action)"
@@ -21,6 +21,7 @@
         </div>
         <div
           *ngIf="action.of.inputs.length > 0"
+          class="instance-container"
           #menuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="menu"
         >

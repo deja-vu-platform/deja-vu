@@ -10,11 +10,17 @@ export interface ActionCollection {
   actions: ActionDefinition[];
 }
 
+export interface ActionInputs {
+  // ioName is what you would put $ in front of to reference
+  // the value is the name of the property set in the included action
+  [forInput: string]: { [ioName: string]: string };
+}
+
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
-  readonly actionInputs: { [name: string]: string[] };
+  readonly actionInputs: ActionInputs;
 }
 
 export interface ClicheActionDefinition extends ActionDefinition {
@@ -33,7 +39,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
-  readonly actionInputs: Readonly<{ [name: string]: string[] }> = {}; // always
+  readonly actionInputs: Readonly<ActionInputs> = {}; // always
   // TODO: styling options
 
   constructor(name: string) {

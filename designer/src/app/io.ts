@@ -92,16 +92,20 @@ export class ScopeIO {
    * Gets the action's input settings, resolves the values,
    *   and sends them to the IO subjects
    */
-  private sendInputs(action: ActionInstance) {
-    action.of.inputs.forEach((input) => {
-      const toSubject = this.getSubject(action, input);
-      const inputVal = action.inputSettings[input];
+  private sendInputs(
+    toAction: ActionInstance,
+    inInput?: { name: string, of: ActionInstance }
+  ) {
+    toAction.of.inputs.forEach((input) => {
+      const toSubject = this.getSubject(toAction, input);
+      const inputVal = toAction.inputSettings[input];
       if (inputVal) {
         if (_.isString(inputVal)) {
-          this.sendExpression(inputVal, toSubject);
+          this.sendExpression(inputVal, toSubject, inInput);
         } else {
-          this.sendInputs(inputVal);
-          this.sendAction(inputVal, toSubject);
+          const newInInput = { name: input, of: toAction };
+          this.sendInputs(inputVal, newInInput);
+          this.sendAction(inputVal, toSubject, newInInput);
         }
       }
     });
@@ -112,30 +116,54 @@ export class ScopeIO {
    * @param toSubject where to send its value
    * If the expression cannot be parsed it just sends the raw string
    */
-  private sendExpression(expr: string, toSubject: BehaviorSubject<any>) {
+  private sendExpression(
+    expr: string,
+    toSubject: BehaviorSubject<any>,
+    inInput?: { name: string, of: ActionInstance }
+  ) {
     const [clicheN, actionN, ioN, ...objectPath] = expr.split('.');
+    let ioNames: string[] = [];
 
+    // resolve action referenced in expression
     let fromAction = (<AppActionDefinition>this.actionInstance.of)
       .findChild(clicheN, actionN);
-    let fromSubjectList: 'inputs' | 'outputs';
     if (fromAction) {
-      fromSubjectList = 'outputs';
+      // case 1: getting sibling action output
+      ioNames = fromAction.of.outputs;
     } else if (
       this.actionInstance.from.name === clicheN
       && this.actionInstance.of.name === actionN
     ) {
+      // case 2: getting parent input
       fromAction = this.actionInstance;
-      fromSubjectList = 'inputs';
+      ioNames = this.actionInstance.of.inputs;
+    }
+    if (
+      inInput
+      && inInput.of.from.name === clicheN
+      && inInput.of.of.name === actionN
+    ) {
+      // case 3: getting value that would have gone to replaced action
+      // note that the action input may belong to an action which is
+      // in this context, which is why this is not an "else if" check
+      fromAction = inInput.of;
+      ioNames = Object.keys(inInput.of.of.actionInputs[inInput.name]);
     }
 
-    if (fromAction && fromAction.of[fromSubjectList].indexOf(ioN) >= 0) {
+    // resolve value of action referenced
+    if (fromAction && ioNames.indexOf(ioN) >= 0) {
       const sub = this.getSubject(fromAction, ioN)
         .subscribe((val) => {
           toSubject.next(_.get(val, objectPath, val));
         });
       this.subscriptions.push(sub);
     } else {
-      toSubject.next(expr); // just pass the string as-is
+      // TODO: full expression support
+      let val: any;
+      try {
+        val = JSON.parse(expr);
+      } catch (e) { }
+      toSubject.next(val);
     }
   }
 
@@ -143,14 +171,19 @@ export class ScopeIO {
    * @param action an action instance
    * @param toSubject where to send a component to render
    */
-  private sendAction(action: ActionInstance, toSubject: BehaviorSubject<any>) {
+  private sendAction(
+    action: ActionInstance,
+    toSubject: BehaviorSubject<any>,
+    inInput?: { name: string, of: ActionInstance }
+  ) {
     toSubject.next({
       type: ScopeIO.actionInstanceComponent,
       inputs: {
         actionInstance: action,
-        actionIO: this.getActionIO(action)
+        actionIO: this.getActionIO(action),
+        extraInputs: Object.values(inInput.of.of.actionInputs[inInput.name]),
+        extraInputsScope: this.getActionIO(inInput.of)
       }
-      // TODO: pass io that would have gone to orignal action
     });
   }
 

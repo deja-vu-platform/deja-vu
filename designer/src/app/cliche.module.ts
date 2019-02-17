@@ -17,7 +17,12 @@ import * as rating from '@deja-vu/rating';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
-import { App, ClicheActionDefinition, ClicheDefinition } from './datatypes';
+import {
+  ActionInputs,
+  App,
+  ClicheActionDefinition,
+  ClicheDefinition
+} from './datatypes';
 import { TextComponent } from './text/text.component';
 
 // TODO: import platform actions (e.g. button, link, etc.)
@@ -69,7 +74,7 @@ function clicheDefinitionFromModule(
         // get inputs and outputs
         const inputs = [];
         const outputs = [];
-        const actionInputs = {};
+        const actionInputs: ActionInputs = {};
         _.forEach(component.propDecorators, (val, key) => {
           const type = val[0].type.prototype.ngMetadataName;
           if (type === 'Input') {
@@ -93,17 +98,20 @@ function clicheDefinitionFromModule(
         );
 
         if (actionInputNames.length > 0) {
+          // parse the template string to extract the object map
           const template: string = component.decorators[0].args[0].template;
           const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
           if (inputMapMatch) {
-            actionInputs[actionInputNames[0]] = inputMapMatch[1]
-              .split(',')
-              .map((s) => s
-                .split(':')[1]
-                .trim()
-              );
+            actionInputs[actionInputNames[0]] = _.fromPairs(
+              inputMapMatch[1]
+                .split(',')
+                .map((s1) => s1.split(':')
+                  .map((s2) => s2.trim())
+                  .reverse()
+                )
+            );
           } else {
-            actionInputs[actionInputNames[0]] = [];
+            actionInputs[actionInputNames[0]] = {};
           }
         }
 

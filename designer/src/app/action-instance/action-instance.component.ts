@@ -35,6 +35,9 @@ implements OnInit, AfterViewInit, OnDestroy {
   @Input() actionIO: ActionIO;
   private readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
+  // for when rendered in dv-include only
+  @Input() extraInputs?: string[];
+  @Input() extraInputsScope?: ActionIO;
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver
@@ -43,6 +46,12 @@ implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     if (this.actionInstance && this.actionIO) {
       this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
+      if (this.extraInputs && this.extraInputsScope) {
+        this.extraInputs.forEach((ioName) => {
+          this.extraInputsScope.getSubject(ioName)
+            .next(this[ioName]);
+        });
+      }
     }
   }
 

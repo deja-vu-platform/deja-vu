@@ -40,6 +40,11 @@
   border-color:rgba(16, 219, 255, .5);
 }
 
+.instance-container {
+  min-width: 100px;
+  min-height: 50px;
+}
+
 .popup-menu {
   height: 200px;
   padding: 0 16px;
