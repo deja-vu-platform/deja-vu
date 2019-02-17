@@ -77,6 +77,7 @@ export class CreateItemCountComponent
   }
 
   emit() {
+    console.log('val', this.idControl.value)
     const itemCountToEmit = _.cloneDeep(this.thisItemCount);
     this.itemCount.emit(itemCountToEmit);
     this.itemCountAsAmount.emit([itemCountToEmit]);

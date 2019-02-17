@@ -443,7 +443,7 @@ function resolvers(db: mongodb.Db, config: TransferConfig): object {
       db.collection('accounts');
     const transfers: mongodb.Collection<TransferDoc<ItemCount[]>> =
       db.collection('transfers');
-    
+
     const newBalanceFn: NewBalanceFn<ItemCount[]> =
       (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
         const accountBalanceMap = _
@@ -512,7 +512,7 @@ const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
      */
     const accounts = db.collection('accounts');
     const transfers = db.collection('transfers');
-    
+
     return Promise.all([
       accounts.createIndex({ id: 1 }, { unique: true, sparse: true }),
       transfers.createIndex({ id: 1 }, { unique: true, sparse: true }),

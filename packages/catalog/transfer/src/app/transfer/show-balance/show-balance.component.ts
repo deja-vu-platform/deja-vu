@@ -16,11 +16,9 @@ import {
   RunService
 } from '@deja-vu/core';
 import { ShowAmountComponent } from '../show-amount/show-amount.component';
-import { API_PATH } from '../transfer.config';
+import { API_PATH, TransferConfig } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
-
-import { TransferConfig } from '../transfer.config';
 
 
 interface BalanceRes {

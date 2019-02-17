@@ -30,7 +30,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./add-to-balance.component.css']
 })
 export class AddToBalanceComponent
-implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
   @Input() showOptionToInputAccountId = true;
@@ -45,7 +45,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   }
 
   @Input() set amount(amount: Amount) {
-    this.amountControl.setValue(amount);
+    if (amount !== undefined) { this.amountControl.setValue(amount); }
   }
 
   // Presentation inputs
@@ -70,7 +70,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -91,7 +91,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
       },
       extraInfo: { returnFields: 'id' }
     })
-    .toPromise();
+      .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -108,12 +108,12 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
       window.setTimeout(() => {
         this.newTransferSaved = false;
       }, SAVED_MSG_TIMEOUT);
-     }
-     // Can't do `this.form.reset();`
-     // See https://github.com/angular/material2/issues/4190
-     if (this.form) {
-       this.form.resetForm();
-     }
+    }
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 
   dvOnExecFailure(reason: Error) {
