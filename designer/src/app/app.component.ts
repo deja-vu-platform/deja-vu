@@ -133,22 +133,27 @@ export class AppComponent implements OnDestroy {
    */
   private configureDragula() {
     this.dragulaService.createGroup('action', {
+      // we use copy to prevent depletion of the action list
       copy: (el, source) => source.classList.contains('action-list'),
-      accepts: (el, target) => target.classList.contains('dvd-row')
+      // you can *only* drag into rows
+      accepts: (el, target) => target.classList.contains('dvd-row'),
+      // if you drag outside of a row the action gets removed
+      removeOnSpill: true
     });
 
     this.dragulaService.drop('action')
-      .pipe(
-        filter(({ el: e, source: s, target: t }) => e && s && t && (s !== t))
-      )
       .subscribe(({ el, source, target }) => {
-        let action: ActionInstance;
+        console.log(el, source, target);
+        // find target row
         let toRowIdx = parseInt(target['dataset'].index, 10);
         if (toRowIdx === this.openAction.rows.length) {
           toRowIdx = -1;
         }
         const toRow = this.openAction.rows[toRowIdx] || new Row();
+
+        let action: ActionInstance;
         if (source.classList.contains('action-list')) {
+          // dragging in a new action
           const {
             source: sourceName,
             action: actionName,
@@ -157,20 +162,27 @@ export class AppComponent implements OnDestroy {
           if (disabled !== 'true') {
             action = this.app.newActionInstanceByName(actionName, sourceName);
           }
-        } else if (source.classList.contains('dvd-row')) {
+        } else {
+          // moving an action
           const fromRowIdx = parseInt(source['dataset'].index, 10);
           const actionIdx = parseInt(el['dataset'].index, 10);
           action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
-        } else {
-          return;
         }
+
+        toRow.addAction(action);
+        if (toRowIdx === -1) {
+          this.openAction.rows.push(toRow);
+        }
+
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        if (action) {
-          toRow.addAction(action);
-          if (toRowIdx === -1) {
-            this.openAction.rows.push(toRow);
-          }
-        }
+      });
+
+    // handle dropping an action outside the page (remove it)
+    this.dragulaService.remove('action')
+      .subscribe(({ el, source }) => {
+        const fromRowIdx = parseInt(source['dataset'].index, 10);
+        const actionIdx = parseInt(el['dataset'].index, 10);
+        this.openAction.rows[fromRowIdx].removeAction(actionIdx);
       });
   }
 }
