@@ -21,6 +21,9 @@ interface VerifyRes {
   styleUrls: ['./validate.component.css']
 })
 export class ValidateComponent implements OnExec, OnInit, OnChanges {
+  @Input() code: string;
+  @Input() isGuest = false;
+
   isValidated = false;
 
   private gs: GatewayService;
@@ -41,37 +44,32 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs) {
+    this.doRequest();
+  }
+
+  dvOnExec() {
+    this.doRequest();
+  }
+
+  doRequest() {
+    if (!this.gs || _.isEmpty(this.code)) {
       return;
     }
 
-    const code = this.passkeyService.getSignedInPasskey();
-    const token = this.passkeyService.getToken();
-
-    if (!code || !token) {
-      return;
-    }
+    const token = this.passkeyService.getToken(this.isGuest);
 
     this.gs.get<VerifyRes>(this.apiPath, {
       params: {
-        query: `
-          query Verify($input: VerifyInput!) {
-            verify(input: $input)
-          }`,
-        variables: JSON.stringify({
+        inputs: {
           input: {
-            code: code,
+            code: this.code,
             token: token
           }
-        })
+        }
       }
     })
       .subscribe((res) => {
         this.isValidated = res.data.verify;
       });
-  }
-
-  dvOnExec() {
-    this.load();
   }
 }

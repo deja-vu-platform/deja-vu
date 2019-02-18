@@ -1,18 +1,20 @@
 import {
+  ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
   Config,
-  Context
+  Context,
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
+import * as shajs from 'sha.js';
 import {
   PasskeyDoc,
   SignInOutput,
   VerifyInput
 } from './schema';
-import * as shajs from 'sha.js';
 import { WORDS } from './words';
 
 
@@ -47,6 +49,37 @@ class PasskeyValidation {
     }
   }
 }
+
+const actionRequestTable: ActionRequestTable = {
+  'create-passkey': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'login':
+        return `
+          mutation Register($code: String!) {
+            createAndValidatePasskey(code: $code) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'register-only':
+        return `
+          mutation Register($code: String!) {
+            createPasskey(code: $code) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'sign-in': (extraInfo) => `
+    mutation SignIn($code: String!) {
+      validatePasskey(code: $code) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'validate': (extraInfo) => `
+    query Validate($input: VerifyInput!) {
+      verify(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
+};
 
 function isPendingCreate(passkey: PasskeyDoc | null) {
   return _.get(passkey, 'pending.type') === 'create-passkey';
@@ -107,7 +140,6 @@ async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
   switch (context.reqType) {
     case 'vote':
       newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
-    // tslint:disable-next-line:no-switch-case-fall-through
     case undefined:
       await passkeys.insertOne(newPasskey);
 
@@ -197,6 +229,7 @@ const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
 
     return passkeys.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 

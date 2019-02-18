@@ -99,19 +99,18 @@ export class CreatePasskeyComponent
     if (this.signIn) {
       const res = await this.gs
         .post<CreateAndValidatePasskeyRes>(this.apiPath, {
-          query: `mutation {
-          createAndValidatePasskey(code: "${this.passkeyControl.value}") {
-            passkey { code }
-            token
+          inputs: { code: this.passkeyControl.value },
+          extraInfo: {
+            action: 'login',
+            returnFields: `
+              passkey { code }
+              token
+            `
           }
-        }`
         })
         .toPromise();
 
-      if (res.errors) {
-        throw new Error(_.map(res.errors, 'message')
-          .join());
-      }
+      if (res.errors) { this.throwErrors(res.errors); }
 
       const token = res.data.createAndValidatePasskey.token;
       passkey = res.data.createAndValidatePasskey.passkey;
@@ -119,18 +118,15 @@ export class CreatePasskeyComponent
 
     } else {
       const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
-        query: `mutation {
-          createPasskey(code: "${this.passkeyControl.value}") {
-            code
-          }
-        }`
+        inputs: { code: this.passkeyControl.value },
+        extraInfo: {
+          action: 'register-only',
+          returnFields: 'passkey { code }'
+        }
       })
         .toPromise();
 
-      if (res.errors) {
-        throw new Error(_.map(res.errors, 'message')
-          .join());
-      }
+      if (res.errors) { this.throwErrors(res.errors); }
 
       passkey = res.data.createPasskey;
     }
@@ -152,5 +148,10 @@ export class CreatePasskeyComponent
 
   dvOnExecFailure(reason: Error) {
     this.newPasskeyError = reason.message;
+  }
+
+  private throwErrors(errors: any) {
+    throw new Error(_.map(errors, 'message')
+      .join());
   }
 }

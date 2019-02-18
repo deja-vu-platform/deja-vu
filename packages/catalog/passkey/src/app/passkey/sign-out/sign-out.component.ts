@@ -1,7 +1,4 @@
-import {
-  Component, ElementRef, Input, OnInit
-} from '@angular/core';
-
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { OnExec, RunService } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -15,6 +12,7 @@ import { PasskeyService } from '../shared/passkey.service';
 })
 export class SignOutComponent implements OnInit, OnExec {
   @Input() buttonLabel = 'Sign Out';
+  @Input() isGuest = false;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -29,6 +27,6 @@ export class SignOutComponent implements OnInit, OnExec {
   }
 
   dvOnExec() {
-    this.passkeyService.signOut();
+    this.passkeyService.signOut(this.isGuest);
   }
 }
