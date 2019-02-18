@@ -17,7 +17,8 @@
     "dv-package-ranking-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "ng2-dragula": "^2.1.0",

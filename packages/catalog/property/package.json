@@ -17,7 +17,8 @@
     "dv-package-property-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "ajv": "^6.2.1",
