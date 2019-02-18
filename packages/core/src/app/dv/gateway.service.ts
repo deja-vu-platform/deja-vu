@@ -7,7 +7,7 @@ import 'rxjs/add/operator/do';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { RUN_ID_ATTR } from './run.service';
+import { ACTION_ID_ATTR, RUN_ID_ATTR } from './run.service';
 
 import * as _ from 'lodash';
 import { NodeUtils } from './node.utils';
@@ -59,6 +59,8 @@ const headers = new HttpHeaders({ 'Content-type': 'application/json' });
 export class TxRequest {
   private requests: ChildRequest[] = [];
   private subjects: Subject<any>[] = [];
+  waitingFor: Set<string> = new Set();
+  sendCalled = false;
 
   constructor(private gatewayUrl: string, private http: HttpClient) { }
 
@@ -66,18 +68,32 @@ export class TxRequest {
    * Add a request to the batch.
    * Returned observable resolves with response (after send is called)
    */
-  add<T>(chReq: ChildRequest): Observable<T> {
+  add<T>(chReq: ChildRequest, actionId: string): Observable<T> {
     this.requests.push(chReq);
     const subject = new Subject<T>();
     this.subjects.push(subject);
+    this.waitingFor.delete(actionId);
+    if (this.sendCalled && this.waitingFor.size === 0) {
+      this.send();
+    }
 
     return subject.asObservable();
+  }
+
+  /**
+   * Block send until we `add` a request with this actionId
+   */
+  waitFor(actionId: string) {
+    this.waitingFor.add(actionId);
   }
 
   /**
    * Send all of the requests.
    */
   send(): void {
+    this.sendCalled = true;
+    if (this.waitingFor.size > 0) { return; }
+
     // not in transaction: just send it
     if (this.size === 1) {
       const { method, body, query: params } = this.requests[0];
@@ -150,6 +166,9 @@ export class GatewayService {
     this.fromStr = this.generateFromStr();
   }
 
+  /**
+   * Call `willRequest` before calling this asynchronously
+   */
   get<T>(path?: string, options?: RequestOptions) {
     return this.request<T>(
       Method.GET,
@@ -161,6 +180,7 @@ export class GatewayService {
 
   /**
    * If the body is an Object it will be converted to JSON
+   * Call `willRequest` before calling this asynchronously
    */
   post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
     return this.request<T>(
@@ -169,6 +189,17 @@ export class GatewayService {
       body,
       options
     );
+  }
+
+  /**
+   * `post/get` need to be called synchronously for tx to work
+   * if you need to call them asyncrhonously, call this first
+   * this will prevent the tx from getting sent without you
+   */
+  willRequest() {
+    const runId = this.from.nativeElement.getAttribute(RUN_ID_ATTR);
+    const txRequest = this.getTxReq(runId);
+    txRequest.waitFor(this.from.nativeElement.getAttribute(RUN_ID_ATTR));
   }
 
   protected isAction(node: Element): boolean {
@@ -201,6 +232,21 @@ export class GatewayService {
     return JSON.stringify(_.reverse(seenActionNodes));
   }
 
+  /**
+   * Gets a TxRequest for runId or makes a new one
+   */
+  private getTxReq(runId?: string) {
+    let txRequest = GatewayService.txBatches[runId];
+    if (txRequest === undefined) {
+      txRequest = new TxRequest(this.gatewayUrl, this.http);
+      if (runId) {
+        GatewayService.txBatches[runId] = txRequest;
+      }
+    }
+
+    return txRequest;
+  }
+
   private request<T>(
     method: Method,
     path?: string,
@@ -211,19 +257,13 @@ export class GatewayService {
 
     const params = this.buildParams(path, options);
 
-    let txRequest = GatewayService.txBatches[params.runId];
-    if (txRequest === undefined) {
-      txRequest = new TxRequest(this.gatewayUrl, this.http);
-      if (params.runId) {
-        GatewayService.txBatches[params.runId] = txRequest;
-      }
-    }
+    const txRequest = this.getTxReq(params.runId);
 
     const individualResponseObservable = txRequest.add<T>({
       method,
       body,
       query: params
-    });
+    }, this.from.nativeElement.getAttribute(RUN_ID_ATTR));
 
     if (!params.runId) {
       txRequest.send();

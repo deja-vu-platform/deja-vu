@@ -6,11 +6,7 @@
       (load)="load($event)"
       (changeAction)="onActionChanged($event)"
     ></app-top-bar>
-    <dv-tx *ngIf="openAction.transaction" class="grow scroll" [attr.data-isaction]="true">
-      <app-action-definition class="grow" [openAction]="openAction" [app]="app">
-      </app-action-definition>
-    </dv-tx>
-    <div *ngIf="!openAction.transaction" class="grow scroll">
+    <div class="grow scroll">
       <app-action-definition class="grow" [openAction]="openAction" [app]="app">
       </app-action-definition>
     </div>

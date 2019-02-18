@@ -62,7 +62,7 @@ const runFunctionNames = {
   }
 };
 
-const ACTION_ID_ATTR = '_dvActionId';
+export const ACTION_ID_ATTR = '_dvActionId';
 export const RUN_ID_ATTR = '_dvRunId';
 
 
@@ -71,8 +71,15 @@ export class RunService {
   private renderer: Renderer2;
   private actionTable: {[id: string]: ActionInfo} = {};
 
-  private static IsDvTx(node) {
-    return node.nodeName.toLowerCase() === 'dv-tx';
+  private static IsDvTx(node: Element) {
+    return (
+      node.nodeName.toLowerCase() === 'dv-tx'
+      || (
+        window['dv-designer']
+        && _.get(node, ['dataset', 'isaction']) === 'true'
+        && node.getAttribute('dvAlias') === 'dv-tx'
+      )
+    );
   }
 
   constructor(
@@ -155,7 +162,10 @@ export class RunService {
    * Walks the dom starting from `node` calling `onAction` with the action info
    * when an action is encountered. No child of actions are traversed.
    */
-  private walkActions(node, onAction: (actionInfo, str?) => void): void {
+  private walkActions(
+    node,
+    onAction: (actionInfo: ActionInfo, str?: string) => void
+  ): void {
     const actionId = node.getAttribute ?
       node.getAttribute(ACTION_ID_ATTR) : undefined;
     if (!actionId) {

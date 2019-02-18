@@ -3,7 +3,6 @@ import { MatSnackBar } from '@angular/material';
 import * as _ from 'lodash';
 import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
-import { filter } from 'rxjs/operators';
 
 import {
   ActionInstance,
@@ -143,7 +142,6 @@ export class AppComponent implements OnDestroy {
 
     this.dragulaService.drop('action')
       .subscribe(({ el, source, target }) => {
-        console.log(el, source, target);
         // find target row
         let toRowIdx = parseInt(target['dataset'].index, 10);
         if (toRowIdx === this.openAction.rows.length) {
