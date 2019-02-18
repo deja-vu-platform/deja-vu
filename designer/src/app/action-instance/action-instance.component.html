@@ -6,6 +6,7 @@
   <div
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
+    [hidden]="hidden"
   >
     <ng-template *ngIf="actionInstance.of.component" propertyClicheAction>
     </ng-template>

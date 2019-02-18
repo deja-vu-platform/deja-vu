@@ -40,11 +40,6 @@
   border-color:rgba(16, 219, 255, .5);
 }
 
-.instance-container {
-  min-width: 100px;
-  min-height: 50px;
-}
-
 .popup-menu {
   height: 200px;
   padding: 0 16px;
@@ -52,4 +47,14 @@
 
 .popup-menu > mat-form-field {
   width: 100%;
+}
+
+// need clickable area for menu
+.instance-container {
+  min-height: 25px;
+  min-width: 100px;
+}
+
+.hint {
+  color: rgba(0,0,0,.25);
 }

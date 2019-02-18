@@ -4,16 +4,22 @@ import * as _ from 'lodash';
 
 import * as dv from '@deja-vu/core';
 
+// commented-out cliches were broken last I checked
+
 import * as allocator from '@deja-vu/allocator';
 import * as authentication from '@deja-vu/authentication';
 import * as authorization from '@deja-vu/authorization';
+import * as comment from '@deja-vu/comment';
 import * as event from '@deja-vu/event';
 import * as follow from '@deja-vu/follow';
 import * as geolocation from '@deja-vu/geolocation';
 import * as group from '@deja-vu/group';
+// import * as label from '@deja-vu/label';
 import * as passkey from '@deja-vu/passkey';
 import * as property from '@deja-vu/property';
+// import * as ranking from '@deja-vu/ranking';
 import * as rating from '@deja-vu/rating';
+import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
@@ -25,19 +31,23 @@ import {
 } from './datatypes';
 import { TextComponent } from './text/text.component';
 
-// TODO: import platform actions (e.g. button, link, etc.)
+const OMNIPRESENT_INPUTS = [ 'hidden' ];
 
 const importedCliches: { [name: string]: Object} = {
   allocator,
   authentication,
   authorization,
+  comment,
   event,
   follow,
   geolocation,
   group,
+  // label,
   passkey,
   property,
+  // ranking,
   rating,
+  scoring,
   task,
   transfer
 };
@@ -72,7 +82,7 @@ function clicheDefinitionFromModule(
       .filter(isComponent)
       .map((component): ClicheActionDefinition => {
         // get inputs and outputs
-        const inputs = [];
+        const inputs = OMNIPRESENT_INPUTS.slice();
         const outputs = [];
         const actionInputs: ActionInputs = {};
         _.forEach(component.propDecorators, (val, key) => {
@@ -133,6 +143,7 @@ export const clicheDefinitions = _
 
 const dvClicheIdx = clicheDefinitions.findIndex((cd) => cd.name === 'dv');
 const [dvCliche] = clicheDefinitions.splice(dvClicheIdx, 1);
+// TODO: filter actions in dvCliche
 
 App.clicheDefinitions = clicheDefinitions;
 App.dvCliche = dvCliche;

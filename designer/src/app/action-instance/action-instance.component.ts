@@ -38,6 +38,7 @@ implements OnInit, AfterViewInit, OnDestroy {
   // for when rendered in dv-include only
   @Input() extraInputs?: { [ioName: string]: string };
   @Input() extraInputsScope?: ActionIO;
+  hidden = false;
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver
@@ -63,6 +64,13 @@ implements OnInit, AfterViewInit, OnDestroy {
         // setTimeout is necessary to avoid angular change detection errors
         setTimeout(() => this.loadClicheAction());
       }
+      setTimeout(() => {
+        const sub = this.actionIO.getSubject('hidden')
+          .subscribe((value) => {
+            this.hidden = value;
+          });
+        this.subscriptions.push(sub);
+      });
     }
   }
 
@@ -116,13 +124,4 @@ implements OnInit, AfterViewInit, OnDestroy {
       && this.actionInstance.of.name === 'text'
     );
   }
-}
-
-function isComponent(inputValue: any) {
-  return (
-    _.isObject(inputValue)
-    && _.isFunction(inputValue.type)
-    && _.isString(inputValue.type.name)
-    && inputValue.type.name.endsWith('Component')
-  );
 }
