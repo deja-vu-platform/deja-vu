@@ -13,8 +13,13 @@ import {
 } from '../../utils';
 
 
-exports.command = 'cliche <name> <pathToDv>';
+exports.command = 'cliche <name>';
 exports.desc = 'create a new cliché';
+exports.builder = (yargs) => yargs.option('pathToDv', {
+  describe: 'Use dv dependencies from the given path',
+  nargs: 1,
+  type: 'string'
+});
 exports.handler = ({ name, pathToDv }) => {
   console.log(`Creating new cliche ${name}`);
   ng(['new', name, '--prefix', name]);

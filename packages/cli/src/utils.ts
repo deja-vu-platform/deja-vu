@@ -190,23 +190,30 @@ export function concurrentlyCmd(...cmds: string[]): string {
   return `concurrently ${cmdStr}`;
 }
 
+const DV_PACKAGE_PREFIX = '@deja-vu';
 const PKGS_FOLDER = 'packages';
 const GATEWAY_PORT = 3000;
-const GATEWAY_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/gateway');
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
 
-const CORE_FOLDER = path.join(PKGS_FOLDER, '@deja-vu/core');
+
+export function getPackageFolder(pkg: string,): string {
+  return path.join(DV_PACKAGE_PREFIX, PKGS_FOLDER, pkg);
+}
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it
 // is what serves the SPA
 export function installAndConfigureGateway(name: string, pathToDv: string) {
+  const gatewayLoc = pathToDv ?
+    path.join('..', pathToDv, getPackageFolder('gateway')) :
+    `${DV_PACKAGE_PREFIX}/gateway`;
+  const coreLoc = pathToDv ?
+    path.join('..', pathToDv, getPackageFolder('core'),
+      NG_PACKAGR.configFileContents.dest) :
+    `${DV_PACKAGE_PREFIX}/core`;
+
   console.log('Install gateway and core');
-  npm([
-    'install', path.join('..', pathToDv, GATEWAY_FOLDER),
-    path.join('..', pathToDv, CORE_FOLDER, NG_PACKAGR.configFileContents.dest),
-    '--save'
-  ], name);
+  npm(['install', gatewayLoc, coreLoc, '--save'], name);
   console.log('Install build-related packages');
   npm(
     ['install', 'concurrently', 'chokidar-cli', 'nodemon', '--save-dev'],
