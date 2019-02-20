@@ -1,5 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
 
 import {
@@ -18,8 +19,8 @@ import { Target } from '../shared/scoring.model';
   templateUrl: './show-targets-by-score.component.html',
   styleUrls: ['./show-targets-by-score.component.css']
 })
-export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
+  OnInit, OnChanges {
   @Input() targets: Target[];
   @Input() showAscending = true;
 
@@ -30,6 +31,7 @@ OnChanges {
   @Input() showScoreValue = true;
   @Input() showScoreSourceId = true;
   @Input() showScoreTargetId = true;
+  @Input() showTargetsList = true;
 
   @Input() totalLabel = 'Total: ';
   @Input() noScoresText = 'No scores to show';
@@ -41,6 +43,8 @@ OnChanges {
   @Input() showTarget: Action = {
     type: <Type<Component>> ShowTargetComponent
   };
+
+  @Output() loadedTargets = new EventEmitter<Target[]>();
 
   showTargetsByScore;
   private gs: GatewayService;
@@ -72,7 +76,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {targetsByScore: Target[]}}>(this.apiPath, {
+      this.gs.get<{ data: { targetsByScore: Target[] } }>(this.apiPath, {
         params: {
           inputs: JSON.stringify({ asc: this.showAscending }),
           extraInfo: {
@@ -80,20 +84,20 @@ OnChanges {
               id
               ${this.showScores ? 'scores ' +
                 '{' +
-                  'id \n' +
-                  `${this.showScoreValue ? 'value \n' : ''}` +
-                  `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
-                  `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                'id \n' +
+                `${this.showScoreValue ? 'value \n' : ''}` +
+                `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
+                `${this.showScoreTargetId ? 'targetId \n' : ''}` +
                 '}' : ''
               }
-              ${this.showTotal ? 'total': ''}
+              ${this.showTotal ? 'total' : ''}
             `
           }
         }
       })
-      .subscribe((res) => {
-        this.targets = res.data.targetsByScore;
-      });
+        .subscribe((res) => {
+          this.targets = res.data.targetsByScore;
+        });
     }
   }
 

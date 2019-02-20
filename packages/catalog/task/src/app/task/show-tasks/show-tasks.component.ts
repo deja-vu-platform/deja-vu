@@ -35,6 +35,7 @@ OnChanges {
   @Input() showDueDate = true;
   @Input() showApproved = true;
   @Input() showCompleted = true;
+  @Input() showTasksList = true;
 
   // Whether to show the user the option to {claim, complete, approve} a task
   // If given, it will show the the option to claim

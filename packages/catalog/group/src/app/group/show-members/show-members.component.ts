@@ -27,7 +27,7 @@ OnChanges {
   @Input() showMembersList = true;
 
   // Fetch rules
-  @Input() inGroupId = '';
+  @Input() inGroupId: string | undefined;
 
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
