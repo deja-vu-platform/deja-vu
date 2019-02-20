@@ -1,11 +1,6 @@
 {
   "name": "livescorecard",
   "type": "app",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "hostauthentication": {
       "name": "authentication",
@@ -90,7 +85,7 @@
               "type": "string"
             }
           },
-          "required": ["firstName, lastName"]
+          "required": ["firstName", "lastName"]
         }
       }
     },
@@ -129,7 +124,13 @@
         }
       }
     },
-    "scoring" : {
+    "problemscore" : {
+      "name": "scoring",
+      "config": {
+        "oneToOneScoring": true
+      }
+    },
+    "climberscore" : {
       "name": "scoring",
       "config": {
         "oneToOneScoring": true
@@ -137,28 +138,31 @@
     }
   },
   "routes": [
-    { "path": "climber", "action": "livescorecard-climber-scorecard" },
-    { "path": "climber/leaderboard", "action": "livescorecard-climber-leaderboard" },
-    { "path": "climber/buddy-landing", "action": "livescorecard-buddy-landing" },
-    { "path": "climber/buddy-scorecard", "action": "livescorecard-buddy-scorecard" },
-    { "path": "climber/rules", "action": "livescorecard-show-rules" },
+    { "path": "climber", "action": "climber-scorecard" },
+    { "path": "climber/leaderboard", "action": "show-leaderboard" },
+    { "path": "climber/buddy-landing", "action": "buddy-landing" },
+    { "path": "climber/buddy-scorecard", "action": "buddy-scorecard" },
+    { "path": "climber/rules", "action": "show-rules" },
 
-    { "path": "host", "action": "livescorecard-show-competitions" },
-    { "path": "host/competition-participants", "action": "livescorecard-show-participants" },
-    { "path": "host/competition-problems", "action": "livescorecard-show-problems" },
-    { "path": "host/competition-leaderboard", "action": "livescorecard-host-leaderboard" },
-    { "path": "host/competition-hosts", "action": "livescorecard-show-hosts" },
-    { "path": "host/competition-rules", "action": "livescorecard-host-rules" },
+    { "path": "host", "action": "show-competitions" },
+    { "path": "host/competition-participants", "action": "show-participants" },
+    { "path": "host/competition-problems", "action": "show-problems" },
+    { "path": "host/competition-leaderboard", "action": "show-leaderboard" },
+    { "path": "host/competition-hosts", "action": "show-hosts" },
+    { "path": "host/competition-rules", "action": "show-rules" },
+    { "path": "host/edit-competition", "action": "edit-competition" },
+    { "path": "host/edit-participant", "action": "edit-participant" },
+    { "path": "host/edit-problem", "action": "edit-problem" },
 
-    { "path": "register", "action": "livescorecard-register" },
+    { "path": "register", "action": "register" },
 
-    { "path": "spectator", "action": "livescorecard-spectator-leaderboard" },
-    { "path": "spectator/rules", "action": "livescorecard-show-rules" },
+    { "path": "spectator", "action": "show-leaderboard" },
+    { "path": "spectator/rules", "action": "show-rules" },
 
-    { "path": "login/climber", "action": "livescorecard-climber-login" },
-    { "path": "login/host", "action": "livescorecard-host-login" },
-    { "path": "login/spectator", "action": "livescorecard-spectator-login" },
+    { "path": "login/climber", "action": "climber-login" },
+    { "path": "login/host", "action": "host-login" },
+    { "path": "login/spectator", "action": "spectator-login" },
 
-    { "path": "", "action": "livescorecard-climber-login" }
+    { "path": "", "action": "climber-login" }
   ]
 }

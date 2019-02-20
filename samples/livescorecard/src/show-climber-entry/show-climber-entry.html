@@ -1,0 +1,36 @@
+<dv.action name="show-climber-entry">
+  <userprofile.show-object id=$id hidden=true />
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-xs-3 center">
+          <h2 class="teal">
+            <!-- Rank -->
+          </h2>
+        </div>
+
+        <div class="col-xs-6">
+          <h2 class="status">
+            <userprofile.show-object class="inline-block"
+              object=userprofile.show-object.loadedObject
+              showOnly=['firstName'] />
+            <userprofile.show-object class="inline-block"
+              object=userprofile.show-object.loadedObject
+              showOnly=['lastName'] />
+          </h2>
+        </div>
+
+        <div class="col-xs-3">
+          <climberscore.show-target id=$id showId=false
+            showScores=false
+            totalLabel='' />
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- TODO: more details -->
+      </div>
+    </div>
+  </div>
+</dv.action>

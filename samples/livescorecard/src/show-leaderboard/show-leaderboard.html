@@ -1,0 +1,42 @@
+<dv.action name="show-leaderboard">
+  <div class="container">
+    <div class="row">
+      <div class="offset-lg-4 col-lg-4">
+        <h1> LEADERBOARD </h1>
+        <hr />
+      </div>
+      <div class="col-lg-4"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="row left-space">
+          <sex.search-items-by-labels />
+        </div>
+
+        <br />
+
+        <div class="row left-space">
+          <category.search-items-by-labels />
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <!-- Leaderboard Header -->
+        <div class="row">
+          <div class="col-xs-3 center">rank</div>
+          <div class="offset-xs-6 col-xs-3">score</div>
+        </div>
+
+        <!-- TODO: Use the results of searches -->
+        <!-- Leaderboard -->
+        <climberscore.show-targets-by-score showAscending=false
+          showScores=false
+          noTargetsText=""
+          showTarget=<livescorecard.show-climber-entry id=$id /> />
+      </div>
+
+      <div class="col-lg-3"></div>
+    </div>
+  </div>
+</dv.action>

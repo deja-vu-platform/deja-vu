@@ -1,0 +1,29 @@
+.head {
+  color: white;
+}
+
+.background {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  min-height: 10em;
+}
+
+.choice {
+  margin: .3em;
+}
+
+@media screen and (min-width: 495px) {
+  .head {
+    margin-top: -1.5em;
+    color: white;
+  }
+}
+
+@media screen and (max-width: 495px) {
+  .head {
+    margin-top: -2.5em;
+    color: white;
+  }
+}

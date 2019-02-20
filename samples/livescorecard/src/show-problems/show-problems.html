@@ -1,0 +1,24 @@
+<dv.action name="show-problems">
+  <livescorecard.host-navbar />
+
+  <div class="container below-navbar">
+    <div class="row">
+      <div class="col-lg-10">
+        <div class="col-xs-2 center white">name</div>
+        <div class="col-xs-3 center white">points</div>
+        <div class="col-xs-5 white">category</div>
+        <div class="col-xs-2"></div>
+      </div>
+    </div>
+
+    <livescorecard.add-problem
+      competitionId=$competitionId
+      loggedInUserId=livescorecard.host-navbar.loggedInUserId />
+
+    <problemscore.show-targets-by-score
+      showScores=false
+      showTotal=false
+      noTargetsText=""
+      showTarget=<livescorecard.show-problem id=$id /> />
+  </div>
+</dv.action>

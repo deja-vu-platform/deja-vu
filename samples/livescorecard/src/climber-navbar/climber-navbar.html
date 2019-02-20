@@ -1,0 +1,60 @@
+<dv.action name="climber-navbar" loggedInClimberCode$=climbercode.logged-in.passkey.code>
+  <dv.tx as livescorecard-auth-check>
+    <competitioncode.logged-in hidden=true />
+    <climbercode.logged-in hidden=true />
+    <dv.redirect href="/login/climber" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+    <div class="container">
+      <div class="navbar-header">
+        <dv.link href="/climber" class="navbar-brand">Climber</dv.link> |
+        <userprofile.show-object id=climbercode.logged-in.passkey.code
+          showOnly=['firstName']/> (<climberscore.show-target
+            class="inline-block"
+            id=climbercode.logged-in.passkey.code
+            showId=false
+            showScores=false
+            totalLabel="" />)
+
+        <button type="button" class="navbar-toggle collapsed"
+          data-toggle="collapse"
+          data-target="#bs-example-navbar-collapse-1"
+          aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="popup">
+            My Code | <climbercode.logged-in class="popuptext" />
+          </li>
+          <li>
+            <dv.link href="/climber/buddy-landing">Buddy Log</dv.link>
+          </li>
+          <li>
+            <dv.link href="/climber">Scorecard</dv.link>
+          </li>
+          <li>
+            <dv.link href="/climber/leaderboard">Leaderboard</dv.link>
+          </li>
+          <li>
+            <dv.link href="/climber/rules"
+              params={ id: competitioncode.logged-in.passkey.code }>
+              Rules
+            </dv.link>
+          </li>
+          <li>
+            <dv.tx as livescorecard-sign-out>
+              <climbercode.sign-out hidden=true />
+              <dv.link href="/login/climber">Log Out</dv.link>
+            </dv.tx>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</dv.action>

@@ -1,0 +1,33 @@
+<dv.action name="show-rules">
+  <!-- TODO: Need to fix this -->
+  <!-- <dv.if condition=$isHost>
+    <livescorecard.host-navbar />
+  </dv.if>
+  <dv.if condition=$isClimber>
+    <livescorecard.climber-navbar />
+  </dv.if>
+  <dv.if condition=$isSpectator>
+    <livescorecard.spectator-navbar />
+  </dv.if> -->
+
+  <div class="row">
+    <div class="offset-lg-2 col-lg-8">
+      <div id="rules">
+        <div class="row">
+          <div class="offset-xs-1 col-xs-10">
+            <span class="padded">Competition Rules</span>
+            <dv.if condition=$canEdit>
+              <!-- canEdit: resource.ownerId===$loggedInUserId -->
+              <span>
+                <img src="assets/edit.png" class="edit padded-button" />
+              </span>
+            </dv.if>
+            <competition.show-object id=$id showOnly=['rules'] />
+          </div>
+          <div class="col-xs-1"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2"></div>
+  </div>
+</dv.action>

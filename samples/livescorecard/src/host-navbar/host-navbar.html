@@ -1,0 +1,26 @@
+<dv.action name="host-navbar"
+  loggedInUserId$=hostauthentication.logged-in.user.id>
+  <dv.tx as livescorecard-auth-check>
+    <hostauthentication.logged-in />
+    <dv.redirect href="/login/host" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+    <div class="container">
+      <div class="navbar-header">
+        <dv.link href="/host" class="navbar-brand">Host</dv.link>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <dv.link href="/host">Competitions</dv.link>
+          </li>
+          <li>
+            <dv.tx as livescorecard-sign-out>
+              <hostauthentication.sign-out hidden=true />
+              <dv.link href="/login/host">Log Out</dv.link>
+            </dv.tx>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</dv.action>

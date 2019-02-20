@@ -1,0 +1,28 @@
+<dv.action name="show-participant">
+  <div class="row">
+    <div class="col-lg-10">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <dv.status savedText="Participant added to competition" />
+          <div class="offset-xs-1 col-xs-3">
+            <userprofile.show-object id=$id />
+          </div>
+          <div class="col-xs-2">
+            <sex.show-labels itemId=$id />
+          </div>
+          <div class="col-xs-2 right">
+            ******
+          </div>
+          <div class="col-xs-2">
+            <category.show-labels itemId=$id />
+          </div>
+          <div class="col-xs-2">
+            <dv.link href="/host/edit-participant" params={ id: $id }>
+              <img src="assets/edit.png" class="edit" />
+            </dv.link>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

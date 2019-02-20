@@ -1,0 +1,23 @@
+<dv.action name="show-hosts">
+  <livescorecard.host-navbar />
+
+  <div class="container below-navbar">
+    <div class="row">
+      <div class="col-xs-4">
+        <p>First Name</p>
+      </div>
+      <div class="col-xs-4">
+        <p>Last Name</p>
+      </div>
+      <div class="col-xs-4">
+        <p>Email</p>
+      </div>
+    </div>
+
+    <competitionhosts.show-members inGroupId=$groupId
+      showMember=<livescorecard.show-host id=$id /> />
+
+    <livescorecard.add-host groupId=$groupId />
+
+  </div>
+</dv.action>

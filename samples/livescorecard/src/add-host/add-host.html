@@ -1,0 +1,28 @@
+<dv.action name="add-host">
+  <div class="container">
+    <div class="row">
+      <div class="offset-xs-7 col-xs-4">
+        <br />
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <hostauthentication.choose-user showChooseButton=false
+              chooseSelectPlaceholder="Choose Host" />
+            <dv.tx>
+              <competitionhosts.add-to-group id=$groupId
+                memberId=hostauthentication.choose-user.selectedUser.id
+                hidden=true />
+              <authorization.add-viewer id=$groupId
+                viewerId=hostauthentication.choose-user.selectedUser.id
+                hidden=true />
+              <dv.button>
+                <img src="assets/add.png" class="add padded-button" />
+              </dv.button>
+              <dv.callback defaultHref="/host" onExecSuccess=true />
+            </dv.tx>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-1"></div>
+    </div>
+  </div>
+</dv.action>

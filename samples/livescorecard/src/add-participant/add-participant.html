@@ -1,0 +1,49 @@
+<dv.action name="add-participant">
+  <sex.show-labels hidden=true />
+  <category.show-labels hidden=true />
+
+  <div class="row">
+    <div class="col-lg-10">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <dv.tx>
+            <dv.status savedText="Participant added to competition" />
+            <div class="offset-xs-1 col-xs-3">
+              <userprofile.create-object
+                id=climbercode.create-passkey.passkey.code />
+            </div>
+            <div class="col-xs-2">
+              <sex.attach-labels itemId=climbercode.create-passkey.passkey.code
+                labels=sex.show-labels.labels
+                showOptionToSubmit=false/>
+            </div>
+            <div class="col-xs-2 right">
+              <climbercode.create-passkey randomPassword=true signIn=false
+                showOptionToSubmit=false />
+            </div>
+            <div class="col-xs-2">
+              <category.attach-labels itemId=climbercode.create-passkey.passkey.code
+                labels=category.show-labels.labels
+                showOptionToSubmit=false/>
+            </div>
+            <div class="col-xs-2">
+              <competitionclimbers.add-to-group id=$competitionId
+                memberId=climbercode.create-passkey.passkey.code
+                hidden=true />
+              <authorization.add-viewer id=$competitionId
+                viewerId=climbercode.create-passkey.passkey.code
+                hidden=true />
+              <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+
+              <dv.button class="add">
+                <img src="assets/add.png" />
+              </dv.button>
+              <dv.callback defaultHref="/host/competition-participants"
+                onExecSuccess=true hidden=true />
+            </div>
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>
