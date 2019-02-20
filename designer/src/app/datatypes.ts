@@ -3,8 +3,6 @@ import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
-// names should be HTML safe (TODO: ensure this)
-
 export interface ActionCollection {
   name: string;
   actions: ActionDefinition[];
@@ -134,16 +132,35 @@ export class AppActionDefinition implements ActionDefinition {
 
 }
 
+const flex = {
+  fs: 'flex-start',
+  fe: 'flex-end',
+  c: 'center'
+};
+
+export const flexJustify = {
+  ...flex,
+  sa: 'space-around',
+  sb: 'space-between',
+  se: 'space-evenly'
+};
+
+export const flexAlign = {
+  ...flex,
+  b: 'baseline',
+  s: 'stretch'
+};
+
 export class Row {
   readonly actions: ActionInstance[] = [];
-  hJust = 'flex-start';
-  vAlign = 'flex-start';
+  hJust: keyof typeof flexJustify = 'fs';
+  vAlign: keyof typeof flexAlign = 'fs';
 
   constructor() {}
 
   toHTML(): string {
-    let html = '  <div class="dvd-row"'
-      + ` style="justify-content:${this.hJust};align-items:${this.vAlign}">\n`;
+
+    let html = `  <div class="dvd-row j${this.hJust} a${this.vAlign}">\n`;
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
     });
@@ -154,7 +171,9 @@ export class Row {
 
   toJSON() {
     return {
-      actions: this.actions.map((action) => action.toJSON())
+      actions: this.actions.map((action) => action.toJSON()),
+      hJust: this.hJust,
+      vAlign: this.vAlign
     };
   }
 
@@ -328,6 +347,8 @@ export class App {
           app.setInputsFromJSON(actionInst, ai);
           row.actions.push(actionInst);
         });
+        row.hJust = r.hJust;
+        row.vAlign = r.vAlign;
         actionDef.rows.push(row);
       });
       app.actions.push(actionDef);

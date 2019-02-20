@@ -23,7 +23,7 @@
       </div>
       <div
         class="dvd-row"
-        [ngStyle]="{ 'justify-content': row.hJust, 'align-items': row.vAlign }"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
         dragula="action"
         [attr.data-index]="rowNum"
       >
@@ -96,21 +96,22 @@
         <div class="popup-menu" (click)="$event.stopPropagation()">
           <mat-form-field>
             <mat-select [(value)]="row.hJust" placeholder="Horizontal Justification">
-              <mat-option value="flex-start">Left</mat-option>
-              <mat-option value="flex-end">Right</mat-option>
-              <mat-option value="center">Center</mat-option>
-              <mat-option value="space-between">Space Between</mat-option>
-              <mat-option value="space-around">Space Around</mat-option>
-              <mat-option value="space-evenly">Space Evenly</mat-option>
+              <mat-option
+                *ngFor="let entry of flexJustifyEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field>
             <mat-select [(value)]="row.vAlign" placeholder="Vertical Alignment">
-              <mat-option value="flex-start">Top</mat-option>
-              <mat-option value="flex-end">Bottom</mat-option>
-              <mat-option value="center">Center</mat-option>
-              <mat-option value="stretch">Stretch</mat-option>
-              <mat-option value="Baseline">Algin Text</mat-option>
+                <mat-option
+                *ngFor="let entry of flexAlignEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
             </mat-select>
           </mat-form-field>
         </div>

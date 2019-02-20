@@ -1,6 +1,7 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "./dragula.scss";
+@import "./app/dvd-app-styles.css";
 @import "~quill/dist/quill.bubble.css";
 @import "~quill/dist/quill.snow.css";
 
@@ -37,9 +38,4 @@ body {
 }
 .text-button-text {
   white-space: nowrap;
-}
-
-.dvd-row {
-  display: flex;
-  flex-wrap: wrap;
 }

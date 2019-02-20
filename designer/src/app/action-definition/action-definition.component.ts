@@ -15,11 +15,11 @@ import {
   ActionInstance,
   App,
   AppActionDefinition,
+  flexAlign,
+  flexJustify,
   Row
 } from '../datatypes';
 import { ScopeIO } from '../io';
-
-const RIGHT_MOUSE_BUTTON = 2;
 
 const emptyRow = new Row();
 
@@ -36,6 +36,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
+  flexAlignEntries = Object.entries(flexAlign);
+  flexJustifyEntries = Object.entries(flexJustify);
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
