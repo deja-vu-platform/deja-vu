@@ -13,21 +13,31 @@
   flex-direction: column;
 }
 
-.dvd-row {
-  min-height: 100px;
-  border-width: 1px 0;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.dvd-row:first-child {
-  border-top: none;
-}
-
-.dvd-row:last-child {
-  border-bottom: none;
+.row-container {
   display: flex;
+  min-height: 100px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.row-control {
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  margin: 4px 0;
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.dvd-row {
   flex: 1;
+}
+
+.row-container:last-child {
+  flex: 1;
+  border-bottom: none;
+
+  .row-control {
+    display: none;
+  }
 }
 
 .action {
@@ -43,10 +53,9 @@
 .popup-menu {
   height: 200px;
   padding: 0 16px;
-}
-
-.popup-menu > mat-form-field {
-  width: 100%;
+  mat-form-field {
+    width: 100%;
+  }
 }
 
 // need clickable area for menu

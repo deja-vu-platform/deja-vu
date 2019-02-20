@@ -12,7 +12,11 @@
     </ng-template>
 
     <div *ngIf="actionInstance.of.rows">
-      <div *ngFor="let row of actionInstance.of.rows">
+      <div
+        *ngFor="let row of actionInstance.of.rows"
+        class="dvd-row"
+        [ngStyle]="{ 'justify-content': row.hJust, 'align-items': row.vAlign }"
+      >
         <div *ngFor="let action of row.actions">
           <app-action-instance
             [actionInstance]="action"

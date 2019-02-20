@@ -1,66 +1,120 @@
 <div
+  *ngIf="actionInstance"
   id="main-view"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
 >
   <div
-    *ngIf="actionInstance"
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
-      class="dvd-row"
-      dragula="action"
-      [attr.data-index]="rowNum"
+      class="row-container"
     >
       <div
-        *ngFor="let action of row.actions; let actionNum = index"
-        class="action"
-        [attr.data-index]="actionNum"
+        class="row-control"
+        #menuTrigger="matMenuTrigger"
+        [matMenuTriggerFor]="rowMenu"
+        (contextmenu)="openMenu(menuTrigger)"
+      >
+        <mat-icon>reorder</mat-icon>
+      </div>
+      <div
+        class="dvd-row"
+        [ngStyle]="{ 'justify-content': row.hJust, 'align-items': row.vAlign }"
+        dragula="action"
+        [attr.data-index]="rowNum"
       >
         <div
-          *ngIf="action.of.inputs.length === 0"
-          #instanceContainer
-          class="instance-container"
+          *ngFor="let action of row.actions; let actionNum = index"
+          class="action"
+          [attr.data-index]="actionNum"
         >
-          <app-action-instance
-            [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
+          <!-- unfortunately there is repeated code here -->
+          <!-- because the menu can't be applied conditionally -->
+          <div
+            *ngIf="action.of.inputs.length === 0"
+            #instanceContainer
+            class="instance-container"
           >
-          </app-action-instance>
-          <div *ngIf="action.showHint" class="hint">
-            Hidden: {{action.fqtag}}
-          </div>
-        </div>
-        <div
-          *ngIf="action.of.inputs.length > 0"
-          #instanceContainer
-          #menuTrigger="matMenuTrigger"
-          [matMenuTriggerFor]="menu"
-          class="instance-container"
-        >
-          <app-action-instance
-            [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
-          >
-          </app-action-instance>
-          <div *ngIf="action.showHint" class="hint">
-            Hidden: {{action.fqtag}}
-          </div>
-          <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
-            <div class="popup-menu" (click)="$event.stopPropagation()">
-              <app-set-inputs
-                [app]="app"
-                [actionInstance]="action"
-                [openAction]="actionInstance.of"
-              >
-              </app-set-inputs>
+            <!-- below is same as below -->
+            <app-action-instance
+              [actionInstance]="action"
+              [actionIO]="scopeIO.getActionIO(action)"
+              [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
+            >
+            </app-action-instance>
+            <div *ngIf="action.showHint" class="hint">
+              Hidden: {{action.fqtag}}
             </div>
-          </mat-menu>
+            <!-- above is same as below -->
+          </div>
+          <div
+            *ngIf="action.of.inputs.length > 0"
+            #instanceContainer
+            class="instance-container"
+            #menuTrigger="matMenuTrigger"
+            [matMenuTriggerFor]="actionMenu"
+            (contextmenu)="openMenu(menuTrigger)"
+          >
+            <!-- below is same as above -->
+            <app-action-instance
+              [actionInstance]="action"
+              [actionIO]="scopeIO.getActionIO(action)"
+              (click)="stopPropIfShift($event)"
+              [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
+            >
+            </app-action-instance>
+            <div *ngIf="action.showHint" class="hint">
+              Hidden: {{action.fqtag}}
+            </div>
+            <!-- above is same as above -->
+            <mat-menu
+              #actionMenu="matMenu"
+              [overlapTrigger]="false"
+              (closed)="onActionMenuClosed()"
+            >
+              <div class="popup-menu" (click)="$event.stopPropagation()">
+                <app-set-inputs
+                  [app]="app"
+                  [actionInstance]="action"
+                  [openAction]="actionInstance.of"
+                >
+                </app-set-inputs>
+              </div>
+            </mat-menu>
+          </div>
         </div>
       </div>
+      <mat-menu
+        #rowMenu="matMenu"
+        [overlapTrigger]="false"
+        (closed)="onRowMenuClosed()"
+      >
+        <div class="popup-menu" (click)="$event.stopPropagation()">
+          <mat-form-field>
+            <mat-select [(value)]="row.hJust" placeholder="Horizontal Justification">
+              <mat-option value="flex-start">Left</mat-option>
+              <mat-option value="flex-end">Right</mat-option>
+              <mat-option value="center">Center</mat-option>
+              <mat-option value="space-between">Space Between</mat-option>
+              <mat-option value="space-around">Space Around</mat-option>
+              <mat-option value="space-evenly">Space Evenly</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select [(value)]="row.vAlign" placeholder="Vertical Alignment">
+              <mat-option value="flex-start">Top</mat-option>
+              <mat-option value="flex-end">Bottom</mat-option>
+              <mat-option value="center">Center</mat-option>
+              <mat-option value="stretch">Stretch</mat-option>
+              <mat-option value="Baseline">Algin Text</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-menu>
     </div>
   </div>
 </div>

@@ -28,15 +28,6 @@ body {
   line-height: 100%;
 }
 
-/* prevent interaction with dynamically-rendered components */
-.action-instance * {
-  pointer-events: none;
-}
-/* don't prevent interaction with quill editor */
-.action-instance quill-editor * {
-  pointer-events: auto;
-}
-
 /* styles for custom quill buttons (don't have component) */
 .ql-bubble .ql-toolbar button:hover .text-button-text {
   color: white;
@@ -46,4 +37,9 @@ body {
 }
 .text-button-text {
   white-space: nowrap;
+}
+
+.dvd-row {
+  display: flex;
+  flex-wrap: wrap;
 }

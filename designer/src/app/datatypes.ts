@@ -136,12 +136,14 @@ export class AppActionDefinition implements ActionDefinition {
 
 export class Row {
   readonly actions: ActionInstance[] = [];
-  // TODO: Flex Settings;
+  hJust = 'flex-start';
+  vAlign = 'flex-start';
 
   constructor() {}
 
   toHTML(): string {
-    let html = '  <div class="dvd-row">\n';
+    let html = '  <div class="dvd-row"'
+      + ` style="justify-content:${this.hJust};align-items:${this.vAlign}">\n`;
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
     });

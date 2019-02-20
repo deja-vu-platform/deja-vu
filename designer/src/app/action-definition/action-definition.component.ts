@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   Input,
   OnInit,
   QueryList,
@@ -18,6 +19,8 @@ import {
 } from '../datatypes';
 import { ScopeIO } from '../io';
 
+const RIGHT_MOUSE_BUTTON = 2;
+
 const emptyRow = new Row();
 
 @Component({
@@ -32,6 +35,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
+  private readonly keysDown: Set<string> = new Set();
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
@@ -41,6 +45,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
+      // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
         this.calcShowHint();
       });
@@ -51,6 +56,16 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   set openAction(action: AppActionDefinition) {
     this.actionInstance = new ActionInstance(action, this.app);
     this.scopeIO.link(this.actionInstance);
+  }
+
+  @HostListener('document:keydown', ['$event.key'])
+  handleKeyDown(key: string) {
+    this.keysDown.add(key);
+  }
+
+  @HostListener('document:keyup', ['$event.key'])
+  handleKeyUp(key: string) {
+    this.keysDown.delete(key);
   }
 
   get rows() {
@@ -64,11 +79,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     return this._rows;
   }
 
-  onMenuClosed() {
+  onActionMenuClosed() {
     this.scopeIO.link(this.actionInstance);
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint());
   }
+
+  onRowMenuClosed() { }
 
   private calcShowHint() {
     let rowActions = 0;
@@ -91,4 +108,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     });
   }
 
+  stopPropIfShift(event: Event) {
+    if (this.keysDown.has('Shift')) {
+      event.stopPropagation();
+    }
+  }
+
+  openMenu(trigger) {
+    trigger.openMenu();
+  }
 }
