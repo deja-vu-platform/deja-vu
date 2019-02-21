@@ -77,7 +77,7 @@ export function capturesToInputs(
           if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
             const action = rest.slice(1)
               .split(NAV_SPLIT_REGEX)[0];
-            if (_.has(symbolTable, [ name, 'symbolTable', action ])) {
+            if (_.has(symbolTable, [name, 'symbolTable', action])) {
               return name + rest;
             }
           } else if (stEntry.kind === 'action') {
@@ -87,11 +87,19 @@ export function capturesToInputs(
           }
         }
         if (_.has(context, name)) {
-          const field = name + rest;
+          const action = rest.slice(1)
+            .split('.', 1)[0];
+          const memberAndOutputAccess = rest.slice(action.length + 1);
+          const [memberAccess, outputAccess] = memberAndOutputAccess.slice(1)
+            .split(NAV_SPLIT_REGEX);
+          const field = name + '.' + action + '.' + memberAccess;
+
           const input = captureToInput(field);
           inputsFromContext.push({ input: input, field: field });
 
-          return input;
+          const operator = memberAndOutputAccess.indexOf('?.') > 0 ? '?.' : '.';
+
+          return outputAccess ? input + operator + outputAccess : input;
         }
         throw new Error(`${name} (${name + rest}) not found in ` +
           `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
