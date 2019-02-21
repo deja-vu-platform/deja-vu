@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-md-12">
       <dv.tx as potluck-claim-party-supply>
-        <transfer.create-transfer fromId=$party?.id
+        <transfer.create-transfer fromId=$partyId
           toId=authentication.logged-in.user?.id
           showOptionToInputFromId=false
           showOptionToInputToId=false
@@ -19,7 +19,7 @@
           inputAmount=
             <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
               <transfer.create-item-count
-                id=authentication.logged-in.user.id
+                id=$partyId
                 showOptionToCreate=false
                 showOptionToInputItemId=false
                 emitOnRunOnly=false />

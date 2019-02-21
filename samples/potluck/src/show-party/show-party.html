@@ -83,16 +83,16 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
+                    <!-- context also wanted here -->
                     <transfer.show-item-counts
                       itemCounts=transfer.show-balance.fetchedBalance
                       showItemCount=<potluck.claim-supply
                         supplyObj=$itemCount
-                        party=authorization.show-resource.fetchedResource /> />
+                        partyId=authorization.show-resource.fetchedResource?.id /> />
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <!-- seems to be a problem passing input to input -->
                     <transfer.show-transfers fromId=$id
                       noTransfersToShowText="No claims"
                       showTransfer=<potluck.show-claim id=$transfer.id /> />
