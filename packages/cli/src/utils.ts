@@ -63,6 +63,10 @@ export function readFileOrFail(file: string): string {
   return readFileSync(file, 'utf8');
 }
 
+export function isInNgProjectRoot(): boolean {
+  return existsSync(NG_CLI_CONFIG_FILE);
+}
+
 /**
  * @return the name of the current project
  */
@@ -70,13 +74,6 @@ export function projectName(): string {
   const data = readFileOrFail(NG_CLI_CONFIG_FILE);
 
   return JSON.parse(data).project.name;
-}
-
-/**
- * @return True if the current project is a cliché or False if it's an app
- */
-export function isCliche(): boolean {
-  return existsSync(NG_PACKAGR.configFilePath);
 }
 
 /**

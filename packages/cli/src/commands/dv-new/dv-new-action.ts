@@ -1,21 +1,35 @@
 import * as _ from 'lodash';
-import * as path from 'path';
-import { isCliche, modulePath, ng, projectName } from '../../utils';
+import {
+  isInNgProjectRoot,
+  getDvPackageName,
+  metadataPath,
+  ng,
+  projectName
+} from '../../utils';
 
 
 exports.command = 'action <name>';
 exports.desc = 'create a new action';
 exports.handler = ({ name }) => {
-  console.log(`Creating new action ${name}`);
-  const projName = projectName();
-  const componentName = isCliche() ? path.join(projName, name) : name;
-  ng(['generate', 'component', componentName]);
+  if (!isInNgProjectRoot()) {
+    console.log('Please run this command from the root of a cliché directory.');
+    return;
+  }
 
-  console.log('Add action to module exports');
+  console.log(`Creating new action ${name}`);
+
+  const clicheName = projectName();
+  const schematicsPkgName = getDvPackageName('schematics');
+  ng(['generate', `${schematicsPkgName}:action`, `--clicheName=${clicheName}`,
+    `--actionName=${name}`]);
+
+  const componentName = componentClassName(name);
   console.log(
-    `Edit ${modulePath(projName)}.ts:\n
-       - add "${componentClassName(name)}" to the exports array\n
-     This will be automated in the future`);
+    `Edit ${metadataPath(clicheName)}.ts:
+    - add the line:
+      import { ${componentName} } from './${name}/${name}.component'\n
+    - add "${componentName}" to the exports and the allComponents array
+This will be automated in the future.`);
 };
 
 function componentClassName(actionName: string): string {
