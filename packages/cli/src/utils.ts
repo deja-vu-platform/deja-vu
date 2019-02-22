@@ -5,7 +5,29 @@ import * as path from 'path';
 
 import { ActionsConfig, getActionTable } from './actionProcessor/actionTable';
 
+export const ACTION_TABLE_FILE_NAME = 'actionTable.json';
+export const DVCONFIG_FILE_PATH = 'dvconfig.json';
+export const DV_PACKAGE_PREFIX = '@deja-vu';
+/**
+ * ng-packagr constants
+ * https://github.com/dherges/ng-packagr
+ */
+export const NG_PACKAGR = {
+  configFilePath: 'ng-package.json',
+  configFileContents: {
+    $schema: path
+      .join('.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
+    lib: {
+      entryFile: 'public_api.ts'
+    },
+    dest: 'pkg'
+  },
+  npmScriptValue: 'ng-packagr -p ng-package.json'
+};
+
 const INDENT_NUM_SPACES = 2;
+const NG_CLI_CONFIG_FILE = '.angular-cli.json';
+const PKGS_FOLDER = 'packages';
 
 /**
  * Executes `ng` synchronously
@@ -15,10 +37,10 @@ export function ng(args: string[], cwd?: string): void {
 }
 
 /**
- * Executes `npm` synchronously
+ * Executes `yarn` synchronously
  */
-export function npm(args: string[], cwd?: string): void {
-  cmd('npm', args, cwd);
+export function yarn(args: string[], cwd?: string): void {
+  cmd('yarn', args, cwd);
 }
 
 export function cmd(cmdS: string, args: string[], cwd?: string): void {
@@ -40,32 +62,6 @@ export function writeFileOrFail(file: string, data: string) {
 export function readFileOrFail(file: string): string {
   return readFileSync(file, 'utf8');
 }
-
-export const APP_MODULE_PATH = path.join('src', 'app', 'app.module.ts');
-export const ENTRY_FILE_PATH = 'public_api.ts';
-
-/**
- * ng-packagr constants
- * https://github.com/dherges/ng-packagr
- */
-export const NG_PACKAGR = {
-  configFilePath: 'ng-package.json',
-  configFileContents: {
-    $schema: path
-      .join('.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
-    lib: {
-      entryFile: ENTRY_FILE_PATH
-    },
-    dest: 'pkg'
-  },
-  npmScriptKey: 'packagr',
-  npmScriptValue: 'ng-packagr -p ng-package.json'
-};
-
-
-const NG_CLI_CONFIG_FILE = '.angular-cli.json';
-export const ACTION_TABLE_FILE_NAME = 'actionTable.json';
-export const DVCONFIG_FILE_PATH = 'dvconfig.json';
 
 /**
  * @return the name of the current project
@@ -90,49 +86,19 @@ export function modulePath(name: string): string {
   return path.join('.', 'src', 'app', `${name}`, `${name}.module`);
 }
 
-export const SERVER_SRC_FOLDER = 'server';
-export const SERVER_DIST_FOLDER = path.join('dist', 'server');
-
-// The number of space characters to use as whitespace when writing JSON
-export const JSON_SPACE = 2;
-
-export function updateDvConfig(
-  updateFn: (dvConfig: DvConfig) => DvConfig): void {
-  updateJsonFile(DVCONFIG_FILE_PATH, updateFn);
-}
-
-export interface PackageJson {
-  peerDependencies?: object;
-  dependencies?: object;
-  devDependencies?: object;
-  scripts?: object;
+/**
+ * @return the path to the metadata file for the given name
+ */
+export function metadataPath(name: string): string {
+  return path.join('.', 'src', 'app', `${name}`, `${name}.metadata`);
 }
 
 /**
- * Update the package.json file
- *
- * @param updateFn the function to use to apply the update
- * @param dir where to look for a package.json file (defaults to the current
- *            working directory)
+ * @param  pathToDv path to the root of the dv monorepo
+ * @return the path to the dv schematics
  */
-export function updatePackage(
-  updateFn: (pkg: PackageJson) => PackageJson, dir?: string): void {
-  const pkgPath: string = dir ? path.join(dir, 'package.json') : 'package.json';
-  updateJsonFile<PackageJson>(pkgPath, updateFn);
-}
-
-/**
- * Update a generic JSON file
- *
- * @param pathOfJsonFile the path to the JSON file to update
- * @param updateFn the function to use to apply the update
- */
-export function updateJsonFile<T>(
-  pathOfJsonFile: string, updateFn: (curr: T) => T): void {
-  const obj = JSON.parse(readFileOrFail(pathOfJsonFile));
-  const newObj = updateFn(obj);
-  writeFileOrFail(
-    pathOfJsonFile, JSON.stringify(newObj, undefined, JSON_SPACE));
+export function getSchematicsPath(pathToDv: string): string {
+  return path.join(pathToDv, PKGS_FOLDER, 'schematics');
 }
 
 export function startGatewayCmd(configFilePath: string): string {
@@ -141,29 +107,23 @@ export function startGatewayCmd(configFilePath: string): string {
 }
 
 export function startServerCmd(
-  watch: boolean, serverDistFolder: string, configKey: string,
-  asFlagValue?: string): string {
-  const cmdS = watch ? `nodemon -w ${serverDistFolder}` : 'node';
-  const eoc = watch ? '--' : '';
+  serverDistFolder: string, configKey: string, asFlagValue?: string): string {
   const script = path.join(serverDistFolder, 'server.js');
 
-  return `${cmdS} ${script} ${eoc} --config '\`dv get ${configKey}\`'` +
+  return `node ${script} --config '\`dv get ${configKey}\`'` +
     (asFlagValue ? ` --as ${asFlagValue}` : '');
 }
 
-export function buildFeCmd(watch: boolean, projectFolder?: string): string {
-  if (watch) {
-    return `chokidar src node_modules -c 'ng build'`;
-  }
-
+export function buildFeCmd(projectFolder?: string): string {
   return buildCmd('ng build', projectFolder);
 }
 
-export function buildServerCmd(watch: boolean, projectFolder?: string): string {
-  const cpSchema = 'cp schema.graphql' + path.join('..', 'dist', 'server');
-  const maybeWatch = watch ? '-w' : '';
+export function buildServerCmd(projectFolder?: string): string {
+  const serverPkg = path.join('.', 'pkg', 'server');
+  const cpSchema = 'cp server/schema.graphql' + serverPkg;
 
-  return buildCmd(`tsc ${maybeWatch} && ${cpSchema}`, projectFolder);
+  return buildCmd(
+    `tsc -p server --outDir ${serverPkg} && ${cpSchema}`, projectFolder);
 }
 
 function buildCmd(cmdS: string, projectFolder?: string): string {
@@ -181,6 +141,10 @@ export function locateClichePackage(pkg: string) {
   return locatePackage(`@deja-vu/${pkg}`);
 }
 
+export function getDvPackageName(name: string) {
+  return `${DV_PACKAGE_PREFIX}/${name}`;
+}
+
 export function concurrentlyCmd(...cmds: string[]): string {
   let cmdStr = '';
   for (const c of cmds) {
@@ -188,60 +152,6 @@ export function concurrentlyCmd(...cmds: string[]): string {
   }
 
   return `concurrently ${cmdStr}`;
-}
-
-const DV_PACKAGE_PREFIX = '@deja-vu';
-const PKGS_FOLDER = 'packages';
-const GATEWAY_PORT = 3000;
-export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
-
-
-export function getPackageFolder(pkg: string,): string {
-  return path.join(DV_PACKAGE_PREFIX, PKGS_FOLDER, pkg);
-}
-
-// Assumes cwd is not the project root
-// All apps and clichés need a gateway even if there are no servers because it
-// is what serves the SPA
-export function installAndConfigureGateway(name: string, pathToDv: string) {
-  const gatewayLoc = pathToDv ?
-    path.join('..', pathToDv, getPackageFolder('gateway')) :
-    `${DV_PACKAGE_PREFIX}/gateway`;
-  const coreLoc = pathToDv ?
-    path.join('..', pathToDv, getPackageFolder('core'),
-      NG_PACKAGR.configFileContents.dest) :
-    `${DV_PACKAGE_PREFIX}/core`;
-
-  console.log('Install gateway and core');
-  npm(['install', gatewayLoc, coreLoc, '--save'], name);
-  console.log('Install build-related packages');
-  npm(
-    ['install', 'concurrently', 'chokidar-cli', 'nodemon', '--save-dev'],
-    name
-  );
-
-  console.log('Initialize dvconfig file');
-  const initialConfig: DvConfig = {
-    name: name, gateway: { config: { wsPort: GATEWAY_PORT } }
-  };
-  writeFileOrFail(
-    path.join(name, DVCONFIG_FILE_PATH),
-    JSON.stringify(initialConfig, undefined, JSON_SPACE)
-  );
-
-  console.log('Add npm script to serve');
-  updatePackage((pkg) => {
-    pkg.scripts[`dv-start-gateway`] = START_THIS_GATEWAY_CMD;
-    pkg.scripts[`dv-build-${name}`] = buildFeCmd(false);
-    pkg.scripts[`dv-build-watch-${name}`] = buildFeCmd(true);
-    pkg.scripts['concurrently'] = 'concurrently';
-    pkg.scripts['tsc'] = 'tsc';
-
-    return pkg;
-  }, name);
-
-  // https://github.com/dherges/ng-packagr/issues/335
-  ng(['set', 'defaults.build.preserveSymlinks', 'true'], name);
 }
 
 export interface DvConfig {
