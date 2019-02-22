@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "application": {
+      "description": "Create a new cliché",
+      "factory": "./application/index#cliche",
+      "schema": "./application/schema.json"
+    }
+  }
+}

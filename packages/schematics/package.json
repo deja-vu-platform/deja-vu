@@ -1,0 +1,27 @@
+{
+  "name": "@deja-vu/schematics",
+  "version": "0.0.1",
+  "description": "Schematics for Déjà Vu",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "package": "yarn build",
+    "test": "npm run build && jasmine src/**/*_spec.js"
+  },
+  "keywords": [
+    "Deja Vu",
+    "Déjà Vu",
+    "dv",
+    "schematics"
+  ],
+  "license": "MIT",
+  "repository": "github:spderosso/dejavu",
+  "schematics": "./src/collection.json",
+  "dependencies": {
+    "@angular-devkit/core": "7.3.2",
+    "@angular-devkit/schematics": "^7.3.2",
+    "@types/jasmine": "^3.0.0",
+    "@types/node": "^8.0.31",
+    "jasmine": "^3.3.0",
+    "typescript": "~3.2.2"
+  }
+}
