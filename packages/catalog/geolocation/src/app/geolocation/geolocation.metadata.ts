@@ -21,11 +21,6 @@ import {
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
-export {
-  CreateMarkerComponent, DeleteMarkerComponent, DisplayMapComponent,
-  GetCurrentLocationComponent, ShowMarkerComponent, ShowMarkersComponent
-};
-
 import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
 
 
