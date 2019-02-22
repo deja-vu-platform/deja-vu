@@ -13,4 +13,7 @@ just like regular Angular schematics.
 - `ng new --collection=@deja-vu/schematics --clicheName=name` -
     create a new cliché with the given name
     (cannot be run inside an Angular project)
+- `ng generate @deja-vu/schematics:action --clicheName=clicheName
+    --actionName=actionName` - create an action in a cliché
+    (must be run inside the `actionName` cliché directory)
  

@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "DvSchematicsGenerateAction",
+  "title": "Create an action for a Déjà Vu cliché",
+  "type": "object",
+  "properties": {
+    "actionName": {
+      "type": "string"
+    },
+    "clicheName": {
+      "type": "string"
+    }
+  },
+  "required": [ "actionName", "clicheName" ],
+  "additionalProperties": false
+}
