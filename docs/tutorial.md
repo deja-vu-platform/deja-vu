@@ -39,6 +39,7 @@ The app's config file (dvconfig.json) is shown below:
 ```json
 {
   "name": "hackernews",
+  "type": "app",
   "usedCliches": {
     "authentication": {},
     "comment": {},
