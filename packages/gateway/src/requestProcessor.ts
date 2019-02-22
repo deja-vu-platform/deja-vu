@@ -78,10 +78,9 @@ function stringify(json: any) {
 }
 
 /**
- * Class for batching transaction responses.
- * Also just sends a regular response for batchSize === 1
+ * Class for batching responses.
  */
-export class TxResponse {
+export class ResponseBatch {
   private responses: ClicheResponse<string>[] = [];
 
   constructor(private res: express.Response, private batchSize: number) { }
@@ -99,6 +98,16 @@ export class TxResponse {
 
     if (this.responses.length === this.batchSize) {
       this.send();
+    }
+  }
+
+  /**
+   * Fail response
+   */
+  fail(status: number, text: string): void {
+    this.responses = [];
+    for (let i = 0; i < this.batchSize; i++) {
+      this.add(status, text, i);
     }
   }
 
@@ -123,9 +132,13 @@ export class TxResponse {
 }
 
 
+class RequestInvalidError {
+  constructor(public readonly message) {}
+}
+
 export abstract class RequestProcessor {
   private readonly txCoordinator: TxCoordinator<
-    GatewayToClicheRequest, ClicheResponse<string>, TxResponse>;
+    GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch>;
   protected readonly dstTable: { [cliche: string]: port } = {};
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
@@ -164,9 +177,11 @@ export abstract class RequestProcessor {
       response = err.response;
     }
     if (!response) {
-      console.error(
-        `Got an undefined response for cliche request
-      ${stringify(clicheReq)}`);
+      const errMsg = `Got an undefined response for cliche ` +
+        `request ${stringify(clicheReq)}`;
+      console.error(errMsg);
+
+      throw new Error(errMsg);
     }
 
     return {
@@ -204,16 +219,10 @@ export abstract class RequestProcessor {
     }
   }
 
-  private static HasRunId(gatewayRequest: GatewayRequest) {
-    const runId = gatewayRequest.runId;
-
-    return !(_.isEmpty(runId) || runId === 'null' || runId === 'undefined');
-  }
-
-  constructor(config: GatewayConfig) {
+  protected constructor(config: GatewayConfig) {
     const txConfig = this.getTxConfig(config);
     this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
-      ClicheResponse<string>, TxResponse>(txConfig);
+      ClicheResponse<string>, ResponseBatch>(txConfig);
   }
 
   start(): Promise<void> {
@@ -224,24 +233,96 @@ export abstract class RequestProcessor {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    return this._processRequest(req, res);
+    return req.query.isTx ?
+      this.processTxRequest(req, res) :
+      this.processNonTxRequest(req, res);
   }
 
-  protected async _processRequest(
+  protected async processTxRequest(
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    if (!req.query.isTx) {
-      return this.doProcessRequest(req, new TxResponse(res, 1), 1);
+    const childRequests: ChildRequest[] = req.body;
+    const resBatch = new ResponseBatch(res, childRequests.length);
+
+    let gatewayToClicheRequests: GatewayToClicheRequest[];
+    try {
+       gatewayToClicheRequests = childRequests
+         .map((childRequest) => this.validateRequest(childRequest));
+    } catch (e) {
+      if (e instanceof RequestInvalidError) {
+        resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
+      } else {
+        console.log('Something bad happened' + e.message);
+        throw e;
+      }
+
+      return;
     }
 
-    const childRequests: ChildRequest[] = req.body;
-    const txRes = new TxResponse(res, childRequests.length);
+    // TODO: check inputs
 
     return Promise
-      .all(childRequests.map((chReq, index) =>
-        this.doProcessRequest(chReq, txRes, index)))
+      .all(gatewayToClicheRequests
+        .map((gatewayToClicheRequest, index) =>
+          RequestProcessor
+            .ForwardRequest<string>(gatewayToClicheRequest)
+            .then((clicheRes: ClicheResponse<string>) => {
+              resBatch.add(clicheRes.status, clicheRes.text, index);
+            })))
       .then(() => {});
+  }
+
+  protected async processNonTxRequest(
+    req: express.Request,
+    res: express.Response
+  ): Promise<void> {
+    const resBatch = new ResponseBatch(res, 1);
+    try {
+      const gatewayToClicheRequest = this.validateRequest(req);
+      const clicheRes: ClicheResponse<string> = await RequestProcessor
+        .ForwardRequest<string>(gatewayToClicheRequest);
+      resBatch.add(clicheRes.status, clicheRes.text, 1);
+    } catch (e) {
+      resBatch.add(INTERNAL_SERVER_ERROR, e.message);
+    }
+  }
+
+  private validateRequest(req: express.Request | ChildRequest)
+    : GatewayToClicheRequest {
+     if (!req.query.from) {
+      throw new RequestInvalidError('No from specified');
+    }
+
+    const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
+
+    const { runId, from: actionPath } = gatewayRequest;
+    const actionTag = this.getActionFromPath(actionPath);
+    const to = RequestProcessor.ClicheOf(actionTag);
+    const toPort: port | undefined = _.get(this.dstTable, to);
+
+    console.log(`Req from ${stringify(gatewayRequest)}`);
+    if (!actionTag) {
+      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
+    }
+    if (toPort === undefined) {
+      throw new RequestInvalidError(
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
+    }
+
+    console.log(
+      `Valid request: port: ${toPort}, ` +
+      `action path: ${actionPath}, runId: ${runId}` +
+      (actionPath.isDvTx() ? `, dvTxId: ${runId}` : ' not part of a tx'));
+
+    return {
+      ...gatewayRequest,
+      ...{
+        url: `http://localhost:${toPort}`,
+        method: req.method,
+        body: req.body
+      }
+    };
   }
 
   protected getActionFromPath(actionPath: ActionPath): ActionTag {
@@ -253,88 +334,14 @@ export abstract class RequestProcessor {
     };
   }
 
-  private validateRequest(
-    actionPath: ActionPath,
-    matchingAction: ActionTag,
-    to: string,
-    toPort: port,
-    txRes: TxResponse
-  ) {
-    if (!matchingAction) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid action path: ${actionPath}`
-      );
+  protected abstract getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[];
 
-      return false;
-    }
-    if (toPort === undefined) {
-      txRes.add(
-        INTERNAL_SERVER_ERROR,
-        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`
-      );
 
-      return false;
-    }
-
-    return true;
-  }
-
-  private async doProcessRequest(
-    req: express.Request | ChildRequest,
-    txRes: TxResponse,
-    index: number
-  ): Promise<void> {
-    if (!req.query.from) {
-      txRes.add(INTERNAL_SERVER_ERROR, 'No from specified');
-
-      return;
-    }
-
-    const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
-
-    const { runId, from: actionPath } = gatewayRequest;
-    const actionTag = this.getActionFromPath(actionPath);
-    const to = RequestProcessor.ClicheOf(actionTag);
-    const toPort: port | undefined = _.get(this.dstTable, to);
-
-    console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!this.validateRequest(actionPath, actionTag, to, toPort, txRes)) {
-        return;
-    }
-
-    console.log(
-      `Processing request: port: ${toPort}, ` +
-      `action path: ${actionPath}, runId: ${runId}` +
-      (actionPath.isDvTx() ? `, dvTxId: ${runId}` : ' not part of a tx'));
-
-    const gatewayToClicheRequest: GatewayToClicheRequest = {
-      ...gatewayRequest,
-      ...{
-        url: `http://localhost:${toPort}`,
-        method: req.method,
-        body: req.body
-      }
-    };
-    /*
-     * For a request to be part of a exec tx, two things must happen:
-     *  - it must have a `runId` (all actions that get executed get a run id,
-     *    independently of whether they are part of a tx or not)
-     *  - the action path must be a dv-tx path (if it isn't, then it is a
-     *    request that was caused by an exec but it is not part of a dv-tx)
-     */
-    if (RequestProcessor.HasRunId(gatewayRequest) && actionPath.isDvTx()) {
-      await this.txCoordinator.processMessage(
-        runId!, actionPath.serialize(), gatewayToClicheRequest, txRes, index);
-    } else {
-      const clicheRes: ClicheResponse<string> = await RequestProcessor
-        .ForwardRequest<string>(gatewayToClicheRequest);
-      txRes.add(clicheRes.status, clicheRes.text, index);
-    }
-  }
-
-  protected getTxConfig(config: GatewayConfig):
-    TxConfig<GatewayToClicheRequest, ClicheResponse<string>, TxResponse> {
+  private getTxConfig(config: GatewayConfig):
+    TxConfig<GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch> {
     return {
       dbHost: config.dbHost,
       dbPort: config.dbPort,
@@ -379,7 +386,7 @@ export abstract class RequestProcessor {
 
       sendAbortToClient: (
         causedAbort: boolean, _gcr?: GatewayToClicheRequest,
-        payload?: ClicheResponse<string>, txRes?: TxResponse) => {
+        payload?: ClicheResponse<string>, txRes?: ResponseBatch) => {
         assert.ok(txRes !== undefined);
         if (causedAbort) {
           assert.ok(payload !== undefined);
@@ -394,7 +401,7 @@ export abstract class RequestProcessor {
 
       sendToClient: (
         payload: ClicheResponse<string>,
-        txRes?: TxResponse,
+        txRes?: ResponseBatch,
         index?: number
       ) => {
         txRes!.add(payload.status, payload.text, index);
@@ -417,18 +424,12 @@ export abstract class RequestProcessor {
       },
 
       onError: (
-        e: Error, _gcr: GatewayToClicheRequest, txRes?: TxResponse) => {
+        e: Error, _gcr: GatewayToClicheRequest, txRes?: ResponseBatch) => {
         console.error(e);
         txRes!.add(INTERNAL_SERVER_ERROR, e.message);
       }
     };
   }
-
-  protected abstract getCohortActions(
-    _actionPath: ActionPath,
-    _dvTxNodeIndex: number
-  ): ActionTag[];
-
 }
 
 export class AppRequestProcessor extends RequestProcessor {
@@ -504,24 +505,21 @@ export class DesignerRequestProcessor extends RequestProcessor {
     this.dstTable[alias || name] = wsPort;
   }
 
-  async processRequest(
+  async processTxRequest(
     req: express.Request,
-    res: express.Response
+    _res: express.Response
   ): Promise<void> {
-    if (req.query.isTx) {
-      const childRequests: ChildRequest[] = req.body;
-      this.cohortActions = childRequests.map((chReq) => {
-        const actionPath = ActionPath.fromString(chReq.query.from);
-        const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+    const childRequests: ChildRequest[] = req.body;
+    this.cohortActions = childRequests.map((chReq) => {
+      const actionPath = ActionPath.fromString(chReq.query.from);
+      const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
 
-        return {
-          fqtag,
-          tag: fqtag,
-          inputs: {}
-        };
-      });
-    }
-    this._processRequest(req, res);
+      return {
+        fqtag,
+        tag: fqtag,
+        inputs: {}
+      };
+    });
   }
 
   protected getCohortActions(
