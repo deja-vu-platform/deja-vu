@@ -23,8 +23,8 @@ aspects of a cliché you'll interact with are the configuration options and expo
 documentation accompanying a cliché includes information about the configuration options
 (e.g., their effect on behavior) and the exported actions.
 
-Cliché actions control a patch of the screen, are
-interactive, and can read and write back-end data.
+Cliché actions are interactive user interface elements that can read and
+write back-end data.
 They can
 also have inputs and produce outputs.
 
@@ -131,14 +131,14 @@ Below is a code excerpt of *HN*'s `submit-post`:
   <hackernews.navbar /> ...
   <div class="main">
     <div class="container">
-      <dv.if condition=hn.navbar.loggedInUser>
+      <dv.if condition=hackernews.navbar.loggedInUser>
         <dv.tx>
-          <dv.id />
+          <dv.gen-id />
           <authentication.authenticate
             id=hackernews.navbar.loggedInUser.id hidden=true />
           <property.create-object
             buttonLabel="Submit"
-            id=dv.id.id
+            id=dv.gen-id.id
             initialValue={ author: hackernews.navbar.loggedInUser.username }
             newObjectSavedText="Post submitted"
             showExclude=['author']
@@ -146,11 +146,11 @@ Below is a code excerpt of *HN*'s `submit-post`:
             
           <scoringposts.create-score
             sourceId=hackernews.navbar.loggedInUser.username
-            targetId=dv.id.id
+            targetId=dv.gen-id.id
             value=0
             hidden=true />
 
-          <dv.link href="/item" params={ id: dv.id.id } hidden=true />
+          <dv.link href="/item" params={ id: dv.gen-id.id } hidden=true />
         </dv.tx>
       </dv.if>
     </div>
@@ -165,7 +165,8 @@ Below is a code excerpt of *HN*'s `submit-post`:
 `create-score` of the `scoringposts` instance of *Scoring*; 
 and three built-in actions (which can be regarded as free-standing cliché actions): `dv.if`, which
 shows the enclosed content if the given condition is true, `dv.gen-id`,
-which generates a unique ID, and `dv.tx`
+which generates a unique ID, `dv.link` which navigates to the action matching
+the `/item` route (and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
 which synchronizes the actions it wraps (explained in more detail later).
 
 App actions, like cliché actions, can have input and
