@@ -13,13 +13,19 @@ import { AgmCoreModule } from '@agm/core';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { CreateMarkerComponent } from './create-marker/create-marker.component';
+export { CreateMarkerComponent };
 import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
+export { DeleteMarkerComponent };
 import { DisplayMapComponent } from './display-map/display-map.component';
+export { DisplayMapComponent };
 import {
   GetCurrentLocationComponent
 } from './get-current-location/get-current-location.component';
+export { GetCurrentLocationComponent };
 import { ShowMarkerComponent } from './show-marker/show-marker.component';
+export { ShowMarkerComponent };
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
+export { ShowMarkersComponent };
 
 import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
 

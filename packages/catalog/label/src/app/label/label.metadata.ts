@@ -10,14 +10,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from '@deja-vu/core';
 
 import { AttachLabelsComponent } from './attach-labels/attach-labels.component';
+export { AttachLabelsComponent };
 import { CreateLabelComponent } from './create-label/create-label.component';
+export { CreateLabelComponent };
 import {
   SearchItemsByLabelsComponent
 } from './search-items-by-labels/search-items-by-labels.component';
+export { SearchItemsByLabelsComponent };
 import { ShowItemComponent } from './show-item/show-item.component';
+export { ShowItemComponent };
 import { ShowItemsComponent } from './show-items/show-items.component';
+export { ShowItemsComponent };
 import { ShowLabelComponent } from './show-label/show-label.component';
+export { ShowLabelComponent };
 import { ShowLabelsComponent } from './show-labels/show-labels.component';
+export { ShowLabelsComponent };
 
 
 const allComponents = [
