@@ -4,4 +4,5 @@ Description of the cliché
 
 ## Actions
 
-- add each action here
+- create-<%= dasherize(clicheName) %>
+- show-<%= dasherize(clicheName) %>

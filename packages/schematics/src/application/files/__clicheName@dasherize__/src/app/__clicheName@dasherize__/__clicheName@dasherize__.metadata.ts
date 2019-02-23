@@ -9,10 +9,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from '@deja-vu/core';
 
 // import all cliché actions here
+import { Create<%= classify(clicheName) %>Component } from './create-<%= dasherize(clicheName) %>/create-<%= dasherize(clicheName) %>.component';
+import { Show<%= classify(clicheName) %>Component } from './show-<%= dasherize(clicheName) %>/show-<%= dasherize(clicheName) %>.component';
 
-
+// add all cliché actions here
 const allComponents = [
-  // add all cliché actions here
+  Create<%= classify(clicheName) %>Component, Show<%= classify(clicheName) %>Component
 ];
 
 const metadata = {
