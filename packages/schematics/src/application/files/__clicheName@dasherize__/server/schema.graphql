@@ -2,7 +2,7 @@ type <%= classify(clicheName) %> {
   id: ID!
 }
 
-type Create<%= classify(clicheName) %>Input {
+input Create<%= classify(clicheName) %>Input {
   id: ID
 }
 
