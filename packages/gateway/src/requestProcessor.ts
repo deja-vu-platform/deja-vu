@@ -261,6 +261,10 @@ export abstract class RequestProcessor {
     }
 
     // TODO: check inputs
+    const actionPath = gatewayToClicheRequests[0].from;
+    const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+    const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
+    console.log(JSON.stringify(cohortActions));
 
     return Promise
       .all(gatewayToClicheRequests
