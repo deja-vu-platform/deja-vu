@@ -8,57 +8,64 @@ Install
 -------
 
 To install you need to have node installed. Once you do, you can install the
-Déjà Vu CLI with:
+Déjà Vu CLI with one of the following commands:
 
 ```
 npm install -g @deja-vu/cli
+yarn global add @deja-vu/cli
 ```
 
 Interface
 ---------
 
-  - `dv new` - create a new app, cliché, or action
-  - `dv serve` - build the app, run it locally and watch for changes
-  - `dv install` - install a cliché
-  - `dv uninstall` - uninstall a cliché
+  - `dv new <type> <name>` - create a new cliché or action, must be run outside of the dv repo
+  - `dv serve` - build the app or cliché in the current directory and run it locally
   - `dv package` - package the cliché so that it can be used in other projects
+  - `dv --help` - show the list of dv commands
 
 
 Guide
 -----
 
-### Create a new app
+### Create a new cliché
 
-To create and serve a new app or cliché:
+To create and serve a new cliché:
 
 ```
-dv new app my-app path-to-dv
-cd my-app
+dv new cliche clichename --pathToDv=deja-vu
+cd deja-vu/packages/catalog/cliche-name
 dv serve
 ```
 
-`path-to-dv` is the path to the folder where the dv code is located (the repo).
+`clichename` must be a single word, all lowercase.
 
-This will generate a bunch of files. If you know Angular and TypeScript they
-will make sense to you but if you don't then it doesn't matter since for
-most apps you'll only have to write HTML and CSS.
+`pathToDv` is the path to the folder where the dv code is located (the repo).
+This argument is optional and the default value is given above.
 
-Navigate to ()[http://localhost:3000/]. The app will automatically reload if you
-change any of the source files.
+The newly-created cliché comes with two initial actions to serve as examples,
+`create-clichename` and `show-clichename`,
+under the assumption that `clichename` is usually the name of the primary entity
+in the cliché. Of course, they can and should be updated.
 
-### Generate actions
+Navigate to ()[http://localhost:3000/] and see the two cliché actions in action.
 
-```
-dv generate action name
-```
+### Create actions in a cliché
 
-### Install a cliché
-
-Inside the app directory, do:
+To create an action in a cliché, run the following from the root of
+the cliché's directory:
 
 ```
-dv install cliche-name path-to-cliche
+dv new action action-name
 ```
+
+By convention, use kebab-case for the `action-name`.
+
+The command will create the HTML, TypeScript, CSS, and test files for the action.
+It will also add the action to `clichename.metadata.ts` and to `app.component.html`
+so that it can be used and tested right away. In order for it to be added
+correctly to those files, the initial structure of those files shouldn't be changed.
+These additions can be skipped using the flags `--skipMetadataImport` and `--skipAppComponentHtml`.
+
 
 Development
 -----------
@@ -67,8 +74,12 @@ If you are developing the cli and you want to test your changes you can build
 and reinstall it globally with:
 
 ```
-npm run clean && npm run build && npm uninstall -g && npm install -g
+npm run package && npm uninstall -g && npm install -g
 ```
+
+Every cliché package also comes with the `dv` command, so you can prepend `yarn`
+or `npm run` to the usual `dv` command, e.g. `yarn dv serve`.
+
 
 Dv Config
 ---------

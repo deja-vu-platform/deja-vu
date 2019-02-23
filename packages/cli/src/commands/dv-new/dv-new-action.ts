@@ -5,7 +5,7 @@ import {
   projectName
 } from '../../utils';
 
-
+// TODO: add option to add the new action to the README
 exports.command = 'action <name>';
 exports.desc = 'create a new action';
 exports.builder = {
