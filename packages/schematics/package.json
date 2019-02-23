@@ -19,8 +19,10 @@
   "dependencies": {
     "@angular-devkit/core": "7.3.2",
     "@angular-devkit/schematics": "^7.3.2",
+    "@types/cheerio": "^0.22.10",
     "@types/jasmine": "^3.0.0",
     "@types/node": "^8.0.31",
+    "cheerio": "^1.0.0-rc.2",
     "jasmine": "^3.3.0",
     "typescript": "~3.2.2"
   }
