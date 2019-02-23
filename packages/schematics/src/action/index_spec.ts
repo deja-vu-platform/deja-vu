@@ -12,7 +12,12 @@ describe('action', () => {
   it('works', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
     const tree = runner.runSchematic(
-      'action', { actionName, clicheName }, Tree.empty());
+      'action', {
+        actionName,
+        clicheName,
+        skipAppComponentHtml: true,
+        skipMetadataImport: true
+      }, Tree.empty());
 
     expect(tree.files).toEqual([
       `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}.component.css`,
