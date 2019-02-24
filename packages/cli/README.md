@@ -40,7 +40,9 @@ dv serve
 `clichename` must be a single word, all lowercase.
 
 `pathToDv` is the path to the folder where the dv code is located (the repo).
-This argument is optional and the default value is given above.
+This argument is optional and the default value is the name of the repo,
+`deja-vu`. As such, it is recommended that the command be run in the directory
+that contains the dv repo.
 
 The newly-created cliché comes with two initial actions to serve as examples,
 `create-clichename` and `show-clichename`,
