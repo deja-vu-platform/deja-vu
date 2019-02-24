@@ -5,18 +5,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' --exclude '.*' src/ dist/",
     "clean": "rm -rf ./dist",
-    "package": "yarn clean && yarn build",
-    "test": "yarn package && jasmine dist/**/*_spec.js"
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "package": "npm run clean && npm run build",
+    "prepare": "npm run package",
+    "test": "npm run package && jasmine dist/**/*_spec.js"
   },
-  "keywords": [
-    "Deja Vu",
-    "Déjà Vu",
-    "dv",
-    "schematics"
-  ],
-  "license": "MIT",
-  "repository": "github:spderosso/dejavu",
-  "schematics": "./dist/collection.json",
   "dependencies": {
     "@angular-devkit/core": "7.3.2",
     "@angular-devkit/schematics": "^7.3.2",
@@ -26,5 +19,13 @@
     "cheerio": "^1.0.0-rc.2",
     "jasmine": "^3.3.0",
     "typescript": "~3.2.2"
-  }
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "schematics": "./dist/collection.json"
 }
