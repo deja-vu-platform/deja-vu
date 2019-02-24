@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "outDir": "dist/",
+    "resolveJsonModule": true,
     "rootDir": "src/",
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
@@ -24,9 +25,10 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
   },
   "include": [
+    "src/**/*.json",
     "src/**/*"
   ],
   "exclude": [
