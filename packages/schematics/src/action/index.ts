@@ -130,7 +130,12 @@ function addToAppComponentHtml(options: any): Rule {
     const filePath = '/src/app/app.component.html';
     const $ = cheerio.load(getFileText(tree, filePath));
     const actionComponentSelector =
-      `${options.clicheName}-${strings.dasherize(options.actionName)}`
+      `${options.clicheName}-${strings.dasherize(options.actionName)}`;
+    // skip if it's already there
+    if ($(actionComponentSelector).length) {
+      return tree;
+    }
+
     const componentHtml =
       `  <h2>${options.actionName}</h2>\n` +
       `  <${actionComponentSelector}></${actionComponentSelector}>\n`;
