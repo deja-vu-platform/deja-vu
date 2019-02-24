@@ -13,7 +13,13 @@ import {
 } from '@angular-devkit/schematics';
 import * as cheerio from 'cheerio';
 import * as ts from 'typescript';
-import { appendToArrayDeclaration, insertImport } from '../utils/ast-utils';
+import {
+  appendToArrayDeclaration,
+  findNodes,
+  insertExport,
+  insertImport,
+  nodesByPosition
+} from '../utils/ast-utils';
 import { InsertChange } from '../utils/change';
 
 
@@ -54,34 +60,64 @@ function getMetadataPath(clicheName: string): string {
   return `/src/app/${dasherizedName}/${dasherizedName}.metadata.ts`;
 }
 
+function findLastComponentImportExportPos(source: ts.SourceFile) {
+  const lastComponentExport = findNodes(source, ts.SyntaxKind.ExportDeclaration)
+    .filter((node: ts.ExportDeclaration) =>
+      node.exportClause && node.exportClause.elements.filter(
+        exportElement => exportElement.getText().match('Component')).length > 0)
+    .sort(nodesByPosition)
+    .pop();
+
+  const lastComponentImport = findNodes(source, ts.SyntaxKind.ImportDeclaration)
+    .filter((node: ts.ImportDeclaration) =>
+      node.moduleSpecifier && node.moduleSpecifier.getText().match('component'))
+    .sort(nodesByPosition)
+    .pop();
+
+  const insertPosByLastExport = lastComponentExport ?
+    lastComponentExport.getEnd() + 1 : 0;
+  const insertPosByLastImport = lastComponentImport ?
+    lastComponentImport.getEnd() + 1 : 0;
+
+  return Math.max(insertPosByLastExport, insertPosByLastImport);
+}
+
 function addComponentToMetadata(options: any): Rule {
   return (tree: Tree) => {
     if (options.skipMetadataImport) {
       return tree;
     }
     const metadataPath = getMetadataPath(options.clicheName);
-    const source = readIntoSourceFile(tree, metadataPath);
-
     const componentPath = `./${strings.dasherize(options.actionName)}/`
                           + strings.dasherize(options.actionName)
                           + '.component';
     const componentName = `${strings.classify(options.actionName)}Component`;
-    
+    const source = readIntoSourceFile(tree, metadataPath);
+
     const changeRecorder = tree.beginUpdate(metadataPath);
+    const insertPos = findLastComponentImportExportPos(source);
 
-    const declarationChange = insertImport(
-      source, metadataPath, componentName, componentPath);
-    if (declarationChange instanceof InsertChange) {
-      changeRecorder.insertLeft(declarationChange.pos, declarationChange.toAdd);
+    const importChange = insertImport(source,
+      metadataPath, componentName, componentPath, insertPos);
+    if (importChange instanceof InsertChange) {
+      changeRecorder.insertLeft(importChange.pos, importChange.toAdd);
     }
 
-    const arrayChange = appendToArrayDeclaration(
-      source, 'allComponents', componentName);
-    if (arrayChange instanceof InsertChange) {
-      changeRecorder.insertLeft(arrayChange.pos, arrayChange.toAdd);
+    const exportChange = insertExport(
+      source, componentName, componentPath, insertPos);
+    if (exportChange instanceof InsertChange) {
+      changeRecorder.insertLeft(exportChange.pos, exportChange.toAdd);
     }
-
     tree.commitUpdate(changeRecorder);
+
+    const arrayChangeRecorder = tree.beginUpdate(metadataPath);
+    const arrayChange = appendToArrayDeclaration(
+      readIntoSourceFile(tree, metadataPath), 'allComponents', componentName);
+    if (arrayChange instanceof InsertChange) {
+      arrayChangeRecorder.insertLeft(arrayChange.pos, arrayChange.toAdd);
+    }
+
+    tree.commitUpdate(arrayChangeRecorder);
     return tree;
   };
 }

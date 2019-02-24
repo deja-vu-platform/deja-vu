@@ -46,12 +46,94 @@ export function appendToArrayDeclaration(source: ts.SourceFile,
         // preserve trailing comma if it's there
         const toInsert = node.elements.hasTrailingComma ?
           ` ${symbolName},` : `, ${symbolName}`;
-        return new InsertChange(source.fileName, node.elements.end, toInsert);
+
+        return new InsertChange(source.fileName, node.getEnd(), toInsert);
       }
     }
   }
 
   return new NoopChange();
+}
+
+/**
+ * Add export { symbolName } to the source
+ * @param source     (the source file to modify and in which to look for
+ *                        existing exports and imports)
+ * @param symbolName (the name to export)
+ * @param fileName   (the file from which symbolName comes)
+ * @param insertPos  (the position to insert the export statement.
+ *                        If not provided, looks for the import declaration
+ *                        of symbolName and inserts after the import position.
+ *                        If there is no such import, falls back to the
+ *                        beginning of the file.)
+ * @return Change
+ */
+export function insertExport(source: ts.SourceFile, symbolName: string,
+  fileName: string, insertPos?: number): Change {
+  const rootNode = source;
+  const allExports = findNodes(
+    rootNode, ts.SyntaxKind.ExportDeclaration) as ts.ExportDeclaration[];
+
+  for (let i = 0; i < allExports.length; i++) {
+    const exportDeclaration = allExports[i];
+
+    if (exportDeclaration.exportClause) {
+      const exported = exportDeclaration.exportClause.elements;
+      for (let j = 0; j < exported.length; j++) {
+        if (exported[j].name.escapedText === symbolName) {
+          return new NoopChange();
+        }
+      }
+    } else {
+      // this is the case of export * from fileName;
+      // StringLiteral of the ExportDeclaration is the import file (fileName in this case).
+      const exportFiles = exportDeclaration.getChildren()
+        .filter(child => child.kind === ts.SyntaxKind.StringLiteral)
+        .map(n => (n as ts.StringLiteral).text);
+
+      if (exportFiles.filter(file => file === fileName).length === 1) {
+        return new NoopChange();
+      }
+    }
+  }
+
+  // insert after the import of symbolName if insertPos is not given
+  if (insertPos === undefined) {
+    const importNode = findImportNode(source, symbolName, fileName);
+    // fall back to start of the file if symbolName is not imported
+    insertPos = importNode ? importNode.getEnd() + 1 : 0;
+  }
+
+  const startSeparator = insertPos === 0 ? '' : '\n';
+  const endSeparator = insertPos === 0 ? '\n' : '';
+  return new InsertChange(
+    source.fileName, insertPos,
+    `${startSeparator}export { ${symbolName} };${endSeparator}`);
+}
+
+/**
+ * @return the Node that imports symbolName from filePath if it exists
+ */
+function findImportNode(
+  source: ts.SourceFile, symbolName: string, filePath: string): ts.Node | undefined {
+  const allNodes = getSourceNodes(source);
+  const matchingNodes = allNodes
+    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
+    .filter((imp: ts.ImportDeclaration) => {
+      return (imp.moduleSpecifier as ts.StringLiteral).text === filePath;
+    })
+    .filter((imp: ts.ImportDeclaration) => {
+      if (!imp.importClause) {
+        return false;
+      }
+      const nodes = findNodes(imp.importClause, ts.SyntaxKind.ImportSpecifier)
+        .filter(n => n.getText() === symbolName);
+
+      return nodes.length > 0;
+    });
+
+  return matchingNodes.length > 0 ? matchingNodes[0] : undefined;
 }
 
 
@@ -61,11 +143,13 @@ export function appendToArrayDeclaration(source: ts.SourceFile,
  * @param fileToEdit (file we want to add import to)
  * @param symbolName (item to import)
  * @param fileName (path to the file)
+ * @param insertPos (the position to insert the import if there is no import
+ *                       of symbolName or no imports from fileName yet)
  * @param isDefault (if true, import follows style for importing default exports)
  * @return Change
  */
 export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolName: string,
-                             fileName: string, isDefault = false): Change {
+                             fileName: string, insertPos: number, isDefault = false): Change {
   const rootNode = source;
   const allImports = findNodes(rootNode, ts.SyntaxKind.ImportDeclaration);
 
@@ -103,34 +187,22 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
         findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].getStart() ||
         findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].getStart();
 
-      return insertAfterLastOccurrence(imports, `, ${symbolName}`, fileToEdit, fallbackPos);
+      return insertAfterLastOccurrence(
+        imports, `, ${symbolName}`, fileToEdit, fallbackPos);
     }
 
     return new NoopChange();
   }
 
   // no such import declaration exists
-  const useStrict = findNodes(rootNode, ts.SyntaxKind.StringLiteral)
-    .filter((n: ts.StringLiteral) => n.text === 'use strict');
-  let fallbackPos = 0;
-  if (useStrict.length > 0) {
-    fallbackPos = useStrict[0].end;
-  }
   const open = isDefault ? '' : '{ ';
   const close = isDefault ? '' : ' }';
-  // if there are no imports or 'use strict' statement, insert import at beginning of file
-  const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
-  const separator = insertAtBeginning ? '' : ';\n';
-  const toInsert = `${separator}import ${open}${symbolName}${close}` +
-    ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
+  const startSeparator = insertPos === 0 ? '' : '\n';
+  const endSeparator = insertPos === 0 ? '\n' : '';
+  const toInsert = `${startSeparator}import ${open}${symbolName}${close}` +
+    ` from '${fileName}';${endSeparator}`;
 
-  return insertAfterLastOccurrence(
-    allImports,
-    toInsert,
-    fileToEdit,
-    fallbackPos,
-    ts.SyntaxKind.StringLiteral,
-  );
+  return new InsertChange(source.fileName, insertPos, toInsert);
 }
 
 
@@ -212,7 +284,7 @@ export function findNode(node: ts.Node, kind: ts.SyntaxKind, text: string): ts.N
  * Helper for sorting nodes.
  * @return function to sort nodes in increasing order of position in sourceFile
  */
-function nodesByPosition(first: ts.Node, second: ts.Node): number {
+export function nodesByPosition(first: ts.Node, second: ts.Node): number {
   return first.getStart() - second.getStart();
 }
 
@@ -260,31 +332,4 @@ export function getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): s
   } else {
     return null;
   }
-}
-
-
-/**
- * Determine if an import already exists.
- */
-export function isImported(source: ts.SourceFile,
-                           classifiedName: string,
-                           importPath: string): boolean {
-  const allNodes = getSourceNodes(source);
-  const matchingNodes = allNodes
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
-    .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
-    .filter((imp: ts.ImportDeclaration) => {
-      return (imp.moduleSpecifier as ts.StringLiteral).text === importPath;
-    })
-    .filter((imp: ts.ImportDeclaration) => {
-      if (!imp.importClause) {
-        return false;
-      }
-      const nodes = findNodes(imp.importClause, ts.SyntaxKind.ImportSpecifier)
-        .filter(n => n.getText() === classifiedName);
-
-      return nodes.length > 0;
-    });
-
-  return matchingNodes.length > 0;
 }
