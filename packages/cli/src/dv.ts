@@ -24,7 +24,7 @@ import {
 const CACHE_DIR = '.dv';
 
 function startServerCmdOfCliche() {
-  return startServerCmd(false, path.join('dist', 'server'), 'config');
+  return startServerCmd(path.join('dist', 'server'), 'config');
 }
 
 function startServerCmdOfUsedCliche(
@@ -39,7 +39,7 @@ function startServerCmdOfUsedCliche(
   const configKey = `usedCliches.${alias}.config`;
   const asFlagValue = (alias !== cliche) ? alias : undefined;
 
-  return startServerCmd(false, serverDistFolder, configKey, asFlagValue);
+  return startServerCmd(serverDistFolder, configKey, asFlagValue);
 }
 
 // tslint:disable no-unused-expression

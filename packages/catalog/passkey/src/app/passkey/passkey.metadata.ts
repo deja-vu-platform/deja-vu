@@ -14,10 +14,15 @@ import { DvModule } from '@deja-vu/core';
 import {
   CreatePasskeyComponent
 } from './create-passkey/create-passkey.component';
+export { CreatePasskeyComponent };
 import { LoggedInComponent } from './logged-in/logged-in.component';
+export { LoggedInComponent };
 import { SignInComponent } from './sign-in/sign-in.component';
+export { SignInComponent };
 import { SignOutComponent } from './sign-out/sign-out.component';
+export { SignOutComponent };
 import { ValidateComponent } from './validate/validate.component';
+export { ValidateComponent };
 
 const allComponents = [
   CreatePasskeyComponent, SignInComponent, SignOutComponent,

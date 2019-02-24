@@ -18,7 +18,8 @@
     "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-label\"",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "uuid": "^3.2.1"

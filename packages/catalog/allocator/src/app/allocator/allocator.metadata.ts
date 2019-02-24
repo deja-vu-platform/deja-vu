@@ -11,11 +11,15 @@ import { DvModule } from '@deja-vu/core';
 import {
   CreateAllocationComponent
 } from './create-allocation/create-allocation.component';
+export { CreateAllocationComponent };
 import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
+export { DeleteResourceComponent };
 import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
+export { EditConsumerComponent };
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
+export { ShowConsumerComponent };
 
 
 const allComponents = [

@@ -13,12 +13,17 @@ import { DragulaModule } from 'ng2-dragula';
 import {
   CreateRankingComponent
 } from './create-ranking/create-ranking.component';
+export { CreateRankingComponent };
 import { ShowRankingComponent } from './show-ranking/show-ranking.component';
+export { ShowRankingComponent };
 import { ShowRankingsComponent } from './show-rankings/show-rankings.component';
+export { ShowRankingsComponent };
 import { ShowTargetComponent } from './show-target/show-target.component';
+export { ShowTargetComponent };
 import {
   ShowFractionalRankingComponent
 } from './show-fractional-ranking/show-fractional-ranking.component';
+export { ShowFractionalRankingComponent };
 
 const allComponents = [
   CreateRankingComponent, ShowRankingComponent, ShowTargetComponent,

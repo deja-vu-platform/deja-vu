@@ -6,7 +6,7 @@
     "dv": "./dist/dv.js"
   },
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/**/*.blueprint.* dist && chmod +x dist/dv.js",
+    "build": "tsc && chmod +x dist/dv.js",
     "package": "npm run clean && npm run build",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
@@ -24,7 +24,6 @@
     "@types/glob": "^5.0.35",
     "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
-    "copyfiles": "^1.2.0",
     "@deja-vu/compiler": "0.0.1",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"

@@ -5,6 +5,8 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { DvModule } from '@deja-vu/core';
+
 import {
   AddToBalanceComponent
 } from './add-to-balance/add-to-balance.component';
@@ -44,7 +46,6 @@ import {
 } from './show-transfers/show-transfers.component';
 export { ShowTransfersComponent };
 
-import { DvModule } from '@deja-vu/core';
 
 const allComponents = [
   CreateTransferComponent, InputMoneyComponent, AddToBalanceComponent,
