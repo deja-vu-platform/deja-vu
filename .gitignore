@@ -8,9 +8,6 @@ out-tsc
 pkg
 .ng_pkg_build
 pkg.tgz
-**/src/**/*.js
-**/src/**/*.js.map
-**/src/**/*.d.ts
 
 # dependencies
 node_modules
