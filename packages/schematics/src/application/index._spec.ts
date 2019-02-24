@@ -12,7 +12,10 @@ describe('action', () => {
     const tree = runner.runSchematic(
       'application', { clicheName }, Tree.empty());
 
-    expect(tree.files.length).not.toEqual(0);
-    tree.files.forEach(file => expect(file).toContain(clicheName));
+    expect(tree.files.length)
+      .not
+      .toEqual(0);
+    tree.files.forEach((file) => expect(file)
+      .toContain(clicheName));
   });
 });

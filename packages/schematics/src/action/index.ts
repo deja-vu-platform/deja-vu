@@ -2,13 +2,13 @@ import { strings } from '@angular-devkit/core';
 import {
   apply,
   chain,
+  filter,
+  mergeWith,
   Rule,
   SchematicContext,
   SchematicsException,
-  Tree,
   template,
-  mergeWith,
-  filter,
+  Tree,
   url
 } from '@angular-devkit/schematics';
 import * as cheerio from 'cheerio';
@@ -28,11 +28,11 @@ export function action(options: any): Rule {
     const templateSource = apply(url('./files'), [
         template({
           ...strings,
-          ...options,
+          ...options
         }),
         filter((path) => !path.endsWith('.DS_Store') && !tree.exists(path))
     ]);
-    
+
     return chain([
       mergeWith(templateSource),
       addComponentToMetadata(options),
@@ -46,31 +46,42 @@ function getFileText(tree: Tree, filePath: string): string {
   if (text === null) {
     throw new SchematicsException(`File ${filePath} does not exist.`);
   }
+
   return text.toString('utf-8');
 }
 
 function readIntoSourceFile(tree: Tree, filePath: string): ts.SourceFile {
   const sourceText = getFileText(tree, filePath);
 
-  return ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
+  return ts.createSourceFile(
+    filePath, sourceText, ts.ScriptTarget.Latest, true);
 }
 
 function getMetadataPath(clicheName: string): string {
   const dasherizedName = strings.dasherize(clicheName);
+
   return `/src/app/${dasherizedName}/${dasherizedName}.metadata.ts`;
 }
 
 function findLastComponentImportExportPos(source: ts.SourceFile) {
   const lastComponentExport = findNodes(source, ts.SyntaxKind.ExportDeclaration)
     .filter((node: ts.ExportDeclaration) =>
-      node.exportClause && node.exportClause.elements.filter(
-        exportElement => exportElement.getText().match('Component')).length > 0)
+      node.exportClause && node.exportClause.elements
+      .filter((exportElement) =>
+        exportElement
+          .getText()
+          .match('Component')
+      ).length > 0
+    )
     .sort(nodesByPosition)
     .pop();
 
   const lastComponentImport = findNodes(source, ts.SyntaxKind.ImportDeclaration)
-    .filter((node: ts.ImportDeclaration) =>
-      node.moduleSpecifier && node.moduleSpecifier.getText().match('component'))
+    .filter((node: ts.ImportDeclaration) => node.moduleSpecifier &&
+      node.moduleSpecifier
+        .getText()
+        .match('component')
+    )
     .sort(nodesByPosition)
     .pop();
 
@@ -116,8 +127,8 @@ function addComponentToMetadata(options: any): Rule {
     if (arrayChange instanceof InsertChange) {
       arrayChangeRecorder.insertLeft(arrayChange.pos, arrayChange.toAdd);
     }
-
     tree.commitUpdate(arrayChangeRecorder);
+
     return tree;
   };
 }
@@ -139,13 +150,16 @@ function addToAppComponentHtml(options: any): Rule {
     const componentHtml =
       `  <h2>${options.actionName}</h2>\n` +
       `  <${actionComponentSelector}></${actionComponentSelector}>\n`;
-    $('div[class=container]').append(componentHtml);
+    $('div[class=container]')
+      .append(componentHtml);
 
     // only take the contents of the body since cheerio .html() adds extra
     // html, head, body tags that we don't want
     // https://github.com/cheeriojs/cheerio/issues/1031
-    const updatedText = $('body').html();
+    const updatedText = $('body')
+      .html();
     tree.overwrite(filePath, updatedText ? updatedText as string : '');
+
     return tree;
-  }
+  };
 }

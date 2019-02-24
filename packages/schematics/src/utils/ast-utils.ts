@@ -86,12 +86,13 @@ export function insertExport(source: ts.SourceFile, symbolName: string,
       }
     } else {
       // this is the case of export * from fileName;
-      // StringLiteral of the ExportDeclaration is the import file (fileName in this case).
+      // StringLiteral of the ExportDeclaration is the import file
+      // (fileName in this case).
       const exportFiles = exportDeclaration.getChildren()
-        .filter(child => child.kind === ts.SyntaxKind.StringLiteral)
-        .map(n => (n as ts.StringLiteral).text);
+        .filter((child) => child.kind === ts.SyntaxKind.StringLiteral)
+        .map((n) => (n as ts.StringLiteral).text);
 
-      if (exportFiles.filter(file => file === fileName).length === 1) {
+      if (exportFiles.filter((file) => file === fileName).length === 1) {
         return new NoopChange();
       }
     }
@@ -106,6 +107,7 @@ export function insertExport(source: ts.SourceFile, symbolName: string,
 
   const startSeparator = insertPos === 0 ? '' : '\n';
   const endSeparator = insertPos === 0 ? '\n' : '';
+
   return new InsertChange(
     source.fileName, insertPos,
     `${startSeparator}export { ${symbolName} };${endSeparator}`);
@@ -114,12 +116,13 @@ export function insertExport(source: ts.SourceFile, symbolName: string,
 /**
  * @return the Node that imports symbolName from filePath if it exists
  */
-function findImportNode(
-  source: ts.SourceFile, symbolName: string, filePath: string): ts.Node | undefined {
+function findImportNode(source: ts.SourceFile,
+  symbolName: string, filePath: string): ts.Node | undefined {
   const allNodes = getSourceNodes(source);
   const matchingNodes = allNodes
-    .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
-    .filter((imp: ts.ImportDeclaration) => imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
+    .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
+    .filter((imp: ts.ImportDeclaration) =>
+      imp.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral)
     .filter((imp: ts.ImportDeclaration) => {
       return (imp.moduleSpecifier as ts.StringLiteral).text === filePath;
     })
@@ -128,7 +131,7 @@ function findImportNode(
         return false;
       }
       const nodes = findNodes(imp.importClause, ts.SyntaxKind.ImportSpecifier)
-        .filter(n => n.getText() === symbolName);
+        .filter((n) => n.getText() === symbolName);
 
       return nodes.length > 0;
     });
@@ -145,30 +148,34 @@ function findImportNode(
  * @param fileName (path to the file)
  * @param insertPos (the position to insert the import if there is no import
  *                       of symbolName or no imports from fileName yet)
- * @param isDefault (if true, import follows style for importing default exports)
+ * @param isDefault (if true,
+ *                      import follows style for importing default exports)
  * @return Change
  */
-export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolName: string,
-                             fileName: string, insertPos: number, isDefault = false): Change {
+export function insertImport(source: ts.SourceFile, fileToEdit: string,
+                             symbolName: string, fileName: string,
+                             insertPos: number, isDefault = false): Change {
   const rootNode = source;
   const allImports = findNodes(rootNode, ts.SyntaxKind.ImportDeclaration);
 
   // get nodes that map to import statements from the file fileName
-  const relevantImports = allImports.filter(node => {
-    // StringLiteral of the ImportDeclaration is the import file (fileName in this case).
+  const relevantImports = allImports.filter((node) => {
+    // StringLiteral of the ImportDeclaration is the import file
+    // (fileName in this case).
     const importFiles = node.getChildren()
-      .filter(child => child.kind === ts.SyntaxKind.StringLiteral)
-      .map(n => (n as ts.StringLiteral).text);
+      .filter((child) => child.kind === ts.SyntaxKind.StringLiteral)
+      .map((n) => (n as ts.StringLiteral).text);
 
-    return importFiles.filter(file => file === fileName).length === 1;
+    return importFiles.filter((file) => file === fileName).length === 1;
   });
 
   if (relevantImports.length > 0) {
     let importsAsterisk = false;
     // imports from import file
     const imports: ts.Node[] = [];
-    relevantImports.forEach(n => {
-      Array.prototype.push.apply(imports, findNodes(n, ts.SyntaxKind.Identifier));
+    relevantImports.forEach((n) => {
+      Array.prototype.push.apply(
+        imports, findNodes(n, ts.SyntaxKind.Identifier));
       if (findNodes(n, ts.SyntaxKind.AsteriskToken).length > 0) {
         importsAsterisk = true;
       }
@@ -179,13 +186,16 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
       return new NoopChange();
     }
 
-    const importTextNodes = imports.filter(n => (n as ts.Identifier).text === symbolName);
+    const importTextNodes = imports.filter((n) =>
+      (n as ts.Identifier).text === symbolName);
 
     // insert import if it's not there
     if (importTextNodes.length === 0) {
       const fallbackPos =
-        findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].getStart() ||
-        findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].getStart();
+        findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0]
+          .getStart() ||
+        findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0]
+          .getStart();
 
       return insertAfterLastOccurrence(
         imports, `, ${symbolName}`, fileToEdit, fallbackPos);
@@ -213,8 +223,9 @@ export function insertImport(source: ts.SourceFile, fileToEdit: string, symbolNa
  * @param max The maximum number of items to return.
  * @return all nodes of kind, or [] if none is found
  */
-export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity): ts.Node[] {
-  if (!node || max == 0) {
+export function findNodes(
+  node: ts.Node, kind: ts.SyntaxKind, max = Infinity): ts.Node[] {
+  if (!node || max === 0) {
     return [];
   }
 
@@ -225,12 +236,13 @@ export function findNodes(node: ts.Node, kind: ts.SyntaxKind, max = Infinity): t
   }
   if (max > 0) {
     for (const child of node.getChildren()) {
-      findNodes(child, kind, max).forEach(node => {
-        if (max > 0) {
-          arr.push(node);
-        }
-        max--;
-      });
+      findNodes(child, kind, max)
+        .forEach((subnode) => {
+          if (max > 0) {
+            arr.push(subnode);
+          }
+          max--;
+        });
 
       if (max <= 0) {
         break;
@@ -265,14 +277,15 @@ export function getSourceNodes(sourceFile: ts.SourceFile): ts.Node[] {
   return result;
 }
 
-export function findNode(node: ts.Node, kind: ts.SyntaxKind, text: string): ts.Node | null {
+export function findNode(
+  node: ts.Node, kind: ts.SyntaxKind, text: string): ts.Node | null {
   if (node.kind === kind && node.getText() === text) {
     // throw new Error(node.getText());
     return node;
   }
 
   let foundNode: ts.Node | null = null;
-  ts.forEachChild(node, childNode => {
+  ts.forEachChild(node, (childNode) => {
     foundNode = foundNode || findNode(childNode, kind, text);
   });
 
@@ -291,13 +304,15 @@ export function nodesByPosition(first: ts.Node, second: ts.Node): number {
 
 /**
  * Insert `toInsert` after the last occurence of `ts.SyntaxKind[nodes[i].kind]`
- * or after the last of occurence of `syntaxKind` if the last occurence is a sub child
+ * or after the last of occurence of `syntaxKind`
+ * if the last occurence is a sub child
  * of ts.SyntaxKind[nodes[i].kind] and save the changes in file.
  *
  * @param nodes insert after the last occurence of nodes
  * @param toInsert string to insert
  * @param file file to insert changes into
- * @param fallbackPos position to insert if toInsert happens to be the first occurence
+ * @param fallbackPos position to insert
+ *                             if toInsert happens to be the first occurence
  * @param syntaxKind the ts.SyntaxKind of the subchildren to insert after
  * @return Change instance
  * @throw Error if toInsert is first occurence but fall back is not set
@@ -307,16 +322,22 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
                                           file: string,
                                           fallbackPos: number,
                                           syntaxKind?: ts.SyntaxKind): Change {
-  // sort() has a side effect, so make a copy so that we won't overwrite the parent's object.
-  let lastItem = [...nodes].sort(nodesByPosition).pop();
+  // sort() has a side effect, so make a copy so that
+  // we won't overwrite the parent's object.
+  let lastItem = [...nodes]
+    .sort(nodesByPosition)
+    .pop();
   if (!lastItem) {
     throw new Error();
   }
   if (syntaxKind) {
-    lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
+    lastItem = findNodes(lastItem, syntaxKind)
+      .sort(nodesByPosition)
+      .pop();
   }
-  if (!lastItem && fallbackPos == undefined) {
-    throw new Error(`tried to insert ${toInsert} as first occurence with no fallback position`);
+  if (!lastItem && fallbackPos === undefined) {
+    throw new Error(`tried to insert ${toInsert} ` +
+      'as first occurence with no fallback position');
   }
   const lastItemPosition: number = lastItem ? lastItem.getEnd() : fallbackPos;
 
@@ -324,10 +345,11 @@ export function insertAfterLastOccurrence(nodes: ts.Node[],
 }
 
 
-export function getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null {
-  if (node.kind == ts.SyntaxKind.Identifier) {
+export function getContentOfKeyLiteral(
+  _source: ts.SourceFile, node: ts.Node): string | null {
+  if (node.kind === ts.SyntaxKind.Identifier) {
     return (node as ts.Identifier).text;
-  } else if (node.kind == ts.SyntaxKind.StringLiteral) {
+  } else if (node.kind === ts.SyntaxKind.StringLiteral) {
     return (node as ts.StringLiteral).text;
   } else {
     return null;

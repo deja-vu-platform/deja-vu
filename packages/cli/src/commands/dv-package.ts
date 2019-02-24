@@ -6,9 +6,9 @@ import {
   actionTable,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
-  yarn,
   readFileOrFail,
-  writeFileOrFail
+  writeFileOrFail,
+  yarn
 } from '../utils';
 
 

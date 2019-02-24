@@ -19,11 +19,15 @@ describe('action', () => {
         skipMetadataImport: true
       }, Tree.empty());
 
-    expect(tree.files).toEqual([
-      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}.component.css`,
-      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}.component.html`,
-      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}.component.spec.ts`,
-      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}.component.ts`
-    ]);
+    const actionFilePathPrefix =
+      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}`;
+
+    expect(tree.files)
+      .toEqual([
+        `${actionFilePathPrefix}.component.css`,
+        `${actionFilePathPrefix}.component.html`,
+        `${actionFilePathPrefix}.component.spec.ts`,
+        `${actionFilePathPrefix}.component.ts`
+      ]);
   });
 });

@@ -1,12 +1,12 @@
 import { strings } from '@angular-devkit/core';
 import {
   apply,
+  filter,
+  mergeWith,
   Rule,
   SchematicContext,
-  Tree,
   template,
-  mergeWith,
-  filter,
+  Tree,
   url
 } from '@angular-devkit/schematics';
 
@@ -18,7 +18,7 @@ export function cliche(options: any): Rule {
       template({
         ...strings,
         ...options
-      }),
+      })
     ]);
 
     return mergeWith(templateSource)(tree, context);
