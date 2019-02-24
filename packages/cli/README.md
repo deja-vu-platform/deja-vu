@@ -66,7 +66,8 @@ The command will create the HTML, TypeScript, CSS, and test files for the action
 It will also add the action to `clichename.metadata.ts` and to `app.component.html`
 so that it can be used and tested right away. In order for it to be added
 correctly to those files, the initial structure of those files shouldn't be changed.
-These additions can be skipped using the flags `--skipMetadataImport` and `--skipAppComponentHtml`.
+These additions can be skipped using the flags `--skipMetadataImport` and `--skipAppComponentHtml`. The command skips a modification if the relevant code
+for that action is already there (e.g. imports in the metadata file).
 
 
 Development
