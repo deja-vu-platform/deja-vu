@@ -17,7 +17,8 @@
     "dv-package-authentication-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

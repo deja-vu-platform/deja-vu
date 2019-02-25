@@ -6,9 +6,9 @@ import {
   actionTable,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
-  npm,
   readFileOrFail,
-  writeFileOrFail
+  writeFileOrFail,
+  yarn
 } from '../utils';
 
 
@@ -17,7 +17,7 @@ exports.desc = 'package a cliché';
 exports.handler = () => {
   const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
   console.log('Packaging cliche');
-  npm(['run', `dv-package-${config.name}`]);
+  yarn([`dv-package-${config.name}`]);
 
   const pkgDir = NG_PACKAGR.configFileContents.dest;
   writeFileOrFail(

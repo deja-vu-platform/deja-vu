@@ -12,27 +12,37 @@ import { DvModule } from '@deja-vu/core';
 import {
   CreateMessageComponent
 } from './create-message/create-message.component';
+export { CreateMessageComponent };
 import {
   CreatePublisherComponent
 } from './create-publisher/create-publisher.component';
+export { CreatePublisherComponent };
 import { EditMessageComponent } from './edit-message/edit-message.component';
+export { EditMessageComponent };
 import {
   FollowUnfollowComponent
 } from './follow-unfollow/follow-unfollow.component';
+export { FollowUnfollowComponent };
 import { ShowFollowerComponent } from './show-follower/show-follower.component';
+export { ShowFollowerComponent };
 import {
   ShowFollowersComponent
 } from './show-followers/show-followers.component';
+export { ShowFollowersComponent };
 import { ShowMessageComponent } from './show-message/show-message.component';
+export { ShowMessageComponent };
 import {
   ShowMessagesComponent
 } from './show-messages/show-messages.component';
+export { ShowMessagesComponent };
 import {
   ShowPublisherComponent
 } from './show-publisher/show-publisher.component';
+export { ShowPublisherComponent };
 import {
   ShowPublishersComponent
 } from './show-publishers/show-publishers.component';
+export { ShowPublishersComponent };
 
 
 const allComponents = [

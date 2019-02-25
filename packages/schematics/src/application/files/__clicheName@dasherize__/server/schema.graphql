@@ -1,0 +1,15 @@
+type <%= classify(clicheName) %> {
+  id: ID!
+}
+
+input Create<%= classify(clicheName) %>Input {
+  id: ID
+}
+
+type Query {
+  <%= camelize(clicheName) %>(id: ID!): <%= classify(clicheName) %>
+}
+
+type Mutation {
+  create<%= classify(clicheName) %>(input: Create<%= classify(clicheName) %>Input!): <%= classify(clicheName) %>
+}
