@@ -17,6 +17,8 @@ import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 import { ActionPath } from './actionPath';
 import { DvConfig, GatewayConfig } from './gateway.model';
 
+import { InputValuesMap, TxInputsValidator } from './txInputsValidator';
+
 
 const JSON_INDENTATION = 2;
 const SUCCESS = 200;
@@ -132,7 +134,7 @@ export class ResponseBatch {
 }
 
 
-class RequestInvalidError {
+export class RequestInvalidError {
   constructor(public readonly message) {}
 }
 
@@ -249,6 +251,23 @@ export abstract class RequestProcessor {
     try {
        gatewayToClicheRequests = childRequests
          .map((childRequest) => this.validateRequest(childRequest));
+
+      const actionPath = gatewayToClicheRequests[0].from;
+      const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+      const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
+      const inputValuesMap: InputValuesMap = {};
+      for (const childRequest of childRequests) {
+        const actionFqtag = ActionPath.fromString(childRequest.query.from)
+          .last();
+        const inputs = childRequest.method === 'GET' ?
+          _.get(childRequest, 'query.options.params.inputs.input') :
+          _.get(childRequest, 'query.body.inputs.input');
+        _.forEach(inputs, (value: any, inputName: string) => {
+          _.set(inputValuesMap, [actionFqtag, inputName], value);
+        });
+      }
+      // TODO: get tx context from request
+      // TxInputsValidator.Validate(inputValuesMap, cohortActions, {});
     } catch (e) {
       if (e instanceof RequestInvalidError) {
         resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
@@ -259,12 +278,6 @@ export abstract class RequestProcessor {
 
       return;
     }
-
-    // TODO: check inputs
-    const actionPath = gatewayToClicheRequests[0].from;
-    const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
-    const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
-    console.log(JSON.stringify(cohortActions));
 
     return Promise
       .all(gatewayToClicheRequests
@@ -291,6 +304,20 @@ export abstract class RequestProcessor {
       resBatch.add(INTERNAL_SERVER_ERROR, e.message);
     }
   }
+
+  protected getActionFromPath(actionPath: ActionPath): ActionTag {
+    const fqtag = actionPath.nodes()[0];
+
+    return {
+      fqtag,
+      tag: fqtag
+    };
+  }
+
+  protected abstract getCohortActions(
+    _actionPath: ActionPath,
+    _dvTxNodeIndex: number
+  ): ActionTag[];
 
   private validateRequest(req: express.Request | ChildRequest)
     : GatewayToClicheRequest {
@@ -328,21 +355,6 @@ export abstract class RequestProcessor {
       }
     };
   }
-
-  protected getActionFromPath(actionPath: ActionPath): ActionTag {
-    const fqtag = actionPath.nodes()[0];
-
-    return {
-      fqtag,
-      tag: fqtag
-    };
-  }
-
-  protected abstract getCohortActions(
-    _actionPath: ActionPath,
-    _dvTxNodeIndex: number
-  ): ActionTag[];
-
 
   private getTxConfig(config: GatewayConfig):
     TxConfig<GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch> {
