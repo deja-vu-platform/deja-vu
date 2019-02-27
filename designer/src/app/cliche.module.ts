@@ -4,8 +4,6 @@ import * as _ from 'lodash';
 
 import * as dv from '@deja-vu/core';
 
-// commented-out cliches were broken last I checked
-
 import * as allocator from '@deja-vu/allocator';
 import * as authentication from '@deja-vu/authentication';
 import * as authorization from '@deja-vu/authorization';
@@ -14,10 +12,10 @@ import * as event from '@deja-vu/event';
 import * as follow from '@deja-vu/follow';
 import * as geolocation from '@deja-vu/geolocation';
 import * as group from '@deja-vu/group';
-// import * as label from '@deja-vu/label';
+import * as label from '@deja-vu/label';
 import * as passkey from '@deja-vu/passkey';
 import * as property from '@deja-vu/property';
-// import * as ranking from '@deja-vu/ranking';
+import * as ranking from '@deja-vu/ranking';
 import * as rating from '@deja-vu/rating';
 import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
@@ -42,10 +40,10 @@ const importedCliches: { [name: string]: Object} = {
   follow,
   geolocation,
   group,
-  // label,
+  label,
   passkey,
   property,
-  // ranking,
+  ranking,
   rating,
   scoring,
   task,
