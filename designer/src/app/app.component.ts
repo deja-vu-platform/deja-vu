@@ -39,18 +39,11 @@ export class AppComponent implements OnDestroy {
   ) {
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
-    // start the backend
-    if (this.electronService.remote) {
-      // we save the reqP to avoid needing to start and stop the gateway
-      const myElectron = this.electronService.remote.require('./electron.js');
-      this.requestProcessor = myElectron.getState();
-      if (!this.requestProcessor) {
-        const gateway = this.electronService.remote.require('@deja-vu/gateway');
-        this.requestProcessor = gateway.startGateway(); // port 3000 default
-        myElectron.setState(this.requestProcessor);
-      }
 
-      // imports for addCliche
+    // imports for addCliche
+    if (this.electronService.remote) {
+      this.requestProcessor = this.electronService.remote
+        .require('./electron.js').requestProcessor;
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
