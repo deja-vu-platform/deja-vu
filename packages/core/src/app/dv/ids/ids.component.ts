@@ -14,6 +14,10 @@ export class IdsComponent {
   @Output() ids = new EventEmitter<string[]>();
   _for: any[] = [];
 
+  // originally this was a regular input instead of a setter
+  // ngOnChanges was used to emit the ids upon setting the input
+  // however when the value was set in the designer ngOnChanges didn't fire
+  // TODO: investigate why
   @Input()
   set for(a: any[]) {
     this._for = a;
