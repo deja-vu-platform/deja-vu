@@ -12,7 +12,8 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "vm2": "^3.6.10",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "async-lock": "^1.1.2",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
@@ -20,7 +21,8 @@
     "minimist": "^1.2.0",
     "relaxed-json": "^1.0.1",
     "superagent": "^3.8.2",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "vm2": "^3.6.10"
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.0",

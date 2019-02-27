@@ -6,6 +6,9 @@ import * as _ from 'lodash';
 
 import { VM } from 'vm2';
 
+import { transformSync } from '@babel/core';
+import * as elvis from '@babel/plugin-proposal-optional-chaining';
+
 
 export interface InputValuesMap {
   [fqtag: string]: {[inputName: string]: any};
@@ -21,7 +24,14 @@ export class TxInputsValidator {
     // what's inside is not a valid JS expression (rules out statements).
     // TODO: we could restrict this even further, since template exprs can't
     //  have assignments, use `new`, etc
-    return new VM({ sandbox: context }).run(`(${unparsedExpr})`);
+
+    // Need to handle ?. (we use babel's plugin for elvis op)
+    const polyfilledCode = transformSync(
+      `(${unparsedExpr})`, { plugins: [elvis] }).code;
+    console.log(`Running code ${polyfilledCode}`);
+
+    return new VM({ sandbox: context })
+      .run(polyfilledCode);
   }
 
   public static Validate(

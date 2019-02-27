@@ -109,4 +109,38 @@ describe('TxInputsValidator', () => {
     expect(() => TxInputsValidator.Validate(inputValuesMap, txActions, context))
       .toThrow();
   });
+
+  it('should validate with elvis op', () => {
+    const inputValuesMap: InputValuesMap = {
+      'scoringposts-create-score': {
+        sourceId: 'ben',
+        targetId: 'new-post-id'
+      },
+      'scoringposts-another-score': {
+        sourceId: 'ben',
+        targetId: 'new-post-id'
+      }
+    };
+    const txActions = [
+      {
+        fqtag: 'scoringposts-create-score', tag: '', inputs: {
+          '[sourceId]': '__ngOutput__hackernews__navbar__loggedInUser?.id',
+          '[targetId]': '__ngOutput__dv__gen_id__id'
+        }
+      },
+      {
+        fqtag: 'scoringposts-another-score', tag: '', inputs: {
+          '[sourceId]': '__ngOutput__hackernews__navbar__loggedInUser.id',
+          '[targetId]': '__ngOutput__dv__gen_id__id'
+        }
+      }
+    ];
+    const context = {
+      __ngOutput__hackernews__navbar__loggedInUser: {
+        id: 'ben'
+      },
+      __ngOutput__dv__gen_id__id: 'new-post-id'
+    };
+    TxInputsValidator.Validate(inputValuesMap, txActions, context);
+  });
 });
