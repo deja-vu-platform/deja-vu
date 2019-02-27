@@ -244,7 +244,8 @@ export abstract class RequestProcessor {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    const childRequests: ChildRequest[] = req.body;
+    const context = req.body[0];
+    const childRequests: ChildRequest[] = req.body.slice(1);
     const resBatch = new ResponseBatch(res, childRequests.length);
 
     let gatewayToClicheRequests: GatewayToClicheRequest[];
@@ -259,15 +260,24 @@ export abstract class RequestProcessor {
       for (const childRequest of childRequests) {
         const actionFqtag = ActionPath.fromString(childRequest.query.from)
           .last();
+        // Needs to match the way we extract inputs from the request in the
+        // cliche-server
         const inputs = childRequest.method === 'GET' ?
-          _.get(childRequest, 'query.options.params.inputs.input') :
-          _.get(childRequest, 'query.body.inputs.input');
+          // query.options is not parsed so we need to parse it
+          _.get(JSON.parse(_.get(childRequest, 'query.options')),
+            'params.inputs.input') :
+          _.get(childRequest, 'body.inputs.input');
+
+        console.log(`Got inputs ${JSON.stringify(inputs)}`);
         _.forEach(inputs, (value: any, inputName: string) => {
           _.set(inputValuesMap, [actionFqtag, inputName], value);
         });
       }
-      // TODO: get tx context from request
-      // TxInputsValidator.Validate(inputValuesMap, cohortActions, {});
+
+      console.log(
+        `Checking with context ${JSON.stringify(context)}` +
+        `Input values map ${JSON.stringify(inputValuesMap)}`);
+      TxInputsValidator.Validate(inputValuesMap, cohortActions, context);
     } catch (e) {
       if (e instanceof RequestInvalidError) {
         resBatch.fail(INTERNAL_SERVER_ERROR, e.message);

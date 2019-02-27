@@ -6,6 +6,8 @@ import { v4 as uuid } from 'uuid';
 
 import { GatewayService } from './gateway.service';
 
+import { NodeUtils } from './node.utils';
+
 
 // To indicate run failure, return a rejected promise
 export type onRun = () => Promise<any> | any;
@@ -62,9 +64,6 @@ const runFunctionNames = {
   }
 };
 
-const ACTION_ID_ATTR = '_dvActionId';
-export const RUN_ID_ATTR = '_dvRunId';
-
 
 @Injectable()
 export class RunService {
@@ -93,8 +92,17 @@ export class RunService {
   register(elem: ElementRef, action: any) {
     const actionId = uuid();
     const node = elem.nativeElement;
-    node.setAttribute(ACTION_ID_ATTR, actionId);
+    NodeUtils.SetActionId(node, actionId);
     this.actionTable[actionId] = {action: action, node: node};
+  }
+
+  registerAppAction(elem: ElementRef, action: any) {
+    this.register(elem, action);
+    NodeUtils.MarkAsAppAction(elem.nativeElement);
+  }
+
+  getActionInstance(actionId: string): any | null {
+    return _.get(this.actionTable[actionId], 'action', null);
   }
 
   /**
@@ -129,25 +137,25 @@ export class RunService {
 
   private async run(runType: RunType, elem: ElementRef) {
     const targetAction = this.getTargetAction(elem.nativeElement);
-    if (targetAction.hasAttribute(RUN_ID_ATTR)) {
+    if (NodeUtils.HasRunId(targetAction)) {
       console.log(
         `Skipping ${runType} since the same one is already in progress`);
 
       return;
     }
     const id = uuid();
-    targetAction.setAttribute(RUN_ID_ATTR, id);
+    NodeUtils.SetRunId(targetAction, id);
     let runResultMap: RunResultMap | undefined;
     try {
       runResultMap = await this.callDvOnRun(runType, targetAction, id);
     } catch (error) {
       console.error(`Got error on ${runType} ${id}: ${error.message}`);
       this.callDvOnRunFailure(runType, targetAction, error);
-      targetAction.removeAttribute(RUN_ID_ATTR);
+      NodeUtils.RemoveRunId(targetAction);
     }
     if (runResultMap) { // no error
       this.callDvOnRunSuccess(runType, targetAction, runResultMap);
-      targetAction.removeAttribute(RUN_ID_ATTR);
+      NodeUtils.RemoveRunId(targetAction);
     }
   }
 
@@ -156,8 +164,7 @@ export class RunService {
    * when an action is encountered. No child of actions are traversed.
    */
   private walkActions(node, onAction: (actionInfo, str?) => void): void {
-    const actionId = node.getAttribute ?
-      node.getAttribute(ACTION_ID_ATTR) : undefined;
+    const actionId = NodeUtils.GetActionId(node);
     if (!actionId) {
       // node is not a dv-action (e.g., it's a <div>) or is dv-tx
       _.each(node.childNodes, (n) => this.walkActions(n, onAction));
@@ -176,7 +183,7 @@ export class RunService {
     // run the action, or each action in tx with the same RUN ID
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnRun]) {
-        actionInfo.node.setAttribute(RUN_ID_ATTR, id);
+        NodeUtils.SetRunId(actionInfo.node, id);
         runs.push(
           Promise
             .resolve(actionInfo.action[dvOnRun]())
@@ -201,7 +208,7 @@ export class RunService {
     const dvOnSuccess = runFunctionNames[runType].onSuccess;
     this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnRun]) {
-        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+        NodeUtils.RemoveRunId(actionInfo.node);
       }
       if (actionInfo.action[dvOnSuccess]) {
         actionInfo.action[dvOnSuccess](runResultMap[actionId]);
@@ -214,12 +221,11 @@ export class RunService {
       const dvOnRun = runFunctionNames[runType].onRun;
       const dvOnFailure = runFunctionNames[runType].onFailure;
       if (actionInfo.action[dvOnRun]) {
-        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+        NodeUtils.RemoveRunId(actionInfo.node);
       }
       if (actionInfo.action[dvOnFailure]) {
         actionInfo.action[dvOnFailure](reason);
       }
     });
   }
-
 }

@@ -17,13 +17,10 @@ export interface TxContext {
 
 export class TxInputsValidator {
   private static Eval(unparsedExpr: string, context: TxContext): any {
-    // TODO: need to ensure that the eval is safe. There's probably a couple
-    //  of hacks a malicious user could do to workaround our checks.
-
     // We wrap the expr in parenthesis so that the parser throws an error if
     // what's inside is not a valid JS expression (rules out statements).
     // TODO: we could restrict this even further, since template exprs can't
-    //  have assignments, etc
+    //  have assignments, use `new`, etc
     return new VM({ sandbox: context }).run(`(${unparsedExpr})`);
   }
 
@@ -40,7 +37,6 @@ export class TxInputsValidator {
       });
     }
 
-    console.log(JSON.stringify(actions));
     // We do the checking by inputs. For each input value we receive, we
     // evaluate the expr that appears in the html source code and check that
     // we get the same value.
@@ -56,17 +52,16 @@ export class TxInputsValidator {
     fqtag: string, inputName: string, inputValue: any,
     context: {[name: string]: any}, actions)
     : void {
-    console.log('Getting ' + fqtag + inputName);
     const unparsedExpr = _.get(actions, [fqtag, inputName]);
     if (unparsedExpr  === undefined) {
-      // it's an internal input
-      console.log('internal input');
+      console.log(
+        `Not checking ${fqtag}.${inputName} since it's internal input`);
 
       return;
     }
-    console.log('got some value to check ' + inputValue);
+    console.log(`Checking ${fqtag}.${inputName}: ${inputValue}`);
     const expectedValue = TxInputsValidator.Eval(unparsedExpr, context);
-    console.log('expected value is ' + expectedValue);
+    console.log(`Expected value for ${fqtag}.${inputName} is ${expectedValue}`);
     if (!_.isEqual(expectedValue, inputValue)) {
       throw new RequestInvalidError(
         `The value obtained for ${fqtag}.${inputName} is not the expected ` +
