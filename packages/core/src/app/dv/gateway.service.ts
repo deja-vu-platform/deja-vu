@@ -86,15 +86,20 @@ export class TxRequest {
     // keys retains only enumerable properties
     const contextKeys = _.without(
       _.keys(actionInstance), 'rs', 'elem', 'ngOnInit');
-    // Output fields are implemented with getters and setters, which are not
-    // returned by `keys`. The internal field has an extra '_'. So if we
-    // ran into a field with 3 underscores we rename it to strip the first
-    // one so that it matches how it is used in the source html. This also
-    // has the side effect that it will clobber the `EventEmitter` value,
-    // which we don't need to send
-    const context = _.mapKeys(
-      _.pick(actionInstance, contextKeys),
-      (_value, key: string) => key.startsWith('___') ? key.slice(1) : key);
+
+    const context = _.pickBy(
+      // Output fields are implemented with getters and setters, which are not
+      // returned by `keys`. The internal field has an extra '_'. So if we
+      // ran into a field with 3 underscores we rename it to strip the first
+      // one so that it matches how it is used in the source html. This also
+      // has the side effect that it will clobber the `EventEmitter` value,
+      // which we don't need to send
+      _.mapKeys(
+        _.pick(actionInstance, contextKeys),
+        (_value, key: string) => key.startsWith('___') ? key.slice(1) : key),
+      (value) => _.isArray(value) || _.isPlainObject(value) ||
+        _.isBoolean(value) || _.isNumber(value) || _.isString(value) ||
+        value === undefined || value === null);
 
     return context;
   }

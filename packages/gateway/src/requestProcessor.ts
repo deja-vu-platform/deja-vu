@@ -292,11 +292,10 @@ export abstract class RequestProcessor {
     return Promise
       .all(gatewayToClicheRequests
         .map((gatewayToClicheRequest, index) =>
-          RequestProcessor
-            .ForwardRequest<string>(gatewayToClicheRequest)
-            .then((clicheRes: ClicheResponse<string>) => {
-              resBatch.add(clicheRes.status, clicheRes.text, index);
-            })))
+          this.txCoordinator.processMessage(
+            gatewayToClicheRequest.runId,
+            gatewayToClicheRequest.from.serialize(),
+            gatewayToClicheRequest, resBatch, index)))
       .then(() => {});
   }
 

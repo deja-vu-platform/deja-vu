@@ -149,7 +149,9 @@ export class RunService {
     try {
       runResultMap = await this.callDvOnRun(runType, targetAction, id);
     } catch (error) {
-      console.error(`Got error on ${runType} ${id}: ${error.message}`);
+      console.error(
+        `Got error on ${runType} ${id} ` +
+        `(${NodeUtils.GetFqTagOfNode(targetAction)}): ${error.message}`);
       this.callDvOnRunFailure(runType, targetAction, error);
       NodeUtils.RemoveRunId(targetAction);
     }
