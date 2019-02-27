@@ -506,6 +506,8 @@ export class AppRequestProcessor extends RequestProcessor {
       ` length but got ${stringify(actionTagPath)}`);
 
     const dvTxNode = actionTagPath[dvTxNodeIndex];
+    assert.ok(dvTxNode !== null && dvTxNode !== undefined,
+      'Expected the tx node to exist on the path');
 
     return _.reject(dvTxNode.content, (action: ActionTag) =>
       action.tag.split('-')[0] === 'dv'
