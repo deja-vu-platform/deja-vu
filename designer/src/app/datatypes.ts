@@ -39,7 +39,8 @@ export class AppActionDefinition implements ActionDefinition {
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
-  readonly actionInputs: Readonly<ActionInputs> = {}; // always
+  // App Actions cannot have action inputs
+  readonly actionInputs: Readonly<ActionInputs> = {};
   // TODO: styling options
 
   constructor(name: string) {
