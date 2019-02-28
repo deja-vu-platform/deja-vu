@@ -1,10 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
+  MatCheckboxModule,
   MatIconModule,
   MatInputModule,
   MatMenuModule,
-  MatSelectModule
+  MatSelectModule,
+  MatTabsModule
 } from '@angular/material';
 
 import { ActionDefinitionComponent } from './action-definition.component';
@@ -27,10 +29,12 @@ describe('ActionDefinitionComponent', () => {
       ],
       imports: [
         FormsModule,
+        MatCheckboxModule,
         MatIconModule,
         MatInputModule,
         MatMenuModule,
-        MatSelectModule
+        MatSelectModule,
+        MatTabsModule
       ]
     })
     .compileComponents();

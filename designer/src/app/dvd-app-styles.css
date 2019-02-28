@@ -49,3 +49,13 @@
 .dvd-row.as {
   align-items: stretch;
 }
+
+.dvd-row > * {
+  flex-grow: 0;
+  flex-shrink: 1;
+  width: max-content;
+}
+
+.dvd-row > .stretch {
+  flex-grow: 1;
+}

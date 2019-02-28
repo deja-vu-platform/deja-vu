@@ -16,11 +16,6 @@ body {
   margin: 0;
 }
 
-/* Ensure text boxes do not get squished */
-.ql-container {
-  min-width: 300px;
-}
-
 /* add class mat-small to mat button to make it fit content */
 .mat-button.mat-small {
   min-width: 1%;
@@ -38,4 +33,11 @@ body {
 }
 .text-button-text {
   white-space: nowrap;
+}
+
+.mat-tab-label, .mat-tab-label-active{
+  min-width: 0!important;
+  padding: 3px!important;
+  margin: 3px!important;
+  flex: 1;
 }

@@ -3,11 +3,11 @@
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
   [ngStyle]="actionInstance.of.styles || {}"
+  [hidden]="hidden"
 >
   <div
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
-    [hidden]="hidden"
   >
     <ng-template *ngIf="actionInstance.of.component" propertyClicheAction>
     </ng-template>
@@ -16,9 +16,12 @@
       <div
         *ngFor="let row of actionInstance.of.rows"
         class="dvd-row"
-        [ngStyle]="{ 'justify-content': row.hJust, 'align-items': row.vAlign }"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
       >
-        <div *ngFor="let action of row.actions">
+        <div
+          *ngFor="let action of row.actions"
+          [ngClass]="action.styles.stretch ? 'stretch' : ''"
+        >
           <app-action-instance
             [actionInstance]="action"
             [actionIO]="scopeIO.getActionIO(action)"

@@ -1,6 +1,7 @@
 import { async, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
+  MatCheckboxModule,
   MatDialogModule,
   MatExpansionModule,
   MatIconModule,
@@ -8,6 +9,7 @@ import {
   MatMenuModule,
   MatSelectModule,
   MatSnackBarModule,
+  MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
 import { ElectronService } from 'ngx-electron';
@@ -40,6 +42,7 @@ describe('AppComponent', () => {
       imports: [
         DvModule,
         FormsModule,
+        MatCheckboxModule,
         MatDialogModule,
         MatExpansionModule,
         MatIconModule,
@@ -47,6 +50,7 @@ describe('AppComponent', () => {
         MatMenuModule,
         MatSelectModule,
         MatSnackBarModule,
+        MatTabsModule,
         MatToolbarModule
       ],
       providers: [

@@ -31,7 +31,9 @@
         <div
           *ngFor="let action of row.actions; let actionNum = index"
           class="action"
+          ngClass="action."
           [attr.data-index]="actionNum"
+          [ngClass]="action.styles.stretch ? 'stretch' : ''"
         >
           <!-- unfortunately there is repeated code here -->
           <!-- because the menu can't be applied conditionally -->
@@ -77,14 +79,27 @@
               [overlapTrigger]="false"
               (closed)="onActionMenuClosed()"
             >
-              <div class="popup-menu" (click)="$event.stopPropagation()">
-                <app-set-inputs
-                  [app]="app"
-                  [actionInstance]="action"
-                  [openAction]="actionInstance.of"
-                >
-                </app-set-inputs>
-              </div>
+              <mat-tab-group
+                class="popup-menu"
+                (click)="$event.stopPropagation()"
+              >
+                <mat-tab label="Styles">
+                  <mat-checkbox [(ngModel)]="action.styles.stretch">
+                    Stretch
+                  </mat-checkbox>
+                </mat-tab>
+                <mat-tab label="Inputs">
+                  <app-set-inputs
+                    [app]="app"
+                    [actionInstance]="action"
+                    [openAction]="actionInstance.of"
+                  >
+                  </app-set-inputs>
+                </mat-tab>
+                <mat-tab label="Outputs">
+                  <p>OUTPUTS TODO</p>
+                </mat-tab>
+              </mat-tab-group>
             </mat-menu>
           </div>
         </div>

@@ -25,11 +25,10 @@ import {
   ActionInputs,
   App,
   ClicheActionDefinition,
-  ClicheDefinition
+  ClicheDefinition,
+  OMNIPRESENT_INPUTS
 } from './datatypes';
 import { TextComponent } from './text/text.component';
-
-const OMNIPRESENT_INPUTS = [ 'hidden' ];
 
 const importedCliches: { [name: string]: Object} = {
   allocator,

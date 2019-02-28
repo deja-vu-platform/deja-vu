@@ -14,6 +14,10 @@ export interface ActionInputs {
   [forInput: string]: { [ioName: string]: string };
 }
 
+export const OMNIPRESENT_INPUTS = [
+  'hidden'
+];
+
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
@@ -48,10 +52,14 @@ export class AppActionDefinition implements ActionDefinition {
   transaction = false;
   // App Actions cannot have action inputs
   readonly actionInputs: Readonly<ActionInputs> = {};
+  // TODO: load/save/export styles
   readonly styles = _.cloneDeep(defaultAppActionStyles);
 
   constructor(name: string) {
     this.name = name;
+    OMNIPRESENT_INPUTS.forEach((inputName) => {
+      this.inputSettings.push({ name: inputName, value: '' });
+    });
   }
 
   get inputs(): string[] {
@@ -207,6 +215,8 @@ export class ActionInstance {
   readonly from: ActionCollection;
   // type is ActionInstance iff inputName in of.actionInputs
   readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
+  // TODO: load/save/export styles
+  readonly styles: { stretch: boolean } = { stretch: false };
   data?: any; // currently only used for the text widget
 
   constructor(

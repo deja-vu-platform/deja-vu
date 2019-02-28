@@ -41,7 +41,6 @@
 .action {
   border: 3px solid rgba(255,255,255,0);
   border-radius: 5px;
-  width: fit-content;
 }
 
 .action:hover {
@@ -54,6 +53,7 @@
   mat-form-field {
     width: 100%;
   }
+  width: 268px;
 }
 
 // need clickable area for menu
@@ -64,4 +64,13 @@
 
 .hint {
   color: rgba(0,0,0,.25);
+}
+
+mat-tab {
+  height: 100%;
+}
+
+mat-checkbox {
+  display: block;
+  margin: 8px;
 }
