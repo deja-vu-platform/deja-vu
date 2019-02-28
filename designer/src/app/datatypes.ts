@@ -52,7 +52,7 @@ export class AppActionDefinition implements ActionDefinition {
   transaction = false;
   // App Actions cannot have action inputs
   readonly actionInputs: Readonly<ActionInputs> = {};
-  // TODO: load/save/export styles
+  // TODO: export styles
   readonly styles = _.cloneDeep(defaultAppActionStyles);
 
   constructor(name: string) {
@@ -142,7 +142,8 @@ export class AppActionDefinition implements ActionDefinition {
       inputSettings: this.inputSettings,
       outputSettings: this.outputSettings,
       rows: this.rows.map((row) => row.toJSON()),
-      transaction: this.transaction
+      transaction: this.transaction,
+      styles: this.styles
       // app actions do not have action inputs
     };
   }
@@ -215,7 +216,7 @@ export class ActionInstance {
   readonly from: ActionCollection;
   // type is ActionInstance iff inputName in of.actionInputs
   readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
-  // TODO: load/save/export styles
+  // TODO: export styles
   readonly styles: { stretch: boolean } = { stretch: false };
   data?: any; // currently only used for the text widget
 
@@ -284,7 +285,8 @@ export class ActionInstance {
     const json = {
       of: this.of.name,
       from: this.from.name,
-      inputSettings: this.inputSettings
+      inputSettings: this.inputSettings,
+      styles: this.styles
     };
     if (this.data) {
       json['data'] = this.data;
@@ -359,11 +361,13 @@ export class App {
       actionDef.outputSettings
         .push.apply(actionDef.outputSettings, aad.outputSettings);
       actionDef.transaction = aad.transaction;
+      Object.assign(actionDef.styles, aad.styles);
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
           const actionInst = app.newActionInstanceByName(ai.of, ai.from);
           app.setInputsFromJSON(actionInst, ai);
+          Object.assign(actionInst.styles, ai.styles);
           row.actions.push(actionInst);
         });
         row.hJust = r.hJust;
