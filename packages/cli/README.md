@@ -44,12 +44,16 @@ This argument is optional and the default value is the name of the repo,
 `deja-vu`. As such, it is recommended that the command be run in the directory
 that contains the dv repo.
 
-The newly-created cliché comes with two initial actions to serve as examples,
-`create-clichename` and `show-clichename`,
+The newly-created cliché comes with four initial actions to serve as examples
+for each of the CRUD (create, read, update, and delete) operations.
+They are called `create-clichename`, `delete-clichename`, `show-clichename`, and `update-clichename`,
 under the assumption that `clichename` is usually the name of the primary entity
-in the cliché. Of course, they can and should be updated.
+in the cliché. Each `clichename` object starts out with an `id` field to
+uniquely identify each object, and an editable `content` field.
+Of course, all of the above can and should be updated.
 
-Navigate to ()[http://localhost:3000/] and see the two cliché actions in action.
+Navigate to ()[http://localhost:3000/] and see the four cliché actions in action.
+All the CRUD operations they represent should already work.
 
 ### Create actions in a cliché
 
