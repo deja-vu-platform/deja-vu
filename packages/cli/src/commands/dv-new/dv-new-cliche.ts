@@ -1,58 +1,45 @@
-import * as _ from 'lodash';
 import * as path from 'path';
 import {
-  ENTRY_FILE_PATH,
-  installAndConfigureGateway,
-  JSON_SPACE,
-  modulePath,
+  cmd,
+  getDvPackageName,
+  getSchematicsPath,
   ng,
-  NG_PACKAGR,
-  npm,
-  updatePackage,
-  writeFileOrFail
+  yarn
 } from '../../utils';
 
 
-exports.command = 'cliche <name> <pathToDv>';
+exports.command = 'cliche <name>';
 exports.desc = 'create a new cliché';
+exports.builder = (yargs) => yargs.option('pathToDv', {
+  default: 'deja-vu',
+  describe: 'the location of the Déjà Vu monorepo',
+  nargs: 1,
+  type: 'string'
+});
 exports.handler = ({ name, pathToDv }) => {
-  console.log(`Creating new cliche ${name}`);
-  ng(['new', name, '--prefix', name]);
+  console.log(`Creating new cliché ${name}`);
 
-  console.log(`Create module ${name}`);
-  ng(['generate', 'module', name], name);
+  // hack to find the schematics from outside the dv monorepo
+  const schematicsPath = getSchematicsPath(pathToDv);
+  const schematicsPkgName = getDvPackageName('schematics');
+  yarn(['link', '--silent'], schematicsPath);
+  yarn(['link', '--silent', schematicsPkgName]);
+  
+  try {
+    const catalogPath = `${pathToDv}/packages/catalog/`;
+    // create outside monorepo first to satisfy new Angular project constraints,
+    // then move it to the catalog
+    ng(['new', `--collection=${schematicsPkgName}`,
+      `--clicheName=${name}`, name]);
+    cmd('mv', [name, catalogPath]);
 
-  installAndConfigureGateway(name, pathToDv);
+    // install and package new cliche
+    const clichePath = path.join(catalogPath, name);
+    yarn([], clichePath);
+    console.log(`Cliché ${name} successfully created at ${clichePath}`);
 
-  console.log('Move angular to peerDependencies');
-  updatePackage((pkg) => {
-    pkg.peerDependencies = _.assign(pkg.peerDependencies, pkg.dependencies);
-    pkg.devDependencies = _.assign(pkg.devDependencies, pkg.dependencies);
-    pkg.dependencies = {};
-
-    return pkg;
-  }, name);
-
-  console.log('Install ng-packagr');
-  npm(['install', 'ng-packagr', '--save-dev'], name);
-
-  console.log('Create ng-packagr config file');
-  writeFileOrFail(
-    path.join(name, NG_PACKAGR.configFilePath),
-    JSON.stringify(NG_PACKAGR.configFileContents, undefined, JSON_SPACE));
-
-  console.log('Create ng-packagr entry file');
-  writeFileOrFail(
-    path.join(name, ENTRY_FILE_PATH),
-    `export * from \'${modulePath(name)}\';`);
-
-  console.log('Add npm script to package');
-  updatePackage((pkg) => {
-    pkg.scripts[NG_PACKAGR.npmScriptKey] = NG_PACKAGR.npmScriptValue;
-    pkg.scripts[`dv-package-${name}`] = 'dv package';
-    pkg.scripts[`dv-package-watch-${name}`] = (
-      `chokidar src/app/${name} server -c 'npm run dv-package-${name}'`);
-
-    return pkg;
-  }, name);
+  } finally {
+    // undo the hack
+    yarn(['unlink', '--silent'], schematicsPath);
+  }
 };

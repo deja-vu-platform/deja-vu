@@ -8,13 +8,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from '@deja-vu/core';
 
 import { CreateScoreComponent } from './create-score/create-score.component';
+export { CreateScoreComponent };
 import { ShowScoreComponent } from './show-score/show-score.component';
+export { ShowScoreComponent };
 import { ShowTargetComponent } from './show-target/show-target.component';
+export { ShowTargetComponent };
 import {
   ShowTargetsByScoreComponent
 } from './show-targets-by-score/show-targets-by-score.component';
+export { ShowTargetsByScoreComponent };
 
-import { API_PATH } from './scoring.config';
 
 const allComponents = [
   CreateScoreComponent, ShowScoreComponent, ShowTargetComponent,

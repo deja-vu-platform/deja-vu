@@ -1,6 +1,7 @@
 import { ActionSymbolTable } from '../symbolTable';
 import {
-  ActionInputCompiler, CompiledActionInput } from './action-input.compiler';
+  ActionInputCompiler, CompiledActionInput
+} from './action-input.compiler';
 
 
 describe('ActionInputCompiler', () => {
@@ -49,7 +50,7 @@ describe('ActionInputCompiler', () => {
     expect(compiledActionInput.action)
       .toMatch('dv.action');
     expect(compiledActionInput.action)
-      .toMatch(/event=\$.*foo.*show-bar.*loadedBar/);
+      .toMatch(/event=\$capture\_+foo\_show\_bar\_loadedBar/);
   });
 
   it('should fail with action with capture not in context', () => {
@@ -57,4 +58,23 @@ describe('ActionInputCompiler', () => {
     expect(() => actionInputCompiler.compile(actionInput, {}))
       .toThrow();
   });
+
+  it('should compile action with the output of an action as the input of ' +
+    'the innermost of two nested inputs', () => {
+      const actionInput = `
+        <authentication.logged-in />
+        <event.choose-and-show-series
+          showEvent=
+              <morg.show-group-meeting
+                groupMeeting=$event
+                loggedInIUserId=authentication.logged-in.user?.id />
+          noEventsToShowText="No meetings to show"
+          chooseSeriesSelectPlaceholder="Choose Meeting Series" />
+      `;
+
+      const compiledActionInput: CompiledActionInput = actionInputCompiler
+        .compile(actionInput, {});
+        expect(compiledActionInput.action)
+        .toMatch(/authentication\.logged\-in\.user\?\.id/);
+    });
 });

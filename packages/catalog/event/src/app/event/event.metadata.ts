@@ -12,20 +12,21 @@ import { DvModule } from '@deja-vu/core';
 import {
   ChooseAndShowSeriesComponent
 } from './choose-and-show-series/choose-and-show-series.component';
+export { ChooseAndShowSeriesComponent };
 import { CreateEventComponent } from './create-event/create-event.component';
+export { CreateEventComponent };
 import { CreateSeriesComponent } from './create-series/create-series.component';
+export { CreateSeriesComponent };
 import {
   CreateWeeklySeriesComponent
 } from './create-weekly-series/create-weekly-series.component';
+export { CreateWeeklySeriesComponent };
 import { DeleteEventComponent } from './delete-event/delete-event.component';
+export { DeleteEventComponent };
 import { ShowEventComponent } from './show-event/show-event.component';
+export { ShowEventComponent };
 import { ShowEventsComponent } from './show-events/show-events.component';
-
-export {
-  ChooseAndShowSeriesComponent, CreateEventComponent, CreateSeriesComponent,
-  CreateWeeklySeriesComponent, DeleteEventComponent, ShowEventComponent,
-  ShowEventsComponent
-};
+export { ShowEventsComponent };
 
 
 const allComponents = [
