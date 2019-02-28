@@ -9,9 +9,10 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
+import { <%= classify(clicheName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
 
 interface Show<%= classify(clicheName) %>Res {
-  data: { <%= camelize(clicheName) %>: any };
+  data: { <%= camelize(clicheName) %>: <%= classify(clicheName) %> };
 }
 
 
@@ -21,11 +22,13 @@ interface Show<%= classify(clicheName) %>Res {
 })
 export class Show<%= classify(clicheName) %>Component implements AfterViewInit, OnChanges, OnEval,
 OnInit {
-  @Input() id: string;
-  @Input() <%= camelize(clicheName) %>;
+  // Provide one of the following: id or <%= clicheName %>
+  @Input() id: string | undefined;
+  @Input() <%= camelize(clicheName) %>: <%= classify(clicheName) %> | undefined;
   @Output() loaded<%= classify(clicheName) %> = new EventEmitter();
 
   @Input() showId = true;
+  @Input() showContent = true;
 
   private gs: GatewayService;
 
@@ -64,6 +67,7 @@ OnInit {
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
+              ${this.showContent ? 'content' : ''}
             `
           }
         },

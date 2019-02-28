@@ -2,18 +2,29 @@ import {
   ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
+  CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  getReturnFields
+  getReturnFields,
+  Validation
 } from '@deja-vu/cliche-server';
 import {
   <%= classify(clicheName) %>Doc,
-  Create<%= classify(clicheName) %>Input
+  Create<%= classify(clicheName) %>Input,
+  Update<%= classify(clicheName) %>Input
 } from './schema';
 
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
+
+
+class <%= classify(clicheName) %>Validation {
+  static async <%= camelize(clicheName) %>ExistsOrFails(
+    <%= camelize(clicheName) %>s: mongodb.Collection<<%= classify(clicheName) %>Doc>, id: string): Promise<<%= classify(clicheName) %>Doc> {
+    return Validation.existsOrFail(<%= camelize(clicheName) %>s, id, '<%= classify(clicheName) %>');
+  }
+}
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
@@ -22,11 +33,34 @@ const actionRequestTable: ActionRequestTable = {
       create<%= classify(clicheName) %>(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'delete-<%= dasherize(clicheName) %>': (extraInfo) => `
+    mutation Delete<%= classify(clicheName) %>($id: ID!) {
+      delete<%= classify(clicheName) %>(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-<%= dasherize(clicheName) %>': (extraInfo) => `
     query Show<%= classify(clicheName) %>($id: ID!) {
       <%= camelize(clicheName) %>(id: $id) ${getReturnFields(extraInfo)}
     }
-  `
+  `,
+  'update-<%= dasherize(clicheName) %>': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation Update<%= classify(clicheName) %>($input: Update<%= classify(clicheName) %>Input!) {
+            update<%= classify(clicheName) %> (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query <%= classify(clicheName) %>($id: ID!) {
+            <%= camelize(clicheName) %>(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  }
 };
 
 function isPendingCreate(doc: <%= classify(clicheName) %>Doc | null) {
@@ -50,14 +84,16 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     },
 
     <%= classify(clicheName) %>: {
-      id: (<%= camelize(clicheName) %>: <%= classify(clicheName) %>Doc) => <%= camelize(clicheName) %>.id
+      id: (<%= camelize(clicheName) %>: <%= classify(clicheName) %>Doc) => <%= camelize(clicheName) %>.id,
+      content: (<%= camelize(clicheName) %>: <%= classify(clicheName) %>Doc) => <%= camelize(clicheName) %>.content
     },
 
     Mutation: {
       create<%= classify(clicheName) %>: async (
         _root, { input }: { input: Create<%= classify(clicheName) %>Input }, context: Context) => {
         const <%= camelize(clicheName) %>: <%= classify(clicheName) %>Doc = {
-          id: input.id ? input.id : uuid()
+          id: input.id ? input.id : uuid(),
+          content: input.content
         };
 
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
@@ -82,6 +118,109 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         return <%= camelize(clicheName) %>;
+      },
+
+      update<%= classify(clicheName) %>: async (
+        _root, { input }: { input: Update<%= classify(clicheName) %>Input }, context: Context) => {
+        const updateOp = { $set: { content: input.content } };
+        const notPending<%= classify(clicheName) %>IdFilter = {
+          id: input.id,
+          pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, input.id);
+            const pendingUpdateObj = await <%= camelize(clicheName) %>s
+              .updateOne(
+                notPending<%= classify(clicheName) %>IdFilter,
+                {
+                  $set: {
+                    pending: {
+                      reqId: context.reqId,
+                      type: 'update-<%= dasherize(clicheName) %>'
+                    }
+                  }
+                });
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, input.id);
+            const updateObj = await <%= camelize(clicheName) %>s
+              .updateOne(notPending<%= classify(clicheName) %>IdFilter, updateOp);
+            if (updateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return updateObj.modifiedCount === 1;
+          case 'commit':
+            await <%= camelize(clicheName) %>s.updateOne(
+              reqIdPendingFilter,
+              { ...updateOp, $unset: { pending: '' } });
+
+            return undefined;
+          case 'abort':
+            await <%= camelize(clicheName) %>s.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
+      },
+
+      delete<%= classify(clicheName) %>: async (_root, { id }, context: Context) => {
+        const notPending<%= classify(clicheName) %>IdFilter = {
+          id: id,
+          pending: { $exists: false }
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+        switch (context.reqType) {
+          case 'vote':
+            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, id);
+            const pendingUpdateObj = await <%= camelize(clicheName) %>s.updateOne(
+              notPending<%= classify(clicheName) %>IdFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'delete-<%= dasherize(clicheName) %>'
+                  }
+                }
+              });
+
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, id);
+            const res = await <%= camelize(clicheName) %>s
+              .deleteOne(notPending<%= classify(clicheName) %>IdFilter);
+
+            if (res.deletedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await <%= camelize(clicheName) %>s.deleteOne(reqIdPendingFilter);
+
+            return undefined;
+          case 'abort':
+            await <%= camelize(clicheName) %>s.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return undefined;
+        }
+
+        return undefined;
       }
     }
   };
