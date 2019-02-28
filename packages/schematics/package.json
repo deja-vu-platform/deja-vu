@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Schematics for Déjà Vu",
   "scripts": {
-    "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' --exclude '.*' src/ dist/",
+    "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' src/ dist/",
     "clean": "rm -rf ./dist",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
     "package": "npm run clean && npm run build",
