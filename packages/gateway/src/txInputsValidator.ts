@@ -20,18 +20,22 @@ export interface TxContext {
 
 export class TxInputsValidator {
   private static Eval(unparsedExpr: string, context: TxContext): any {
-    // We wrap the expr in parenthesis so that the parser throws an error if
-    // what's inside is not a valid JS expression (rules out statements).
-    // TODO: we could restrict this even further, since template exprs can't
-    //  have assignments, use `new`, etc
-
-    // Need to handle ?. (we use babel's plugin for elvis op)
+    // Since we need to handle `?.`, which is not part of JS, we use babel
+    // to polyfill the template expr
     const polyfilledCode = transformSync(
-      `(${unparsedExpr})`, { plugins: [elvis] }).code;
+      // We wrap the expr in parenthesis so that the parser throws an error if
+      // what's inside is not a valid JS expression (rules out statements).
+      // TODO: we could restrict this even further, since template exprs can't
+      //  have assignments, use `new`, etc
+      `(${unparsedExpr})`, { plugins: [elvis] }) // polyfills `?.`
+      .code;
     console.log(`Running code ${polyfilledCode}`);
 
-    return new VM({ sandbox: context })
-      .run(polyfilledCode);
+    // This is safer than `eval`. It runs the code in a sandbox.
+    const vm = new VM();
+    _.forEach(context, vm.freeze); // don't let template exprs modify context
+
+    return vm.run(polyfilledCode);
   }
 
   public static Validate(

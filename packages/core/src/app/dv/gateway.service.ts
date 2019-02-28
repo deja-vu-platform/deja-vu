@@ -66,7 +66,13 @@ export class TxRequest {
     private fromNode: any, private renderer: Renderer2,
     private rs: RunService) { }
 
-  private getContext() {
+  /**
+   * Gets the context for this tx request.
+   * The context is a map `field -> value` for all the fields of the app action
+   * containing the tx. Only fields that can be referenced in template exprs
+   * are included (e.g., `ngOnInit` is not part of the context)
+   */
+  private getContext(): { [field: string]: any } {
     const appActionNode = NodeUtils
       .GetAppActionNodeContainingNode(this.fromNode, this.renderer);
     if (appActionNode === null) {
@@ -84,8 +90,7 @@ export class TxRequest {
     //  source code and send only those (instead of sending everything)
 
     // keys retains only enumerable properties
-    const contextKeys = _.without(
-      _.keys(actionInstance), 'rs', 'elem', 'ngOnInit');
+    const contextKeys = _.without(_.keys(actionInstance), 'rs', 'elem');
 
     const context = _.pickBy(
       // Output fields are implemented with getters and setters, which are not

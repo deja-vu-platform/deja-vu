@@ -499,7 +499,7 @@ export class AppRequestProcessor extends RequestProcessor {
     // We know that the action path is a valid one because if otherwise the
     // tx would have never been initiated in the first place
     const debugPaths = _.map(
-      paths, (p) => ActionHelper.FilterActionTagPath(p, ['fqtag']))
+      paths, (p) => ActionHelper.PickActionTagPath(p, ['fqtag']))
     assert.ok(paths.length === 1,
       `Expected 1 path but got ${paths.length} for ` +
       `${actionPath.serialize()}: ${JSON.stringify(debugPaths)}`);

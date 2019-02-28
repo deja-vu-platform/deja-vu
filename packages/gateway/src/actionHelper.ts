@@ -304,18 +304,15 @@ export class ActionHelper {
     }
   }
 
-  static FilterActionTagPath(
+  static PickActionTagPath(
     actionPath: ActionTagPath | ActionTag[] | ActionAst,
     pickProps: string[]): any[] {
     return _.map(actionPath, (actionTag) => {
       const newContent = ActionHelper
-        .FilterActionTagPath(actionTag.content, pickProps);
+        .PickActionTagPath(actionTag.content, pickProps);
       const rest = _.pick(actionTag, pickProps);
 
-      return _.isEmpty(newContent) ? rest : {
-        ..._.pick(actionTag, pickProps),
-        content: newContent
-      };
+      return _.isEmpty(newContent) ? rest : { ...rest, content: newContent };
     });
   }
 
