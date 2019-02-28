@@ -7,10 +7,11 @@ import 'rxjs/add/operator/do';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { RUN_ID_ATTR } from './run.service';
-
 import * as _ from 'lodash';
+
 import { NodeUtils } from './node.utils';
+
+import { RunService } from './run.service';
 
 
 export interface Dict {
@@ -60,7 +61,53 @@ export class TxRequest {
   private requests: ChildRequest[] = [];
   private subjects: Subject<any>[] = [];
 
-  constructor(private gatewayUrl: string, private http: HttpClient) { }
+  constructor(
+    private gatewayUrl: string, private http: HttpClient,
+    private fromNode: any, private renderer: Renderer2,
+    private rs: RunService) { }
+
+  /**
+   * Gets the context for this tx request.
+   * The context is a map `field -> value` for all the fields of the app action
+   * containing the tx. Only fields that can be referenced in template exprs
+   * are included (e.g., `ngOnInit` is not part of the context)
+   */
+  private getContext(): { [field: string]: any } {
+    const appActionNode = NodeUtils
+      .GetAppActionNodeContainingNode(this.fromNode, this.renderer);
+    if (appActionNode === null) {
+      throw new Error(
+        `App node for ${NodeUtils.GetFqTagOfNode(this.fromNode)} not found`);
+    }
+    const actionId = NodeUtils.GetActionId(appActionNode);
+    const actionInstance = this.rs.getActionInstance(actionId);
+    if (actionInstance === null) {
+      throw new Error(
+        `Action instance for id ${actionId} not found`);
+    }
+
+    // TODO: get the exact fields of the context that we need from the
+    //  source code and send only those (instead of sending everything)
+
+    // keys retains only enumerable properties
+    const contextKeys = _.without(_.keys(actionInstance), 'rs', 'elem');
+
+    const context = _.pickBy(
+      // Output fields are implemented with getters and setters, which are not
+      // returned by `keys`. The internal field has an extra '_'. So if we
+      // ran into a field with 3 underscores we rename it to strip the first
+      // one so that it matches how it is used in the source html. This also
+      // has the side effect that it will clobber the `EventEmitter` value,
+      // which we don't need to send
+      _.mapKeys(
+        _.pick(actionInstance, contextKeys),
+        (_value, key: string) => key.startsWith('___') ? key.slice(1) : key),
+      (value) => _.isArray(value) || _.isPlainObject(value) ||
+        _.isBoolean(value) || _.isNumber(value) || _.isString(value) ||
+        value === undefined || value === null);
+
+    return context;
+  }
 
   /**
    * Add a request to the batch.
@@ -111,7 +158,7 @@ export class TxRequest {
     } else {
       this.http.post<ChildResponse[]>(
         this.gatewayUrl,
-        this.requests,
+        [this.getContext(), ...this.requests],
         { headers, params: { isTx: '1' } }
       )
         .subscribe(
@@ -145,6 +192,7 @@ export class GatewayService {
     private gatewayUrl: string,
     private http: HttpClient,
     private renderer: Renderer2,
+    private rs: RunService,
     private from: ElementRef
   ) {
     this.fromStr = this.generateFromStr();
@@ -213,7 +261,9 @@ export class GatewayService {
 
     let txRequest = GatewayService.txBatches[params.runId];
     if (txRequest === undefined) {
-      txRequest = new TxRequest(this.gatewayUrl, this.http);
+      txRequest = new TxRequest(
+        this.gatewayUrl, this.http, this.from.nativeElement,
+        this.renderer, this.rs);
       if (params.runId) {
         GatewayService.txBatches[params.runId] = txRequest;
       }
@@ -236,7 +286,7 @@ export class GatewayService {
     const params = {
       from: this.fromStr,
       fullActionName: this.getActionName(),
-      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
+      runId: NodeUtils.GetRunId(this.from.nativeElement)
     };
     if (path) {
       params['path'] = path;
@@ -260,9 +310,10 @@ export class DesignerGatewayService extends GatewayService {
     gatewayUrl: string,
     http: HttpClient,
     renderer: Renderer2,
+    rs: RunService,
     from: ElementRef
   ) {
-    super(gatewayUrl, http, renderer, from);
+    super(gatewayUrl, http, renderer, rs, from);
   }
 
   protected isAction(node: Element): boolean {
@@ -284,7 +335,7 @@ export class GatewayServiceFactory {
   private readonly renderer: Renderer2;
   constructor(
     @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
-    rendererFactory: RendererFactory2) {
+    rendererFactory: RendererFactory2, private rs: RunService) {
     // https://github.com/angular/angular/issues/17824
     // It seems like while you can get Renderer2 injected in components it
     // doesn't work for services. The workaround is to get the factory injected
@@ -302,6 +353,6 @@ export class GatewayServiceFactory {
   for(from: ElementRef): GatewayService {
     const cls = window['dv-designer'] ? DesignerGatewayService : GatewayService;
 
-    return new cls(this.gatewayUrl, this.http, this.renderer, from);
+    return new cls(this.gatewayUrl, this.http, this.renderer, this.rs, from);
   }
 }

@@ -29,14 +29,16 @@
   <div class="btn-toolbar toolbar">
     <!-- TODO: Do not show if already voted on the review (scoring.has-voted) -->
     <dv.if condition=$loggedInUserId !== $comment.authorId>
-      <dv.tx as sweetspots-upvote-review>
-        <authentication.authenticate id=$loggedInUserId hidden=true />
-        <sweetspots.vote-review id=$comment.id
+      <dv.tx>
+        <authentication.authenticate as upvote-review-authenticate
+          id=$loggedInUserId hidden=true />
+        <sweetspots.vote-review as upvote-review-vote
+          id=$comment.id
           loggedInUserId=$loggedInUserId
           spotOwnerId=$comment.authorId
           upvote=true />
       </dv.tx>
-      <dv.tx as sweetspots-downvote-review>
+      <dv.tx>
         <authentication.authenticate id=$loggedInUserId hidden=true />
         <sweetspots.vote-review id=$comment.id
           loggedInUserId=$loggedInUserId
