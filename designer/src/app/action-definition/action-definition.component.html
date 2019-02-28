@@ -8,6 +8,7 @@
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
+    [ngStyle]="actionInstance.of.styles"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"

@@ -31,6 +31,15 @@ export interface IO {
   value: string;
 }
 
+export const defaultAppActionStyles = {
+  backgroundColor: 'white',
+  borderWidth: '0',
+  borderColor: 'black',
+  borderStyle: 'solid',
+  padding: '8px'
+};
+export type AppActionStyles = typeof defaultAppActionStyles;
+
 export class AppActionDefinition implements ActionDefinition {
   name: string;
   readonly inputSettings: IO[] = [];
@@ -39,7 +48,7 @@ export class AppActionDefinition implements ActionDefinition {
   transaction = false;
   // App Actions cannot have action inputs
   readonly actionInputs: Readonly<ActionInputs> = {};
-  // TODO: styling options
+  readonly styles = _.cloneDeep(defaultAppActionStyles);
 
   constructor(name: string) {
     this.name = name;

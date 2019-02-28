@@ -2,6 +2,7 @@
   *ngIf="actionInstance"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
+  [ngStyle]="actionInstance.of.styles || {}"
 >
   <div
     [attr.data-isaction]="!!actionInstance.of.transaction"

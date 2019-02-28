@@ -7,8 +7,6 @@
 #page {
   width: 100%;
   min-height: 100vh;
-  background: white; /* TODO: configurable */
-  padding: 8px;
   display: flex;
   flex-direction: column;
 }
@@ -41,7 +39,7 @@
 }
 
 .action {
-  border: 3px solid white; /* TODO: configurable */
+  border: 3px solid rgba(255,255,255,0);
   border-radius: 5px;
   width: fit-content;
 }
