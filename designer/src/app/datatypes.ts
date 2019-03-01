@@ -172,7 +172,7 @@ export const flexAlign = {
 export class Row {
   readonly actions: ActionInstance[] = [];
   hJust: keyof typeof flexJustify = 'fs';
-  vAlign: keyof typeof flexAlign = 'fs';
+  vAlign: keyof typeof flexAlign = 's';
 
   constructor() {}
 
