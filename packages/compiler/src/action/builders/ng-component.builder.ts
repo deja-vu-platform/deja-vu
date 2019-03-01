@@ -121,13 +121,14 @@ export class NgComponentBuilder {
     this.style = this.style || '';
 
     return `
-      import { Component, OnInit } from '@angular/core';
+      import { Component, ElementRef, OnInit } from '@angular/core';
       ${noInputs ? '' :
       'import { Input } from \'@angular/core\';\n' +
       'import { ActivatedRoute } from \'@angular/router\';'}
       ${_.isEmpty(outputFields) ?
         '' : 'import { Output, EventEmitter } from \'@angular/core\';'}
       ${actionImports}
+      import { RunService } from \'@deja-vu/core\';
 
       @Component({
         selector: "${this.selector}",
@@ -139,14 +140,17 @@ export class NgComponentBuilder {
         ${inputFields.join('\n  ')}
         ${fields.join('\n  ')}
 
-        ${noInputs ? '' :
-        `constructor(private route: ActivatedRoute) {}
+        constructor(
+           ${noInputs ? '' : 'private route: ActivatedRoute,'}
+           private elem: ElementRef, private rs: RunService) {}
 
         ngOnInit() {
-          this.route.paramMap.subscribe(params => {
+          this.rs.registerAppAction(this.elem, this);
+          ${noInputs ? '' :
+          `this.route.paramMap.subscribe(params => {
             ${inputParams.join('\n  ')}
-          });
-        }`}
+          });`}
+        }
 
         ${[...allUsedFields].map((usedField: string) => `
         get ${usedField}() {

@@ -80,6 +80,11 @@ export function toNgTemplate(
         .match(/dvAlias="(.*)"/);
       const alias = (maybeAlias !== null) ? maybeAlias[1] : undefined;
 
+
+      if (transformedActionName === 'dv-tx' && alias !== undefined) {
+        throw new Error(`dv.tx can't be aliased`);
+      }
+
       const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(
         transformedActionName, symbolTable, alias);
       if (actionEntry === undefined) {
@@ -148,13 +153,12 @@ export function toNgTemplate(
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpToStr = (leftExpr, op, rightExpr) => {
-    const opTransformMap = {
-      'gt': '>', 'gte': '>=', 'lt': '<', 'lte': '<='
-    };
+    const opTransformMap = { gt: '>', gte: '>=', lt: '<', lte: '<=' };
     const transformedOpString = opTransformMap[op.sourceString] ?
       opTransformMap[op.sourceString] : op.sourceString;
 
-    return `${leftExpr.toNgTemplate()} ${transformedOpString} ${rightExpr.toNgTemplate()}`;
+    return `${leftExpr.toNgTemplate()} ` +
+      `${transformedOpString} ${rightExpr.toNgTemplate()}`;
   };
 
   return {

@@ -243,6 +243,7 @@ describe('ActionHelper', () => {
     ];
     const actionPath = new ActionPath(arrayActionPath);
     const matchingPaths = actionHelper.getMatchingPaths(actionPath);
-    expect(matchingPaths.length).toBe(2);
+    expect(matchingPaths.length)
+      .toBe(2);
   });
 });

@@ -304,6 +304,18 @@ export class ActionHelper {
     }
   }
 
+  static PickActionTagPath(
+    actionPath: ActionTagPath | ActionTag[] | ActionAst,
+    pickProps: string[]): any[] {
+    return _.map(actionPath, (actionTag) => {
+      const newContent = ActionHelper
+        .PickActionTagPath(actionTag.content, pickProps);
+      const rest = _.pick(actionTag, pickProps);
+
+      return _.isEmpty(newContent) ? rest : { ...rest, content: newContent };
+    });
+  }
+
   /**
    * Create a new action helper
    *
@@ -555,7 +567,9 @@ export class ActionHelper {
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
-      const routeActions: ActionTag[] = this.getRouteActions(this.actionTable);
+      // user could have multiple routes to the same action so we need to dedup
+      const routeActions: ActionTag[] = _.uniqBy(
+        this.getRouteActions(this.actionTable), 'fqtag');
       ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
