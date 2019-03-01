@@ -34,19 +34,19 @@ export interface RequestOptions {
   readonly headers?: Dict;
 }
 
-enum Method {
+export enum Method {
   GET = 'GET',
   POST = 'POST'
 }
 
-interface Params {
+export interface Params {
   from: string;
   runId: string;
   path?: string;
   options?: string;
 }
 
-interface ChildRequest {
+export interface ChildRequest {
   method: Method;
   body: string | Object;
   query: Params;
@@ -139,7 +139,7 @@ export class RequestInvalidError {
 }
 
 export abstract class RequestProcessor {
-  private readonly txCoordinator: TxCoordinator<
+  protected readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch>;
   protected readonly dstTable: { [cliche: string]: port } = {};
 
@@ -244,8 +244,8 @@ export abstract class RequestProcessor {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    const context = req.body[0];
-    const childRequests: ChildRequest[] = req.body.slice(1);
+    const context = req.body.context;
+    const childRequests: ChildRequest[] = req.body.requests;
     const resBatch = new ResponseBatch(res, childRequests.length);
 
     let gatewayToClicheRequests: GatewayToClicheRequest[];
@@ -328,7 +328,7 @@ export abstract class RequestProcessor {
     _dvTxNodeIndex: number
   ): ActionTag[];
 
-  private validateRequest(req: express.Request | ChildRequest)
+  protected validateRequest(req: express.Request | ChildRequest)
     : GatewayToClicheRequest {
      if (!req.query.from) {
       throw new RequestInvalidError('No from specified');
@@ -541,11 +541,16 @@ export class DesignerRequestProcessor extends RequestProcessor {
     delete this.dstTable[alias || name];
   }
 
-  async processTxRequest(
+  protected async processTxRequest(
     req: express.Request,
-    _res: express.Response
+    res: express.Response
   ): Promise<void> {
-    const childRequests: ChildRequest[] = req.body;
+    const childRequests: ChildRequest[] = req.body.requests;
+
+    // the cohorts cannot be determined from the (nonexistent) action table
+    // so we get them from the paths in the request
+    // I think this is actually not safe because we only save one set of cohorts
+    // but this is designer only where problematic fast requesting is unlikely
     this.cohortActions = childRequests.map((chReq) => {
       const actionPath = ActionPath.fromString(chReq.query.from);
       const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
@@ -556,6 +561,26 @@ export class DesignerRequestProcessor extends RequestProcessor {
         inputs: {}
       };
     });
+
+    // this is the same as in the app version except we skip input validation
+    const resBatch = new ResponseBatch(res, childRequests.length);
+    let gatewayToClicheRequests: GatewayToClicheRequest[];
+    try {
+      gatewayToClicheRequests = childRequests
+        .map((childRequest) => this.validateRequest(childRequest));
+    } catch (e) {
+      resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
+    }
+
+    // same as in the app version
+    return Promise
+      .all(gatewayToClicheRequests
+        .map((gatewayToClicheRequest, index) =>
+          this.txCoordinator.processMessage(
+            gatewayToClicheRequest.runId,
+            gatewayToClicheRequest.from.serialize(),
+            gatewayToClicheRequest, resBatch, index)))
+      .then(() => {});
   }
 
   protected getCohortActions(

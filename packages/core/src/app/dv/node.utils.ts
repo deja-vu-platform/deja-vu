@@ -133,8 +133,7 @@ export class NodeUtils {
     }
   }
 
-  static GetAppActionNodeContainingNode(node, renderer: Renderer2)
-    : any | null {
+  static GetAppActionNodeContainingNode(node, renderer: Renderer2): any | null {
     let appActionNode = null;
     NodeUtils.WalkUpFromNode(node, renderer, (visitNode) => {
       if (NodeUtils.IsAppAction(visitNode)) {

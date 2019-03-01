@@ -202,8 +202,7 @@ export class RunService {
 
     // send the request, if relevant
     if (GatewayService.txBatches[id]) {
-      GatewayService.txBatches[id].send();
-      delete GatewayService.txBatches[id];
+      GatewayService.txBatches[id].setNumActions(runs.length);
     }
 
     const resultMaps: RunResultMap[] = await Promise.all(runs);

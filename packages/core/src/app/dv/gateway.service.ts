@@ -58,15 +58,67 @@ const headers = new HttpHeaders({ 'Content-type': 'application/json' });
  * Class for batching transaction requests.
  */
 export class TxRequest {
+  // info that would have been sent by each action individually
   private requests: ChildRequest[] = [];
+  // observables given to the actions to post responses to
   private subjects: Subject<any>[] = [];
-  waitingFor: Set<string> = new Set();
-  sendCalled = false;
+  // the number of actions in this transaction that have posted
+  private numActionsDone = 0;
+  // the number of actions in the transaction
+  // this is known only in the runService so it must be set after construction
+  private numActionsTotal: number;
 
   constructor(
-    private gatewayUrl: string, private http: HttpClient,
-    private fromNode: any, private renderer: Renderer2,
-    private rs: RunService) { }
+    private gatewayUrl: string,
+    private http: HttpClient,
+    private fromNode: any,
+    private renderer: Renderer2,
+    private rs: RunService
+  ) { }
+
+  /**
+   * Set the number of actions that are part of the tx
+   * The tx request will never be sent until this is done
+   */
+  setNumActions(numActions: number): void {
+    this.numActionsTotal = numActions;
+    if (this.isReady()) {
+      this.send();
+    }
+  }
+
+  /**
+   * Add a request to the batch.
+   * Returned observable resolves with response (after send is called)
+   */
+  postRequest<T>(chReq?: ChildRequest): Observable<T> {
+    const subject = new Subject<T>();
+    this.requests.push(chReq);
+    this.subjects.push(subject);
+    this.postNoRequest();
+
+    return subject.asObservable();
+  }
+
+  /**
+   * Report an action in the tx group as not sending a request
+   */
+  postNoRequest(): void {
+    this.numActionsDone += 1;
+    if (this.isReady()) {
+      this.send();
+    }
+  }
+
+  /**
+   * Whether or not the request is ready to send
+   */
+  private isReady(): boolean {
+    return (
+      this.numActionsTotal !== undefined
+      && this.numActionsDone === this.numActionsTotal
+    );
+  }
 
   /**
    * Gets the context for this tx request.
@@ -112,37 +164,11 @@ export class TxRequest {
   }
 
   /**
-   * Add a request to the batch.
-   * Returned observable resolves with response (after send is called)
-   */
-  add<T>(chReq: ChildRequest, actionId: string): Observable<T> {
-    this.requests.push(chReq);
-    const subject = new Subject<T>();
-    this.subjects.push(subject);
-    this.waitingFor.delete(actionId);
-    if (this.sendCalled && this.waitingFor.size === 0) {
-      this.send();
-    }
-
-    return subject.asObservable();
-  }
-
-  /**
-   * Block send until we `add` a request with this actionId
-   */
-  waitFor(actionId: string) {
-    this.waitingFor.add(actionId);
-  }
-
-  /**
    * Send all of the requests.
    */
-  send(): void {
-    this.sendCalled = true;
-    if (this.waitingFor.size > 0) { return; }
-
+  private send(): void {
     // not in transaction: just send it
-    if (this.size === 1) {
+    if (this.numActionsTotal === 1) {
       const { method, body, query: params } = this.requests[0];
       let obs: Observable<any> = null;
       switch (method) {
@@ -174,7 +200,7 @@ export class TxRequest {
     } else {
       this.http.post<ChildResponse[]>(
         this.gatewayUrl,
-        [this.getContext(), ...this.requests],
+        { context: this.getContext(), requests: this.requests },
         { headers, params: { isTx: '1' } }
       )
         .subscribe(
@@ -192,11 +218,10 @@ export class TxRequest {
             });
           });
     }
+    // this object will never be used again so we can drop the reference
+    delete GatewayService.txBatches[NodeUtils.GetRunId(this.fromNode)];
   }
 
-  get size() {
-    return this.subjects.length;
-  }
 }
 
 
@@ -215,8 +240,9 @@ export class GatewayService {
   }
 
   /**
-   * Call `willRequest` before calling this asynchronously
+   * An action must call get, post, or noRequest exactly once
    */
+
   get<T>(path?: string, options?: RequestOptions) {
     return this.request<T>(
       Method.GET,
@@ -226,10 +252,6 @@ export class GatewayService {
     );
   }
 
-  /**
-   * If the body is an Object it will be converted to JSON
-   * Call `willRequest` before calling this asynchronously
-   */
   post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
     return this.request<T>(
       Method.POST,
@@ -239,15 +261,10 @@ export class GatewayService {
     );
   }
 
-  /**
-   * `post/get` need to be called synchronously for tx to work
-   * if you need to call them asyncrhonously, call this first
-   * this will prevent the tx from getting sent without you
-   */
-  willRequest() {
+  noRequest() {
     const runId = NodeUtils.GetRunId(this.from.nativeElement);
     const txRequest = this.getTxReq(runId);
-    txRequest.waitFor(this.from.nativeElement.runId);
+    txRequest.postNoRequest();
   }
 
   protected isAction(node: Element): boolean {
@@ -283,7 +300,7 @@ export class GatewayService {
   /**
    * Gets a TxRequest for runId or makes a new one
    */
-  private getTxReq(runId?: string): TxRequest {
+  public getTxReq(runId?: string): TxRequest {
     let txRequest = GatewayService.txBatches[runId];
     if (txRequest === undefined) {
       txRequest = new TxRequest(
@@ -309,14 +326,14 @@ export class GatewayService {
 
     const txRequest = this.getTxReq(params.runId);
 
-    const individualResponseObservable = txRequest.add<T>({
+    const individualResponseObservable = txRequest.postRequest<T>({
       method,
       body,
       query: params
-    }, params.runId);
+    });
 
     if (!params.runId) {
-      txRequest.send();
+      txRequest.setNumActions(1);
     }
 
     return individualResponseObservable;

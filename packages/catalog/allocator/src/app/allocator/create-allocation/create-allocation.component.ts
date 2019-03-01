@@ -59,7 +59,6 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
   }
 
   async dvOnExec() {
-    this.gs.willRequest();
     if (this.resourceIds === undefined) {
       console.log('Create allocation waiting for resourceIds');
       await this.resourceIdsChange.asObservable()

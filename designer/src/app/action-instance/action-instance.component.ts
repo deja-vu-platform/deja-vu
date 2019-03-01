@@ -7,7 +7,8 @@ import {
   OnDestroy,
   OnInit,
   Type,
-  ViewChild
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
@@ -19,6 +20,7 @@ import {
   ClicheActionDefinition
 } from '../datatypes';
 import { ActionIO, ScopeIO} from '../io';
+import { RunService } from '@deja-vu/core';
 
 
 @Component({
@@ -41,7 +43,9 @@ implements OnInit, AfterViewInit, OnDestroy {
   hidden = false;
 
   constructor(
-    private readonly componentFactoryResolver: ComponentFactoryResolver
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    private readonly elem: ElementRef,
+    private readonly rs: RunService
   ) { }
 
   ngOnInit() {
@@ -53,6 +57,9 @@ implements OnInit, AfterViewInit, OnDestroy {
             .next(this[thisProp]);
         });
       }
+    }
+    if (this.actionInstance && this.actionInstance.isAppAction) {
+      this.rs.registerAppAction(this.elem, this);
     }
   }
 

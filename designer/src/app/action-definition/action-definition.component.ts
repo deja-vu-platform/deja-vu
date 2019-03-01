@@ -3,9 +3,11 @@ import {
   Component,
   ElementRef,
   Input,
+  OnInit,
   QueryList,
   ViewChildren
 } from '@angular/core';
+import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import {
@@ -23,13 +25,19 @@ const emptyRow = new Row();
   templateUrl: './action-definition.component.html',
   styleUrls: ['./action-definition.component.scss']
 })
-export class ActionDefinitionComponent implements AfterViewInit {
+export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
+
+  constructor(private elem: ElementRef, private rs: RunService) { }
+
+  ngOnInit() {
+    this.rs.registerAppAction(this.elem, this);
+  }
 
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {

@@ -188,11 +188,15 @@ export class ActionInstance {
   }
 
   // needed for action processing
-  get fqtag() {
+  get fqtag(): string {
     return `${this.from.name}-${this.of.name}`;
   }
 
-  isOrContains(actionDefinition: ActionDefinition, deep: boolean) {
+  get isAppAction(): boolean {
+    return (this.of instanceof App);
+  }
+
+  isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
     return (
       this.of === actionDefinition
       || (
