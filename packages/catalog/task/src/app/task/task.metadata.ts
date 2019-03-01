@@ -10,26 +10,36 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from '@deja-vu/core';
 
 import { ApproveTaskComponent } from './approve-task/approve-task.component';
+export { ApproveTaskComponent };
 import {
   ClaimTaskComponent
 } from './claim-task/claim-task.component';
+export { ClaimTaskComponent };
 import { CompleteTaskComponent } from './complete-task/complete-task.component';
+export { CompleteTaskComponent };
 import {
   CreateDueDateComponent
 } from './create-due-date/create-due-date.component';
+export { CreateDueDateComponent };
 import {
   CreateTaskComponent
 } from './create-task/create-task.component';
+export { CreateTaskComponent };
 import {
   ShowAssigneeComponent
 } from './show-assignee/show-assignee.component';
+export { ShowAssigneeComponent };
 import {
   ShowTaskComponent
 } from './show-task/show-task.component';
+export { ShowTaskComponent };
 import {
   ShowTasksComponent
 } from './show-tasks/show-tasks.component';
+export { ShowTasksComponent };
 import { UpdateTaskComponent } from './update-task/update-task.component';
+export { UpdateTaskComponent };
+
 
 const allComponents = [
   ApproveTaskComponent, ClaimTaskComponent,

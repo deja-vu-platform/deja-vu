@@ -17,7 +17,8 @@
     "dv-package-scoring-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "uuid": "^3.2.1"

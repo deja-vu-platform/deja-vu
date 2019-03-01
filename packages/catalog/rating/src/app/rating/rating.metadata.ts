@@ -9,15 +9,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   RateTargetComponent
 } from './rate-target/rate-target.component';
+export { RateTargetComponent };
 import {
   ShowAverageRatingComponent
 } from './show-average-rating/show-average-rating.component';
+export { ShowAverageRatingComponent };
 import {
   ShowRatingComponent
 } from './show-rating/show-rating.component';
+export { ShowRatingComponent };
 import {
   ShowRatingsByTargetComponent
 } from './show-ratings-by-target/show-ratings-by-target.component';
+export { ShowRatingsByTargetComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 

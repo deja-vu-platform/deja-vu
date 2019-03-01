@@ -1,7 +1,7 @@
 <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
   searchResults$=label.search-items-by-labels.searchResultItems>
 
-  <dv.tx as sweetspots-auth-check>
+  <dv.tx>
     <authentication.logged-in />
     <dv.if condition=$accessRequired>
       <dv.redirect href="/login" onEvalFailure=true />
@@ -24,7 +24,7 @@
       <dv.if condition=authentication.logged-in.user>
         <div class="navbar-form navbar-right inline-block">
           <div class="btn-toolbar toolbar">
-            <dv.tx as sweetspots-sign-out>
+            <dv.tx>
               <authentication.sign-out class="btn btn-danger"
                 buttonLabel="Logout"/>
               <dv.link href="/login" hidden=true />

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "DvSchematicsNewCliche",
+  "title": "Create Déjà Vu cliché",
+  "type": "object",
+  "properties": {
+    "clicheName": {
+      "type": "string"
+    }
+  },
+  "required": [ "clicheName" ],
+  "additionalProperties": false
+}

@@ -11,33 +11,43 @@ import { DvModule } from '@deja-vu/core';
 import {
   AddViewerComponent
 } from './add-viewer/add-viewer.component';
+export { AddViewerComponent };
 import {
   AddRemoveViewerComponent
 } from './add-remove-viewer/add-remove-viewer.component';
+export { AddRemoveViewerComponent };
 import {
   CanEditComponent
 } from './can-edit/can-edit.component';
+export { CanEditComponent };
 import {
   CanViewComponent
 } from './can-view/can-view.component';
+export { CanViewComponent };
 import {
   CreateResourceComponent
 } from './create-resource/create-resource.component';
+export { CreateResourceComponent };
 import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
+export { DeleteResourceComponent };
 import {
   RemoveViewerComponent
 } from './remove-viewer/remove-viewer.component';
+export { RemoveViewerComponent };
 import {
   ShowOwnerComponent
 } from './show-owner/show-owner.component';
+export { ShowOwnerComponent };
 import {
   ShowResourceComponent
 } from './show-resource/show-resource.component';
+export { ShowResourceComponent };
 import {
   ShowResourcesComponent
 } from './show-resources/show-resources.component';
+export { ShowResourcesComponent };
 
 
 const allComponents = [

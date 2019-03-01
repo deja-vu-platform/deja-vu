@@ -58,8 +58,8 @@ describe('ActionHelper', () => {
           },
           content: [
             {
-              fqtag: 'dv-id',
-              tag: 'dv-id',
+              fqtag: 'dv-gen-id',
+              tag: 'dv-gen-id',
               inputs: {
                 '(id)': 'rewardId=$event'
               }
@@ -95,8 +95,8 @@ describe('ActionHelper', () => {
           },
           content: [
             {
-              fqtag: 'dv-id',
-              tag: 'dv-id',
+              fqtag: 'dv-gen-id',
+              tag: 'dv-gen-id',
               inputs: {
                 '(id)': 'childId=$event'
               }
@@ -243,6 +243,7 @@ describe('ActionHelper', () => {
     ];
     const actionPath = new ActionPath(arrayActionPath);
     const matchingPaths = actionHelper.getMatchingPaths(actionPath);
-    expect(matchingPaths.length).toBe(2);
+    expect(matchingPaths.length)
+      .toBe(2);
   });
 });

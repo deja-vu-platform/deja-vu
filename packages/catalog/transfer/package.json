@@ -17,7 +17,8 @@
     "dv-package-transfer": "npm run dv-package-transfer-client && npm run dv-package-transfer-server",
     "concurrently": "concurrently",
     "tsc": "tsc",
-    "ng": "ng"
+    "ng": "ng",
+    "dv": "dv"
   },
   "dependencies": {
     "uuid": "^3.2.1"

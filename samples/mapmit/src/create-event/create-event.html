@@ -10,17 +10,17 @@
         showLoadedMarkers=false
         showDirectionsControl=false />
 
-      <dv.tx as mapmit-create-event-form>
-        <dv.id />
+      <dv.tx>
+        <dv.gen-id />
         <dv.status savedText="Event created" />
         <!-- Title, Description, Room Number, Location Description -->
         <div class="create-event-input">
-          <property.create-object id=dv.id.id showOptionToSubmit=false />
+          <property.create-object id=dv.gen-id.id showOptionToSubmit=false />
         </div>
 
         <!-- Location -->
         <div class="create-event-input">
-          <geolocation.create-marker id=dv.id.id
+          <geolocation.create-marker id=dv.gen-id.id
             title=geolocation.display-map.newMarker?.title
             latitude=geolocation.display-map.newMarker?.latitude
             longitude=geolocation.display-map.newMarker?.longitude
@@ -30,7 +30,7 @@
 
         <!-- Time + Date -->
         <div class="create-event-input">
-          <event.create-event id=dv.id.id showOptionToSubmit=false />
+          <event.create-event id=dv.gen-id.id showOptionToSubmit=false />
         </div>
 
         <!-- Choose Group widget works but need to figure out how to
@@ -38,7 +38,7 @@
                and a group may be used for multiple events -->
         <!-- Instead, we will assume a 1-1 mapping between group and event -->
         <group.create-group
-          id=dv.id.id
+          id=dv.gen-id.id
           memberIds=[mapmit.navbar.loggedInUserId]
           showOptionToAddMembers=false
           showOptionToSubmit=false
@@ -51,7 +51,7 @@
             </dv.link>
           </div>
           <div class="save-button">
-            <authorization.create-resource id=dv.id.id
+            <authorization.create-resource id=dv.gen-id.id
               ownerId=mapmit.navbar.loggedInUserId
               hidden=true />
             <authentication.authenticate id=mapmit.navbar.loggedInUserId

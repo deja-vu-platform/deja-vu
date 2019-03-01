@@ -11,12 +11,12 @@
     <div class="container">
       <dv.if condition=hackernews.navbar.loggedInUser>
         <dv.tx>
-          <dv.id />
+          <dv.gen-id />
           <authentication.authenticate
             id=hackernews.navbar.loggedInUser.id hidden=true />
           <property.create-object
             buttonLabel="Submit"
-            id=dv.id.id
+            id=dv.gen-id.id
             initialValue={ author: hackernews.navbar.loggedInUser.username }
             newObjectSavedText="Post submitted"
             showExclude=['author']
@@ -25,11 +25,11 @@
           <!-- also allows database to prevent author from upvoting own post -->
           <scoringposts.create-score
             sourceId=hackernews.navbar.loggedInUser.username
-            targetId=dv.id.id
+            targetId=dv.gen-id.id
             value=0
             hidden=true />
 
-          <dv.link href="/item" params={ id: dv.id.id } hidden=true />
+          <dv.link href="/item" params={ id: dv.gen-id.id } hidden=true />
         </dv.tx>
       </dv.if>
     </div>
