@@ -1,10 +1,10 @@
 <dv.action name="upvote">
   <dv.if condition=$id>
     <dv.if condition=$isPost>
-      <dv.tx as hackernews-upvote-post>
-        <authentication.authenticate
+      <dv.tx>
+        <authentication.authenticate as upvote-post-authenticate
           id=$loggedInUser?.id hidden=true />
-        <scoringposts.create-score
+        <scoringposts.create-score as upvote-post-create-score
           buttonDisabled=$disabled || !$loggedInUser
           class="upvote-button"
           newScoreSavedText=""
@@ -17,7 +17,7 @@
     </dv.if>
     <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
     <dv.if condition=!$isPost>
-      <dv.tx as hackernews-upvote-comment>
+      <dv.tx>
         <authentication.authenticate
           id=$loggedInUser?.id hidden=true />
         <scoringcomments.create-score

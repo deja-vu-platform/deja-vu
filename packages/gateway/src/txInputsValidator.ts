@@ -29,11 +29,14 @@ export class TxInputsValidator {
       //  have assignments, use `new`, etc
       `(${unparsedExpr})`, { plugins: [elvis] }) // polyfills `?.`
       .code;
-    console.log(`Running code ${polyfilledCode}`);
+    console.log(`Running code ${polyfilledCode} with ` +
+        `context ${JSON.stringify(context)}`);
 
     // This is safer than `eval`. It runs the code in a sandbox.
     const vm = new VM();
-    _.forEach(context, vm.freeze); // don't let template exprs modify context
+    // for some reason doing forEach(context, vm.freeze) doesn't work sometimes
+    _.forEach(context, (value: any, key: string) => vm.freeze(value, key));
+    // don't let template exprs modify context
 
     return vm.run(polyfilledCode);
   }

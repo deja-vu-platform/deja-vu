@@ -5,8 +5,8 @@
     hidden=true />
 
   <div class="vote-buttons">
-    <dv.tx as upvote>
-      <authentication.authenticate as upvoteAuth
+    <dv.tx>
+      <authentication.authenticate as upvote-authentication
         id=$loggedInUser?.id hidden=true />
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === 1>
@@ -22,7 +22,7 @@
       </dv.button>
 
       <!-- TODO: clicking on something already upvoted undoes the upvote -->
-      <scoring.create-score
+      <scoring.create-score as upvote-create-score
         buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
         class="vote-button upvote"
         newScoreSavedText=""
@@ -51,9 +51,9 @@
             showScores=false />
       </p>
     </dv.if>
-    
-    <dv.tx as downvote>
-      <authentication.authenticate as downvoteAuth
+
+    <dv.tx>
+      <authentication.authenticate as downvote-authenticate
         id=$loggedInUser?.id hidden=true />
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === -1>
@@ -69,7 +69,7 @@
       </dv.button>
 
       <!-- TODO: clicking on something already downvoted undoes the downvote -->
-      <scoring.create-score
+      <scoring.create-score as downvote-create-score
         buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
         class="vote-button downvote"
         newScoreSavedText=""
