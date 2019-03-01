@@ -11,6 +11,10 @@ body {
   background-color: #4FB5C3;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 .white {
   color: white;
 }
@@ -20,12 +24,29 @@ body {
   color: black;
   flex: 1;
   height: 100%;
+  padding-bottom: 5%;
+}
+
+nav a.dvlink {
+  color: lightgrey;
+}
+
+dv-link.btn.btn-outline-secondary.choice.active,
+dv-link.btn-outline-secondary:hover {
+  background-color: #4FB5C3;
+}
+
+dv-link.btn.btn-outline-secondary.choice.active a,
+dv-link.btn-outline-secondary:hover a{
+  background-color: #4FB5C3;
+  color: white;
 }
 
 .btn-success,
 authentication-sign-in button.mat-button {
   background-color: #4FB5C3;
   border: none;
+  color: white !important;
 }
 
 .btn-success:hover,
@@ -38,6 +59,7 @@ authentication-sign-in button.mat-button:active:focus,
 authentication-sign-in button.mat-button:focus {
   background-color: #218290;
   border: none;
+  color: white !important;
 }
 
 .btn-danger {
@@ -53,21 +75,22 @@ authentication-sign-in button.mat-button:focus {
   border: none;
 }
 
-.full {
+.full,
+authentication-sign-in button.mat-button {
   width: 80%;
   margin-top: 1em;
   height: 3em;
   text-align: center;
 }
 
-.add {
-	opacity: .9;
-	cursor: pointer;
-	height: 2.5em;
+.add img {
+  opacity: .9;
+  cursor: pointer;
+  height: 2.5em;
 }
 
-.add:hover {
-	opacity: 1;
+.add img:hover {
+  opacity: 1;
 }
 
 .link {
@@ -84,9 +107,10 @@ authentication-sign-in button.mat-button:focus {
   margin-top: 75px;
 }
 
-.panel-default {
+.card {
   border-color: white;
   color: black;
+  margin: .2em;
 }
 
 .edit {
@@ -115,10 +139,6 @@ authentication-sign-in button.mat-button:focus {
   height: 1.3em;
   display: inline-block;
   padding-right: .2em;
-}
-
-.panel {
-  margin: .2em;
 }
 
 .right {
@@ -263,4 +283,12 @@ input[type=password].authentication {
 
 .choice a {
   margin: .3em;
+}
+
+.col-2-input-fields .mat-input-flex {
+  width: 9.375em;
+}
+
+.col-1-input-fields .mat-input-flex {
+  width: 4.6875em;
 }

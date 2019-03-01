@@ -1,34 +1,35 @@
 <dv.action name="show-competition">
-  <div class="row">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-xs-3">
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-3">
           <!-- Competition Name -->
           <competition.show-object id=$id showOnly=['name'] />
         </div>
-        <div class="col-xs-2">
+        <div class="col-2">
           <!-- Competition End Date -->
           <event.show-event id=$id showId=false showStartDate=false />
         </div>
-        <div class="col-xs-2">
+        <div class="col-2">
           <!-- TODO: Competition Code -->
           <p>TODO</p>
           <!-- TODO: Temp: Link to hosts -->
         </div>
-        <div class="col-xs-1">
+        <div class="col-1">
           <!-- Competition Participants -->
-          <dv.link href="/host/competition-participants"
+          <!-- <dv.link href="/host/competition-participants"
             params={ competitionId: $id }>
             <img src="assets/sent.png" class="hostcompentry" />
           </dv.link>
           <span>
             <competitionclimbers.show-members inGroupId=$id
               showMembersList=false />
-          </span>
+          </span> -->
         </div>
-        <div class="col-xs-1">
+        <div class="col-1">
           <!-- Competition Problems -->
-          <dv.link href="/host/competition-problems"
+          <!-- <dv.link href="/host/competition-problems"
             params={ competitionId: $id }>
             <img src="assets/mountainsgray.png" class="hostcompentry" />
           </dv.link>
@@ -37,20 +38,20 @@
               showTargetsList=false
               showScores=false
               showTotal=false />
-          </span>
+          </span> -->
         </div>
-        <div class="col-xs-1">
+        <div class="col-1">
           <!-- Comeptition Leaderboard -->
-          <dv.link href="/host/competition-leaderboard"
+          <!-- <dv.link href="/host/competition-leaderboard"
             params={ competitionId: $id }>
             <img src="assets/leaderboardgray.png" class="trophy" />
-          </dv.link>
+          </dv.link> -->
         </div>
-        <div class="col-xs-2">
+        <div class="col-2">
           <!-- Edit Competition -->
-          <dv.link href="/host/edit-competition" params={ id: $id }>
+          <!-- <dv.link href="/host/edit-competition" params={ id: $id }>
             <img src="assets/edit.png" class="edit" />
-          </dv.link>
+          </dv.link> -->
         </div>
       </div>
     </div>

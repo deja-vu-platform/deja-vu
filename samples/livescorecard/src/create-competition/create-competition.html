@@ -1,16 +1,68 @@
 <dv.action name="create-competition">
-  <!-- Error waiting to happen -->
-  <!-- <div class="row">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-3 white">name</div>
-        <div class="col-2 white">date</div>
-        <div class="col-2 white">code</div>
-        <div class="col-1"></div>
-        <div class="col-1"></div>
-        <div class="col-1"></div>
-        <div class="col-2"></div>
-      </div>
+  <div class="card">
+    <div class="card-body">
+      <dv.tx>
+        <dv.status savedText="New competition created!" />
+        <dv.gen-id />
+        <!-- TODO: Allow Passkey to use ID -->
+        <div class="row">
+          <div class="col-3">
+            <!-- Competition Name -->
+            <!-- <competition.create-property as livescorecard-competition-name
+              name="name" /> -->
+            <competition.create-object id=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-2 col-2-input-fields">
+            <!-- Competition Dates -->
+            <event.create-event
+              id=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-2 col-2-input-fields">
+            <!-- Comeptition Code -->
+            <competitioncode.create-passkey
+              inputLabel="comp code"
+              signIn=false
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-1 col-1-input-fields">
+            <!-- Rules should actually be created after the competition,
+              but since there is currently no way to edit property/ objects,
+              we will add the rules here -->
+              <!-- <competition.create-property as livescorecard-competition-rules
+                name="rules" /> -->
+          </div>
+          <div class="col-1"></div>
+          <div class="col-1"></div>
+          <div class="col-2">
+            <!-- <competition.create-object
+              id=dv.gen-id.id
+              initialValue={
+                name: livescorecard-competition-name.value,
+                rules: livescorecard-competition-rules.value
+              }
+              hidden=true /> -->
+
+            <competitionhosts.create-group
+              id=dv.gen-id.id
+              memberIds=[$loggedInUserId] hidden=true />
+            <competitionclimbers.create-group
+              id=dv.gen-id.id hidden=true />
+            <authorization.create-resource
+              id=dv.gen-id.id
+              ownerId=$loggedInUserId
+              viewerIds=[dv.gen-id.id]
+              hidden=true />
+            <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+
+            <dv.button class="add">
+              <img src="assets/add.png" />
+            </dv.button>
+            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+          </div>
+        </div>
+      </dv.tx>
     </div>
-  </div> -->
+  </div>
 </dv.action>

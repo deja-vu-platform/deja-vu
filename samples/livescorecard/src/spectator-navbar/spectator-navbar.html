@@ -1,41 +1,31 @@
 <dv.action name="spectator-navbar" loggedInCompCode$=competitioncode.logged-in.passkey.code>
-  <dv.tx as livescorecard-auth-check>
+  <dv.tx>
     <competitioncode.logged-in hidden=true />
     <dv.redirect href="/login/spectator" onEvalFailure=true />
   </dv.tx>
 
-  <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+  <!-- <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
     <div class="container">
       <div class="navbar-header">
-        <dv.link href="/host" class="navbar-brand">Host</dv.link>
-        <button type="button" class="navbar-toggle collapsed"
-          data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-          aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
+        <dv.link href="/host" class="navbar-brand">Spectator</dv.link>
       </div>
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <dv.link href="/spectator">Leaderboard</dv.link>
-          </li>
-          <li>
-            <dv.link href="/spectator/rules"
-              params={ id: competitioncode.logged-in.passkey.code }>
-              Rules
-            </dv.link>
-          </li>
-          <li>
-            <dv.tx as livescorecard-sign-out>
-              <competitioncode.sign-out hidden=true />
-              <dv.link href="/login/spectator">Log Out</dv.link>
-            </dv.tx>
-          </li>
-        </ul>
-      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <dv.link href="/spectator">Leaderboard</dv.link>
+        </li>
+        <li>
+          <dv.link href="/spectator/rules"
+            params={ id: competitioncode.logged-in.passkey.code }>
+            Rules
+          </dv.link>
+        </li>
+        <li>
+          <dv.tx>
+            <competitioncode.sign-out hidden=true />
+            <dv.link href="/login/spectator">Log Out</dv.link>
+          </dv.tx>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </nav> -->
 </dv.action>

@@ -9,15 +9,14 @@
   <dv.if condition=$isSpectator>
     <livescorecard.spectator-navbar />
   </dv.if> -->
-
-  <div class="row">
+              <!-- canEdit: resource.ownerId===$loggedInUserId -->
+  <!-- <div class="row">
     <div class="offset-lg-2 col-lg-8">
       <div id="rules">
         <div class="row">
           <div class="offset-xs-1 col-xs-10">
             <span class="padded">Competition Rules</span>
             <dv.if condition=$canEdit>
-              <!-- canEdit: resource.ownerId===$loggedInUserId -->
               <span>
                 <img src="assets/edit.png" class="edit padded-button" />
               </span>
@@ -29,5 +28,5 @@
       </div>
     </div>
     <div class="col-lg-2"></div>
-  </div>
+  </div> -->
 </dv.action>
