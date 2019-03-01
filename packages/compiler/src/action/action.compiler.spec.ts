@@ -606,4 +606,25 @@ describe('ActionCompiler', () => {
     `;
     actionCompiler.compile(appName, action, st);
   });
+
+  it('should fail if dv-tx is aliased', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      scoring: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="action-with-tx-alias">
+        <dv.tx as foo>
+          <property.create-object />
+          <scoring.create-score />
+        </dv.tx>
+      </dv.action>
+    `;
+    expect(() => actionCompiler.compile(appName, action, st))
+      .toThrow();
+  });
 });
