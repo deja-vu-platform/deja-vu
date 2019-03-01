@@ -61,7 +61,7 @@ const actionRequestTable: ActionRequestTable = {
         `;
       case 'register-only':
         return `
-          mutation Register($code: String!) {
+          mutation Register($code: String) {
             createPasskey(code: $code) ${getReturnFields(extraInfo)}
           }
         `;
@@ -122,7 +122,7 @@ async function getRandomPasscode(passkeys: mongodb.Collection<PasskeyDoc>) {
 }
 
 async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
-  code: string, context: Context) {
+  code: string, context: Context): Promise<PasskeyDoc> {
   if (_.isEmpty(code)) {
     // Generate random code
     code = await getRandomPasscode(passkeys);
@@ -133,6 +133,8 @@ async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
     }
 
     PasskeyValidation.passkeyIsValidOrFail(code);
+
+    return { code: code };
   }
 
   const newPasskey: PasskeyDoc = { code: getHashedCode(code) };

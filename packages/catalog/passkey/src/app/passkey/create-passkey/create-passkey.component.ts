@@ -121,7 +121,7 @@ export class CreatePasskeyComponent
         inputs: { code: this.passkeyControl.value },
         extraInfo: {
           action: 'register-only',
-          returnFields: 'passkey { code }'
+          returnFields: 'code'
         }
       })
         .toPromise();
