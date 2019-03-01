@@ -9,8 +9,9 @@
         <group.show-group group=$group
           showMember=<authentication.show-user id=$id/> />
 
-        <dv.tx as mapmit-join-leave-group-owned-by-user>
-          <group.join-leave class="btn btn-default remove-from-group-btn"
+        <dv.tx>
+          <group.join-leave as group-owned-by-user-join-leave
+            class="btn btn-default remove-from-group-btn"
             group=$group memberId=$loggedInUserId />
         </dv.tx>
 
@@ -33,8 +34,10 @@
 
       <dv.if condition=$isMemberOf>
         <group.show-group group=$group showMembers=false />
-        <dv.tx as mapmit-join-leave-group-user-is-member-of>
-          <authentication.authenticate id=$loggedInUserId hidden=true />
+        <dv.tx>
+          <authentication.authenticate
+            as group-user-is-member-of-authenticate
+            id=$loggedInUserId hidden=true />
           <authorization.add-remove-viewer resourceId=$group?.id
             viewerId=$loggedInUserId hidden=true/>
           <group.join-leave class="btn btn-default remove-from-group-btn"
