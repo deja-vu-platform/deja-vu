@@ -109,6 +109,8 @@ export class CreateRankingComponent
           .join());
       }
       newRanking.id = res.data.createRanking.id;
+    } else {
+      this.gs.noRequest();
     }
 
     this.ranking.emit(newRanking);

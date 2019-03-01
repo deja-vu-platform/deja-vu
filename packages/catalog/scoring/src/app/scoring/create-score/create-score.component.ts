@@ -108,6 +108,8 @@ export class CreateScoreComponent
       }
 
       newScore.id = res.data.createScore.id;
+    } else {
+      this.gs.noRequest();
     }
 
     this.score.emit(newScore);
