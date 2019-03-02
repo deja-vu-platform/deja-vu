@@ -15,11 +15,13 @@ exports.builder = (yargs) => yargs
     describe: 'The type of the action to create'
   })
   .positional('entityName', {
-    describe: 'The name of the entity on which to perform the action'
+    describe: 'The name of the entity on which to perform the action, ' +
+      'or the name of the action if the action type is "blank"'
   })
   .positional('actionName', {
     describe: 'The name of the action to create, ' +
-      'which defaults to `type-entityName` if not provided'
+      'which defaults to `type-entityName` if not provided and ' +
+      'the action type is not "blank"'
   })
   .options({
     skipAppComponentHtml: {
@@ -42,7 +44,8 @@ exports.handler = ({ type, entityName, actionName,
     return;
   }
 
-  const actualActionName = actionName ? actionName : `${type}-${entityName}`;
+  const actualActionName = type === 'blank' ? entityName :
+    (actionName ? actionName : `${type}-${entityName}`);
   console.log(`Creating new action ${actualActionName}`);
 
   const clicheName = projectName();
