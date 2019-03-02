@@ -4,6 +4,7 @@ import {
   chain,
   filter,
   mergeWith,
+  move,
   Rule,
   SchematicContext,
   SchematicsException,
@@ -25,12 +26,13 @@ import { InsertChange } from '../utils/change';
 
 export function action(options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    const templateSource = apply(url('./files'), [
+    const templateSource = apply(url(`./files/${options.type}`), [
         template({
           ...strings,
           ...options
         }),
-        filter((path) => !path.endsWith('.DS_Store') && !tree.exists(path))
+        filter((path) => !path.endsWith('.DS_Store') && !tree.exists(path)),
+        move(getClicheAppPath(options.clicheName))
     ]);
 
     return chain([
@@ -57,10 +59,16 @@ function readIntoSourceFile(tree: Tree, filePath: string): ts.SourceFile {
     filePath, sourceText, ts.ScriptTarget.Latest, true);
 }
 
+function getClicheAppPath(clicheName: string): string {
+  const dasherizedName = strings.dasherize(clicheName);
+
+  return `/src/app/${dasherizedName}`;
+}
+
 function getMetadataPath(clicheName: string): string {
   const dasherizedName = strings.dasherize(clicheName);
 
-  return `/src/app/${dasherizedName}/${dasherizedName}.metadata.ts`;
+  return `${getClicheAppPath(clicheName)}/${dasherizedName}.metadata.ts`;
 }
 
 function findLastComponentImportExportPos(source: ts.SourceFile) {
@@ -86,9 +94,9 @@ function findLastComponentImportExportPos(source: ts.SourceFile) {
     .pop();
 
   const insertPosByLastExport = lastComponentExport ?
-    lastComponentExport.getEnd() + 1 : 0;
+    lastComponentExport.getEnd() : 0;
   const insertPosByLastImport = lastComponentImport ?
-    lastComponentImport.getEnd() + 1 : 0;
+    lastComponentImport.getEnd() : 0;
 
   return Math.max(insertPosByLastExport, insertPosByLastImport);
 }
