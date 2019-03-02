@@ -70,8 +70,15 @@ export class RunService {
   private renderer: Renderer2;
   private actionTable: {[id: string]: ActionInfo} = {};
 
-  private static IsDvTx(node) {
-    return node.nodeName.toLowerCase() === 'dv-tx';
+  private static IsDvTx(node: Element) {
+    return (
+      node.nodeName.toLowerCase() === 'dv-tx'
+      || (
+        window['dv-designer']
+        && _.get(node, ['dataset', 'isaction']) === 'true'
+        && node.getAttribute('dvAlias') === 'dv-tx'
+      )
+    );
   }
 
   constructor(
@@ -195,8 +202,7 @@ export class RunService {
 
     // send the request, if relevant
     if (GatewayService.txBatches[id]) {
-      GatewayService.txBatches[id].send();
-      delete GatewayService.txBatches[id];
+      GatewayService.txBatches[id].setNumActions(runs.length);
     }
 
     const resultMaps: RunResultMap[] = await Promise.all(runs);

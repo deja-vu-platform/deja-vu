@@ -48,3 +48,13 @@
 .popup-menu > mat-form-field {
   width: 100%;
 }
+
+// need clickable area for menu
+.instance-container {
+  min-height: 25px;
+  min-width: 100px;
+}
+
+.hint {
+  color: rgba(0,0,0,.25);
+}

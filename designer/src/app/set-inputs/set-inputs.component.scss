@@ -1,0 +1,18 @@
+.set-inputs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
+  column-gap: 16px;
+}
+
+button.replace-action {
+  width: 100%;
+  padding-left: 0;
+  text-align: left;
+  font-weight: normal;
+  font-size: 16px;
+}
+
+button.replace-action .name {
+  color: #757575;
+}

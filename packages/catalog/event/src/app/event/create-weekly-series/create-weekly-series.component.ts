@@ -97,6 +97,8 @@ export class CreateWeeklySeriesComponent
           extraInfo: { returnFields: 'id' }
         })
         .toPromise();
+    } else {
+      this.gs.noRequest();
     }
   }
 

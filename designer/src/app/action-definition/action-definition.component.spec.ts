@@ -2,10 +2,12 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule, MatMenuModule } from '@angular/material';
 
+import { ActionDefinitionComponent } from './action-definition.component';
+
 import {
   ActionInstanceComponent
 } from '../action-instance/action-instance.component';
-import { ActionDefinitionComponent } from './action-definition.component';
+import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 
 describe('ActionDefinitionComponent', () => {
   let component: ActionDefinitionComponent;
@@ -15,7 +17,8 @@ describe('ActionDefinitionComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         ActionDefinitionComponent,
-        ActionInstanceComponent
+        ActionInstanceComponent,
+        SetInputsComponent
       ],
       imports: [
         FormsModule,

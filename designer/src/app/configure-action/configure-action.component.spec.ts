@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
   MatCheckboxModule,
+  MatDialogModule,
   MatDialogRef,
   MatIconModule,
   MatInputModule,
@@ -23,6 +24,7 @@ describe('ConfigureActionComponent', () => {
         BrowserAnimationsModule,
         FormsModule,
         MatCheckboxModule,
+        MatDialogModule,
         MatIconModule,
         MatInputModule,
         MatListModule

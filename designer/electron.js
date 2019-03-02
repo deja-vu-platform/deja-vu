@@ -2,6 +2,10 @@
 const { app, BrowserWindow } = require('electron');
 const isDev = require('electron-is-dev');
 
+const gateway = require('@deja-vu/gateway');
+
+const requestProcessor = gateway.startGateway(); // port 3000 default
+
 function startElectron(url, serveDelay = 0) {
   let win;
 
@@ -46,4 +50,7 @@ function startElectron(url, serveDelay = 0) {
   });
 }
 
-module.exports = startElectron;
+module.exports = {
+  startElectron,
+  requestProcessor, // designer imports this to manage cliches dynamically
+};

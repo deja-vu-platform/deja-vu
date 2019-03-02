@@ -4,25 +4,26 @@ import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
-  MatInputModule,
   MatSelectModule
 } from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ConfigureClicheComponent } from './configure-cliche.component';
+import { InputActionComponent } from './input-action.component';
 
-describe('ConfigureClicheComponent', () => {
-  let component: ConfigureClicheComponent;
-  let fixture: ComponentFixture<ConfigureClicheComponent>;
+import { SetInputsComponent } from '../set-inputs/set-inputs.component';
+
+describe('InputActionComponent', () => {
+  let component: InputActionComponent;
+  let fixture: ComponentFixture<InputActionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfigureClicheComponent ],
+      declarations: [
+        InputActionComponent,
+        SetInputsComponent
+      ],
       imports: [
-        BrowserAnimationsModule,
         FormsModule,
         MatDialogModule,
-        MatInputModule,
         MatSelectModule
       ],
       providers: [
@@ -34,7 +35,7 @@ describe('ConfigureClicheComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfigureClicheComponent);
+    fixture = TestBed.createComponent(InputActionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

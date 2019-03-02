@@ -1,5 +1,14 @@
-<div id="main-view">
-  <div id="page" *ngIf="actionInstance">
+<div
+  id="main-view"
+  [attr.data-isaction]="true"
+  [attr.dvAlias]="actionInstance.fqtag"
+>
+  <div
+    *ngIf="actionInstance"
+    id="page"
+    [attr.data-isaction]="!!actionInstance.of.transaction"
+    [attr.dvAlias]="'dv-tx'"
+  >
     <div
       *ngFor="let row of rows; let rowNum = index"
       class="dvd-row"
@@ -11,34 +20,43 @@
         class="action"
         [attr.data-index]="actionNum"
       >
-        <!-- unfortunately we can't apply inputs conditionally -->
-        <div *ngIf="action.of.inputs.length === 0">
-          <app-action-instance
-            [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
-          >
-          </app-action-instance>
-        </div>
         <div
-          *ngIf="action.of.inputs.length > 0"
-          #menuTrigger="matMenuTrigger"
-          [matMenuTriggerFor]="menu"
+          *ngIf="action.of.inputs.length === 0"
+          #instanceContainer
+          class="instance-container"
         >
           <app-action-instance
             [actionInstance]="action"
             [actionIO]="scopeIO.getActionIO(action)"
           >
           </app-action-instance>
+          <div *ngIf="action.showHint" class="hint">
+            Hidden: {{action.fqtag}}
+          </div>
+        </div>
+        <div
+          *ngIf="action.of.inputs.length > 0"
+          #instanceContainer
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="menu"
+          class="instance-container"
+        >
+          <app-action-instance
+            [actionInstance]="action"
+            [actionIO]="scopeIO.getActionIO(action)"
+          >
+          </app-action-instance>
+          <div *ngIf="action.showHint" class="hint">
+            Hidden: {{action.fqtag}}
+          </div>
           <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
             <div class="popup-menu" (click)="$event.stopPropagation()">
-              <mat-form-field *ngFor="let input of action.of.inputs">
-                <input
-                  matInput
-                  class="input-value"
-                  [placeholder]="input"
-                  [name]="input"
-                  [(ngModel)]="action.inputSettings[input]">
-              </mat-form-field>
+              <app-set-inputs
+                [app]="app"
+                [actionInstance]="action"
+                [openAction]="actionInstance.of"
+              >
+              </app-set-inputs>
             </div>
           </mat-menu>
         </div>
