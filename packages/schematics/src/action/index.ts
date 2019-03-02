@@ -12,7 +12,7 @@ import {
   Tree,
   url
 } from '@angular-devkit/schematics';
-import * as cheerio from 'cheerio';
+import { HTMLElement, parse, TextNode } from 'node-html-parser';
 import * as ts from 'typescript';
 import {
   appendToArrayDeclaration,
@@ -147,11 +147,12 @@ function addToAppComponentHtml(options: any): Rule {
       return tree;
     }
     const filePath = '/src/app/app.component.html';
-    const $ = cheerio.load(getFileText(tree, filePath));
+
+    const root = parse(getFileText(tree, filePath)) as HTMLElement;
     const actionComponentSelector =
       `${options.clicheName}-${strings.dasherize(options.actionName)}`;
     // skip if it's already there
-    if ($(actionComponentSelector).length) {
+    if (root.querySelector(actionComponentSelector)) {
       return tree;
     }
 
@@ -160,15 +161,16 @@ function addToAppComponentHtml(options: any): Rule {
     const componentHtml =
       `  <h2>${title}</h2>\n` +
       `  <${actionComponentSelector}></${actionComponentSelector}>\n`;
-    $('div[class=container]')
-      .append(componentHtml);
 
-    // only take the contents of the body since cheerio .html() adds extra
-    // html, head, body tags that we don't want
-    // https://github.com/cheeriojs/cheerio/issues/1031
-    const updatedText = $('body')
-      .html();
-    tree.overwrite(filePath, updatedText ? updatedText as string : '');
+    const container = root.querySelector('div.container');
+    if (!container) {
+      console.log('Could not find div with class container, ' +
+        `skipping update to ${filePath}`);
+      return tree;
+    }
+
+    container.appendChild(new TextNode(componentHtml));
+    tree.overwrite(filePath, root.toString());
 
     return tree;
   };
