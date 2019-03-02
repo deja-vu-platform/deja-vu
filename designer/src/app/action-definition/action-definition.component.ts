@@ -42,7 +42,9 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   constructor(private elem: ElementRef, private rs: RunService) { }
 
   ngOnInit() {
-    this.rs.registerAppAction(this.elem, this);
+    if (this.actionInstance && this.actionInstance.isAppAction) {
+      this.rs.registerAppAction(this.elem, this);
+    }
   }
 
   ngAfterViewInit() {

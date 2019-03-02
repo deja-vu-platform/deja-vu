@@ -1,50 +1,81 @@
+$row-control-width: 32px; // we need this fixed for the pseudo background
+
+// the region outside of the page
 #main-view {
   width: 100%;
   background: darkgray;
-  padding: 16px;
+  padding: 24px;
+  padding-left: 0; // because there is the offpage button on the left
 }
 
 #page {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100vh; // will exceed its parent a bit
   display: flex;
   flex-direction: column;
+  // put a white background behind the page
+  // (in case they set the background to something transparent)
+  position: relative;
+  box-sizing: content-box;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: $row-control-width;
+    bottom: 0;
+    right: 0;
+    background: white;
+    z-index: -1;
+  }
 }
 
+// contains both the control ("offpage") and content
 .row-container {
   display: flex;
-  min-height: 100px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+// looks like it's outside of the page
 .row-control {
-  border-right: 1px solid rgba(0, 0, 0, 0.2);
-  margin: 4px 0;
-  padding-right: 8px;
+  width: $row-control-width;
   display: flex;
   align-items: center;
+  padding: 0 4px;
+  button {
+    padding: 0;
+  }
 }
 
+// the content on the page
 .dvd-row {
   flex: 1;
+  display: flex;
+}
+// dvd-row has "page" styles applied to it which we must override sometimes
+.row-container:not(:first-child) .dvd-row {
+  border-top: none !important;
+  padding-top: 0 !important;
+}
+.row-container:not(:last-child) .dvd-row {
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.2) !important;
+  padding-bottom: 0 !important;
 }
 
+// we have a giant invisible last row for dragging content into
 .row-container:last-child {
   flex: 1;
-  border-bottom: none;
-
   .row-control {
-    display: none;
+    visibility: hidden;
   }
 }
 
 .action {
+  // start with invisible border to avoid shifts on hover
   border: 3px solid rgba(255,255,255,0);
   border-radius: 5px;
-}
-
-.action:hover {
-  border-color:rgba(16, 219, 255, .5);
+  &:hover {
+    border-color:rgba(16, 219, 255, .5);
+  }
 }
 
 .popup-menu {
@@ -53,7 +84,7 @@
   mat-form-field {
     width: 100%;
   }
-  width: 268px;
+  width: 268px; // in needs a fixed size; this is the biggest that works
 }
 
 // need clickable area for menu
@@ -62,6 +93,7 @@
   min-width: 100px;
 }
 
+// text showing where invisible actions are
 .hint {
   color: rgba(0,0,0,.25);
 }

@@ -477,6 +477,7 @@ export class App {
     }, null, '  ');
   }
 
+  // We need a consistent object to return or Angular freaks out
   get actionCollections(): ActionCollection[] {
     this._actionCollections.splice(0);
     this._actionCollections.push(this);

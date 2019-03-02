@@ -2,14 +2,15 @@ import {
   AfterViewInit,
   Component,
   ComponentFactoryResolver,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   OnInit,
   Type,
-  ViewChild,
-  ElementRef
+  ViewChild
 } from '@angular/core';
+import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
@@ -20,7 +21,6 @@ import {
   ClicheActionDefinition
 } from '../datatypes';
 import { ActionIO, ScopeIO} from '../io';
-import { RunService } from '@deja-vu/core';
 
 
 @Component({

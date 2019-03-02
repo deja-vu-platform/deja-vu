@@ -8,25 +8,28 @@
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
-    [ngStyle]="actionInstance.of.styles"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
       class="row-container"
     >
-      <div
-        class="row-control"
-        #menuTrigger="matMenuTrigger"
-        [matMenuTriggerFor]="rowMenu"
-        (contextmenu)="openMenu(menuTrigger)"
-      >
-        <mat-icon>reorder</mat-icon>
+      <div class="row-control">
+        <button
+          mat-button
+          class=" mat-small"
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="rowMenu"
+          (contextmenu)="openMenu(menuTrigger)"
+        >
+          <mat-icon>drag_handle</mat-icon>
+        </button>
       </div>
       <div
         class="dvd-row"
         [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
         dragula="action"
         [attr.data-index]="rowNum"
+        [ngStyle]="actionInstance.of.styles"
       >
         <div
           *ngFor="let action of row.actions; let actionNum = index"
