@@ -13,34 +13,34 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
-import { <%= classify(clicheName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
+import { <%= classify(entityName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
 
 
-interface Create<%= classify(clicheName) %>Res {
-  data: { create<%= classify(clicheName) %>: <%= classify(clicheName) %> };
+interface <%= classify(actionName) %>Res {
+  data: { <%= camelize(actionName) %>: <%= classify(entityName) %> };
   errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-create-<%= dasherize(clicheName) %>',
-  templateUrl: './create-<%= dasherize(clicheName) %>.component.html',
-  styleUrls: ['./create-<%= dasherize(clicheName) %>.component.css'],
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
+  templateUrl: './<%= dasherize(actionName) %>.component.html',
+  styleUrls: ['./<%= dasherize(actionName) %>.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: Create<%= classify(clicheName) %>Component,
+      useExisting: <%= classify(actionName) %>Component,
       multi: true
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: Create<%= classify(clicheName) %>Component,
+      useExisting: <%= classify(actionName) %>Component,
       multi: true
     }
   ]
 })
-export class Create<%= classify(clicheName) %>Component implements OnInit, OnExec, OnExecFailure,
+export class <%= classify(actionName) %>Component implements OnInit, OnExec, OnExecFailure,
   OnExecSuccess {
   @Input() id: string | undefined;
   @Input() set content(inputContent: string) {
@@ -49,20 +49,20 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
   @Input() showOptionToSubmit = true;
 
   // Presentation inputs
-  @Input() buttonLabel = 'Create <%= classify(clicheName) %>';
+  @Input() buttonLabel = 'Create <%= classify(entityName) %>';
   @Input() inputContentLabel = 'Content';
-  @Input() new<%= classify(clicheName) %>SavedText = 'New <%= clicheName %> saved';
+  @Input() new<%= classify(entityName) %>SavedText = 'New <%= entityName %> saved';
 
   @ViewChild(FormGroupDirective) form;
 
   contentControl = new FormControl('', Validators.required);
-  create<%= classify(clicheName) %>Form: FormGroup = this.builder.group({
+  <%= camelize(actionName) %>Form: FormGroup = this.builder.group({
     contentControl: this.contentControl
   });
 
 
-  new<%= classify(clicheName) %>Saved = false;
-  new<%= classify(clicheName) %>Error: string;
+  new<%= classify(entityName) %>Saved = false;
+  new<%= classify(entityName) %>Error: string;
 
   private gs: GatewayService;
 
@@ -81,7 +81,7 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<Create<%= classify(clicheName) %>Res>(this.apiPath, {
+    const res = await this.gs.post<<%= classify(actionName) %>Res>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -99,9 +99,9 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
   }
 
   dvOnExecSuccess() {
-    this.new<%= classify(clicheName) %>Saved = true;
+    this.new<%= classify(entityName) %>Saved = true;
     window.setTimeout(() => {
-      this.new<%= classify(clicheName) %>Saved = false;
+      this.new<%= classify(entityName) %>Saved = false;
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -111,6 +111,6 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
   }
 
   dvOnExecFailure(reason: Error) {
-    this.new<%= classify(clicheName) %>Error = reason.message;
+    this.new<%= classify(entityName) %>Error = reason.message;
   }
 }

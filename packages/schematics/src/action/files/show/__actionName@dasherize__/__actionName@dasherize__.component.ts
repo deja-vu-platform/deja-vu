@@ -9,23 +9,23 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
-import { <%= classify(clicheName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
+import { <%= classify(entityName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
 
-interface Show<%= classify(clicheName) %>Res {
-  data: { <%= camelize(clicheName) %>: <%= classify(clicheName) %> };
+interface <%= classify(entityName) %>Res {
+  data: { <%= camelize(entityName) %>: <%= classify(entityName) %> };
 }
 
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-show-<%= dasherize(clicheName) %>',
-  templateUrl: './show-<%= dasherize(clicheName) %>.component.html'
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
+  templateUrl: './<%= dasherize(actionName) %>.component.html'
 })
-export class Show<%= classify(clicheName) %>Component implements AfterViewInit, OnChanges, OnEval,
+export class <%= classify(actionName) %>Component implements AfterViewInit, OnChanges, OnEval,
 OnInit {
-  // Provide one of the following: id or <%= clicheName %>
+  // Provide one of the following: id or <%= entityName %>
   @Input() id: string | undefined;
-  @Input() <%= camelize(clicheName) %>: <%= classify(clicheName) %> | undefined;
-  @Output() loaded<%= classify(clicheName) %> = new EventEmitter();
+  @Input() <%= camelize(entityName) %>: <%= classify(entityName) %> | undefined;
+  @Output() loaded<%= classify(entityName) %> = new EventEmitter();
 
   @Input() showId = true;
   @Input() showContent = true;
@@ -59,7 +59,7 @@ OnInit {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<Show<%= classify(clicheName) %>Res>(this.apiPath, {
+      this.gs.get<<%= classify(entityName) %>Res>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -72,15 +72,15 @@ OnInit {
           }
         },
       })
-      .pipe(map((res: Show<%= classify(clicheName) %>Res) => res.data.<%= camelize(clicheName) %>))
-      .subscribe((<%= camelize(clicheName) %>) => {
-        this.<%= camelize(clicheName) %> = <%= camelize(clicheName) %>;
-        this.loaded<%= classify(clicheName) %>.emit(<%= camelize(clicheName) %>);
+      .pipe(map((res: <%= classify(entityName) %>Res) => res.data.<%= camelize(entityName) %>))
+      .subscribe((<%= camelize(entityName) %>) => {
+        this.<%= camelize(entityName) %> = <%= camelize(entityName) %>;
+        this.loaded<%= classify(entityName) %>.emit(<%= camelize(entityName) %>);
       });
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.<%= camelize(clicheName) %> && this.id && this.gs);
+    return !!(!this.<%= camelize(entityName) %> && this.id && this.gs);
   }
 }

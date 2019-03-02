@@ -1,14 +1,14 @@
 <form (ngSubmit)="onSubmit()"
-  [formGroup]="create<%= classify(clicheName) %>Form"
+  [formGroup]="<%= camelize(actionName) %>Form"
   class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <div *ngIf="new<%= classify(clicheName) %>Saved">
+    <div *ngIf="new<%= classify(entityName) %>Saved">
       <i class="material-icons">done</i>
-        {{new<%= classify(clicheName) %>SavedText}}
+        {{new<%= classify(entityName) %>SavedText}}
     </div>
-    <mat-error *ngIf="new<%= classify(clicheName) %>Error">
+    <mat-error *ngIf="new<%= classify(entityName) %>Error">
       <i class="material-icons">report_problem</i>
-      {{new<%= classify(clicheName) %>Error}}
+      {{new<%= classify(entityName) %>Error}}
     </mat-error>
   </div>
   <div class="form-group">
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" [disabled]="!create<%= classify(clicheName) %>Form.valid">
+    <button mat-button type="submit" [disabled]="!<%= camelize(actionName) %>Form.valid">
       {{buttonLabel}}
     </button>
   </div>
