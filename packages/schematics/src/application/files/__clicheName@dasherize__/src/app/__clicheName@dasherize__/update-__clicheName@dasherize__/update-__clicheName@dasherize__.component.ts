@@ -53,7 +53,7 @@ export class Update<%= classify(clicheName) %>Component implements
 
   // Presentation text
   @Input() buttonLabel = 'Update <%= capitalize(clicheName) %>';
-  @Input() inputLabel = 'Edit <%= clicheName %>';
+  @Input() inputContentLabel = 'Edit Content';
   @Input() update<%= classify(clicheName) %>SavedText = '<%= capitalize(clicheName) %> updated';
   @Input() startEditButtonLabel = 'Edit';
   @Input() stopEditButtonLabel = 'Cancel';

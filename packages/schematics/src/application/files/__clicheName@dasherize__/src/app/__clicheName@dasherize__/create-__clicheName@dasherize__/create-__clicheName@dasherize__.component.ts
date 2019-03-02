@@ -16,7 +16,7 @@ import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
 import { <%= classify(clicheName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
 
 
-interface Create<%= classify(clicheName) %>Response {
+interface Create<%= classify(clicheName) %>Res {
   data: { create<%= classify(clicheName) %>: <%= classify(clicheName) %> };
   errors: { message: string }[];
 }
@@ -50,7 +50,7 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
 
   // Presentation inputs
   @Input() buttonLabel = 'Create <%= classify(clicheName) %>';
-  @Input() inputLabel = 'Content';
+  @Input() inputContentLabel = 'Content';
   @Input() new<%= classify(clicheName) %>SavedText = 'New <%= clicheName %> saved';
 
   @ViewChild(FormGroupDirective) form;
@@ -81,7 +81,7 @@ export class Create<%= classify(clicheName) %>Component implements OnInit, OnExe
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<Create<%= classify(clicheName) %>Response>(this.apiPath, {
+    const res = await this.gs.post<Create<%= classify(clicheName) %>Res>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
