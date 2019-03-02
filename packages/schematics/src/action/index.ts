@@ -155,8 +155,10 @@ function addToAppComponentHtml(options: any): Rule {
       return tree;
     }
 
+    const title = `${strings.capitalize(options.type)} ` +
+      `${strings.capitalize(options.entityName)}`;
     const componentHtml =
-      `  <h2>${options.actionName}</h2>\n` +
+      `  <h2>${title}</h2>\n` +
       `  <${actionComponentSelector}></${actionComponentSelector}>\n`;
     $('div[class=container]')
       .append(componentHtml);
