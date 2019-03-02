@@ -61,10 +61,29 @@ To create an action in a cliché, run the following from the root of
 the cliché's directory:
 
 ```
-dv new action action-name
+dv new action type entityname action-name
 ```
 
-By convention, use kebab-case for the `action-name`.
+By convention, use kebab-case for the `action-name`, and a single word for
+the `entityname` on which to perform the action.
+
+There are five possible `type` parameters that can be used:
+`blank`, `create`, `show`, `update`, and `delete`. The first creates a blank
+action, while the rest each create an action for the one of the CRUD operations,
+respectively. If `blank` is specified as the `type`, the parameter `entityName`
+will be the action name (the parameter `action-name` will be unused). For other `type`s, the default action name is `type-entityname`.
+Here are a few examples that demonstrate the above rules:
+
+```
+# create the choose-event action with the blank template
+dv new action blank choose-event
+
+# create the show-event action
+dv new action show event
+
+# create the edit-event action using the update action template
+dv new action udpate event edit-event
+```
 
 The command will create the HTML, TypeScript, CSS, and test files for the action.
 It will also add the action to `clichename.metadata.ts` and to `app.component.html`
