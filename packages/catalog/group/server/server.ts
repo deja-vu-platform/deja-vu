@@ -77,7 +77,7 @@ const actionRequestTable: ActionRequestTable = {
       members(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(group: GroupDoc | null) {
   return _.get(group, 'pending.type') === 'create-group';
@@ -115,7 +115,8 @@ async function addOrRemoveMember(
       return true;
     case undefined:
       await GroupValidation.groupExistsOrFail(groups, groupId);
-      const updateObj = await groups.updateOne(notPendingGroupIdFilter, updateOp);
+      const updateObj = await groups
+        .updateOne(notPendingGroupIdFilter, updateOp);
       if (updateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }

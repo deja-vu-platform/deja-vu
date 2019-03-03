@@ -25,6 +25,7 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
 export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   @Input() showMembersList = true;
+  @Input() noMembersText = 'No members';
 
   // Fetch rules
   @Input() inGroupId: string | undefined;
