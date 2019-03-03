@@ -91,6 +91,7 @@ export class FloatingMenuComponent implements AfterViewInit {
   private static ANIMS_PER_CYCLE = 4;
   private static OPEN_ANIM_NUM = 0;
   // private static CLOSE_ANIM_NUM = 3;
+  static maxZ = 1000;
 
   @Output() shouldClose = new EventEmitter<null>();
   @Output() closed = new EventEmitter<null>();
@@ -118,20 +119,6 @@ export class FloatingMenuComponent implements AfterViewInit {
   }
 
   /**
-   * Should fire when the menu is actually opened
-   */
-  private onOpened() {
-    const menu = this.content.nativeElement
-      .parentElement
-      .parentElement
-      .parentElement;
-    const handle = this.content.nativeElement.querySelector('.handle');
-    makeDraggable(menu, handle);
-    removeOverlay();
-    this.opened.emit(null);
-  }
-
-  /**
    * Forward the event from MatMenu
    */
   onClosed() {
@@ -144,5 +131,38 @@ export class FloatingMenuComponent implements AfterViewInit {
    */
   close() {
     this.shouldClose.emit(null);
+  }
+
+  /**
+   * The native element containing the menu
+   */
+  private get menu(): HTMLElement {
+    return this.content.nativeElement
+      .parentElement
+      .parentElement
+      .parentElement;
+  }
+
+  /**
+   * Should fire when the menu is actually opened
+   */
+  private onOpened() {
+    removeOverlay();
+
+    this.toFront();
+    this.menu.addEventListener('mousedown', this.toFront, true);
+
+    const handle = this.content.nativeElement.querySelector('.handle');
+    makeDraggable(this.menu, handle);
+
+    this.opened.emit(null);
+  }
+
+  /**
+   * Move this floating menu in front of any other floating menus
+   */
+  private toFront = () => {
+    FloatingMenuComponent.maxZ += 1;
+    this.menu.style.zIndex = `${FloatingMenuComponent.maxZ}`;
   }
 }
