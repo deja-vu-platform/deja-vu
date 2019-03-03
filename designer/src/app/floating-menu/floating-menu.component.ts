@@ -21,7 +21,7 @@ function removeOverlay(delay = 1, nextDelay = 10) {
   setTimeout(() => {
     const overlay = document.querySelector(overlaySelector);
     if (overlay) {
-      overlay.parentElement.removeChild(overlay);
+      overlay.remove();
     } else {
       removeOverlay(nextDelay);
     }
@@ -39,8 +39,10 @@ function removeOverlay(delay = 1, nextDelay = 10) {
  *    (defaults to element)
  */
 function makeDraggable(element: HTMLElement, handle?: HTMLElement) {
-  handle = handle ? handle : element;
+  handle = handle || element; // default handle to element
 
+  // state
+  // we need to use client diff because client != element coords
   let lastClientX: number;
   let lastClientY: number;
   let left: number;
@@ -50,7 +52,6 @@ function makeDraggable(element: HTMLElement, handle?: HTMLElement) {
     left += mouseEvent.clientX - lastClientX;
     top += mouseEvent.clientY - lastClientY;
 
-    element.style.position = 'absolute';
     element.style.left = left + 'px';
     element.style.top = top + 'px';
 
@@ -59,17 +60,24 @@ function makeDraggable(element: HTMLElement, handle?: HTMLElement) {
   }
 
   handle.addEventListener('mousedown', (mouseEvent: MouseEvent) => {
+    element.style.position = 'absolute';
+
+    // we need to get initial values on the first click event
     lastClientX = mouseEvent.clientX;
     lastClientY = mouseEvent.clientY;
+
     const rect = element.getBoundingClientRect();
     left = rect.left;
     top = rect.top;
+
+    handle.style.pointerEvents = 'none';
     window.addEventListener('mousemove', onMove);
   });
 
   window.addEventListener('mouseup', () => {
+    handle.style.pointerEvents = 'unset';
     window.removeEventListener('mousemove', onMove);
-  });
+  }, true); // capturing phase so pointer-events: none doesn't block it
 }
 
 
@@ -84,11 +92,13 @@ export class FloatingMenuComponent implements AfterViewInit {
   private static OPEN_ANIM_NUM = 0;
   // private static CLOSE_ANIM_NUM = 3;
 
-  @ViewChild('menu') matMenu: MatMenu;
-  @ViewChild('content') content: ElementRef;
-
-  @Output() closed = new EventEmitter<null>();
   @Output() shouldClose = new EventEmitter<null>();
+  @Output() closed = new EventEmitter<null>();
+  @Output() opened = new EventEmitter<null>();
+
+  @ViewChild('menu') private readonly matMenu: MatMenu;
+  @ViewChild('content') private readonly content: ElementRef;
+
   private animCount = 0;
 
   /**
@@ -118,6 +128,7 @@ export class FloatingMenuComponent implements AfterViewInit {
     const handle = this.content.nativeElement.querySelector('.handle');
     makeDraggable(menu, handle);
     removeOverlay();
+    this.opened.emit(null);
   }
 
   /**

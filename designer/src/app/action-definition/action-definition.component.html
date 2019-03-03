@@ -79,12 +79,11 @@
             <!-- above is same as above -->
             <app-floating-menu
               #actionMenu
+              (opened)="clickFirstTab(actionNum)"
               (closed)="onActionMenuClosed()"
               (shouldClose)="closeMenu(actionMenuTrigger)"
             >
-              <mat-tab-group
-                class="popup-menu"
-              >
+              <mat-tab-group #actionMenuContent class="popup-menu">
                 <mat-tab label="Inputs">
                   <app-set-inputs
                     [app]="app"

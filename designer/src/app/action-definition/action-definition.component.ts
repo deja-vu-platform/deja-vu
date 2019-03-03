@@ -8,7 +8,7 @@ import {
   QueryList,
   ViewChildren
 } from '@angular/core';
-import { MatMenuTrigger } from '@angular/material';
+import { MatMenuTrigger, MatTabGroup } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -33,6 +33,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
+  @ViewChildren('actionMenuContent')
+    private actionMenuContents: QueryList<MatTabGroup>;
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
@@ -125,5 +127,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   closeMenu(trigger: MatMenuTrigger) {
     trigger.closeMenu();
+  }
+
+  clickFirstTab(actionNum: number) {
+    const tabGroupEl: HTMLElement = this.actionMenuContents
+      .toArray()[actionNum]._elementRef.nativeElement;
+    const firstTabEl = tabGroupEl
+      .querySelector('.mat-tab-label');
+    firstTabEl.dispatchEvent(new Event('mousedown'));
   }
 }
