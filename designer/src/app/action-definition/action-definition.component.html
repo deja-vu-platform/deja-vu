@@ -17,9 +17,9 @@
         <button
           mat-button
           class=" mat-small"
-          #menuTrigger="matMenuTrigger"
-          [matMenuTriggerFor]="rowMenu"
-          (contextmenu)="openMenu(menuTrigger)"
+          #rowMenuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="rowMenu.matMenu"
+          (contextmenu)="openMenu(rowMenuTrigger)"
         >
           <mat-icon>drag_handle</mat-icon>
         </button>
@@ -61,9 +61,9 @@
             *ngIf="action.of.inputs.length > 0"
             #instanceContainer
             class="instance-container"
-            #menuTrigger="matMenuTrigger"
-            [matMenuTriggerFor]="actionMenu"
-            (contextmenu)="openMenu(menuTrigger)"
+            #actionMenuTrigger="matMenuTrigger"
+            [matMenuTriggerFor]="actionMenu.matMenu"
+            (contextmenu)="openMenu(actionMenuTrigger)"
           >
             <!-- below is same as above -->
             <app-action-instance
@@ -77,14 +77,13 @@
               Hidden: {{action.fqtag}}
             </div>
             <!-- above is same as above -->
-            <mat-menu
-              #actionMenu="matMenu"
-              [overlapTrigger]="false"
+            <app-floating-menu
+              #actionMenu
               (closed)="onActionMenuClosed()"
+              (shouldClose)="closeMenu(actionMenuTrigger)"
             >
               <mat-tab-group
                 class="popup-menu"
-                (click)="$event.stopPropagation()"
               >
                 <mat-tab label="Inputs">
                   <app-set-inputs
@@ -98,14 +97,14 @@
                   <p>OUTPUTS TODO</p>
                 </mat-tab>
               </mat-tab-group>
-            </mat-menu>
+            </app-floating-menu>
           </div>
         </div>
       </div>
-      <mat-menu
+      <app-floating-menu
         #rowMenu="matMenu"
-        [overlapTrigger]="false"
         (closed)="onRowMenuClosed()"
+        (shouldClose)="closeMenu(rowMenuTrigger)"
       >
         <div class="popup-menu" (click)="$event.stopPropagation()">
           <mat-form-field>
@@ -129,7 +128,7 @@
             </mat-select>
           </mat-form-field>
         </div>
-      </mat-menu>
+      </app-floating-menu>
     </div>
   </div>
 </div>

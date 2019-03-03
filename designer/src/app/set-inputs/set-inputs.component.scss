@@ -3,6 +3,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
   column-gap: 16px;
+  padding: 0 16px;
 }
 
 button.replace-action {

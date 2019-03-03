@@ -38,6 +38,7 @@ import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
 import { ScopeIO } from './io';
+import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 
 ScopeIO.actionInstanceComponent = ActionInstanceComponent;
 
@@ -53,7 +54,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent
+    TopBarComponent,
+    FloatingMenuComponent
   ],
   imports: [
     BrowserModule,

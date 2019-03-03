@@ -8,6 +8,7 @@ import {
   QueryList,
   ViewChildren
 } from '@angular/core';
+import { MatMenuTrigger } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -118,7 +119,11 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     }
   }
 
-  openMenu(trigger) {
+  openMenu(trigger: MatMenuTrigger) {
     trigger.openMenu();
+  }
+
+  closeMenu(trigger: MatMenuTrigger) {
+    trigger.closeMenu();
   }
 }

@@ -15,6 +15,9 @@ import { ActionDefinitionComponent } from './action-definition.component';
 import {
   ActionInstanceComponent
 } from '../action-instance/action-instance.component';
+import {
+  FloatingMenuComponent
+} from '../floating-menu/floating-menu.component';
 import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 
 describe('ActionDefinitionComponent', () => {
@@ -26,14 +29,15 @@ describe('ActionDefinitionComponent', () => {
       declarations: [
         ActionDefinitionComponent,
         ActionInstanceComponent,
+        FloatingMenuComponent,
         SetInputsComponent
       ],
       imports: [
         FormsModule,
         MatCheckboxModule,
+        MatMenuModule,
         MatIconModule,
         MatInputModule,
-        MatMenuModule,
         MatSelectModule,
         MatTabsModule
       ],

@@ -24,6 +24,7 @@ import {
 import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
+import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import { SetInputsComponent } from './set-inputs/set-inputs.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
@@ -35,6 +36,7 @@ describe('AppComponent', () => {
         ActionDefinitionComponent,
         ActionInstanceComponent,
         AppComponent,
+        FloatingMenuComponent,
         SetInputsComponent,
         SideMenuComponent,
         TopBarComponent

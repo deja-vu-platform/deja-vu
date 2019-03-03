@@ -79,12 +79,11 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 }
 
 .popup-menu {
-  height: 200px;
-  padding: 0 16px;
+  height: 250px;
+  width: 268px; // in needs a fixed size; this is the biggest that works
   mat-form-field {
     width: 100%;
   }
-  width: 268px; // in needs a fixed size; this is the biggest that works
 }
 
 // need clickable area for menu
@@ -98,8 +97,8 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
   color: rgba(0,0,0,.25);
 }
 
-mat-tab {
-  height: 100%;
+mat-tab-group {
+  padding: 0;
 }
 
 mat-checkbox {
