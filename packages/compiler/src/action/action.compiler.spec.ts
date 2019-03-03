@@ -84,7 +84,8 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .not.toMatch('dv.action');
+      .not
+      .toMatch('dv.action');
     expect(compiledAction.ngTemplate)
       .toMatch('\"\'hello\'\"');
     expect(compiledAction.ngTemplate)
@@ -420,7 +421,69 @@ describe('ActionCompiler', () => {
     });
 
   it('should compile action with action input ' +
-    'that uses context inputs', () => {
+    'that uses context', () => {
+      const st: SymbolTable = {
+        scoring: {
+          kind: 'cliche'
+        },
+        foo: {
+          kind: 'cliche'
+        }
+      };
+      const action = `
+      <dv.action name="home">
+        <foo.navbar />
+        <div>
+          <scoring.show-targets-by-score
+            showTarget=<foo.show-post
+            loggedInUser=foo.navbar.loggedInUser />
+          >
+          </scoring.show-targets-by-score>
+        </div>
+      </dv.action>`;
+      const compiledAction: CompiledAction = actionCompiler
+        .compile(appName, action, st);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`[showTarget]`);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`tag`);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`type`);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`inputs`);
+      expect(compiledAction.actionInputs.length)
+        .toBe(1);
+      const actionInput = compiledAction.actionInputs[0];
+      expect(actionInput.ngTemplate)
+        .toMatch(`show-post`);
+      const inputRegex = /@Input\(\)\s+(.*);/;
+      expect(actionInput.ngComponent)
+        .toMatch(inputRegex);
+
+      const inputField = actionInput.ngComponent
+        .match(inputRegex)[1];
+      expect(actionInput.ngTemplate)
+        .toMatch(inputField);
+
+      const inputsObjRegex = new RegExp(
+        `{\\s*${inputField}:\\s*([^}\\s]*)\\s*}`);
+
+      expect(compiledAction.ngTemplate)
+        .toMatch(inputsObjRegex);
+
+      const outputField = compiledAction.ngTemplate
+        .match(inputsObjRegex)[1];
+      expect(compiledAction.ngTemplate)
+        .toMatch(`${outputField}=`);
+      expect(compiledAction.ngComponent)
+        .toMatch(outputField);
+
+      expect(compiledAction.ngTemplate)
+        .toMatch('capture__');
+    });
+
+    it('should compile action with action input ' +
+    'that uses context', () => {
       const st: SymbolTable = {
         scoring: {
           kind: 'cliche'
@@ -482,7 +545,7 @@ describe('ActionCompiler', () => {
     });
 
   it('should compile action with action input ' +
-    'that shadows context inputs', () => {
+    'that captures context inputs with member access', () => {
       const st: SymbolTable = {
         scoring: {
           kind: 'cliche'
@@ -493,41 +556,90 @@ describe('ActionCompiler', () => {
       };
       const action = `
       <dv.action name="home">
-        <foo.navbar />
+        <foo.navbar id=$myId.id />
         <div>
           <scoring.show-targets-by-score
             showTarget=<div>
-              <foo.navbar />
-              <foo.show-post
-               loggedInUser=foo.navbar.loggedInUser />
-               </div>
-          >
-          </scoring.show-targets-by-score>
+              <foo.other-navbar />
+              <foo.create-post id=$myId.id user=foo.navbar.user />
+            </div>
+          />
         </div>
       </dv.action>`;
       const compiledAction: CompiledAction = actionCompiler
         .compile(appName, action, st);
       expect(compiledAction.ngTemplate)
-        .toMatch(`[showTarget]`);
+        .toMatch(/\[showTarget\]/);
       expect(compiledAction.ngTemplate)
         .toMatch(`tag`);
       expect(compiledAction.ngTemplate)
         .toMatch(`type`);
+
+      const inputsObjRegex = (inputField) => new RegExp(
+        `${inputField}:\\s*([^}\\s]*)`);
+
+      expect(compiledAction.ngTemplate)
+        .toMatch(inputsObjRegex(`capture__foo_navbar_user`));
+      expect(compiledAction.ngTemplate)
+        .toMatch(inputsObjRegex(`capture__myId`));
+
       expect(compiledAction.actionInputs.length)
         .toBe(1);
       const actionInput = compiledAction.actionInputs[0];
       expect(actionInput.ngTemplate)
         .toMatch(`navbar`);
       expect(actionInput.ngTemplate)
-        .toMatch(`show-post`);
+        .toMatch(`create-post`);
+      expect(actionInput.ngTemplate)
+        .toMatch(/\[id\]="capture__myId.id"/);
       expect(actionInput.ngComponent)
-        .not
-        .toMatch('@Input()');
+        .toMatch(/@Input\(\) capture__myId;/);
+  });
+
+  it('should compile action with action input ' +
+    'that captures context inputs', () => {
+      const st: SymbolTable = {
+        scoring: {
+          kind: 'cliche'
+        },
+        foo: {
+          kind: 'cliche'
+        }
+      };
+      const action = `
+      <dv.action name="home">
+        <foo.navbar id=$myId />
+        <div>
+          <scoring.show-targets-by-score
+            showTarget=<div><foo.create-post id=$myId /></div>
+          />
+        </div>
+      </dv.action>`;
+      const compiledAction: CompiledAction = actionCompiler
+        .compile(appName, action, st);
+      expect(compiledAction.ngTemplate)
+        .toMatch(/\[showTarget\]/);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`tag`);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`type`);
+
+      const inputsObjRegex = (inputField) => new RegExp(
+        `${inputField}:\\s*([^}\\s]*)`);
 
       expect(compiledAction.ngTemplate)
-        .not
-        .toMatch('capture__');
-    });
+        .toMatch(inputsObjRegex(`capture__myId`));
+
+      expect(compiledAction.actionInputs.length)
+        .toBe(1);
+      const actionInput = compiledAction.actionInputs[0];
+      expect(actionInput.ngTemplate)
+        .toMatch(`create-post`);
+      expect(actionInput.ngTemplate)
+        .toMatch(/\[id\]="capture__myId"/);
+      expect(actionInput.ngComponent)
+        .toMatch(/@Input\(\) capture__myId;/);
+  });
 
   it('should compile action with action input ' +
     'that maps outputs', () => {

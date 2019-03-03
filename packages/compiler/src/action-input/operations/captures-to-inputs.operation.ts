@@ -17,7 +17,7 @@ function captureToInput(field: string) {
  * Turn all references to the action input's context (captures) to inputs
  *
  * @param symbolTable the symbol table of the input action
- * @param context the context information given by its containing action
+ * @param context the context information given by its wrapping action
  * @param inputsFromContext array where the inputs from context should be saved
  */
 export function capturesToInputs(
@@ -44,7 +44,17 @@ export function capturesToInputs(
     Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
     Expr_member: recurse, Expr_literal: recurse,
 
-    Expr_input: (input) => input.sourceString,
+    Expr_input: (inputNode) => {
+      const input = inputNode.sourceString;
+      if (_.has(context, input)) {
+        const capturedInput = captureToInput(input.slice(1));
+        inputsFromContext.push({ input: capturedInput, field: input });
+
+        return capturedInput;
+      } else {
+        return input;
+      }
+    },
     Expr_element: (element) => element.sourceString,
 
     Expr_parens: (op, expr, cp) => op.sourceString +
@@ -69,7 +79,15 @@ export function capturesToInputs(
       const nameOrInput = nameOrInputNode.sourceString;
       const rest = restNode.sourceString;
       if (isInput(nameOrInput)) {
-        return nameOrInput + restNode.sourceString;
+        if (_.has(context, nameOrInput)) {
+          // it's capturing an input from the context
+          const capturedInput = captureToInput(nameOrInput.slice(1));
+          inputsFromContext.push({ input: capturedInput, field: nameOrInput });
+
+          return capturedInput + restNode.sourceString;
+        } else {
+          return nameOrInput + restNode.sourceString;
+        }
       } else {
         const name = nameOrInput;
         if (_.has(symbolTable, name)) {
