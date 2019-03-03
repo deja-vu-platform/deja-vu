@@ -1,38 +1,37 @@
 <dv.action name="add-problem">
-  <!-- <category.show-labels hidden=true />
+  <category.show-labels hidden=true />
 
-  <div class="row">
-    <div class="col-lg-10">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <dv.tx>
-            <dv.status savedText="New problem created" />
-            <dv.gen-id />
-            <div class="col-xs-2">
-              <problem.create-object id=dv.gen-id.id
-                showOptionToSubmit=false/>
-            </div>
-            <div class="col-xs-3">
-              <problemscore.create-score id=dv.gen-id.id
-                sourceId=$competitionId
-                targetId=dv.gen-id.id
-                showOptionToSubmit=false />
-            </div>
-            <div class="col-xs-5">
-              <category.attach-labels itemId=dv.gen-id.id
-                labels=category.show-labels.labels />
-            </div>
+  <div class="card">
+    <div class="card-body">
+      <dv.tx>
+        <dv.status savedText="New problem created" />
+        <dv.gen-id />
+        <div class="row">
+          <div class="col-2 col-2-input-fields">
+            <problem.create-object id=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-3 col-3-input-fields">
+            <problemscore.create-score id=dv.gen-id.id
+              sourceId=$competitionId
+              targetId=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-5 category-labels">
+            <category.attach-labels itemId=dv.gen-id.id
+              inputLabel=""
+              labels=category.show-labels.labels
+              showOptionToSubmit=false />
+          </div>
 
-            <hostauthentication.authenticate id=$loggedInUserId />
-            <dv.button class="add">
-              <img src="assets/add.png" />
-            </dv.button>
-            <dv.callback defaultHref="/host/competition-problems"
-              onExecSuccess=true hidden=true />
-          </dv.tx>
+          <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+          <dv.button class="add">
+            <img src="assets/add.png" />
+          </dv.button>
+          <dv.callback defaultHref="/host/competition-problems"
+            onExecSuccess=true hidden=true />
         </div>
-      </div>
+      </dv.tx>
     </div>
-  </div> -->
-
+  </div>
 </dv.action>

@@ -3,15 +3,13 @@
   <!-- TODO: edit name, labels -->
 
   <!-- Delete Participant -->
-  <!-- <dv.tx> -->
+  <dv.tx>
     <!-- userprofile.delete-object -->
     <!-- climbercode.delete-passkey -->
     <!-- sex.delete-item -->
     <!-- category.delete-item -->
-    <!-- <event.delete-event id=$id />
-    <competitionclimbers.join-leave memberId=$loggedInUserId
-      groupId=$id hidden=true />
-    <authorization.remove-viewer id=$id viewerId=$loggedInUserId hidden=true />
-  </dv.tx> -->
+    <competitionclimbers.join-leave memberId=$id
+      groupId=$competitionId />
+  </dv.tx>
 
 </dv.action>

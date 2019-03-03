@@ -1,10 +1,10 @@
 <dv.action name="show-participants">
   <livescorecard.host-navbar />
 
-  <div class="container">
+  <div class="container below-navbar">
 
     <!-- TODO: Sort by name -->
-    <!-- <div class="row">
+    <div class="row">
       <div class="col-lg-4">
         <span>Sort by: (soon)</span>
         <div class="row left-space">
@@ -24,30 +24,24 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
 
     <br />
 
-    <!-- Header -->
-    <!-- <div class="row">
-      <div class="col-lg-10">
-        <div class="offset-xs-1 col-xs-3 center white">name</div>
-        <div class="col-xs-1 center white">sex</div>
-        <div class="col-xs-2 right white">reveal all
-          <input type="checkbox" />
-        </div>
-        <div class="col-xs-1 white">code</div>
-        <div class="col-xs-2 white">category</div>
-        <div class="col-xs-2"></div>
-      </div>
-      <div class="col-lg-2"></div>
-    </div> -->
+    <div class="row">
+      <div class="offset-1 col-3 center white">name</div>
+      <div class="col-2 center white">sex</div>
+      <div class="col-2 white">category</div>
+      <div class="col-2 white"></div>
+    </div>
 
-    <!-- Add Participant to Competition -->
-    <!-- <livescorecard.add-participant competitionId=$competitionId /> -->
+    <livescorecard.add-participant
+      loggedInUserId=livescorecard.host-navbar.loggedInUserId
+      competitionId=$competitionId />
 
-    <!-- All Participants -->
-    <!-- <competitionclimbers.show-members inGroupId=$competitionId
-      showMember=<livescorecard.show-participant id=$id /> /> -->
+    <competitionclimbers.show-members inGroupId=$competitionId
+      noMembersText=""
+      showMember=<livescorecard.show-participant id=$id
+        competitionId=$competitionId /> />
   </div>
 </dv.action>

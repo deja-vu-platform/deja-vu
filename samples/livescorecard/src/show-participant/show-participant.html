@@ -1,28 +1,29 @@
 <dv.action name="show-participant">
-  <!-- <div class="row">
-    <div class="col-lg-10">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <dv.status savedText="Participant added to competition" />
-          <div class="offset-xs-1 col-xs-3">
-            <userprofile.show-object id=$id />
-          </div>
-          <div class="col-xs-2">
-            <sex.show-labels itemId=$id />
-          </div>
-          <div class="col-xs-2 right">
-            ******
-          </div>
-          <div class="col-xs-2">
-            <category.show-labels itemId=$id />
-          </div>
-          <div class="col-xs-2">
-            <dv.link href="/host/edit-participant" params={ id: $id }>
-              <img src="assets/edit.png" class="edit" />
-            </dv.link>
-          </div>
+  <userprofile.show-object id=$id  hidden=true />
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="offset-1 col-3">
+          <userprofile.show-object class="inline-block"
+            showOnly=['firstName']
+            object=userprofile.show-object.loadedObject/>
+          <userprofile.show-object class="inline-block"
+            showOnly=['lastName']
+            object=userprofile.show-object.loadedObject />
+        </div>
+        <div class="col-2">
+          <sex.show-labels itemId=$id />
+        </div>
+        <div class="col-2">
+          <category.show-labels itemId=$id />
+        </div>
+        <div class="col-2 center">
+          <dv.link href="/host/edit-participant"
+            params={ id: $id, competitionId: $competitionId }>
+            <img src="assets/edit.png" class="edit" />
+          </dv.link>
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 </dv.action>

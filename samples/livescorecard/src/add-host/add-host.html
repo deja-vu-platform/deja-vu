@@ -1,28 +1,26 @@
 <dv.action name="add-host">
-  <!-- <div class="container">
-    <div class="row">
-      <div class="offset-xs-7 col-xs-4">
-        <br />
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <hostauthentication.choose-user showChooseButton=false
-              chooseSelectPlaceholder="Choose Host" />
-            <dv.tx>
-              <competitionhosts.add-to-group id=$groupId
-                memberId=hostauthentication.choose-user.selectedUser.id
-                hidden=true />
-              <authorization.add-viewer id=$groupId
-                viewerId=hostauthentication.choose-user.selectedUser.id
-                hidden=true />
-              <dv.button>
-                <img src="assets/add.png" class="add padded-button" />
-              </dv.button>
-              <dv.callback defaultHref="/host" onExecSuccess=true />
-            </dv.tx>
-          </div>
+  <div class="card">
+    <div class="card-body">
+      <hostauthentication.choose-user showChooseButton=false
+        chooseSelectPlaceholder="Choose Host" />
+      <dv.tx>
+        <dv.status savedText="New host added to the competition" />
+        <div class="row inline-block">
+          <competitionhosts.add-to-group id=$competitionId
+            memberId=hostauthentication.choose-user.selectedUser?.id
+            hidden=true />
+          <authorization.add-viewer id=$competitionId
+            viewerId=hostauthentication.choose-user.selectedUser?.id
+            hidden=true />
+          <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+
+          <dv.button class="add right-shift">
+            <img src="assets/add.png" />
+          </dv.button>
+          <dv.callback defaultHref="/host/competition-hosts"
+            onExecSuccess=true hidden=true />
         </div>
-      </div>
-      <div class="col-xs-1"></div>
+      </dv.tx>
     </div>
-  </div> -->
+  </div>
 </dv.action>

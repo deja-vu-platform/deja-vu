@@ -37,7 +37,7 @@ dv-link.btn-outline-secondary:hover {
 }
 
 dv-link.btn.btn-outline-secondary.choice.active a,
-dv-link.btn-outline-secondary:hover a{
+dv-link.btn-outline-secondary:hover a {
   background-color: #4FB5C3;
   color: white;
 }
@@ -91,6 +91,39 @@ authentication-sign-in button.mat-button {
 
 .add img:hover {
   opacity: 1;
+}
+
+img.hostcompentry {
+  height: 1.3em;
+  display: inline-block;
+  padding-right: .2em;
+}
+
+img.trophy {
+  height: 1.1em;
+}
+
+.edit img {
+  opacity: .3;
+  height: 1.5em;
+  cursor: pointer;
+  margin-left: .2em;
+}
+
+.edit img:hover {
+  opacity: .5;
+}
+
+@media screen and (max-width: 423px) {
+  .edit img {
+    display: block;
+    margin-top: 2em;
+  }
+}
+
+.edit-rules img {
+  padding-left: 1em;
+  margin-bottom: 1em;
 }
 
 .link {
@@ -285,6 +318,10 @@ input[type=password].authentication {
   margin: .3em;
 }
 
+.col-3-input-fields .mat-input-flex {
+  width: 14.0625em;
+}
+
 .col-2-input-fields .mat-input-flex {
   width: 9.375em;
 }
@@ -292,3 +329,25 @@ input[type=password].authentication {
 .col-1-input-fields .mat-input-flex {
   width: 4.6875em;
 }
+
+.right-shift {
+  padding-left: 1.5em;
+}
+
+.category-labels .mat-input-infix {
+  border-top-width: 0em;
+  padding-bottom: 0.25em;
+  padding-top: 0.25em;
+}
+
+authorization-show-resources ul,
+group-show-members ul {
+  margin: 0em 0.125em;
+}
+
+livescorecard-show-problem .property-show-object-property,
+livescorecard-show-problem scoring-show-score div.ng-star-inserted,
+livescorecard-show-problem .edit img {
+  padding-top: 0.625em;
+}
+
