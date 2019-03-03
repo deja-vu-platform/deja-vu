@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatInputModule } from '@angular/material';
+import {
+  MatCheckboxModule,
+  MatDialogModule,
+  MatInputModule
+} from '@angular/material';
 
 import { SetInputsComponent } from './set-inputs.component';
 
@@ -13,6 +17,7 @@ describe('SetInputsComponent', () => {
       declarations: [ SetInputsComponent ],
       imports: [
         FormsModule,
+        MatCheckboxModule,
         MatDialogModule,
         MatInputModule
       ]

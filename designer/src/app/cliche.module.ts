@@ -104,9 +104,10 @@ function clicheDefinitionFromModule(
           isComponent(_.get(instance, [input, 'type']))
         );
 
+        const template: string = component.decorators[0].args[0].template;
+        // parse the template string to extract the object map
+        // TODO: stop assuming zero or one action input per action
         if (actionInputNames.length > 0) {
-          // parse the template string to extract the object map
-          const template: string = component.decorators[0].args[0].template;
           const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
           if (inputMapMatch) {
             actionInputs[actionInputNames[0]] = _.fromPairs(
@@ -128,7 +129,8 @@ function clicheDefinitionFromModule(
           component,
           inputs,
           outputs,
-          actionInputs
+          actionInputs,
+          ngContent: template.includes('ng-content')
         };
       })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
@@ -153,7 +155,8 @@ dvCliche.actions.push(({
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: {}
+  actionInputs: {},
+  ngContent: false
 }));
 
 @NgModule({

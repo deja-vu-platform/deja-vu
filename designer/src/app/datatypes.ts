@@ -23,6 +23,7 @@ export interface ActionDefinition {
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
   readonly actionInputs: ActionInputs;
+  readonly ngContent: boolean;
 }
 
 export interface ClicheActionDefinition extends ActionDefinition {
@@ -54,6 +55,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly actionInputs: Readonly<ActionInputs> = {};
   // TODO: export styles
   readonly styles = _.cloneDeep(defaultAppActionStyles);
+  readonly ngContent = false;
 
   constructor(name: string) {
     this.name = name;
@@ -218,6 +220,7 @@ export class ActionInstance {
   readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
   // TODO: export styles
   readonly styles: { stretch: boolean } = { stretch: false };
+  readonly ngContent: string | ActionInstance;
   data?: any; // currently only used for the text widget
 
   constructor(

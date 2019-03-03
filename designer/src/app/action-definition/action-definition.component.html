@@ -86,11 +86,6 @@
                 class="popup-menu"
                 (click)="$event.stopPropagation()"
               >
-                <mat-tab label="Styles">
-                  <mat-checkbox [(ngModel)]="action.styles.stretch">
-                    Stretch
-                  </mat-checkbox>
-                </mat-tab>
                 <mat-tab label="Inputs">
                   <app-set-inputs
                     [app]="app"
