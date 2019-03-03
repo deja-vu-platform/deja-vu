@@ -21,6 +21,7 @@ import { Target } from '../shared/scoring.model';
 })
 export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   OnInit, OnChanges {
+  @Input() targetIds: string[] | undefined;
   @Input() targets: Target[];
   @Input() showAscending = true;
 
@@ -32,6 +33,7 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   @Input() showScoreSourceId = true;
   @Input() showScoreTargetId = true;
   @Input() showTargetsList = true;
+  @Input() showIndex = false;
 
   @Input() totalLabel = 'Total: ';
   @Input() noScoresText = 'No scores to show';
@@ -78,7 +80,12 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
     if (this.canEval()) {
       this.gs.get<{ data: { targetsByScore: Target[] } }>(this.apiPath, {
         params: {
-          inputs: JSON.stringify({ asc: this.showAscending }),
+          inputs: {
+            input: {
+              asc: this.showAscending,
+              targetIds: this.targetIds
+            }
+          },
           extraInfo: {
             returnFields: `
               id

@@ -18,7 +18,7 @@ export interface Target {
 }
 
 export interface CreateScoreInput {
-  id: string;
+  id?: string;
   value: number;
   sourceId: string;
   targetId: string;
@@ -28,4 +28,9 @@ export interface ShowScoreInput {
   id?: string;
   sourceId?: string;
   targetId?: string;
+}
+
+export interface TargetsByScoreInput {
+  asc?: boolean;
+  targetIds?: string[];
 }
