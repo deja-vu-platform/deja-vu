@@ -43,6 +43,7 @@
     { "path": "login", "action": "login" },
     { "path": "news", "action": "home" },
     { "path": "submit", "action": "submit-post" },
+    { "path": "reply", "action": "reply" },
     { "path": "", "action": "home" }
   ]
 }
