@@ -6,35 +6,57 @@ import {
 } from '../../utils';
 
 // TODO: add option to add the new action to the README
-exports.command = 'action <name>';
+// TODO: add option to add relevant server code
+exports.command = 'action <type> <entityName> [actionName]';
 exports.desc = 'create a new action';
-exports.builder = {
-  skipAppComponentHtml: {
-    default: false,
-    describe: 'When set, the new action will not be added to the app.component.html file.',
-    type: 'boolean'
-  },
-  skipMetadataImport: {
-    default: false,
-    describe: 'When set, the new action will not be added to the metadata file.',
-    type: 'boolean'
-  }
-};
-exports.handler = ({ name, skipAppComponentHtml, skipMetadataImport }) => {
+exports.builder = (yargs) => yargs
+  .positional('type', {
+    choices: ['blank', 'create', 'delete', 'show', 'update'],
+    describe: 'The type of the action to create'
+  })
+  .positional('entityName', {
+    describe: 'The name of the entity on which to perform the action, ' +
+      'or the name of the action if the action type is "blank"'
+  })
+  .positional('actionName', {
+    describe: 'The name of the action to create, ' +
+      'which defaults to `type-entityName` if not provided and ' +
+      'the action type is not "blank"'
+  })
+  .options({
+    skipAppComponentHtml: {
+      default: false,
+      describe: 'When set, the new action will not be added to the app.component.html file.',
+      type: 'boolean'
+    },
+    skipMetadataImport: {
+      default: false,
+      describe: 'When set, the new action will not be added to the metadata file.',
+      type: 'boolean'
+    }
+  });
+;
+exports.handler = ({ type, entityName, actionName,
+  skipAppComponentHtml, skipMetadataImport }) => {
   if (!isInNgProjectRoot()) {
-    console.log('Please run this command from the root of a cliché directory.');
+    console.log(
+      'Error: Please run this command from the root of a cliché directory.');
     return;
   }
 
-  console.log(`Creating new action ${name}`);
+  const actualActionName = type === 'blank' ? entityName :
+    (actionName ? actionName : `${type}-${entityName}`);
+  console.log(`Creating new action ${actualActionName}`);
 
   const clicheName = projectName();
   const schematicsPkgName = getDvPackageName('schematics');
 
   ng(['generate',
     `${schematicsPkgName}:action`,
+    `--actionName=${actualActionName}`,
     `--clicheName=${clicheName}`,
-    `--actionName=${name}`,
+    `--entityName=${entityName}`,
+    `--type=${type}`,
     getOptionalFlag(skipAppComponentHtml, '--skipAppComponentHtml'),
     getOptionalFlag(skipMetadataImport, '--skipMetadataImport')]);
 };

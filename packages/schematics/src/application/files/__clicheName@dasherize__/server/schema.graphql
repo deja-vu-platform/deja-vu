@@ -1,9 +1,16 @@
 type <%= classify(clicheName) %> {
   id: ID!
+  content: String!
 }
 
 input Create<%= classify(clicheName) %>Input {
   id: ID
+  content: String!
+}
+
+input Update<%= classify(clicheName) %>Input {
+  id: ID!
+  content: String!
 }
 
 type Query {
@@ -12,4 +19,6 @@ type Query {
 
 type Mutation {
   create<%= classify(clicheName) %>(input: Create<%= classify(clicheName) %>Input!): <%= classify(clicheName) %>
+  delete<%= classify(clicheName) %>(id: ID!): Boolean
+  update<%= classify(clicheName) %>(input: Update<%= classify(clicheName) %>Input!): Boolean
 }

@@ -1,15 +1,25 @@
-<div *ngIf="actionInstance" [attr.data-isaction]="true" [attr.dvAlias]="actionInstance.fqtag">
-  <ng-template *ngIf="actionInstance.of.component" propertyClicheAction>
-  </ng-template>
+<div
+  *ngIf="actionInstance"
+  [attr.data-isaction]="true"
+  [attr.dvAlias]="actionInstance.fqtag"
+>
+  <div
+    [attr.data-isaction]="!!actionInstance.of.transaction"
+    [attr.dvAlias]="'dv-tx'"
+    [hidden]="hidden"
+  >
+    <ng-template *ngIf="actionInstance.of.component" propertyClicheAction>
+    </ng-template>
 
-  <div *ngIf="actionInstance.of.rows">
-    <div *ngFor="let row of actionInstance.of.rows">
-      <div *ngFor="let action of row.actions">
-        <app-action-instance
-          [actionInstance]="action"
-          [actionIO]="scopeIO.getActionIO(action)"
-        >
-        </app-action-instance>
+    <div *ngIf="actionInstance.of.rows">
+      <div *ngFor="let row of actionInstance.of.rows">
+        <div *ngFor="let action of row.actions">
+          <app-action-instance
+            [actionInstance]="action"
+            [actionIO]="scopeIO.getActionIO(action)"
+          >
+          </app-action-instance>
+        </div>
       </div>
     </div>
   </div>

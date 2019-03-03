@@ -1,5 +1,5 @@
 <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
-  <dv.tx as mapmit-auth-check>
+  <dv.tx>
     <authentication.logged-in />
     <dv.redirect href="/login" onEvalFailure=true />
   </dv.tx>
@@ -25,7 +25,7 @@
         </span>
       </div>
       <div id="logout" class="navbar-item">
-        <dv.tx as mapmit-sign-out>
+        <dv.tx>
           <authentication.sign-out />
           <dv.link href="/login" hidden=true />
         </dv.tx>

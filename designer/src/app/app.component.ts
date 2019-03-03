@@ -1,16 +1,13 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
+import * as _ from 'lodash';
 import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
-import { filter } from 'rxjs/operators';
 
-import { clicheDefinitions, dvCliche } from './cliche.module';
 import {
-  ActionDefinition,
   ActionInstance,
   App,
   AppActionDefinition,
-  ClicheDefinition,
   ClicheInstance,
   Row
 } from './datatypes';
@@ -22,12 +19,13 @@ import {
   styleUrls: ['./app.component.scss'],
   viewProviders: [DragulaService]
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   app = new App('newapp');
   openAction = this.app.homepage;
 
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
+  private readonly setElectronState: (state: any) => void;
   private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
   private readonly path: any; // path module
   private readonly cp: any; // child_process module
@@ -41,76 +39,19 @@ export class AppComponent {
   ) {
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
-    // start the backend
+
+    // imports for addCliche
     if (this.electronService.remote) {
-      const gateway = this.electronService.remote.require('@deja-vu/gateway');
-      this.requestProcessor = gateway.startGateway(); // port 3000 default
-      // imports for addCliche
+      this.requestProcessor = this.electronService.remote
+        .require('./electron.js').requestProcessor;
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
     }
   }
 
-  /**
-   * Must run in constructor
-   */
-  private configureDragula() {
-    this.dragulaService.createGroup('action', {
-      copy: (el, source) => source.classList.contains('action-list'),
-      accepts: (el, target) => target.classList.contains('dvd-row')
-    });
-
-    this.dragulaService.drop('action')
-      .pipe(
-        filter(({ el: e, source: s, target: t }) => e && s && t && (s !== t))
-      )
-      .subscribe(({ el, source, target }) => {
-        let action: ActionInstance;
-        let toRowIdx = parseInt(target['dataset'].index, 10);
-        if (toRowIdx === this.openAction.rows.length) {
-          toRowIdx = -1;
-        }
-        const toRow = this.openAction.rows[toRowIdx] || new Row();
-        if (source.classList.contains('action-list')) {
-          const {
-            source: sourceName,
-            action: actionName,
-            disabled
-          } = el['dataset'];
-          if (disabled !== 'true') {
-            action = this.newAction(sourceName, actionName);
-          }
-        } else if (source.classList.contains('dvd-row')) {
-          const fromRowIdx = parseInt(source['dataset'].index, 10);
-          const actionIdx = parseInt(el['dataset'].index, 10);
-          action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
-        } else {
-          return;
-        }
-        el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        if (action) {
-          toRow.addAction(action);
-          if (toRowIdx === -1) {
-            this.openAction.rows.push(toRow);
-          }
-        }
-      });
-  }
-
-  /**
-   * Generate a new Action Instance for the given action from the given cliche
-   */
-  private newAction(sourceName: string, actionName: string): ActionInstance {
-    const source: App | ClicheDefinition | ClicheInstance = [
-      this.app,
-      dvCliche,
-      ...this.app.cliches
-    ].find((s) => s.name === sourceName);
-    const actionDefinition = (<ActionDefinition[]>source.actions)
-      .find((a) => a.name === actionName);
-
-    return new ActionInstance(actionDefinition, source);
+  ngOnDestroy() {
+    this.removeAllCliches();
   }
 
   /**
@@ -141,12 +82,28 @@ export class AppComponent {
     const childProcess = this.processes[clicheName];
     if (childProcess) {
       childProcess.kill('SIGINT');
+      delete this.processes[clicheName];
+    }
+    if (this.requestProcessor) {
+      this.requestProcessor.removeCliche(clicheName);
     }
   }
 
+  /**
+   * User selected a new action to edit
+   */
+  onActionChanged(openAction: AppActionDefinition) {
+    this.openAction = openAction;
+  }
+
+  /**
+   * Load an app from a save file
+   */
   load(appJSON: string) {
     this.zone.run(() => {
-      this.app = App.fromJSON(appJSON, clicheDefinitions, dvCliche);
+      this.removeAllCliches();
+      this.app = App.fromJSON(appJSON);
+      this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
       this.snackBar.open('Save has been loaded.', 'dismiss', {
         duration: 2500
@@ -154,7 +111,69 @@ export class AppComponent {
     });
   }
 
-  onActionChanged(openAction: AppActionDefinition) {
-    this.openAction = openAction;
+  /**
+   * Stop all cliche backends to avoid port collisions
+   */
+  private removeAllCliches() {
+    this.app.cliches.forEach((c) => {
+      this.removeCliche(c.name);
+    });
+  }
+
+  /**
+   * Must run in constructor
+   */
+  private configureDragula() {
+    this.dragulaService.createGroup('action', {
+      // we use copy to prevent depletion of the action list
+      copy: (el, source) => source.classList.contains('action-list'),
+      // you can *only* drag into rows
+      accepts: (el, target) => target.classList.contains('dvd-row'),
+      // if you drag outside of a row the action gets removed
+      removeOnSpill: true
+    });
+
+    this.dragulaService.drop('action')
+      .subscribe(({ el, source, target }) => {
+        // find target row
+        let toRowIdx = parseInt(target['dataset'].index, 10);
+        if (toRowIdx === this.openAction.rows.length) {
+          toRowIdx = -1;
+        }
+        const toRow = this.openAction.rows[toRowIdx] || new Row();
+
+        let action: ActionInstance;
+        if (source.classList.contains('action-list')) {
+          // dragging in a new action
+          const {
+            source: sourceName,
+            action: actionName,
+            disabled
+          } = el['dataset'];
+          if (disabled !== 'true') {
+            action = this.app.newActionInstanceByName(actionName, sourceName);
+          }
+        } else {
+          // moving an action
+          const fromRowIdx = parseInt(source['dataset'].index, 10);
+          const actionIdx = parseInt(el['dataset'].index, 10);
+          action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+        }
+
+        toRow.addAction(action);
+        if (toRowIdx === -1) {
+          this.openAction.rows.push(toRow);
+        }
+
+        el.parentNode.removeChild(el); // delete copy that Dragula leaves
+      });
+
+    // handle dropping an action outside the page (remove it)
+    this.dragulaService.remove('action')
+      .subscribe(({ el, source }) => {
+        const fromRowIdx = parseInt(source['dataset'].index, 10);
+        const actionIdx = parseInt(el['dataset'].index, 10);
+        this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+      });
   }
 }

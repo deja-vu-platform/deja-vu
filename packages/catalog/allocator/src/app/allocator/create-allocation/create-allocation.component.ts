@@ -12,7 +12,7 @@ import { map, take } from 'rxjs/operators';
 import { API_PATH } from '../allocator.config';
 
 
-interface CreateAllocationRes {
+export interface CreateAllocationRes {
   data: { createAllocation: { id: string } };
 }
 
@@ -60,17 +60,20 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
 
   async dvOnExec() {
     if (this.resourceIds === undefined) {
+      console.log('Create allocation waiting for resourceIds');
       await this.resourceIdsChange.asObservable()
         .pipe(take(1))
         .toPromise();
     }
     if (this.consumerIds === undefined) {
+      console.log('Create allocation waiting for consumerIds');
       await this.consumerIdsChange.asObservable()
         .pipe(take(1))
         .toPromise();
     }
     console.log(`Create allocation with ${this.id}`);
-    this.gs.post<CreateAllocationRes>(this.apiPath, {
+
+    return this.gs.post<CreateAllocationRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -80,9 +83,11 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
       },
       extraInfo: { returnFields: 'id' }
     })
-      .pipe(map((res: CreateAllocationRes) => res.data.createAllocation))
-      .subscribe((allocation) => {
-        this.allocation.emit({ id: allocation.id });
+      .toPromise()
+      .then((res) => {
+        this.allocation.emit({ id: res.data.createAllocation.id });
+
+        return res;
       });
   }
 }

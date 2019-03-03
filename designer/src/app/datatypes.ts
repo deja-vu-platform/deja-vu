@@ -5,10 +5,22 @@ import * as uuidv4 from 'uuid/v4';
 
 // names should be HTML safe (TODO: ensure this)
 
+export interface ActionCollection {
+  name: string;
+  actions: ActionDefinition[];
+}
+
+export interface ActionInputs {
+  // ioName is what you would put $ in front of to reference
+  // the value is the name of the property set in the included action
+  [forInput: string]: { [ioName: string]: string };
+}
+
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
+  readonly actionInputs: ActionInputs;
 }
 
 export interface ClicheActionDefinition extends ActionDefinition {
@@ -27,6 +39,8 @@ export class AppActionDefinition implements ActionDefinition {
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
+  // App Actions cannot have action inputs
+  readonly actionInputs: Readonly<ActionInputs> = {};
   // TODO: styling options
 
   constructor(name: string) {
@@ -58,11 +72,9 @@ export class AppActionDefinition implements ActionDefinition {
   contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
       r.actions.some((a) => (
-        a.of === actionDefinition
-        || (
-          deep
-          && a.of['contains']
-          && (<AppActionDefinition>a.of).contains(actionDefinition, true)
+        a.isOrContains(actionDefinition, deep) ||
+        _.some(a.inputSettings, (v) =>
+          v && !_.isString(v) && v.isOrContains(actionDefinition, deep)
         )
       ))
     );
@@ -85,18 +97,26 @@ export class AppActionDefinition implements ActionDefinition {
     }
   }
 
-  toHTML() {
-    let html = `<dv.action name="${this.name}">\n`;
+  toHTML(): string {
+    let html = `<dv.action name="${this.name}"`;
+    const outputs = this.outputSettings.filter(({ value }) => !!value);
+    outputs.forEach(({ name, value }) => {
+      html += `\n  ${name}$=${value}`;
+    });
+    if (outputs.length > 0) {
+      html += '\n';
+    }
+    html += '>\n';
     if (this.transaction) {
-      html += `<dv.tx>\n`;
+      html += '<dv.tx>\n';
     }
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
     if (this.transaction) {
-      html += `</dv.tx>\n`;
+      html += '</dv.tx>\n';
     }
-    html += `</dv.action>`;
+    html += '</dv.action>';
 
     return html;
   }
@@ -104,10 +124,11 @@ export class AppActionDefinition implements ActionDefinition {
   toJSON() {
     return {
       name: this.name,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputSettings: this.inputSettings,
+      outputSettings: this.outputSettings,
       rows: this.rows.map((row) => row.toJSON()),
       transaction: this.transaction
+      // app actions do not have action inputs
     };
   }
 
@@ -119,7 +140,7 @@ export class Row {
 
   constructor() {}
 
-  toHTML() {
+  toHTML(): string {
     let html = '  <div class="dvd-row">\n';
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
@@ -153,34 +174,68 @@ export class Row {
 export class ActionInstance {
   readonly id = uuidv4();
   readonly of: ActionDefinition;
-  readonly from: App | ClicheInstance | ClicheDefinition;
-  readonly inputSettings: { [inputName: string]: string } = {};
+  readonly from: ActionCollection;
+  // type is ActionInstance iff inputName in of.actionInputs
+  readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
   data?: any; // currently only used for the text widget
 
   constructor(
     ofAction: ActionDefinition,
-    from: App | ClicheInstance | ClicheDefinition
+    from: ActionCollection
   ) {
     this.of = ofAction;
     this.from = from;
   }
 
   // needed for action processing
-  get fqtag() {
+  get fqtag(): string {
     return `${this.from.name}-${this.of.name}`;
   }
 
-  toHTML(): string {
+  get isAppAction(): boolean {
+    return (this.of instanceof App);
+  }
+
+  isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
+    return (
+      this.of === actionDefinition
+      || (
+        deep
+        && this.of['contains']
+        && (<AppActionDefinition>this.of)
+          .contains(actionDefinition, deep)
+      )
+    );
+  }
+
+  /**
+   * @param extraIndents should not be provided externally
+   */
+  toHTML(extraIndents = 0): string {
     // text widget is just plain HTML static content
     if (this.of.name === 'text' && this.from.name === 'dv') {
       return `    <div>${this.data}</div>\n`;
     }
 
-    let html = `    <${this.from.name}.${this.of.name}\n`;
+    const baseNumIndents = 4;
+    const xIdnt = '  '.repeat(extraIndents);
+
+    let html = `    <${this.from.name}.${this.of.name}`;
+
     _.forEach(this.inputSettings, (val, key) => {
-      html += `      ${key}=${val}\n`;
+      const strVal = _.isString(val)
+        ? val
+        : val.toHTML(extraIndents + 1)
+          .slice(baseNumIndents, -1); // strip leading indent and ending newline
+      html += `\n${xIdnt}      ${key}=${strVal}`;
     });
-    html += `    />\n`;
+
+    if (_.size(this.inputSettings) === 0) {
+      html += ' ';
+    } else {
+      html += `\n${xIdnt}    `;
+    }
+    html += '/>\n';
 
     return html;
   }
@@ -229,24 +284,19 @@ export class ClicheInstance {
 }
 
 export class App {
+  // populated in cliche.module.ts to avoid circular dependencies
+  static dvCliche: ActionCollection;
+  static clicheDefinitions: ClicheDefinition[];
+
   name: string; // no dashes
   readonly actions: AppActionDefinition[];
   readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
   readonly cliches: ClicheInstance[] = [];
+  // need consistent object to return
+  private readonly _actionCollections: ActionCollection[] = [];
 
-  constructor(name: string) {
-    this.name = name;
-    this.actions = [new AppActionDefinition('new-action-1')];
-    this.pages = [...this.actions];
-    this.homepage = this.pages[0];
-  }
-
-  static fromJSON(
-    jsonString: string,
-    clicheDefinitions: ClicheDefinition[],
-    dvCliche: ClicheDefinition
-  ): App {
+  static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
 
     const app = new App(appJSON.name);
@@ -256,7 +306,7 @@ export class App {
     app.pages.pop();
 
     appJSON.cliches.forEach((ci) => {
-      const ofCliche = clicheDefinitions.find((cd) => cd.name === ci.of);
+      const ofCliche = App.clicheDefinitions.find((cd) => cd.name === ci.of);
       const clicheInstance = new ClicheInstance(ci.name, ofCliche);
       Object.assign(clicheInstance.config, ci.config);
       app.cliches.push(clicheInstance);
@@ -264,24 +314,16 @@ export class App {
 
     appJSON.actions.forEach((aad) => {
       const actionDef = new AppActionDefinition(aad.name);
-      actionDef.inputs.push.apply(actionDef.inputs, aad.inputs);
-      actionDef.outputs.push.apply(actionDef.inputs, aad.outputs);
+      actionDef.inputSettings
+        .push.apply(actionDef.inputSettings, aad.inputSettings);
+      actionDef.outputSettings
+        .push.apply(actionDef.outputSettings, aad.outputSettings);
       actionDef.transaction = aad.transaction;
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
-          const from = [
-            ...app.cliches,
-            app,
-            dvCliche
-          ].find((c) => c.name === ai.from);
-          const ofAction = (<ActionDefinition[]>from.actions)
-            .find((a) => a.name === ai.of);
-          const actionInst = new ActionInstance(ofAction, from);
-          Object.assign(actionInst.inputSettings, ai.inputSettings);
-          if (ai.data) {
-            actionInst.data = ai.data;
-          }
+          const actionInst = app.newActionInstanceByName(ai.of, ai.from);
+          app.setInputsFromJSON(actionInst, ai);
           row.actions.push(actionInst);
         });
         actionDef.rows.push(row);
@@ -298,6 +340,14 @@ export class App {
     app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
 
     return app;
+  }
+
+  constructor(name: string) {
+    this.name = name;
+    this.actions = [new AppActionDefinition('new-action-1')];
+    this.pages = [...this.actions];
+    this.homepage = this.pages[0];
+    this._actionCollections.push(this);
   }
 
   private tsortActions(): AppActionDefinition[] {
@@ -373,11 +423,71 @@ export class App {
         }) && obj // mutate and then return obj
       ), {}),
       routes: [
-        { path: '', action: `${this.name}-${this.homepage.name}` },
+        { path: '', action: this.homepage.name },
         ..._.map(this.pages, (page) => (
-          { path: page.name, action: `${this.name}-${page.name}` }
+          { path: page.name, action: page.name }
         ))
       ]
     }, null, '  ');
+  }
+
+  get actionCollections(): ActionCollection[] {
+    this._actionCollections.splice(0);
+    this._actionCollections.push(this);
+    this._actionCollections.push(App.dvCliche);
+    this._actionCollections.push.apply(
+      this._actionCollections,
+      this.cliches
+        .sort(({ name: nameA }, { name: nameB }) =>
+          nameA === nameB ? 0 : (nameA < nameB ? -1 : 1)
+        )
+    );
+
+    return this._actionCollections;
+  }
+
+  /**
+   * @param ofName name of action declared in app, imported cliche, or DV cliche
+   * @param fromName name of cliche instance, or app, or the DV cliche
+   * @return a new action instance or undefined if the names do not resolve
+   */
+  newActionInstanceByName(ofName: string, fromName: string): ActionInstance {
+    const fromSource = this.actionCollections.find((c) => c.name === fromName);
+
+    const ofAction = fromSource
+      ? (<ActionDefinition[]>fromSource.actions).find((a) => a.name === ofName)
+      : undefined;
+
+    return ofAction
+      ? new ActionInstance(ofAction, fromSource)
+      : undefined;
+  }
+
+  /**
+   * @param actionInstance the action instance to mutate
+   * @param inputSettings JSON form of ActionInstance
+   */
+  private setInputsFromJSON(
+    actionInstance: ActionInstance,
+    actionInstanceObject: any
+  ) {
+    _.forEach(actionInstanceObject.inputSettings, (setting, name) => {
+      if (_.isString(setting)) {
+        actionInstance.inputSettings[name] = setting;
+      } else {
+        const inputtedAction = this.newActionInstanceByName(
+          setting.of,
+          setting.from
+        );
+        actionInstance.inputSettings[name] = inputtedAction;
+        this.setInputsFromJSON(
+          inputtedAction,
+          setting
+        );
+      }
+    });
+    if (actionInstanceObject.data) {
+      actionInstance.data = actionInstanceObject.data;
+    }
   }
 }

@@ -7,7 +7,8 @@ import {
   OnDestroy,
   OnInit,
   Type,
-  ViewChild
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
@@ -18,7 +19,9 @@ import {
   AppActionDefinition,
   ClicheActionDefinition
 } from '../datatypes';
-import { ActionIO, linkChildren, ScopeIO } from '../io';
+import { ActionIO, ScopeIO} from '../io';
+import { RunService } from '@deja-vu/core';
+
 
 @Component({
   selector: 'app-action-instance',
@@ -30,35 +33,58 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(ClicheActionDirective)
     private readonly actionHost: ClicheActionDirective;
-  @Input() readonly actionInstance: ActionInstance;
-  @Input() private readonly actionIO: ActionIO;
+  @Input() actionInstance: ActionInstance;
+  @Input() actionIO: ActionIO;
   private readonly scopeIO: ScopeIO = new ScopeIO();
   private subscriptions: Subscription[] = [];
+  // for when rendered in dv-include only
+  @Input() extraInputs?: { [ioName: string]: string };
+  @Input() extraInputsScope?: ActionIO;
+  hidden = false;
 
   constructor(
-    private readonly componentFactoryResolver: ComponentFactoryResolver
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    private readonly elem: ElementRef,
+    private readonly rs: RunService
   ) { }
 
   ngOnInit() {
     if (this.actionInstance && this.actionIO) {
       this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
+      if (this.extraInputs && this.extraInputsScope) {
+        _.forEach(this.extraInputs, (thisProp, ioName) => {
+          this.extraInputsScope.getSubject(ioName)
+            .next(this[thisProp]);
+        });
+      }
+    }
+    if (this.actionInstance && this.actionInstance.isAppAction) {
+      this.rs.registerAppAction(this.elem, this);
     }
   }
 
   ngAfterViewInit() {
     if (this.actionInstance) {
       if (this.actionInstance.of instanceof AppActionDefinition) {
-        this.subscriptions = linkChildren(this.actionInstance, this.scopeIO);
+        this.scopeIO.link(this.actionInstance);
       } else {
         // setTimeout is necessary to avoid angular change detection errors
         setTimeout(() => this.loadClicheAction());
       }
+      setTimeout(() => {
+        const sub = this.actionIO.getSubject('hidden')
+          .subscribe((value) => {
+            this.hidden = value;
+          });
+        this.subscriptions.push(sub);
+      });
     }
   }
 
   loadClicheAction() {
     // create component and add to DOM
-    const { component } = <ClicheActionDefinition>this.actionInstance.of;
+    const actionDefinition = <ClicheActionDefinition>this.actionInstance.of;
+    const { component } = actionDefinition;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
     const viewContainerRef = this.actionHost.viewContainerRef;
@@ -66,7 +92,7 @@ implements OnInit, AfterViewInit, OnDestroy {
     const componentRef = viewContainerRef.createComponent(componentFactory);
 
     // subscribe to outputs, storing last outputted value
-    this.actionInstance.of.outputs.forEach((output) => {
+    actionDefinition.outputs.forEach((output) => {
       this.subscriptions.push(
         (<EventEmitter<any>>componentRef.instance[output]).subscribe((val) => {
           this.actionIO.getSubject(output)
@@ -76,7 +102,8 @@ implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // pass in inputs, and allow the value to be updated
-    this.actionInstance.of.inputs.forEach((input) => {
+    actionDefinition.inputs.forEach((input) => {
+      // give new values
       this.subscriptions.push(
         this.actionIO.getSubject(input)
           .subscribe((val) => {
@@ -95,6 +122,7 @@ implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach((s) => s.unsubscribe());
+    this.scopeIO.unlink();
   }
 
   shouldPassActionInstance() {

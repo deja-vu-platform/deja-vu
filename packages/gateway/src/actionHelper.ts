@@ -304,18 +304,31 @@ export class ActionHelper {
     }
   }
 
+  static PickActionTagPath(
+    actionPath: ActionTagPath | ActionTag[] | ActionAst,
+    pickProps: string[]): any[] {
+    return _.map(actionPath, (actionTag) => {
+      const newContent = ActionHelper
+        .PickActionTagPath(actionTag.content, pickProps);
+      const rest = _.pick(actionTag, pickProps);
+
+      return _.isEmpty(newContent) ? rest : { ...rest, content: newContent };
+    });
+  }
+
   /**
    * Create a new action helper
    *
    * @param usedCliches a list of the names of all cliches used (not their
    *                    aliases)
    * @param appActionTable the action table for this app
-   * @param routes the route information
+   * @param routeActionSelectors tags of actions that have a route
+   *   tag should be of form appname-action-name
    */
   constructor(
     usedCliches?: string[],
     appActionTable?: ActionTable,
-    private readonly routes?: { path: string, action: string }[]
+    private readonly routeActionSelectors?: string[]
   ) {
     const clicheActionTables = _.map(_
       .uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
@@ -373,17 +386,6 @@ export class ActionHelper {
     }
 
     this.actionTable = _.pick(this.actionTable, Array.from(usedActions));
-  }
-
-  /**
-   * Add a cliche's actions for shouldHaveExecRequest
-   * actionTable is not modified because this assumes you did not provide
-   *   an appActionTable in which case it is irrelevant
-   * Adding the same cliche a second time does nothing
-   */
-  addCliche(cliche: string) {
-    _.get(ActionHelper.GetActionsNoRequest(cliche), 'exec', <string[]>[])
-      .forEach((actionName) => this.actionsNoExecRequest.add(actionName));
   }
 
   /**
@@ -555,7 +557,9 @@ export class ActionHelper {
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
-      const routeActions: ActionTag[] = this.getRouteActions(this.actionTable);
+      // user could have multiple routes to the same action so we need to dedup
+      const routeActions: ActionTag[] = _.uniqBy(
+        this.getRouteActions(this.actionTable), 'fqtag');
       ret = <ActionTag[]> _.concat(<ActionTag[]> ret, routeActions);
     }
 
@@ -570,15 +574,15 @@ export class ActionHelper {
    * @return a list of `ActionTag`s, one for each route
    */
   private getRouteActions(actionTable: ActionTable): ActionTag[] {
-    return _.map(this.routes, (route) => {
-      if (!_.has(actionTable, route.action)) {
-        throw new Error(`Route action ${route.action} doesn't exist`);
+    return _.map(this.routeActionSelectors, (action) => {
+      if (!_.has(actionTable, action)) {
+        throw new Error(`Route action ${action} doesn't exist`);
       }
 
       return {
-        fqtag: route.action,
-        tag: route.action,
-        content: actionTable[route.action],
+        fqtag: action,
+        tag: action,
+        content: actionTable[action],
         context: {}
       };
     });

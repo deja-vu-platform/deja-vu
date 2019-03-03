@@ -14,13 +14,15 @@ import { ElectronService } from 'ngx-electron';
 
 import { DvModule } from '@deja-vu/core';
 
+import { AppComponent } from './app.component';
+
 import {
   ActionDefinitionComponent
 } from './action-definition/action-definition.component';
 import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
-import { AppComponent } from './app.component';
+import { SetInputsComponent } from './set-inputs/set-inputs.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
@@ -31,8 +33,9 @@ describe('AppComponent', () => {
         ActionDefinitionComponent,
         ActionInstanceComponent,
         AppComponent,
-        TopBarComponent,
-        SideMenuComponent
+        SetInputsComponent,
+        SideMenuComponent,
+        TopBarComponent
       ],
       imports: [
         DvModule,

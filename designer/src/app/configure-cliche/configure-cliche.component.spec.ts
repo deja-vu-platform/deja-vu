@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
+  MatDialogModule,
   MatDialogRef,
   MatInputModule,
   MatSelectModule
@@ -20,6 +21,7 @@ describe('ConfigureClicheComponent', () => {
       imports: [
         BrowserAnimationsModule,
         FormsModule,
+        MatDialogModule,
         MatInputModule,
         MatSelectModule
       ],

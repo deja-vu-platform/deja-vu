@@ -85,7 +85,7 @@
         <!-- Join Group if already not in it -->
         <dv.if condition=rendezvous.navbar.loggedInUserId !== authorization.show-owner.ownerId>
           <div class="inline btn-group form-group" id="join-leave-group">
-            <dv.tx as rendezvous-join-leave>
+            <dv.tx>
               <authorization.add-remove-viewer resourceId=$eventId
                 viewerId=rendezvous.navbar.loggedInUserId hidden=true />
 
@@ -102,7 +102,7 @@
           <tbody>
             <tr id="add-comment-row">
               <th id="add-comment">
-                <dv.tx as rendezvous-event-comment>
+                <dv.tx>
                   <comment.create-comment
                     authorId=rendezvous.navbar.loggedInUserId
                     targetId=$eventId inputLabel="Post a new comment"

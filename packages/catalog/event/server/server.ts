@@ -256,7 +256,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         const notPendingEventsFilter = { pending: { $exists: false } };
         const reqIdPendingFilter = { 'pending.reqId': context.reqId };
         if (isPartOfSeries) {
-          _.set(notPendingEventsFilter, 'events.id', id);
+          notPendingEventsFilter['events.id'] = id;
           const updateOp = { $pull: { events: { id: id } } };
 
           switch (context.reqType) {

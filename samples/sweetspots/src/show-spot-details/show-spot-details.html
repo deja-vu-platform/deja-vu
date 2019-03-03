@@ -22,7 +22,7 @@
         <!-- Delete Spot -->
         <!-- TODO: Only delete the spot within a day of being created -->
         <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId>
-          <dv.tx as sweetspots-delete-spot>
+          <dv.tx>
             <geolocation.delete-marker id=$id hidden=true />
             <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
               targetId=sweetspots.navbar.loggedInUserId
@@ -49,8 +49,9 @@
 
         <div class="btn-toolbar toolbar">
           <!-- Favorite/ Unfavorite Spot -->
-          <dv.tx as sweetspots-favorite-spot>
-            <authentication.authenticate id=sweetspots.navbar.loggedInUserId
+          <dv.tx>
+            <authentication.authenticate as favorite-spot-authenticate
+              id=sweetspots.navbar.loggedInUserId
               hidden=true />
             <follow.follow-unfollow class="btn btn-success favorite-spot"
               publisherId=$id
@@ -92,11 +93,13 @@
         <dv.if condition=!rating.show-rating.loadedRating>
           <div>
             <h4>Write a review:</h4>
-            <dv.tx as sweetspots-write-review>
+            <dv.tx>
               <dv.status savedText="Review created!" />
-              <authentication.authenticate id=sweetspots.navbar.loggedInUserId
+              <authentication.authenticate as write-review-authenticate
+                id=sweetspots.navbar.loggedInUserId
                 hidden=true />
-              <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
+              <reputation.create-score as write-review-create-score
+                sourceId=sweetspots.navbar.loggedInUserId
                 targetId=authorization.show-owner.ownerId
                 value=1
                 hidden=true/>

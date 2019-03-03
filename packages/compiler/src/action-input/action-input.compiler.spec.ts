@@ -67,14 +67,14 @@ describe('ActionInputCompiler', () => {
           showEvent=
               <morg.show-group-meeting
                 groupMeeting=$event
-                loggedInIUserId=authentication.logged-in.user?.id />
+                loggedInUserId=authentication.logged-in.user?.id />
           noEventsToShowText="No meetings to show"
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       `;
 
       const compiledActionInput: CompiledActionInput = actionInputCompiler
         .compile(actionInput, {});
-        expect(compiledActionInput.action)
+      expect(compiledActionInput.action)
         .toMatch(/authentication\.logged\-in\.user\?\.id/);
     });
 });

@@ -33,7 +33,13 @@ function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {
   const clicheOrActionAlias = _
     .split(fullMemberAccess, '.', 1)[0];
-  const stEntry: StEntry = symbolTable[clicheOrActionAlias];
+  const stEntry: StEntry | undefined = symbolTable[clicheOrActionAlias];
+  if (stEntry === undefined) {
+    throw new Error(
+      `Symbol ${clicheOrActionAlias} not found in ` +
+      `symbol table ${pretty(symbolTable)}`);
+  }
+
   let clicheName: string, actionName: string, output: string;
   let alias: string | undefined;
   let memberAccesses: string;
@@ -79,6 +85,11 @@ export function toNgTemplate(
       const maybeAlias: string[] | null = transformedElementName
         .match(/dvAlias="(.*)"/);
       const alias = (maybeAlias !== null) ? maybeAlias[1] : undefined;
+
+
+      if (transformedActionName === 'dv-tx' && alias !== undefined) {
+        throw new Error(`dv.tx can't be aliased`);
+      }
 
       const actionEntry: ActionStEntry | undefined = getStEntryForNgComponent(
         transformedActionName, symbolTable, alias);
@@ -148,13 +159,12 @@ export function toNgTemplate(
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpToStr = (leftExpr, op, rightExpr) => {
-    const opTransformMap = {
-      'gt': '>', 'gte': '>=', 'lt': '<', 'lte': '<='
-    };
+    const opTransformMap = { gt: '>', gte: '>=', lt: '<', lte: '<=' };
     const transformedOpString = opTransformMap[op.sourceString] ?
       opTransformMap[op.sourceString] : op.sourceString;
 
-    return `${leftExpr.toNgTemplate()} ${transformedOpString} ${rightExpr.toNgTemplate()}`;
+    return `${leftExpr.toNgTemplate()} ` +
+      `${transformedOpString} ${rightExpr.toNgTemplate()}`;
   };
 
   return {
@@ -335,7 +345,9 @@ function transformActionInput(
 
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
-        `${k}: ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
+        `${k}: ${isInput(inputsObj[k]) ?
+          inputsObj[k] :
+          nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 
     return `{
