@@ -1,9 +1,10 @@
 <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onClosed()">
-  <div class="floating-menu" (click)="$event.stopPropagation()">
+  <div #content class="floating-menu" (click)="$event.stopPropagation()">
     <div class="top-bar">
       <button mat-flat-button color="warn" class="mat-small" (click)="close()">
         <mat-icon>close</mat-icon>
       </button>
+      <div class="handle"></div>
     </div>
     <ng-content></ng-content>
   </div>
