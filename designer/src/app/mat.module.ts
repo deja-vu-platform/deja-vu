@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {
   MatButtonModule,
   MatCheckboxModule,
+  MatDialogModule,
   MatExpansionModule,
   MatIconModule,
   MatInputModule,
@@ -17,6 +18,7 @@ import {
 const modules = [
   MatButtonModule,
   MatCheckboxModule,
+  MatDialogModule,
   MatExpansionModule,
   MatIconModule,
   MatInputModule,

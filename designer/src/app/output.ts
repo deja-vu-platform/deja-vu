@@ -18,7 +18,6 @@ export class Output {
 
     this.container.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log('got this far!');
     });
   }
 

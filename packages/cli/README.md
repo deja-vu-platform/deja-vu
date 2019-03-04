@@ -44,12 +44,16 @@ This argument is optional and the default value is the name of the repo,
 `deja-vu`. As such, it is recommended that the command be run in the directory
 that contains the dv repo.
 
-The newly-created cliché comes with two initial actions to serve as examples,
-`create-clichename` and `show-clichename`,
+The newly-created cliché comes with four initial actions to serve as examples
+for each of the CRUD (create, read, update, and delete) operations.
+They are called `create-clichename`, `delete-clichename`, `show-clichename`, and `update-clichename`,
 under the assumption that `clichename` is usually the name of the primary entity
-in the cliché. Of course, they can and should be updated.
+in the cliché. Each `clichename` object starts out with an `id` field to
+uniquely identify each object, and an editable `content` field.
+Of course, all of the above can and should be updated.
 
-Navigate to ()[http://localhost:3000/] and see the two cliché actions in action.
+Navigate to ()[http://localhost:3000/] and see the four cliché actions in action.
+All the CRUD operations they represent should already work.
 
 ### Create actions in a cliché
 
@@ -57,10 +61,29 @@ To create an action in a cliché, run the following from the root of
 the cliché's directory:
 
 ```
-dv new action action-name
+dv new action type entityname action-name
 ```
 
-By convention, use kebab-case for the `action-name`.
+By convention, use kebab-case for the `action-name`, and a single word for
+the `entityname` on which to perform the action.
+
+There are five possible `type` parameters that can be used:
+`blank`, `create`, `show`, `update`, and `delete`. The first creates a blank
+action, while the rest each create an action for the one of the CRUD operations,
+respectively. If `blank` is specified as the `type`, the parameter `entityName`
+will be the action name (the parameter `action-name` will be unused). For other `type`s, the default action name is `type-entityname`.
+Here are a few examples that demonstrate the above rules:
+
+```
+# create the choose-event action with the blank template
+dv new action blank choose-event
+
+# create the show-event action
+dv new action show event
+
+# create the edit-event action using the update action template
+dv new action udpate event edit-event
+```
 
 The command will create the HTML, TypeScript, CSS, and test files for the action.
 It will also add the action to `clichename.metadata.ts` and to `app.component.html`

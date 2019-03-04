@@ -134,6 +134,8 @@ export class CreateObjectComponent
         throw new Error(_.map(res.errors, 'message')
           .join());
       }
+    } else {
+      this.gs.noRequest();
     }
     this.object.emit(input);
   }

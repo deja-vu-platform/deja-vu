@@ -3,6 +3,7 @@ import {
   cmd,
   getDvPackageName,
   getSchematicsPath,
+  isInNgProjectRoot,
   ng,
   yarn
 } from '../../utils';
@@ -17,6 +18,11 @@ exports.builder = (yargs) => yargs.option('pathToDv', {
   type: 'string'
 });
 exports.handler = ({ name, pathToDv }) => {
+  if (isInNgProjectRoot()) {
+    console.log(
+      'Error: You cannot run this command inside of an Angular project.');
+    return;
+  }
   console.log(`Creating new cliché ${name}`);
 
   // hack to find the schematics from outside the dv monorepo

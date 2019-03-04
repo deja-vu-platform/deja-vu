@@ -33,7 +33,13 @@ function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ActionSymbolTable) {
   const clicheOrActionAlias = _
     .split(fullMemberAccess, '.', 1)[0];
-  const stEntry: StEntry = symbolTable[clicheOrActionAlias];
+  const stEntry: StEntry | undefined = symbolTable[clicheOrActionAlias];
+  if (stEntry === undefined) {
+    throw new Error(
+      `Symbol ${clicheOrActionAlias} not found in ` +
+      `symbol table ${pretty(symbolTable)}`);
+  }
+
   let clicheName: string, actionName: string, output: string;
   let alias: string | undefined;
   let memberAccesses: string;
@@ -339,7 +345,9 @@ function transformActionInput(
 
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
-        `${k}: ${nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
+        `${k}: ${isInput(inputsObj[k]) ?
+          inputsObj[k] :
+          nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 
     return `{

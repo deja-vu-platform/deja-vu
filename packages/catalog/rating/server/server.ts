@@ -2,7 +2,6 @@ import {
   ActionRequestTable,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
   getReturnFields
@@ -131,7 +130,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         switch (context.reqType) {
           case 'vote':
-            const pendingUpdateObj = await ratings.updateMany(
+            await ratings.updateOne(
               notPendingRatingFilter,
               {
                 $set: {
@@ -144,20 +143,19 @@ function resolvers(db: mongodb.Db, _config: Config): object {
               { upsert: true }
             );
 
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
+            // If there's a concurrent update then the upsert will fail because
+            // of the (sourceId, targetId) index
 
             return true;
 
           case undefined:
-            const updateObj = await ratings.updateMany(
+            await ratings.updateOne(
               notPendingRatingFilter,
               { $set: { rating: input.newRating } },
               { upsert: true });
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
+
+            // If there's a concurrent update then the upsert will fail because
+            // of the (sourceId, targetId) index
 
             return true;
 
@@ -174,7 +172,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             return false;
 
           case 'abort':
-            await ratings.updateMany(
+            await ratings.updateOne(
               reqIdPendingFilter,
               { $unset: { pending: '' } },
               { upsert: true }

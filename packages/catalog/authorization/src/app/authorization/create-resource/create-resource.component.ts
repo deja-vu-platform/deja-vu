@@ -76,6 +76,8 @@ export class CreateResourceComponent implements
         extraInfo: { returnFields: 'id' }
       })
         .toPromise();
+    } else {
+      this.gs.noRequest();
     }
     this.resource.emit(resource);
   }

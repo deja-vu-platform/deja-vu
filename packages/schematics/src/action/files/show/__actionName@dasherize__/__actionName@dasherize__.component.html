@@ -1,0 +1,9 @@
+<span *ngIf="<%= camelize(entityName) %>">
+  <div *ngIf="showId">
+    {{<%= camelize(entityName) %>.id}}
+  </div>
+
+  <div *ngIf="showContent">
+    {{<%= camelize(entityName) %>.content}}
+  </div>
+</span>

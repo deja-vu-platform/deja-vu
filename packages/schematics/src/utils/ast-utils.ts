@@ -47,7 +47,7 @@ export function appendToArrayDeclaration(source: ts.SourceFile,
         const toInsert = node.elements.hasTrailingComma ?
           ` ${symbolName},` : `, ${symbolName}`;
 
-        return new InsertChange(source.fileName, node.getEnd(), toInsert);
+        return new InsertChange(source.fileName, node.elements.end, toInsert);
       }
     }
   }

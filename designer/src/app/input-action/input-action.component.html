@@ -1,0 +1,34 @@
+<div class="input-action">
+  <mat-form-field *ngIf="data?.app"> 
+    <mat-select
+      name="action"
+      placeholder="Replace With Action"
+      [(ngModel)]="selection"
+      (selectionChange)="onSelectAction()"
+    >
+      <mat-option [value]="'[]'">-- Default --</mat-option>
+      <mat-optgroup
+        *ngFor="let actionCollection of data.app.actionCollections"
+        [label]="actionCollection.name"
+      >
+        <mat-option
+          *ngFor="let action of actionCollection.actions"
+          [value]="stringify([action.name, actionCollection.name])"
+          [disabled]="disable(action)"
+        >
+          {{action.name}}
+        </mat-option>
+      </mat-optgroup>
+    </mat-select>
+  </mat-form-field>
+  <mat-dialog-content>
+    <div *ngIf="actionInstance" class="set-inputs-container">
+      <app-set-inputs
+        *ngIf="actionInstance"
+        [app]="data.app"
+        [actionInstance]="actionInstance"
+        [openAction]="data.openAction"
+      ></app-set-inputs>
+    </div>
+  </mat-dialog-content>
+</div>

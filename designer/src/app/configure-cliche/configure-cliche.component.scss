@@ -2,16 +2,17 @@
   text-align: center;
 }
 
-form {
+mat-dialog-content {
   display: flex;
   flex-direction: column;
 }
 
-textarea {
-  font-family: monospace;
-}
-
-.buttons {
+mat-dialog-actions {
   display: flex;
   justify-content: space-between;
+}
+
+textarea {
+  font-family: monospace;
+  max-height: 320px; /* prevent scrolling on dialog */
 }

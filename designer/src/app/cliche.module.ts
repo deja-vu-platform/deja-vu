@@ -7,32 +7,45 @@ import * as dv from '@deja-vu/core';
 import * as allocator from '@deja-vu/allocator';
 import * as authentication from '@deja-vu/authentication';
 import * as authorization from '@deja-vu/authorization';
+import * as comment from '@deja-vu/comment';
 import * as event from '@deja-vu/event';
 import * as follow from '@deja-vu/follow';
 import * as geolocation from '@deja-vu/geolocation';
 import * as group from '@deja-vu/group';
+import * as label from '@deja-vu/label';
 import * as passkey from '@deja-vu/passkey';
 import * as property from '@deja-vu/property';
+import * as ranking from '@deja-vu/ranking';
 import * as rating from '@deja-vu/rating';
+import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
-import { ClicheDefinition } from './datatypes';
+import {
+  ActionInputs,
+  App,
+  ClicheActionDefinition,
+  ClicheDefinition
+} from './datatypes';
 import { TextComponent } from './text/text.component';
 
-// TODO: import platform actions (e.g. button, link, etc.)
+const OMNIPRESENT_INPUTS = [ 'hidden' ];
 
 const importedCliches: { [name: string]: Object} = {
   allocator,
   authentication,
   authorization,
+  comment,
   event,
   follow,
   geolocation,
   group,
+  label,
   passkey,
   property,
+  ranking,
   rating,
+  scoring,
   task,
   transfer
 };
@@ -53,6 +66,10 @@ const modules: any[] = Object.values(importedCliches)
 importedCliches['dv'] = dv;
 const componentSuffix = 'Component';
 
+function isComponent(f: any) {
+  return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
+}
+
 function clicheDefinitionFromModule(
   importedModule: Object,
   name: string
@@ -60,18 +77,61 @@ function clicheDefinitionFromModule(
   return {
     name,
     actions: Object.values(importedModule)
-      .filter((f) => _.isString(f.name) && f.name.endsWith(componentSuffix))
-      .map((component) => ({
-        name: _.kebabCase(component.name
-          .slice(0, componentSuffix.length * -1)),
-        component,
-        inputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
-          val[0].type.prototype.ngMetadataName === 'Input'
-        ))),
-        outputs: Object.keys(_.pickBy(component.propDecorators, (val) => (
-          val[0].type.prototype.ngMetadataName === 'Output'
-        )))
-      }))
+      .filter(isComponent)
+      .map((component): ClicheActionDefinition => {
+        // get inputs and outputs
+        const inputs = OMNIPRESENT_INPUTS.slice();
+        const outputs = [];
+        const actionInputs: ActionInputs = {};
+        _.forEach(component.propDecorators, (val, key) => {
+          const type = val[0].type.prototype.ngMetadataName;
+          if (type === 'Input') {
+            inputs.push(key);
+          } else if (type === 'Output') {
+            outputs.push(key);
+          }
+        });
+
+        // detect action inputs
+        let instance;
+        try {
+          instance = new component();
+        } catch {
+          instance = {};
+          // TODO: figure out how to handle components that err on undef inputs
+        }
+
+        const actionInputNames = inputs.filter((input) =>
+          isComponent(_.get(instance, [input, 'type']))
+        );
+
+        if (actionInputNames.length > 0) {
+          // parse the template string to extract the object map
+          const template: string = component.decorators[0].args[0].template;
+          const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
+          if (inputMapMatch) {
+            actionInputs[actionInputNames[0]] = _.fromPairs(
+              inputMapMatch[1]
+                .split(',')
+                .map((s1) => s1.split(':')
+                  .map((s2) => s2.trim())
+                  .reverse()
+                )
+            );
+          } else {
+            actionInputs[actionInputNames[0]] = {};
+          }
+        }
+
+        return {
+          name: _.kebabCase(component.name
+            .slice(0, componentSuffix.length * -1)),
+          component,
+          inputs,
+          outputs,
+          actionInputs
+        };
+      })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
   };
 }
@@ -79,14 +139,22 @@ function clicheDefinitionFromModule(
 export const clicheDefinitions = _
   .map(importedCliches, clicheDefinitionFromModule);
 
-export const dvCliche = clicheDefinitions.find((cd) => cd.name === 'dv');
+const dvClicheIdx = clicheDefinitions.findIndex((cd) => cd.name === 'dv');
+const [dvCliche] = clicheDefinitions.splice(dvClicheIdx, 1);
+// TODO: filter actions in dvCliche
+
+App.clicheDefinitions = clicheDefinitions;
+App.dvCliche = dvCliche;
+
 export const dvCoreActions = dvCliche.actions
   .map(({ component: c }) => <any>c);
+
 dvCliche.actions.push(({
   name: 'text',
   component: <Component>TextComponent,
   inputs: [],
-  outputs: []
+  outputs: [],
+  actionInputs: {}
 }));
 
 @NgModule({
