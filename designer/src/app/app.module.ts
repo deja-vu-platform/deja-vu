@@ -9,6 +9,7 @@ import { QuillModule } from 'ngx-quill';
 
 import { DvModule, GATEWAY_URL } from '@deja-vu/core';
 
+import { AppRoutingModule } from './app-routing.module';
 import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';
 
@@ -66,7 +67,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     NgxElectronModule,
     QuillModule,
     DvModule,
-    ClicheModule
+    ClicheModule,
+    AppRoutingModule
   ],
   providers: [
     {

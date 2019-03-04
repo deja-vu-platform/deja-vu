@@ -88,10 +88,12 @@ function makeDraggable(element: HTMLElement, handle?: HTMLElement) {
   exportAs: 'matMenu'
 })
 export class FloatingMenuComponent implements AfterViewInit {
-  private static ANIMS_PER_CYCLE = 4;
-  private static OPEN_ANIM_NUM = 0;
-  // private static CLOSE_ANIM_NUM = 3;
-  static maxZ = 1000;
+  private static readonly ANIMS_PER_CYCLE = 4;
+  private static readonly OPEN_ANIM_NUM = 0;
+  // private static readonly CLOSE_ANIM_NUM = 3;
+  private static readonly INITIAL_Z = 100;
+  private static maxZ = FloatingMenuComponent.INITIAL_Z;
+  private static numOpen = 0;
 
   @Output() shouldClose = new EventEmitter<null>();
   @Output() closed = new EventEmitter<null>();
@@ -123,6 +125,10 @@ export class FloatingMenuComponent implements AfterViewInit {
    */
   onClosed() {
     this.closed.emit(null);
+    FloatingMenuComponent.numOpen -= 1;
+    if (FloatingMenuComponent.numOpen === 0) {
+      FloatingMenuComponent.maxZ = FloatingMenuComponent.INITIAL_Z;
+    }
   }
 
   /**
@@ -156,13 +162,16 @@ export class FloatingMenuComponent implements AfterViewInit {
     makeDraggable(this.menu, handle);
 
     this.opened.emit(null);
+    FloatingMenuComponent.numOpen += 1;
   }
 
   /**
    * Move this floating menu in front of any other floating menus
    */
   private toFront = () => {
-    FloatingMenuComponent.maxZ += 1;
-    this.menu.style.zIndex = `${FloatingMenuComponent.maxZ}`;
+    if ((parseInt(this.menu.style.zIndex, 10)) < FloatingMenuComponent.maxZ) {
+      FloatingMenuComponent.maxZ += 1;
+      this.menu.style.zIndex = `${FloatingMenuComponent.maxZ}`;
+    }
   }
 }

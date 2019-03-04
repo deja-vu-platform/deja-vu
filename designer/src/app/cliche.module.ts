@@ -123,14 +123,18 @@ function clicheDefinitionFromModule(
           }
         }
 
+        if (template.includes('ng-content')) {
+          inputs.push('*content');
+          actionInputs['*content'] = {};
+        }
+
         return {
           name: _.kebabCase(component.name
             .slice(0, componentSuffix.length * -1)),
           component,
           inputs,
           outputs,
-          actionInputs,
-          ngContent: template.includes('ng-content')
+          actionInputs
         };
       })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
@@ -155,8 +159,7 @@ dvCliche.actions.push(({
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: {},
-  ngContent: false
+  actionInputs: {}
 }));
 
 @NgModule({

@@ -53,3 +53,7 @@ button.mat-small-y {
 .mat-tab-body-wrapper {
   flex: 1;
 }
+
+.cdk-global-overlay-wrapper {
+  z-index: 1000;
+}

@@ -3,37 +3,57 @@ import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
+/**
+ * A named collection of actions
+ * Could be App, ClicheDefinition, ClicheInstance, etc.
+ */
 export interface ActionCollection {
   name: string;
   actions: ActionDefinition[];
 }
 
+/**
+ * an input map for each named action input
+ */
 export interface ActionInputs {
   // ioName is what you would put $ in front of to reference
   // the value is the name of the property set in the included action
   [forInput: string]: { [ioName: string]: string };
 }
 
+/**
+ * inputs that are present on **every** action
+ * cliche actions should already have these
+ * these need to be added to app actions
+ */
 export const OMNIPRESENT_INPUTS = [
   'hidden'
 ];
 
+/**
+ * Action Definition
+ * Defines the name you use, the inputs you provide,
+ * and the outputs and content you get when you instantiate an action
+ */
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
   readonly actionInputs: ActionInputs;
-  readonly ngContent: boolean;
 }
+
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
 }
 
+/**
+ * Definitions of Inputs or Outputs for AppActionDefinition
+ */
 // tslint:disable-next-line interface-name
 export interface IO {
   name: string;
-  value: string;
+  value: string; // default constant for input, epression for output
 }
 
 export const defaultAppActionStyles = {
@@ -55,17 +75,16 @@ export class AppActionDefinition implements ActionDefinition {
   readonly actionInputs: Readonly<ActionInputs> = {};
   // TODO: export styles
   readonly styles = _.cloneDeep(defaultAppActionStyles);
-  readonly ngContent = false;
 
   constructor(name: string) {
     this.name = name;
-    OMNIPRESENT_INPUTS.forEach((inputName) => {
-      this.inputSettings.push({ name: inputName, value: '' });
-    });
   }
 
   get inputs(): string[] {
-    return this.inputSettings.map((io) => io.name);
+    return [
+      ...OMNIPRESENT_INPUTS,
+      ...this.inputSettings.map((io) => io.name)
+    ];
   }
 
   get outputs(): string[] {
@@ -88,12 +107,7 @@ export class AppActionDefinition implements ActionDefinition {
    */
   contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
-      r.actions.some((a) => (
-        a.isOrContains(actionDefinition, deep) ||
-        _.some(a.inputSettings, (v) =>
-          v && !_.isString(v) && v.isOrContains(actionDefinition, deep)
-        )
-      ))
+      r.actions.some((a) => a.isOrContains(actionDefinition, deep))
     );
   }
 
@@ -152,6 +166,10 @@ export class AppActionDefinition implements ActionDefinition {
 
 }
 
+/**
+ * Angular doesn't like style attributes so we have classes for flex
+ * e.g. .dvd-row.jsa gives you justify-content: space-around
+ */
 const flex = {
   fs: 'flex-start',
   fe: 'flex-end',
@@ -171,6 +189,9 @@ export const flexAlign = {
   s: 'stretch'
 };
 
+/**
+ * Actions in AppActionDefinitions are grouped into rows for stylistic reasons
+ */
 export class Row {
   readonly actions: ActionInstance[] = [];
   hJust: keyof typeof flexJustify = 'fs';
@@ -212,6 +233,11 @@ export class Row {
   // to do a move within row, do remove and then add
 }
 
+/**
+ * An Action Instance is a single usage (HTML Tag) of an action
+ * It has its own input settings and its own outputs
+ * But these are defined by its definition
+ */
 export class ActionInstance {
   readonly id = uuidv4();
   readonly of: ActionDefinition;
@@ -219,9 +245,8 @@ export class ActionInstance {
   // type is ActionInstance iff inputName in of.actionInputs
   readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
   // TODO: export styles
-  readonly styles: { stretch: boolean } = { stretch: false };
-  readonly ngContent: string | ActionInstance;
   data?: any; // currently only used for the text widget
+  readonly styles = { stretch: false };
 
   constructor(
     ofAction: ActionDefinition,
@@ -242,13 +267,18 @@ export class ActionInstance {
 
   isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
     return (
+      // is
       this.of === actionDefinition
+      // contains (content, app action only)
       || (
-        deep
-        && this.of['contains']
-        && (<AppActionDefinition>this.of)
-          .contains(actionDefinition, deep)
+        this.of instanceof AppActionDefinition
+        && this.of.contains(actionDefinition, deep)
       )
+      // contains (action input, cliche action only but no need to check this)
+      || _.some(
+          _.pickBy(this.inputSettings, (_v, k) => k in this.of.actionInputs),
+          (a: ActionInstance) => a.isOrContains(actionDefinition, deep)
+        )
     );
   }
 
@@ -267,6 +297,7 @@ export class ActionInstance {
     let html = `    <${this.from.name}.${this.of.name}`;
 
     _.forEach(this.inputSettings, (val, key) => {
+      if (key === '*content') { return; }
       const strVal = _.isString(val)
         ? val
         : val.toHTML(extraIndents + 1)
@@ -281,6 +312,8 @@ export class ActionInstance {
     }
     html += '/>\n';
 
+    // TODO: ngContent
+
     return html;
   }
 
@@ -288,8 +321,7 @@ export class ActionInstance {
     const json = {
       of: this.of.name,
       from: this.from.name,
-      inputSettings: this.inputSettings,
-      styles: this.styles
+      inputSettings: this.inputSettings
     };
     if (this.data) {
       json['data'] = this.data;
@@ -299,12 +331,23 @@ export class ActionInstance {
   }
 }
 
+// AppActionInstance vs ClicheActionInstance isn't relevant
+// For the cases when it does matter, inspecting .of is fine
+
+/**
+ * A cliche is defined by its names and the actions it has
+ */
 export interface ClicheDefinition {
   readonly name: string;
   readonly actions: ClicheActionDefinition[];
   // TODO: config options
 }
 
+/**
+ * The same cliche can be instantiated ("included") multiple times
+ * One reason for this is getting a second db
+ * Another is to use different config options
+ */
 export class ClicheInstance {
   name: string;
   readonly of: ClicheDefinition;
@@ -328,6 +371,9 @@ export class ClicheInstance {
   }
 }
 
+/**
+ * A DV App created with the Designer
+ */
 export class App {
   // populated in cliche.module.ts to avoid circular dependencies
   static dvCliche: ActionCollection;
@@ -341,6 +387,9 @@ export class App {
   // need consistent object to return
   private readonly _actionCollections: ActionCollection[] = [];
 
+  /**
+   * Create an app from a save file
+   */
   static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
 
@@ -370,7 +419,6 @@ export class App {
         r.actions.forEach((ai) => {
           const actionInst = app.newActionInstanceByName(ai.of, ai.from);
           app.setInputsFromJSON(actionInst, ai);
-          Object.assign(actionInst.styles, ai.styles);
           row.actions.push(actionInst);
         });
         row.hJust = r.hJust;
@@ -450,6 +498,9 @@ export class App {
     }, null, '  ');
   }
 
+  /**
+   * Generate dvconfig.json for the app
+   */
   toDVConfigJSON() {
     const basePort = 3000;
     const clichePortOffset = 2;

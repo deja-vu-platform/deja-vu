@@ -1,4 +1,11 @@
 <div class="set-inputs" *ngIf="actionInstance">  
+
+  <div *ngIf="actionInstance.styles" class="style-input mat-form-field">
+    <mat-checkbox [(ngModel)]="actionInstance.styles.stretch">
+      Stretch
+    </mat-checkbox>
+  </div>
+
   <div *ngFor="let input of actionInputs" class="action-input mat-form-field">
     <button
       mat-button
@@ -21,10 +28,4 @@
       [name]="input"
       [(ngModel)]="actionInstance.inputSettings[input]">
   </mat-form-field>
-
-  <div *ngIf="actionInstance.styles" class="style-input mat-form-field">
-    <mat-checkbox [(ngModel)]="actionInstance.styles.stretch">
-      Stretch
-    </mat-checkbox>
-  </div>
 </div>
