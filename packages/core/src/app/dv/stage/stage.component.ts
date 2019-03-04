@@ -40,6 +40,9 @@ export class StageComponent
   @Input() stageEntity: Action | undefined;
   @Input() showEntity: Action | undefined;
 
+  @Input() filter: string[] | undefined;
+  @Output() filteredStagedEntities = new EventEmitter<any[]>();
+
   // Presentation inputs
   @Input() entityName = 'Entity';
   @Input() stageButtonLabel = 'Add';
@@ -82,12 +85,14 @@ export class StageComponent
     if (value !== undefined && value !== null) {
       this.staged.push(value);
       this.stagedEntities.emit(_.cloneDeep(this.staged));
+      this.filteredStagedEntities.emit(_.cloneDeep(this.filterEntities()));
     }
   }
 
   unstage(index: number) {
     _.pullAt(this.staged, index);
     this.stagedEntities.emit(_.cloneDeep(this.staged));
+    this.filteredStagedEntities.emit(_.cloneDeep(this.filterEntities()));
   }
 
   writeValue(value: any[]) {
@@ -97,6 +102,7 @@ export class StageComponent
       this.staged = [];
     }
     this.stagedEntities.emit(_.cloneDeep(this.staged));
+    this.filteredStagedEntities.emit(_.cloneDeep(this.filterEntities()));
   }
 
   registerOnChange(fn: (value: string) => void) {
@@ -120,5 +126,9 @@ export class StageComponent
     if (this.form) {
       this.form.resetForm();
     }
+  }
+
+  private filterEntities() {
+    return _.map(this.staged, (s) => _.pick(s, this.filter));
   }
 }
