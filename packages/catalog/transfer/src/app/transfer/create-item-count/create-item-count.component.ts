@@ -36,6 +36,9 @@ export class CreateItemCountComponent
   @Input() set id(value: string) {
     this.idControl.setValue(value);
   }
+  @Input() set count(value: number) {
+    this.countControl.setValue(value);
+  }
 
   @ViewChild(FormGroupDirective) form;
   createItemCountForm: FormGroup = this.builder.group({
