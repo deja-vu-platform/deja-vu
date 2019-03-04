@@ -16,30 +16,32 @@ Team Reach
 
 ## Cliches Used
 - Authorization
-- StandardAuthentication
-- PasskeyAuthentication
+- Authentication
+- Passkey (x2)
 - Event
 - Task
-- Group
+- Group (x2)
+- Label (x2)
+- Property (x3)
+- Scoring (x2)
 
 ## Missing Features
-### Host 
-- Register with profile information -> `Profile` cliche
-- Display host profile info -> `Profile` cliche
-- Edit competition info -> `Event`, `Group` cliches
-- Edit climber info ->  `Group` cliche
-- List number of climbers -> Needs new widget in the `Group` cliche
-- List number of climbs -> Needs new widget in the `Task` cliche
-- Leaderboard -> `Scoring` cliche
-- Add sex, category info for a climber -> Persisted fields OR create new widgets in the `Profile` cliche
-- Add point, category info for a climb -> Persisted fields
-- Sort climbers in alphabetical order -> Needs a `Sort` or `Filter` cliche
+### Host
+- Edit competition info -> Event, Property
+- Delete competition info -> Property, Passkey
+- Edit participant info ->  Property, Label
+- Delete participant info ->  Property, Passkey, Label
+- Edit problem info ->  Property, Scoring, Label
+- Delete problem info -> Property, Scoring, Label
+- Sort climbers in alphabetical order -> Needs a Sort or Filter cliche
 
-### Climber 
-- Record number of falls per climb -> `Scoring` cliche
-- Leaderboard -> `Scoring` cliche
-- Sort climbs by name/ points -> Needs a `Sort` or `Filter` cliche
-- Give approval by entering credentials -> Needs new widget in the `Task` cliche
+### Climber
+<!-- All for now -->
+- Record number of falls per climb -> Scoring cliche
+- Leaderboard -> Scoring cliche
+- Sort climbs by name/ points -> Needs a Sort or Filter cliche
+- Give approval by entering credentials -> Needs new widget in the Task cliche
 
-### Spectator 
-- Leaderboard -> `Scoring` cliche
+### Spectator
+<!-- All for now -->
+- Leaderboard -> Scoring cliche

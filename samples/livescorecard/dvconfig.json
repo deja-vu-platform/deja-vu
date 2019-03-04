@@ -21,19 +21,16 @@
       }
     },
     "authorization": {
-      "name": "authorization",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "event": {
-      "name": "event",
       "config": {
         "reinitDbOnStartup": true
       }
     },
     "task": {
-      "name": "task",
       "config": {
         "reinitDbOnStartup": true
       }
@@ -46,12 +43,6 @@
     },
     "competitionclimbers": {
       "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "ranking": {
-      "name": "ranking",
       "config": {
         "reinitDbOnStartup": true
       }
