@@ -1,5 +1,5 @@
 <dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
-  <dv.tx as potluck-auth-check>
+  <dv.tx>
     <authentication.logged-in />
     <dv.redirect href="/login" onEvalFailure=true />
   </dv.tx>
@@ -14,7 +14,7 @@
               showId=false />
           </li>
           <li>
-            <dv.tx as potluck-sign-out>
+            <dv.tx>
               <authentication.sign-out />
               <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
             </dv.tx>

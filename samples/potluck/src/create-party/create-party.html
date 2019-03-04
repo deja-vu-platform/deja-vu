@@ -23,15 +23,17 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-horizontal">
-                <dv.tx as potluck-create-party-form>
+                <dv.tx>
                   <dv.gen-id />
                   <dv.status savedText="Party created" />
                   <div class="row">
                     <div class="col-md-5">
-                      <party.create-object id=dv.gen-id.id showOptionToSubmit=false />
+                      <party.create-object id=dv.gen-id.id
+                        showOptionToSubmit=false />
                     </div>
                     <div class="col-md-5 offset-md-2">
-                      <event.create-event id=dv.gen-id.id showOptionToSubmit=false />
+                      <event.create-event id=dv.gen-id.id
+                        showOptionToSubmit=false />
                     </div>
                   </div>
                   <hr class="divider" />
@@ -62,14 +64,15 @@
                             <potluck.create-supply />
                           </dv.action>
                         showEntity=<potluck.show-supply supplyObj=$entity />
-                        stageHeader=<potluck.supply-list-header /> />
+                        stageHeader=<potluck.supply-list-header />
+                        filter=['id','count'] />
                     </div>
                   </div>
 
                   <supply.create-objects objects=dv.stage.stagedEntities
                     hidden=true />
-                  <transfer.add-to-balance accountId=dv.gen-id.id
-                    amount=dv.stage.stagedEntities hidden=true />
+                  <transfer.add-to-balance accountId=dv.gen-id.id hidden=true
+                    amount=dv.stage.filteredStagedEntities  />
 
 
                   <authorization.create-resource id=dv.gen-id.id
@@ -80,12 +83,10 @@
                   <authentication.authenticate id=potluck.navbar.loggedInUserId
                     hidden=true />
 
-                  <div class="row" id="party-form-footer">
-                    <div class="offset-md-4 col-md-3">
-                      <dv.button>Create Party</dv.button>
-                      <dv.callback defaultHref="/parties" onExecSuccess=true
-                        hidden=true />
-                    </div>
+                  <div class="row justify-content-center" id="party-form-footer">
+                    <dv.button>Create Party</dv.button>
+                    <dv.callback defaultHref="/parties" onExecSuccess=true
+                      hidden=true />
                   </div>
                 </dv.tx>
               </div>

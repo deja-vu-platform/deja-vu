@@ -6,16 +6,18 @@
       <div class="row">
         <div class="offset-md-2 col-md">
           <h1 class="white-text">Sign In</h1>
-          <dv.tx as potluck-login>
+          <dv.tx>
             <authentication.sign-in />
-            <dv.callback defaultHref="/parties" onExecSuccess=true hidden=true />
+            <dv.callback defaultHref="/parties"
+              onExecSuccess=true hidden=true />
           </dv.tx>
         </div>
         <div class="col-md">
           <h1 class="white-text">Register</h1>
-          <dv.tx as potluck-register-user>
+          <dv.tx>
             <authentication.register-user buttonLabel="Register" />
-            <dv.callback defaultHref="/parties" onExecSuccess=true hidden=true />
+            <dv.callback defaultHref="/parties"
+              onExecSuccess=true hidden=true />
           </dv.tx>
         </div>
       </div>

@@ -83,7 +83,6 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <!-- context also wanted here -->
                     <transfer.show-item-counts
                       itemCounts=transfer.show-balance.fetchedBalance
                       showItemCount=<potluck.claim-supply
@@ -105,7 +104,8 @@
           <div class="row top-space">
             <div class="col-md-12">
               <h4>Add Supplies</h4>
-              <potluck.create-supply id=$id save=true />
+              <potluck.create-supply id=$id save=true
+                loggedInUserId=$loggedInUserId />
             </div>
           </div>
         </div>
