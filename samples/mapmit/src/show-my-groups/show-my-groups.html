@@ -4,8 +4,8 @@
   <div id="my-groups-column-container">
     <div class="my-groups-column" id="my-groups-column-left">
       <!-- Show groups owned by user -->
-      <div class="panel panel-default">
-        <div class="panel-body groups-panel-body">
+      <div class="card">
+        <div class="card-body groups-panel-body">
           <h2>Groups I Own</h2>
           <group.show-groups
             withMemberId=mapmit.navbar.loggedInUserId
@@ -19,8 +19,8 @@
 
       <!-- Show groups for which the user is a member -->
     <div class="my-groups-column" id="my-groups-column-right">
-      <div class="panel panel-default">
-        <div class="panel-body groups-panel-body">
+      <div class="card">
+        <div class="card-body groups-panel-body">
           <h2>Groups I'm In</h2>
           <group.show-groups
             withMemberId=mapmit.navbar.loggedInUserId
