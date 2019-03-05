@@ -4,39 +4,35 @@
   <div class="main">
     <div class="container">
       <div class="comment-container">
-        <dv.if condition=!$id>Comment not found</dv.if>
+        <div class="inline-block">
+          <hackernews.upvote
+            disabled=!hackernews.navbar.loggedInUser ||
+              comment.show-comment.loadedComment?.authorId ===
+              hackernews.navbar.loggedInUser?.username
+            id=$id loggedInUser=hackernews.navbar.loggedInUser isPost=false />
+        </div>
 
-        <dv.if condition=$id>
-          <div class="inline-block">
-            <hackernews.upvote
-              disabled=!hackernews.navbar.loggedInUser ||
-                comment.show-comment.loadedComment?.authorId ===
-                hackernews.navbar.loggedInUser?.username
-              id=$id loggedInUser=hackernews.navbar.loggedInUser isPost=false />
-          </div>
-
-          <div class="inline-block">
-            <span class="subtext">
-              <comment.show-comment id=$id
-                showId=false showTargetId=false showContent=false />
-            </span>
+        <div class="inline-block">
+          <span class="subtext">
             <comment.show-comment id=$id
-              showId=false showAuthorId=false showTargetId=false />
-          </div>
-          <div class="write-comment-container">
-            <hr class="post-separator" />
+              showId=false showTargetId=false showContent=false />
+          </span>
+          <comment.show-comment id=$id
+            showId=false showAuthorId=false showTargetId=false />
+        </div>
+        <div class="write-comment-container">
+          <hr class="post-separator" />
 
-            <dv.tx>
-              <authentication.authenticate
-                user=hackernews.navbar.loggedInUser hidden=true />
-              <comment.create-comment
-                authorId=hackernews.navbar.loggedInUser?.username
-                buttonLabel="Reply"
-                showOptionToSubmit=!!hackernews.navbar.loggedInUser
-                targetId=$id />
-            </dv.tx>
-          </div>
-        </dv.if>
+          <dv.tx>
+            <authentication.authenticate
+              user=hackernews.navbar.loggedInUser hidden=true />
+            <comment.create-comment
+              authorId=hackernews.navbar.loggedInUser?.username
+              buttonLabel="Reply"
+              showOptionToSubmit=!!hackernews.navbar.loggedInUser
+              targetId=$id />
+          </dv.tx>
+        </div>
       </div>
     </div>
   </div>
