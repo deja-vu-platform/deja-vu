@@ -20,7 +20,8 @@
 
     <dv.if condition=authentication.logged-in.user id="navbar-right">
       <div id="welcome-user" class="navbar-item">
-        <span class="inline">Logged in as: <authentication.show-user
+        <span class="inline">Logged in as:
+          <authentication.show-user class="inline-block"
             user=authentication.logged-in.user showId=false />
         </span>
       </div>
