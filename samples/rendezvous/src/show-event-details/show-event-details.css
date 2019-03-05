@@ -7,10 +7,10 @@
 .event-info-table {
   background-color: #FFEFEE;
   border: 1px solid #CC9088;
-  margin-bottom: 20px;
+  margin: 1.5em 0;
 }
 
-.panel-body {
+.card-body {
   padding: 15px;
 }
 
@@ -174,4 +174,12 @@
 #comment-title {
   margin-top: 80px;
   display: flex;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.oblique {
+  font-style: oblique;
 }

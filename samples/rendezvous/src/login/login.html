@@ -1,24 +1,24 @@
 <dv.action name="login">
   <div class="index">
-    <div class="panel panel-default" id="login-panel">
-      <div class="panel-heading">
+    <div class="card" id="login-panel">
+      <div class="card-header">
         <h3>Rendezvous</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
         <h4 id="login-title">Login</h4>
         <div>
           <dv.tx>
-            <authentication.sign-in />
+            <authentication.sign-in buttonLabel="Enter" />
             <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
           </dv.tx>
         </div>
-        <p class="auth-link">Coming soon: Recover forgotten password.</p>
+        <a href="/" class="auth-link">Forgot password? (Coming Soon)</a>
       </div>
     </div>
 
     <div id="create-account">
       <dv.link href="/register" class="auth-link">
-        Create account.
+        Create account
       </dv.link>
     </div>
   </div>
