@@ -1,7 +1,7 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import * as mongodb from 'mongodb';
 import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
 
 import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
@@ -23,7 +23,9 @@ export const CONCURRENT_UPDATE_ERROR =
  * The type of the table that maps action names to
  * functions that return the corresponding graphql request
  */
-export type ActionRequestTable = { [key: string]: (extraInfo) => string };
+export interface ActionRequestTable {
+  [key: string]: (extraInfo) => string;
+}
 
 /**
  * Generates the return fields for a graphql request, if any
@@ -33,6 +35,7 @@ export function getReturnFields(e: any) {
   const hasValue = !(_.isEmpty(e) || _.isNil(e));
   const hasReturnFields = hasValue ?
     !(_.isEmpty(e.returnFields) || _.isNil(e.returnFields)) : false;
+
   return hasReturnFields ? '{' + e.returnFields + '}' : '';
 }
 
@@ -70,7 +73,8 @@ export class ClicheServer<C extends Config = Config> {
   private readonly _initResolvers: InitResolversFn<C> | undefined;
   private readonly _dynamicTypeDefs: string[];
 
-  constructor(name: string, actionRequestTable: ActionRequestTable, config: C, schemaPath: string,
+  constructor(name: string, actionRequestTable: ActionRequestTable,
+    config: C, schemaPath: string,
     initDbCallback?: InitDbCallbackFn<C>, initResolvers?: InitResolversFn<C>,
     dynamicTypeDefs: string[] = []) {
     this._name = name;
@@ -88,30 +92,35 @@ export class ClicheServer<C extends Config = Config> {
    *                           with the cliché name and a separator
    */
   private static GetActionName(fullActionName: string) {
-    return fullActionName.split('-').slice(1).join('-');
+    return fullActionName
+      .split('-')
+      .slice(1)
+      .join('-');
   }
 
   // needs clicheServer passed in because `this` is not in scope
   // when this function is used
-  private static SetGraphqlQuery = (clicheServer: ClicheServer) =>
-    (req, _res, next) => {
+  private static SetGraphqlQuery(clicheServer: ClicheServer) {
+    return (req, _res, next) => {
       const reqField = req.method === 'GET' ? 'query' : 'body';
       req[reqField].query = clicheServer._actionRequestTable[
         ClicheServer.GetActionName(req['fullActionName'])
       ](req[reqField].extraInfo);
       req[reqField].variables = req[reqField].inputs;
       next();
-    }
+    };
+  }
 
   private startApp(schema) {
     const app = express();
 
+    const reqParamNamesInOrder = ['fullActionName', 'reqId', 'reqType'];
+
     // /dv-{fullActionName}/{reqId}/{reqType}/
     app.use(/^\/dv-(.*)\/(.*)\/(vote|commit|abort)\/.*/,
       (req, _res, next) => {
-        req['fullActionName'] = req.params[0];
-        req['reqId'] = req.params[1];
-        req['reqType'] = req.params[2];
+        reqParamNamesInOrder.forEach(
+          (name, index) => req[name] = req.params[index]);
         next();
       },
       bodyParser.json(),
