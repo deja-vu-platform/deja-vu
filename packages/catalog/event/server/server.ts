@@ -1,8 +1,9 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
   getReturnFields,
@@ -13,13 +14,11 @@ import {
   CreateSeriesInput,
   EventDoc,
   GraphQlEvent,
-  PendingDoc,
   SeriesDoc,
   UpdateEventInput
 } from './schema';
 
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
@@ -37,12 +36,12 @@ function dateToUnixTime(date: Date): number {
 
 class EventValidation {
   static async eventExistsOrFail(
-    events: mongodb.Collection<EventDoc>, id: string): Promise<EventDoc> {
+    events: Collection<EventDoc>, id: string): Promise<EventDoc> {
     return Validation.existsOrFail(events, id, 'Event');
   }
 
   static async eventExistsInSeriesOrFail(
-    series: mongodb.Collection<SeriesDoc>, id: string): Promise<void> {
+    series: Collection<SeriesDoc>, id: string): Promise<void> {
     const s: SeriesDoc | null = await series
       .findOne({ 'events.id': id }, { projection: { _id: 1 } });
     if (s === null) {
@@ -102,39 +101,17 @@ const actionRequestTable: ActionRequestTable = {
   `
 }
 
-function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
-  const docPending = _.get(doc, 'pending.type');
-
-  return docPending === 'create-event' || docPending === 'create-series';
-}
-
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const events: mongodb.Collection<EventDoc> = db.collection('events');
-  const series: mongodb.Collection<SeriesDoc> = db.collection('series');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const events: Collection<EventDoc> = db.collection('events');
+  const series: Collection<SeriesDoc> = db.collection('series');
 
   return {
     Query: {
       // TODO: search between dates
-      events: () => events.find({ pending: { $exists: false } })
-        .toArray(),
-      series: () => series.find({ pending: { $exists: false } })
-        .toArray(),
-      event: async (_root, { id }) => {
-        const evt: EventDoc | null = await events.findOne({ id: id });
-        if (isPendingCreate(evt)) {
-          return null;
-        }
-
-        return evt;
-      },
-      oneSeries: async (_root, { id }) => {
-        const s: SeriesDoc | null = await series.findOne({ id: id });
-        if (isPendingCreate(s)) {
-          return null;
-        }
-
-        return s;
-      }
+      events: () => events.find(),
+      series: () => series.find(),
+      event: async (_root, { id }) => await events.findOne({ id: id }),
+      oneSeries: async (_root, { id }) => await series.findOne({ id: id })
     },
     Event: {
       id: (evt: EventDoc) => evt.id,
@@ -166,28 +143,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           endDate: unixTimeToDate(input.endDate)
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            e.pending = { reqId: context.reqId, type: 'create-event' };
-            /* falls through */
-          case undefined:
-            await events.insertOne(e);
-
-            return e;
-          case 'commit':
-            await events.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await events.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-        }
-
-        return e;
+        return events.insertOne(context, e);
       },
       updateEvent: async (
         _root, { input }: { input: UpdateEventInput }, context: Context) => {
@@ -202,152 +158,22 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           return false;
         }
         const updateOp = { $set: setObject };
-        const notPendingEventFilter = {
-          id: input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            await EventValidation.eventExistsOrFail(events, input.id);
-            const pendingUpdateObj = await events
-              .updateOne(
-                notPendingEventFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'update-event'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
 
-            return true;
-          case undefined:
-            await EventValidation.eventExistsOrFail(events, input.id);
-            const updateObj = await events
-              .updateOne(notPendingEventFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await events.updateOne(
-              reqIdPendingFilter,
-              { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await events.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await events.updateOne(context, { id: input.id }, updateOp);
       },
       deleteEvent: async (_root, { id }, context: Context) => {
         const isPartOfSeries: boolean = await events
           .findOne({ id: id }, { projection: { _id: 1 }}) === null;
-        const notPendingEventsFilter = { pending: { $exists: false } };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
         if (isPartOfSeries) {
-          notPendingEventsFilter['events.id'] = id;
+          const filter = { 'events.id': id };
           const updateOp = { $pull: { events: { id: id } } };
 
-          switch (context.reqType) {
-            case 'vote':
-              await EventValidation.eventExistsInSeriesOrFail(series, id);
-              const pendingUpdateObj = await series.updateOne(
-                notPendingEventsFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'delete-series-event'
-                    }
-                  }
-                });
-
-              if (pendingUpdateObj.matchedCount === 0) {
-                throw new Error(CONCURRENT_UPDATE_ERROR);
-              }
-
-              return true;
-            case undefined:
-              await EventValidation.eventExistsInSeriesOrFail(series, id);
-              const updateObj = await series.updateOne(
-                notPendingEventsFilter, updateOp);
-
-              if (updateObj.matchedCount === 0) {
-                throw new Error(CONCURRENT_UPDATE_ERROR);
-              }
-
-              return true;
-            case 'commit':
-              await series.updateOne(
-                reqIdPendingFilter,
-                { ...updateOp, $unset: { pending: '' } });
-
-              return undefined;
-            case 'abort':
-              await series.updateOne(
-                reqIdPendingFilter, { $unset: { pending: '' } });
-
-              return undefined;
-          }
-
-          // https://github.com/Microsoft/TypeScript/issues/19423
-          return undefined;
+          return await series.updateOne(context, filter, updateOp, {},
+            async () =>
+              await EventValidation.eventExistsInSeriesOrFail(series, id));
         } else {
-          _.set(notPendingEventsFilter, 'id', id);
-
-          switch (context.reqType) {
-            case 'vote':
-              await EventValidation.eventExistsOrFail(events, id);
-              const pendingUpdateObj = await events.updateOne(
-                notPendingEventsFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'delete-event'
-                    }
-                  }
-                });
-
-              if (pendingUpdateObj.matchedCount === 0) {
-                throw new Error(CONCURRENT_UPDATE_ERROR);
-              }
-
-              return true;
-            case undefined:
-              await EventValidation.eventExistsOrFail(events, id);
-              const res = await events
-                .deleteOne({ id: id, pending: { $exists: false } });
-
-              if (res.deletedCount === 0) {
-                throw new Error(CONCURRENT_UPDATE_ERROR);
-              }
-
-              return true;
-            case 'commit':
-              await events.deleteOne(reqIdPendingFilter);
-
-              return undefined;
-            case 'abort':
-              await events.updateOne(
-                reqIdPendingFilter, { $unset: { pending: '' } });
-
-              return undefined;
-          }
-
-          // https://github.com/Microsoft/TypeScript/issues/19423
-          return undefined;
+          return await events.deleteOne(context, { id: id });
         }
       },
       createSeries: async (
@@ -356,61 +182,37 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         if (_.isEmpty(input.events)) {
           throw new Error('Series has no events');
         }
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        let pending: PendingDoc | undefined;
-        switch (context.reqType) {
-          case 'vote':
-            pending = { reqId: context.reqId, type: 'create-series' };
-            /* falls through */
-          case undefined:
-            const evts: EventDoc[] = [];
-            const seriesId = input.id ? input.id : uuid();
-            for (const createEvent of input.events) {
-              const eventId = createEvent.id ? createEvent.id : uuid();
-              const e = {
-                id: eventId,
-                startDate: unixTimeToDate(createEvent.startDate),
-                endDate: unixTimeToDate(createEvent.endDate)
-              };
-              evts.push(e);
-            }
-            const sortedInserts = _.sortBy(evts, 'startDate');
-            const newSeries: SeriesDoc = {
-              id: seriesId,
-              startsOn: _.first(sortedInserts).startDate,
-              endsOn: _.last(sortedInserts).startDate,
-              events: evts
-            };
-            if (pending) {
-              newSeries.pending = pending;
-            }
-
-            await series.insertOne(newSeries);
-
-            return newSeries;
-          case 'commit':
-            await series.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await series.deleteOne(reqIdPendingFilter);
-
-            return undefined;
+        const evts: EventDoc[] = [];
+        const seriesId = input.id ? input.id : uuid();
+        for (const createEvent of input.events) {
+          const eventId = createEvent.id ? createEvent.id : uuid();
+          const e = {
+            id: eventId,
+            startDate: unixTimeToDate(createEvent.startDate),
+            endDate: unixTimeToDate(createEvent.endDate)
+          };
+          evts.push(e);
         }
+        const sortedInserts = _.sortBy(evts, 'startDate');
+        const newSeries: SeriesDoc = {
+          id: seriesId,
+          startsOn: _.first(sortedInserts).startDate,
+          endsOn: _.last(sortedInserts).startDate,
+          events: evts
+        };
 
-        return undefined;
+        return await series.insertOne(context, newSeries);
       }
     }
   };
 }
 
 const eventCliche: ClicheServer = new ClicheServerBuilder('event')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
     // Stores individual events that are not part of any series
-    const events: mongodb.Collection<EventDoc> = db.collection('events');
+    const events: Collection<EventDoc> = db.collection('events');
     // Stores event series. Its constituent events are embedded in `SeriesDoc`
-    const series: mongodb.Collection<SeriesDoc> = db.collection('series');
+    const series: Collection<SeriesDoc> = db.collection('series');
 
     return Promise.all([
       events.createIndex({ id: 1 }, { unique: true }),
