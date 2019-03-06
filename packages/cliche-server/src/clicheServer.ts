@@ -7,17 +7,11 @@ import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
 
 import { Config } from './config';
+import { ClicheDb } from './db';
 
 // GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
 // tslint:disable-next-line:no-var-requires
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
-
-
-/**
- * The error message to include when there is a concurrent update in the server.
- */
-export const CONCURRENT_UPDATE_ERROR =
-  'An error has occured. Please try again later';
 
 /**
  * The type of the table that maps action names to
@@ -43,20 +37,14 @@ export function getReturnFields(e: any) {
  * The type of the function to be called after connecting to the db.
  */
 export type InitDbCallbackFn<C = Config> =
-  (db: mongodb.Db, config: C) => Promise<any>;
+  (db: ClicheDb, config: C) => Promise<any>;
 
 /**
  * The type of the function to be called to generate the resolvers.
  * @return the resolvers object
  */
 export type InitResolversFn<C = Config> =
-  (db: mongodb.Db, config: C) => object;
-
-export interface Context {
-  reqType: 'vote' | 'commit' | 'abort' | undefined;
-  runId: string;
-  reqId: string;
-}
+  (db: ClicheDb, config: C) => object;
 
 /**
  * The server for a cliche that contains its associated db (if applicable)
@@ -185,17 +173,19 @@ export class ClicheServer<C extends Config = Config> {
       `mongodb://${mongoServer}`);
 
     this._db = client.db(this._config.dbName);
+    const clicheDb: ClicheDb = new ClicheDb(this._db);
 
     if (this._config.reinitDbOnStartup) {
       await this._db.dropDatabase();
       console.log(`Reinitialized db ${this._config.dbName}`);
     }
     if (this._initDbCallback) {
-      await this._initDbCallback(this._db, this._config);
+      await this._initDbCallback(clicheDb, this._config);
     }
     // TODO: support for initResolvers that don't require a db
     if (this._initResolvers) {
-      this._resolvers = this._initResolvers(this._db, this._config);
+      this._resolvers = this._initResolvers(
+        clicheDb, this._config);
       const typeDefs = [
         readFileSync(this._schemaPath, 'utf8'), ...this._dynamicTypeDefs];
       const schema = makeExecutableSchema(
