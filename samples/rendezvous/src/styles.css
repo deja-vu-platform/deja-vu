@@ -3,14 +3,13 @@
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-
 @import url('https://fonts.googleapis.com/css?family=Raleway');
-
 md-icon {
   font-family: 'Material Icons' !important;
 }
 
-body, html {
+body,
+html {
   overflow-x: hidden;
   overflow-y: auto;
   height: 100%;
@@ -37,6 +36,8 @@ div.index {
 h3 {
   font-weight: 500;
   font-size: 32px;
+  padding: 0;
+  margin: 0;
 }
 
 .inline-block {
@@ -45,6 +46,10 @@ h3 {
 
 textarea {
   resize: vertical;
+}
+
+.mat-input-wrapper {
+  font-family: 'Raleway', sans-serif;
 }
 
 table {
@@ -66,12 +71,7 @@ select {
   font-family: 'Raleway', sans-serif;
 }
 
-.panel > .panel-heading {
-  background-image: none;
-  background-color: #ffa599;
-}
-
-.panel > .panel-body > p {
+.card>.card-body>p {
   display: inline-block;
   word-wrap: break-word;
 }
@@ -84,7 +84,7 @@ select {
   display: inline-block;
 }
 
-.btn > input {
+.btn>input {
   color: blue;
 }
 
@@ -98,7 +98,7 @@ select {
   width: 50px;
 }
 
-.new-event{
+.new-event {
   width: 75%;
   font-family: 'Raleway', sans-serif;
   margin: 0 auto;
@@ -121,6 +121,7 @@ select {
 .event-display td {
   border-top: 1px solid #CC9088;
 }
+
 .event-display td:first-child {
   border-top: none;
 }
@@ -131,7 +132,7 @@ select {
   text-align: center;
 }
 
-.button, #create button{
+.button {
   border: 0;
   background-color: #ffd0cc;
   color: black;
@@ -139,6 +140,15 @@ select {
   margin-top: 20px;
   border-radius: 5px;
   border: 1px solid #B3594D;
+}
+
+.register-button {
+  margin: 0;
+  padding: 0;
+}
+
+.register-button button.mat-button {
+  font-family: 'Raleway', sans-serif;
 }
 
 .display-buttons {
@@ -155,7 +165,7 @@ select {
   padding: 1px;
 }
 
-#event-info{
+#event-info {
   width: 100%;
   padding-top: 20px;
   border-radius: 5px;
@@ -163,37 +173,38 @@ select {
   margin-top: 60px;
 }
 
-#back{
+#back {
   background-color: #ffd0cc;
   color: black;
-  margin-right: 10px;
+  margin-right: 0.625em;
+  margin-top: 0px;
 }
 
-#create button{
+#create button {
   background-color: #ffd0cc;
   color: black;
-  margin-right: 10px;
-  float: none!important;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  border-radius: 4px;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+  width: 5em;
+  font-size: 1em;
+  margin-left: 0;
   margin-top: 10px;
-  margin-left: 10px;
-  width: 80px;
 }
 
 .form-horizontal .form-group {
-    margin-right: 0px;
-    margin-left:  0px;
+  margin-right: 0px;
+  margin-left: 0px;
 }
 
-.panel-heading {
+.card-header {
   overflow: auto;
+  background-image: none;
+  background-color: #ffa599;
 }
-
 
 /* make place searchbox look like other inputs on page */
+
 #search-for-place input {
   width: 100%;
   height: 34px;
@@ -208,11 +219,12 @@ select {
   margin-top: 0;
   outline: 1px;
 }
+
 #search-for-place input:focus {
   border-color: #66afe9;
   outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
 .not-shown {
@@ -225,3 +237,62 @@ select {
   display: block;
 }
 
+.auth-link a.dvlink,
+a.auth-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 10px;
+  color: #B3594D;
+}
+
+authentication-sign-in button.mat-button {
+  width: 150px;
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+}
+
+authentication-sign-out button.mat-button {
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+  margin-right: 30px;
+}
+
+.profile-button {
+  font-size: 0.875em;
+  margin: 0 0 0.0625em 0;
+  padding: 0.55em 1em;
+}
+
+.profile-signout-buttons {
+  margin-top: 0.625em;
+}
+
+#create-event-button {
+  margin: 0px;
+  text-align: right;
+}
+
+group-show-members li.list-group-item {
+  border: none;
+  background: none;
+}
+
+comment-create-comment .mat-input-container {
+  width: 80%;
+}
+
+comment-create-comment button.mat-button {
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+}

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -26,6 +27,8 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
   @Input() showAuthorId = true;
   @Input() showTargetId = true;
   @Input() showContent = true;
+
+  @Output() loadedComment = new EventEmitter<Comment>();
 
   private gs: GatewayService;
 
@@ -96,6 +99,7 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
           })
           .subscribe((res) => {
             this.comment = res.data.commentByAuthorTarget;
+            this.loadedComment.emit(this.comment);
           });
       }
 

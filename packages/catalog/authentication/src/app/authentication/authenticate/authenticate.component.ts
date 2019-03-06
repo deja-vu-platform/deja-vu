@@ -13,6 +13,8 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../authentication.config';
 
+import { User } from '../shared/authentication.model';
+
 
 @Component({
   selector: 'authentication-authenticate',
@@ -20,7 +22,8 @@ import { API_PATH } from '../authentication.config';
   styleUrls: ['./authenticate.component.css']
 })
 export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
-  @Input() id: string;
+  @Input() id: string | undefined;
+  @Input() user: User | undefined;
   isAuthenticated = false;
 
   private gs: GatewayService;
@@ -49,7 +52,7 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
   }
 
   doRequest() {
-    if (!this.gs || _.isEmpty(this.id)) {
+    if (!this.gs || (_.isEmpty(this.id) && _.isEmpty(this.user))) {
       return;
     }
     const token = this.authenticationService.getToken();
@@ -57,7 +60,7 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
       params: {
         inputs: {
           input: {
-            id: this.id,
+            id: this.id ? this.id : this.user.id,
             token: token
           }
         }

@@ -5,7 +5,6 @@
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 @import url('https://fonts.googleapis.com/css?family=Mogra');
-
 md-icon {
   font-family: 'Material Icons' !important;
 }
@@ -24,8 +23,12 @@ md-icon {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .btn-primary {
@@ -199,10 +202,16 @@ follow-follow-unfollow button.btn {
   border-color: #4cae4c !important;
 }
 
-search-items-by-labels button.mat-button {
+label-search-items-by-labels button.mat-button {
   display: inline-block;
+  margin-left: 1em;
+  background-color: floralwhite;
 }
 
 rating-rate-target .rating {
   justify-content: start;
+}
+
+sweetspots-add-a-spot-form .mat-input-container {
+  width: 100%;
 }
