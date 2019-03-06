@@ -2,7 +2,7 @@
   background-color: #ffa599;
 }
 
-.panel-body {
+.card-body {
   padding: 15px;
 }
 
@@ -29,12 +29,6 @@ td {
   float: right;
 }
 
-#create {
-  margin-top: 10px;
-  margin-left: 10px;
-  width: 80px;
-}
-
 #back {
   margin-top: 10px;
   width: 80px;
@@ -42,4 +36,8 @@ td {
 
 #tags {
   padding-top: 0px;
+}
+
+.event-title-info {
+  margin-top: 2em;
 }
