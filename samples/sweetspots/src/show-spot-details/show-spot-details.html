@@ -19,64 +19,72 @@
             showDirectionsControl=false/>
         </div>
 
-        <!-- Delete Spot -->
-        <!-- TODO: Only delete the spot within a day of being created -->
-        <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId>
-          <dv.tx>
-            <geolocation.delete-marker id=$id hidden=true />
-            <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
-              targetId=sweetspots.navbar.loggedInUserId
-              value=-1 hidden=true />
-            <authorization.delete-resource id=$id hidden=true />
-            <authentication.authenticate id=sweetspots.navbar.loggedInUserId
-              hidden=true />
-              <!-- TODO: comment.delete-target -->
-            <comment.delete-comment class="btn btn-danger delete-spot" id=$id
-              authorId=sweetspots.navbar.loggedInUserId />
-            <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
-
-            <!-- TODO -->
-            <!-- <label.delete-item />
-            <rating.delete-target />
-            <follow.delete-publisher />
-            <property.delete-object /> -->
-          </dv.tx>
-        </dv.if>
-
-        <h5>Average Rating: <rating.show-average-rating
-          targetId=$id showStars=false
-          showNumRatings=false/></h5>
-
-        <div class="btn-toolbar toolbar">
-          <!-- Favorite/ Unfavorite Spot -->
-          <dv.tx>
-            <authentication.authenticate as favorite-spot-authenticate
-              id=sweetspots.navbar.loggedInUserId
-              hidden=true />
-            <follow.follow-unfollow class="btn btn-success favorite-spot"
-              publisherId=$id
-              followerId=sweetspots.navbar.loggedInUserId
-              followButtonLabel="Favorite"
-              unfollowButtonLabel="Unfavorite"
-              hidden=!sweetspots.navbar.loggedInUserId />
-          </dv.tx>
-
-          <!-- TODO: Report Spot -->
-          <button class="btn btn-danger report-spot"
-          hidden=sweetspots.navbar.loggedInUserId>
-            Coming Soon: Report
-          </button>
-          <!-- Delete spot if reportScore > 10 + numReviews where
-            reportScore = sum(reporters.rep at that time) -->
-        </div>
+        <h5>Average Rating:
+          <rating.show-average-rating class="inline-block"
+            targetId=$id showStars=false
+            showNumRatings=false/>
+        </h5>
 
         <!-- Location -->
-        <h6>Location: <geolocation.show-marker
-          marker=geolocation.show-marker.loadedMarker
-          showId=false showTitle=false showMapId=false /></h6>
-        <br />
-        <!-- TODO: Timestamp -->
-        <h6>Created on: Coming Soon</h6>
+        <h6>
+          <label>Location:</label>
+          <geolocation.show-marker
+            marker=geolocation.show-marker.loadedMarker
+            showId=false showTitle=false showMapId=false />
+        </h6>
+
+          <!-- TODO: Timestamp -->
+        <h6 class="timestamp">Created on: Coming Soon</h6>
+
+        <div class="inline-block detail-buttons">
+          <!-- Delete Spot -->
+          <!-- TODO: Only delete the spot within a day of being created -->
+          <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId
+            class="inline-block">
+            <dv.tx>
+              <geolocation.delete-marker id=$id hidden=true />
+              <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
+                targetId=sweetspots.navbar.loggedInUserId
+                value=-1 hidden=true />
+              <authorization.delete-resource id=$id hidden=true />
+              <authentication.authenticate id=sweetspots.navbar.loggedInUserId
+                hidden=true />
+                <!-- TODO: comment.delete-target -->
+              <comment.delete-comment class="btn btn-danger delete-spot" id=$id
+                authorId=sweetspots.navbar.loggedInUserId />
+              <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
+
+              <!-- TODO -->
+              <!-- <label.delete-item />
+              <rating.delete-target />
+              <follow.delete-publisher />
+              <property.delete-object /> -->
+            </dv.tx>
+          </dv.if>
+
+          <div class="btn-toolbar toolbar inline-block">
+            <!-- Favorite/ Unfavorite Spot -->
+            <dv.tx>
+              <authentication.authenticate as favorite-spot-authenticate
+                id=sweetspots.navbar.loggedInUserId
+                hidden=true />
+              <follow.follow-unfollow class="btn btn-success favorite-spot"
+                publisherId=$id
+                followerId=sweetspots.navbar.loggedInUserId
+                followButtonLabel="Favorite"
+                unfollowButtonLabel="Unfavorite"
+                hidden=!sweetspots.navbar.loggedInUserId />
+            </dv.tx>
+
+            <!-- TODO: Report Spot -->
+            <button class="btn btn-danger report-spot"
+              hidden=sweetspots.navbar.loggedInUserId>
+              Coming Soon: Report
+            </button>
+            <!-- Delete spot if reportScore > 10 + numReviews where
+              reportScore = sum(reporters.rep at that time) -->
+          </div>
+        </div>
       </div>
 
       <div class="col-md-6">

@@ -1,0 +1,16 @@
+.row {
+  padding-top: 1em;
+}
+
+.detail-buttons {
+  padding-bottom: 2em;
+}
+
+.timestamp {
+  color: grey;
+  font-style: oblique;
+}
+
+label {
+  font-weight: bold;
+}
