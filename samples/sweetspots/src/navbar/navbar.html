@@ -8,7 +8,7 @@
     </dv.if>
   </dv.tx>
 
-  <nav id="nav-bar" class="navbar navbar-default">
+  <nav id="nav-bar" class="navbar navbar-light">
     <div class="container-fluid">
 
       <div class="navbar-header">
@@ -17,12 +17,12 @@
         </dv.link>
       </div>
 
-      <div class="navbar-form navbar-left search">
+      <div class="form-inline navbar-left search">
         <label.search-items-by-labels hidden=!$showSearch />
       </div>
 
       <dv.if condition=authentication.logged-in.user>
-        <div class="navbar-form navbar-right inline-block">
+        <div class="form-inline navbar-right inline-block">
           <div class="btn-toolbar toolbar">
             <dv.tx>
               <authentication.sign-out class="btn btn-danger"
@@ -44,7 +44,7 @@
       </dv.if>
 
       <dv.if condition=!authentication.logged-in.user>
-        <div class="navbar-form navbar-right">
+        <div class="form-inline navbar-right">
           <div class="btn-toolbar toolbar">
             <dv.link href="/login" class="mat-button btn btn-primary login-btn">
               Login
