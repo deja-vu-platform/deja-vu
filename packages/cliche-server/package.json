@@ -4,7 +4,8 @@
   "description": "The server class and its helpers for Déjà Vu cliches",
   "scripts": {
     "build": "tsc",
-    "package": "yarn run build",
+    "clean": "rm -rf ./dist",
+    "package": "yarn clean && yarn run build",
     "prepare": "yarn run package",
     "lint": "tslint -p . -c tslint.json src/*.ts"
   },
