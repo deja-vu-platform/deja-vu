@@ -7,8 +7,7 @@
       <dv.if condition=$createdByUser &&
         $loggedInUserId === authorization.show-owner.ownerId>
         <group.show-group group=$group
-          showMember=<authentication.show-user
-            id=authorization.show-owner.ownerId /> />
+          showMember=<authentication.show-user id=$id /> />
 
         <dv.tx>
           <group.join-leave as group-owned-by-user-join-leave
