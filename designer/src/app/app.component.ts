@@ -1,5 +1,6 @@
-import { Component, NgZone, OnDestroy } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
+import { NavigationStart, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
@@ -19,7 +20,7 @@ import {
   styleUrls: ['./app.component.scss'],
   viewProviders: [DragulaService]
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   app = new App('newapp');
   openAction = this.app.homepage;
 
@@ -35,7 +36,8 @@ export class AppComponent implements OnDestroy {
     private readonly dragulaService: DragulaService,
     private readonly zone: NgZone,
     private readonly snackBar: MatSnackBar,
-    private readonly electronService: ElectronService
+    private readonly electronService: ElectronService,
+    private readonly router: Router
   ) {
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
@@ -48,6 +50,29 @@ export class AppComponent implements OnDestroy {
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
     }
+  }
+
+  ngOnInit() {
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationStart) {
+        const name = e.url.slice(1);
+        if (name === '') {
+          this.openAction = this.app.homepage;
+        } else {
+          const openAction = this.app.actions.find((a) => a.name === name);
+          if (openAction) {
+            this.openAction = openAction;
+          } else if (!this.router.navigated) {
+            this.router.navigateByUrl('');
+          } else {
+            this.snackBar
+              .open('Page Not Found', 'Go Home')
+              .afterDismissed()
+              .subscribe(() => this.router.navigateByUrl(''));
+          }
+        }
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -87,13 +112,6 @@ export class AppComponent implements OnDestroy {
     if (this.requestProcessor) {
       this.requestProcessor.removeCliche(clicheName);
     }
-  }
-
-  /**
-   * User selected a new action to edit
-   */
-  onActionChanged(openAction: AppActionDefinition) {
-    this.openAction = openAction;
   }
 
   /**

@@ -125,7 +125,6 @@ implements OnInit, AfterViewInit, OnDestroy {
    * To be called in a new thread AfterViewInit
    */
   private loadClicheAction() {
-    console.log('loading', this.actionInstance);
     // create component and add to DOM
     const actionDefinition = <ClicheActionDefinition>this.actionInstance.of;
     const { component } = actionDefinition;

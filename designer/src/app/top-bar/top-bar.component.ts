@@ -8,6 +8,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ElectronService } from 'ngx-electron';
 
@@ -83,7 +84,6 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
-  @Output() readonly changeAction = new EventEmitter<AppActionDefinition>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
   readonly fs: any;
@@ -96,7 +96,8 @@ export class TopBarComponent {
     private readonly electronService: ElectronService,
     private readonly snackBar: MatSnackBar,
     private readonly zone: NgZone,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly router: Router
   ) {
     if (this.electronService.remote) {
       this.fs = this.electronService.remote.require('fs');
@@ -104,7 +105,7 @@ export class TopBarComponent {
   }
 
   onSelectAction() {
-    this.changeAction.emit(this.openAction);
+    this.router.navigateByUrl(this.openAction.name);
   }
 
   createAction = () => {
