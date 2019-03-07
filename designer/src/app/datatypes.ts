@@ -84,11 +84,12 @@ export class AppActionDefinition implements ActionDefinition {
     return [
       ...OMNIPRESENT_INPUTS,
       ...this.inputSettings.map((io) => io.name)
-    ];
+    ].sort();
   }
 
   get outputs(): string[] {
-    return this.outputSettings.map((io) => io.name);
+    return this.outputSettings.map((io) => io.name)
+      .sort();
   }
 
   get rows(): Row[] {

@@ -128,6 +128,9 @@ function clicheDefinitionFromModule(
           actionInputs['*content'] = {};
         }
 
+        inputs.sort();
+        outputs.sort();
+
         return {
           name: _.kebabCase(component.name
             .slice(0, componentSuffix.length * -1)),
