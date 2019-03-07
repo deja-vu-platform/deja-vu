@@ -11,8 +11,6 @@ import { PasskeyService } from '../shared/passkey.service';
   template: ''
 })
 export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
-  @Input() isGuest = false;
-
   @Output() passkey = new EventEmitter();
 
   constructor(
@@ -28,7 +26,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
   }
 
   async dvOnEval(): Promise<void> {
-    const passkey = this.passkeyService.getSignedInPasskey(this.isGuest);
+    const passkey = this.passkeyService.getSignedInPasskey();
 
     if (passkey) {
       this.passkey.emit(passkey);

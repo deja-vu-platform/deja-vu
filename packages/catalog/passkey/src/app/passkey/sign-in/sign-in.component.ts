@@ -38,7 +38,6 @@ export class SignInComponent
   @Input() passkeyValidatedText = 'Passkey validated';
 
   @Input() showOptionToSubmit = true;
-  @Input() isGuest = false;
 
   @Output() passkey = new EventEmitter<Passkey>();
 
@@ -92,7 +91,7 @@ export class SignInComponent
 
     const token = res.data.validatePasskey.token;
     const passkey = res.data.validatePasskey.passkey;
-    this.passkeyService.setSignedInPasskey(token, passkey, this.isGuest);
+    this.passkeyService.setSignedInPasskey(token, passkey);
     this.passkey.emit(passkey);
   }
 

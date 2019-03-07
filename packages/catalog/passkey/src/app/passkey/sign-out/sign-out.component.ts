@@ -12,7 +12,6 @@ import { PasskeyService } from '../shared/passkey.service';
 })
 export class SignOutComponent implements OnInit, OnExec {
   @Input() buttonLabel = 'Sign Out';
-  @Input() isGuest = false;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -27,6 +26,6 @@ export class SignOutComponent implements OnInit, OnExec {
   }
 
   dvOnExec() {
-    this.passkeyService.signOut(this.isGuest);
+    this.passkeyService.signOut();
   }
 }

@@ -22,7 +22,6 @@ interface VerifyRes {
 })
 export class ValidateComponent implements OnExec, OnInit, OnChanges {
   @Input() code: string;
-  @Input() isGuest = false;
 
   isValidated = false;
 
@@ -56,7 +55,7 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
       return;
     }
 
-    const token = this.passkeyService.getToken(this.isGuest);
+    const token = this.passkeyService.getToken();
 
     this.gs.get<VerifyRes>(this.apiPath, {
       params: {
