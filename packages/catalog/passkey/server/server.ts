@@ -9,13 +9,15 @@ import {
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import * as shajs from 'sha.js';
 import {
+  CreatePasskeyInput,
   PasskeyDoc,
   SignInOutput,
   VerifyInput
 } from './schema';
 import { WORDS } from './words';
+
+import { v4 as uuid } from 'uuid';
 
 
 // TODO: Update passkey.validate.ts if any changes made
@@ -28,19 +30,22 @@ const WORDS_SIZE = WORDS.length;
 const SECRET_KEY = 'ultra-secret-key';
 
 class PasskeyValidation {
-  static async passkeyExistsOrFail(passkeys: mongodb.Collection<PasskeyDoc>,
-    code: string): Promise<PasskeyDoc> {
-    const hashedCode = getHashedCode(code);
+  static async passkeyIsNew(passkeys: mongodb.Collection<PasskeyDoc>,
+    id: string, code: string): Promise<PasskeyDoc> {
     const passkey: PasskeyDoc | null = await passkeys
-      .findOne({ code: hashedCode });
-    if (!passkey) {
-      throw new Error(`Passkey ${code} not found.`);
+      .findOne({
+        $or: [
+          { id: id }, { code: code }
+        ]
+      });
+    if (passkey) {
+      throw new Error(`Passkey already exists.`);
     }
 
     return passkey;
   }
 
-  static passkeyIsValidOrFail(value: string): void {
+  static isCodeValid(value: string): void {
     const length: number = value.length;
 
     if (length < PASSKEY_MIN_LENGTH || length > PASSKEY_MAX_LENGTH) {
@@ -55,20 +60,25 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'login':
         return `
-          mutation Register($code: String!) {
-            createAndValidatePasskey(code: $code) ${getReturnFields(extraInfo)}
+          mutation Register($input: CreatePasskeyInput!) {
+            createAndValidatePasskey(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
       case 'register-only':
         return `
-          mutation Register($code: String) {
-            createPasskey(code: $code) ${getReturnFields(extraInfo)}
+          mutation Register($input: CreatePasskeyInput!) {
+            createPasskey(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
       default:
         throw new Error('Need to specify extraInfo.action');
     }
   },
+  'show-passkey': (extraInfo) => `
+    query ShowPasskey($id: ID!) {
+      passkey(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'sign-in': (extraInfo) => `
     mutation SignIn($code: String!) {
       validatePasskey(code: $code) ${getReturnFields(extraInfo)}
@@ -85,10 +95,64 @@ function isPendingCreate(passkey: PasskeyDoc | null) {
   return _.get(passkey, 'pending.type') === 'create-passkey';
 }
 
-function getHashedCode(code: string): string {
-  return shajs('sha256')
-    .update(code)
-    .digest('hex');
+async function newPasskeyDocOrFail(passkeys: mongodb.Collection<PasskeyDoc>,
+  input: CreatePasskeyInput): Promise<PasskeyDoc> {
+
+  if (_.isEmpty(input.code)) {
+    input.code = await getRandomPasscode(passkeys);
+  }
+
+  PasskeyValidation.isCodeValid(input.code);
+
+  const id = input.id ? input.id : uuid();
+
+  await PasskeyValidation.passkeyIsNew(passkeys, id, input.code);
+
+  return {
+    id: id,
+    code: input.code
+  };
+}
+
+/**
+ * Generates a random code.
+ * @returns{string} A unique 5-7 letter english word not found in the database.
+ */
+async function getRandomPasscode(passkeys: mongodb.Collection<PasskeyDoc>) {
+  const randomIndex = Math.floor(Math.random() * WORDS_SIZE);
+  const code = WORDS[randomIndex];
+
+  return await passkeys
+    .findOne({ code: code })
+    .then((passkey) => {
+      if (!passkey) { return code; }
+
+      return getRandomPasscode(passkeys);
+    });
+}
+
+async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
+  input: CreatePasskeyInput, context: Context): Promise<PasskeyDoc> {
+  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  const newPasskey: PasskeyDoc = await newPasskeyDocOrFail(passkeys, input);
+  switch (context.reqType) {
+    case 'vote':
+      newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
+    case undefined:
+      await passkeys.insertOne(newPasskey);
+
+      return newPasskey;
+    case 'commit':
+      await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+
+      return newPasskey;
+    case 'abort':
+      await passkeys.deleteOne(reqIdPendingFilter);
+
+      return undefined;
+  }
+
+  return undefined;
 }
 
 function sign(code: string): string {
@@ -104,62 +168,6 @@ function verify(token: string, code: string): boolean {
   return tokenUserId === code;
 }
 
-/**
- * Generates a random code.
- * @returns{string} A unique 5-7 letter english word not found in the database.
- */
-async function getRandomPasscode(passkeys: mongodb.Collection<PasskeyDoc>) {
-  const randomIndex = Math.floor(Math.random() * WORDS_SIZE);
-  const code = WORDS[randomIndex];
-
-  return await passkeys
-    .findOne({ code: getHashedCode(code) })
-    .then((passkey) => {
-      if (!passkey) { return code; }
-
-      return getRandomPasscode(passkeys);
-    });
-}
-
-async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
-  code: string, context: Context): Promise<PasskeyDoc> {
-  if (_.isEmpty(code)) {
-    // Generate random code
-    code = await getRandomPasscode(passkeys);
-  } else {
-    const passkey = await passkeys.findOne({ code: getHashedCode(code) });
-    if (passkey) {
-      throw new Error(`Passkey ${code} already exists`);
-    }
-
-    PasskeyValidation.passkeyIsValidOrFail(code);
-
-    return { code: code };
-  }
-
-  const newPasskey: PasskeyDoc = { code: getHashedCode(code) };
-  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-  switch (context.reqType) {
-    case 'vote':
-      newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
-    case undefined:
-      await passkeys.insertOne(newPasskey);
-
-      return newPasskey;
-    case 'commit':
-      await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-      return newPasskey;
-    case 'abort':
-      await passkeys.deleteOne(reqIdPendingFilter);
-
-      return newPasskey;
-  }
-
-  return newPasskey;
-
-}
-
 function resolvers(db: mongodb.Db, _config: Config): object {
   const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
 
@@ -168,11 +176,14 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       passkeys: () => passkeys.find({ pending: { $exists: false } })
         .toArray(),
 
-      passkey: async (_root, { code }) => {
-        const passkey: PasskeyDoc = await PasskeyValidation.passkeyExistsOrFail(
-          passkeys, code);
+      passkey: async (_root, { id }) => {
+        const passkey: PasskeyDoc | null = await passkeys.findOne({ id: id });
 
-        return isPendingCreate(passkey) ? null : passkey;
+        if (_.isNil(passkey) || isPendingCreate(passkey)) {
+          throw new Error(`Passkey ${id} not found`);
+        }
+
+        return passkey;
       },
 
       verify: (_root, { input }: { input: VerifyInput }) =>
@@ -180,6 +191,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     },
 
     Passkey: {
+      id: (passkey: PasskeyDoc) => passkey.id,
       code: (passkey: PasskeyDoc) => passkey.code
     },
 
@@ -189,14 +201,16 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     },
 
     Mutation: {
-      createPasskey: async (_root, { code }, context: Context) => {
-        const passkey = await createPasskey(passkeys, code, context);
+      createPasskey: async (
+        _root, { input }: { input: CreatePasskeyInput }, context: Context) => {
+        const passkey = await createPasskey(passkeys, input, context);
 
         return passkey;
       },
 
-      createAndValidatePasskey: async (_root, { code }, context: Context) => {
-        const passkey = await createPasskey(passkeys, code, context);
+      createAndValidatePasskey: async (
+        _root, { input }: { input: CreatePasskeyInput }, context: Context) => {
+        const passkey = await createPasskey(passkeys, input, context);
 
         if (!_.isNil(passkey)) {
           const token: string = sign(passkey!.code);
@@ -211,8 +225,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       validatePasskey: async (_root, { code }) => {
-        const passkey = await PasskeyValidation.passkeyExistsOrFail(
-          passkeys, code);
+        const passkey: PasskeyDoc = await passkeys
+          .findOne({ code: code });
 
         const token: string = sign(code);
 
@@ -229,7 +243,10 @@ const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
   .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
     const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
 
-    return passkeys.createIndex({ id: 1 }, { unique: true, sparse: true });
+    return Promise.all([
+      passkeys.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      passkeys.createIndex({ code: 1 }, { unique: true, sparse: true })
+    ]);
   })
   .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)

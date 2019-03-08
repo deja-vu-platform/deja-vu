@@ -1,4 +1,5 @@
 type Passkey {
+  id: ID!
   code: String!
 }
 
@@ -7,19 +8,24 @@ type SignInOutput {
   passkey: Passkey!
 }
 
+input CreatePasskeyInput {
+  id: ID
+  code: String
+}
+
 input VerifyInput {
   code: String!
   token: String!
 }
 
 type Query {
-  passkey(code: String!): Passkey
+  passkey(id: ID!): Passkey
   passkeys: [Passkey]
   verify(input: VerifyInput!): Boolean
 }
 
 type Mutation {
-  createPasskey(code: String): Passkey
-  createAndValidatePasskey(code: String!): SignInOutput
+  createPasskey(input: CreatePasskeyInput!): Passkey
+  createAndValidatePasskey(input: CreatePasskeyInput!): SignInOutput
   validatePasskey(code: String!): SignInOutput
 }

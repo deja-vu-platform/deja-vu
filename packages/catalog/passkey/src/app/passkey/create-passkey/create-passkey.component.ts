@@ -50,6 +50,7 @@ interface CreatePasskeyRes {
 })
 export class CreatePasskeyComponent
   implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  @Input() id: string | undefined;
 
   // Presentation options
   @Input() randomPassword = false;
@@ -95,15 +96,21 @@ export class CreatePasskeyComponent
   }
 
   async dvOnExec(): Promise<void> {
+    const inputs = {
+      input: {
+        id: this.id,
+        code: this.passkeyControl.value
+      }
+    };
     let passkey;
     if (this.signIn) {
       const res = await this.gs
         .post<CreateAndValidatePasskeyRes>(this.apiPath, {
-          inputs: { code: this.passkeyControl.value },
+          inputs: inputs,
           extraInfo: {
             action: 'login',
             returnFields: `
-              passkey { code }
+              passkey { id, code }
               token
             `
           }
@@ -118,10 +125,13 @@ export class CreatePasskeyComponent
 
     } else {
       const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
-        inputs: { code: this.passkeyControl.value },
+        inputs: inputs,
         extraInfo: {
           action: 'register-only',
-          returnFields: 'code'
+          returnFields: `
+            id,
+            code
+          `
         }
       })
         .toPromise();

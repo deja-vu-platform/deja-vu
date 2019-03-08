@@ -77,7 +77,7 @@ export class SignInComponent
       inputs: { code: this.passkeyControl.value },
       extraInfo: {
         returnFields: `
-          passkey { code }
+          passkey { id, code }
           token
         `
       }
