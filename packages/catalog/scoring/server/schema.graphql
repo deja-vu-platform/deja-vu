@@ -24,6 +24,7 @@ input ShowScoreInput {
   targetId: ID
 }
 
+# If targetIds are provided, the targets will be loaded and sorted by score
 input TargetsByScoreInput {
   asc: Boolean
   targetIds: [ID]
