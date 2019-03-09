@@ -67,10 +67,7 @@ implements OnInit, AfterViewInit, OnDestroy {
   }
 
   shouldPassActionInstance() {
-    return (
-      this.actionInstance.from.name === 'dv'
-      && this.actionInstance.of.name === 'text'
-    );
+    return this.actionInstance.isText;
   }
 
   /**

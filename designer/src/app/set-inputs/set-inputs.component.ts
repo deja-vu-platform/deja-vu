@@ -5,9 +5,13 @@ import * as uuidv4 from 'uuid/v4';
 
 import { ActionInstance, App, AppActionDefinition } from '../datatypes';
 import {
-  DialogData,
+  DialogData as InputActionDialogData,
   InputActionComponent
 } from '../input-action/input-action.component';
+import {
+  DialogData as TextDialogData,
+  TextComponent
+} from '../text/text.component';
 
 @Component({
   selector: 'app-set-inputs',
@@ -40,7 +44,7 @@ export class SetInputsComponent implements OnChanges {
    */
   inputAction(inputName: string) {
     // arguments
-    const data: DialogData = {
+    const data: InputActionDialogData = {
       app: this.app,
       currentValue: <ActionInstance>this
         .actionInstance.inputSettings[inputName],
@@ -57,5 +61,16 @@ export class SetInputsComponent implements OnChanges {
         this.actionInstance.inputSettings[inputName] =
           dialogRef.componentInstance.actionInstance;
       });
+  }
+
+  openTextEditor() {
+    const data: TextDialogData = {
+      actionInstance: this.actionInstance,
+      readOnly: false
+    };
+    this.dialog.open(TextComponent, {
+      width: '50vw',
+      data
+    });
   }
 }

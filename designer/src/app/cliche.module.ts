@@ -160,7 +160,7 @@ export const dvCoreActions = dvCliche.actions
 dvCliche.actions.push(({
   name: 'text',
   component: <Component>TextComponent,
-  inputs: [],
+  inputs: ['*html'],
   outputs: [],
   actionInputs: {}
 }));

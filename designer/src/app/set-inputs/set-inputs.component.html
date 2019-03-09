@@ -1,9 +1,22 @@
-<div class="set-inputs" *ngIf="actionInstance">  
+<div class="set-inputs" *ngIf="actionInstance">
 
   <div *ngIf="actionInstance.styles" class="style-input mat-form-field">
     <mat-checkbox [(ngModel)]="actionInstance.styles.stretch">
       Stretch
     </mat-checkbox>
+  </div>
+
+  <div *ngIf="actionInstance.isText" class="action-input mat-form-field">
+    <button
+      mat-button
+      class="replace-action"
+      matTooltip="Edit Text"
+      (click)="openTextEditor()"
+    >
+      <span class="value">
+        Edit Content
+      </span>
+    </button>
   </div>
 
   <div *ngFor="let input of actionInputs" class="action-input mat-form-field">

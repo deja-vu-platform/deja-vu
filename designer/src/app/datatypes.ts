@@ -266,6 +266,13 @@ export class ActionInstance {
     return (this.of instanceof App);
   }
 
+  get isText(): boolean {
+    return (
+      this.from.name === 'dv'
+      && this.of.name === 'text'
+    );
+  }
+
   isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
     return (
       // is
@@ -288,7 +295,7 @@ export class ActionInstance {
    */
   toHTML(extraIndents = 0): string {
     // text widget is just plain HTML static content
-    if (this.of.name === 'text' && this.from.name === 'dv') {
+    if (this.isText) {
       return `    <div>${this.data}</div>\n`;
     }
 

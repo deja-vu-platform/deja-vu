@@ -12,6 +12,7 @@ import {
   MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ElectronService } from 'ngx-electron';
 
 import { DvModule } from '@deja-vu/core';
@@ -53,7 +54,8 @@ describe('AppComponent', () => {
         MatSelectModule,
         MatSnackBarModule,
         MatTabsModule,
-        MatToolbarModule
+        MatToolbarModule,
+        RouterTestingModule
       ],
       providers: [
         ElectronService
