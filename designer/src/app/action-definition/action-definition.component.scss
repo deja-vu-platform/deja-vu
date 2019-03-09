@@ -85,6 +85,9 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
     width: 100%;
   }
 }
+.row-menu {
+  padding: 16px;
+}
 
 // need clickable area for menu
 .instance-container {
