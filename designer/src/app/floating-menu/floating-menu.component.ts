@@ -155,6 +155,7 @@ export class FloatingMenuComponent implements AfterViewInit {
   private onOpened() {
     removeOverlay();
 
+    this.menu.style.zIndex = '0';
     this.toFront();
     this.menu.addEventListener('mousedown', this.toFront, true);
 
