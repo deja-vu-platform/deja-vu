@@ -1,5 +1,6 @@
 /* TODO: figure out how to import CSS as a string */
 
+export default `
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
@@ -61,3 +62,4 @@
 .dvd-row > .stretch {
   flex-grow: 1;
 }
+`;

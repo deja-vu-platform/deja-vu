@@ -18,59 +18,6 @@ import {
 } from '../configure-action/configure-action.component';
 import { App, AppActionDefinition } from '../datatypes';
 
-// TODO: figure out how to import as string
-const STYLES = `@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";
-
-.dvd-row {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.dvd-row.jfs {
-  justify-content: flex-start;
-}
-
-.dvd-row.jfe {
-  justify-content: flex-end;
-}
-
-.dvd-row.jc {
-  justify-content: center;
-}
-
-.dvd-row.jsb {
-  justify-content: space-between;
-}
-
-.dvd-row.jsa {
-  justify-content: space-around;
-}
-
-.dvd-row.jse {
-  justify-content: space-evenly;
-}
-
-.dvd-row.afs {
-  align-items: flex-start;
-}
-
-.dvd-row.afe {
-  align-items: flex-end;
-}
-
-.dvd-row.ac {
-  align-items: center;
-}
-
-.dvd-row.ab {
-  align-items: baseline;
-}
-
-.dvd-row.as {
-  align-items: stretch;
-}
-`;
 
 const NUM_CONST_FILES = 3;
 const SNACKBAR_DURATION = 2500;
@@ -207,7 +154,8 @@ export class TopBarComponent {
 
       this.fs.mkdir(`${appRoot}/src`, (e1) => {
         if (e1 && e1.code !== 'EEXIST') { throw e1; }
-        this.fs.writeFile(`${appRoot}/src/styles.css`, STYLES, writeCallback);
+        const css = this.app.toCSS();
+        this.fs.writeFile(`${appRoot}/src/styles.css`, css, writeCallback);
 
         this.app.actions.forEach((action) => {
           const actionRoot = `${appRoot}/src/${action.name}`;

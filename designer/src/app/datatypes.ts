@@ -3,6 +3,8 @@ import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
+import dvdAppStyles from './dvd-app-styles';
+
 /**
  * A named collection of actions
  * Could be App, ClicheDefinition, ClicheInstance, etc.
@@ -142,15 +144,27 @@ export class AppActionDefinition implements ActionDefinition {
     if (this.transaction) {
       html += '<dv.tx>\n';
     }
+    html += `<div class="dvd-action ${this.name}">\n`;
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
     if (this.transaction) {
       html += '</dv.tx>\n';
     }
+    html += '</div>\n';
     html += '</dv.action>';
 
     return html;
+  }
+
+  toCSS(): string {
+    let css = `.dvd-action.${this.name} {`;
+    _.forEach(this.styles, (value, property) => {
+      css += `\n  ${_.kebabCase(property)}: ${value};`;
+    });
+    css += '\n}';
+
+    return css;
   }
 
   toJSON() {
@@ -304,8 +318,14 @@ export class ActionInstance {
 
     let html = `    <${this.from.name}.${this.of.name}`;
 
+    let numAttrs = 0;
+    if (this.styles.stretch) {
+      numAttrs += 1;
+      html += `\n${xIdnt}      class="stretch"`;
+    }
     _.forEach(this.inputSettings, (val, key) => {
       if (key === '*content') { return; }
+      numAttrs += 1;
       const strVal = _.isString(val)
         ? val
         : val.toHTML(extraIndents + 1)
@@ -313,12 +333,20 @@ export class ActionInstance {
       html += `\n${xIdnt}      ${key}=${strVal}`;
     });
 
-    if (_.size(this.inputSettings) === 0) {
+    if (numAttrs === 0) {
       html += ' ';
     } else {
       html += `\n${xIdnt}    `;
     }
-    html += '/>\n';
+    if (this.inputSettings['*content']) {
+      html += '>\n';
+      html += '  '.repeat(extraIndents + 1)
+        + (this.inputSettings['*content'] as ActionInstance)
+          .toHTML(extraIndents + 1);
+      html += `${xIdnt}    </${this.from.name}.${this.of.name}>\n`;
+    } else {
+      html += '/>\n';
+    }
 
     // TODO: ngContent
 
@@ -329,7 +357,8 @@ export class ActionInstance {
     const json = {
       of: this.of.name,
       from: this.from.name,
-      inputSettings: this.inputSettings
+      inputSettings: this.inputSettings,
+      styles: this.styles
     };
     if (this.data) {
       json['data'] = this.data;
@@ -426,6 +455,7 @@ export class App {
         const row = new Row();
         r.actions.forEach((ai) => {
           const actionInst = app.newActionInstanceByName(ai.of, ai.from);
+          Object.assign(actionInst.styles, ai.styles);
           app.setInputsFromJSON(actionInst, ai);
           row.actions.push(actionInst);
         });
@@ -537,6 +567,14 @@ export class App {
         ))
       ]
     }, null, '  ');
+  }
+
+  toCSS(): string {
+    return (
+      dvdAppStyles
+      + '\n'
+      + this.actions.reduce((css, action) => css + '\n\n' + action.toCSS(), '')
+    );
   }
 
   // We need a consistent object to return or Angular freaks out
