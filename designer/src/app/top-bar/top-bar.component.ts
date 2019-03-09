@@ -105,7 +105,8 @@ export class TopBarComponent {
   }
 
   onSelectAction() {
-    this.router.navigateByUrl(this.openAction.name);
+    console.log(this.openAction.name);
+    this.router.navigateByUrl('/' + this.openAction.name);
   }
 
   createAction = () => {

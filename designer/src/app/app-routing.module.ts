@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AppComponent } from '../app/app.component';
+import { DesignerComponent } from './designer/designer.component';
 
 const routes: Routes = [
-  { path: ':action', component: AppComponent }
+  { path: '**', component: DesignerComponent }
 ];
 
 @NgModule({

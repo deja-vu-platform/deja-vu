@@ -28,6 +28,7 @@ import {
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
+import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import {
   InputActionComponent
@@ -56,7 +57,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     SideMenuComponent,
     TextComponent,
     TopBarComponent,
-    FloatingMenuComponent
+    FloatingMenuComponent,
+    DesignerComponent
   ],
   imports: [
     BrowserModule,
