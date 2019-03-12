@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
 
 import { OnEval, RunService } from '@deja-vu/core';

@@ -10,13 +10,14 @@ import {
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
+
 import {
   CreateTaskInput,
   TaskDoc,
   TasksInput,
   UpdateTaskInput
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
 
 class TaskValidation {
@@ -85,7 +86,7 @@ function getTaskFilter(input: TasksInput) {
   let filter = {};
   if (!_.isNil(input)) {
     filter = _.omit(input, ['assigned']);
-    if (input.assigned === false) {
+    if (!input.assigned) {
       filter['assigneeId'] = null;
     }
   }
