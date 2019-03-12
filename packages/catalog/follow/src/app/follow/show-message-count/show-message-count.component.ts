@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../follow.config';
-import { Message } from '../shared/follow.model';
 
 import * as _ from 'lodash';
 
@@ -26,11 +25,6 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
 
   @Input() ofPublishersFollowedById: string | undefined;
   @Input() byPublisherId: string | undefined;
-
-  @Input() messageIds: string[] | undefined;
-  @Input() set message(value: Message[]) {
-    this.messageIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +50,6 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.messageCount = this.messageIds.length;
     }
   }
 
@@ -81,6 +73,6 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.messageIds && this.gs);
+    return !!(this.gs);
   }
 }

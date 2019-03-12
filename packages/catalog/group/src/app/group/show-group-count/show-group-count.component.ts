@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../group.config';
-import { Group } from '../shared/group.model';
 
 import * as _ from 'lodash';
 
@@ -25,12 +24,6 @@ export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
   groupCount: number;
 
   @Input() withMemberId: string | undefined;
-
-
-  @Input() groupIds: string[] | undefined;
-  @Input() set group(value: Group[]) {
-    this.groupIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +49,6 @@ export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.groupCount = this.groupIds.length;
     }
   }
 
@@ -80,6 +71,6 @@ export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.groupIds && this.gs);
+    return !!(this.gs);
   }
 }

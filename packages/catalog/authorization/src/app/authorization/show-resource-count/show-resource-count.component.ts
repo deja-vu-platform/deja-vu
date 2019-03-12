@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../authorization.config';
-import { Resource } from '../shared/authorization.model';
 
 import * as _ from 'lodash';
 
@@ -26,11 +25,6 @@ export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
 
   @Input() createdBy: string | undefined;
   @Input() viewableBy: string | undefined;
-
-  @Input() resourceIds: string[] | undefined;
-  @Input() set resources(value: Resource[]) {
-    this.resourceIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +50,6 @@ export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.resourceCount = this.resourceIds.length;
     }
   }
 
@@ -81,6 +73,6 @@ export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.resourceIds && this.gs);
+    return !!(this.gs);
   }
 }

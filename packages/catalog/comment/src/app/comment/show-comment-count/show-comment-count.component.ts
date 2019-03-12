@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../comment.config';
-import { Comment } from '../shared/comment.model';
 
 import * as _ from 'lodash';
 
@@ -26,11 +25,6 @@ export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
 
   @Input() byAuthorId: string | undefined;
   @Input() ofTargetId: string | undefined;
-
-  @Input() commentIds: string[] | undefined;
-  @Input() set comments(value: Comment[]) {
-    this.commentIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +50,6 @@ export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.commentCount = this.commentIds.length;
     }
   }
 
@@ -81,6 +73,6 @@ export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.commentIds && this.gs);
+    return !!(this.gs);
   }
 }

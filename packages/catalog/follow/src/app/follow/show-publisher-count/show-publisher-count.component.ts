@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../follow.config';
-import { Publisher } from '../shared/follow.model';
 
 import * as _ from 'lodash';
 
@@ -25,11 +24,6 @@ export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
   publisherCount: number;
 
   @Input() followedById: string | undefined;
-
-  @Input() publisherIds: string[] | undefined;
-  @Input() set publisher(value: Publisher[]) {
-    this.publisherIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -55,8 +49,6 @@ export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.publisherCount = this.publisherIds.length;
     }
   }
 
@@ -79,6 +71,6 @@ export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.publisherIds && this.gs);
+    return !!(this.gs);
   }
 }

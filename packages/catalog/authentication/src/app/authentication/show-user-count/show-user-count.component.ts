@@ -7,7 +7,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../authentication.config';
-import { User } from '../shared/authentication.model';
 
 import * as _ from 'lodash';
 
@@ -22,11 +21,6 @@ interface UserCountRes {
 export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
   OnInit {
   userCount: number;
-
-  @Input() userIds: string[] | undefined;
-  @Input() set users(value: User[]) {
-    this.userIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -52,8 +46,6 @@ export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.userCount = this.userIds.length;
     }
   }
 
@@ -68,6 +60,6 @@ export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
   }
 
   private canEval(): boolean {
-    return !!(!this.userIds && this.gs);
+    return !!(this.gs);
   }
 }

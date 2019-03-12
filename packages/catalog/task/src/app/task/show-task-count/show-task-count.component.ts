@@ -7,7 +7,6 @@ import {
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
-import { Task } from '../shared/task.model';
 import { API_PATH } from '../task.config';
 
 import * as _ from 'lodash';
@@ -30,11 +29,6 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
   @Input() approved: boolean | undefined;
   @Input() assigned: boolean | undefined;
   @Input() completed: boolean | undefined;
-
-  @Input() taskIds: string[] | undefined;
-  @Input() set task(value: Task[]) {
-    this.taskIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -60,8 +54,6 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.taskCount = this.taskIds.length;
     }
   }
 
@@ -88,6 +80,6 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.taskIds && this.gs);
+    return !!(this.gs);
   }
 }

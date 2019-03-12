@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../rating.config';
-import { Rating } from '../shared/rating.model';
 
 import * as _ from 'lodash';
 
@@ -26,11 +25,6 @@ export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
 
   @Input() bySourceId: string | undefined;
   @Input() ofTargetId: string | undefined;
-
-  @Input() ratingIds: string[] | undefined;
-  @Input() set rating(value: Rating[]) {
-    this.ratingIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +50,6 @@ export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.ratingCount = this.ratingIds.length;
     }
   }
 
@@ -81,6 +73,6 @@ export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.ratingIds && this.gs);
+    return !!(this.gs);
   }
 }

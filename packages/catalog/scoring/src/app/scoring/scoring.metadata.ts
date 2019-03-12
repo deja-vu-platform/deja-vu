@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule }   from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule
 } from '@angular/material';
@@ -17,13 +17,11 @@ import {
   ShowTargetsByScoreComponent
 } from './show-targets-by-score/show-targets-by-score.component';
 export { ShowTargetsByScoreComponent };
-import { ShowTargetCountComponent } from './show-target-count/show-target-count.component';
-export { ShowTargetCountComponent };
 
 
 const allComponents = [
   CreateScoreComponent, ShowScoreComponent, ShowTargetComponent,
-  ShowTargetsByScoreComponent, ShowTargetCountComponent
+  ShowTargetsByScoreComponent
 ];
 
 const metadata = {

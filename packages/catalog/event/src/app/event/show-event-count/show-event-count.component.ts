@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../event.config';
-import { Event } from '../shared/event.model';
 
 import * as _ from 'lodash';
 
@@ -26,11 +25,6 @@ export class ShowEventCountComponent implements AfterViewInit, OnChanges,
   // TODO
   @Input() startDateFilter: any;
   @Input() endDateFilter: any;
-
-  @Input() eventIds: string[] | undefined;
-  @Input() set events(value: Event[]) {
-    this.eventIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -56,8 +50,6 @@ export class ShowEventCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.eventCount = this.eventIds.length;
     }
   }
 
@@ -81,6 +73,6 @@ export class ShowEventCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.eventIds && this.gs);
+    return !!(this.gs);
   }
 }

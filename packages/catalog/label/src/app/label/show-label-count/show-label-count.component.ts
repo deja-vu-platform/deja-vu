@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../label.config';
-import { Label } from '../shared/label.model';
 
 import * as _ from 'lodash';
 
@@ -25,11 +24,6 @@ export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
   labelCount: number;
 
   @Input() itemId: string | undefined;
-
-  @Input() labelIds: string[] | undefined;
-  @Input() set label(value: Label[]) {
-    this.labelIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -55,8 +49,6 @@ export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.labelCount = this.labelIds.length;
     }
   }
 
@@ -79,6 +71,6 @@ export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.labelIds && this.gs);
+    return !!(this.gs);
   }
 }

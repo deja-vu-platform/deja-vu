@@ -8,7 +8,7 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../geolocation.config';
-import { Location, Marker } from '../shared/geolocation.model';
+import { Location } from '../shared/geolocation.model';
 
 import * as _ from 'lodash';
 
@@ -27,11 +27,6 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
   @Input() ofMapId: string | undefined;
   @Input() center: Location | undefined;
   @Input() radius: number | undefined;
-
-  @Input() markerIds: string[] | undefined;
-  @Input() set marker(value: Marker[]) {
-    this.markerIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -57,8 +52,6 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.markerCount = this.markerIds.length;
     }
   }
 
@@ -83,6 +76,6 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.markerIds && this.gs);
+    return !!(this.gs);
   }
 }

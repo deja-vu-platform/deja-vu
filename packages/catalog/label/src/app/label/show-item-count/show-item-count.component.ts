@@ -23,8 +23,6 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
   itemCount: number;
 
-  @Input() itemIds: string[] | undefined;
-
   private gs: GatewayService;
 
   constructor(
@@ -49,8 +47,6 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.itemCount = this.itemIds.length;
     }
   }
 
@@ -71,6 +67,6 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.itemIds && this.gs);
+    return !!(this.gs);
   }
 }

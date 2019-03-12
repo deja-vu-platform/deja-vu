@@ -8,7 +8,6 @@ import {
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../follow.config';
-import { Follower } from '../shared/follow.model';
 
 import * as _ from 'lodash';
 
@@ -25,11 +24,6 @@ export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
   followerCount: number;
 
   @Input() ofPublisherId: string | undefined;
-
-  @Input() followerIds: string[] | undefined;
-  @Input() set follower(value: Follower[]) {
-    this.followerIds = _.map(value, 'id');
-  }
 
   private gs: GatewayService;
 
@@ -55,8 +49,6 @@ export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.followerCount = this.followerIds.length;
     }
   }
 
@@ -79,6 +71,6 @@ export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.followerIds && this.gs);
+    return !!(this.gs);
   }
 }

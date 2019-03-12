@@ -25,8 +25,6 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
 
   @Input() inGroupId: string | undefined;
 
-  @Input() memberIds: string[] | undefined;
-
   private gs: GatewayService;
 
   constructor(
@@ -51,8 +49,6 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
   load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
-    } else {
-      this.memberCount = this.memberIds.length;
     }
   }
 
@@ -75,6 +71,6 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(!this.memberIds && this.gs);
+    return !!(this.gs);
   }
 }
