@@ -9,6 +9,7 @@ import {
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 import {
   AllocationDoc,
   Assignment,
@@ -17,7 +18,6 @@ import {
   DeleteResourceInput,
   EditConsumerOfResourceInput
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
 
 const actionRequestTable: ActionRequestTable = {
@@ -35,7 +35,8 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'edit':
         return `
-          mutation EditConsumerOfResource($input: EditConsumerOfResourceInput!) {
+          mutation EditConsumerOfResource(
+            $input: EditConsumerOfResourceInput!) {
             editConsumerOfResource (input: $input) ${getReturnFields(extraInfo)}
           }
         `;
@@ -54,26 +55,14 @@ const actionRequestTable: ActionRequestTable = {
       consumerOfResource(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
-
-function isPendingCreate(alloc: AllocationDoc | null) {
-  return _.get(alloc, 'pending.type') === 'create-allocation';
-}
+};
 
 function resolvers(db: ClicheDb, _config: Config): object {
   const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
   return {
     Query: {
-      allocation: async (_root, { id }) => {
-        const alloc: AllocationDoc | null = await allocations
-          .findOne({ id: id });
-        if (isPendingCreate(alloc)) {
-          return null;
-        }
-
-        return alloc;
-      },
+      allocation: async (_root, { id }) => allocations.findOne({ id: id }),
       consumerOfResource: async (
         _root, { input: { resourceId, allocationId } }
           : { input: ConsumerOfResourceInput }) => {
@@ -82,13 +71,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
             { id: allocationId, 'assignments.resourceId': resourceId },
             { projection: { 'assignments.$.consumerId': 1 } });
 
-        // TODO: do we want to throw an error or not?
-        // if (_.isNil(alloc)) {
-        //   throw new Error(
-        //     `Allocation ${allocationId} or resource ${resourceId} not found`);
-        // }
-
-        return alloc!.assignments[0].consumerId;
+        return alloc.assignments[0].consumerId;
       }
     },
     Allocation: {
