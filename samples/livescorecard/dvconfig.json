@@ -131,8 +131,6 @@
   "routes": [
     { "path": "climber", "action": "climber-scorecard" },
     { "path": "climber/leaderboard", "action": "show-leaderboard" },
-    { "path": "climber/buddy-landing", "action": "buddy-landing" },
-    { "path": "climber/buddy-scorecard", "action": "buddy-scorecard" },
     { "path": "climber/rules", "action": "show-rules" },
 
     { "path": "host", "action": "show-competitions" },
