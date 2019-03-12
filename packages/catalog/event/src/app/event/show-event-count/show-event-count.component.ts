@@ -22,7 +22,7 @@ interface EventCountRes {
 })
 export class ShowEventCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public eventCount: number;
+  eventCount: number;
   // TODO
   @Input() startDateFilter: any;
   @Input() endDateFilter: any;

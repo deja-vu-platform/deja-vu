@@ -21,7 +21,7 @@ interface UserCountRes {
 })
 export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
   OnInit {
-  public userCount: number;
+  userCount: number;
 
   @Input() userIds: string[] | undefined;
   @Input() set users(value: User[]) {

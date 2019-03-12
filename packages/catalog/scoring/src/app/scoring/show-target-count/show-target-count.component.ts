@@ -22,7 +22,7 @@ interface TargetCountRes {
 })
 export class ShowTargetCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public targetCount: number;
+  targetCount: number;
 
   @Input() targetIds: string[] | undefined;
   @Input() set target(value: Target[]) {

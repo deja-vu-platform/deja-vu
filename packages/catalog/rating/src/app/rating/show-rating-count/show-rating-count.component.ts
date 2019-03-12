@@ -22,7 +22,7 @@ interface RatingCountRes {
 })
 export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public ratingCount: number;
+  ratingCount: number;
 
   @Input() bySourceId: string | undefined;
   @Input() ofTargetId: string | undefined;

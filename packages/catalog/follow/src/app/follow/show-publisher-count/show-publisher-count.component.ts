@@ -22,7 +22,7 @@ interface PublisherCountRes {
 })
 export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public publisherCount: number;
+  publisherCount: number;
 
   @Input() followedById: string | undefined;
 

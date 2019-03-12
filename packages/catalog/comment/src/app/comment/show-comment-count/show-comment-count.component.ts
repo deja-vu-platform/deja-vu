@@ -22,7 +22,7 @@ interface CommentCountRes {
 })
 export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public commentCount: number;
+  commentCount: number;
 
   @Input() byAuthorId: string | undefined;
   @Input() ofTargetId: string | undefined;

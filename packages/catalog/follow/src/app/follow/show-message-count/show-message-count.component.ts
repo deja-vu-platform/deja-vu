@@ -22,7 +22,7 @@ interface MessageCountRes {
 })
 export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public messageCount: number;
+  messageCount: number;
 
   @Input() ofPublishersFollowedById: string | undefined;
   @Input() byPublisherId: string | undefined;

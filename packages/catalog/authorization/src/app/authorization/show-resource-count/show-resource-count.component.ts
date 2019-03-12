@@ -22,7 +22,7 @@ interface ResourceCountRes {
 })
 export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public resourceCount: number;
+  resourceCount: number;
 
   @Input() createdBy: string | undefined;
   @Input() viewableBy: string | undefined;

@@ -22,7 +22,7 @@ interface FollowerCountRes {
 })
 export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public followerCount: number;
+  followerCount: number;
 
   @Input() ofPublisherId: string | undefined;
 

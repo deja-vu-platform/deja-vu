@@ -22,7 +22,7 @@ interface MarkerCountRes {
 })
 export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public markerCount: number;
+  markerCount: number;
 
   @Input() ofMapId: string | undefined;
   @Input() center: Location | undefined;

@@ -21,7 +21,7 @@ interface ItemCountRes {
 })
 export class ShowItemCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public itemCount: number;
+  itemCount: number;
 
   @Input() itemIds: string[] | undefined;
 

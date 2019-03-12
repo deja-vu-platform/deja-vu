@@ -22,7 +22,7 @@ interface TaskCountRes {
 })
 export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public taskCount: number;
+  taskCount: number;
 
   @Input() assigneeId: string | undefined;
   @Input() assignerId: string | undefined;

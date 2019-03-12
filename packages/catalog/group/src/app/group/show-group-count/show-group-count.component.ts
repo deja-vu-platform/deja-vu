@@ -22,7 +22,7 @@ interface GroupCountRes {
 })
 export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public groupCount: number;
+  groupCount: number;
 
   @Input() withMemberId: string | undefined;
 

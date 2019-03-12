@@ -22,7 +22,7 @@ interface LabelCountRes {
 })
 export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public labelCount: number;
+  labelCount: number;
 
   @Input() itemId: string | undefined;
 

@@ -21,7 +21,7 @@ interface MemberCountRes {
 })
 export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
-  public memberCount: number;
+  memberCount: number;
 
   @Input() inGroupId: string | undefined;
 
