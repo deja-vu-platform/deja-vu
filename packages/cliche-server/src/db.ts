@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import { Validation } from './validation';
 
 export type Query<T> = mongodb.FilterQuery<T>;
 
@@ -14,19 +13,53 @@ export interface Context {
  * The empty Context to use when it isn't applicable,
  * e.g. when populating a Collection with initial objects on initialization.
  */
-export const EMPTY_CONTEXT: Context =
-  { reqType: undefined, runId: '', reqId: '' };
+export const EMPTY_CONTEXT: Context = {
+  reqType: undefined, runId: '', reqId: ''
+};
 
-/**
- * The error message to include when there is a concurrent update in the server.
- */
-const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
+export class ClicheDbError extends Error {
+  public readonly errorCode: number;
 
-const unsetPendingOp = { $unset: { _pending: '' } };
-
-function getReqIdPendingFilter(context: Context) {
-  return { '_pending.reqId': context.reqId };
+  constructor(message: string, errorCode: number) {
+    super(message);
+    // tslint:disable-next-line
+    // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.errorCode = errorCode;
+  }
 }
+export class ClicheDbNotFoundError extends ClicheDbError {
+  public static readonly ERROR_CODE = 404;
+  constructor(collectionName: string) {
+    // remove the 's', assumes collectionName ends with one
+    const entityName = collectionName.substr(0, collectionName.length - 1);
+    super(`${_.capitalize(entityName)} not found`,
+      ClicheDbNotFoundError.ERROR_CODE);
+  }
+}
+export class ClicheDbConcurrentUpdateError extends ClicheDbError {
+  public static readonly ERROR_CODE = 500;
+  constructor() {
+    super('An error has occurred. Please try again later.',
+      ClicheDbConcurrentUpdateError.ERROR_CODE);
+  }
+}
+export class ClicheDbUnknownUpdateError extends ClicheDbError {
+  public static readonly ERROR_CODE = 500;
+  constructor() {
+    super('An unknown error has occurred. Please contact an administrator.',
+      ClicheDbUnknownUpdateError.ERROR_CODE);
+  }
+}
+
+const unsetPendingOp = { $unset:
+  {
+    _pending: '',
+    _pendingDetails: ''
+  }
+};
 
 /**
  * Wrapper around the MongoDb Node.js driver
@@ -39,10 +72,6 @@ export class Collection<T extends Object> {
   private readonly _db: mongodb.Db;
   private readonly _name: string;
   private readonly _collection: mongodb.Collection<T>;
-
-  private readonly DEFAULT_VALIDATE_FN = async (id: string) =>
-    // TODO: will this use the correct `this`?
-    await Validation.existsOrFail(this, id, this._name)
 
   constructor(db: mongodb.Db, name: string) {
     this._db = db;
@@ -61,58 +90,47 @@ export class Collection<T extends Object> {
   }
 
   // async deleteMany(context: Context, filter: Query<T>,
-  //   options?: mongodb.CommonOptions,
-  //   validateFn?: Function): Promise<boolean> {
+  //   options?: mongodb.CommonOptions): Promise<boolean> {
   //   // TODO
   // }
 
-  async deleteOne(context: Context, filter: Query<T>,
-    validateFn?: Function): Promise<boolean> {
-    filter['_pending'] = { $exists: false };
+  async deleteOne(context: Context, filter: Query<T>): Promise<boolean> {
 
     switch (context.reqType) {
       case 'vote':
-        validateFn ? validateFn() : this.DEFAULT_VALIDATE_FN(filter['id']);
-        const pendingUpdateObj = await this._collection.updateOne(
-          filter,
-          {
-            $set: {
-              _pending: {
-                reqId: context.reqId,
-                type: `delete-${this._name}`
-              }
+        await this.getLockAndUpdate(filter, {
+          $set: {
+            _pendingDetails: {
+              reqId: context.reqId,
+              type: `delete-${this._name}`
             }
-          });
-
-        if (pendingUpdateObj.matchedCount === 0) {
-          throw new Error(CONCURRENT_UPDATE_ERROR);
-        }
+          }
+        });
 
         return true;
       case undefined:
-        validateFn ? validateFn() : this.DEFAULT_VALIDATE_FN(filter['id']);
-        const res = await this._collection.deleteOne(filter);
+        const res = await this._collection.deleteOne(
+          this.getNotPendingFilter(filter));
 
         if (res.deletedCount === 0) {
-          throw new Error(CONCURRENT_UPDATE_ERROR);
+          throw new ClicheDbConcurrentUpdateError();
         }
 
         return true;
-      case 'commit': {
-        await this._collection.deleteOne(getReqIdPendingFilter(context));
-      }
-      case 'abort': {
-        await this._collection.updateOne(
-          getReqIdPendingFilter(context), unsetPendingOp);
-      }
+      case 'commit':
+        await this._collection.deleteOne(this.getReqIdPendingFilter(context));
+        break;
+      case 'abort':
+        await this.releasePendingLock(context);
+        break;
     }
 
     return undefined;
   }
 
   async find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]> {
-    const queryNotPendingCreate: Query<T> = query ? query : {};
-    queryNotPendingCreate['_pending.type'] = { $ne: `create-${this._name}` };
+    const queryNotPendingCreate: Query<T> =
+      this.getNotPendingCreateFilter(query);
 
     return await this._collection
       .find(queryNotPendingCreate, options)
@@ -120,21 +138,23 @@ export class Collection<T extends Object> {
   }
 
   async findOne(query: Query<T>, options?: mongodb.FindOneOptions): Promise<T> {
-    query['_pending.type'] = { $ne: `create-${this._name}` };
+    const queryNotPendingCreate: Query<T> =
+      this.getNotPendingCreateFilter(query);
 
-    // TODO: This returns null if it's not found.
-    // Should it throw an error instead or not and let clients
-    // handle it themselves?
-    return await this._collection.findOne(query, options);
+    const doc: T | null = await this._collection.findOne(
+      queryNotPendingCreate, options);
+    if (doc === null) {
+      throw new ClicheDbNotFoundError(this._name);
+    }
+
+    return doc;
   }
 
   async insertMany(context: Context, docs: T[],
     options?: mongodb.CollectionInsertManyOptions): Promise<T[]> {
     switch (context.reqType) {
       case 'vote':
-        _.each(docs, (doc) => {
-          doc['_pending'] = { reqId: context.reqId };
-        });
+        _.each(docs, (doc) => this.makePendingCreate(context, doc));
         /* falls through */
       case undefined:
         await this._collection.insertMany(docs, options);
@@ -142,10 +162,10 @@ export class Collection<T extends Object> {
         return docs;
       case 'commit': {
         await this._collection.updateMany(
-          getReqIdPendingFilter(context), unsetPendingOp);
+          this.getReqIdPendingFilter(context), unsetPendingOp);
       }
       case 'abort': {
-        await this._collection.deleteMany(getReqIdPendingFilter(context));
+        await this._collection.deleteMany(this.getReqIdPendingFilter(context));
       }
     }
 
@@ -156,80 +176,120 @@ export class Collection<T extends Object> {
     options?: mongodb.CollectionInsertOneOptions): Promise<T> {
     switch (context.reqType) {
       case 'vote':
-        doc['_pending'] = {
-          reqId: context.reqId,
-          type: `create-${this._name}`
-        };
+        this.makePendingCreate(context, doc);
       /* falls through */
       case undefined:
         await this._collection.insertOne(doc, options);
 
         return doc;
-      case 'commit': {
-        await this._collection.updateOne(
-          getReqIdPendingFilter(context), unsetPendingOp);
-      }
-      case 'abort': {
-        await this._collection.deleteOne(getReqIdPendingFilter(context));
-      }
+      case 'commit':
+        await this.releasePendingLock(context);
+        break;
+      case 'abort':
+        await this._collection.deleteOne(this.getReqIdPendingFilter(context));
+        break;
     }
 
     return doc;
   }
 
   // async updateMany(context: Context, filter: Query<T>, update: Object,
-  //   options?: mongodb.CommonOptions & { upsert?: boolean },
-  //   validateFn?: Function): Promise<boolean> {
+  //   options?: mongodb.CommonOptions & { upsert?: boolean }
+  // ):Promise<boolean> {
   //   // TODO
   // }
 
   async updateOne(context: Context, filter: Query<T>, update: Object,
-    options?: mongodb.ReplaceOneOptions,
-    validateFn?: Function): Promise<boolean> {
-    filter['_pending'] = { $exists: false };
+    options?: mongodb.ReplaceOneOptions): Promise<boolean> {
 
     switch (context.reqType) {
       case 'vote':
-        validateFn ? validateFn() : this.DEFAULT_VALIDATE_FN(filter['id']);
-        const pendingUpdateObj = await this._collection
-          .updateOne(
-            filter,
-            {
-              $set: {
-                _pending: {
-                  reqId: context.reqId,
-                  type: `update-${this._name}`
-                }
-              }
-            });
-        if (pendingUpdateObj.matchedCount === 0) {
-          throw new Error(CONCURRENT_UPDATE_ERROR);
-        }
+        await this.getLockAndUpdate(filter, {
+          $set: {
+            _pendingDetails: {
+              reqId: context.reqId,
+              type: `update-${this._name}`
+            }
+          }
+        });
 
         return true;
       case undefined:
-        validateFn ? validateFn() : this.DEFAULT_VALIDATE_FN(filter['id']);
         const updateObj = await this._collection
-          .updateOne(filter, update, options);
+          .updateOne(this.getNotPendingFilter(filter), update, options);
+
         if (updateObj.matchedCount === 0) {
-          throw new Error(CONCURRENT_UPDATE_ERROR);
+          throw new ClicheDbConcurrentUpdateError();
         }
 
         return true;
-      case 'commit': {
-        await this._collection.updateOne(
-          getReqIdPendingFilter(context),
+      case 'commit':
+        await this._collection.updateOne(this.getReqIdPendingFilter(context),
           { ...update, ...unsetPendingOp });
-      }
-      case 'abort': {
-        await this._collection.updateOne(
-          getReqIdPendingFilter(context), unsetPendingOp);
-      }
+        break;
+      case 'abort':
+        await this.releasePendingLock(context);
+        break;
     }
 
     return undefined;
   }
 
+  private async getPendingLock(filter: Query<T>): Promise<void> {
+    const pendingUpdateObj = await this._collection.updateOne(
+        filter,
+        { $set: { _pending: true } });
+
+    if (pendingUpdateObj.matchedCount === 0) {
+      throw new ClicheDbNotFoundError(this._name);
+    }
+    if (pendingUpdateObj.modifiedCount === 0) {
+      throw new ClicheDbConcurrentUpdateError();
+    }
+  }
+
+  private async releasePendingLock(context: Context): Promise<void> {
+    await this._collection.updateOne(
+      this.getReqIdPendingFilter(context), unsetPendingOp);
+  }
+
+  private async getLockAndUpdate(
+    filter: Query<T>, update: Object): Promise<void> {
+    this.getPendingLock(filter);
+    const updateResult = await this._collection
+      .updateOne(filter, update);
+
+    if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
+      // Unknown because the update to get the lock
+      // had just been successfully applied on the same object.
+      // No other update should have gone through in between,
+      // so there is no reason for this update to have failed
+      throw new ClicheDbUnknownUpdateError();
+    }
+  }
+
+  private async getReqIdPendingFilter(context: Context) {
+    return { '_pendingDetails.reqId': context.reqId };
+  }
+
+  private getNotPendingFilter(filter: Query<T> | undefined) {
+    return Object.assign({}, filter, { _pending : { $exists: false }});
+  }
+
+  private getNotPendingCreateFilter(filter: Query<T> | undefined): Query<T> {
+    return Object.assign({}, filter, {
+      _pending: { $exists: false },
+      '_pendingDetails.type': { $ne: `create-${this._name}` }
+    });
+  }
+
+  private makePendingCreate(context: Context, doc: T): void {
+    doc['_pending'] = true;
+    doc['_pendingDetails'] = {
+      reqId: context.reqId,
+      type: `create-${this._name}`
+    };
+  }
 }
 
 export class ClicheDb {

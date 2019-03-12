@@ -1,13 +1,13 @@
 import {
   ActionRequestTable,
   ClicheDb,
+  ClicheDbNotFoundError,
   ClicheServer,
   ClicheServerBuilder,
   Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import {
   CreateEventInput,
@@ -32,22 +32,6 @@ function unixTimeToDate(unixTime: string | number): Date {
 
 function dateToUnixTime(date: Date): number {
   return date.valueOf() / MS_IN_S;
-}
-
-class EventValidation {
-  static async eventExistsOrFail(
-    events: Collection<EventDoc>, id: string): Promise<EventDoc> {
-    return Validation.existsOrFail(events, id, 'Event');
-  }
-
-  static async eventExistsInSeriesOrFail(
-    series: Collection<SeriesDoc>, id: string): Promise<void> {
-    const s: SeriesDoc | null = await series
-      .findOne({ 'events.id': id }, { projection: { _id: 1 } });
-    if (s === null) {
-      throw new Error(`Event ${id} doesn't exist `);
-    }
-  }
 }
 
 const actionRequestTable: ActionRequestTable = {
@@ -99,7 +83,7 @@ const actionRequestTable: ActionRequestTable = {
       events(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function resolvers(db: ClicheDb, _config: Config): object {
   const events: Collection<EventDoc> = db.collection('events');
@@ -162,16 +146,21 @@ function resolvers(db: ClicheDb, _config: Config): object {
         return await events.updateOne(context, { id: input.id }, updateOp);
       },
       deleteEvent: async (_root, { id }, context: Context) => {
-        const isPartOfSeries: boolean = await events
-          .findOne({ id: id }, { projection: { _id: 1 }}) === null;
+        let isPartOfSeries = false;
+        try {
+          await events.findOne({ id: id }, { projection: { _id: 1 }});
+        } catch (err) {
+          if (err.errorCode !== ClicheDbNotFoundError.ERROR_CODE) {
+            throw err;
+          }
+          isPartOfSeries = true;
+        }
 
         if (isPartOfSeries) {
           const filter = { 'events.id': id };
           const updateOp = { $pull: { events: { id: id } } };
 
-          return await series.updateOne(context, filter, updateOp, {},
-            async () =>
-              await EventValidation.eventExistsInSeriesOrFail(series, id));
+          return await series.updateOne(context, filter, updateOp);
         } else {
           return await events.deleteOne(context, { id: id });
         }

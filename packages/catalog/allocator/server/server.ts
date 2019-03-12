@@ -6,8 +6,7 @@ import {
   Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import {
@@ -20,28 +19,6 @@ import {
 } from './schema';
 import { v4 as uuid } from 'uuid';
 
-
-class AllocationValidation {
-  static async allocationExistsOrFail(
-    allocations: Collection<AllocationDoc>,
-    id: string): Promise<AllocationDoc> {
-    return Validation.existsOrFail(allocations, id, 'Allocation');
-  }
-
-  static async resourceIsPartOfAllocationOrFail(
-    allocations: Collection<AllocationDoc>,
-    allocationId: string, resourceId: string): Promise<void> {
-    const alloc: AllocationDoc | null = await allocations
-      .findOne(
-        { id: allocationId, 'assignments.resourceId': resourceId },
-        { projection: { _id: 1 } });
-    if (alloc === null) {
-      throw new Error(
-        `Resource ${resourceId} is not part of allocation ` +
-        `${allocationId}`);
-    }
-  }
-}
 
 const actionRequestTable: ActionRequestTable = {
   'create-allocation': (extraInfo) => `
@@ -136,10 +113,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
           id: allocationId,
           'assignments.resourceId': resourceId
         };
-        return await allocations
-              .updateOne(context, allocFilter, updateOp, {}, async () =>
-                await AllocationValidation.resourceIsPartOfAllocationOrFail(
-              allocations, allocationId, resourceId));
+
+        return await allocations.updateOne(context, allocFilter, updateOp);
       },
       createAllocation: async (
         _root, { input: { id, resourceIds, consumerIds } }
@@ -178,10 +153,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
         const allocationIdFilter = { id: allocationId };
 
         return await allocations.updateOne(
-          context, allocationIdFilter, updateOp, {},
-          async () => await AllocationValidation.allocationExistsOrFail(
-          allocations, allocationId)
-        );
+          context, allocationIdFilter, updateOp);
       }
     }
   };
