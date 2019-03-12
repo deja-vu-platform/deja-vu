@@ -54,7 +54,15 @@ export class ClicheDbUnknownUpdateError extends ClicheDbError {
   }
 }
 
-const unsetPendingOp = { $unset:
+export interface PendingDoc {
+  _pending?: boolean;
+  _pendingDetails?: {
+    reqId: string;
+    type: string;
+  };
+}
+
+const unsetPendingOp: Object = { $unset:
   {
     _pending: '',
     _pendingDetails: ''
@@ -71,7 +79,7 @@ const unsetPendingOp = { $unset:
 export class Collection<T extends Object> {
   private readonly _db: mongodb.Db;
   private readonly _name: string;
-  private readonly _collection: mongodb.Collection<T>;
+  private readonly _collection: mongodb.Collection<PendingDoc & T>;
 
   constructor(db: mongodb.Db, name: string) {
     this._db = db;
@@ -129,7 +137,7 @@ export class Collection<T extends Object> {
   }
 
   async find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]> {
-    const queryNotPendingCreate: Query<T> =
+    const queryNotPendingCreate: Query<PendingDoc & T> =
       this.getNotPendingCreateFilter(query);
 
     return await this._collection
@@ -138,7 +146,7 @@ export class Collection<T extends Object> {
   }
 
   async findOne(query: Query<T>, options?: mongodb.FindOneOptions): Promise<T> {
-    const queryNotPendingCreate: Query<T> =
+    const queryNotPendingCreate: Query<PendingDoc & T> =
       this.getNotPendingCreateFilter(query);
 
     const doc: T | null = await this._collection.findOne(
@@ -225,7 +233,7 @@ export class Collection<T extends Object> {
         return true;
       case 'commit':
         await this._collection.updateOne(this.getReqIdPendingFilter(context),
-          { ...update, ...unsetPendingOp });
+          { ...update, ...unsetPendingOp } as Object);
         break;
       case 'abort':
         await this.releasePendingLock(context);
@@ -268,24 +276,26 @@ export class Collection<T extends Object> {
     }
   }
 
-  private async getReqIdPendingFilter(context: Context) {
+  private async getReqIdPendingFilter(context: Context): Query<PendingDoc & T> {
     return { '_pendingDetails.reqId': context.reqId };
   }
 
-  private getNotPendingFilter(filter: Query<T> | undefined) {
+  private getNotPendingFilter(
+    filter: Query<T> | undefined): Query<PendingDoc & T> {
     return Object.assign({}, filter, { _pending : { $exists: false }});
   }
 
-  private getNotPendingCreateFilter(filter: Query<T> | undefined): Query<T> {
+  private getNotPendingCreateFilter(
+    filter: Query<T> | undefined): Query<PendingDoc & T> {
     return Object.assign({}, filter, {
       _pending: { $exists: false },
       '_pendingDetails.type': { $ne: `create-${this._name}` }
     });
   }
 
-  private makePendingCreate(context: Context, doc: T): void {
-    doc['_pending'] = true;
-    doc['_pendingDetails'] = {
+  private makePendingCreate(context: Context, doc: PendingDoc & T): void {
+    doc._pending = true;
+    doc._pendingDetails = {
       reqId: context.reqId,
       type: `create-${this._name}`
     };
