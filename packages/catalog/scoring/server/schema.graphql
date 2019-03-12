@@ -34,6 +34,7 @@ type Query {
   score(input: ShowScoreInput!): Score
   target(id: ID!): Target
   targetsByScore(input: TargetsByScoreInput): [Target!]
+  targetCount(input: TargetsByScoreInput): Int
 }
 
 type Mutation {

@@ -156,6 +156,11 @@ const actionRequestTable: ActionRequestTable = {
       userById(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-user-count': (extraInfo) => `
+    query ShowUserCount {
+      userCount ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-users': (extraInfo) => `
     query ShowUsers($input: UsersInput!) {
       users(input: $input) ${getReturnFields(extraInfo)}
@@ -238,11 +243,13 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     Query: {
       users: () => users.find({ pending: { $exists: false } })
         .toArray(),
+
       user: async (_root, { username }) => {
         const user: UserDoc | null = await users.findOne({ username: username });
 
         return isPendingRegister(user) ? null : user;
       },
+
       userById: async (_root, { id }) => {
         const user: UserDoc | null = await users.findOne({ id: id });
 
@@ -252,6 +259,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         return user;
       },
+
+      userCount: () => users.count({ pending: { $exists: false } }),
 
       verify: (_root, { input }: { input: VerifyInput }) => verify(
         input.token, input.id)

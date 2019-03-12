@@ -23,12 +23,12 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
   styleUrls: ['./show-members.component.css']
 })
 export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
-  @Input() showMembersList = true;
-  @Input() noMembersText = 'No members';
-
+  OnChanges {
   // Fetch rules
   @Input() inGroupId: string | undefined;
+
+  // Presentation rules
+  @Input() noMembersText = 'No members';
 
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
@@ -69,13 +69,13 @@ OnChanges {
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.gs
-        .get<{data: {members: string[]}}>('/graphql', {
+        .get<{ data: { members: string[] } }>('/graphql', {
           params: {
-            inputs: JSON.stringify({
+            inputs: {
               input: {
                 inGroupId: this.inGroupId
               }
-            })
+            }
           }
         })
         .subscribe((res) => {

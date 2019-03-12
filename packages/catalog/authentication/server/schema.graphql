@@ -38,6 +38,7 @@ input VerifyInput {
 type Query {
   user(username: String!): User
   userById(id: String!): User
+  userCount: Int
   users(input: UsersInput!): [User!]
   verify(input: VerifyInput!): Boolean
 }

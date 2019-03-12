@@ -102,11 +102,13 @@
           <div>
             <h4>Write a review:</h4>
             <dv.tx>
+              <dv.gen-id />
               <dv.status savedText="Review created!" />
               <authentication.authenticate as write-review-authenticate
                 id=sweetspots.navbar.loggedInUserId
                 hidden=true />
               <reputation.create-score as write-review-create-score
+                id=dv.gen-id.id
                 sourceId=sweetspots.navbar.loggedInUserId
                 targetId=authorization.show-owner.ownerId
                 value=1

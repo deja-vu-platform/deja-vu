@@ -51,6 +51,11 @@ const actionRequestTable: ActionRequestTable = {
     query ShowMarkers($input: MarkersInput!) {
       markers(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-marker-count': (extraInfo) => `
+    query ShowMarkerCount($input: MarkersInput) {
+      markerCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 
@@ -62,6 +67,30 @@ function milesToRadian(miles: number) {
   const earthRadiusInMiles = 3963.2;
 
   return miles / earthRadiusInMiles;
+}
+
+function getMarkersFilter(input: MarkersInput): any {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input)) {
+    if (input.ofMapId) {
+      // Get markers by map
+      filter['mapId'] = input.ofMapId;
+    }
+
+    if (input.centerLat && input.centerLng && input.radius) {
+      // Get markers within a given radius (in miles)
+      filter['location'] = {
+        $geoWithin: {
+          $centerSphere: [
+            [input.centerLng, input.centerLat],
+            milesToRadian(input.radius)
+          ]
+        }
+      };
+    }
+  }
+
+  return filter;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -78,27 +107,13 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         return marker;
       },
 
-      markers: (_root, { input }: { input: MarkersInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.ofMapId) {
-          // Get markers by map
-          filter['mapId'] = input.ofMapId;
-        }
-
-        if (input.centerLat && input.centerLng && input.radius) {
-          // Get markers within a given radius (in miles)
-          filter['location'] = {
-            $geoWithin: {
-              $centerSphere: [
-                [input.centerLng, input.centerLat],
-                milesToRadian(input.radius)
-              ]
-            }
-          };
-        }
-
-        return markers.find(filter)
+      markers: async (_root, { input }: { input: MarkersInput }) => {
+        return await markers.find(getMarkersFilter(input))
           .toArray();
+      },
+
+      markerCount: (_root, { input }: { input: MarkersInput }) => {
+        return markers.count(getMarkersFilter(input));
       }
     },
 

@@ -2,21 +2,18 @@
   <h1>Scoring</h1>
 
   <h2>Create Score (id win1, sourceId competition1, targetId ben)</h2>
-  <scoring-create-score
-    id="win1"
+  <scoring-create-score id="win1"
     sourceId="competition1"
     targetId="ben">
   </scoring-create-score>
 
   <h2>Create score by targetId alice</h2>
-  <scoring-create-score
-    sourceId="competition1"
+  <scoring-create-score sourceId="competition1"
     targetId="alice">
   </scoring-create-score>
 
   <h2>Create score by targetId cat</h2>
-  <scoring-create-score
-    sourceId="competition1"
+  <scoring-create-score sourceId="competition1"
     targetId="cat">
   </scoring-create-score>
 
@@ -31,6 +28,9 @@
   <scoring-show-targets-by-score [showIndex]="true"
     [targetIds]="['alice', 'cat']">
   </scoring-show-targets-by-score>
+
+  <h2>Show Target Count</h2>
+  <scoring-show-target-count></scoring-show-target-count>
 
   <h2>Show Target and Show Targets by Score in a tx</h2>
   <dv-tx>

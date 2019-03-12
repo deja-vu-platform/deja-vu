@@ -31,8 +31,9 @@ input TasksInput {
 
 
 type Query {
-  tasks(input: TasksInput!): [Task]
+  tasks(input: TasksInput): [Task]
   task(id: ID!): Task
+  taskCount(input: TasksInput): Int
 }
 
 type Mutation {

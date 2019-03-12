@@ -36,8 +36,9 @@ input CommentsInput {
 
 type Query {
   comment(id: ID): Comment
+  commentCount(input: CommentsInput): Int
   commentByAuthorTarget(input: CommentInput!): Comment
-  comments(input: CommentsInput!): [Comment]
+  comments(input: CommentsInput): [Comment]
 }
 
 type Mutation {

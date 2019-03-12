@@ -70,11 +70,11 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
     if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
-          inputs: JSON.stringify({
+          inputs: {
             input: {
               itemId: this.itemId
             }
-          }),
+          },
           extraInfo: { returnFields: 'id' }
         }
       })

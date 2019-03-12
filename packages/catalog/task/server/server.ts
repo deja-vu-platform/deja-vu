@@ -48,8 +48,13 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-tasks': (extraInfo) => `
-    query ShowTasks($input: TasksInput!) {
+    query ShowTasks($input: TasksInput) {
       tasks(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-task-count': (extraInfo) => `
+    query ShowTaskCount($input: TasksInput) {
+      taskCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'update-task': (extraInfo) => {
@@ -69,11 +74,24 @@ const actionRequestTable: ActionRequestTable = {
       default:
         throw new Error('Need to specify extraInfo.action');
     }
-  },
-}
+  }
+};
 
 function isPendingCreate(task: TaskDoc | null) {
   return _.get(task, 'pending.type') === 'create-task';
+}
+
+function getTaskFilter(input: TasksInput) {
+  let filter = {};
+  if (!_.isNil(input)) {
+    filter = _.omit(input, ['assigned']);
+    if (input.assigned === false) {
+      filter['assigneeId'] = null;
+    }
+  }
+  filter['pending'] = { $exists: false };
+
+  return filter;
 }
 
 async function updateTask(
@@ -133,19 +151,18 @@ function resolvers(db: mongodb.Db, _config: Config): object {
   return {
     Query: {
       tasks: async (_root, { input }: { input: TasksInput }) => {
-        const filterOp = _.omit(input, ['assigned']);
-        if (input.assigned === false) {
-          filterOp['assigneeId'] = null;
-        }
-        filterOp['pending'] = { $in: [ null, { type: { $ne: 'create-task' } } ]};
-
-        return await tasks.find(filterOp)
+        return await tasks.find(getTaskFilter(input))
           .toArray();
       },
+
       task: async (_root, { id }) => {
         const task: TaskDoc | null = await tasks.findOne({ id: id });
 
         return isPendingCreate(task) ? null : task;
+      },
+
+      taskCount: (_root, { input }: { input: TasksInput }) => {
+        return tasks.count(input);
       }
     },
     Task: {
@@ -156,7 +173,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     },
     Mutation: {
       createTask: async (
-        _root, { input }: {input: CreateTaskInput}, context: Context) => {
+        _root, { input }: { input: CreateTaskInput }, context: Context) => {
         const newTask: TaskDoc = {
           id: input.id ? input.id : uuid(),
           assignerId: input.assignerId,

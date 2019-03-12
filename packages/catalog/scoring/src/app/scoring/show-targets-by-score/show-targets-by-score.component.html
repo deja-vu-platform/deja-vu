@@ -1,28 +1,23 @@
-<div *ngIf="showTargetsList">
-  <div *ngIf="targets" class="container">
-    <ul class="list-group">
-      <li *ngFor="let target of targets; index as i" class="list-group-item">
-        <dv-include [action]="showTarget"
-          [inputs]="{
-            id: target.id, target: target, showId: showId,
-            showScores: showScores, showTotal: showTotal,
-            showScoreId: showScoreId, showScoreValue: showScoreValue,
-            showScoreSourceId: showScoreSourceId,
-            showScoreTargetId: showScoreTargetId,
-            totalLabel: totalLabel, noScoresText: noScoresText,
-            showScore: showScore, showIndex: showIndex, index: i
-          }"
-          [parent]="showTargetsByScore"
-          default-showTarget="{ tag: scoring-show-target }">
-        </dv-include>
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="!targets || targets.length === 0">
-    {{noTargetsText}}
-  </div>
+<div *ngIf="targets" class="container">
+  <ul class="list-group">
+    <li *ngFor="let target of targets; index as i" class="list-group-item">
+      <dv-include [action]="showTarget"
+        [inputs]="{
+          id: target.id, target: target, showId: showId,
+          showScores: showScores, showTotal: showTotal,
+          showScoreId: showScoreId, showScoreValue: showScoreValue,
+          showScoreSourceId: showScoreSourceId,
+          showScoreTargetId: showScoreTargetId,
+          totalLabel: totalLabel, noScoresText: noScoresText,
+          showScore: showScore, showIndex: showIndex, index: i
+        }"
+        [parent]="showTargetsByScore"
+        default-showTarget="{ tag: scoring-show-target }">
+      </dv-include>
+    </li>
+  </ul>
 </div>
-<div *ngIf="!showTargetsList">
-  {{ targets ? targets.length : 0 }}
+
+<div *ngIf="!targets || targets.length === 0">
+  {{noTargetsText}}
 </div>

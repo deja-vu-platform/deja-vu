@@ -81,7 +81,7 @@ export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
       } else {
         this.gs.get<ItemsRes>(this.apiPath, {
           params: {
-            inputs: JSON.stringify({ input: {} })
+            inputs: { input: {} }
           }
         })
           .subscribe((res) => {

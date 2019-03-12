@@ -46,6 +46,11 @@ const actionRequestTable: ActionRequestTable = {
       target(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-target-count': (extraInfo) => `
+    query ShowTargetCount($input: TargetsByScoreInput) {
+      targetCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-targets-by-score': (extraInfo) => `
     query ShowTargetsByScore($input: TargetsByScoreInput) {
       targetsByScore(input: $input) ${getReturnFields(extraInfo)}
@@ -108,12 +113,32 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           scores: targetScores
         };
       },
+
+      targetCount: async (_root, { input }: { input: TargetsByScoreInput }) => {
+        const filter = { pending: { $exists: false } };
+        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
+          filter['targetId'] = { $in: input.targetIds };
+        }
+
+        const res = await scores.aggregate([
+          { $match: filter },
+          {
+            $group: {
+              _id: '$targetId', count: { $sum: 1 }
+            }
+          }
+        ])
+          .toArray();
+
+        return _.reduce(res, (sum, obj) => sum + obj['count'], 0);
+      },
+
       // TODO: pagination, max num results
       targetsByScore: async (
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
         const query = { pending: { $exists: false } };
-        if (!_.isNil(input.targetIds)) {
+        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
           query['targetId'] = { $in: input.targetIds };
         }
 

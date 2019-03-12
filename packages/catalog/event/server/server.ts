@@ -99,8 +99,13 @@ const actionRequestTable: ActionRequestTable = {
     query ShowEvents($input: EventsInput!) {
       events(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-event-count': (extraInfo) => `
+    query ShowEventCount($input: EventsInput) {
+      eventCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
-}
+};
 
 function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
   const docPending = _.get(doc, 'pending.type');
@@ -134,7 +139,9 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         return s;
-      }
+      },
+      // TODO: search between dates
+      eventCount: () => events.count({ pending: { $exists: false } })
     },
     Event: {
       id: (evt: EventDoc) => evt.id,

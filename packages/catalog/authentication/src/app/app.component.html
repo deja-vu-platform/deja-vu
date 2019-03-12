@@ -17,7 +17,13 @@
   <h1>Is the user of id ben authenticated?</h1>
   <authentication-authenticate id="ben"></authentication-authenticate>
   <h1>Users</h1>
-  <authentication-show-users></authentication-show-users>
+  <authentication-show-users (fetchedUsers)="users=$event">
+  </authentication-show-users>
   <h1>Choose User</h1>
   <authentication-choose-user></authentication-choose-user>
+  <h1>Show User Count</h1>
+  <authentication-show-user-count></authentication-show-user-count>
+  <h1>Show User Count from Output</h1>
+  <authentication-show-user-count [users]="users">
+  </authentication-show-user-count>
 </div>

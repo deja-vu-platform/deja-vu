@@ -32,7 +32,6 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   @Input() showScoreValue = true;
   @Input() showScoreSourceId = true;
   @Input() showScoreTargetId = true;
-  @Input() showTargetsList = true;
   @Input() showIndex = false;
 
   @Input() totalLabel = 'Total: ';

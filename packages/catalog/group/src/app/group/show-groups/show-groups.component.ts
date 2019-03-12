@@ -67,11 +67,11 @@ OnChanges {
       this.gs
         .get<{data: {groups: Group[]}}>('/graphql', {
           params: {
-            inputs: JSON.stringify({
+            inputs: {
               input: {
                 withMemberId: this.withMemberId
               }
-            }),
+            },
             extraInfo: {
               returnFields: `
                 id

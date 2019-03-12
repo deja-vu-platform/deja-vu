@@ -23,8 +23,10 @@ input CreateMemberInput {
 
 type Query {
   group(id: ID!): Group
-  members(input: MembersInput!): [ID!]
-  groups(input: GroupsInput!): [Group!]
+  groups(input: GroupsInput): [Group!]
+  groupCount(input: GroupsInput): Int
+  members(input: MembersInput): [ID!]
+  memberCount(input: MembersInput): Int
 }
 
 type Mutation {

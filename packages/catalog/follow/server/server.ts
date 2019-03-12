@@ -80,20 +80,46 @@ const actionRequestTable: ActionRequestTable = {
       followers(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-follower-count': (extraInfo) => `
+    query ShowFollowers($input: FollowersInput) {
+      followerCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-messages': (extraInfo) => `
     query ShowMessages($input: MessagesInput!) {
       messages(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-message-count': (extraInfo) => `
+    query ShowMessages($input: MessagesInput) {
+      messageCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-publishers': (extraInfo) => `
     query ShowPublishers($input: PublishersInput!) {
       publishers(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-publisher-count': (extraInfo) => `
+    query ShowPublishers($input: PublishersInput) {
+      publisherCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 
 function isPendingCreate(doc: PublisherDoc | null) {
   return _.get(doc, 'pending.type') === 'create-publisher';
+}
+
+function getPublisherFilter(input: PublishersInput) {
+  // No publisher filter
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input) && !_.isNil(input.followedById)) {
+    // Get all publishers of a follower
+    filter['followerIds'] = input.followedById;
+  }
+
+  return filter;
 }
 
 async function getAggregatedMessages(
@@ -122,6 +148,31 @@ async function getAggregatedMessages(
     .toArray();
 
   return results;
+}
+
+async function getMessages(publishers, input) {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
+    // Get messages by a specific publisher
+    const publisher = await publishers.findOne(
+      { id: input.byPublisherId, pending: { $exists: false } },
+      { projection: { messages: 1 } });
+
+    if (_.isNil(publisher) || isPendingCreate(publisher)) {
+      throw new Error(`Publisher ${input.byPublisherId} not found`);
+    }
+
+    return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
+
+  } else {
+    if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
+      filter['followerIds'] = input.ofPublishersFollowedById;
+    }
+    // No message filter
+    const results = await getAggregatedMessages(publishers, filter);
+
+    return results[0] ? results[0].messages : [];
+  }
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -154,7 +205,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       followers: async (_root, { input }: { input: FollowersInput }) => {
-        if (input.ofPublisherId) {
+        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
           // A publisher's followers
           const publisher = await publishers.findOne(
             { id: input.ofPublisherId, pending: { $exists: false } },
@@ -192,50 +243,60 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         ])
           .toArray();
 
-        return results[0].followerIds;
+        return results[0] ? results[0].followerIds : [];
+      },
+
+      followerCount: async (_root, { input }: { input: FollowersInput }) => {
+
+        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
+          // A publisher's followers
+          const publisher = await publishers.findOne(
+            { id: input.ofPublisherId, pending: { $exists: false } },
+            { projection: { followerIds: 1 } }
+          );
+
+          if (_.isNil(publisher) || isPendingCreate(publisher)) {
+            throw new Error(`Publisher ${input.ofPublisherId} not found`);
+          }
+
+          return !_.isEmpty(publisher!.followerIds) ?
+            publisher!.followerIds.length : 0;
+        }
+
+        // No follower filter
+        const results = await publishers.aggregate([
+          { $match: { pending: { $exists: false } } },
+          {
+            $group: {
+              _id: 0,
+              count: {
+                $sum: { $size: '$followerIds' }
+              }
+            }
+          }
+        ])
+          .toArray();
+
+        return results[0] ? results[0]['count'] : 0;
       },
 
       publishers: async (_root, { input }: { input: PublishersInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.followedById) {
-          // Get all publishers of a follower
-          filter['followerIds'] = input.followedById;
-
-          return publishers.find(filter)
-            .toArray();
-        }
-
-        // No publisher filter
-        return publishers.find(filter)
+        return publishers.find(getPublisherFilter(input))
           .toArray();
       },
 
+      publisherCount: (_root, { input }: { input: PublishersInput }) => {
+        return publishers.count(getPublisherFilter(input));
+      },
+
       messages: async (_root, { input }: { input: MessagesInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.byPublisherId) {
-          // Get messages by a specific publisher
-          const publisher = await publishers.findOne(
-            { id: input.byPublisherId, pending: { $exists: false } },
-            { projection: { messages: 1 } });
+        return await getMessages(publishers, input);
+      },
 
-          if (_.isNil(publisher) || isPendingCreate(publisher)) {
-            throw new Error(`Publisher ${input.byPublisherId} not found`);
-          }
+      messageCount: async (_root, { input }: { input: MessagesInput }) => {
+        const allMessages = await getMessages(publishers, input);
 
-          return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
-
-        } else if (input.ofPublishersFollowedById) {
-          filter['followerIds'] = input.ofPublishersFollowedById;
-          const results = await getAggregatedMessages(publishers, filter);
-
-          return results[0].messages;
-
-        } else {
-          // No message filter
-          const results = await getAggregatedMessages(publishers, filter);
-
-          return results[0].messages;
-        }
+        return allMessages!.length;
       },
 
       isFollowing: async (_root, { input }: { input: FollowUnfollowInput }) => {
@@ -518,7 +579,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
 
     return Promise.all([
       publishers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      publishers.createIndex({ id: 1 , 'messages.id': 1 }, { unique: true })
+      publishers.createIndex({ id: 1, 'messages.id': 1 }, { unique: true })
     ]);
   })
   .actionRequestTable(actionRequestTable)

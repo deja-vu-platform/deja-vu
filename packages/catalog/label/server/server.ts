@@ -50,13 +50,13 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'items':
         return `
-          query SearchItemsByLabel($input: ItemsInput!) {
+          query SearchItemsByLabel($input: ItemsInput) {
             items(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
       case 'labels':
         return `
-          query SearchItemsByLabel($input: LabelsInput!) {
+          query SearchItemsByLabel($input: LabelsInput) {
             labels(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
@@ -65,19 +65,81 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-items': (extraInfo) => `
-    query ShowItems($input: ItemsInput!) {
+    query ShowItems($input: ItemsInput) {
       items(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-item-count': (extraInfo) => `
+    query ShowItemCount($input: ItemsInput) {
+      itemCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-labels': (extraInfo) => `
-    query ShowLabels($input: LabelsInput!) {
+    query ShowLabels($input: LabelsInput) {
       labels(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-label-count': (extraInfo) => `
+    query ShowLabelCount($input: LabelsInput) {
+      labelCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
 
 function isPendingCreate(doc: LabelDoc | null) {
   return _.get(doc, 'pending.type') === 'create-label';
+}
+
+function getLabelFilter(input: LabelsInput) {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input) && !_.isNil(input.itemId)) {
+    // Labels of an item
+    filter['itemIds'] = input.itemId;
+  }
+
+  return filter;
+}
+
+async function getItems(labels: mongodb.Collection<LabelDoc>,
+  input: ItemsInput) {
+  const matchQuery = {};
+  const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
+  const reduceOperator = {};
+  let initialValue;
+
+  if (!_.isNil(input) && !_.isNil(input.labelIds)) {
+    // Items matching all labelIds
+    const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
+    matchQuery['id'] = { $in: standardizedLabelIds };
+    matchQuery['pending'] = { $exists: false };
+    groupQuery['initialSet'] = { $first: '$itemIds' };
+    initialValue = '$initialSet';
+    reduceOperator['$setIntersection'] = ['$$value', '$$this'];
+  } else {
+    // No label filter
+    initialValue = [];
+    reduceOperator['$setUnion'] = ['$$value', '$$this'];
+  }
+  const results = await labels.aggregate([
+    { $match: matchQuery },
+    {
+      $group: groupQuery
+    },
+    {
+      $project: {
+        itemIds: {
+          $reduce: {
+            input: '$itemIds',
+            initialValue: initialValue,
+            in: reduceOperator
+          }
+        }
+      }
+    }
+  ])
+    .toArray();
+
+  return !_.isEmpty(results) ? results[0].itemIds : [];
 }
 
 function resolvers(db: mongodb.Db, _config: LabelConfig): object {
@@ -96,55 +158,22 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
       },
 
       items: async (_root, { input }: { input: ItemsInput }) => {
-        const matchQuery = {};
-        const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
-        const reduceOperator = {};
-        let initialValue;
+        return await getItems(labels, input);
+      },
 
-        if (input.labelIds) {
-          // Items matching all labelIds
-          const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-          matchQuery['id'] = { $in: standardizedLabelIds };
-          matchQuery['pending'] = { $exists: false };
-          groupQuery['initialSet'] = { $first: '$itemIds' };
-          initialValue = '$initialSet';
-          reduceOperator['$setIntersection'] = ['$$value', '$$this'];
-        } else {
-          // No label filter
-          initialValue = [];
-          reduceOperator['$setUnion'] = ['$$value', '$$this'];
-        }
-        const results = await labels.aggregate([
-          { $match: matchQuery },
-          {
-            $group: groupQuery
-          },
-          {
-            $project: {
-              itemIds: {
-                $reduce: {
-                  input: '$itemIds',
-                  initialValue: initialValue,
-                  in: reduceOperator
-                }
-              }
-            }
-          }
-        ])
-          .toArray();
+      itemCount: async (_root, { input }: { input: ItemsInput }) => {
+        const res = await getItems(labels, input);
 
-        return !_.isEmpty(results) ? results[0].itemIds : [];
+        return res.length;
       },
 
       labels: async (_root, { input }: { input: LabelsInput }) => {
-        const query = { pending: { $exists: false } };
-        if (input.itemId) {
-          // Labels of an item
-          query['itemIds'] = input.itemId;
-        }
-
-        return labels.find(query)
+        return await labels.find(getLabelFilter(input))
           .toArray();
+      },
+
+      labelCount: (_root, { input }: { input: LabelsInput }) => {
+        return labels.count(getLabelFilter(input));
       }
     },
 

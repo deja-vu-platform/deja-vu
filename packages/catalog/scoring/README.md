@@ -12,3 +12,5 @@ Keep track of scores
 - create-score
 - show-score
 - show-target
+- show-target-count
+- show-targets-by-score

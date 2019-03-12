@@ -68,19 +68,83 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-groups': (extraInfo) => `
-    query ShowGroups($input: GroupsInput!) {
+    query ShowGroups($input: GroupsInput) {
       groups(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-group-count': (extraInfo) => `
+    query ShowGroupCount($input: GroupsInput) {
+      groupCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-members': (extraInfo) => `
-    query ShowMembers($input: MembersInput!) {
+    query ShowMembers($input: MembersInput) {
       members(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-member-count': (extraInfo) => `
+    query ShowMemberCount($input: MembersInput) {
+      memberCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
 
 function isPendingCreate(group: GroupDoc | null) {
   return _.get(group, 'pending.type') === 'create-group';
+}
+
+function getGroupFilter(input: GroupsInput) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+
+  const filter = (!_.isNil(input) && !_.isNil(input.withMemberId)) ?
+    { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  return filter;
+}
+
+async function getMembers(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+  const filter = (!_.isNil(input) && !_.isNil(input.inGroupId)) ?
+    { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  const pipelineResults = await groups.aggregate([
+    { $match: filter },
+    {
+      $group: {
+        _id: 0,
+        memberIds: { $push: '$memberIds' }
+      }
+    },
+    {
+      $project: {
+        memberIds: {
+          $reduce: {
+            input: '$memberIds',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ])
+    .toArray();
+
+  const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
+
+  return matchingMembers;
 }
 
 async function addOrRemoveMember(
@@ -148,58 +212,26 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         return isPendingCreate(group) ? null : group;
       },
-      members: async (_root, { input }: { input: MembersInput }) => {
-        const noCreateGroupPending = {
-          $or: [
-            { pending: { $exists: false } },
-            { pending: { type: { $ne: 'create-group' } } }
-          ]
-        };
-        const filter = input.inGroupId ?
-          { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
-          noCreateGroupPending;
 
-        const pipelineResults = await groups.aggregate([
-          { $match: filter },
-          {
-            $group: {
-              _id: 0,
-              memberIds: { $push: '$memberIds' }
-            }
-          },
-          {
-            $project: {
-              memberIds: {
-                $reduce: {
-                  input: '$memberIds',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
-          .toArray();
-
-        const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
-
-        return matchingMembers;
-      },
       groups: async (_root, { input }: { input: GroupsInput }) => {
-        const noCreateGroupPending = {
-          $or: [
-            { pending: { $exists: false } },
-            { pending: { type: { $ne: 'create-group' } } }
-          ]
-        };
-
-        const filter = input.withMemberId ?
-          { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
-          noCreateGroupPending;
-
-        return groups.find(filter)
+        return groups.find(getGroupFilter(input))
           .toArray();
+      },
+
+      groupCount: (_root, { input }: { input: GroupsInput }) => {
+        return groups.count(getGroupFilter(input));
+      },
+
+      members: async (_root, { input }: { input: MembersInput }) => {
+        return await getMembers(groups, input);
+      },
+
+      memberCount: async (_root, { input }: { input: MembersInput }) => {
+        const res = await getMembers(groups, input);
+
+        return res.length;
       }
+
     },
     Group: {
       id: (group: GroupDoc) => group.id,

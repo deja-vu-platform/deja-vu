@@ -33,8 +33,9 @@ input RemoveViewerFromResourceInput {
 
 type Query {
   resource(id: ID!): Resource
+  resourceCount(input: ResourcesInput): Int
   owner(resourceId: ID!): ID
-  resources(input: ResourcesInput!): [Resource!]
+  resources(input: ResourcesInput): [Resource!]
   canView(input: PrincipalResourceInput!): Boolean
   canEdit(input: PrincipalResourceInput!): Boolean
 }

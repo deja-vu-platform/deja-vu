@@ -24,6 +24,7 @@ interface RatingsRes {
 export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
   @Input() targetId: string;
+
   @Input() showRating: Action = { type: <Type<Component>>ShowRatingComponent };
 
   @Input() noRatingsToShowText = 'No ratings to show';
@@ -60,11 +61,11 @@ OnInit, OnChanges {
     if (this.canEval()) {
       this.gs.get<RatingsRes>(this.apiPath, {
         params: {
-          inputs: JSON.stringify({
+          inputs: {
             input: {
               ofTargetId: this.targetId
             }
-          }),
+          },
           extraInfo: {
             returnFields: `
               sourceId
