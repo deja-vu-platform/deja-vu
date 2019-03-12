@@ -105,7 +105,7 @@ const actionRequestTable: ActionRequestTable = {
       resources(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: ResourceDoc | null) {
   return _.get(doc, 'pending.type') === 'create-resource';
