@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecFailure,
-  OnExecSuccess, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec,
+  OnExecFailure, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -122,9 +122,9 @@ export class RegisterUserComponent
           `
         }
       })
-      .toPromise();
+        .toPromise();
 
-      if (res.errors) this.throwErrors(res.errors);
+      if (res.errors) { this.throwErrors(res.errors); }
 
       const token = res.data.registerAndSignIn.token;
       user = res.data.registerAndSignIn.user;
@@ -141,9 +141,9 @@ export class RegisterUserComponent
           `
         }
       })
-      .toPromise();
+        .toPromise();
 
-      if (res.errors) this.throwErrors(res.errors);
+      if (res.errors) { this.throwErrors(res.errors); }
 
       user = res.data.register;
     }
