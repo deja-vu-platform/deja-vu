@@ -1,1 +1,4 @@
-{{ labelCount ? labelCount : 0 }}
+<span *ngIf="labelCount">
+  {{ labelCount }}
+</span>
+<span *ngIf="!labelCount">0</span>

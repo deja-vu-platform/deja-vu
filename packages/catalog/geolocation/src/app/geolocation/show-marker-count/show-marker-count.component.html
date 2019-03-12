@@ -1,1 +1,4 @@
-{{ markerCount ? markerCount : 0 }}
+<span *ngIf="markerCount">
+  {{ markerCount }}
+</span>
+<span *ngIf="!markerCount">0</span>

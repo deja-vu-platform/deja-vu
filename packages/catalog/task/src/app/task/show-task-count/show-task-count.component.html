@@ -1,1 +1,4 @@
-{{ taskCount ? taskCount : 0 }}
+<span *ngIf="taskCount">
+  {{ taskCount }}
+</span>
+<span *ngIf="!taskCount">0</span>

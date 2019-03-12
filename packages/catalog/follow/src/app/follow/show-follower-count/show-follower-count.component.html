@@ -1,1 +1,4 @@
-{{ followerCount ? followerCount : 0 }}
+<span *ngIf="followerCount">
+  {{ followerCount }}
+</span>
+<span *ngIf="!followerCount">0</span>

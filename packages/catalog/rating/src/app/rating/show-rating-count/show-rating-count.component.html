@@ -1,1 +1,4 @@
-{{ ratingCount ? ratingCount : 0 }}
+<span *ngIf="ratingCount">
+  {{ ratingCount }}
+</span>
+<span *ngIf="!ratingCount">0</span>

@@ -1,1 +1,4 @@
-{{ commentCount ? commentCount : 0 }}
+<span *ngIf="commentCount">
+  {{ commentCount }}
+</span>
+<span *ngIf="!commentCount">0</span>

@@ -1,1 +1,4 @@
-{{ messageCount ? messageCount : 0 }}
+<span *ngIf="messageCount">
+  {{ messageCount }}
+</span>
+<span *ngIf="!messageCount">0</span>

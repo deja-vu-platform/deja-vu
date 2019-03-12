@@ -1,1 +1,4 @@
-{{ eventCount ? eventCount : 0 }}
+<span *ngIf="eventCount">
+  {{ eventCount }}
+</span>
+<span *ngIf="!eventCount">0</span>

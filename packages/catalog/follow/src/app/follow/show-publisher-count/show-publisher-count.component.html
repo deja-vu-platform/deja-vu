@@ -1,1 +1,4 @@
-{{ publisherCount ? publisherCount : 0 }}
+<span *ngIf="publisherCount">
+  {{ publisherCount }}
+</span>
+<span *ngIf="!publisherCount">0</span>

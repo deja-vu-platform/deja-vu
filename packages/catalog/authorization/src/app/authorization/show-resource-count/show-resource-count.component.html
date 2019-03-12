@@ -1,1 +1,4 @@
-{{ resourceCount ? resourceCount : 0 }}
+<span *ngIf="resourceCount">
+  {{ resourceCount }}
+</span>
+<span *ngIf="!resourceCount">0</span>

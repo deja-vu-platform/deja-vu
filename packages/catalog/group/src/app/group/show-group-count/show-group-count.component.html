@@ -1,1 +1,4 @@
-{{ groupCount ? groupCount : 0 }}
+<span *ngIf="groupCount">
+  {{ groupCount }}
+</span>
+<span *ngIf="!groupCount">0</span>

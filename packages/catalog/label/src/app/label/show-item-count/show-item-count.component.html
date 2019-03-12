@@ -1,1 +1,4 @@
-{{ itemCount ? itemCount : 0 }}
+<span *ngIf="itemCount">
+  {{ itemCount }}
+</span>
+<span *ngIf="!itemCount">0</span>

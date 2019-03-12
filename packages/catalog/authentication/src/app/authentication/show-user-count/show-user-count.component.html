@@ -1,1 +1,4 @@
-{{ userCount ? userCount : 0 }}
+<span *ngIf="userCount">
+  {{ userCount }}
+</span>
+<span *ngIf="!userCount">0</span>
