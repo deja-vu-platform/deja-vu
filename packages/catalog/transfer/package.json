@@ -13,7 +13,7 @@
     "e2e": "ng e2e",
     "dv-build-transfer": "ng build && tsc -p server && cp server/schema.graphql ./dist/server && cp server/schema.template.graphql ./dist/server",
     "dv-package-transfer-client": "ng-packagr -p ng-package.json",
-    "dv-package-transfer-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
+    "dv-package-transfer-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server && cp server/schema.template.graphql ./pkg/server",
     "dv-package-transfer": "npm run dv-package-transfer-client && npm run dv-package-transfer-server",
     "concurrently": "concurrently",
     "tsc": "tsc",
