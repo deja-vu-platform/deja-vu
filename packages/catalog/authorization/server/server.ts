@@ -1,12 +1,12 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import {
   AddViewerToResourceInput,
@@ -19,16 +19,8 @@ import {
 
 
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
-
-class ResourceValidation {
-  static async resourceExistsOrFail(resources: mongodb.Collection<ResourceDoc>,
-    id: string): Promise<ResourceDoc> {
-    return Validation.existsOrFail(resources, id, 'Resource');
-  }
-}
 
 const actionRequestTable: ActionRequestTable = {
   'add-remove-viewer': (extraInfo) => {
@@ -41,8 +33,10 @@ const actionRequestTable: ActionRequestTable = {
         `;
       case 'remove':
         return `
-          mutation RemoveViewerFromResource($input: RemoveViewerFromResourceInput!) {
-            removeViewerFromResource(input: $input) ${getReturnFields(extraInfo)}
+          mutation RemoveViewerFromResource(
+            $input: RemoveViewerFromResourceInput!) {
+            removeViewerFromResource(input: $input)
+              ${getReturnFields(extraInfo)}
           }
         `;
       case 'view':
@@ -100,47 +94,29 @@ const actionRequestTable: ActionRequestTable = {
       resources(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
-function isPendingCreate(doc: ResourceDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-resource';
-}
-
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const resources: mongodb.Collection<ResourceDoc> = db.collection('resources');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const resources: Collection<ResourceDoc> = db.collection('resources');
 
   return {
     Query: {
       resources: async (_root, { input }: { input: ResourcesInput }) => {
-        const filter = { pending: { $exists: false } };
+        const filter = {};
         if (input.createdBy) {
           filter['ownerId'] = input.createdBy;
         } else if (input.viewableBy) {
           filter['viewerIds'] = input.viewableBy;
         }
 
-        return await resources
-          .find(filter)
-          .toArray();
+        return await resources.find(filter);
       },
 
-      resource: async (_root, { id }) => {
-        const resource: ResourceDoc | null = await ResourceValidation
-          .resourceExistsOrFail(resources, id);
-        if (_.isNil(resource) || isPendingCreate(resource)) {
-          throw new Error(`Resource ${id} not found`);
-        }
-
-        return resource;
-      },
+      resource: async (_root, { id }) => await resources.findOne({ id }),
 
       owner: async (_root, { resourceId }) => {
         const resource = await resources
           .findOne({ id: resourceId }, { projection: { ownerId: 1 } });
-
-        if (_.isNil(resource) || isPendingCreate(resource)) {
-          throw new Error(`Resource ${resourceId} not found`);
-        }
 
         return resource!.ownerId;
       },
@@ -150,10 +126,6 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           .findOne({ id: input.resourceId, viewerIds: input.principalId },
             { projection: { _id: 1 } });
 
-        if (isPendingCreate(resource)) {
-          return null;
-        }
-
         return !_.isNil(resource);
       },
 
@@ -161,10 +133,6 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         const resource = await resources
           .findOne({ id: input.resourceId, ownerId: input.principalId },
             { projection: { _id: 1 } });
-
-        if (isPendingCreate(resource)) {
-          return null;
-        }
 
         return !_.isNil(resource);
       }
@@ -187,85 +155,16 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           viewerIds: _.union(_.get(input, 'viewerIds', []), [input.ownerId])
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newResource.pending = {
-              reqId: context.reqId,
-              type: 'create-resource'
-            };
-          /* falls through */
-          case undefined:
-            await resources.insertOne(newResource);
-
-            return newResource;
-          case 'commit':
-            await resources.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await resources.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-        }
-
-        return newResource;
+        return await resources.insertOne(context, newResource);
       },
 
       addViewerToResource: async (
-        _root,
-        { input }: { input: AddViewerToResourceInput }, context: Context) => {
+        _root, { input }: { input: AddViewerToResourceInput },
+        context: Context) => {
         const updateOp = { $push: { viewerIds: input.viewerId } };
-        const notPendingResourceIdFilter = {
-          id: input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            await ResourceValidation.resourceExistsOrFail(resources, input.id);
-            const pendingUpdateObj = await resources
-              .updateOne(
-                notPendingResourceIdFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'add-viewer-to-resource'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await ResourceValidation.resourceExistsOrFail(resources, input.id);
-            const updateObj = await resources
-              .updateOne(notPendingResourceIdFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await resources.updateOne(
-              reqIdPendingFilter,
-              { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await resources.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await resources
+              .updateOne(context, { id: input.id }, updateOp);
       },
 
       removeViewerFromResource: async (
@@ -273,113 +172,21 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         { input }: { input: RemoveViewerFromResourceInput },
         context: Context) => {
         const updateOp = { $pull: { viewerIds: input.viewerId } };
-        const notPendingResourceIdFilter = {
-          id: input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            await ResourceValidation.resourceExistsOrFail(resources, input.id);
-            const pendingUpdateObj = await resources
-              .updateOne(
-                notPendingResourceIdFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'remove-viewer-from-resource'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await ResourceValidation.resourceExistsOrFail(resources, input.id);
-            const updateObj = await resources
-              .updateOne(notPendingResourceIdFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await resources.updateOne(
-              reqIdPendingFilter,
-              { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await resources.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await resources
+              .updateOne(context, { id: input.id }, updateOp);
       },
 
-      deleteResource: async (_root, { id }, context: Context) => {
-        const notPendingResourceIdFilter = {
-          id: id, pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            await ResourceValidation.resourceExistsOrFail(resources, id);
-            const pendingUpdateObj = await resources.updateOne(
-              notPendingResourceIdFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'delete-resource'
-                  }
-                }
-              });
-
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await ResourceValidation.resourceExistsOrFail(resources, id);
-            const res = await resources
-              .deleteOne(notPendingResourceIdFilter);
-
-            if (res.deletedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await resources.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-          case 'abort':
-            await resources.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
-      }
+      deleteResource: async (_root, { id }, context: Context) => await
+        resources.deleteOne(context, { id })
     }
   };
 }
 
 const authorizationCliche: ClicheServer =
   new ClicheServerBuilder('authorization')
-    .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-      const resources: mongodb.Collection<ResourceDoc> =
-        db.collection('resources');
+    .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+      const resources: Collection<ResourceDoc> = db.collection('resources');
 
       return Promise.all([
         resources.createIndex({ id: 1 }, { unique: true }),
