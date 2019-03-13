@@ -47,10 +47,10 @@ function nonInputMemberAccessToField(
     case 'cliche':
       clicheName = clicheOrActionAlias;
       [ actionName, output ] = fullMemberAccess
-        .slice(clicheOrActionAlias.length + 1)
+        .slice(clicheName.length + 1)
         .split('.', 2);
       memberAccesses = fullMemberAccess
-        .slice(clicheOrActionAlias.length + actionName.length +
+        .slice(clicheName.length + actionName.length +
           output.length + 2);
       break;
     case 'action':
@@ -58,10 +58,16 @@ function nonInputMemberAccessToField(
       actionName = stEntry.actionName;
       alias = clicheOrActionAlias;
       output = fullMemberAccess
-        .slice(clicheOrActionAlias.length + 1)
+        .slice(alias.length + 1)
         .split('.', 1)[0];
-      memberAccesses = fullMemberAccess
-        .slice(clicheOrActionAlias.length + output.length + 1);
+      if (output.endsWith('?')) {
+        output = output.slice(0, -1);
+        memberAccesses = '?' + fullMemberAccess
+          .slice(alias.length + output.length + 2);
+      } else {
+        memberAccesses = fullMemberAccess
+          .slice(alias.length + output.length + 1);
+      }
       break;
     default:
       throw new Error(`Unexpected entry ${stEntry.kind}`);
