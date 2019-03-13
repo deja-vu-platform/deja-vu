@@ -1,0 +1,20 @@
+<dv.action name="create-chore">
+  <dv.tx>
+    <dv.gen-id />
+    <dv.status savedText="Chore created" />
+    <chore.create-object id=dv.gen-id.id showOptionToSubmit=false />
+    <task.create-task
+      id=dv.gen-id.id
+      assignerId=$parent?.id
+      assigneeId=child.choose-object.selectedObjectId
+      showOptionToInputAssignee=false
+      showOptionToSubmit=false />
+    <!-- TODO: check assignerId and check asignee is child -->
+    <div>
+      <child.choose-object
+        chooseObjectSelectPlaceholder="Select Assignee"
+        showOnly=['name'] execOnSelection=false resetOnExecSuccess=true />
+    </div>
+    <dv.button>Create Chore</dv.button>
+  </dv.tx>
+</dv.action>
