@@ -34,7 +34,6 @@
         <div
           *ngFor="let action of row.actions; let actionNum = index"
           class="action"
-          ngClass="action."
           [attr.data-index]="actionNum"
           [ngClass]="action.styles.stretch ? 'stretch' : ''"
         >
