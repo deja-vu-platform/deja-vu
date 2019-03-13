@@ -114,6 +114,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   dvOnExecSuccess() {
     this.newUserSignedIn = true;
+    this.newUserSignedInError = '';
     window.setTimeout(() => {
       this.newUserSignedIn = false;
     }, SAVED_MSG_TIMEOUT);
