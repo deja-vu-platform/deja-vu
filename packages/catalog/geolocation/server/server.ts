@@ -1,12 +1,12 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import {
   CreateMarkerInput,
@@ -14,17 +14,8 @@ import {
   MarkersInput
 } from './schema';
 
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
-
-class MarkerValidation {
-  static async markerExistsOrFail(
-    markers: mongodb.Collection<MarkerDoc>, id: string): Promise<MarkerDoc> {
-    return Validation.existsOrFail(markers, id, 'Marker');
-  }
-}
 
 const actionRequestTable: ActionRequestTable = {
   'show-marker': (extraInfo) => `
@@ -54,32 +45,21 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function isPendingCreate(doc: MarkerDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-marker';
-}
-
 function milesToRadian(miles: number) {
   const earthRadiusInMiles = 3963.2;
 
   return miles / earthRadiusInMiles;
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const markers: Collection<MarkerDoc> = db.collection('markers');
 
   return {
     Query: {
-      marker: async (_root, { id }) => {
-        const marker = await MarkerValidation.markerExistsOrFail(markers, id);
-        if (_.isNil(marker) || isPendingCreate(marker)) {
-          throw new Error(`Marker ${id} does not exist`);
-        }
+      marker: async (_root, { id }) => await markers.findOne({ id }),
 
-        return marker;
-      },
-
-      markers: (_root, { input }: { input: MarkersInput }) => {
-        const filter = { pending: { $exists: false } };
+      markers: async (_root, { input }: { input: MarkersInput }) => {
+        const filter = {};
         if (input.ofMapId) {
           // Get markers by map
           filter['mapId'] = input.ofMapId;
@@ -97,8 +77,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           };
         }
 
-        return markers.find(filter)
-          .toArray();
+        return await markers.find(filter);
       }
     },
 
@@ -123,90 +102,18 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           mapId: input.mapId
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            newMarker.pending = {
-              reqId: context.reqId,
-              type: 'create-marker'
-            };
-          /* falls through */
-          case undefined:
-            await markers.insertOne(newMarker);
-
-            return newMarker;
-          case 'commit':
-            await markers.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return newMarker;
-          case 'abort':
-            await markers.deleteOne(reqIdPendingFilter);
-
-            return newMarker;
-        }
-
-        return newMarker;
+        return await markers.insertOne(context, newMarker);
       },
 
-      deleteMarker: async (_root, { id }, context: Context) => {
-        const notPendingMarkerIdFilter = {
-          id: id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            await MarkerValidation.markerExistsOrFail(markers, id);
-            const pendingUpdateObj = await markers.updateOne(
-              notPendingMarkerIdFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'delete-marker'
-                  }
-                }
-              });
-
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await MarkerValidation.markerExistsOrFail(markers, id);
-            const res = await markers
-              .deleteOne(notPendingMarkerIdFilter);
-
-            if (res.deletedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await markers.deleteOne(reqIdPendingFilter);
-
-            return true;
-          case 'abort':
-            await markers.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return true;
-        }
-
-        return true;
-      }
+      deleteMarker: async (_root, { id }, context: Context) =>
+        await markers.deleteOne(context, { id })
     }
   };
 }
 
 const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const markers: Collection<MarkerDoc> = db.collection('markers');
 
     return Promise.all([
       markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
