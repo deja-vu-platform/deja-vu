@@ -128,6 +128,102 @@ describe('ActionCompiler', () => {
       .toMatch(/dv-if/);
   });
 
+  it('should compile action with dv.if with action', () => {
+    const st: SymbolTable = {
+      foo: {
+        kind: 'cliche',
+        clicheName: 'foo'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <dv.if condition=2 lt 3>
+          <foo.action />
+        </dv.if>
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch('foo-action');
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\*ngIf="2 < 3"/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv\.if/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv-if/);
+  });
+
+  it('should compile action with input action with dv.if', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <event.choose-and-show-series
+          showEvent=<dv.if condition=2 lt 3>
+            <${appName}.action />
+          </dv.if>
+        />
+      </dv.action>
+    `;
+
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`${appName}-action`);
+  });
+
+  it('should compile action with input action with dv.if', () => {
+    const st: SymbolTable = {
+      transfer: {
+        kind: 'cliche',
+        clicheName: 'transfer'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <transfer.show-balance />
+        <dv.for elems=[1, 2, 3]
+        showElem= <dv.if
+          condition=$elem gt transfer.show-balance.fetchedBalance>
+          <${appName}.action reward=$elem />
+        </dv.if>
+        />
+      </dv.action>
+    `;
+
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngComponent)
+      .toMatch(/@Input\(\) elem/);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`${appName}-action`);
+  });
+
   it('should compile action with actions', () => {
     const heading = 'Group meeting organizer';
     const st: SymbolTable = {
