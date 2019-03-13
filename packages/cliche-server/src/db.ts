@@ -53,6 +53,13 @@ export class ClicheDbUnknownUpdateError extends ClicheDbError {
       ClicheDbUnknownUpdateError.ERROR_CODE);
   }
 }
+export class ClicheDbDuplicateKeyError extends ClicheDbError {
+  public static readonly ERROR_CODE = 400;
+  constructor() {
+    super('Write violates the collection\'s uniqueness constraints',
+      ClicheDbDuplicateKeyError.ERROR_CODE);
+  }
+}
 
 export interface PendingDoc {
   _pending?: boolean;
@@ -103,20 +110,14 @@ export class Collection<T extends Object> {
   // }
 
   async deleteOne(context: Context, filter: Query<T>): Promise<boolean> {
-
     switch (context.reqType) {
       case 'vote':
-        await this.getLockAndUpdate(filter, {
-          $set: {
-            _pendingDetails: {
-              reqId: context.reqId,
-              type: `delete-${this._name}`
-            }
-          }
-        });
+        // make sure doc exists and that no one else touches it before we commit
+        await this.getLockForUpdate(context, filter, 'delete');
 
         return true;
       case undefined:
+        // can't delete anything that's pending
         const res = await this._collection.deleteOne(
           this.getNotPendingFilter(filter));
 
@@ -129,7 +130,7 @@ export class Collection<T extends Object> {
         await this._collection.deleteOne(this.getReqIdPendingFilter(context));
         break;
       case 'abort':
-        await this.releasePendingLock(context);
+        await this.releaseLock(context);
         break;
     }
 
@@ -162,19 +163,24 @@ export class Collection<T extends Object> {
     options?: mongodb.CollectionInsertManyOptions): Promise<T[]> {
     switch (context.reqType) {
       case 'vote':
-        _.each(docs, (doc) => this.makePendingCreate(context, doc));
+        // indicate that the documents we're about to insert are still pending
+        _.each(docs, (doc) => this.setPendingCreate(context, doc));
         /* falls through */
       case undefined:
+        // TODO: handle errors when some doc ids violate uniqueness constraints
+        // should all not get inserted, or should the valid ones get inserted?
         await this._collection.insertMany(docs, options);
 
         return docs;
-      case 'commit': {
+      case 'commit':
+        // release lock/remove pending fields
+        // to indicate that the documents are now actually created
         await this._collection.updateMany(
           this.getReqIdPendingFilter(context), unsetPendingOp);
-      }
-      case 'abort': {
+        break;
+      case 'abort':
         await this._collection.deleteMany(this.getReqIdPendingFilter(context));
-      }
+        break;
     }
 
     return docs;
@@ -184,14 +190,24 @@ export class Collection<T extends Object> {
     options?: mongodb.CollectionInsertOneOptions): Promise<T> {
     switch (context.reqType) {
       case 'vote':
-        this.makePendingCreate(context, doc);
-      /* falls through */
+        // indicate that the document we're about to insert is still pending
+        this.setPendingCreate(context, doc);
+        /* falls through */
       case undefined:
-        await this._collection.insertOne(doc, options);
+        const insertResult: mongodb.InsertOneWriteOpResult =
+          await this._collection.insertOne(doc, options);
+
+        if (insertResult.insertedCount === 0) {
+          // TODO: if the insert fails does it necessarily mean
+          // it was a duplicate key error?
+          throw new ClicheDbDuplicateKeyError();
+        }
 
         return doc;
       case 'commit':
-        await this.releasePendingLock(context);
+        // release lock/remove pending fields
+        // to indicate that the document is now actually created
+        await this.releaseLock(context);
         break;
       case 'abort':
         await this._collection.deleteOne(this.getReqIdPendingFilter(context));
@@ -212,17 +228,14 @@ export class Collection<T extends Object> {
 
     switch (context.reqType) {
       case 'vote':
-        await this.getLockAndUpdate(filter, {
-          $set: {
-            _pendingDetails: {
-              reqId: context.reqId,
-              type: `update-${this._name}`
-            }
-          }
-        });
+        // make sure doc exists and that no one else touches it before we commit
+        await this.getLockForUpdate(context, filter, 'update');
 
         return true;
       case undefined:
+        // the filter only returns items that are not pending
+        // and if there are no matches, it means that some other tx
+        // owns the lock and is also performing an update, so this should fail
         const updateObj = await this._collection
           .updateOne(this.getNotPendingFilter(filter), update, options);
 
@@ -232,18 +245,29 @@ export class Collection<T extends Object> {
 
         return true;
       case 'commit':
+        // apply the update and remove the pending lock at the same time
         await this._collection.updateOne(this.getReqIdPendingFilter(context),
           { ...update, ...unsetPendingOp } as Object);
         break;
       case 'abort':
-        await this.releasePendingLock(context);
+        await this.releaseLock(context);
         break;
     }
 
     return undefined;
   }
 
+  /**
+   * Attempt to get the lock on the document given by the filter,
+   * and throws the appropriate exception if it fails.
+   * @param  filter the filter to get the desired document
+   * @return the promise that will resolve when the method is done
+   * @throws ClicheDbNotFoundError if the filter does not return any documents
+   * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
+   */
   private async getPendingLock(filter: Query<T>): Promise<void> {
+    // use the _pending field as the lock
+    // if it is set to true, that means someone owns the lock to that doc
     const pendingUpdateObj = await this._collection.updateOne(
         filter,
         { $set: { _pending: true } });
@@ -251,21 +275,43 @@ export class Collection<T extends Object> {
     if (pendingUpdateObj.matchedCount === 0) {
       throw new ClicheDbNotFoundError(this._name);
     }
+    // if nothing was modified, it means that _pending: true
+    // was already previously set, meaning some other tx has the lock so we fail
     if (pendingUpdateObj.modifiedCount === 0) {
       throw new ClicheDbConcurrentUpdateError();
     }
   }
 
-  private async releasePendingLock(context: Context): Promise<void> {
+  private async releaseLock(context: Context): Promise<void> {
     await this._collection.updateOne(
       this.getReqIdPendingFilter(context), unsetPendingOp);
   }
 
-  private async getLockAndUpdate(
-    filter: Query<T>, update: Object): Promise<void> {
+  /**
+   * Try to aquire the lock of a document for the given context.
+   *
+   * @param  context the context trying to acquire the lock
+   * @param  filter  the filter to get the document to lock
+   * @param  updateType whether the update is for an update or a delete
+   * @throws ClicheDbNotFoundError if the filter does not return any documents
+   * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
+   */
+  private async getLockForUpdate(context: Context,
+    filter: Query<T>, updateType: 'update' | 'delete'): Promise<void> {
+    // Get the lock on the document first, then udpate the document
+    // with the information from the context.
+    // Separating these actions allows us to differentiate between
+    // not found errors and concurrent update errors
     this.getPendingLock(filter);
     const updateResult = await this._collection
-      .updateOne(filter, update);
+      .updateOne(filter, {
+        $set: {
+          _pendingDetails: {
+            reqId: context.reqId,
+            type: `${updateType}-${this._name}`
+          }
+        }
+      });
 
     if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
       // Unknown because the update to get the lock
@@ -276,7 +322,11 @@ export class Collection<T extends Object> {
     }
   }
 
-  private async getReqIdPendingFilter(context: Context): Query<PendingDoc & T> {
+  /**
+   * Get the query for obtaining all the documents
+   * that the given context has the lock to
+   */
+  private getReqIdPendingFilter(context: Context): Query<PendingDoc & T> {
     return { '_pendingDetails.reqId': context.reqId };
   }
 
@@ -293,7 +343,15 @@ export class Collection<T extends Object> {
     });
   }
 
-  private makePendingCreate(context: Context, doc: PendingDoc & T): void {
+  /**
+   * Set the appropriate "pending" fields of the given document
+   * to indicate that it is still pending creation,
+   * i.e. it is not actually part of the collection yet,
+   * and that the given context owns the lock to the document.
+   * @param context the context trying to creating the document
+   * @param doc the document to create and on which to set pending fields
+   */
+  private setPendingCreate(context: Context, doc: PendingDoc & T): void {
     doc._pending = true;
     doc._pendingDetails = {
       reqId: context.reqId,
@@ -311,6 +369,9 @@ export class ClicheDb {
     this._db = db;
   }
 
+  /**
+   * Get the collection with the given name from the database.
+   */
   collection(name: string): Collection<any> {
     if (!this._collections.has(name)) {
       this._collections.set(name, new Collection(this._db, name));
