@@ -165,7 +165,7 @@ export function toNgTemplate(
   };
   const recurse = (expr) => expr.toNgTemplate();
   const binOpToStr = (leftExpr, op, rightExpr) => {
-    const opTransformMap = { gt: '>', gte: '>=', lt: '<', lte: '<=' };
+    const opTransformMap = { gt: '>', 'gt=': '>=', lt: '<', 'lt=': '<=' };
     const transformedOpString = opTransformMap[op.sourceString] ?
       opTransformMap[op.sourceString] : op.sourceString;
 

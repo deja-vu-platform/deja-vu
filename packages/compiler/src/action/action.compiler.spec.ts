@@ -186,6 +186,9 @@ describe('ActionCompiler', () => {
       .toBe(1);
     expect(compiledAction.actionInputs[0].ngTemplate)
       .toMatch(`${appName}-action`);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .not
+      .toMatch(`lt`);
   });
 
   it('should compile action with input action with dv.if', () => {
@@ -201,7 +204,7 @@ describe('ActionCompiler', () => {
         <transfer.show-balance />
         <dv.for elems=[1, 2, 3]
         showElem= <dv.if
-          condition=$elem gt transfer.show-balance.fetchedBalance>
+          condition=$elem gt= transfer.show-balance.fetchedBalance>
           <${appName}.action reward=$elem />
         </dv.if>
         />
@@ -222,6 +225,9 @@ describe('ActionCompiler', () => {
       .toMatch(/@Input\(\) elem/);
     expect(compiledAction.actionInputs[0].ngTemplate)
       .toMatch(`${appName}-action`);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .not
+      .toMatch(`gt`);
   });
 
   it('should compile action with actions', () => {
