@@ -1,0 +1,9 @@
+<div *ngIf="showElem">
+  <div *ngFor="let elem of elems">
+    <dv-include
+      [action]="showElem"
+      [inputs]="{ elem: elem }"
+      [parent]="forComponent" no-default-showElem>
+    </dv-include>
+  </div>
+</div>
