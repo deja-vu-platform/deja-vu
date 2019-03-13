@@ -65,7 +65,7 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
       }
       this.gs.get<MarkerCountRes>(this.apiPath, {
         params: {
-          inputs: { input: filter }
+          inputs: JSON.stringify({ input: filter })
         }
       })
         .pipe(map((res: MarkerCountRes) => res.data.markerCount))

@@ -77,12 +77,12 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-comments': (extraInfo) => `
-    query ShowComments($input: CommentsInput) {
+    query ShowComments($input: CommentsInput!) {
       comments(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-comment-count': (extraInfo) => `
-    query ShowCommentCount($input: CommentsInput) {
+    query ShowCommentCount($input: CommentsInput!) {
       commentCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `

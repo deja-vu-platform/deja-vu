@@ -56,11 +56,11 @@ export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<GroupCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               withMemberId: this.withMemberId
             }
-          }
+          })
         }
       })
         .pipe(map((res: GroupCountRes) => res.data.groupCount))

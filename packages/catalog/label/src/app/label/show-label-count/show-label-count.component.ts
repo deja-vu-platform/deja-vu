@@ -56,11 +56,11 @@ export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<LabelCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               itemId: this.itemId
             }
-          }
+          })
         }
       })
         .pipe(map((res: LabelCountRes) => res.data.labelCount))

@@ -68,22 +68,22 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-groups': (extraInfo) => `
-    query ShowGroups($input: GroupsInput) {
+    query ShowGroups($input: GroupsInput!) {
       groups(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-group-count': (extraInfo) => `
-    query ShowGroupCount($input: GroupsInput) {
+    query ShowGroupCount($input: GroupsInput!) {
       groupCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-members': (extraInfo) => `
-    query ShowMembers($input: MembersInput) {
+    query ShowMembers($input: MembersInput!) {
       members(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-member-count': (extraInfo) => `
-    query ShowMemberCount($input: MembersInput) {
+    query ShowMemberCount($input: MembersInput!) {
       memberCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `

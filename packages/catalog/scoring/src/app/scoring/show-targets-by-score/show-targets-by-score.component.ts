@@ -79,12 +79,12 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
     if (this.canEval()) {
       this.gs.get<{ data: { targetsByScore: Target[] } }>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               asc: this.showAscending,
               targetIds: this.targetIds
             }
-          },
+          }),
           extraInfo: {
             returnFields: `
               id

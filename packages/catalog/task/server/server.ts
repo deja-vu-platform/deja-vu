@@ -49,12 +49,12 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-tasks': (extraInfo) => `
-    query ShowTasks($input: TasksInput) {
+    query ShowTasks($input: TasksInput!) {
       tasks(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-task-count': (extraInfo) => `
-    query ShowTaskCount($input: TasksInput) {
+    query ShowTaskCount($input: TasksInput!) {
       taskCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,

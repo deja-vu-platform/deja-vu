@@ -57,12 +57,12 @@ export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<CommentCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               byAuthorId: this.byAuthorId,
               ofTargetId: this.ofTargetId
             }
-          }
+          })
         }
       })
         .pipe(map((res: CommentCountRes) => res.data.commentCount))

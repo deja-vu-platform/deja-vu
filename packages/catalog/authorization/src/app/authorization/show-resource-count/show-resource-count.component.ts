@@ -57,12 +57,12 @@ export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<ResourceCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               createdBy: this.createdBy,
               viewableBy: this.viewableBy
             }
-          }
+          })
         }
       })
         .pipe(map((res: ResourceCountRes) => res.data.resourceCount))

@@ -71,11 +71,11 @@ export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{ data: { members: string[] } }>('/graphql', {
           params: {
-            inputs: {
+            inputs: JSON.stringify({
               input: {
                 inGroupId: this.inGroupId
               }
-            }
+            })
           }
         })
         .subscribe((res) => {

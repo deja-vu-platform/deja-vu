@@ -68,12 +68,12 @@ OnChanges {
     if (this.canEval()) {
       this.gs.get<ResourcesRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               createdBy: this.createdBy,
               viewableBy: this.viewableBy
             }
-          },
+          }),
           extraInfo: { returnFields: 'id' }
         }
       })

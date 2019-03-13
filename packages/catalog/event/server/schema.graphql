@@ -39,7 +39,7 @@ input CreateSeriesInput {
 
 type Query {
   events(input: EventsInput!): [Event!]
-  eventCount(input: EventsInput): Int
+  eventCount(input: EventsInput!): Int
   series: [Series!]
   event(id: ID!): Event
   oneSeries(id: ID!): Series

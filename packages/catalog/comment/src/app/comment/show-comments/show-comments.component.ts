@@ -62,12 +62,12 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
       this.gs
         .get<CommentsRes>(this.apiPath, {
           params: {
-            inputs: {
+            inputs: JSON.stringify({
               input: {
                 byAuthorId: this.byAuthorId,
                 ofTargetId: this.ofTargetId
               }
-            },
+            }),
             extraInfo: {
               returnFields: `
                 ${this.showId ? 'id' : ''}

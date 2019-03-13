@@ -50,13 +50,13 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'items':
         return `
-          query SearchItemsByLabel($input: ItemsInput) {
+          query SearchItemsByLabel($input: ItemsInput!) {
             items(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
       case 'labels':
         return `
-          query SearchItemsByLabel($input: LabelsInput) {
+          query SearchItemsByLabel($input: LabelsInput!) {
             labels(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
@@ -65,22 +65,22 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-items': (extraInfo) => `
-    query ShowItems($input: ItemsInput) {
+    query ShowItems($input: ItemsInput!) {
       items(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-item-count': (extraInfo) => `
-    query ShowItemCount($input: ItemsInput) {
+    query ShowItemCount($input: ItemsInput!) {
       itemCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-labels': (extraInfo) => `
-    query ShowLabels($input: LabelsInput) {
+    query ShowLabels($input: LabelsInput!) {
       labels(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-label-count': (extraInfo) => `
-    query ShowLabelCount($input: LabelsInput) {
+    query ShowLabelCount($input: LabelsInput!) {
       labelCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `

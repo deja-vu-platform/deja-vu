@@ -96,12 +96,12 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-resource-count': (extraInfo) => `
-    query ShowResourceCount($input: ResourcesInput) {
+    query ShowResourceCount($input: ResourcesInput!) {
       resourceCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-resources': (extraInfo) => `
-    query ShowResources($input: ResourcesInput) {
+    query ShowResources($input: ResourcesInput!) {
       resources(input: $input) ${getReturnFields(extraInfo)}
     }
   `

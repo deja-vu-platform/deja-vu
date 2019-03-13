@@ -82,7 +82,7 @@ OnChanges {
       this.gs
         .get<{data: {tasks: Task[]}}>('/graphql', {
           params: {
-            inputs: {
+            inputs: JSON.stringify({
               input: {
                 assigneeId: this.assigneeId,
                 assignerId: this.assignerId,
@@ -90,7 +90,7 @@ OnChanges {
                 assigned: this.assigned,
                 completed: this.completed
               }
-            },
+            }),
             extraInfo: {
               returnFields: `
                 ${this.showId ? 'id' : ''}

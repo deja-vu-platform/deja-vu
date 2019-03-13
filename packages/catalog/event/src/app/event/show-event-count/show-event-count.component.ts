@@ -57,12 +57,12 @@ export class ShowEventCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<EventCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               startDate: this.startDateFilter,
               endDate: this.endDateFilter
             }
-          }
+          })
         }
       })
         .pipe(map((res: EventCountRes) => res.data.eventCount))

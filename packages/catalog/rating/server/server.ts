@@ -45,12 +45,12 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-rating-count': (extraInfo) => `
-    query ShowRatingCount($input: RatingsInput) {
+    query ShowRatingCount($input: RatingsInput!) {
       ratingCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-ratings-by-target': (extraInfo) => `
-    query ShowRatingsByTarget($input: RatingsInput) {
+    query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
     }
   `

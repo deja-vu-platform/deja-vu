@@ -81,7 +81,7 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-follower-count': (extraInfo) => `
-    query ShowFollowers($input: FollowersInput) {
+    query ShowFollowerCount($input: FollowersInput!) {
       followerCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
@@ -91,17 +91,17 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-message-count': (extraInfo) => `
-    query ShowMessages($input: MessagesInput) {
+    query ShowMessageCount($input: MessagesInput!) {
       messageCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-publishers': (extraInfo) => `
-    query ShowPublishers($input: PublishersInput!) {
+    query ShowPublisherCount($input: PublishersInput!) {
       publishers(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-publisher-count': (extraInfo) => `
-    query ShowPublishers($input: PublishersInput) {
+    query ShowPublishers($input: PublishersInput!) {
       publisherCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `

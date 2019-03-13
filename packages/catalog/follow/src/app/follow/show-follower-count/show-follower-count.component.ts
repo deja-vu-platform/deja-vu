@@ -56,11 +56,11 @@ export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<FollowerCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               ofPublisherId: this.ofPublisherId
             }
-          }
+          })
         }
       })
         .pipe(map((res: FollowerCountRes) => res.data.followerCount))

@@ -61,11 +61,11 @@ OnInit, OnChanges {
     if (this.canEval()) {
       this.gs.get<RatingsRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               ofTargetId: this.targetId
             }
-          },
+          }),
           extraInfo: {
             returnFields: `
               sourceId

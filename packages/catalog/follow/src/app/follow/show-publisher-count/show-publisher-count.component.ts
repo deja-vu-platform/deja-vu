@@ -56,11 +56,11 @@ export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<PublisherCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               followedById: this.followedById
             }
-          }
+          })
         }
       })
         .pipe(map((res: PublisherCountRes) => res.data.publisherCount))

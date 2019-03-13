@@ -46,13 +46,8 @@ const actionRequestTable: ActionRequestTable = {
       target(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
-  'show-target-count': (extraInfo) => `
-    query ShowTargetCount($input: TargetsByScoreInput) {
-      targetCount(input: $input) ${getReturnFields(extraInfo)}
-    }
-  `,
   'show-targets-by-score': (extraInfo) => `
-    query ShowTargetsByScore($input: TargetsByScoreInput) {
+    query ShowTargetsByScore($input: TargetsByScoreInput!) {
       targetsByScore(input: $input) ${getReturnFields(extraInfo)}
     }
   `

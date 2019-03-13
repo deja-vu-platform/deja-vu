@@ -23,8 +23,8 @@ input MarkersInput {
 
 type Query {
   marker(id: ID!): Marker
-  markers(input: MarkersInput): [Marker]
-  markerCount(input: MarkersInput): Int
+  markers(input: MarkersInput!): [Marker]
+  markerCount(input: MarkersInput!): Int
 }
 
 type Mutation {

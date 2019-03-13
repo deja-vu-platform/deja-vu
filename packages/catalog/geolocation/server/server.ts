@@ -53,7 +53,7 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-marker-count': (extraInfo) => `
-    query ShowMarkerCount($input: MarkersInput) {
+    query ShowMarkerCount($input: MarkersInput!) {
       markerCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `

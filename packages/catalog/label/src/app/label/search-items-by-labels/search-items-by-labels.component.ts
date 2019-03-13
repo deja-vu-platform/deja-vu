@@ -98,11 +98,11 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
   async dvOnExec(): Promise<void> {
     this.gs.get<ItemsRes>(this.apiPath, {
       params: {
-        inputs: {
+        inputs: JSON.stringify({
           input: {
             labelIds: this.selectedLabelIds
           }
-        },
+        }),
         extraInfo: { action: 'items' }
       }
     })
@@ -121,7 +121,7 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
     if (this.canEval()) {
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
-          inputs: { input: {} },
+          inputs: JSON.stringify({ input: {} }),
           extraInfo: {
             action: 'labels',
             returnFields: 'id'

@@ -41,13 +41,13 @@ input FollowUnfollowInput {
 
 type Query {
   followers(input: FollowersInput!): [ID]
-  followerCount(input: FollowersInput): Int
+  followerCount(input: FollowersInput!): Int
   publisher(id: ID!): Publisher
-  publishers(input: PublishersInput): [Publisher]
-  publisherCount(input: PublishersInput): Int
+  publishers(input: PublishersInput!): [Publisher]
+  publisherCount(input: PublishersInput!): Int
   message(id: ID!): Message
   messages(input: MessagesInput!): [Message]
-  messageCount(input: MessagesInput): Int
+  messageCount(input: MessagesInput!): Int
   isFollowing(input: FollowUnfollowInput!): Boolean
 }
 

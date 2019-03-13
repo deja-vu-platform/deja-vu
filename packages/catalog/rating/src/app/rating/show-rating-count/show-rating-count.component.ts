@@ -57,12 +57,12 @@ export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<RatingCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               bySourceId: this.bySourceId,
               ofTargetId: this.ofTargetId
             }
-          }
+          })
         }
       })
         .pipe(map((res: RatingCountRes) => res.data.ratingCount))

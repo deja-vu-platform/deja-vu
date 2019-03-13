@@ -54,9 +54,7 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<ItemCountRes>(this.apiPath, {
         params: {
-          inputs: {
-            input: {}
-          }
+          inputs: JSON.stringify({ input: {} })
         }
       })
         .pipe(map((res: ItemCountRes) => res.data.itemCount))

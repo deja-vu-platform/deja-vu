@@ -57,12 +57,12 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<MessageCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               byPublisherId: this.byPublisherId,
               ofPublishersFollowedById: this.ofPublishersFollowedById
             }
-          }
+          })
         }
       })
         .pipe(map((res: MessageCountRes) => res.data.messageCount))

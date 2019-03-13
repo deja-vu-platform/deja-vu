@@ -61,7 +61,7 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
     if (this.canEval()) {
       this.gs.get<TaskCountRes>(this.apiPath, {
         params: {
-          inputs: {
+          inputs: JSON.stringify({
             input: {
               assigneeId: this.assigneeId,
               assignerId: this.assignerId,
@@ -69,7 +69,7 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
               assigned: this.assigned,
               completed: this.completed
             }
-          }
+          })
         }
       })
         .pipe(map((res: TaskCountRes) => res.data.taskCount))
