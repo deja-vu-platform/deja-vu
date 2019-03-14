@@ -299,7 +299,7 @@ export class ActionInstance {
       // contains (action input, cliche action only but no need to check this)
       || _.some(
           _.pickBy(this.inputSettings, (_v, k) => k in this.of.actionInputs),
-          (a: ActionInstance) => a.isOrContains(actionDefinition, deep)
+          (a: ActionInstance) => a && a.isOrContains(actionDefinition, deep)
         )
     );
   }

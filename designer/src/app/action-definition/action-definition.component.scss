@@ -79,8 +79,7 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 }
 
 .popup-menu {
-  height: 250px;
-  width: 268px; // in needs a fixed size; this is the biggest that works
+  height: 100%;
   mat-form-field {
     width: 100%;
   }

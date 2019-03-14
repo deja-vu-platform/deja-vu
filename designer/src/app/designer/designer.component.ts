@@ -141,56 +141,90 @@ export class DesignerComponent implements OnInit, OnDestroy {
    * Must run in constructor
    */
   private configureDragula() {
+    // drag actions on the page to add them
+    // drag them between rows to move them
     this.dragulaService.createGroup('action', {
+      moves: (el, source) => source.classList.contains('action-list')
+        || source.classList.contains('dvd-row'),
       // we use copy to prevent depletion of the action list
       copy: (el, source) => source.classList.contains('action-list'),
-      // you can *only* drag into rows
-      accepts: (el, target) => target.classList.contains('dvd-row'),
+      accepts: (el, target) => target.classList.contains('dvd-row')
+        || target.classList.contains('action-input'),
       // if you drag outside of a row the action gets removed
       removeOnSpill: true
     });
 
     this.dragulaService.drop('action')
       .subscribe(({ el, source, target }) => {
-        // find target row
-        let toRowIdx = parseInt(target['dataset'].index, 10);
-        if (toRowIdx === this.openAction.rows.length) {
-          toRowIdx = -1;
-        }
-        const toRow = this.openAction.rows[toRowIdx] || new Row();
+        if (target.classList.contains('dvd-row')) {
+          // find source action
+          let action: ActionInstance;
+          if (source.classList.contains('action-list')) {
+            // dragging in a new action
+            const {
+              source: sourceName,
+              action: actionName,
+              disabled
+            } = el['dataset'];
+            if (disabled !== 'true') {
+              action = this.app.newActionInstanceByName(actionName, sourceName);
+            }
+          } else if (source.classList.contains('dvd-row')) {
+            // moving an action
+            const fromRowIdx = parseInt(source['dataset'].index, 10);
+            const actionIdx = parseInt(el['dataset'].index, 10);
+            action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+          }
 
-        let action: ActionInstance;
-        if (source.classList.contains('action-list')) {
-          // dragging in a new action
+          if (action) {
+            // find target row
+            let toRowIdx = parseInt(target['dataset'].index, 10);
+            if (toRowIdx === this.openAction.rows.length) {
+              toRowIdx = -1;
+            }
+            const toRow = this.openAction.rows[toRowIdx] || new Row();
+            toRow.addAction(action);
+            if (toRowIdx === -1) {
+              this.openAction.rows.push(toRow);
+            }
+          }
+        } else if (
+          target.classList.contains('action-input')
+          && source.classList.contains('action-list')
+        ) {
           const {
             source: sourceName,
             action: actionName,
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            action = this.app.newActionInstanceByName(actionName, sourceName);
+            target.dispatchEvent(new CustomEvent('inputAction', {
+              detail: { sourceName, actionName }
+            }));
           }
-        } else {
-          // moving an action
-          const fromRowIdx = parseInt(source['dataset'].index, 10);
-          const actionIdx = parseInt(el['dataset'].index, 10);
-          action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
         }
-
-        toRow.addAction(action);
-        if (toRowIdx === -1) {
-          this.openAction.rows.push(toRow);
-        }
-
+        // TODO: to action input
         el.parentNode.removeChild(el); // delete copy that Dragula leaves
       });
 
     // handle dropping an action outside the page (remove it)
     this.dragulaService.remove('action')
       .subscribe(({ el, source }) => {
-        const fromRowIdx = parseInt(source['dataset'].index, 10);
-        const actionIdx = parseInt(el['dataset'].index, 10);
-        this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+        if (source.classList.contains('dvd-row')) {
+          const fromRowIdx = parseInt(source['dataset'].index, 10);
+          const actionIdx = parseInt(el['dataset'].index, 10);
+          this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+        }
+      });
+
+    // drag away an inputted action to remove it
+    this.dragulaService.createGroup('inputted-action', {
+      moves: (el) => el.classList.contains('inputted-action'),
+      removeOnSpill: true
+    });
+    this.dragulaService.remove('inputted-action')
+      .subscribe(({ source }) => {
+        source.dispatchEvent(new CustomEvent('unInputAction'));
       });
   }
 }

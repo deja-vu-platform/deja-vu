@@ -1,13 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatMenuTrigger } from '@angular/material';
 import * as _ from 'lodash';
-import * as uuidv4 from 'uuid/v4';
 
 import { ActionInstance, App, AppActionDefinition } from '../datatypes';
-import {
-  DialogData as InputActionDialogData,
-  InputActionComponent
-} from '../input-action/input-action.component';
 import {
   DialogData as TextDialogData,
   TextComponent
@@ -39,28 +34,20 @@ export class SetInputsComponent implements OnChanges {
     this.actionInputs = actionInputs;
   }
 
-  /**
-   * Open the menu for passing in an action
-   */
-  inputAction(inputName: string) {
-    // arguments
-    const data: InputActionDialogData = {
-      app: this.app,
-      currentValue: <ActionInstance>this
-        .actionInstance.inputSettings[inputName],
-      openAction: this.openAction
-    };
-    // open the menu
-    const dialogRef = this.dialog.open(InputActionComponent, {
-      width: '50vw',
-      data
-    });
-    // update the input setting
-    dialogRef.afterClosed()
-      .subscribe(() => {
-        this.actionInstance.inputSettings[inputName] =
-          dialogRef.componentInstance.actionInstance;
-      });
+  inputAction(inputName: string, event: CustomEvent) {
+    this.actionInstance.inputSettings[inputName] =
+      this.app.newActionInstanceByName(
+        event.detail.actionName,
+        event.detail.sourceName
+      );
+  }
+
+  unInputAction(inputName: string) {
+    this.actionInstance.inputSettings[inputName] = undefined;
+  }
+
+  closeMenu(trigger: MatMenuTrigger) {
+    trigger.closeMenu();
   }
 
   openTextEditor() {

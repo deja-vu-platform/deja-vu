@@ -6,11 +6,10 @@
     </mat-checkbox>
   </div>
 
-  <div *ngIf="actionInstance.isText" class="action-input mat-form-field">
+  <div *ngIf="actionInstance.isText" class="text-input mat-form-field">
     <button
       mat-button
-      class="replace-action"
-      matTooltip="Edit Text"
+      class="edit-text"
       (click)="openTextEditor()"
     >
       <span class="value">
@@ -19,18 +18,35 @@
     </button>
   </div>
 
-  <div *ngFor="let input of actionInputs" class="action-input mat-form-field">
-    <button
-      mat-button
-      class="replace-action"
-      matTooltip="Replace Action"
-      (click)="inputAction(input)"
+  <div
+    *ngFor="let input of actionInputs"
+    class="action-input mat-form-field"
+    dragula="action"
+    (inputAction)="inputAction(input, $event)"
+  >
+    <span class="prompt no-drag">Replace {{input}}</span>
+    <div
+      *ngIf="actionInstance.inputSettings[input]"
+      dragula="inputted-action"
+      (unInputAction)="unInputAction(input)"
     >
-      <span class="name">{{ input + ':'}}</span>
-      <span class="value">
-        {{ actionInstance.inputSettings[input]?.fqtag || 'Default' }}
-      </span>
-    </button>
+      <span class="reminder no-drag">{{input}}</span>
+      <button mat-button
+        class="inputted-action"
+        #menuTrigger="matMenuTrigger"
+        [matMenuTriggerFor]="menu.matMenu"
+      >
+        {{actionInstance.inputSettings[input].fqtag}}
+      </button>
+      <app-floating-menu #menu (shouldClose)="closeMenu(menuTrigger)">
+        <!-- TODO: list args -->
+        <app-set-inputs
+          [app]="app"
+          [actionInstance]="actionInstance.inputSettings[input]"
+          [openAction]="openAction"
+        ></app-set-inputs>
+      </app-floating-menu>
+    </div>
   </div>
 
   <mat-form-field *ngFor="let input of expressionInputs" class="expression-input">

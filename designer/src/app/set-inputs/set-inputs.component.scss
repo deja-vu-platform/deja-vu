@@ -6,14 +6,71 @@
   padding: 16px;
 }
 
-button.replace-action {
+$action-input-padding: 4px;
+.action-input {
+  border: 1px dashed lightgray;
+  height: 45.5px; // chosen to be consistent with mat inputs
+  // 20px chosen to be consistent with mat inputs
+  // -1px lets us align reminder of field name texts
+  margin: 20px -1px;
+
+  // put a bit of space around the interior button
+  // we want the reminder text to disappear on button hover only
+  // so we need to use negative position to offset the padding
+  padding: $action-input-padding;
+  > div {
+    position: relative;
+    > .reminder {
+      position: absolute;
+      top: -$action-input-padding;
+      left: -$action-input-padding;
+      color: #4756B1;
+      font-size: 75%;
+      cursor: default;
+    }
+    &:hover {
+      .reminder {
+        display: none;
+      }
+    }
+    // needed so that button can fill the area
+    width: 100%;
+    height: 100%;
+  }
+
+  // center content 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .prompt {
+    color: #757575; // mat input placeholder color
+    cursor: default;
+    // hide the prompt message when an action is dragged in
+    &:not(:only-child) {
+      display: none;
+    }
+  }
+
+  button {
+    width: 100%;
+    height: 100%;
+    span {
+      line-height: 100%; // override mat default to make text fit
+    }
+    &:focus {
+      outline: 0;
+    }
+  }
+}
+
+.edit-text {
   width: 100%;
   padding-left: 0;
   text-align: left;
   font-weight: normal;
   font-size: 16px;
-}
-
-button.replace-action .name {
-  color: #757575;
+  .name {
+    color: #757575;
+  }
 }

@@ -31,9 +31,6 @@ import {
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import {
-  InputActionComponent
-} from './input-action/input-action.component';
-import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
@@ -52,13 +49,12 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     AppComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
+    DesignerComponent,
+    FloatingMenuComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent,
-    FloatingMenuComponent,
-    DesignerComponent
+    TopBarComponent
   ],
   imports: [
     BrowserModule,
@@ -85,7 +81,6 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     ActionInstanceComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
     TextComponent
   ].concat(dvCoreActions)
 })

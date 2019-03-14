@@ -1,3 +1,10 @@
+.floating-menu {
+  height: 250px;
+  width: 256px; // chosen emperically
+  display: flex;
+  flex-direction: column;
+}
+
 .top-bar {
   display: flex;
   border-bottom: 1px solid black;
@@ -12,4 +19,9 @@
     background: lightgray;
     cursor: grab;
   }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
 }
