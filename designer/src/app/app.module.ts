@@ -9,6 +9,7 @@ import { QuillModule } from 'ngx-quill';
 
 import { DvModule, GATEWAY_URL } from '@deja-vu/core';
 
+import { AppRoutingModule } from './app-routing.module';
 import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';
 
@@ -27,6 +28,8 @@ import {
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
+import { DesignerComponent } from './designer/designer.component';
+import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import {
   InputActionComponent
 } from './input-action/input-action.component';
@@ -53,7 +56,9 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent
+    TopBarComponent,
+    FloatingMenuComponent,
+    DesignerComponent
   ],
   imports: [
     BrowserModule,
@@ -64,7 +69,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     NgxElectronModule,
     QuillModule,
     DvModule,
-    ClicheModule
+    ClicheModule,
+    AppRoutingModule
   ],
   providers: [
     {

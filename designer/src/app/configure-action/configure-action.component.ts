@@ -5,7 +5,13 @@ import {
 } from '@angular/material';
 import * as _ from 'lodash';
 
-import { App, AppActionDefinition, IO } from '../datatypes';
+import {
+  App,
+  AppActionDefinition,
+  AppActionStyles,
+  defaultAppActionStyles,
+  IO
+} from '../datatypes';
 
 interface ControlGroup {
   form: { valid: boolean };
@@ -28,6 +34,7 @@ export class ConfigureActionComponent implements OnInit {
   page: boolean;
   home: boolean;
   transaction: boolean;
+  styles: AppActionStyles = defaultAppActionStyles;
 
   readonly ioTypes: IOType[] = ['Input', 'Output']; // fixed, not state
   readonly currentIO = { Input: <IO[]>[], Output: <IO[]>[] };
@@ -40,6 +47,7 @@ export class ConfigureActionComponent implements OnInit {
   ngOnInit() {
     if (this.data.action) {
       this.name = this.data.action.name;
+      this.styles = _.cloneDeep(this.data.action.styles);
       this.page = this.actionIsPage();
       this.home = this.data.app.homepage === this.data.action;
       this.transaction = this.data.action.transaction;
@@ -124,6 +132,8 @@ export class ConfigureActionComponent implements OnInit {
         }
       });
     });
+
+    Object.assign(action.styles, this.styles);
 
     this.dialogRef.close();
   }

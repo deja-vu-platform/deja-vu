@@ -12,6 +12,7 @@ import { ButtonComponent } from './button/button.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
+import { ForComponent } from './for/for.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
 import { GenIdsComponent } from './gen-ids/gen-ids.component';
@@ -29,8 +30,8 @@ import { StatusComponent } from './status/status.component';
 import { TxComponent } from './tx/tx.component';
 import { ZipComponent } from './zip/zip.component';
 
-import { OfDirective } from './of.directive';
 import { ConfigService } from './config.service';
+import { OfDirective } from './of.directive';
 
 
 const allComponents = [
@@ -38,7 +39,8 @@ const allComponents = [
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
-  RedirectComponent, ZipComponent, ShowCountComponent
+  RedirectComponent, ZipComponent, ShowCountComponent,
+  ForComponent
 ];
 
 @NgModule({

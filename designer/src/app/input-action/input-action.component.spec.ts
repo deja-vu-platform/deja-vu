@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
+  MatCheckboxModule,
   MatDialogModule,
   MatDialogRef,
   MatSelectModule
@@ -23,6 +24,7 @@ describe('InputActionComponent', () => {
       ],
       imports: [
         FormsModule,
+        MatCheckboxModule,
         MatDialogModule,
         MatSelectModule
       ],

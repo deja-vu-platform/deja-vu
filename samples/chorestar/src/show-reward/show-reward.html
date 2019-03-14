@@ -1,0 +1,23 @@
+<dv.action name="show-reward">
+  <div class="row">
+    <div class="col-md-4">
+      <reward.show-object object=$reward showOnly=['name'] />
+    </div>
+    <div class="col-md-4">
+      <i class="material-icons icon">star_rate</i>
+      <reward.show-object object=$reward showOnly=['cost'] />
+    </div>
+    <div class="col-md-4">
+      <dv.if condition=$showOptionToPurchase>
+      <!-- TODO: check here -->
+        <transfer.add-to-balance
+          showOptionToInputAccountId=false
+          showOptionToInputBalance=false
+          accountId=$user.id
+          amount=-1 * $reward.cost
+          buttonLabel="Purchase"
+          newTransferSavedText="Reward purchased." />
+      </dv.if>
+    </div>
+  </div>
+</dv.action>

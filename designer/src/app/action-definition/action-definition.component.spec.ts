@@ -1,12 +1,23 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatInputModule, MatMenuModule } from '@angular/material';
+import {
+  MatCheckboxModule,
+  MatIconModule,
+  MatInputModule,
+  MatMenuModule,
+  MatSelectModule,
+  MatTabsModule
+} from '@angular/material';
+import { RunService } from '@deja-vu/core';
 
 import { ActionDefinitionComponent } from './action-definition.component';
 
 import {
   ActionInstanceComponent
 } from '../action-instance/action-instance.component';
+import {
+  FloatingMenuComponent
+} from '../floating-menu/floating-menu.component';
 import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 
 describe('ActionDefinitionComponent', () => {
@@ -18,12 +29,20 @@ describe('ActionDefinitionComponent', () => {
       declarations: [
         ActionDefinitionComponent,
         ActionInstanceComponent,
+        FloatingMenuComponent,
         SetInputsComponent
       ],
       imports: [
         FormsModule,
+        MatCheckboxModule,
+        MatMenuModule,
+        MatIconModule,
         MatInputModule,
-        MatMenuModule
+        MatSelectModule,
+        MatTabsModule
+      ],
+      providers: [
+        { provide: RunService, useValue: {} }
       ]
     })
     .compileComponents();

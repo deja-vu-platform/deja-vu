@@ -60,6 +60,7 @@
     "packages/*",
     "packages/catalog/*",
     "samples/chorestar",
+    "samples/chorestar/.dv",
     "samples/hackernews",
     "samples/hackernews/.dv",
     "samples/listify",

@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, RunService
+  Action, GatewayService, GatewayServiceFactory, OnExecSuccess, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -20,7 +20,7 @@ import { API_PATH } from '../property.config';
   templateUrl: './choose-object.component.html',
   styleUrls: ['./choose-object.component.css']
 })
-export class ChooseObjectComponent implements OnInit {
+export class ChooseObjectComponent implements OnInit, OnExecSuccess {
   @Input() chooseObjectSelectPlaceholder = 'Choose Object';
   @Input() showObject: Action = {
     type: <Type<Component>> ShowObjectComponent
@@ -28,6 +28,9 @@ export class ChooseObjectComponent implements OnInit {
   @Input() showOnly: string[];
   @Input() showExclude: string[];
   @Input() showBaseUrlsOnly: boolean = false;
+  @Input() execOnSelection = true;
+  @Input() resetOnExecSuccess = false;
+
   @Output() objects = new EventEmitter<Object[]>();
   _objects: Object[] = [];
 
@@ -105,6 +108,14 @@ export class ChooseObjectComponent implements OnInit {
   updateSelected(id: string) {
     this._selectedObjectId = id;
     this.selectedObjectId.emit(id);
-    setTimeout(() => this.rs.exec(this.elem));
+    if (this.execOnSelection) {
+      setTimeout(() => this.rs.exec(this.elem));
+    }
+  }
+
+  dvOnExecSuccess() {
+    if (this.resetOnExecSuccess) {
+      this._selectedObjectId = null;
+    }
   }
 }

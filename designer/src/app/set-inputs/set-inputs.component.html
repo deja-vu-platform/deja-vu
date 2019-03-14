@@ -1,35 +1,44 @@
 <div class="set-inputs" *ngIf="actionInstance">
-  <ng-container *ngFor="let input of actionInstance.of.inputs">
 
-    <mat-form-field
-      *ngIf="!actionInstance.of.actionInputs[input]"
-      class="expression-input"
+  <div *ngIf="actionInstance.styles" class="style-input mat-form-field">
+    <mat-checkbox [(ngModel)]="actionInstance.styles.stretch">
+      Stretch
+    </mat-checkbox>
+  </div>
+
+  <div *ngIf="actionInstance.isText" class="action-input mat-form-field">
+    <button
+      mat-button
+      class="replace-action"
+      matTooltip="Edit Text"
+      (click)="openTextEditor()"
     >
-      <input
-        matInput
-        class="input-value"
-        [placeholder]="input"
-        [name]="input"
-        [(ngModel)]="actionInstance.inputSettings[input]">
-    </mat-form-field>
+      <span class="value">
+        Edit Content
+      </span>
+    </button>
+  </div>
 
-    <div
-      *ngIf="actionInstance.of.actionInputs[input]"
-      class="action-input"
+  <div *ngFor="let input of actionInputs" class="action-input mat-form-field">
+    <button
+      mat-button
+      class="replace-action"
+      matTooltip="Replace Action"
+      (click)="inputAction(input)"
     >
-      <!-- TODO: pass in action component -->
-      <button
-        mat-button
-        class="replace-action"
-        matTooltip="Replace Action"
-        (click)="inputAction(input)"
-      >
-        <span class="name">{{ input + ':'}}</span>
-        <span class="value">
-          {{ actionInstance.inputSettings[input]?.fqtag || 'Default' }}
-        </span>
-      </button>
-    </div>
+      <span class="name">{{ input + ':'}}</span>
+      <span class="value">
+        {{ actionInstance.inputSettings[input]?.fqtag || 'Default' }}
+      </span>
+    </button>
+  </div>
 
-  </ng-container>
+  <mat-form-field *ngFor="let input of expressionInputs" class="expression-input">
+    <input
+      matInput
+      class="input-value"
+      [placeholder]="input"
+      [name]="input"
+      [(ngModel)]="actionInstance.inputSettings[input]">
+  </mat-form-field>
 </div>
