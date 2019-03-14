@@ -494,7 +494,8 @@ describe('ActionCompiler', () => {
       .toMatch(`show-event`);
   });
 
-  /* TODO: fix the parsing bug exposed by this test
+  /* TODO: fix the parsing bug exposed by this test.
+      The action fails to parse when `assigneeId=...` appears first
   it('should compile action with action input with inputs', () => {
     const st: SymbolTable = {
       task: {
