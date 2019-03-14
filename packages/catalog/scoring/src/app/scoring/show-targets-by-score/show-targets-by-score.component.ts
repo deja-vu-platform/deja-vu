@@ -103,6 +103,7 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
       })
         .subscribe((res) => {
           this.targets = res.data.targetsByScore;
+          this.loadedTargets.emit(this.targets);
         });
     }
   }
