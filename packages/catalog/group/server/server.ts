@@ -108,8 +108,8 @@ function getGroupFilter(input: GroupsInput) {
   return filter;
 }
 
-async function getMembers(groups: mongodb.Collection<GroupDoc>,
-  input: MembersInput) {
+function getMemberAggregationPipeline(input: MembersInput,
+  getCount = false) {
   const noCreateGroupPending = {
     $or: [
       { pending: { $exists: false } },
@@ -120,7 +120,7 @@ async function getMembers(groups: mongodb.Collection<GroupDoc>,
     { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
     noCreateGroupPending;
 
-  const pipelineResults = await groups.aggregate([
+  const pipeline: any = [
     { $match: filter },
     {
       $group: {
@@ -139,12 +139,32 @@ async function getMembers(groups: mongodb.Collection<GroupDoc>,
         }
       }
     }
-  ])
-    .toArray();
+  ];
 
-  const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$memberIds' } } });
+  }
 
-  return matchingMembers;
+  return pipeline;
+}
+
+async function getMembers(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input))
+    .next();
+
+  return res.memberIds;
+}
+
+async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input, true))
+    .next();
+
+  return res['count'];
 }
 
 async function addOrRemoveMember(
@@ -227,9 +247,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       memberCount: async (_root, { input }: { input: MembersInput }) => {
-        const res = await getMembers(groups, input);
-
-        return res.length;
+        return await getMemberCount(groups, input)
       }
 
     },
