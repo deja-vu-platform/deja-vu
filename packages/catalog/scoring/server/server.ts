@@ -97,6 +97,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
         return score;
       },
+
       target: async (_root, { id }): Promise<Target> => {
         const targetScores: ScoreDoc[] = await scores.find({
           targetId: id, pending: { $exists: false }
@@ -107,25 +108,6 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           id: id,
           scores: targetScores
         };
-      },
-
-      targetCount: async (_root, { input }: { input: TargetsByScoreInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
-          filter['targetId'] = { $in: input.targetIds };
-        }
-
-        const res = await scores.aggregate([
-          { $match: filter },
-          {
-            $group: {
-              _id: '$targetId', count: { $sum: 1 }
-            }
-          }
-        ])
-          .toArray();
-
-        return _.reduce(res, (sum, obj) => sum + obj['count'], 0);
       },
 
       // TODO: pagination, max num results
