@@ -1,5 +1,8 @@
 <dv.action name="show-competition">
 
+  <problemscore.show-targets-by-score hidden=true
+    showScores=false showTotal=false />
+
   <div class="card">
     <div class="card-body">
       <div class="row">
@@ -34,7 +37,7 @@
             <img src="assets/mountainsgray.png" class="hostcompentry" />
           </dv.link>
           <span class="inline-block">
-            <problemscore.show-target-count />
+              <dv.show-count array=problemscore.show-targets-by-score.loadedTargets />
           </span>
         </div>
         <div class="col-1">
