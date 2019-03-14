@@ -122,10 +122,37 @@ function getPublisherFilter(input: PublishersInput) {
   return filter;
 }
 
-async function getAggregatedMessages(
-  publishers: mongodb.Collection<PublisherDoc>,
-  matchQuery: any): Promise<PublisherDoc[]> {
-  const results = await publishers.aggregate([
+function getFollowerAggregationPipeline(getCount = false) {
+  const pipeline: any = [
+    { $match: { pending: { $exists: false } } },
+    {
+      $group: {
+        _id: 0,
+        followerIds: { $push: '$followerIds' }
+      }
+    },
+    {
+      $project: {
+        followerIds: {
+          $reduce: {
+            input: '$followerIds',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ];
+
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$followerIds' } } });
+  }
+
+  return pipeline;
+}
+
+function getMessageAggregationPipeline(matchQuery: any, getCount = false) {
+  const pipeline: any = [
     { $match: matchQuery },
     {
       $group: {
@@ -144,35 +171,13 @@ async function getAggregatedMessages(
         }
       }
     }
-  ])
-    .toArray();
+];
 
-  return results;
-}
-
-async function getMessages(publishers, input) {
-  const filter = { pending: { $exists: false } };
-  if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
-    // Get messages by a specific publisher
-    const publisher = await publishers.findOne(
-      { id: input.byPublisherId, pending: { $exists: false } },
-      { projection: { messages: 1 } });
-
-    if (_.isNil(publisher) || isPendingCreate(publisher)) {
-      throw new Error(`Publisher ${input.byPublisherId} not found`);
-    }
-
-    return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
-
-  } else {
-    if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
-      filter['followerIds'] = input.ofPublishersFollowedById;
-    }
-    // No message filter
-    const results = await getAggregatedMessages(publishers, filter);
-
-    return results[0] ? results[0].messages : [];
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$messages' } } });
   }
+
+  return pipeline;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -221,26 +226,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         // No follower filter
-        const results = await publishers.aggregate([
-          { $match: { pending: { $exists: false } } },
-          {
-            $group: {
-              _id: 0,
-              followerIds: { $push: '$followerIds' }
-            }
-          },
-          {
-            $project: {
-              followerIds: {
-                $reduce: {
-                  input: '$followerIds',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
+        const results = await publishers
+          .aggregate(getFollowerAggregationPipeline())
           .toArray();
 
         return results[0] ? results[0].followerIds : [];
@@ -250,34 +237,26 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
           // A publisher's followers
-          const publisher = await publishers.findOne(
-            { id: input.ofPublisherId, pending: { $exists: false } },
-            { projection: { followerIds: 1 } }
-          );
+          const res = await publishers.aggregate([
+            {
+              $match: {
+                id: input.ofPublisherId,
+                pending: { $exists: false }
+              }
+            },
+            { $project: { count: { $size: '$memberIds' } } }
+          ])
+            .next();
 
-          if (_.isNil(publisher) || isPendingCreate(publisher)) {
-            throw new Error(`Publisher ${input.ofPublisherId} not found`);
-          }
-
-          return !_.isEmpty(publisher!.followerIds) ?
-            publisher!.followerIds.length : 0;
+          return res ? res['count'] : 0;
         }
 
         // No follower filter
-        const results = await publishers.aggregate([
-          { $match: { pending: { $exists: false } } },
-          {
-            $group: {
-              _id: 0,
-              count: {
-                $sum: { $size: '$followerIds' }
-              }
-            }
-          }
-        ])
-          .toArray();
+        const results = await publishers
+          .aggregate(getFollowerAggregationPipeline(true))
+          .next();
 
-        return results[0] ? results[0]['count'] : 0;
+        return results ? results['count'] : 0;
       },
 
       publishers: async (_root, { input }: { input: PublishersInput }) => {
@@ -290,13 +269,60 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       messages: async (_root, { input }: { input: MessagesInput }) => {
-        return await getMessages(publishers, input);
+        const filter = { pending: { $exists: false } };
+        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
+          filter['id'] = input.byPublisherId;
+
+          // Get messages by a specific publisher
+          const publisher = await publishers.findOne(
+            filter,
+            { projection: { messages: 1 } });
+
+          if (_.isNil(publisher) || isPendingCreate(publisher)) {
+            throw new Error(`Publisher ${input.byPublisherId} not found`);
+          }
+
+          return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
+
+        } else {
+          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
+            // Get all the messages of publishers that a user follows
+            filter['followerIds'] = input.ofPublishersFollowedById;
+          }
+
+          const results = await publishers
+            .aggregate(getMessageAggregationPipeline(filter))
+            .toArray();
+
+          return results[0] ? results[0].messages : [];
+        }
       },
 
       messageCount: async (_root, { input }: { input: MessagesInput }) => {
-        const allMessages = await getMessages(publishers, input);
+        const filter = { pending: { $exists: false } };
 
-        return allMessages!.length;
+        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
+          filter['id'] = input.byPublisherId;
+          // A publisher's messages
+          const res = await publishers.aggregate([
+            { $match: filter },
+            { $project: { count: { $size: '$messages' } } }
+          ])
+            .next();
+
+          return res ? res['count'] : 0;
+        } else {
+          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
+            // Get all the messages of publishers that a user follows
+            filter['followerIds'] = input.ofPublishersFollowedById;
+          }
+
+          const results = await publishers
+            .aggregate(getMessageAggregationPipeline(filter, true))
+            .next();
+
+          return results ? results['count'] : 0;
+        }
       },
 
       isFollowing: async (_root, { input }: { input: FollowUnfollowInput }) => {
