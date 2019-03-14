@@ -104,7 +104,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
             { kind: 'output' });
           break;
         case 'action':
-          _.set(stEntry, `symbolTable.${rest[0]}`, { kind: 'output' });
+          _.set(stEntry, [ 'symbolTable', rest[0]], { kind: 'output' });
           break;
         default:
           // nothing

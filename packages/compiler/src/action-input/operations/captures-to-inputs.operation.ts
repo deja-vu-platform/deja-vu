@@ -25,7 +25,7 @@ export function capturesToInputs(
   inputsFromContext: InputFromContext[]) {
   const recurse = (expr) => expr.capturesToInputs();
   const binOpRecurse = (leftExpr, op, rightExpr) =>
-    leftExpr.capturesToInputs() + op.sourceString +
+    leftExpr.capturesToInputs() + ' ' + op.sourceString + ' ' +
     rightExpr.capturesToInputs();
 
   return {

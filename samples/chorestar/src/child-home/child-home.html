@@ -1,0 +1,93 @@
+<dv.action name="child-home">
+  <div class="body">
+    <chorestar.child-navbar />
+    <group.show-groups
+      withMemberId=chorestar.child-navbar.user?.id hidden=true />
+
+    <div class="container-fluid main">
+      <div id="child-heading" class="col-md-12">
+        <div class="row">
+          <div class="offset-md-4 col-md-4">
+            <h3>
+              StarBank Total:
+              <i class="material-icons icon">star_rate</i>
+              <transfer.show-balance
+                accountId=chorestar.child-navbar.user?.id />
+            </h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="white-box offset-md-1 col-md-5">
+            <h2>Chores</h2>
+            <div class="row section">
+              <div class="col-md-12">
+                <h3>Uncompleted Chores</h3>
+                <task.show-tasks
+                  noTasksToShowText="No uncompleted chores"
+                  assigneeId=chorestar.child-navbar.user?.id
+                  completed=false
+                  showOptionToComplete=true
+                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+              </div>
+            </div>
+            <div class="row section">
+              <div class="col-md-12">
+                <h3>Chores Pending Approval</h3>
+                <task.show-tasks
+                  noTasksToShowText="No chores pending approval"
+                  assigneeId=chorestar.child-navbar.user?.id
+                  completed=true
+                  approved=false
+                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+              </div>
+            </div>
+            <div class="row section">
+              <div class="col-md-12">
+                <h3>Completed and Approved Chores</h3>
+                <task.show-tasks
+                  noTasksToShowText="No approved chores"
+                  assigneeId=chorestar.child-navbar.user?.id
+                  completed=true
+                  approved=true
+                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+              </div>
+            </div>
+          </div>
+
+          <div class="white-box right-box col-md-5">
+            <h2>Rewards</h2>
+            <reward.show-objects hidden=true showOnly=['name', 'cost'] />
+            <div class="row section">
+              <div class="col-md-12">
+                <h3>Rewards You Can Buy</h3>
+                <dv.for elems=reward.show-objects.objects
+                  showElem= <dv.if
+                  condition=$elem.cost lt= transfer.show-balance.fetchedBalance>
+                    <chorestar.show-reward
+                      reward=$elem
+                      user=chorestar.child-navbar.user
+                      showOptionToPurchase=true />
+                  </dv.if>
+                />
+              </div>
+            </div>
+            <div class="row section">
+              <div class="col-md-12">
+                <h3>Rewards You Cannot Buy Yet</h3>
+                <dv.for elems=reward.show-objects.objects
+                  showElem= <dv.if
+                  condition=$elem.cost gt transfer.show-balance.fetchedBalance>
+                    <chorestar.show-reward
+                      reward=$elem
+                      user=chorestar.child-navbar.user
+                      showOptionToPurchase=false />
+                  </dv.if>
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>
