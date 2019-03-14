@@ -30,11 +30,17 @@ mat-checkbox {
   margin-bottom: 8px;
 }
 
-mat-list-item mat-form-field {
+.compound-input mat-form-field {
   flex: 1;
+  padding-right: 16px;
+  &:last-child {
+    padding-right: 0;
+  }
+}
+div.compound-input {
+  display: flex;
 }
 
 .io-name {
-  padding-right:16px;
   margin-left:-8px;
 }

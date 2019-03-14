@@ -1,66 +1,112 @@
 <div
+  *ngIf="actionInstance"
   id="main-view"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
 >
   <div
-    *ngIf="actionInstance"
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
-      class="dvd-row"
-      dragula="action"
-      [attr.data-index]="rowNum"
+      class="row-container"
     >
+      <div class="row-control">
+        <button
+          mat-button
+          class=" mat-small"
+          #rowMenuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="rowMenu.matMenu"
+          (contextmenu)="openMenu(rowMenuTrigger)"
+        >
+          <mat-icon>drag_handle</mat-icon>
+        </button>
+      </div>
       <div
-        *ngFor="let action of row.actions; let actionNum = index"
-        class="action"
-        [attr.data-index]="actionNum"
+        class="dvd-row"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
+        dragula="action"
+        [attr.data-index]="rowNum"
+        [ngStyle]="actionInstance.of.styles"
       >
         <div
-          *ngIf="action.of.inputs.length === 0"
-          #instanceContainer
-          class="instance-container"
+          *ngFor="let action of row.actions; let actionNum = index"
+          class="action"
+          [attr.data-index]="actionNum"
+          [ngClass]="action.styles.stretch ? 'stretch' : ''"
         >
-          <app-action-instance
-            [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
+          <div
+            #instanceContainer
+            class="instance-container"
+            #actionMenuTrigger="matMenuTrigger"
+            [matMenuTriggerFor]="actionMenu.matMenu"
+            (contextmenu)="openMenu(actionMenuTrigger)"
           >
-          </app-action-instance>
-          <div *ngIf="action.showHint" class="hint">
-            Hidden: {{action.fqtag}}
-          </div>
-        </div>
-        <div
-          *ngIf="action.of.inputs.length > 0"
-          #instanceContainer
-          #menuTrigger="matMenuTrigger"
-          [matMenuTriggerFor]="menu"
-          class="instance-container"
-        >
-          <app-action-instance
-            [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
-          >
-          </app-action-instance>
-          <div *ngIf="action.showHint" class="hint">
-            Hidden: {{action.fqtag}}
-          </div>
-          <mat-menu #menu="matMenu" [overlapTrigger]="false" (closed)="onMenuClosed(action)">
-            <div class="popup-menu" (click)="$event.stopPropagation()">
-              <app-set-inputs
-                [app]="app"
-                [actionInstance]="action"
-                [openAction]="actionInstance.of"
-              >
-              </app-set-inputs>
+            <!-- below is same as above -->
+            <app-action-instance
+              [actionInstance]="action"
+              [actionIO]="scopeIO.getActionIO(action)"
+              (click)="stopPropIfShift($event)"
+              [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
+            >
+            </app-action-instance>
+            <div *ngIf="action.showHint" class="hint">
+              Hidden: {{action.fqtag}}
             </div>
-          </mat-menu>
+            <!-- above is same as above -->
+            <app-floating-menu
+              #actionMenu
+              (opened)="clickFirstTab(actionNum)"
+              (closed)="onActionMenuClosed()"
+              (shouldClose)="closeMenu(actionMenuTrigger)"
+            >
+              <mat-tab-group #actionMenuContent class="popup-menu action-menu">
+                <mat-tab label="Inputs">
+                  <app-set-inputs
+                    [app]="app"
+                    [actionInstance]="action"
+                    [openAction]="actionInstance.of"
+                  >
+                  </app-set-inputs>
+                </mat-tab>
+                <mat-tab label="Outputs">
+                  <p>OUTPUTS TODO</p>
+                </mat-tab>
+              </mat-tab-group>
+            </app-floating-menu>
+          </div>
         </div>
       </div>
+      <app-floating-menu
+        #rowMenu="matMenu"
+        (closed)="onRowMenuClosed()"
+        (shouldClose)="closeMenu(rowMenuTrigger)"
+      >
+        <div class="popup-menu row-menu" (click)="$event.stopPropagation()">
+          <mat-form-field>
+            <mat-select [(value)]="row.hJust" placeholder="Horizontal Justification">
+              <mat-option
+                *ngFor="let entry of flexJustifyEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select [(value)]="row.vAlign" placeholder="Vertical Alignment">
+                <mat-option
+                *ngFor="let entry of flexAlignEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </app-floating-menu>
     </div>
   </div>
 </div>

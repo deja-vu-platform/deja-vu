@@ -25,11 +25,10 @@ import {
   ActionInputs,
   App,
   ClicheActionDefinition,
-  ClicheDefinition
+  ClicheDefinition,
+  OMNIPRESENT_INPUTS
 } from './datatypes';
 import { TextComponent } from './text/text.component';
-
-const OMNIPRESENT_INPUTS = [ 'hidden' ];
 
 const importedCliches: { [name: string]: Object} = {
   allocator,
@@ -105,9 +104,10 @@ function clicheDefinitionFromModule(
           isComponent(_.get(instance, [input, 'type']))
         );
 
+        const template: string = component.decorators[0].args[0].template;
+        // parse the template string to extract the object map
+        // TODO: stop assuming zero or one action input per action
         if (actionInputNames.length > 0) {
-          // parse the template string to extract the object map
-          const template: string = component.decorators[0].args[0].template;
           const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
           if (inputMapMatch) {
             actionInputs[actionInputNames[0]] = _.fromPairs(
@@ -122,6 +122,14 @@ function clicheDefinitionFromModule(
             actionInputs[actionInputNames[0]] = {};
           }
         }
+
+        if (template.includes('ng-content')) {
+          inputs.push('*content');
+          actionInputs['*content'] = {};
+        }
+
+        inputs.sort();
+        outputs.sort();
 
         return {
           name: _.kebabCase(component.name

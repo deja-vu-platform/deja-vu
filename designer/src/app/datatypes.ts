@@ -3,19 +3,40 @@ import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
-// names should be HTML safe (TODO: ensure this)
+import dvdAppStyles from './dvd-app-styles';
 
+/**
+ * A named collection of actions
+ * Could be App, ClicheDefinition, ClicheInstance, etc.
+ */
 export interface ActionCollection {
   name: string;
   actions: ActionDefinition[];
 }
 
+/**
+ * an input map for each named action input
+ */
 export interface ActionInputs {
   // ioName is what you would put $ in front of to reference
   // the value is the name of the property set in the included action
   [forInput: string]: { [ioName: string]: string };
 }
 
+/**
+ * inputs that are present on **every** action
+ * cliche actions should already have these
+ * these need to be added to app actions
+ */
+export const OMNIPRESENT_INPUTS = [
+  'hidden'
+];
+
+/**
+ * Action Definition
+ * Defines the name you use, the inputs you provide,
+ * and the outputs and content you get when you instantiate an action
+ */
 export interface ActionDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
@@ -23,15 +44,28 @@ export interface ActionDefinition {
   readonly actionInputs: ActionInputs;
 }
 
+
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
 }
 
+/**
+ * Definitions of Inputs or Outputs for AppActionDefinition
+ */
 // tslint:disable-next-line interface-name
 export interface IO {
   name: string;
-  value: string;
+  value: string; // default constant for input, epression for output
 }
+
+export const defaultAppActionStyles = {
+  backgroundColor: 'white',
+  borderWidth: '0',
+  borderColor: 'black',
+  borderStyle: 'solid',
+  padding: '8px'
+};
+export type AppActionStyles = typeof defaultAppActionStyles;
 
 export class AppActionDefinition implements ActionDefinition {
   name: string;
@@ -41,18 +75,23 @@ export class AppActionDefinition implements ActionDefinition {
   transaction = false;
   // App Actions cannot have action inputs
   readonly actionInputs: Readonly<ActionInputs> = {};
-  // TODO: styling options
+  // TODO: export styles
+  readonly styles = _.cloneDeep(defaultAppActionStyles);
 
   constructor(name: string) {
     this.name = name;
   }
 
   get inputs(): string[] {
-    return this.inputSettings.map((io) => io.name);
+    return [
+      ...OMNIPRESENT_INPUTS,
+      ...this.inputSettings.map((io) => io.name)
+    ].sort();
   }
 
   get outputs(): string[] {
-    return this.outputSettings.map((io) => io.name);
+    return this.outputSettings.map((io) => io.name)
+      .sort();
   }
 
   get rows(): Row[] {
@@ -71,12 +110,7 @@ export class AppActionDefinition implements ActionDefinition {
    */
   contains(actionDefinition: ActionDefinition, deep = false) {
     return this.rows.some((r) =>
-      r.actions.some((a) => (
-        a.isOrContains(actionDefinition, deep) ||
-        _.some(a.inputSettings, (v) =>
-          v && !_.isString(v) && v.isOrContains(actionDefinition, deep)
-        )
-      ))
+      r.actions.some((a) => a.isOrContains(actionDefinition, deep))
     );
   }
 
@@ -110,15 +144,27 @@ export class AppActionDefinition implements ActionDefinition {
     if (this.transaction) {
       html += '<dv.tx>\n';
     }
+    html += `<div class="dvd-action ${this.name}">\n`;
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
     if (this.transaction) {
       html += '</dv.tx>\n';
     }
+    html += '</div>\n';
     html += '</dv.action>';
 
     return html;
+  }
+
+  toCSS(): string {
+    let css = `.dvd-action.${this.name} {`;
+    _.forEach(this.styles, (value, property) => {
+      css += `\n  ${_.kebabCase(property)}: ${value};`;
+    });
+    css += '\n}';
+
+    return css;
   }
 
   toJSON() {
@@ -127,21 +173,50 @@ export class AppActionDefinition implements ActionDefinition {
       inputSettings: this.inputSettings,
       outputSettings: this.outputSettings,
       rows: this.rows.map((row) => row.toJSON()),
-      transaction: this.transaction
+      transaction: this.transaction,
+      styles: this.styles
       // app actions do not have action inputs
     };
   }
 
 }
 
+/**
+ * Angular doesn't like style attributes so we have classes for flex
+ * e.g. .dvd-row.jsa gives you justify-content: space-around
+ */
+const flex = {
+  fs: 'flex-start',
+  fe: 'flex-end',
+  c: 'center'
+};
+
+export const flexJustify = {
+  ...flex,
+  sa: 'space-around',
+  sb: 'space-between',
+  se: 'space-evenly'
+};
+
+export const flexAlign = {
+  ...flex,
+  b: 'baseline',
+  s: 'stretch'
+};
+
+/**
+ * Actions in AppActionDefinitions are grouped into rows for stylistic reasons
+ */
 export class Row {
   readonly actions: ActionInstance[] = [];
-  // TODO: Flex Settings;
+  hJust: keyof typeof flexJustify = 'fs';
+  vAlign: keyof typeof flexAlign = 's';
 
   constructor() {}
 
   toHTML(): string {
-    let html = '  <div class="dvd-row">\n';
+
+    let html = `  <div class="dvd-row j${this.hJust} a${this.vAlign}">\n`;
     _.forEach(this.actions, (action) => {
       html += action.toHTML();
     });
@@ -152,7 +227,9 @@ export class Row {
 
   toJSON() {
     return {
-      actions: this.actions.map((action) => action.toJSON())
+      actions: this.actions.map((action) => action.toJSON()),
+      hJust: this.hJust,
+      vAlign: this.vAlign
     };
   }
 
@@ -171,13 +248,20 @@ export class Row {
   // to do a move within row, do remove and then add
 }
 
+/**
+ * An Action Instance is a single usage (HTML Tag) of an action
+ * It has its own input settings and its own outputs
+ * But these are defined by its definition
+ */
 export class ActionInstance {
   readonly id = uuidv4();
   readonly of: ActionDefinition;
   readonly from: ActionCollection;
   // type is ActionInstance iff inputName in of.actionInputs
   readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
+  // TODO: export styles
   data?: any; // currently only used for the text widget
+  readonly styles = { stretch: false };
 
   constructor(
     ofAction: ActionDefinition,
@@ -196,15 +280,27 @@ export class ActionInstance {
     return (this.of instanceof App);
   }
 
+  get isText(): boolean {
+    return (
+      this.from.name === 'dv'
+      && this.of.name === 'text'
+    );
+  }
+
   isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
     return (
+      // is
       this.of === actionDefinition
+      // contains (content, app action only)
       || (
-        deep
-        && this.of['contains']
-        && (<AppActionDefinition>this.of)
-          .contains(actionDefinition, deep)
+        this.of instanceof AppActionDefinition
+        && this.of.contains(actionDefinition, deep)
       )
+      // contains (action input, cliche action only but no need to check this)
+      || _.some(
+          _.pickBy(this.inputSettings, (_v, k) => k in this.of.actionInputs),
+          (a: ActionInstance) => a.isOrContains(actionDefinition, deep)
+        )
     );
   }
 
@@ -213,7 +309,7 @@ export class ActionInstance {
    */
   toHTML(extraIndents = 0): string {
     // text widget is just plain HTML static content
-    if (this.of.name === 'text' && this.from.name === 'dv') {
+    if (this.isText) {
       return `    <div>${this.data}</div>\n`;
     }
 
@@ -222,7 +318,14 @@ export class ActionInstance {
 
     let html = `    <${this.from.name}.${this.of.name}`;
 
+    let numAttrs = 0;
+    if (this.styles.stretch) {
+      numAttrs += 1;
+      html += `\n${xIdnt}      class="stretch"`;
+    }
     _.forEach(this.inputSettings, (val, key) => {
+      if (key === '*content') { return; }
+      numAttrs += 1;
       const strVal = _.isString(val)
         ? val
         : val.toHTML(extraIndents + 1)
@@ -230,12 +333,22 @@ export class ActionInstance {
       html += `\n${xIdnt}      ${key}=${strVal}`;
     });
 
-    if (_.size(this.inputSettings) === 0) {
+    if (numAttrs === 0) {
       html += ' ';
     } else {
       html += `\n${xIdnt}    `;
     }
-    html += '/>\n';
+    if (this.inputSettings['*content']) {
+      html += '>\n';
+      html += '  '.repeat(extraIndents + 1)
+        + (this.inputSettings['*content'] as ActionInstance)
+          .toHTML(extraIndents + 1);
+      html += `${xIdnt}    </${this.from.name}.${this.of.name}>\n`;
+    } else {
+      html += '/>\n';
+    }
+
+    // TODO: ngContent
 
     return html;
   }
@@ -244,7 +357,8 @@ export class ActionInstance {
     const json = {
       of: this.of.name,
       from: this.from.name,
-      inputSettings: this.inputSettings
+      inputSettings: this.inputSettings,
+      styles: this.styles
     };
     if (this.data) {
       json['data'] = this.data;
@@ -254,12 +368,23 @@ export class ActionInstance {
   }
 }
 
+// AppActionInstance vs ClicheActionInstance isn't relevant
+// For the cases when it does matter, inspecting .of is fine
+
+/**
+ * A cliche is defined by its names and the actions it has
+ */
 export interface ClicheDefinition {
   readonly name: string;
   readonly actions: ClicheActionDefinition[];
   // TODO: config options
 }
 
+/**
+ * The same cliche can be instantiated ("included") multiple times
+ * One reason for this is getting a second db
+ * Another is to use different config options
+ */
 export class ClicheInstance {
   name: string;
   readonly of: ClicheDefinition;
@@ -283,6 +408,9 @@ export class ClicheInstance {
   }
 }
 
+/**
+ * A DV App created with the Designer
+ */
 export class App {
   // populated in cliche.module.ts to avoid circular dependencies
   static dvCliche: ActionCollection;
@@ -296,6 +424,9 @@ export class App {
   // need consistent object to return
   private readonly _actionCollections: ActionCollection[] = [];
 
+  /**
+   * Create an app from a save file
+   */
   static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
 
@@ -319,13 +450,17 @@ export class App {
       actionDef.outputSettings
         .push.apply(actionDef.outputSettings, aad.outputSettings);
       actionDef.transaction = aad.transaction;
+      Object.assign(actionDef.styles, aad.styles);
       aad.rows.forEach((r) => {
         const row = new Row();
         r.actions.forEach((ai) => {
           const actionInst = app.newActionInstanceByName(ai.of, ai.from);
+          Object.assign(actionInst.styles, ai.styles);
           app.setInputsFromJSON(actionInst, ai);
           row.actions.push(actionInst);
         });
+        row.hJust = r.hJust;
+        row.vAlign = r.vAlign;
         actionDef.rows.push(row);
       });
       app.actions.push(actionDef);
@@ -401,6 +536,9 @@ export class App {
     }, null, '  ');
   }
 
+  /**
+   * Generate dvconfig.json for the app
+   */
   toDVConfigJSON() {
     const basePort = 3000;
     const clichePortOffset = 2;
@@ -431,6 +569,15 @@ export class App {
     }, null, '  ');
   }
 
+  toCSS(): string {
+    return (
+      dvdAppStyles
+      + '\n'
+      + this.actions.reduce((css, action) => css + '\n\n' + action.toCSS(), '')
+    );
+  }
+
+  // We need a consistent object to return or Angular freaks out
   get actionCollections(): ActionCollection[] {
     this._actionCollections.splice(0);
     this._actionCollections.push(this);

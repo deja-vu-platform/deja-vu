@@ -1,0 +1,15 @@
+.top-bar {
+  display: flex;
+  border-bottom: 1px solid black;
+  button {
+    padding: 0;
+    font-size: 16px;
+    height: 24px;
+    width: 24px;
+  }
+  .handle {
+    flex: 1;
+    background: lightgray;
+    cursor: grab;
+  }
+}

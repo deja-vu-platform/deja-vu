@@ -8,6 +8,8 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
+import * as _ from 'lodash';
 import { ElectronService } from 'ngx-electron';
 
 import {
@@ -16,10 +18,9 @@ import {
 } from '../configure-action/configure-action.component';
 import { App, AppActionDefinition } from '../datatypes';
 
+
 const NUM_CONST_FILES = 3;
 const SNACKBAR_DURATION = 2500;
-const STYLES = `@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";`;
 
 @Component({
   selector: 'app-top-bar',
@@ -30,7 +31,6 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
-  @Output() readonly changeAction = new EventEmitter<AppActionDefinition>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
   readonly fs: any;
@@ -43,7 +43,8 @@ export class TopBarComponent {
     private readonly electronService: ElectronService,
     private readonly snackBar: MatSnackBar,
     private readonly zone: NgZone,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly router: Router
   ) {
     if (this.electronService.remote) {
       this.fs = this.electronService.remote.require('fs');
@@ -51,7 +52,8 @@ export class TopBarComponent {
   }
 
   onSelectAction() {
-    this.changeAction.emit(this.openAction);
+    console.log(this.openAction.name);
+    this.router.navigateByUrl('/' + this.openAction.name);
   }
 
   createAction = () => {
@@ -152,7 +154,8 @@ export class TopBarComponent {
 
       this.fs.mkdir(`${appRoot}/src`, (e1) => {
         if (e1 && e1.code !== 'EEXIST') { throw e1; }
-        this.fs.writeFile(`${appRoot}/src/styles.css`, STYLES, writeCallback);
+        const css = this.app.toCSS();
+        this.fs.writeFile(`${appRoot}/src/styles.css`, css, writeCallback);
 
         this.app.actions.forEach((action) => {
           const actionRoot = `${appRoot}/src/${action.name}`;

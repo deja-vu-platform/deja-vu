@@ -7,6 +7,8 @@ import {
   MatSnackBarModule,
   MatToolbarModule
 } from '@angular/material';
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { ElectronService } from 'ngx-electron';
 
 import { TopBarComponent } from './top-bar.component';
@@ -24,7 +26,8 @@ describe('TopBarComponent', () => {
         MatIconModule,
         MatSelectModule,
         MatSnackBarModule,
-        MatToolbarModule
+        MatToolbarModule,
+        RouterTestingModule
       ],
       providers: [
         ElectronService

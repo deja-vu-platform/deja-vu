@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RunService } from '@deja-vu/core';
 
 import { ActionInstanceComponent } from './action-instance.component';
 
@@ -8,7 +9,10 @@ describe('ActionInstanceComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ActionInstanceComponent]
+      declarations: [ActionInstanceComponent],
+      providers: [
+        { provide: RunService, useValue: {} }
+      ]
     })
     .compileComponents();
   }));
