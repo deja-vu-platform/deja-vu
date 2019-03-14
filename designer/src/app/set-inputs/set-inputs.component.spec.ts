@@ -3,9 +3,14 @@ import { FormsModule } from '@angular/forms';
 import {
   MatCheckboxModule,
   MatDialogModule,
-  MatInputModule
+  MatIconModule,
+  MatInputModule,
+  MatMenuModule
 } from '@angular/material';
 
+import {
+  FloatingMenuComponent
+} from '../floating-menu/floating-menu.component';
 import { SetInputsComponent } from './set-inputs.component';
 
 describe('SetInputsComponent', () => {
@@ -14,11 +19,16 @@ describe('SetInputsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SetInputsComponent ],
+      declarations: [
+        SetInputsComponent,
+        FloatingMenuComponent
+      ],
       imports: [
         FormsModule,
         MatCheckboxModule,
         MatDialogModule,
+        MatMenuModule,
+        MatIconModule,
         MatInputModule
       ]
     })
