@@ -347,3 +347,7 @@ livescorecard-show-problem .edit img {
   padding-top: 0.625em;
 }
 
+scoring-show-targets-by-score .container {
+  padding: 0;
+}
+
