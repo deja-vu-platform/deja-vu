@@ -10,7 +10,8 @@ import {
   OnDestroy,
   OnInit,
   Type,
-  ViewChild
+  ViewChild,
+  ComponentRef
 } from '@angular/core';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
@@ -145,36 +146,49 @@ implements OnInit, AfterViewInit, OnDestroy {
       );
     });
 
+    const defaults = {};
     // pass in inputs, and allow the value to be updated
     actionDefinition.inputs.forEach((input) => {
-      // give new values
+      defaults[input] = componentRef.instance[input];
       this.subscriptions.push(
         this.actionIO.getSubject(input)
           .subscribe((val) => {
-            if (val === undefined) { return; }
+            if (val === undefined) {
+              val = defaults[input];
+            }
             if (input === '*content') {
-              // create the component to put in ng-content
-              const childComponentFactory = this.componentFactoryResolver
-                .resolveComponentFactory<ActionInstanceComponent>(val.type);
-              const childComponentRef = childComponentFactory
-                .create(this.injector);
-              // we need to recreate the cliche action component with content
-              viewContainerRef.clear();
-              componentRef = viewContainerRef.createComponent(
-                componentFactory,
-                0,
-                this.injector,
-                [[childComponentRef.location.nativeElement]]
-              );
-              // pass inputs
-              childComponentRef.instance.actionInstance =
-                val.inputs.actionInstance;
-              childComponentRef.instance.actionIO = val.inputs.actionIO;
-              // detect changes since Angular doesn't expect inputs like this
-              childComponentRef.instance.ref.detectChanges();
-              // trigger lifecylce hooks, which would have already fired
-              childComponentRef.instance.ngOnInit();
-              childComponentRef.instance.ngAfterViewInit();
+              if (val) {
+                // create the component to put in ng-content
+                let childComponentRef: ComponentRef<ActionInstanceComponent>;
+                const childComponentFactory = this.componentFactoryResolver
+                  .resolveComponentFactory<ActionInstanceComponent>(val.type);
+                childComponentRef = childComponentFactory.create(this.injector);
+                // we need to recreate the cliche action component with content
+                viewContainerRef.clear();
+                componentRef = viewContainerRef.createComponent(
+                  componentFactory,
+                  0,
+                  this.injector,
+                  [[childComponentRef.location.nativeElement]]
+                );
+                // pass inputs
+                childComponentRef.instance.actionInstance =
+                  val.inputs.actionInstance;
+                childComponentRef.instance.actionIO = val.inputs.actionIO;
+                // detect changes since Angular doesn't expect inputs like this
+                childComponentRef.instance.ref.detectChanges();
+                // trigger lifecylce hooks, which would have already fired
+                childComponentRef.instance.ngOnInit();
+                childComponentRef.instance.ngAfterViewInit();
+              } else {
+                // re-render the component with no content
+                viewContainerRef.clear();
+                componentRef = viewContainerRef.createComponent(
+                  componentFactory,
+                  0,
+                  this.injector
+                );
+              }
             } else {
               componentRef.instance[input] = val;
             }

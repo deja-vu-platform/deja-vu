@@ -52,7 +52,6 @@ export class TopBarComponent {
   }
 
   onSelectAction() {
-    console.log(this.openAction.name);
     this.router.navigateByUrl('/' + this.openAction.name);
   }
 

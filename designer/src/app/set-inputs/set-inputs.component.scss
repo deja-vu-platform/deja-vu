@@ -6,6 +6,7 @@
   padding: 16px;
 }
 
+$mat-placeholder-color: #757575;
 $action-input-padding: 4px;
 .action-input {
   border: 1px dashed lightgray;
@@ -24,7 +25,7 @@ $action-input-padding: 4px;
       position: absolute;
       top: -$action-input-padding;
       left: -$action-input-padding;
-      color: #4756B1;
+      color: $mat-placeholder-color;
       font-size: 75%;
       cursor: default;
     }
@@ -44,7 +45,7 @@ $action-input-padding: 4px;
   align-items: center;
 
   .prompt {
-    color: #757575; // mat input placeholder color
+    color: $mat-placeholder-color; // mat input placeholder color
     cursor: default;
     // hide the prompt message when an action is dragged in
     &:not(:only-child) {

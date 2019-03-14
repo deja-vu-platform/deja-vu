@@ -71,8 +71,14 @@ export class ScopeIO {
     this.actionDefinition.inputSettings.forEach((io) => {
       const toSubject = this.getSubject(actionInstance, io.name);
       toSubject.subscribe((val) => {
-        if (val === undefined) {
-          toSubject.next(io.value);
+        if (val === undefined && io.value !== undefined) {
+          let newVal;
+          try {
+            newVal = JSON.parse(io.value);
+          } catch (e) {
+            newVal = io.value;
+          }
+          toSubject.next(newVal);
         }
       });
     });
@@ -107,6 +113,8 @@ export class ScopeIO {
           this.sendInputs(inputVal, newInInput);
           this.sendAction(inputVal, toSubject, newInInput);
         }
+      } else {
+        toSubject.next(undefined);
       }
     });
   }
