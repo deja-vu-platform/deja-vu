@@ -80,6 +80,9 @@
                     >
                       {{output}}
                     </div>
+                    <div *ngIf="action.of.outputs.length === 0" class="no-drag">
+                      This action has no outputs.
+                    </div>
                   </div>
                 </mat-tab>
               </mat-tab-group>
