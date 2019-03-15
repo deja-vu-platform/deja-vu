@@ -153,9 +153,9 @@ async function getMembers(groups: mongodb.Collection<GroupDoc>,
 
   const res = await groups
     .aggregate(getMemberAggregationPipeline(input))
-    .next();
+    .toArray();
 
-  return res.memberIds;
+  return res[0] ? res[0].memberIds : [];
 }
 
 async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
@@ -164,7 +164,7 @@ async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
     .aggregate(getMemberAggregationPipeline(input, true))
     .next();
 
-  return res['count'];
+  return res ? res['count'] : 0;
 }
 
 async function addOrRemoveMember(
@@ -247,7 +247,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       memberCount: async (_root, { input }: { input: MembersInput }) => {
-        return await getMemberCount(groups, input)
+        return await getMemberCount(groups, input);
       }
 
     },

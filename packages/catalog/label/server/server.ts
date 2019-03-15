@@ -100,8 +100,7 @@ function getLabelFilter(input: LabelsInput) {
   return filter;
 }
 
-async function getItems(labels: mongodb.Collection<LabelDoc>,
-  input: ItemsInput) {
+function getItemAggregationPipeline(input: ItemsInput, getCount = false) {
   const matchQuery = {};
   const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
   const reduceOperator = {};
@@ -120,7 +119,8 @@ async function getItems(labels: mongodb.Collection<LabelDoc>,
     initialValue = [];
     reduceOperator['$setUnion'] = ['$$value', '$$this'];
   }
-  const results = await labels.aggregate([
+
+  const pipeline: any = [
     { $match: matchQuery },
     {
       $group: groupQuery
@@ -136,10 +136,13 @@ async function getItems(labels: mongodb.Collection<LabelDoc>,
         }
       }
     }
-  ])
-    .toArray();
+  ];
 
-  return !_.isEmpty(results) ? results[0].itemIds : [];
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$itemIds' } } });
+  }
+
+  return pipeline;
 }
 
 function resolvers(db: mongodb.Db, _config: LabelConfig): object {
@@ -158,13 +161,19 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
       },
 
       items: async (_root, { input }: { input: ItemsInput }) => {
-        return await getItems(labels, input);
+        const res = await labels
+          .aggregate(getItemAggregationPipeline(input))
+          .toArray();
+
+        return res[0] ? res[0].itemIds : [];
       },
 
       itemCount: async (_root, { input }: { input: ItemsInput }) => {
-        const res = await getItems(labels, input);
+        const res = await labels
+          .aggregate(getItemAggregationPipeline(input, true))
+          .next();
 
-        return res.length;
+        return res ? res['count'] : 0;
       },
 
       labels: async (_root, { input }: { input: LabelsInput }) => {
