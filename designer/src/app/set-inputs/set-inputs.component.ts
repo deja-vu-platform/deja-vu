@@ -46,6 +46,11 @@ export class SetInputsComponent implements OnChanges {
     this.actionInstance.inputSettings[inputName] = undefined;
   }
 
+  addOutput(inputName: string, event: CustomEvent) {
+    this.actionInstance.inputSettings[inputName] = event.detail.output;
+    // TODO: append once that is actually supported
+  }
+
   closeMenu(trigger: MatMenuTrigger) {
     trigger.closeMenu();
   }

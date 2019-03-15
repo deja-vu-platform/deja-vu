@@ -226,5 +226,17 @@ export class DesignerComponent implements OnInit, OnDestroy {
       .subscribe(({ source }) => {
         source.dispatchEvent(new CustomEvent('unInputAction'));
       });
+
+    // drag away an inputted action to remove it
+    this.dragulaService.createGroup('expression-io', {
+      moves: (el, source) => source.classList.contains('outputs'),
+      copy: (el, source) => source.classList.contains('outputs')
+    });
+    this.dragulaService.drop('expression-io')
+      .subscribe(({ el, target }) => {
+        target.dispatchEvent(new CustomEvent('addOutput', {
+          detail: { output: el['dataset'].output }
+        }));
+    });
   }
 }

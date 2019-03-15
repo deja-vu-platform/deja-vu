@@ -55,6 +55,9 @@
       class="input-value"
       [placeholder]="input"
       [name]="input"
-      [(ngModel)]="actionInstance.inputSettings[input]">
+      [(ngModel)]="actionInstance.inputSettings[input]"
+      dragula="expression-io"
+      (addOutput)="addOutput(input, $event)"
+    >
   </mat-form-field>
 </div>
