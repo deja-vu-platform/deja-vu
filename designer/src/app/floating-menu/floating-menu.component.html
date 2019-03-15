@@ -4,7 +4,9 @@
       <button mat-flat-button color="warn" class="mat-small" (click)="close()">
         <mat-icon>close</mat-icon>
       </button>
-      <div class="handle"></div>
+      <div class="handle">
+        <span>{{title}}</span>
+      </div>
     </div>
     <div class="content">
       <ng-content></ng-content>

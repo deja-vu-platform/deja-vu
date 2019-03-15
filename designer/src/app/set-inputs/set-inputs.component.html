@@ -38,7 +38,11 @@
       >
         {{actionInstance.inputSettings[input].fqtag}}
       </button>
-      <app-floating-menu #menu (shouldClose)="closeMenu(menuTrigger)">
+      <app-floating-menu
+        #menu
+        [title]="actionInstance.inputSettings[input].fqtag"
+        (shouldClose)="closeMenu(menuTrigger)"
+      >
         <!-- TODO: list args -->
         <app-set-inputs
           [app]="app"

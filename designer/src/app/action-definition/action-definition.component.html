@@ -58,6 +58,7 @@
             <!-- above is same as above -->
             <app-floating-menu
               #actionMenu
+              [title]="action.fqtag"
               (opened)="clickFirstTab(actionNum)"
               (closed)="onActionMenuClosed()"
               (shouldClose)="closeMenu(actionMenuTrigger)"
@@ -88,6 +89,7 @@
       </div>
       <app-floating-menu
         #rowMenu="matMenu"
+        [title]="'Row ' + (rowNum + 1)"
         (closed)="onRowMenuClosed()"
         (shouldClose)="closeMenu(rowMenuTrigger)"
       >

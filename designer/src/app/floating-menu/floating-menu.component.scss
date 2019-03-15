@@ -18,6 +18,10 @@
     flex: 1;
     background: lightgray;
     cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 90%;
   }
 }
 
