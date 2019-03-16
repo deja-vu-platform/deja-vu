@@ -39,6 +39,8 @@ export class SignInComponent
 
   @Input() showOptionToSubmit = true;
 
+  @Input() setPasskey = true;
+
   @Output() passkey = new EventEmitter<Passkey>();
 
   @ViewChild(FormGroupDirective) form;
@@ -91,7 +93,10 @@ export class SignInComponent
 
     const token = res.data.validatePasskey.token;
     const passkey = res.data.validatePasskey.passkey;
-    this.passkeyService.setSignedInPasskey(token, passkey);
+    if (this.setPasskey) {
+      this.passkeyService.setSignedInPasskey(token, passkey);
+    }
+
     this.passkey.emit(passkey);
   }
 

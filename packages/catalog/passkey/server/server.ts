@@ -30,6 +30,19 @@ const WORDS_SIZE = WORDS.length;
 const SECRET_KEY = 'ultra-secret-key';
 
 class PasskeyValidation {
+  static async passkeyExistsByCode(passkeys: mongodb.Collection<PasskeyDoc>,
+    code: string): Promise<PasskeyDoc> {
+    const passkey: PasskeyDoc | null = await passkeys
+      .findOne({ code: code });
+
+    if (_.isNil(passkey)) {
+      throw new Error(`Passkey not found.`);
+    }
+
+    return passkey;
+  }
+
+
   static async passkeyIsNew(passkeys: mongodb.Collection<PasskeyDoc>,
     id: string, code: string): Promise<PasskeyDoc> {
     const passkey: PasskeyDoc | null = await passkeys
@@ -38,6 +51,7 @@ class PasskeyValidation {
           { id: id }, { code: code }
         ]
       });
+
     if (passkey) {
       throw new Error(`Passkey already exists.`);
     }
@@ -134,18 +148,24 @@ async function getRandomPasscode(passkeys: mongodb.Collection<PasskeyDoc>) {
 async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
   input: CreatePasskeyInput, context: Context): Promise<PasskeyDoc> {
   const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-  const newPasskey: PasskeyDoc = await newPasskeyDocOrFail(passkeys, input);
   switch (context.reqType) {
     case 'vote':
-      newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
+      const newPasskeyVote: PasskeyDoc =
+        await newPasskeyDocOrFail(passkeys, input);
+      newPasskeyVote.pending = { reqId: context.reqId, type: 'create-passkey' };
+
+      await passkeys.insertOne(newPasskeyVote);
+
+      return newPasskeyVote;
     case undefined:
+      const newPasskey: PasskeyDoc = await newPasskeyDocOrFail(passkeys, input);
       await passkeys.insertOne(newPasskey);
 
       return newPasskey;
     case 'commit':
       await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
 
-      return newPasskey;
+      return undefined;
     case 'abort':
       await passkeys.deleteOne(reqIdPendingFilter);
 
@@ -225,8 +245,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       validatePasskey: async (_root, { code }) => {
-        const passkey: PasskeyDoc = await passkeys
-          .findOne({ code: code });
+        const passkey = await PasskeyValidation
+          .passkeyExistsByCode(passkeys, code);
 
         const token: string = sign(code);
 

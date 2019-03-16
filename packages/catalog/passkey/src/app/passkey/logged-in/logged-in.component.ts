@@ -4,6 +4,7 @@ import {
 
 import { OnEval, RunService } from '@deja-vu/core';
 
+import { Passkey } from '../shared/passkey.model';
 import { PasskeyService } from '../shared/passkey.service';
 
 @Component({
@@ -11,7 +12,7 @@ import { PasskeyService } from '../shared/passkey.service';
   template: ''
 })
 export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
-  @Output() passkey = new EventEmitter();
+  @Output() passkey = new EventEmitter<Passkey>();
 
   constructor(
     private elem: ElementRef, private rs: RunService,
