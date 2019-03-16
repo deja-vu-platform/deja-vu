@@ -2,12 +2,6 @@ export interface RatingDoc {
   sourceId: string;
   targetId: string;
   rating: number;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'set-rating';
 }
 
 export interface RatingInput {
