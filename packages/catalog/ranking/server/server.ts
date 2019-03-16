@@ -1,13 +1,15 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
 import {
   CreateRankingInput,
   Ranking,
@@ -15,7 +17,6 @@ import {
   RankingsInput,
   TargetRank
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
 
 interface RankingConfig extends Config {
@@ -63,20 +64,20 @@ function rankingDocsToRanking(rankingDocs: RankingDoc[]): Ranking {
   };
 }
 
-function resolvers(db: mongodb.Db, _config: RankingConfig): object {
-  const rankings: mongodb.Collection<RankingDoc> = db.collection('rankings');
+function resolvers(db: ClicheDb, _config: RankingConfig): object {
+  const rankings: Collection<RankingDoc> = db.collection('rankings');
 
   return {
     Query: {
       ranking: async (_root, { id, sourceId }) => {
-        const query = { pending: { $exists: false } };
+        const query = {};
         if (id) {
           query['id'] = id;
         }
         if (sourceId) {
           query['sourceId'] = sourceId;
         }
-        const rankingDocs = await rankings.find(query).toArray();
+        const rankingDocs = await rankings.find(query);
 
         if (rankingDocs.length === 0) {
           throw new Error(`Ranking ${id} not found`);
@@ -85,36 +86,33 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
         return rankingDocsToRanking(rankingDocs);
       },
       rankings: async (_root, { input }: { input: RankingsInput }) => {
-        const query = { ...input, pending: { $exists: false } };
-
         const groupedRankingDocs = await rankings.aggregate([
-          { $match: query },
+          { $match: input },
           {
             $group: {
               _id: { id: '$id', sourceId: '$sourceId' },
               rankingDocs: { $push: '$$ROOT' }
             }
           }
-        ]).toArray() as any[]; // .aggregate() typing is wrong
+        ])
+        .toArray() as any[]; // .aggregate() typing is wrong
 
         return groupedRankingDocs.map(
-          group => rankingDocsToRanking(group.rankingDocs));
+          (group) => rankingDocsToRanking(group.rankingDocs));
       },
       // In the future, all ranking strategies of ranking could be supported.
       // For now, we only implement fractional ranking
       // https://en.wikipedia.org/wiki/Ranking#Strategies_for_assigning_rankings
       fractionalRanking: async (_root, { targetIds }) => {
-        const query = {
-          targetId: { $in: targetIds },
-          pending: { $exists: false }
-        };
+        const query = { targetId: { $in: targetIds } };
 
         const targetRankings = await rankings.aggregate([
           { $match: query },
           { $group: { _id: '$targetId', avgRank: { $avg: '$rank' } } },
-          { $project: { id: "$_id", avgRank: 1 } }
+          { $project: { id: '$_id', avgRank: 1 } }
         ])
-        .sort({ avgRank: 1 }).toArray();
+        .sort({ avgRank: 1 })
+        .toArray();
 
         // calculate the rankings of just the targetIds relative to each othe
         // based on their average rankings
@@ -130,7 +128,9 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
             // where 2.5 is the average of the ordinal ranks 2 and 3.
             // uses the formula (a+b)/(2*n) to get the sum from a, a+1, ..., b
             // where b=a+n-1, a=nextRank, n=nextRankCount
-            const tiedRank = (2 * nextRank + nextRankCount - 1)/(2 * nextRankCount);
+            const tiedRank =
+              // tslint:disable-next-line
+              (2 * nextRank + nextRankCount - 1) / (2 * nextRankCount);
             for (let j = i - nextRankCount + 1; j <= i; j++) {
               targetRankings[j]['rank'] = tiedRank;
             }
@@ -148,7 +148,7 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
     Ranking: {
       id: (ranking: Ranking) => ranking.id,
       sourceId: (ranking: Ranking) => ranking.sourceId,
-      targets: (ranking: Ranking) => ranking.targets,
+      targets: (ranking: Ranking) => ranking.targets
     },
     TargetRank: {
       id: (target: TargetRank) => target.id,
@@ -165,38 +165,12 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
               sourceId: input.sourceId,
               targetId: target.id,
               rank: target.rank
-            }
+            };
           }
         );
-        const newRanking = rankingDocsToRanking(rankingDocs);
+        await rankings.insertMany(context, rankingDocs);
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            rankingDocs.forEach((ranking: RankingDoc) => {
-              ranking.pending = {
-                reqId: context.reqId,
-                type: 'create-ranking'
-              };
-            });
-          /* falls through */
-          case undefined:
-            await rankings.insertMany(rankingDocs);
-
-            return newRanking;
-          case 'commit':
-            await rankings.update(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return newRanking;
-          case 'abort':
-            await rankings.deleteMany(reqIdPendingFilter);
-
-            return newRanking;
-        }
-
-        return newRanking;
+        return rankingDocsToRanking(rankingDocs);
       }
     }
   };
@@ -204,8 +178,8 @@ function resolvers(db: mongodb.Db, _config: RankingConfig): object {
 
 const rankingCliche: ClicheServer<RankingConfig> =
   new ClicheServerBuilder<RankingConfig>('ranking')
-    .initDb((db: mongodb.Db, config: RankingConfig): Promise<any> => {
-      const rankings: mongodb.Collection<RankingDoc> = db.collection('rankings');
+    .initDb((db: ClicheDb, config: RankingConfig): Promise<any> => {
+      const rankings: Collection<RankingDoc> = db.collection('rankings');
       const sourceTargetIndexOptions = config.oneToOneRanking ?
         { unique: true, sparse: true } : {};
 
