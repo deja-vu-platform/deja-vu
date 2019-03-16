@@ -33,4 +33,5 @@ export interface ShowScoreInput {
 export interface TargetsByScoreInput {
   asc?: boolean;
   targetIds?: string[];
+  sourceId?: string;
 }

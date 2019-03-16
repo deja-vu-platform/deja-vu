@@ -115,8 +115,15 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
         const query = { pending: { $exists: false } };
-        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
-          query['targetId'] = { $in: input.targetIds };
+
+        if (!_.isNil(input)) {
+          if (!_.isNil(input.targetIds)) {
+            query['targetId'] = { $in: input.targetIds };
+          }
+
+          if (!_.isNil(input.sourceId)) {
+            query['sourceId'] = input.sourceId;
+          }
         }
 
         const targets: any = await scores.aggregate([

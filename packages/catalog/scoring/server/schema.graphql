@@ -25,9 +25,12 @@ input ShowScoreInput {
 }
 
 # If targetIds are provided, the targets will be loaded and sorted by score
+# If sourceId is provided, the targets associated with that source
+#   will be loaded and sorted by score
 input TargetsByScoreInput {
   asc: Boolean
   targetIds: [ID]
+  sourceId: ID
 }
 
 type Query {
