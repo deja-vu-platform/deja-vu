@@ -4,6 +4,7 @@
     id="edit-action"
     class="mat-small"
     (click)="editAction()"
+    matTooltip="Configure Action"
   >
     <mat-icon>more_vert</mat-icon>
   </button>
@@ -33,6 +34,7 @@
     #menuTrigger="matMenuTrigger"
     [matMenuTriggerFor]="menu.matMenu"
     class="mat-small"
+    matTooltip="Inputs & Outputs"
   >
     <mat-icon>input</mat-icon>
   </button>
@@ -98,6 +100,9 @@
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>
+          <div *ngIf="openAction.outputSettings.length === 0">
+            This action has no outputs.
+          </div>
         </div>
         <button mat-button color="primary" (click)="addIO('output')" class="add-io">
           <mat-icon>add_circle</mat-icon> Add Output 
@@ -120,10 +125,10 @@
           <div *ngIf="openAction.inputSettings.length === 0" class="no-drag">
             This action has no inputs.
           </div>
-          <button mat-button color="primary" (click)="addIO('input')" class="add-io">
-            <mat-icon>add_circle</mat-icon> Add Input 
-          </button>
         </div>
+        <button mat-button color="primary" (click)="addIO('input')" class="add-io">
+          <mat-icon>add_circle</mat-icon> Add Input 
+        </button>
       </mat-tab>
     </mat-tab-group>
   </app-floating-menu>
