@@ -232,7 +232,8 @@ export class Collection<T extends Object> {
     switch (context.reqType) {
       case 'vote':
         // make sure doc exists and that no one else touches it before we commit
-        await this.getLockForUpdate(context, filter, 'update');
+        await this.getLockForUpdate(context, filter, 'update',
+          options && options.upsert);
 
         return true;
       case undefined:
@@ -296,9 +297,9 @@ export class Collection<T extends Object> {
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
-  private async getLockForUpdate(context: Context,
-    filter: Query<T>, updateType: 'update' | 'delete'): Promise<void> {
-    return await this.getLockAndUpdate(context, filter, updateType);
+  private async getLockForUpdate(context: Context, filter: Query<T>,
+    updateType: 'update' | 'delete', upsert: boolean = false): Promise<void> {
+    return await this.getLockAndUpdate(context, filter, updateType, { upsert });
   }
 
   /**
@@ -322,26 +323,37 @@ export class Collection<T extends Object> {
     // with the information from the context and the given update.
     // Separating these actions allows us to differentiate between
     // not found errors and concurrent update errors
-    this.getPendingLock(filter);
-    const updateSetOp = {
-      ...update['$set'], // make sure to include any $set ops from `update`
-      _pendingDetails: {
-        reqId: context.reqId,
-        type: `${updateType}-${this._name}`
-      }
-    };
-    const updateResult = await this._collection
-      .updateOne(filter, {
-        ...update,
-        $set: updateSetOp
-      }, options);
+    try {
+      await this.getPendingLock(filter);
+      const updateSetOp = {
+        ...update['$set'], // make sure to include any $set ops from `update`
+        _pendingDetails: {
+          reqId: context.reqId,
+          type: `${updateType}-${this._name}`
+        }
+      };
+      const updateResult = await this._collection
+        .updateOne(filter, {
+          ...update,
+          $set: updateSetOp
+        } as Object, options);
 
-    if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
-      // Unknown because the update to get the lock
-      // had just been successfully applied on the same object.
-      // No other update should have gone through in between,
-      // so there is no reason for this update to have failed
-      throw new ClicheDbUnknownUpdateError();
+      if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
+        // Unknown because the update to get the lock
+        // had just been successfully applied on the same object.
+        // No other update should have gone through in between,
+        // so there is no reason for this update to have failed
+        throw new ClicheDbUnknownUpdateError();
+      }
+    } catch (err) {
+      if (options && options.upsert &&
+        err.errorCode === ClicheDbNotFoundError.ERROR_CODE) {
+        await this.insertOne(
+          context, Object.assign({}, filter, update['$set']), options);
+
+        return;
+      }
+      throw err;
     }
   }
 
