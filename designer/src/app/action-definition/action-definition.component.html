@@ -8,24 +8,27 @@
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
+    dragula="row"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
       class="row-container"
+      [ngClass]="{ 'no-drag': rowNum == rows.length - 1 }"
+      [attr.data-index]="rowNum"
     >
-      <div class="row-control">
+      <div class="row-control handle">
         <button
           mat-button
-          class=" mat-small"
+          class="mat-small handle"
           #rowMenuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="rowMenu.matMenu"
           (contextmenu)="openMenu(rowMenuTrigger)"
         >
-          <mat-icon>drag_handle</mat-icon>
+          <mat-icon class="handle">drag_handle</mat-icon>
         </button>
       </div>
       <div
-        class="dvd-row"
+        class="dvd-row no-drag"
         [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
         dragula="action"
         [attr.data-index]="rowNum"

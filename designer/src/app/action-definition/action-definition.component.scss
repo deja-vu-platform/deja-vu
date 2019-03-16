@@ -38,11 +38,11 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 // looks like it's outside of the page
 .row-control {
   width: $row-control-width;
-  display: flex;
-  align-items: center;
-  padding: 0 4px;
   button {
-    padding: 0;
+    cursor: grab;
+    padding: 0 4px;
+    height: 100%;
+    width: 100%;
   }
 }
 

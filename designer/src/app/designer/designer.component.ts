@@ -241,5 +241,30 @@ export class DesignerComponent implements OnInit, OnDestroy {
           }));
         }
     });
+
+    // drag away an inputted action to remove it
+    this.dragulaService.createGroup('row', {
+      moves: (el, source, handle) => handle.classList.contains('handle')
+        && source.lastChild !== el
+    });
+    this.dragulaService.drop('row')
+      .subscribe(({ el, sibling }) => {
+        const fromRowIdx = parseInt(el['dataset'].index, 10);
+        const [moveRow] = this.openAction.rows.splice(fromRowIdx, 1);
+        const toRowIdx = sibling ?
+          parseInt(sibling['dataset'].index, 10)
+          : -1;
+        const insertBefore = this.openAction.rows[toRowIdx];
+        if (insertBefore) {
+          for (let i = 0; i < this.openAction.rows.length; i += 1) {
+            if (insertBefore === this.openAction.rows[i]) {
+              this.openAction.rows.splice(i, 0, moveRow);
+              break;
+            }
+          }
+        } else {
+          this.openAction.rows.push(moveRow);
+        }
+      });
   }
 }
