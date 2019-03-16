@@ -3,14 +3,19 @@ import { FormsModule } from '@angular/forms';
 import {
   MatDialogModule,
   MatIconModule,
+  MatMenuModule,
   MatSelectModule,
   MatSnackBarModule,
+  MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { ElectronService } from 'ngx-electron';
 
+import {
+  FloatingMenuComponent
+} from '../floating-menu/floating-menu.component';
 import { TopBarComponent } from './top-bar.component';
 
 describe('TopBarComponent', () => {
@@ -19,13 +24,15 @@ describe('TopBarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TopBarComponent],
+      declarations: [TopBarComponent, FloatingMenuComponent],
       imports: [
         FormsModule,
         MatDialogModule,
         MatIconModule,
+        MatMenuModule,
         MatSelectModule,
         MatSnackBarModule,
+        MatTabsModule,
         MatToolbarModule,
         RouterTestingModule
       ],

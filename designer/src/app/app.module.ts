@@ -21,6 +21,9 @@ import {
 import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
+import {
+  AddAppActionIoComponent
+} from './add-app-action-io/add-app-action-io.component';
 import { AppComponent } from './app.component';
 import {
   ConfigureActionComponent
@@ -54,7 +57,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent
+    TopBarComponent,
+    AddAppActionIoComponent
   ],
   imports: [
     BrowserModule,
@@ -79,6 +83,7 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
   bootstrap: [AppComponent],
   entryComponents: [
     ActionInstanceComponent,
+    AddAppActionIoComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
     TextComponent

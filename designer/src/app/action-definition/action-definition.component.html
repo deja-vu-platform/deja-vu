@@ -59,7 +59,7 @@
             <app-floating-menu
               #actionMenu
               [title]="action.fqtag"
-              (opened)="clickFirstTab(actionNum)"
+              (opened)="clickFirstTab(actionMenuContent)"
               (closed)="onActionMenuClosed()"
               (shouldClose)="closeMenu(actionMenuTrigger)"
             >
@@ -73,7 +73,7 @@
                   </app-set-inputs>
                 </mat-tab>
                 <mat-tab label="Outputs">
-                  <div dragula="expression-io" class="outputs">
+                  <div dragula="expression-io" class="inputtables">
                     <div
                       *ngFor="let output of action.of.outputs"
                       [attr.data-output]="action.from.name + '.' + action.of.name + '.' + output"
