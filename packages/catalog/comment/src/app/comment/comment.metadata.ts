@@ -23,11 +23,13 @@ import { ShowCommentComponent } from './show-comment/show-comment.component';
 export { ShowCommentComponent };
 import { ShowCommentsComponent } from './show-comments/show-comments.component';
 export { ShowCommentsComponent };
+import { ShowCommentCountComponent } from './show-comment-count/show-comment-count.component';
+export { ShowCommentCountComponent };
 
 
 const allComponents = [
   CreateCommentComponent, DeleteCommentComponent, EditCommentComponent,
-  ShowCommentComponent, ShowCommentsComponent
+  ShowCommentComponent, ShowCommentsComponent, ShowCommentCountComponent
 ];
 
 const metadata = {

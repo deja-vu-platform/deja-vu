@@ -1,0 +1,46 @@
+<dv.action name="show-climber-entry">
+  <userprofile.show-object id=$climber.id hidden=true />
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-3 center">
+          <h2 class="teal">
+            <!-- Climber Rank -->
+            <climberscore.show-target target=$climber
+              index=$rank+1
+              showIndex=true
+              showId=false
+              showScores=false
+              showTotal=false />
+          </h2>
+        </div>
+
+        <div class="col-6">
+          <!-- Climber Name -->
+          <h2 class="status">
+            <userprofile.show-object class="inline-block"
+              object=userprofile.show-object.loadedObject
+              showOnly=['firstName'] />
+            <userprofile.show-object class="inline-block"
+              object=userprofile.show-object.loadedObject
+              showOnly=['lastName'] />
+          </h2>
+        </div>
+
+        <div class="col-3">
+          <!-- Climber Score -->
+          <climberscore.show-target target=$climber
+            showId=false
+            showScores=false
+            totalLabel='' />
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- TODO: more details - Top Five Climbs -->
+        Top Five Climbs coming soon!
+      </div>
+    </div>
+  </div>
+</dv.action>

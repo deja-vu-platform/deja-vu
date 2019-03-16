@@ -8,7 +8,8 @@ const PASSKEY_KEY = 'passkey';
 
 @Injectable()
 export class PasskeyService {
-  setSignedInPasskey(token: string, passkey: Passkey) {
+  setSignedInPasskey(token: string, passkey: Passkey,
+    isGuest: boolean = false) {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(PASSKEY_KEY, JSON.stringify(passkey));
   }

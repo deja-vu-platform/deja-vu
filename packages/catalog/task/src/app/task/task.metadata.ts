@@ -39,13 +39,15 @@ import {
 export { ShowTasksComponent };
 import { UpdateTaskComponent } from './update-task/update-task.component';
 export { UpdateTaskComponent };
+import { ShowTaskCountComponent } from './show-task-count/show-task-count.component';
+export { ShowTaskCountComponent };
 
 
 const allComponents = [
   ApproveTaskComponent, ClaimTaskComponent,
   CompleteTaskComponent, CreateDueDateComponent, CreateTaskComponent,
   ShowAssigneeComponent, ShowTaskComponent, ShowTasksComponent,
-  UpdateTaskComponent
+  UpdateTaskComponent, ShowTaskCountComponent
 ];
 
 const metadata = {

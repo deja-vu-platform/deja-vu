@@ -1,0 +1,50 @@
+<dv.action name="add-participant">
+  <sex.show-labels hidden=true />
+  <category.show-labels hidden=true />
+
+  <div class="card">
+    <div class="card-body">
+      <dv.tx>
+        <dv.status savedText="Participant added to competition!" />
+        <dv.gen-id />
+        <div class="row">
+          <div class="offset-1 col-3">
+            <!-- Participant Name -->
+            <userprofile.create-object id=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-2">
+            <!-- Participant Sex -->
+            <sex.attach-labels itemId=dv.gen-id.id
+              inputLabel=""
+              labels=sex.show-labels.labels
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-2">
+            <!-- Participant Skill Level -->
+            <category.attach-labels itemId=dv.gen-id.id
+              inputLabel=""
+              labels=category.show-labels.labels
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-2 center">
+            <climbercode.create-passkey id=dv.gen-id.id
+              randomPassword=true
+              signIn=false
+              showOptionToSubmit=false />
+            <competitionclimbers.add-to-group id=$competitionId
+              memberId=dv.gen-id.id
+              hidden=true />
+            <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+
+            <dv.button class="add">
+              <img src="assets/add.png" />
+            </dv.button>
+            <dv.callback defaultHref="/host/competition-participants"
+              onExecSuccess=true hidden=true />
+          </div>
+        </div>
+      </dv.tx>
+    </div>
+  </div>
+</dv.action>

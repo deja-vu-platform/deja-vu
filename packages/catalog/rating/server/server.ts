@@ -44,6 +44,11 @@ const actionRequestTable: ActionRequestTable = {
       rating(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-rating-count': (extraInfo) => `
+    query ShowRatingCount($input: RatingsInput!) {
+      ratingCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-ratings-by-target': (extraInfo) => `
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
@@ -53,6 +58,23 @@ const actionRequestTable: ActionRequestTable = {
 
 function isPendingUpdate(doc: RatingDoc | null) {
   return _.get(doc, 'pending.type') === 'update-rating';
+}
+
+function getRatingFilter(input: RatingsInput) {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input)) {
+    if (input.bySourceId) {
+      // All ratings by a source
+      filter['sourceId'] = input.bySourceId;
+    }
+
+    if (input.ofTargetId) {
+      // All ratings of a target
+      filter['targetId'] = input.ofTargetId;
+    }
+  }
+
+  return filter;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -72,20 +94,13 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         return rating;
       },
 
-      ratings: (_root, { input }: { input: RatingsInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.bySourceId) {
-          // All ratings by a source
-          filter['sourceId'] = input.bySourceId;
-        }
-
-        if (input.ofTargetId) {
-          // All ratings of a target
-          filter['targetId'] = input.ofTargetId;
-        }
-
-        return ratings.find(filter)
+      ratings: async (_root, { input }: { input: RatingsInput }) => {
+        return await ratings.find(getRatingFilter(input))
           .toArray();
+      },
+
+      ratingCount: (_root, { input }: { input: RatingsInput }) => {
+        return ratings.count(getRatingFilter(input));
       },
 
       averageRatingForTarget: async (_root, { targetId }) => {

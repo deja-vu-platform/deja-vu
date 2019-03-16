@@ -1,4 +1,7 @@
 <div *ngIf="target">
+  <div *ngIf="showIndex">
+    <span>{{index}}</span>
+  </div>
   <div *ngIf="showId">
     <span>{{target.id}}</span>
   </div>
@@ -7,12 +10,12 @@
 
     <ul *ngIf="showScores" class="list-group">
       <li *ngFor="let score of target.scores" class="list-group-item">
-        <dv-include 
-          [action]="showScore" 
+        <dv-include
+          [action]="showScore"
           [inputs]="{
             score: score, showId: showScoreId, showValue: showScoreValue,
             showScoreSourceId: showScoreSourceId,
-            showTargetId: showScoreTargetId 
+            showTargetId: showScoreTargetId
           }"
           [parent]="showTarget"
           default-showScore="{ tag: scoring-show-score }">

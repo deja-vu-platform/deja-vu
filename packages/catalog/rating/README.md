@@ -6,5 +6,6 @@ Crowdsource evaluation of items
 
 - rate-target
 - show-average-rating
-- show-ratings-by-target
 - show-rating
+- show-rating-count
+- show-ratings-by-target

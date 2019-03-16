@@ -1,0 +1,31 @@
+<dv.action name="spectator-navbar" loggedInCompCode$=competitioncode.logged-in.passkey.code>
+  <dv.tx>
+    <competitioncode.logged-in hidden=true />
+    <dv.redirect href="/login/spectator" onEvalFailure=true />
+  </dv.tx>
+
+  <!-- <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+    <div class="container">
+      <div class="navbar-header">
+        <dv.link href="/host" class="navbar-brand">Spectator</dv.link>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <dv.link href="/spectator">Leaderboard</dv.link>
+        </li>
+        <li>
+          <dv.link href="/spectator/rules"
+            params={ id: competitioncode.logged-in.passkey.code }>
+            Rules
+          </dv.link>
+        </li>
+        <li>
+          <dv.tx>
+            <competitioncode.sign-out hidden=true />
+            <dv.link href="/login/spectator">Log Out</dv.link>
+          </dv.tx>
+        </li>
+      </ul>
+    </div>
+  </nav> -->
+</dv.action>

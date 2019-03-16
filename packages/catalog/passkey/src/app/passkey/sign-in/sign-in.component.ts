@@ -37,6 +37,8 @@ export class SignInComponent
   @Input() buttonLabel = 'Validate';
   @Input() passkeyValidatedText = 'Passkey validated';
 
+  @Input() showOptionToSubmit = true;
+
   @Output() passkey = new EventEmitter<Passkey>();
 
   @ViewChild(FormGroupDirective) form;
@@ -47,7 +49,7 @@ export class SignInComponent
   });
 
   @Input() set code(code: string) {
-    if (code) { this.passkeyControl.setValue(code); }
+    if (!_.isNil(code)) { this.passkeyControl.setValue(code); }
   }
 
   passkeyValidated = false;
@@ -72,12 +74,13 @@ export class SignInComponent
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<ValidatePasskeyRes>(this.apiPath, {
-      query: `mutation {
-        validatePasskey(code: "${this.passkeyControl.value}") {
-          passkey { code }
+      inputs: { code: this.passkeyControl.value },
+      extraInfo: {
+        returnFields: `
+          passkey { id, code }
           token
-        }
-      }`
+        `
+      }
     })
       .toPromise();
 

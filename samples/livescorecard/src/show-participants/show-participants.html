@@ -1,0 +1,47 @@
+<dv.action name="show-participants">
+  <livescorecard.host-navbar />
+
+  <div class="container below-navbar">
+
+    <!-- TODO: Sort by name -->
+    <div class="row">
+      <div class="col-lg-4">
+        <span>Sort by: (soon)</span>
+        <div class="row left-space">
+          <div class="row left-space">
+            <div class="radio">
+              <label>
+                <input type="radio" name="sortradio" value="Alphabetical by Last Name" />
+                Alphabetical by Last Name
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="sortradio" value="Alphabetical by First Name" />
+                Alphabetical by First Name
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+      <div class="offset-1 col-3 center white">name</div>
+      <div class="col-2 center white">sex</div>
+      <div class="col-2 white">category</div>
+      <div class="col-2 white"></div>
+    </div>
+
+    <livescorecard.add-participant
+      loggedInUserId=livescorecard.host-navbar.loggedInUserId
+      competitionId=$competitionId />
+
+    <competitionclimbers.show-members inGroupId=$competitionId
+      noMembersText=""
+      showMember=<livescorecard.show-participant id=$id
+        competitionId=$competitionId /> />
+  </div>
+</dv.action>

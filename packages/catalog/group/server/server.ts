@@ -72,15 +72,99 @@ const actionRequestTable: ActionRequestTable = {
       groups(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-group-count': (extraInfo) => `
+    query ShowGroupCount($input: GroupsInput!) {
+      groupCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-members': (extraInfo) => `
     query ShowMembers($input: MembersInput!) {
       members(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-member-count': (extraInfo) => `
+    query ShowMemberCount($input: MembersInput!) {
+      memberCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
-}
+};
 
 function isPendingCreate(group: GroupDoc | null) {
   return _.get(group, 'pending.type') === 'create-group';
+}
+
+function getGroupFilter(input: GroupsInput) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+
+  const filter = (!_.isNil(input) && !_.isNil(input.withMemberId)) ?
+    { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  return filter;
+}
+
+function getMemberAggregationPipeline(input: MembersInput,
+  getCount = false) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+  const filter = (!_.isNil(input) && !_.isNil(input.inGroupId)) ?
+    { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  const pipeline: any = [
+    { $match: filter },
+    {
+      $group: {
+        _id: 0,
+        memberIds: { $push: '$memberIds' }
+      }
+    },
+    {
+      $project: {
+        memberIds: {
+          $reduce: {
+            input: '$memberIds',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ];
+
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$memberIds' } } });
+  }
+
+  return pipeline;
+}
+
+async function getMembers(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input))
+    .toArray();
+
+  return res[0] ? res[0].memberIds : [];
+}
+
+async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input, true))
+    .next();
+
+  return res ? res['count'] : 0;
 }
 
 async function addOrRemoveMember(
@@ -115,7 +199,8 @@ async function addOrRemoveMember(
       return true;
     case undefined:
       await GroupValidation.groupExistsOrFail(groups, groupId);
-      const updateObj = await groups.updateOne(notPendingGroupIdFilter, updateOp);
+      const updateObj = await groups
+        .updateOne(notPendingGroupIdFilter, updateOp);
       if (updateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }
@@ -147,58 +232,24 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         return isPendingCreate(group) ? null : group;
       },
-      members: async (_root, { input }: { input: MembersInput }) => {
-        const noCreateGroupPending = {
-          $or: [
-            { pending: { $exists: false } },
-            { pending: { type: { $ne: 'create-group' } } }
-          ]
-        };
-        const filter = input.inGroupId ?
-          { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
-          noCreateGroupPending;
 
-        const pipelineResults = await groups.aggregate([
-          { $match: filter },
-          {
-            $group: {
-              _id: 0,
-              memberIds: { $push: '$memberIds' }
-            }
-          },
-          {
-            $project: {
-              memberIds: {
-                $reduce: {
-                  input: '$memberIds',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
-          .toArray();
-
-        const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
-
-        return matchingMembers;
-      },
       groups: async (_root, { input }: { input: GroupsInput }) => {
-        const noCreateGroupPending = {
-          $or: [
-            { pending: { $exists: false } },
-            { pending: { type: { $ne: 'create-group' } } }
-          ]
-        };
-
-        const filter = input.withMemberId ?
-          { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
-          noCreateGroupPending;
-
-        return groups.find(filter)
+        return groups.find(getGroupFilter(input))
           .toArray();
+      },
+
+      groupCount: (_root, { input }: { input: GroupsInput }) => {
+        return groups.count(getGroupFilter(input));
+      },
+
+      members: async (_root, { input }: { input: MembersInput }) => {
+        return await getMembers(groups, input);
+      },
+
+      memberCount: async (_root, { input }: { input: MembersInput }) => {
+        return await getMemberCount(groups, input);
       }
+
     },
     Group: {
       id: (group: GroupDoc) => group.id,

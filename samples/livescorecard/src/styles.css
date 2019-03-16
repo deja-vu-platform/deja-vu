@@ -1,0 +1,353 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+html,
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  background-color: #4FB5C3;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.white {
+  color: white;
+}
+
+.white-back {
+  background-color: white;
+  color: black;
+  flex: 1;
+  height: 100%;
+  padding-bottom: 5%;
+}
+
+nav a.dvlink {
+  color: lightgrey;
+}
+
+dv-link.btn.btn-outline-secondary.choice.active,
+dv-link.btn-outline-secondary:hover {
+  background-color: #4FB5C3;
+}
+
+dv-link.btn.btn-outline-secondary.choice.active a,
+dv-link.btn-outline-secondary:hover a {
+  background-color: #4FB5C3;
+  color: white;
+}
+
+.btn-success,
+authentication-sign-in button.mat-button {
+  background-color: #4FB5C3;
+  border: none;
+  color: white !important;
+}
+
+.btn-success:hover,
+.btn-success:active,
+.btn-success:active:focus,
+.btn-success:focus,
+authentication-sign-in button.mat-button:hover,
+authentication-sign-in button.mat-button:active,
+authentication-sign-in button.mat-button:active:focus,
+authentication-sign-in button.mat-button:focus {
+  background-color: #218290;
+  border: none;
+  color: white !important;
+}
+
+.btn-danger {
+  background-color: #871515;
+  border: none;
+}
+
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger:active:focus,
+.btn-danger:focus {
+  background-color: #BB2B2B;
+  border: none;
+}
+
+.full,
+authentication-sign-in button.mat-button {
+  width: 80%;
+  margin-top: 1em;
+  height: 3em;
+  text-align: center;
+}
+
+.add img {
+  opacity: .9;
+  cursor: pointer;
+  height: 2.5em;
+}
+
+.add img:hover {
+  opacity: 1;
+}
+
+img.hostcompentry {
+  height: 1.3em;
+  display: inline-block;
+  padding-right: .2em;
+}
+
+img.trophy {
+  height: 1.1em;
+}
+
+.edit img {
+  opacity: .3;
+  height: 1.5em;
+  cursor: pointer;
+  margin-left: .2em;
+}
+
+.edit img:hover {
+  opacity: .5;
+}
+
+@media screen and (max-width: 423px) {
+  .edit img {
+    display: block;
+    margin-top: 2em;
+  }
+}
+
+.edit-rules img {
+  padding-left: 1em;
+  margin-bottom: 1em;
+}
+
+.link {
+  cursor: pointer;
+  color: #218290;
+}
+
+.link:hover {
+  color: #218290;
+  font-weight: bold;
+}
+
+.below-navbar {
+  margin-top: 75px;
+}
+
+.card {
+  border-color: white;
+  color: black;
+  margin: .2em;
+}
+
+.edit {
+  opacity: .3;
+  height: 1.5em;
+  cursor: pointer;
+  margin-left: .2em;
+}
+
+.edit:hover {
+  opacity: .5;
+}
+
+@media screen and (max-width: 423px) {
+  .edit {
+    display: block;
+    margin-top: 2em;
+  }
+}
+
+.mycode {
+  display: inline-block !important;
+}
+
+.competition-entry {
+  height: 1.3em;
+  display: inline-block;
+  padding-right: .2em;
+}
+
+.right {
+  text-align: right;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.inv-border {
+  border: 1px;
+}
+
+.left-space {
+  margin-left: 1em;
+}
+
+.labels {
+  opacity: .9;
+  color: black;
+}
+
+.red {
+  color: #871515;
+}
+
+.edit-status {
+  display: inline;
+}
+
+.others {
+  height: 1.3em;
+  margin-right: .2em;
+  display: inline-block;
+}
+
+.others:hover {
+  opacity: .5;
+  cursor: pointer;
+}
+
+.round-checkbox {
+  cursor: pointer;
+  width: 1.5em;
+  height: 1.5em;
+  top: 0;
+  border: 1px solid #bdc3c7;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.check {
+  height: 2em;
+  margin-top: -1em;
+  margin-left: .2em;
+}
+
+.round-checkbox:hover {
+  background-color: #ecf0f1;
+}
+
+.tall {
+  height: 100%;
+  flex: 1;
+}
+
+.center {
+  text-align: center;
+}
+
+.teal {
+  color: #4FB5C3;
+}
+
+input[disabled] {
+  background-color: #bdc3c7;
+}
+
+input {
+  color: black;
+}
+
+input[type=text] {
+  width: 100%;
+  padding: .2em;
+  border-color: #F5F5F5;
+}
+
+input[type=radio]:after {
+  cursor: pointer;
+  width: 1em;
+  height: 1em;
+  top: 0;
+  border: 1px solid white;
+  border-radius: 50%;
+  background-color: white;
+}
+
+input[type=radio]checked:after {
+  width: .5em;
+  height: .5em;
+  border: 1px solid white;
+  border-radius: 50%;
+  background-color: #218290;
+}
+
+input[type=text].authentication:not(.passkey-create) {
+  width: 80%;
+  height: 3em;
+  text-align: center;
+  border: 1px solid #bdc3c7;
+  margin: 0em auto;
+}
+
+input[type=password].authentication {
+  width: 80%;
+  margin: 0em auto;
+  height: 3em;
+  text-align: center;
+  border: 1px solid #bdc3c7;
+}
+
+.user-form {
+  margin: 30px 0px;
+}
+
+.event-item,
+.task-item {
+  background-color: transparent;
+  border: none;
+}
+
+.choice a {
+  margin: .3em;
+}
+
+.col-3-input-fields .mat-input-flex {
+  width: 14.0625em;
+}
+
+.col-2-input-fields .mat-input-flex {
+  width: 9.375em;
+}
+
+.col-1-input-fields .mat-input-flex {
+  width: 4.6875em;
+}
+
+.right-shift {
+  padding-left: 1.5em;
+}
+
+.category-labels .mat-input-infix {
+  border-top-width: 0em;
+  padding-bottom: 0.25em;
+  padding-top: 0.25em;
+}
+
+authorization-show-resources ul,
+group-show-members ul {
+  margin: 0em 0.125em;
+}
+
+livescorecard-show-problem .property-show-object-property,
+livescorecard-show-problem scoring-show-score div.ng-star-inserted,
+livescorecard-show-problem .edit img {
+  padding-top: 0.625em;
+}
+
+scoring-show-targets-by-score .container {
+  padding: 0;
+}
+

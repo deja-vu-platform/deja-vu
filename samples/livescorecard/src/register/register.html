@@ -1,0 +1,29 @@
+<dv.action name="register">
+  <div class="host-register white-back">
+    <livescorecard.banner />
+    <div class="container text-center">
+      <div class="row">
+        <div class="offset-lg-4 col-lg-4 offset-lg-4">
+          <hr class="user-form" />
+          <dv.tx>
+            <dv.gen-id />
+            <userprofile.create-object id=dv.gen-id.id
+              showOptionToSubmit=false />
+
+            <hostauthentication.register-user id=dv.gen-id.id
+              inputLabel="username"
+              passwordLabel="password"
+              retypePasswordLabel="confirm password"
+              showOptionToSubmit=false />
+            <dv.button class="btn btn-success full">REGISTER</dv.button>
+            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+          </dv.tx>
+
+          <p>Already have an account? Sign in
+            <dv.link href="/login/host" class="link inline-block">here</dv.link>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

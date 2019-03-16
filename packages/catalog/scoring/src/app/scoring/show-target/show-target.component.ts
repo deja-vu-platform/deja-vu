@@ -1,14 +1,6 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  OnInit,
-  OnChanges,
-  Output,
-  Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnInit, Output, Type
 } from '@angular/core';
 
 import {
@@ -27,9 +19,10 @@ import { Target } from '../shared/scoring.model';
   styleUrls: ['./show-target.component.css']
 })
 export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
   @Input() id: string;
   @Input() target: Target;
+  @Input() index: number;
 
   @Input() showId = true;
   @Input() showScores = true;
@@ -38,12 +31,13 @@ OnChanges {
   @Input() showScoreValue = true;
   @Input() showScoreSourceId = true;
   @Input() showScoreTargetId = true;
+  @Input() showIndex = false;
 
   @Input() totalLabel = 'Total: ';
   @Input() noScoresText = 'No scores to show';
 
   @Input() showScore: Action = {
-    type: <Type<Component>> ShowScoreComponent
+    type: <Type<Component>>ShowScoreComponent
   };
 
   @Output() loadedTarget = new EventEmitter<Target>();
@@ -78,7 +72,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {target: Target}}>(this.apiPath, {
+      this.gs.get<{ data: { target: Target } }>(this.apiPath, {
         params: {
           inputs: { id: this.id },
           extraInfo: {
@@ -91,16 +85,16 @@ OnChanges {
                     `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
                     `${this.showScoreTargetId ? 'targetId \n' : ''}` +
                   '}' : ''
-                }
-                ${this.showTotal ? 'total': ''}
+                 }
+                ${this.showTotal ? 'total' : ''}
             `
           }
         }
       })
-      .subscribe((res) => {
-        this.target = res.data.target;
-        this.loadedTarget.emit(this.target);
-      });
+        .subscribe((res) => {
+          this.target = res.data.target;
+          this.loadedTarget.emit(this.target);
+        });
     }
   }
 

@@ -12,8 +12,10 @@ import {
   CreateScoreInput,
   ScoreDoc,
   ShowScoreInput,
-  Target
+  Target,
+  TargetsByScoreInput
 } from './schema';
+
 import { v4 as uuid } from 'uuid';
 
 interface ScoringConfig extends Config {
@@ -45,8 +47,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-targets-by-score': (extraInfo) => `
-    query ShowTargetsByScore($asc: Boolean) {
-      targetsByScore(asc: $asc) ${getReturnFields(extraInfo)}
+    query ShowTargetsByScore($input: TargetsByScoreInput!) {
+      targetsByScore(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -77,12 +79,12 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
             sourceId: input.sourceId,
             targetId: input.targetId,
             pending: { $exists: false }
-          }
+          };
         } else {
           query = {
             id: input.id,
             pending: { $exists: false }
-          }
+          };
         }
 
         const score = await scores.findOne(query);
@@ -95,6 +97,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
         return score;
       },
+
       target: async (_root, { id }): Promise<Target> => {
         const targetScores: ScoreDoc[] = await scores.find({
           targetId: id, pending: { $exists: false }
@@ -106,29 +109,36 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           scores: targetScores
         };
       },
+
       // TODO: pagination, max num results
       targetsByScore: async (
-        _root, { asc }: { asc: boolean }): Promise<Target[]> => {
+        _root,
+        { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
+        const query = { pending: { $exists: false } };
+        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
+          query['targetId'] = { $in: input.targetIds };
+        }
+
         const targets: any = await scores.aggregate([
+          { $match: query },
           {
             $group: {
               _id: '$targetId', scores: { $push: '$$ROOT' }
             }
-          }, {
-            $match: { pending: { $exists: false } }
           }
-        ]).toArray();
+        ])
+          .toArray();
 
         return _(targets)
-        .map((target) => {
-          return {
-            ...target,
-            total: totalScoreFn(_.map(target.scores, 'value')),
-            id: target._id
-          }
-        })
-        .orderBy(['total'], [ asc ? 'asc' : 'desc' ])
-        .value();
+          .map((target) => {
+            return {
+              ...target,
+              total: totalScoreFn(_.map(target.scores, 'value')),
+              id: target._id
+            };
+          })
+          .orderBy(['total'], [input.asc ? 'asc' : 'desc'])
+          .value();
       }
     },
     Score: {

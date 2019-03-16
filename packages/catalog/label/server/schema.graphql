@@ -25,7 +25,9 @@ input AddLabelsToItemInput {
 type Query {
   label(id: ID!): Label
   labels(input: LabelsInput!): [Label]
+  labelCount(input: LabelsInput!): Int
   items(input: ItemsInput!): [ID]
+  itemCount(input: ItemsInput!): Int
 }
 
 type Mutation {

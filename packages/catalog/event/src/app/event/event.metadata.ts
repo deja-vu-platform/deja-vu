@@ -27,12 +27,14 @@ import { ShowEventComponent } from './show-event/show-event.component';
 export { ShowEventComponent };
 import { ShowEventsComponent } from './show-events/show-events.component';
 export { ShowEventsComponent };
+import { ShowEventCountComponent } from './show-event-count/show-event-count.component';
+export { ShowEventCountComponent };
 
 
 const allComponents = [
   ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
   CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent,
-  ShowEventsComponent
+  ShowEventsComponent, ShowEventCountComponent
 ];
 
 const metadata = {

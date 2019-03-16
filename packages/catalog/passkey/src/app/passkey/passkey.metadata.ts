@@ -23,10 +23,12 @@ import { SignOutComponent } from './sign-out/sign-out.component';
 export { SignOutComponent };
 import { ValidateComponent } from './validate/validate.component';
 export { ValidateComponent };
+import { ShowPasskeyComponent } from './show-passkey/show-passkey.component';
+export { ShowPasskeyComponent };
 
 const allComponents = [
   CreatePasskeyComponent, SignInComponent, SignOutComponent,
-  LoggedInComponent, ValidateComponent
+  LoggedInComponent, ValidateComponent, ShowPasskeyComponent
 ];
 
 const metadata = {

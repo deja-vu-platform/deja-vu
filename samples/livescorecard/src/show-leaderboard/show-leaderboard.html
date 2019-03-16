@@ -1,0 +1,50 @@
+<dv.action name="show-leaderboard">
+  <dv.if condition=$isHost>
+    <livescorecard.host-navbar />
+  </dv.if>
+
+  <div class="container below-navbar">
+    <div class="row">
+      <div class="offset-lg-4 col-lg-4">
+        <h1> LEADERBOARD </h1>
+        <hr />
+      </div>
+      <div class="col-lg-4"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="row left-space">
+          <sex.search-items-by-labels
+            searchPlaceholder="Search by sex" />
+        </div>
+
+        <br />
+
+        <div class="row left-space">
+          <category.search-items-by-labels
+            searchPlaceholder="Search by skill level" />
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <!-- Leaderboard Header -->
+        <div class="row">
+          <div class="col-3 center">rank</div>
+          <div class="offset-6 col-3">score</div>
+        </div>
+
+        <!-- Leaderboard -->
+        <!-- TODO: Might need to use show-items -->
+        <climberscore.show-targets-by-score showAscending=false
+          targetIds=sex.search-items-by-labels.searchResultItems || category.search-items-by-labels.searchResultItems
+          showScores=false
+          noTargetsText=""
+          showTarget=<livescorecard.show-climber-entry
+            climber=$target rank=$index /> />
+      </div>
+
+      <div class="col-lg-3"></div>
+    </div>
+  </div>
+</dv.action>

@@ -80,14 +80,29 @@ const actionRequestTable: ActionRequestTable = {
       followers(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-follower-count': (extraInfo) => `
+    query ShowFollowerCount($input: FollowersInput!) {
+      followerCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-messages': (extraInfo) => `
     query ShowMessages($input: MessagesInput!) {
       messages(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-message-count': (extraInfo) => `
+    query ShowMessageCount($input: MessagesInput!) {
+      messageCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-publishers': (extraInfo) => `
-    query ShowPublishers($input: PublishersInput!) {
+    query ShowPublisherCount($input: PublishersInput!) {
       publishers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-publisher-count': (extraInfo) => `
+    query ShowPublishers($input: PublishersInput!) {
+      publisherCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -96,10 +111,48 @@ function isPendingCreate(doc: PublisherDoc | null) {
   return _.get(doc, 'pending.type') === 'create-publisher';
 }
 
-async function getAggregatedMessages(
-  publishers: mongodb.Collection<PublisherDoc>,
-  matchQuery: any): Promise<PublisherDoc[]> {
-  const results = await publishers.aggregate([
+function getPublisherFilter(input: PublishersInput) {
+  // No publisher filter
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input) && !_.isNil(input.followedById)) {
+    // Get all publishers of a follower
+    filter['followerIds'] = input.followedById;
+  }
+
+  return filter;
+}
+
+function getFollowerAggregationPipeline(getCount = false) {
+  const pipeline: any = [
+    { $match: { pending: { $exists: false } } },
+    {
+      $group: {
+        _id: 0,
+        followerIds: { $push: '$followerIds' }
+      }
+    },
+    {
+      $project: {
+        followerIds: {
+          $reduce: {
+            input: '$followerIds',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ];
+
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$followerIds' } } });
+  }
+
+  return pipeline;
+}
+
+function getMessageAggregationPipeline(matchQuery: any, getCount = false) {
+  const pipeline: any = [
     { $match: matchQuery },
     {
       $group: {
@@ -118,10 +171,13 @@ async function getAggregatedMessages(
         }
       }
     }
-  ])
-    .toArray();
+];
 
-  return results;
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$messages' } } });
+  }
+
+  return pipeline;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -154,7 +210,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       followers: async (_root, { input }: { input: FollowersInput }) => {
-        if (input.ofPublisherId) {
+        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
           // A publisher's followers
           const publisher = await publishers.findOne(
             { id: input.ofPublisherId, pending: { $exists: false } },
@@ -170,52 +226,56 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         // No follower filter
-        const results = await publishers.aggregate([
-          { $match: { pending: { $exists: false } } },
-          {
-            $group: {
-              _id: 0,
-              followerIds: { $push: '$followerIds' }
-            }
-          },
-          {
-            $project: {
-              followerIds: {
-                $reduce: {
-                  input: '$followerIds',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
+        const results = await publishers
+          .aggregate(getFollowerAggregationPipeline())
           .toArray();
 
-        return results[0].followerIds;
+        return results[0] ? results[0].followerIds : [];
+      },
+
+      followerCount: async (_root, { input }: { input: FollowersInput }) => {
+
+        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
+          // A publisher's followers
+          const res = await publishers.aggregate([
+            {
+              $match: {
+                id: input.ofPublisherId,
+                pending: { $exists: false }
+              }
+            },
+            { $project: { count: { $size: '$memberIds' } } }
+          ])
+            .next();
+
+          return res ? res['count'] : 0;
+        }
+
+        // No follower filter
+        const results = await publishers
+          .aggregate(getFollowerAggregationPipeline(true))
+          .next();
+
+        return results ? results['count'] : 0;
       },
 
       publishers: async (_root, { input }: { input: PublishersInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.followedById) {
-          // Get all publishers of a follower
-          filter['followerIds'] = input.followedById;
-
-          return publishers.find(filter)
-            .toArray();
-        }
-
-        // No publisher filter
-        return publishers.find(filter)
+        return publishers.find(getPublisherFilter(input))
           .toArray();
+      },
+
+      publisherCount: (_root, { input }: { input: PublishersInput }) => {
+        return publishers.count(getPublisherFilter(input));
       },
 
       messages: async (_root, { input }: { input: MessagesInput }) => {
         const filter = { pending: { $exists: false } };
-        if (input.byPublisherId) {
+        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
+          filter['id'] = input.byPublisherId;
+
           // Get messages by a specific publisher
           const publisher = await publishers.findOne(
-            { id: input.byPublisherId, pending: { $exists: false } },
+            filter,
             { projection: { messages: 1 } });
 
           if (_.isNil(publisher) || isPendingCreate(publisher)) {
@@ -224,17 +284,44 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
           return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
 
-        } else if (input.ofPublishersFollowedById) {
-          filter['followerIds'] = input.ofPublishersFollowedById;
-          const results = await getAggregatedMessages(publishers, filter);
-
-          return results[0].messages;
-
         } else {
-          // No message filter
-          const results = await getAggregatedMessages(publishers, filter);
+          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
+            // Get all the messages of publishers that a user follows
+            filter['followerIds'] = input.ofPublishersFollowedById;
+          }
 
-          return results[0].messages;
+          const results = await publishers
+            .aggregate(getMessageAggregationPipeline(filter))
+            .toArray();
+
+          return results[0] ? results[0].messages : [];
+        }
+      },
+
+      messageCount: async (_root, { input }: { input: MessagesInput }) => {
+        const filter = { pending: { $exists: false } };
+
+        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
+          filter['id'] = input.byPublisherId;
+          // A publisher's messages
+          const res = await publishers.aggregate([
+            { $match: filter },
+            { $project: { count: { $size: '$messages' } } }
+          ])
+            .next();
+
+          return res ? res['count'] : 0;
+        } else {
+          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
+            // Get all the messages of publishers that a user follows
+            filter['followerIds'] = input.ofPublishersFollowedById;
+          }
+
+          const results = await publishers
+            .aggregate(getMessageAggregationPipeline(filter, true))
+            .next();
+
+          return results ? results['count'] : 0;
         }
       },
 
@@ -518,7 +605,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
 
     return Promise.all([
       publishers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      publishers.createIndex({ id: 1 , 'messages.id': 1 }, { unique: true })
+      publishers.createIndex({ id: 1, 'messages.id': 1 }, { unique: true })
     ]);
   })
   .actionRequestTable(actionRequestTable)

@@ -80,11 +80,33 @@ const actionRequestTable: ActionRequestTable = {
     query ShowComments($input: CommentsInput!) {
       comments(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-comment-count': (extraInfo) => `
+    query ShowCommentCount($input: CommentsInput!) {
+      commentCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 
 function isPendingCreate(doc: CommentDoc | null) {
   return _.get(doc, 'pending.type') === 'create-comment';
+}
+
+function getCommentFilter(input: CommentsInput) {
+  const filter = { pending: { $exists: false } };
+
+  if (!_.isNil(input)) {
+    if (input.byAuthorId) {
+      // Comments by an author
+      filter['authorId'] = input.byAuthorId;
+    }
+    if (input.ofTargetId) {
+      // Comments of a target
+      filter['targetId'] = input.ofTargetId;
+    }
+  }
+
+  return filter;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -117,18 +139,12 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       comments: async (_root, { input }: { input: CommentsInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (!_.isEmpty(input.byAuthorId)) {
-          // Comments by an author
-          filter['authorId'] = input.byAuthorId;
-        }
-        if (!_.isEmpty(input.ofTargetId)) {
-          // Comments of a target
-          filter['targetId'] = input.ofTargetId;
-        }
-
-        return comments.find(filter)
+        return await comments.find(getCommentFilter(input))
           .toArray();
+      },
+
+      commentCount: (_root, { input }: { input: CommentsInput }) => {
+        return comments.count(getCommentFilter(input));
       }
     },
 

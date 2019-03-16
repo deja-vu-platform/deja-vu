@@ -1,9 +1,8 @@
 import {
-  AfterViewInit, Component, ElementRef,
-  EventEmitter, Input, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
 
-import { RunService } from '@deja-vu/core';
+import { OnEval, RunService } from '@deja-vu/core';
 
 import { PasskeyService } from '../shared/passkey.service';
 
@@ -11,7 +10,7 @@ import { PasskeyService } from '../shared/passkey.service';
   selector: 'passkey-logged-in',
   template: ''
 })
-export class LoggedInComponent implements OnInit, AfterViewInit {
+export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
   @Output() passkey = new EventEmitter();
 
   constructor(
@@ -23,12 +22,16 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-        const passkey = this.passkeyService.getSignedInPasskey();
+    setTimeout(() => this.rs.eval(this.elem));
+  }
 
-      if (passkey) {
-        this.passkey.emit(passkey);
-      }
-    });
+  async dvOnEval(): Promise<void> {
+    const passkey = this.passkeyService.getSignedInPasskey();
+
+    if (passkey) {
+      this.passkey.emit(passkey);
+    } else {
+      throw new Error('No user is logged in');
+    }
   }
 }

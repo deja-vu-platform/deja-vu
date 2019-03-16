@@ -6,10 +6,11 @@ Verify the user's identity with a username and password
 
 - authenticate
 - change-password
-- register-user
-- show-users
 - choose-user
-- sign-in
 - logged-in
+- register-user
 - show-user
+- show-user-count
+- show-users
+- sign-in
 - sign-out

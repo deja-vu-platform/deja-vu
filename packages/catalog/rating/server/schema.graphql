@@ -28,6 +28,7 @@ input SetRatingInput {
 type Query {
   rating(input: RatingInput!): Rating
   ratings(input: RatingsInput!): [Rating]
+  ratingCount(input: RatingsInput!): Int
   averageRatingForTarget(targetId: ID!): AverageRatingForTargetOutput
 }
 

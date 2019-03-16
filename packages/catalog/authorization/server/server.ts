@@ -95,15 +95,33 @@ const actionRequestTable: ActionRequestTable = {
       resource(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-resource-count': (extraInfo) => `
+    query ShowResourceCount($input: ResourcesInput!) {
+      resourceCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-resources': (extraInfo) => `
     query ShowResources($input: ResourcesInput!) {
       resources(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
 function isPendingCreate(doc: ResourceDoc | null) {
   return _.get(doc, 'pending.type') === 'create-resource';
+}
+
+function getResourceFilter(input: ResourcesInput) {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input)) {
+    if (input.createdBy) {
+      filter['ownerId'] = input.createdBy;
+    } else if (input.viewableBy) {
+      filter['viewerIds'] = input.viewableBy;
+    }
+  }
+
+  return filter;
 }
 
 function resolvers(db: mongodb.Db, _config: Config): object {
@@ -112,15 +130,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
   return {
     Query: {
       resources: async (_root, { input }: { input: ResourcesInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.createdBy) {
-          filter['ownerId'] = input.createdBy;
-        } else if (input.viewableBy) {
-          filter['viewerIds'] = input.viewableBy;
-        }
-
-        return await resources
-          .find(filter)
+        return await resources.find(getResourceFilter(input))
           .toArray();
       },
 
@@ -132,6 +142,10 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         return resource;
+      },
+
+      resourceCount: (_root, { input }: { input: ResourcesInput }) => {
+        return resources.count(getResourceFilter(input));
       },
 
       owner: async (_root, { resourceId }) => {

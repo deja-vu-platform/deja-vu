@@ -25,12 +25,16 @@ import { ShowLabelComponent } from './show-label/show-label.component';
 export { ShowLabelComponent };
 import { ShowLabelsComponent } from './show-labels/show-labels.component';
 export { ShowLabelsComponent };
+import { ShowItemCountComponent } from './show-item-count/show-item-count.component';
+export { ShowItemCountComponent };
+import { ShowLabelCountComponent } from './show-label-count/show-label-count.component';
+export { ShowLabelCountComponent };
 
 
 const allComponents = [
   CreateLabelComponent, SearchItemsByLabelsComponent,
   ShowItemComponent, ShowItemsComponent, ShowLabelComponent,
-  ShowLabelsComponent, AttachLabelsComponent
+  ShowLabelsComponent, AttachLabelsComponent, ShowItemCountComponent, ShowLabelCountComponent
 ];
 
 const metadata = {

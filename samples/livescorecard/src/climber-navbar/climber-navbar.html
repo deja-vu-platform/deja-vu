@@ -1,0 +1,45 @@
+<dv.action name="climber-navbar" loggedInClimberCode$=climbercode.logged-in.passkey.code>
+  <dv.tx>
+    <competitioncode.logged-in hidden=true />
+    <climbercode.logged-in hidden=true />
+    <dv.redirect href="/login/climber" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+    <div class="container">
+      <div class="navbar-header">
+        <dv.link href="/climber" class="navbar-brand">Climber</dv.link> |
+        <userprofile.show-object id=climbercode.logged-in.passkey.code
+          showOnly=['firstName']/> (<climberscore.show-target
+            class="inline-block"
+            id=climbercode.logged-in.passkey.code
+            showId=false
+            showScores=false
+            totalLabel="" />)
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="popup">
+          My Code | <climbercode.logged-in class="popuptext" />
+        </li>
+        <li>
+          <dv.link href="/climber">Scorecard</dv.link>
+        </li>
+        <li>
+          <dv.link href="/climber/leaderboard">Leaderboard</dv.link>
+        </li>
+        <li>
+          <dv.link href="/climber/rules"
+            params={ id: competitioncode.logged-in.passkey.code }>
+            Rules
+          </dv.link>
+        </li>
+        <li>
+          <dv.tx>
+            <climbercode.sign-out hidden=true />
+            <dv.link href="/login/climber">Log Out</dv.link>
+          </dv.tx>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</dv.action>

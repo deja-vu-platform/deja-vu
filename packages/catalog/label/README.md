@@ -5,9 +5,11 @@ Label items so that they can be found later
 ## Actions
 
 - attach-labels
+- create-label
 - search-items-by-labels
 - show-item
-- show-label
-- create-label
+- show-item-count
 - show-items
+- show-label
+- show-label-count
 - show-labels
