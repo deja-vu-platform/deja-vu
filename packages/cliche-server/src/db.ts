@@ -259,6 +259,9 @@ export class Collection<T extends Object> {
   /**
    * Attempt to get the lock on the document given by the filter,
    * and throws the appropriate exception if it fails.
+   *
+   * Note: This is not reentrant yet.
+   *
    * @param  filter the filter to get the desired document
    * @return the promise that will resolve when the method is done
    * @throws ClicheDbNotFoundError if the filter does not return any documents
@@ -291,6 +294,8 @@ export class Collection<T extends Object> {
    * If successful, the document will contain information from the context
    * that indicates that context owns the lock to the document.
    *
+   * Note: This is not reentrant yet.
+   *
    * @param  context the context trying to acquire the lock
    * @param  filter  the filter to get the document to lock
    * @param  updateType whether the update is for an update or a delete
@@ -308,6 +313,8 @@ export class Collection<T extends Object> {
    * If successful, the document will be updated
    * and will also contain information from the context
    * that indicates that context owns the lock to the document.
+   *
+   * Note: This is not reentrant yet.
    *
    * @param  context the context trying to acquire the lock
    * @param  filter  the filter to get the document to lock
