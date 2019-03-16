@@ -12,6 +12,7 @@ import {
   CreateGroupInput,
   GroupDoc,
   GroupsInput,
+  MemberDoc,
   MembersInput
 } from './schema';
 
@@ -85,6 +86,11 @@ const actionRequestTable: ActionRequestTable = {
   'show-member-count': (extraInfo) => `
     query ShowMemberCount($input: MembersInput!) {
       memberCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-member': (extraInfo) => `
+    query ShowMember($id: ID!) {
+      member(id: $id) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -242,6 +248,23 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         return groups.count(getGroupFilter(input));
       },
 
+      member: async (_root, { id }) => {
+        const groupsWithMember = await groups
+          .find({ memberIds: id }, { projection: { id: 1, _id: 0 } })
+          .toArray();
+
+        if (_.isNil(groupsWithMember) || _.isEmpty(groupsWithMember)) {
+          throw new Error(`Member ${id} does not exist`);
+        }
+
+        const groupIds = _.map(groupsWithMember, 'id');
+
+        return {
+          id: id,
+          groupIds: groupIds
+        };
+      },
+
       members: async (_root, { input }: { input: MembersInput }) => {
         return await getMembers(groups, input);
       },
@@ -254,6 +277,10 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     Group: {
       id: (group: GroupDoc) => group.id,
       memberIds: (group: GroupDoc) => group.memberIds
+    },
+    Member: {
+      id: (member: MemberDoc) => member.id,
+      groupIds: (member: MemberDoc) => member.groupIds
     },
     Mutation: {
       createGroup: async (
