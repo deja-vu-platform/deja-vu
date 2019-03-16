@@ -4,7 +4,7 @@ import * as mongodb from 'mongodb';
 export type Query<T> = mongodb.FilterQuery<T>;
 
 export interface Context {
-  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  reqType: 'vote' | 'commit' | 'abort' | undefined; // undefined if not a tx
   runId: string;
   reqId: string;
 }
@@ -94,7 +94,8 @@ export class Collection<T extends Object> {
     this._collection = this._db.collection(this._name);
   }
 
-  aggregate(pipeline, options): mongodb.AggregationCursor<T> {
+  aggregate(pipeline: Object[], options?: mongodb.CollectionAggregationOptions):
+    mongodb.AggregationCursor<T> {
     // TODO
     return this._collection.aggregate(pipeline, options);
   }
@@ -117,12 +118,14 @@ export class Collection<T extends Object> {
 
         return true;
       case undefined:
-        // can't delete anything that's pending
-        const res = await this._collection.deleteOne(
-          this.getNotPendingFilter(filter));
+        // try to lock on it first to throw
+        // either not found or concurrent update error if needed
+        await this.getLockForUpdate(context, filter, 'delete');
+        const res = await this._collection.deleteOne(filter);
 
         if (res.deletedCount === 0) {
-          throw new ClicheDbConcurrentUpdateError();
+          // unknown because the delete shouldn't fail if the lock succeeded
+          throw new ClicheDbUnknownUpdateError();
         }
 
         return true;
@@ -233,15 +236,10 @@ export class Collection<T extends Object> {
 
         return true;
       case undefined:
-        // the filter only returns items that are not pending
-        // and if there are no matches, it means that some other tx
-        // owns the lock and is also performing an update, so this should fail
-        const updateObj = await this._collection
-          .updateOne(this.getNotPendingFilter(filter), update, options);
-
-        if (updateObj.matchedCount === 0) {
-          throw new ClicheDbConcurrentUpdateError();
-        }
+        // using the locking method below allows us to throw the right error–
+        // not found or concurrent update error
+        await this.getLockAndUpdate(context, filter, 'update', update, options);
+        await this.releaseLock(context);
 
         return true;
       case 'commit':
@@ -289,6 +287,8 @@ export class Collection<T extends Object> {
 
   /**
    * Try to aquire the lock of a document for the given context.
+   * If successful, the document will contain information from the context
+   * that indicates that context owns the lock to the document.
    *
    * @param  context the context trying to acquire the lock
    * @param  filter  the filter to get the document to lock
@@ -298,20 +298,43 @@ export class Collection<T extends Object> {
    */
   private async getLockForUpdate(context: Context,
     filter: Query<T>, updateType: 'update' | 'delete'): Promise<void> {
+    return await this.getLockAndUpdate(context, filter, updateType);
+  }
+
+  /**
+   * Try to aquire the lock of a document for the given context,
+   * then apply the given update.
+   * If successful, the document will be updated
+   * and will also contain information from the context
+   * that indicates that context owns the lock to the document.
+   *
+   * @param  context the context trying to acquire the lock
+   * @param  filter  the filter to get the document to lock
+   * @param  updateType whether the update is for an update or a delete
+   * @param  update  the update to apply to the locked document
+   * @throws ClicheDbNotFoundError if the filter does not return any documents
+   * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
+   */
+  private async getLockAndUpdate(context: Context, filter: Query<T>,
+    updateType: 'update' | 'delete', update: Object = {},
+    options?: mongodb.ReplaceOneOptions): Promise<void> {
     // Get the lock on the document first, then udpate the document
-    // with the information from the context.
+    // with the information from the context and the given update.
     // Separating these actions allows us to differentiate between
     // not found errors and concurrent update errors
     this.getPendingLock(filter);
+    const updateSetOp = {
+      ...update['$set'], // make sure to include any $set ops from `update`
+      _pendingDetails: {
+        reqId: context.reqId,
+        type: `${updateType}-${this._name}`
+      }
+    };
     const updateResult = await this._collection
       .updateOne(filter, {
-        $set: {
-          _pendingDetails: {
-            reqId: context.reqId,
-            type: `${updateType}-${this._name}`
-          }
-        }
-      });
+        ...update,
+        $set: updateSetOp
+      }, options);
 
     if (updateResult.matchedCount === 0 || updateResult.modifiedCount === 0) {
       // Unknown because the update to get the lock
@@ -328,11 +351,6 @@ export class Collection<T extends Object> {
    */
   private getReqIdPendingFilter(context: Context): Query<PendingDoc & T> {
     return { '_pendingDetails.reqId': context.reqId };
-  }
-
-  private getNotPendingFilter(
-    filter: Query<T> | undefined): Query<PendingDoc & T> {
-    return Object.assign({}, filter, { _pending : { $exists: false }});
   }
 
   private getNotPendingCreateFilter(
