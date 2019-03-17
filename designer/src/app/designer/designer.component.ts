@@ -271,8 +271,15 @@ export class DesignerComponent implements OnInit, OnDestroy {
       copy: (el, source) => source.classList.contains('inputtables')
     });
     this.dragulaService.drop('expression-io')
-      .subscribe(({ el, target }) => {
-        if (target && target.classList.contains('input-value')) {
+      .subscribe(({ el, target, source }) => {
+        if (
+          target
+          && target.classList.contains('input-value')
+          && !(
+            source['dataset'].context
+            && source['dataset'].context !== target['dataset'].context
+          )
+        ) {
           target.dispatchEvent(new CustomEvent('addOutput', {
             detail: { output: el['dataset'].output }
           }));

@@ -43,12 +43,30 @@
         [title]="actionInstance.inputSettings[input].fqtag"
         (shouldClose)="closeMenu(menuTrigger)"
       >
-        <!-- TODO: list args -->
-        <app-set-inputs
-          [app]="app"
-          [actionInstance]="actionInstance.inputSettings[input]"
-          [openAction]="openAction"
-        ></app-set-inputs>
+        <div class="menu-content">
+          <div class="original-inputs">
+            <h3>Inputs to Original Action</h3>
+            <div
+              *ngIf="actionInput(input).length > 0"
+              class="inputtables"
+              dragula="expression-io"
+              [attr.data-context]="actionInstance.fqtag + '.' + input"
+            >
+              <div
+                *ngFor="let name of actionInput(input)"
+                [attr.data-output]="'$' + name"
+              >
+                {{name}}
+              </div>
+            </div>
+          </div>
+          <app-set-inputs
+            [app]="app"
+            [actionInstance]="actionInstance.inputSettings[input]"
+            [openAction]="openAction"
+            [context]="actionInstance.fqtag + '.' + input"
+          ></app-set-inputs>
+        </div>
       </app-floating-menu>
     </div>
   </div>
@@ -62,6 +80,7 @@
       [(ngModel)]="actionInstance.inputSettings[input]"
       dragula="expression-io"
       (addOutput)="addOutput(input, $event)"
+      [attr.data-context]="context"
     >
   </mat-form-field>
 </div>

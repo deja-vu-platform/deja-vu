@@ -79,7 +79,8 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 }
 
 .popup-menu {
-  height: 100%;
+  height: 250px;
+  width: 256px; // chosen emperically
   mat-form-field {
     width: 100%;
   }
@@ -115,3 +116,5 @@ mat-checkbox {
 .no-drag {
   cursor: default;
 }
+
+

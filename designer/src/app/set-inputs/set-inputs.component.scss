@@ -75,3 +75,20 @@ $action-input-padding: 4px;
     color: #757575;
   }
 }
+
+.menu-content {
+  height: 250px;
+  display: flex;
+  > * {
+    width: 256px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .original-inputs {
+    border-right: 1px dashed lightgray;
+    padding: 16px;
+    h3 {
+      font-size: 118%;
+    }
+  }
+}

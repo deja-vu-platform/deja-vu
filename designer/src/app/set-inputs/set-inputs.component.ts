@@ -17,6 +17,7 @@ export class SetInputsComponent implements OnChanges {
   @Input() app: App;
   @Input() actionInstance: ActionInstance;
   @Input() openAction: AppActionDefinition;
+  @Input() context = '';
 
   expressionInputs: string[];
   actionInputs: string[];
@@ -64,5 +65,9 @@ export class SetInputsComponent implements OnChanges {
       width: '50vw',
       data
     });
+  }
+
+  actionInput(name: string) {
+    return Object.keys(this.actionInstance.of.actionInputs[name]);
   }
 }

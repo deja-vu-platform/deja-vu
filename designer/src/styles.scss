@@ -69,3 +69,13 @@ button.mat-small-y {
 .compound-input .mat-form-field-infix {
   width: unset;
 }
+
+.mat-menu-panel {
+  max-width: none !important; // override
+}
+
+.inputtables > * {
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
