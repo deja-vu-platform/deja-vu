@@ -139,4 +139,19 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     // we need to let it resolve before updating again
     setTimeout(() => mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs);
   }
+
+  ioReferences(action: ActionInstance) {
+    return _.map(action.inputSettings, (val) => {
+      if (_.isString(val)) {
+        return _.get(this.scopeIO.resolveExpression(val), 'ioName');
+      }
+
+      return val.of.name;
+    })
+      .filter((v) => !!v);
+  }
+
+  floor(n: number): number {
+    return Math.floor(n);
+  }
 }

@@ -89,6 +89,50 @@ export class ScopeIO {
     this.actionInstance = undefined;
   }
 
+  /**
+   * Get the action + input/output name referenced in an expression
+   * @param expr an expression
+   * @param inInput given if this expression is going to a replacing action
+   * @todo add support for multiple references
+   */
+  resolveExpression(
+    expr: string,
+    inInput?: { name: string, of: ActionInstance }
+  ) {
+    let ioName: string;
+    let objectPath: string[];
+    let fromAction: ActionInstance;
+
+    if (expr.startsWith('$')) {
+      // getting an input from above
+      [ioName, ...objectPath] = expr.split('.');
+      ioName = ioName.slice(1); // strip leading '$'
+      if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
+        // getting an input from within an action input
+        fromAction = inInput.of;
+      } else if (this.actionInstance.of.inputs.includes(ioName)) {
+        // getting an input from the parent
+        fromAction = this.actionInstance;
+      }
+    } else {
+      // getting an output from a sibling
+      let clicheN: string;
+      let actionN: string;
+      [clicheN, actionN, ioName, ...objectPath] = expr.split('.');
+      const maybeFromAction = (<AppActionDefinition>this.actionInstance.of)
+        .findChild(clicheN, actionN);
+      if (maybeFromAction && maybeFromAction.of.outputs.includes(ioName)) {
+        fromAction = maybeFromAction;
+      }
+    }
+
+    return fromAction ? {
+      fromAction,
+      ioName,
+      objectPath
+    } : undefined;
+  }
+
   private unsubscribeAll() {
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.subscriptions = [];
@@ -122,6 +166,7 @@ export class ScopeIO {
   /**
    * @param expr an expression
    * @param toSubject where to send its value
+   * @param inInput given if this expression is going to a replacing action
    * If the expression cannot be parsed it just sends the raw string
    */
   private sendExpression(
@@ -129,35 +174,12 @@ export class ScopeIO {
     toSubject: BehaviorSubject<any>,
     inInput?: { name: string, of: ActionInstance }
   ) {
-    let fromSubject: BehaviorSubject<any>;
-    let ioName: string;
-    let objectPath: string[];
+    const resolution = this.resolveExpression(expr, inInput);
 
-    if (expr.startsWith('$')) {
-      // getting an input from above
-      [ioName, ...objectPath] = expr.split('.');
-      ioName = ioName.slice(1); // strip leading '$'
-      if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
-        // getting an input from within an action input
-        fromSubject = this.getSubject(inInput.of, ioName);
-      } else if (this.actionInstance.of.inputs.includes(ioName)) {
-        // getting an input from the parent
-        fromSubject = this.getSubject(this.actionInstance, ioName);
-      }
-    } else {
-      // getting an output from a sibling
-      let clicheN: string;
-      let actionN: string;
-      [clicheN, actionN, ioName, ...objectPath] = expr.split('.');
-      const fromAction = (<AppActionDefinition>this.actionInstance.of)
-        .findChild(clicheN, actionN);
-      if (fromAction && fromAction.of.outputs.includes(ioName)) {
-        fromSubject = this.getSubject(fromAction, ioName);
-      }
-    }
-
-    if (fromSubject) {
+    if (resolution) {
       // pass value from IO along
+      const { fromAction, ioName, objectPath } = resolution;
+      const fromSubject = this.getSubject(fromAction, ioName);
       const subscription = fromSubject.subscribe((val) => {
         toSubject.next(_.get(val, objectPath, val));
       });

@@ -58,8 +58,10 @@ button.mat-small-y {
   z-index: 1000;
 }
 
-.gu-mirror button.rm {
-  display: none !important;
+.gu-mirror, .gu-transit {
+  .hide-on-drag {
+    display: none !important;
+  }
 }
 
 .mat-form-field-wrapper {
