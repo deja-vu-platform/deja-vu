@@ -127,14 +127,15 @@ export class Collection<T extends Object> {
           // unknown because the delete shouldn't fail if the lock succeeded
           throw new ClicheDbUnknownUpdateError();
         }
-        await this.releaseLock(context);
+        await this.releaseLock(context, filter);
 
         return true;
       case 'commit':
-        await this._collection.deleteOne(this.getReqIdPendingFilter(context));
+        await this._collection.deleteOne(
+          this.getReqIdPendingFilter(context, filter));
         break;
       case 'abort':
-        await this.releaseLock(context);
+        await this.releaseLock(context, filter);
         break;
     }
 
@@ -183,7 +184,8 @@ export class Collection<T extends Object> {
           this.getReqIdPendingFilter(context), unsetPendingOp);
         break;
       case 'abort':
-        await this._collection.deleteMany(this.getReqIdPendingFilter(context));
+        await this._collection.deleteMany(
+          this.getReqIdPendingFilter(context));
         break;
     }
 
@@ -204,18 +206,20 @@ export class Collection<T extends Object> {
         if (insertResult.insertedCount === 0) {
           // TODO: if the insert fails does it necessarily mean
           // it was a duplicate key error?
+          // it could be that there's another that's pending create,
+          // so the error then should be a concurrent update error instead
           throw new ClicheDbDuplicateKeyError();
         }
-        await this.releaseLock(context);
 
         return doc;
       case 'commit':
         // release lock/remove pending fields
         // to indicate that the document is now actually created
-        await this.releaseLock(context);
+        await this.releaseLock(context, doc);
         break;
       case 'abort':
-        await this._collection.deleteOne(this.getReqIdPendingFilter(context));
+        await this._collection.deleteOne(
+          this.getReqIdPendingFilter(context, doc));
         break;
     }
 
@@ -242,16 +246,17 @@ export class Collection<T extends Object> {
         // using the locking method below allows us to throw the right error–
         // not found or concurrent update error
         await this.getLockAndUpdate(context, filter, 'update', update, options);
-        await this.releaseLock(context);
+        await this.releaseLock(context, filter);
 
         return true;
       case 'commit':
         // apply the update and remove the pending lock at the same time
-        await this._collection.updateOne(this.getReqIdPendingFilter(context),
+        await this._collection.updateOne(
+          this.getReqIdPendingFilter(context, filter),
           { ...update, ...unsetPendingOp } as Object);
         break;
       case 'abort':
-        await this.releaseLock(context);
+        await this.releaseLock(context, filter);
         break;
     }
 
@@ -286,9 +291,10 @@ export class Collection<T extends Object> {
     }
   }
 
-  private async releaseLock(context: Context): Promise<void> {
+  private async releaseLock(
+    context: Context, filter: Query<T>): Promise<void> {
     await this._collection.updateOne(
-      this.getReqIdPendingFilter(context), unsetPendingOp);
+      this.getReqIdPendingFilter(context, filter), unsetPendingOp);
   }
 
   /**
@@ -370,8 +376,10 @@ export class Collection<T extends Object> {
    * Get the query for obtaining all the documents
    * that the given context has the lock to
    */
-  private getReqIdPendingFilter(context: Context): Query<PendingDoc & T> {
-    return { '_pendingDetails.reqId': context.reqId };
+  private getReqIdPendingFilter(
+    context: Context, filter: Query<T> = {}): Query<PendingDoc & T> {
+    return Object.assign(
+      {}, filter, { '_pendingDetails.reqId': context.reqId });
   }
 
   private getNotPendingCreateFilter(
