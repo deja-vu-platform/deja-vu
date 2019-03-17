@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
+  ComponentRef,
   ElementRef,
   EventEmitter,
   Injector,
@@ -10,8 +11,7 @@ import {
   OnDestroy,
   OnInit,
   Type,
-  ViewChild,
-  ComponentRef
+  ViewChild
 } from '@angular/core';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';

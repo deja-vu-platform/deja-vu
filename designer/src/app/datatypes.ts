@@ -263,7 +263,7 @@ export class ActionInstance {
   }
 
   get isAppAction(): boolean {
-    return (this.of instanceof App);
+    return (this.from instanceof App);
   }
 
   get isText(): boolean {

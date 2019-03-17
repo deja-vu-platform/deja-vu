@@ -42,6 +42,12 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
+  @Input()
+  set openAction(action: AppActionDefinition) {
+    this.actionInstance = new ActionInstance(action, this.app);
+    this.scopeIO.link(this.actionInstance);
+  }
+
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
       this.rs.registerAppAction(this.elem, this);
@@ -55,12 +61,6 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
         this.calcShowHint();
       });
     });
-  }
-
-  @Input()
-  set openAction(action: AppActionDefinition) {
-    this.actionInstance = new ActionInstance(action, this.app);
-    this.scopeIO.link(this.actionInstance);
   }
 
   @HostListener('document:keydown', ['$event.key'])
