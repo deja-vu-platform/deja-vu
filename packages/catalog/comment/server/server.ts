@@ -22,6 +22,11 @@ import {
 import { v4 as uuid } from 'uuid';
 
 
+interface CommentConfig extends Config {
+  /* Whether only authors can edit/delete their own comments or not */
+  onlyAuthorCanEdit?: boolean;
+}
+
 class CommentValidation {
   static async commentExistsOrFails(
     comments: Collection<CommentDoc>, id: string): Promise<CommentDoc> {
@@ -83,7 +88,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, config: CommentConfig): object {
   const comments: Collection<CommentDoc> = db.collection('comments');
 
   return {
@@ -106,7 +111,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
           filter['targetId'] = input.ofTargetId;
         }
 
-        return comments.find(filter);
+        return await comments.find(filter);
       }
     },
 
@@ -132,41 +137,44 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       editComment: async (
         _root, { input }: { input: EditCommentInput }, context: Context) => {
-        const comment = await CommentValidation.commentExistsOrFails(
-          comments, input.id);
-        // TODO: make this atomic/is this check even needed?
-        // users could use authorization for this
-        // so that the functionality to edit other people's comments
-        // is still available
-        if (comment.authorId !== input.authorId) {
-          throw new Error('Only the author of the comment can edit it.');
-        }
+          if (config.onlyAuthorCanEdit) {
+            const comment = await CommentValidation.commentExistsOrFails(
+              comments, input.id);
+            // IMPORTANT: No explicit transaction logic here to make this atomic
+            // only because Comment authorIds CANNOT be changed.
+            // If for some reason editing Comment authorIds becomes possible,
+            // this functionality will be broken.
+            // Note that the authorization cliché could also be used
+            // to get the same functionality.
+            if (comment.authorId !== input.authorId) {
+              throw new Error('Only the author of the comment can edit it.');
+            }
+          }
 
         const updateOp = { $set: { content: input.content } };
 
-        return comments.updateOne(context, { id: input.id }, updateOp);
+        return await comments.updateOne(context, { id: input.id }, updateOp);
       },
 
-      deleteComment: async (_root, { input }: { input: DeleteCommentInput },
-        context: Context) => {
-        const comment = await CommentValidation.commentExistsOrFails(
-          comments, input.id);
-        // TODO: make this atomic/is this check even needed?
-        // users could use authorization for this
-        // so that the functionality to edit other people's comments
-        // is still available
-        if (comment.authorId !== input.authorId) {
-          throw new Error('Only the author of the comment can edit it.');
+      deleteComment: async (
+        _root, { input }: { input: DeleteCommentInput }, context: Context) => {
+        if (config.onlyAuthorCanEdit) {
+          const comment = await CommentValidation.commentExistsOrFails(
+            comments, input.id);
+          // the IMPORTANT note in editComment also applies
+          if (comment.authorId !== input.authorId) {
+            throw new Error('Only the author of the comment can delete it.');
+          }
         }
 
-        return comments.deleteOne(context, { id: input.id });
+        return await comments.deleteOne(context, { id: input.id });
       }
     }
   };
 }
 
 const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+  .initDb((db: ClicheDb, _config: CommentConfig): Promise<any> => {
     const comments: Collection<CommentDoc> = db.collection('comments');
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
