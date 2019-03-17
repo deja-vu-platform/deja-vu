@@ -232,20 +232,6 @@ export class Row {
       vAlign: this.vAlign
     };
   }
-
-  addAction(action: ActionInstance, index?: number) {
-    if (index === undefined) {
-      this.actions.push(action);
-    } else {
-      this.actions.splice(index, 0, action);
-    }
-  }
-
-  removeAction(index: number): ActionInstance {
-    return this.actions.splice(index, 1)[0];
-  }
-
-  // to do a move within row, do remove and then add
 }
 
 /**
