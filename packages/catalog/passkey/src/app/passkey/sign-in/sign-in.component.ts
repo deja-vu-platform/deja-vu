@@ -72,14 +72,12 @@ export class SignInComponent
 
   async dvOnExec(): Promise<void> {
     const res = await this.gs.post<ValidatePasskeyRes>(this.apiPath, {
-      query: `mutation {
-        validatePasskey(code: "${this.passkeyControl.value}") {
-          passkey { code }
-          token
-        }
-      }`
+      inputs: { code: this.passkeyControl.value },
+      extraInfo: {
+        returnFields: 'passkey { code }, token'
+      }
     })
-      .toPromise();
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

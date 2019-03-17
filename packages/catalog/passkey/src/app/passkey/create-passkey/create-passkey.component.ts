@@ -95,16 +95,17 @@ export class CreatePasskeyComponent
   }
 
   async dvOnExec(): Promise<void> {
+    // value could be undefined if form was just cleared so make sure it's not
+    const code = this.passkeyControl.value ? this.passkeyControl.value : '';
     let passkey;
     if (this.signIn) {
       const res = await this.gs
         .post<CreateAndValidatePasskeyRes>(this.apiPath, {
-          query: `mutation {
-          createAndValidatePasskey(code: "${this.passkeyControl.value}") {
-            passkey { code }
-            token
+          inputs: JSON.stringify({ code }),
+          extraInfo: {
+            action: 'createAndValidate',
+            returnFields: 'passkey { code }, token'
           }
-        }`
         })
         .toPromise();
 
@@ -119,13 +120,13 @@ export class CreatePasskeyComponent
 
     } else {
       const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
-        query: `mutation {
-          createPasskey(code: "${this.passkeyControl.value}") {
-            code
-          }
-        }`
+        inputs: JSON.stringify({ code }),
+        extraInfo: {
+          action: 'create',
+          returnFields: 'code'
+        }
       })
-        .toPromise();
+      .toPromise();
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')

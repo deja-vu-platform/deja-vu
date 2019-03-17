@@ -1,18 +1,22 @@
 import {
+  ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
-  Context
+  Context,
+  EMPTY_CONTEXT,
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import * as shajs from 'sha.js';
 import {
   PasskeyDoc,
   SignInOutput,
   VerifyInput
 } from './schema';
-import * as shajs from 'sha.js';
 import { WORDS } from './words';
 
 
@@ -20,24 +24,41 @@ import { WORDS } from './words';
 const PASSKEY_MIN_LENGTH = 3;
 const PASSKEY_MAX_LENGTH = 15;
 
-const WORDS_SIZE = WORDS.length;
-
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
 
-class PasskeyValidation {
-  static async passkeyExistsOrFail(passkeys: mongodb.Collection<PasskeyDoc>,
-    code: string): Promise<PasskeyDoc> {
-    const hashedCode = getHashedCode(code);
-    const passkey: PasskeyDoc | null = await passkeys
-      .findOne({ code: hashedCode });
-    if (!passkey) {
-      throw new Error(`Passkey ${code} not found.`);
+const actionRequestTable: ActionRequestTable = {
+  'create-passkey': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'create':
+        return `
+          mutation CreatePasskey($code: String!) {
+            createPasskey(code: $code) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'createAndValidate':
+        return `
+          mutation CreateAndValidatePasskey($code: String!) {
+            createAndValidatePasskey(code: $code) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
     }
+  },
+  'sign-in': (extraInfo) => `
+    mutation ValidatePasskey($code: String!) {
+      validatePasskey(code: $code) ${getReturnFields(extraInfo)}
+    }
+  `,
+  validate: (_extraInfo) => `
+    query Verify($input: VerifyInput!) {
+      verify(input: $input)
+    }
+  `
+};
 
-    return passkey;
-  }
-
+class PasskeyValidation {
   static passkeyIsValidOrFail(value: string): void {
     const length: number = value.length;
 
@@ -46,10 +67,6 @@ class PasskeyValidation {
       ${PASSKEY_MIN_LENGTH}-${PASSKEY_MAX_LENGTH} characters long.`);
     }
   }
-}
-
-function isPendingCreate(passkey: PasskeyDoc | null) {
-  return _.get(passkey, 'pending.type') === 'create-passkey';
 }
 
 function getHashedCode(code: string): string {
@@ -75,71 +92,45 @@ function verify(token: string, code: string): boolean {
  * Generates a random code.
  * @returns{string} A unique 5-7 letter english word not found in the database.
  */
-async function getRandomPasscode(passkeys: mongodb.Collection<PasskeyDoc>) {
-  const randomIndex = Math.floor(Math.random() * WORDS_SIZE);
-  const code = WORDS[randomIndex];
+async function getRandomPasscode(passkeys: Collection<PasskeyDoc>) {
+  const results = await passkeys.aggregate([
+    { $match: { used: false } },
+    { $sample: { size: 1 } }
+  ])
+  .toArray();
+  if (results.length === 0) {
+    throw new Error(
+      'No passcodes left to give out, but you may create your own.');
+  }
 
-  return await passkeys
-    .findOne({ code: getHashedCode(code) })
-    .then((passkey) => {
-      if (!passkey) { return code; }
-
-      return getRandomPasscode(passkeys);
-    });
+  return results[0].code;
 }
 
-async function createPasskey(passkeys: mongodb.Collection<PasskeyDoc>,
-  code: string, context: Context) {
+async function createPasskey(passkeys: Collection<PasskeyDoc>,
+  code: string, context: Context): Promise<PasskeyDoc> {
+  let hashedCode;
   if (_.isEmpty(code)) {
-    // Generate random code
-    code = await getRandomPasscode(passkeys);
+    hashedCode = await getRandomPasscode(passkeys);
+    await passkeys.updateOne(
+      context, { code: hashedCode }, { $set: { used: true } });
   } else {
-    const passkey = await passkeys.findOne({ code: getHashedCode(code) });
-    if (passkey) {
-      throw new Error(`Passkey ${code} already exists`);
-    }
-
     PasskeyValidation.passkeyIsValidOrFail(code);
+    hashedCode = getHashedCode(code);
+    await passkeys.insertOne(
+      context, { code: hashedCode, used: true });
   }
 
-  const newPasskey: PasskeyDoc = { code: getHashedCode(code) };
-  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-  switch (context.reqType) {
-    case 'vote':
-      newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
-    // tslint:disable-next-line:no-switch-case-fall-through
-    case undefined:
-      await passkeys.insertOne(newPasskey);
-
-      return newPasskey;
-    case 'commit':
-      await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-      return newPasskey;
-    case 'abort':
-      await passkeys.deleteOne(reqIdPendingFilter);
-
-      return newPasskey;
-  }
-
-  return newPasskey;
-
+  return { code: hashedCode };
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
 
   return {
     Query: {
-      passkeys: () => passkeys.find({ pending: { $exists: false } })
-        .toArray(),
+      passkeys: () => passkeys.find(),
 
-      passkey: async (_root, { code }) => {
-        const passkey: PasskeyDoc = await PasskeyValidation.passkeyExistsOrFail(
-          passkeys, code);
-
-        return isPendingCreate(passkey) ? null : passkey;
-      },
+      passkey: async (_root, { code }) => await passkeys.findOne({ code }),
 
       verify: (_root, { input }: { input: VerifyInput }) =>
         verify(input.token, input.code)
@@ -156,34 +147,24 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
     Mutation: {
       createPasskey: async (_root, { code }, context: Context) => {
-        const passkey = await createPasskey(passkeys, code, context);
-
-        return passkey;
+        return await createPasskey(passkeys, code, context);
       },
 
       createAndValidatePasskey: async (_root, { code }, context: Context) => {
         const passkey = await createPasskey(passkeys, code, context);
 
-        if (!_.isNil(passkey)) {
-          const token: string = sign(passkey!.code);
-
-          return {
-            token: token,
-            passkey: passkey
-          };
-        }
-
-        return undefined;
+        return {
+          token: sign(passkey.code),
+          passkey: passkey
+        };
       },
 
       validatePasskey: async (_root, { code }) => {
-        const passkey = await PasskeyValidation.passkeyExistsOrFail(
-          passkeys, code);
-
-        const token: string = sign(code);
+        const passkey = await passkeys.findOne(
+          { code: getHashedCode(code), used: true });
 
         return {
-          token: token,
+          token: sign(code),
           passkey: passkey
         };
       }
@@ -192,11 +173,20 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 }
 
 const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const passkeys: mongodb.Collection<PasskeyDoc> = db.collection('passkeys');
+  .initDb(async (db: ClicheDb, _config: Config): Promise<any> => {
+    const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
+    await Promise.all([
+      passkeys.createIndex({ code: 1 }, { unique: true, sparse: true }),
+      passkeys.createIndex({ used: 1 }, { sparse: true })
+    ]);
 
-    return passkeys.createIndex({ id: 1 }, { unique: true, sparse: true });
+    await passkeys.insertMany(EMPTY_CONTEXT, _.map(WORDS, (code) => {
+      return { code: getHashedCode(code), used: false };
+    }));
+
+    return Promise.resolve();
   })
+  .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
   .build();
 
