@@ -127,6 +127,7 @@ export class Collection<T extends Object> {
           // unknown because the delete shouldn't fail if the lock succeeded
           throw new ClicheDbUnknownUpdateError();
         }
+        await this.releaseLock(context);
 
         return true;
       case 'commit':
@@ -205,6 +206,7 @@ export class Collection<T extends Object> {
           // it was a duplicate key error?
           throw new ClicheDbDuplicateKeyError();
         }
+        await this.releaseLock(context);
 
         return doc;
       case 'commit':
