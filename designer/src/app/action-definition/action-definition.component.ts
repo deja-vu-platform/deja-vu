@@ -58,6 +58,22 @@ interface ColorAssignments {
   };
 }
 
+/**
+ * Like _.uniq but you provide a key function
+ * It is on you to insure that each element gets a unique key
+ */
+function uniqKey<T>(
+  arr: T[],
+  keyFn: (e: T, i: number, a: T[]) => string
+): T[] {
+  const keyToVal: { [key: string]: T } = {};
+  arr.forEach((e, i, a) => {
+    keyToVal[keyFn(e, i, a)] = e;
+  });
+
+  return Object.values(keyToVal);
+}
+
 @Component({
   selector: 'app-action-definition',
   templateUrl: './action-definition.component.html',
@@ -173,18 +189,34 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   /**
    * Get all sibling outputs / parent inputs referenced by an action
    */
-  ioReferences(action: ActionInstance): Resolution[] {
-    return _.uniq(
-      _.filter(this.scopeIO.references[action.id], (r) => !!r)
+  ioReferences(by: ActionInstance | Row): Resolution[] {
+    const resolutions: Resolution[] = (by instanceof ActionInstance)
+      ? _.filter(this.scopeIO.references[by.id], (r) => !!r)
+      : [].concat(...by.actions.map((a) => this.ioReferences(a)))
+          .filter((r) => r.fromAction === this.actionInstance);
+
+    return uniqKey<Resolution>(
+      resolutions,
+      (r) => JSON.stringify([r.ioName, r.fromAction.id])
     );
   }
 
   /**
    * Get all outputs of an action which are referenced in this scope
    */
-  ioReferenced(action: ActionInstance): string[] {
-    return Array.from(this.scopeIO.referenced[action.id] || []);
+  ioReferenced(
+    from: ActionInstance | Row
+  ): { ioName: string, fromAction?: ActionInstance }[] {
+    if (from instanceof ActionInstance) {
+      return Array.from(this.scopeIO.referenced[from.id] || []);
+    } else {
+      const ids = new Set(from.actions.map((a) => a.id));
+
+      return this.ioReferences(this.actionInstance)
+        .filter((r) => ids.has(r.fromAction.id));
+    }
   }
+
 
   /**
    * Used for color-coding I/O
@@ -221,8 +253,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     // free colors assigned to IOs that are no longer referenced
     _.forOwn(this.colorAssignments, (obj, actionID) => {
       _.forOwn(obj, (color, ioName) => {
-        const ios = _.get(this.scopeIO.referenced, actionID, emptySet);
-        if (!ios.has(ioName)) {
+        const ios = this.scopeIO.referenced[actionID] || [];
+        if (!ios.find((r) => r.ioName === ioName)) {
           this.availableColors.add(color);
         }
       });
@@ -233,7 +265,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
       this.scopeIO.referenced,
       (ioNames, aID) => {
         const ioToColor = {};
-        ioNames.forEach((ioN) => {
+        ioNames.forEach(({ ioName: ioN }) => {
           let color = _.get(this.colorAssignments, [aID, ioN], '');
           if (!color) {
             color = this.availableColors.values()

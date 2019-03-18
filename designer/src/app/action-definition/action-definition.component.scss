@@ -1,10 +1,11 @@
 $row-control-width: 32px; // we need this fixed for the pseudo background
+$main-view-padding: 24px;
 
 // the region outside of the page
 #main-view {
   width: 100%;
   background: darkgray;
-  padding: 24px;
+  padding: $main-view-padding;
   padding-left: 0; // because there is the offpage button on the left
 }
 
@@ -33,6 +34,15 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 // contains both the control ("offpage") and content
 .row-container {
   display: flex;
+  .row-refs {
+    position: relative;
+    right: -$main-view-padding;
+    text-align: right;
+  }
+  &:hover {
+    // override global
+    box-shadow: none !important;
+  }
 }
 
 // looks like it's outside of the page

@@ -109,11 +109,31 @@
             *ngFor="let ioRef of ioReferenced(action); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
-              color: color(action, ioRef)
+              color: color(action, ioRef.ioName)
             }"
           >
-            → {{ioRef}}
+            → {{ioRef.ioName}}
           </div>
+        </div>
+      </div>
+      <div class="row-refs no-drag">
+        <div
+          class="ref-indicator input-ref-indicator hide-on-drag"
+          *ngFor="let ioRef of ioReferences(row); let refNum = index"
+          [ngStyle]="{
+            color: color(actionInstance, ioRef.ioName)
+          }"
+        >
+          {{ioRef.ioName}} ←
+        </div>
+        <div
+          class="ref-indicator output-ref-indicator hide-on-drag"
+          *ngFor="let ioRef of ioReferenced(row); let refNum = index"
+          [ngStyle]="{
+            color: color(ioRef.fromAction, ioRef.ioName)
+          }"
+        >
+          {{ioRef.ioName}} →
         </div>
       </div>
       <app-floating-menu

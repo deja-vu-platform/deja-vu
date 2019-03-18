@@ -12,6 +12,14 @@ interface References {
   };
 }
 
+// the dual of references
+interface Referenced {
+  [actionID: string]: {
+    byAction: ActionInstance,
+    ioName: string;
+  }[];
+}
+
 export interface InInput {
   name: string;
   of: ActionInstance;
@@ -46,7 +54,7 @@ export class ScopeIO {
   private actionInstance: AppActionInstance;
 
   readonly references: References = {};
-  readonly referenced: { [actionID: string]: Set<string> } = {};
+  readonly referenced: Referenced = {};
 
   /**
    * Used to link scopes when an app action is instantiated
@@ -155,9 +163,9 @@ export class ScopeIO {
           });
       }
       if (this.referenced[id] === undefined) {
-        this.referenced[id] = new Set();
+        this.referenced[id] = [];
       } else {
-        this.referenced[id].clear();
+        this.referenced[id].length = 0;
       }
     });
 
@@ -187,7 +195,14 @@ export class ScopeIO {
       const resolution = this.resolveExpression(inputValue, inInput);
       this.references[toAction.id][inputName] = resolution;
       if (resolution) {
-        this.referenced[resolution.fromAction.id].add(resolution.ioName);
+        if (!this.referenced[resolution.fromAction.id].find((r) =>
+          r.ioName === resolution.ioName && r.byAction.id === toAction.id
+        )) {
+          this.referenced[resolution.fromAction.id].push({
+            ioName: resolution.ioName,
+            byAction: toAction
+          });
+        }
       }
   }
 
