@@ -33,8 +33,6 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
-  @ViewChildren('actionMenuContent')
-    private actionMenuContents: QueryList<MatTabGroup>;
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
@@ -43,6 +41,12 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   flexJustifyEntries = Object.entries(flexJustify);
 
   constructor(private elem: ElementRef, private rs: RunService) { }
+
+  @Input()
+  set openAction(action: AppActionDefinition) {
+    this.actionInstance = new ActionInstance(action, this.app);
+    this.scopeIO.link(this.actionInstance);
+  }
 
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
@@ -57,12 +61,6 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
         this.calcShowHint();
       });
     });
-  }
-
-  @Input()
-  set openAction(action: AppActionDefinition) {
-    this.actionInstance = new ActionInstance(action, this.app);
-    this.scopeIO.link(this.actionInstance);
   }
 
   @HostListener('document:keydown', ['$event.key'])
@@ -129,11 +127,16 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     trigger.closeMenu();
   }
 
-  clickFirstTab(actionNum: number) {
-    const tabGroupEl: HTMLElement = this.actionMenuContents
-      .toArray()[actionNum]._elementRef.nativeElement;
-    const firstTabEl = tabGroupEl
-      .querySelector('.mat-tab-label');
+  clickFirstTab(mtg: MatTabGroup) {
+    // the selected tab is not highlighted unless we touch it
+    const tabGroupEl: HTMLElement = mtg._elementRef.nativeElement;
+    const firstTabEl = tabGroupEl.querySelector('.mat-tab-label');
     firstTabEl.dispatchEvent(new Event('mousedown'));
+    // the not-selected tab does not load the first time for some reason
+    const numTabs = 2;
+    mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs;
+    // selectedIndex seems to be a setter
+    // we need to let it resolve before updating again
+    setTimeout(() => mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs);
   }
 }

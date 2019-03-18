@@ -57,3 +57,25 @@ button.mat-small-y {
 .cdk-global-overlay-wrapper {
   z-index: 1000;
 }
+
+.gu-mirror button.rm {
+  display: none !important;
+}
+
+.mat-form-field-wrapper {
+  width: 100%;
+}
+
+.compound-input .mat-form-field-infix {
+  width: unset;
+}
+
+.mat-menu-panel {
+  max-width: none !important; // override
+}
+
+.inputtables > * {
+  height: 48px;
+  display: flex;
+  align-items: center;
+}

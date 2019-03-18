@@ -21,6 +21,9 @@ import {
 import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
+import {
+  AddAppActionIoComponent
+} from './add-app-action-io/add-app-action-io.component';
 import { AppComponent } from './app.component';
 import {
   ConfigureActionComponent
@@ -30,9 +33,6 @@ import {
 } from './configure-cliche/configure-cliche.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
-import {
-  InputActionComponent
-} from './input-action/input-action.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
@@ -52,13 +52,13 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     AppComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
+    DesignerComponent,
+    FloatingMenuComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
     TopBarComponent,
-    FloatingMenuComponent,
-    DesignerComponent
+    AddAppActionIoComponent
   ],
   imports: [
     BrowserModule,
@@ -83,9 +83,9 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
   bootstrap: [AppComponent],
   entryComponents: [
     ActionInstanceComponent,
+    AddAppActionIoComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
     TextComponent
   ].concat(dvCoreActions)
 })

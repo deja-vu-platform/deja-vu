@@ -38,11 +38,11 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 // looks like it's outside of the page
 .row-control {
   width: $row-control-width;
-  display: flex;
-  align-items: center;
-  padding: 0 4px;
   button {
-    padding: 0;
+    cursor: grab;
+    padding: 0 4px;
+    height: 100%;
+    width: 100%;
   }
 }
 
@@ -80,12 +80,12 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 
 .popup-menu {
   height: 250px;
-  width: 268px; // in needs a fixed size; this is the biggest that works
+  width: 256px; // chosen emperically
   mat-form-field {
     width: 100%;
   }
 }
-.row-menu {
+.row-menu, .inputtables {
   padding: 16px;
 }
 
@@ -112,3 +112,9 @@ mat-checkbox {
   display: block;
   margin: 8px;
 }
+
+.no-drag {
+  cursor: default;
+}
+
+

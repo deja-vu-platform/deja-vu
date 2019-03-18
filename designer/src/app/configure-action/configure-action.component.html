@@ -94,53 +94,6 @@
         [(ngModel)]="styles.padding"
       >
     </mat-form-field>
-
-    <div *ngFor="let ioType of ioTypes" class="mat-form-field">
-      <div style="display:flex">
-        <h2>{{ioType + 's'}}</h2>
-        <button
-          class="mat-small mat-small-y"
-          mat-button
-          color="primary"
-          (click)="addIO(ioType)"
-          type="button"
-        >
-          <mat-icon>add_circle_outline</mat-icon>
-        </button>
-      </div>
-      <mat-list>
-        <mat-list-item
-          *ngFor="let io of currentIO[ioType]; let i = index"
-          class="compound-input"
-        >
-          <mat-form-field class="io-name">
-            <input
-              matInput
-              [name]="ioType + i + 'Name'"
-              placeholder="Name"
-              [(ngModel)]="io.name"
-            >
-          </mat-form-field>
-          <mat-form-field>
-            <input
-              matInput
-              [name]="ioType + i + 'Value'"
-              [placeholder]="(ioType === 'Input' ? 'Default' : '') + ' Value'"
-              [(ngModel)]="io.value"
-            >
-          </mat-form-field>
-          <button
-            mat-button
-            color="warn"
-            class="mat-small mat-small-y"
-            (click)="removeIO(ioType, i)"
-            type="button"
-          >
-            <mat-icon>remove_circle_outline</mat-icon>
-          </button>
-        </mat-list-item>
-      </mat-list>
-    </div>
   </mat-dialog-content>
 
   <mat-dialog-actions>
