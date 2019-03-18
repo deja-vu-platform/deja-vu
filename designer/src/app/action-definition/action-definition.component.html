@@ -47,7 +47,7 @@
             [matMenuTriggerFor]="actionMenu.matMenu"
             (contextmenu)="openMenu(actionMenuTrigger)"
             [ngStyle]="{
-              'grid-row': 'span ' + (1 + floor(ioReferences(action).length / 2))
+              'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
             }"
           >
             <!-- below is same as above -->
@@ -95,15 +95,24 @@
             </app-floating-menu>
           </div>
           <div
-            class="io-ref-indicator hide-on-drag"
+            class="input-ref-indicator hide-on-drag"
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
             [ngStyle]="{
-              'grid-row': 1 + floor(refNum / 2),
-              'grid-column': refNum % 2 === 0 ? 1 : 3,
-              'justify-self': refNum % 2 === 0 ? 'end' : 'start'
+              'grid-row': 1 + refNum,
+              color: color(ioRef.fromAction, ioRef.ioName)
             }"
           >
-            {{ioRef}}
+            {{ioRef.ioName}} →
+          </div>
+          <div
+            class="output-ref-indicator hide-on-drag"
+            *ngFor="let ioRef of ioReferenced(action); let refNum = index"
+            [ngStyle]="{
+              'grid-row': 1 + refNum,
+              color: color(action, ioRef)
+            }"
+          >
+            → {{ioRef}}
           </div>
         </div>
       </div>

@@ -80,6 +80,14 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
     border: 3px solid rgba(255,255,255,0);
     border-radius: 5px;
   }
+  .input-ref-indicator {
+    grid-column: 1;
+    justify-self: end;
+  }
+  .output-ref-indicator {
+    grid-column: 3;
+    justify-self: start;
+  }
   &:hover {
     // override global
     box-shadow: none !important;

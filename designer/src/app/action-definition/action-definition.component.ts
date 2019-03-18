@@ -16,13 +16,47 @@ import {
   ActionInstance,
   App,
   AppActionDefinition,
+  AppActionInstance,
   flexAlign,
   flexJustify,
+  Resolution,
   Row
 } from '../datatypes';
 import { ScopeIO } from '../io';
 
 const emptyRow = new Row();
+
+// perceptually distinct colors
+// https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+// I've ordered them to mostly have most accessible first
+const COLORS = [
+  '#4363d8', // blue
+  '#800000', // maroon
+  '#f58231', // orange
+  '#e6beff', // lavender
+  '#000075', // navy
+  '#fabebe', // pink
+  '#ffe119', // yellow
+  '#3cb44b', // green
+  '#e6194B', // red
+  '#42d4f4', // cyan
+  '#f032e6', // magenta
+  '#469990', // teal
+  '#9A6324', // brown
+  '#aaffc3', // mint
+  '#fffac8', // beige
+  '#911eb4', // purple
+  '#808000', // olive
+  '#bfef45', // lime
+  '#ffd8b1', // apricot
+  '#a9a9a9' // grey
+];
+
+interface ColorAssignments {
+  [actionID: string]: {
+    [ioName: string]: string;
+  };
+}
 
 @Component({
   selector: 'app-action-definition',
@@ -33,19 +67,21 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
-  actionInstance: ActionInstance;
+  actionInstance: AppActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
+  readonly flexAlignEntries = Object.entries(flexAlign);
+  readonly flexJustifyEntries = Object.entries(flexJustify);
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
-  flexAlignEntries = Object.entries(flexAlign);
-  flexJustifyEntries = Object.entries(flexJustify);
+
+  private colorAssignments: ColorAssignments = {};
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
   @Input()
   set openAction(action: AppActionDefinition) {
-    this.actionInstance = new ActionInstance(action, this.app);
-    this.scopeIO.link(this.actionInstance);
+    this.actionInstance = new AppActionInstance(action, this.app);
+    this.link();
   }
 
   ngOnInit() {
@@ -84,8 +120,27 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     return this._rows;
   }
 
-  onActionMenuClosed() {
+  link() {
     this.scopeIO.link(this.actionInstance);
+    let i = 0;
+    this.colorAssignments = _.mapValues(
+      this.actionInstance.referenced,
+      (ioNames) => {
+        const ioToColor = {};
+        ioNames.forEach((ioName) => {
+          if (!ioToColor[ioName]) {
+            ioToColor[ioName] = COLORS[i];
+            i += 1;
+          }
+        });
+
+        return ioToColor;
+      }
+    );
+  }
+
+  onActionMenuClosed() {
+    this.link();
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint());
   }
@@ -140,18 +195,25 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     setTimeout(() => mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs);
   }
 
-  ioReferences(action: ActionInstance) {
-    return _.map(action.inputSettings, (val) => {
-      if (_.isString(val)) {
-        return _.get(this.scopeIO.resolveExpression(val), 'ioName');
-      }
-
-      return val.of.name;
-    })
-      .filter((v) => !!v);
+  ioReferences(action: ActionInstance): Resolution[] {
+    return _.uniq(
+      _.filter(this.actionInstance.references[action.id], (r) => !!r)
+    );
   }
 
-  floor(n: number): number {
-    return Math.floor(n);
+  ioReferenced(action: ActionInstance): string[] {
+    return (this.actionInstance.referenced[action.id] || []);
+  }
+
+  color(action: ActionInstance, ioName: string): string {
+    return _.get(
+      this.colorAssignments,
+      [action.id, ioName],
+      'rgba(0,0,0,0'
+    ) as string;
+  }
+
+  max(...numbers: number[]): number {
+    return Math.max(...numbers);
   }
 }

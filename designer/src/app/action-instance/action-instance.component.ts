@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 import { ClicheActionDirective } from '../cliche-action.directive';
 import {
   ActionInstance,
-  AppActionDefinition,
+  AppActionInstance,
   ClicheActionDefinition
 } from '../datatypes';
 import { ActionIO, ScopeIO} from '../io';
@@ -103,7 +103,7 @@ implements OnInit, AfterViewInit, OnDestroy {
    */
   private loadContent() {
     if (this.actionInstance) {
-      if (this.actionInstance.of instanceof AppActionDefinition) {
+      if (this.actionInstance instanceof AppActionInstance) {
         this.scopeIO.link(this.actionInstance);
       } else {
         // setTimeout is necessary to avoid angular change detection errors
