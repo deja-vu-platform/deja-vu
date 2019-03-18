@@ -8,24 +8,27 @@
     id="page"
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
+    dragula="row"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
       class="row-container"
+      [ngClass]="{ 'no-drag': rowNum == rows.length - 1 }"
+      [attr.data-index]="rowNum"
     >
-      <div class="row-control">
+      <div class="row-control handle">
         <button
           mat-button
-          class=" mat-small"
+          class="mat-small handle"
           #rowMenuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="rowMenu.matMenu"
           (contextmenu)="openMenu(rowMenuTrigger)"
         >
-          <mat-icon>drag_handle</mat-icon>
+          <mat-icon class="handle">drag_handle</mat-icon>
         </button>
       </div>
       <div
-        class="dvd-row"
+        class="dvd-row no-drag"
         [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
         dragula="action"
         [attr.data-index]="rowNum"
@@ -58,7 +61,8 @@
             <!-- above is same as above -->
             <app-floating-menu
               #actionMenu
-              (opened)="clickFirstTab(actionNum)"
+              [title]="action.fqtag"
+              (opened)="clickFirstTab(actionMenuContent)"
               (closed)="onActionMenuClosed()"
               (shouldClose)="closeMenu(actionMenuTrigger)"
             >
@@ -72,7 +76,17 @@
                   </app-set-inputs>
                 </mat-tab>
                 <mat-tab label="Outputs">
-                  <p>OUTPUTS TODO</p>
+                  <div dragula="expression-io" class="inputtables">
+                    <div
+                      *ngFor="let output of action.of.outputs"
+                      [attr.data-output]="action.from.name + '.' + action.of.name + '.' + output"
+                    >
+                      {{output}}
+                    </div>
+                    <div *ngIf="action.of.outputs.length === 0" class="no-drag">
+                      This action has no outputs.
+                    </div>
+                  </div>
                 </mat-tab>
               </mat-tab-group>
             </app-floating-menu>
@@ -81,6 +95,7 @@
       </div>
       <app-floating-menu
         #rowMenu="matMenu"
+        [title]="'Row ' + (rowNum + 1)"
         (closed)="onRowMenuClosed()"
         (shouldClose)="closeMenu(rowMenuTrigger)"
       >

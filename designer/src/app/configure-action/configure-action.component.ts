@@ -9,8 +9,7 @@ import {
   App,
   AppActionDefinition,
   AppActionStyles,
-  defaultAppActionStyles,
-  IO
+  defaultAppActionStyles
 } from '../datatypes';
 
 interface ControlGroup {
@@ -21,8 +20,6 @@ export interface DialogData {
   app: App;
   action?: AppActionDefinition;
 }
-
-type IOType = 'Input' | 'Output';
 
 @Component({
   selector: 'app-configure-action',
@@ -36,9 +33,6 @@ export class ConfigureActionComponent implements OnInit {
   transaction: boolean;
   styles: AppActionStyles = defaultAppActionStyles;
 
-  readonly ioTypes: IOType[] = ['Input', 'Output']; // fixed, not state
-  readonly currentIO = { Input: <IO[]>[], Output: <IO[]>[] };
-
   constructor(
     private readonly dialogRef: MatDialogRef<ConfigureActionComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
@@ -51,11 +45,6 @@ export class ConfigureActionComponent implements OnInit {
       this.page = this.actionIsPage();
       this.home = this.data.app.homepage === this.data.action;
       this.transaction = this.data.action.transaction;
-      this.ioTypes.forEach((ioType) => {
-        this.data.action[`${ioType.toLowerCase()}Settings`].forEach((io) => {
-          this.currentIO[ioType].push(Object.assign({}, io));
-        });
-      });
     }
   }
 
@@ -118,21 +107,6 @@ export class ConfigureActionComponent implements OnInit {
 
     action.transaction = this.transaction;
 
-    this.ioTypes.forEach((ioType) => {
-      const before: IO[] = action[ioType.toLowerCase() + 'Settings'];
-      const after = this.currentIO[ioType];
-      // remove all io not in form state from action state
-      _.remove(before, (beforeIO) =>
-        after.find((afterIO) => afterIO.name === beforeIO.name)
-      );
-      // add all io in form state but not action state
-      after.forEach((afterIO) => {
-        if (!before.find((beforeIO) => beforeIO.name === afterIO.name)) {
-          before.push(afterIO);
-        }
-      });
-    });
-
     Object.assign(action.styles, this.styles);
 
     this.dialogRef.close();
@@ -153,14 +127,6 @@ export class ConfigureActionComponent implements OnInit {
       this.data.app.actions.length > 1
       && this.data.app.homepage !== this.data.action
     );
-  }
-
-  removeIO(ioType: IOType, index: number) {
-    this.currentIO[ioType].splice(index, 1);
-  }
-
-  addIO(ioType: IOType) {
-    this.currentIO[ioType].push({name: '', value: '' });
   }
 
 }

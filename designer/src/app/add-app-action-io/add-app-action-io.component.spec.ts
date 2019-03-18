@@ -2,31 +2,26 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
-  MatCheckboxModule,
   MatDialogModule,
   MatDialogRef,
-  MatSelectModule
+  MatInputModule
 } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { InputActionComponent } from './input-action.component';
+import { AddAppActionIoComponent } from './add-app-action-io.component';
 
-import { SetInputsComponent } from '../set-inputs/set-inputs.component';
-
-describe('InputActionComponent', () => {
-  let component: InputActionComponent;
-  let fixture: ComponentFixture<InputActionComponent>;
+describe('AddAppActionIoComponent', () => {
+  let component: AddAppActionIoComponent;
+  let fixture: ComponentFixture<AddAppActionIoComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        InputActionComponent,
-        SetInputsComponent
-      ],
+      declarations: [ AddAppActionIoComponent ],
       imports: [
+        BrowserAnimationsModule,
         FormsModule,
-        MatCheckboxModule,
         MatDialogModule,
-        MatSelectModule
+        MatInputModule
       ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
@@ -37,7 +32,7 @@ describe('InputActionComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InputActionComponent);
+    fixture = TestBed.createComponent(AddAppActionIoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

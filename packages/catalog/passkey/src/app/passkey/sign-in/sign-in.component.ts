@@ -8,7 +8,7 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  OnExecSuccess, RunService, StorageService
 } from '@deja-vu/core';
 
 
@@ -16,7 +16,6 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../passkey.config';
 import { Passkey, SignInOutput } from '../shared/passkey.model';
-import { PasskeyService } from '../shared/passkey.service';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -39,8 +38,6 @@ export class SignInComponent
 
   @Input() showOptionToSubmit = true;
 
-  @Input() setPasskey = true;
-
   @Output() passkey = new EventEmitter<Passkey>();
 
   @ViewChild(FormGroupDirective) form;
@@ -62,7 +59,7 @@ export class SignInComponent
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private passkeyService: PasskeyService,
+    private ss: StorageService,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
@@ -93,9 +90,8 @@ export class SignInComponent
 
     const token = res.data.validatePasskey.token;
     const passkey = res.data.validatePasskey.passkey;
-    if (this.setPasskey) {
-      this.passkeyService.setSignedInPasskey(token, passkey);
-    }
+    this.ss.setItem(this.elem, 'token', token);
+    this.ss.setItem(this.elem, 'passkey', passkey);
 
     this.passkey.emit(passkey);
   }

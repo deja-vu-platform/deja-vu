@@ -141,56 +141,171 @@ export class DesignerComponent implements OnInit, OnDestroy {
    * Must run in constructor
    */
   private configureDragula() {
+    // drag actions on the page to add them
+    // drag them between rows to move them
     this.dragulaService.createGroup('action', {
+      moves: (el, source) => source.classList.contains('action-list')
+        || source.classList.contains('dvd-row'),
       // we use copy to prevent depletion of the action list
       copy: (el, source) => source.classList.contains('action-list'),
-      // you can *only* drag into rows
-      accepts: (el, target) => target.classList.contains('dvd-row'),
+      accepts: (el, target, source) => target.classList.contains('dvd-row')
+        || (
+          target.classList.contains('action-input')
+          && source.classList.contains('action-list')
+        ),
       // if you drag outside of a row the action gets removed
       removeOnSpill: true
     });
 
+    // this function is unfortunately kind of complicated
+    // because you cannot put two dragula groups on one element
     this.dragulaService.drop('action')
-      .subscribe(({ el, source, target }) => {
-        // find target row
-        let toRowIdx = parseInt(target['dataset'].index, 10);
-        if (toRowIdx === this.openAction.rows.length) {
-          toRowIdx = -1;
-        }
-        const toRow = this.openAction.rows[toRowIdx] || new Row();
+      .subscribe(({ el, source, target, sibling }) => {
+        // usually we want to get rid of the copy that dragula creates
+        // however in some circumstances angular does not create a new elm
+        // so we need to keep the copy
+        let shouldRemoveCopy = true;
 
-        let action: ActionInstance;
-        if (source.classList.contains('action-list')) {
-          // dragging in a new action
+        if (target.classList.contains('dvd-row')) {
+          // use case 1: instantiating an action by dragging it into a row
+          // find target row (-1 means new last row)
+          let toRowIdx = parseInt(target['dataset'].index, 10);
+          if (toRowIdx === this.openAction.rows.length) {
+            toRowIdx = -1;
+          }
+          // find target index within row (-1 means last)
+          let newActionIndex = sibling
+            ? parseInt(sibling['dataset'].index, 10)
+            : -1;
+          // find source action
+          let action: ActionInstance;
+          if (source.classList.contains('action-list')) {
+            // case 1: dragging in a new action
+            const {
+              source: sourceName,
+              action: actionName,
+              disabled
+            } = el['dataset'];
+            if (disabled !== 'true') {
+              action = this.app.newActionInstanceByName(actionName, sourceName);
+            }
+          } else if (source.classList.contains('dvd-row')) {
+            // case 2: moving an action
+            const fromRowIdx = parseInt(source['dataset'].index, 10);
+            const actionIdx = parseInt(el['dataset'].index, 10);
+            [action] = this.openAction.rows[fromRowIdx].actions
+              .splice(actionIdx, 1);
+            if (fromRowIdx === toRowIdx) {
+              // this is when ng does not generate a new element
+              if (actionIdx < newActionIndex || newActionIndex === -1) {
+                shouldRemoveCopy = false;
+              }
+              // account for chaning the index of the sibling
+              // we want to insert in front of
+              if (actionIdx < newActionIndex) {
+                newActionIndex -= 1;
+              }
+            }
+          }
+
+          if (action) {
+            const toRow = this.openAction.rows[toRowIdx] || new Row();
+            if (newActionIndex >= 0) {
+              toRow.actions.splice(newActionIndex, 0, action);
+            } else {
+              toRow.actions.push(action);
+            }
+            if (toRowIdx === -1) {
+              this.openAction.rows.push(toRow);
+            }
+          }
+        } else if (
+          target.classList.contains('action-input')
+          && source.classList.contains('action-list')
+        ) {
+          // use case 2: passing an action to an input
           const {
             source: sourceName,
             action: actionName,
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            action = this.app.newActionInstanceByName(actionName, sourceName);
+            target.dispatchEvent(new CustomEvent('inputAction', {
+              detail: { sourceName, actionName }
+            }));
           }
         } else {
-          // moving an action
-          const fromRowIdx = parseInt(source['dataset'].index, 10);
-          const actionIdx = parseInt(el['dataset'].index, 10);
-          action = this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+          // do nothing when dragging an action from the page to an input
+          shouldRemoveCopy = false;
         }
-
-        toRow.addAction(action);
-        if (toRowIdx === -1) {
-          this.openAction.rows.push(toRow);
+        if (shouldRemoveCopy) {
+          el.parentNode.removeChild(el); // delete copy that Dragula leaves
         }
-
-        el.parentNode.removeChild(el); // delete copy that Dragula leaves
       });
 
     // handle dropping an action outside the page (remove it)
     this.dragulaService.remove('action')
       .subscribe(({ el, source }) => {
-        const fromRowIdx = parseInt(source['dataset'].index, 10);
-        const actionIdx = parseInt(el['dataset'].index, 10);
-        this.openAction.rows[fromRowIdx].removeAction(actionIdx);
+        if (source.classList.contains('dvd-row')) {
+          const fromRowIdx = parseInt(source['dataset'].index, 10);
+          const actionIdx = parseInt(el['dataset'].index, 10);
+          this.openAction.rows[fromRowIdx].actions.splice(actionIdx, 1);
+        }
+      });
+
+    // drag away an inputted action to remove it
+    this.dragulaService.createGroup('inputted-action', {
+      moves: (el) => el.classList.contains('inputted-action'),
+      removeOnSpill: true
+    });
+    this.dragulaService.remove('inputted-action')
+      .subscribe(({ source }) => {
+        source.dispatchEvent(new CustomEvent('unInputAction'));
+      });
+
+    // drag an output into an expression input to populate the input
+    // with a reference to the output automatically
+    this.dragulaService.createGroup('expression-io', {
+      moves: (el, source) => source.classList.contains('inputtables')
+        && !el.classList.contains('no-drag'),
+      copy: (el, source) => source.classList.contains('inputtables')
+    });
+    this.dragulaService.drop('expression-io')
+      .subscribe(({ el, target, source }) => {
+        if (
+          target
+          && target.classList.contains('input-value')
+          && !(
+            source['dataset'].context
+            && source['dataset'].context !== target['dataset'].context
+          )
+        ) {
+          target.dispatchEvent(new CustomEvent('addOutput', {
+            detail: { output: el['dataset'].output }
+          }));
+        }
+    });
+
+    // drag rows to reorder them
+    this.dragulaService.createGroup('row', {
+      moves: (el, source, handle) => handle.classList.contains('handle')
+        && source.lastChild !== el
+    });
+    this.dragulaService.drop('row')
+      .subscribe(({ el, sibling }) => {
+        const fromRowIdx = parseInt(el['dataset'].index, 10);
+        const [moveRow] = this.openAction.rows.splice(fromRowIdx, 1);
+        let toRowIdx = sibling ?
+          parseInt(sibling['dataset'].index, 10)
+          : -1;
+        if (fromRowIdx < toRowIdx) {
+          toRowIdx -= 1;
+        }
+        if (toRowIdx >= 0) {
+          this.openAction.rows.splice(toRowIdx, 0, moveRow);
+        } else {
+          this.openAction.rows.push(moveRow);
+        }
       });
   }
 }

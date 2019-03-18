@@ -32,6 +32,7 @@ import { ZipComponent } from './zip/zip.component';
 
 import { ConfigService } from './config.service';
 import { OfDirective } from './of.directive';
+import { StorageService } from './storage.service';
 
 
 const allComponents = [
@@ -53,7 +54,9 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
   declarations: [...allComponents, OfDirective],
-  providers: [ GatewayServiceFactory, RunService, ConfigService ],
+  providers: [
+    GatewayServiceFactory, RunService, ConfigService, StorageService
+  ],
   exports: [...allComponents, OfDirective]
 })
 export class DvModule { }

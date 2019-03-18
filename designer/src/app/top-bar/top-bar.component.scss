@@ -22,3 +22,39 @@
 .right {
   margin-left: auto;
 }
+
+.io-container {
+  padding: 16px;
+  mat-form-field {
+    width: 100%;
+  }
+  .io-and-button {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    >:first-child {
+      flex: 1 1 0;
+    }
+    button {
+      padding: 0;
+      // largest that works, emperically
+      width: 44px;
+      height: 44px;
+    }
+  }
+}
+
+button.add-io {
+  width: 60%;
+  display: block;
+  margin: 16px auto;
+}
+
+mat-tab-group {
+  height: 100%;
+}
+
+.popup-menu {
+  height: 250px;
+  width: 256px; // chosen emperically
+}

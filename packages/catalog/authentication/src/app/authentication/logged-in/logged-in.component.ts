@@ -1,23 +1,19 @@
 import {
-  AfterViewInit, Component, ElementRef,
-  EventEmitter, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
-import { RunService } from '@deja-vu/core';
+import { RunService, StorageService } from '@deja-vu/core';
 
-import { AuthenticationService } from '../shared/authentication.service';
-
-import { User } from '../shared/authentication.model';
 
 @Component({
   selector: 'authentication-logged-in',
-  templateUrl: './logged-in.component.html',
+  templateUrl: './logged-in.component.html'
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();
 
   constructor(
     private elem: ElementRef, private rs: RunService,
-    private authenticationService: AuthenticationService) {}
+    private ss: StorageService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -30,7 +26,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
   }
 
   async dvOnEval(): Promise<void> {
-    const user = this.authenticationService.getSignedInUser();
+    const user = this.ss.getItem(this.elem, 'user');
     if (user) {
       this.user.emit(user);
     } else {

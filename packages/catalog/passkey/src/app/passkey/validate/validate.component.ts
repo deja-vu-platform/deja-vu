@@ -2,13 +2,12 @@ import {
   Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService, StorageService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
 import { API_PATH } from '../passkey.config';
-import { PasskeyService } from '../shared/passkey.service';
 
 interface VerifyRes {
   data: { verify: boolean };
@@ -29,7 +28,7 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private passkeyService: PasskeyService,
+    private rs: RunService, private ss: StorageService,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
@@ -55,7 +54,7 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
       return;
     }
 
-    const token = this.passkeyService.getToken();
+    const token = this.ss.getItem(this.elem, 'token');
 
     this.gs.get<VerifyRes>(this.apiPath, {
       params: {

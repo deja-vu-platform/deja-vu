@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  Input,
   Output,
   ViewChild
 } from '@angular/core';
@@ -95,6 +96,7 @@ export class FloatingMenuComponent implements AfterViewInit {
   private static maxZ = FloatingMenuComponent.INITIAL_Z;
   private static numOpen = 0;
 
+  @Input() title = '';
   @Output() shouldClose = new EventEmitter<null>();
   @Output() closed = new EventEmitter<null>();
   @Output() opened = new EventEmitter<null>();
