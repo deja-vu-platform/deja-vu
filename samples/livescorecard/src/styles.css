@@ -31,6 +31,10 @@ nav a.dvlink {
   color: lightgrey;
 }
 
+.space-filler {
+  padding: 0px 20px;
+}
+
 dv-link.btn.btn-outline-secondary.choice.active,
 dv-link.btn-outline-secondary:hover {
   background-color: #4FB5C3;
@@ -351,3 +355,8 @@ scoring-show-targets-by-score .container {
   padding: 0;
 }
 
+.participant-label .list-group-item,
+.problem-label .list-group-item {
+  padding: 0;
+  border: none;
+}

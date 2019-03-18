@@ -12,16 +12,18 @@
             object=userprofile.show-object.loadedObject />
         </div>
         <div class="col-2">
-          <sex.show-labels itemId=$id />
+          <sex.show-labels itemId=$id class="participant-label"/>
         </div>
         <div class="col-2">
-          <category.show-labels itemId=$id />
+          <category.show-labels itemId=$id class="participant-label"/>
         </div>
         <div class="col-2 center">
-          <dv.link href="/host/edit-participant"
+          <climbercode.show-passkey id=$id
+            showId=false />
+          <!-- <dv.link href="/host/edit-participant"
             params={ id: $id, competitionId: $competitionId }>
             <img src="assets/edit.png" class="edit" />
-          </dv.link>
+          </dv.link> -->
         </div>
       </div>
     </div>

@@ -32,7 +32,7 @@
       <div class="offset-1 col-3 center white">name</div>
       <div class="col-2 center white">sex</div>
       <div class="col-2 white">category</div>
-      <div class="col-2 white"></div>
+      <div class="col-2 white">code</div>
     </div>
 
     <livescorecard.add-participant
@@ -41,7 +41,7 @@
 
     <competitionclimbers.show-members inGroupId=$competitionId
       noMembersText=""
-      showMember=<livescorecard.show-participant id=$id
-        competitionId=$competitionId /> />
+      showMember=<livescorecard.show-participant id=$id /> />
+      <!-- competitionId=$competitionId -->
   </div>
 </dv.action>

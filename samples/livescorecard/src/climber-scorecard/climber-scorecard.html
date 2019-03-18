@@ -1,3 +1,61 @@
 <dv.action name="climber-scorecard">
+  <livescorecard.climber-navbar />
 
+  <div class="container below-navbar">
+    <!-- Top 5 Climbs -->
+    <div class="row">
+      <div class="col-3">
+        <h2>My Top 5</h2>
+      </div>
+      <div class="col-6">
+        Coming Soon
+      </div>
+      <div class="col-3"></div>
+    </div>
+
+    <div class="row">
+      <!-- Filters -->
+      <div class="col-3">
+        <h2>All Climbs</h2>
+        <p>Sort by: (soon)</p>
+        <div class="row left-space">
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="climb number" />
+              climb number
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="points: high to low" />
+              <!-- TODO: Trigger loading in asc order -->
+              points: high to low
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="points: low to high" />
+              points: low to high
+            </label>
+          </div>
+          <label>
+            <input type="checkbox" />
+            <span>show only incomplete climbs</span>
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" />
+            <span>show only climbs that add to your score</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- All Climbs -->
+      <div class="col-6">
+        <!-- scoring.show-targets-by-score sourceId=$competitionId -->
+      </div>
+
+      <div class="col-3"></div>
+    </div>
+  </div>
 </dv.action>
