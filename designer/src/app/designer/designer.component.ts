@@ -1,4 +1,10 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  NgZone,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { NavigationStart, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -22,6 +28,7 @@ import {
 export class DesignerComponent implements OnInit, OnDestroy {
   app = new App('newapp');
   openAction = this.app.homepage;
+  readonly ioChange = new EventEmitter<void>();
 
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};

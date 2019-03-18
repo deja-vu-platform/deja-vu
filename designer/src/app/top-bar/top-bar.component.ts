@@ -40,6 +40,7 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
+  @Output() readonly ioChange = new EventEmitter<void>(); // async
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
   readonly fs: any;
@@ -225,6 +226,7 @@ export class TopBarComponent {
 
   closeMenu(trigger: MatMenuTrigger) {
     trigger.closeMenu();
+    this.ioChange.emit();
   }
 
   clickFirstTab(mtg: MatTabGroup) {

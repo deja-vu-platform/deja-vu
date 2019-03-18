@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
   OnInit,
@@ -81,6 +82,8 @@ function uniqKey<T>(
 })
 export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
+  @Input() ioChange: EventEmitter<void>;
+
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
   private lastNumActions = 0;
@@ -106,6 +109,9 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
       this.rs.registerAppAction(this.elem, this);
+    }
+    if (this.ioChange) {
+      this.ioChange.subscribe(() => this.link());
     }
   }
 
