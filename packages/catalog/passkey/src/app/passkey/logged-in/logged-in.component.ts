@@ -2,9 +2,8 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
 
-import { OnEval, RunService } from '@deja-vu/core';
+import { OnEval, RunService, StorageService } from '@deja-vu/core';
 
-import { PasskeyService } from '../shared/passkey.service';
 
 @Component({
   selector: 'passkey-logged-in',
@@ -15,7 +14,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
 
   constructor(
     private elem: ElementRef, private rs: RunService,
-    private passkeyService: PasskeyService) { }
+    private ss: StorageService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -26,7 +25,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
   }
 
   async dvOnEval(): Promise<void> {
-    const passkey = this.passkeyService.getSignedInPasskey();
+    const passkey = this.ss.getItem(this.elem, 'passkey');
 
     if (passkey) {
       this.passkey.emit(passkey);
