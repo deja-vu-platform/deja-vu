@@ -8,13 +8,10 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExec,
-  OnExecFailure, OnExecSuccess, RunService
+  OnExecFailure, OnExecSuccess, RunService, StorageService
 } from '@deja-vu/core';
 
-
 import * as _ from 'lodash';
-
-import { AuthenticationService } from '../shared/authentication.service';
 
 import { User } from '../shared/authentication.model';
 
@@ -65,7 +62,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private authenticationService: AuthenticationService,
+    private ss: StorageService,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
@@ -100,7 +97,8 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
     const token = res.data.signIn.token;
     const user = res.data.signIn.user;
-    this.authenticationService.setSignedInUser(token, user);
+    this.ss.setItem(this.elem, 'token', token);
+    this.ss.setItem(this.elem, 'user', user);
     this.user.emit(user);
   }
 
