@@ -119,7 +119,6 @@
       <app-floating-menu
         #rowMenu="matMenu"
         [title]="'Row ' + (rowNum + 1)"
-        (closed)="onRowMenuClosed()"
         (shouldClose)="closeMenu(rowMenuTrigger)"
       >
         <div class="popup-menu row-menu" (click)="$event.stopPropagation()">
