@@ -214,7 +214,10 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     from: ActionInstance | Row
   ): { ioName: string, fromAction?: ActionInstance }[] {
     if (from instanceof ActionInstance) {
-      return Array.from(this.scopeIO.referenced[from.id] || []);
+      return uniqKey(
+        Array.from(this.scopeIO.referenced[from.id] || []),
+        (r) => r.ioName
+      );
     } else {
       const ids = new Set(from.actions.map((a) => a.id));
 

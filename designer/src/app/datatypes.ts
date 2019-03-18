@@ -378,7 +378,7 @@ export class ActionInstance {
     this.of.inputs.forEach((name) => {
       const value = this.inputSettings[name];
       if (deep && value instanceof ActionInstance) {
-        value.walkInputs(true, callback, { name, of: value });
+        value.walkInputs(true, callback, { name, of: this });
       }
       callback(name, value, inInput);
     });
