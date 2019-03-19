@@ -14,6 +14,13 @@ input CreateTaskInput {
   dueDate: String
 }
 
+# different task IDs, but same assigner
+input CreateTasksForAssigneesInput {
+  assignerId: ID
+  assigneeIds: [ID]
+  dueDate: String
+}
+
 input UpdateTaskInput {
   id: ID!
   assignerId: ID
@@ -38,6 +45,7 @@ type Query {
 
 type Mutation {
   createTask(input: CreateTaskInput!): Task
+  createTasksForAssignees(input: CreateTasksForAssigneesInput!): [Task]
   updateTask(input: UpdateTaskInput!): Boolean
   claimTask(id: ID!, assigneeId: ID!): Boolean
   completeTask(id: ID!): Boolean

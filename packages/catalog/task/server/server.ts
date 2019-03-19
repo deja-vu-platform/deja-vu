@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 
 import {
   CreateTaskInput,
+  CreateTasksForAssigneesInput,
   TaskDoc,
   TasksInput,
   UpdateTaskInput
@@ -46,6 +47,11 @@ const actionRequestTable: ActionRequestTable = {
   'create-task': (extraInfo) => `
     mutation CreateTask($input: CreateTaskInput!) {
       createTask (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'create-tasks-for-assignees': (extraInfo) => `
+    mutation CreateTasksForAssignees($input: CreateTasksForAssigneesInput!) {
+      createTasksForAssignees (input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-tasks': (extraInfo) => `
@@ -83,14 +89,11 @@ function isPendingCreate(task: TaskDoc | null) {
 }
 
 function getTaskFilter(input: TasksInput) {
-  let filter = {};
-  if (!_.isNil(input)) {
-    filter = _.omit(input, ['assigned']);
-    if (!input.assigned) {
-      filter['assigneeId'] = null;
-    }
+  const filter = _.omit(input, ['assigned']);
+  if (input.assigned === false) {
+    filter['assigneeId'] = null;
   }
-  filter['pending'] = { $exists: false };
+  filter['pending'] = { $in: [null, { type: { $ne: 'create-task' } }] };
 
   return filter;
 }
@@ -163,7 +166,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       taskCount: (_root, { input }: { input: TasksInput }) => {
-        return tasks.count(input);
+        return tasks.count(getTaskFilter(input));
       }
     },
     Task: {
@@ -204,6 +207,49 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         }
 
         return newTask;
+      },
+      createTasksForAssignees: async (
+        _root, { input }: { input: CreateTasksForAssigneesInput },
+        context: Context) => {
+        let newTasks: TaskDoc[] = _.map(input.assigneeIds, (assigneeId) => {
+          return {
+            id: uuid(),
+            assignerId: input.assignerId,
+            assigneeId: assigneeId,
+            dueDate: input.dueDate,
+            completed: false,
+            approved: false
+          };
+        });
+
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+        switch (context.reqType) {
+          case 'vote':
+            newTasks = _.map(newTasks, (task) => {
+              _.set(task, 'pending', {
+                reqId: context.reqId, type: 'create-task'
+              });
+
+              return task;
+            });
+
+          case undefined:
+            const res = await tasks.insertMany(newTasks);
+
+            return newTasks;
+          case 'commit':
+            await tasks.updateMany(
+              reqIdPendingFilter,
+              { $unset: { pending: '' } });
+
+            return newTasks;
+          case 'abort':
+            await tasks.deleteMany(reqIdPendingFilter);
+
+            return newTasks;
+        }
+
+        return newTasks;
       },
       updateTask: async (
         _root, { input }: { input: UpdateTaskInput }, context: Context) => {
