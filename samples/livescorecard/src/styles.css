@@ -345,9 +345,9 @@ group-show-members ul {
   margin: 0em 0.125em;
 }
 
-livescorecard-show-problem .property-show-object-property,
-livescorecard-show-problem scoring-show-score div.ng-star-inserted,
-livescorecard-show-problem .edit img {
+livescorecard-show-climb .property-show-object-property,
+livescorecard-show-climb scoring-show-score div.ng-star-inserted,
+livescorecard-show-climb .edit img {
   padding-top: 0.625em;
 }
 
@@ -356,7 +356,7 @@ scoring-show-targets-by-score .container {
 }
 
 .participant-label .list-group-item,
-.problem-label .list-group-item {
+.climb-label .list-group-item {
   padding: 0;
   border: none;
 }

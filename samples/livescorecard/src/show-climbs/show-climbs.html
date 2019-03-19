@@ -1,4 +1,4 @@
-<dv.action name="show-problems">
+<dv.action name="show-climbs">
   <livescorecard.host-navbar />
 
   <div class="container below-navbar">
@@ -8,14 +8,11 @@
       <div class="col-5 center white">category</div>
     </div>
 
-    <livescorecard.add-problem
+    <livescorecard.add-climb
       competitionId=$competitionId
       loggedInUserId=livescorecard.host-navbar.loggedInUserId />
 
-    <problemscore.show-targets-by-score
-      showScores=false
-      showTotal=false
-      noTargetsText=""
-      showTarget=<livescorecard.show-problem id=$id /> />
+    <climb.show-objects noObjectsToShowText=""
+      showObject=<livescorecard.show-climb climb=$object /> />
   </div>
 </dv.action>

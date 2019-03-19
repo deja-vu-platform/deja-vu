@@ -1,8 +1,7 @@
 <dv.action name="climber-navbar"
-  loggedInClimberId$=climbercode.logged-in.passkey.id
+  climber$=climbercode.logged-in.passkey
   competitionId$=competitioncode.logged-in.passkey.id>
 
-  <!-- if the hack works, we will have to always pass the competition id around -->
   <dv.tx>
     <climbercode.logged-in hidden=true />
     <competitioncode.logged-in hidden=true />
@@ -26,7 +25,7 @@
       </div>
 
       <div class="navbar-nav navbar-right inline-block">
-        <div class="nav-item popup">
+        <div class="nav-item popuptext">
           <climbercode.show-passkey
             passkey=climbercode.logged-in.passkey
             showId=false class="inline-block" />
@@ -41,9 +40,11 @@
         </div>
 
         <div class="nav-item">
-          <!-- TODO: Get the competition -->
-          <dv.link class="nav-link" href="/climber/rdives"
-            params={ competitionId: competitioncode.logged-in.passkey.id }>
+          <dv.link class="nav-link" href="/climber/rules"
+            params={
+              isClimber: true,
+              competitionId: competitioncode.logged-in.passkey?.id
+             }>
             Rules
           </dv.link>
         </div>
@@ -51,6 +52,7 @@
         <div class="nav-item">
           <dv.tx>
             <climbercode.sign-out hidden=true />
+            <competitioncode.sign-out hidden=true />
             <dv.link class="nav-link" href="/login/climber">Log Out</dv.link>
           </dv.tx>
         </div>

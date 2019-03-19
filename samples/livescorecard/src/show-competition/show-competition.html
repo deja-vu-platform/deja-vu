@@ -1,7 +1,6 @@
 <dv.action name="show-competition">
 
-  <problemscore.show-targets-by-score hidden=true sourceId=$id
-    showScores=false showTotal=false />
+  <climb.show-objects hidden=true />
 
   <div class="card">
     <div class="card-body">
@@ -31,13 +30,13 @@
           </span>
         </div>
         <div class="col-1">
-          <!-- Competition Problems -->
-          <dv.link href="/host/competition-problems"
+          <!-- Competition Climbs -->
+          <dv.link href="/host/competition-climbs"
             params={ competitionId: $id }>
             <img src="assets/mountainsgray.png" class="hostcompentry" />
           </dv.link>
           <span class="inline-block">
-              <dv.show-count array=problemscore.show-targets-by-score.loadedTargets />
+              <dv.show-count array=climb.show-objects.objects />
           </span>
         </div>
         <div class="col-1">

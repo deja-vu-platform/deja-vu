@@ -31,8 +31,8 @@ Team Reach
 - Delete competition info -> Property, Passkey
 - Edit participant info ->  Property, Label
 - Delete participant info ->  Property, Passkey, Label
-- Edit problem info ->  Property, Scoring, Label
-- Delete problem info -> Property, Scoring, Label
+- Edit climb info ->  Property, Scoring, Label
+- Delete climb info -> Property, Scoring, Label
 - Sort climbers in alphabetical order -> Needs a Sort or Filter cliche
 
 ### Climber

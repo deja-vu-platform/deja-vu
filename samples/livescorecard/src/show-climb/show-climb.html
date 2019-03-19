@@ -1,21 +1,18 @@
-<dv.action name="show-problem">
+<dv.action name="show-climb">
   <div class="card">
     <div class="card-body">
       <div class="row">
         <div class="col-2 center">
-          <problem.show-object id=$id />
+          <climb.show-object object=$climb showOnly=['climbNumber'] />
         </div>
         <div class="col-3 center">
-          <problemscore.show-score id=$id
-            showId=false
-            showSourceId=false
-            showTargetId=false />
+          <climb.show-object object=$climb showOnly=['score'] />
         </div>
         <div class="col-3">
-          <category.show-labels itemId=$id class="problem-label"/>
+          <category.show-labels itemId=$climb.id class="climb-label"/>
         </div>
         <div class="col-2">
-          <dv.link href="/host/edit-problem" params={ id: $id }>
+          <dv.link href="/host/edit-climb" params={ id: $climb.id }>
             <img src="assets/edit.png" class="edit" />
           </dv.link>
         </div>

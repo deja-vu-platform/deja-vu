@@ -28,13 +28,14 @@
           <div class="radio">
             <label>
               <input type="radio" name="sortradio" value="points: high to low" />
-              <!-- TODO: Trigger loading in asc order -->
+              <!-- TODO: Trigger loading in desc order -->
               points: high to low
             </label>
           </div>
           <div class="radio">
             <label>
               <input type="radio" name="sortradio" value="points: low to high" />
+              <!-- TODO: Trigger loading in asc order -->
               points: low to high
             </label>
           </div>
@@ -52,10 +53,26 @@
 
       <!-- All Climbs -->
       <div class="col-6">
-        <!-- scoring.show-targets-by-score sourceId=$competitionId -->
+        <div class="row">
+          <div class="col-2 labels">status</div>
+          <div class="col-6 labels">climb info</div>
+          <div class="col-2 labels">sent</div>
+          <div class="col-2 labels red">falls</div>
+        </div>
       </div>
 
       <div class="col-3"></div>
     </div>
   </div>
+
+  <div class="row">
+    <div class="offset-3 col-6">
+      <task.show-tasks
+        showTask=<livescorecard.show-scorecard-entry task=$task
+          climber=livescorecard.climber-navbar.climber />
+        assigneeId=livescorecard.climber-navbar.climber?.id  />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
 </dv.action>

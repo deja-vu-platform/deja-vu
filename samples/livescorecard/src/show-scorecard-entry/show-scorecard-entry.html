@@ -1,0 +1,78 @@
+<dv.action name="show-scorecard-entry">
+
+  <climb.show-object id=$task.assignerId hidden=false />
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-2">
+          <!-- status -->
+          <dv.if condition=$task.completed>
+            <span>
+              <img class="check" src="assets/check.png" />
+              <div class="roundCheckBox"></div>
+            </span>
+          </dv.if>
+
+          <dv.if condition=!$task.completed>
+            <dv.tx>
+              <!-- TODO: only approve task if other climber code given -
+                          all done on the same page -->
+              <task.complete-task id=$task.id hidden=true />
+              <climbercode.validate as validate-complete-climb
+                code=$climber?.code hidden=true />
+              <dv.button>
+                  <img class="check" src="assets/pendingCheck.png" />
+                  <div class="roundCheckBox"></div>
+              </dv.button>
+            </dv.tx>
+          </dv.if>
+        </div>
+
+        <div class="col-2">
+          <!-- climb number -->
+          <span class="inline-block">#</span>
+          <climb.show-object class="inline-block"
+            object=climb.show-object.loadedObject
+            showOnly=['climbNumber'] />
+        </div>
+
+        <div class="col-2">
+          <category.show-labels id=$task.id />
+        </div>
+
+        <div class="col-2 center">
+          <!-- climb score -->
+          <climb.show-object class="inline-block"
+            object=climb.show-object.loadedObject
+            showOnly=['score'] />
+        </div>
+        <div class="col-2 center">
+            <!-- falls -->
+          <falls.show-target class="red" id=$task.id showIndex=false
+            showId=false
+            showScores=false
+            totalLabel="" />
+
+          <!-- increment falls if not completed -->
+          <dv.if condition=!$task.completed>
+            <dv.tx>
+              <falls.create-score sourceId=$climber?.id
+                targetId=$task.id
+                value=1
+                class="upvote-button"
+                newScoreSavedText=""
+                showOptionToInputValue=false
+                submitMatIconName="arrow_drop_up" />
+              <climberscore.create-score sourceId=$task.id
+                targetId=$climber?.id
+                value=-1 hidden=true />
+              <climbercode.validate as validate-increase-falls
+                code=$climber?.code hidden=true />
+            </dv.tx>
+          </dv.if>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

@@ -1,20 +1,14 @@
-<dv.action name="add-problem">
+<dv.action name="add-climb">
   <category.show-labels hidden=true />
 
   <div class="card">
     <div class="card-body">
       <dv.tx>
-        <dv.status savedText="New problem created" />
+        <dv.status savedText="New climb created" />
         <dv.gen-id />
         <div class="row">
-          <div class="col-2 col-2-input-fields">
-            <problem.create-object id=dv.gen-id.id
-              showOptionToSubmit=false />
-          </div>
-          <div class="col-3 col-3-input-fields">
-            <problemscore.create-score id=dv.gen-id.id
-              sourceId=$competitionId
-              targetId=dv.gen-id.id
+          <div class="col-5 col-3-input-fields">
+            <climb.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
           <div class="col-5 category-labels">
@@ -28,7 +22,7 @@
           <dv.button class="add">
             <img src="assets/add.png" />
           </dv.button>
-          <dv.callback defaultHref="/host/competition-problems"
+          <dv.callback defaultHref="/host/competition-climbs"
             params={ competitionId: $competitionId }
             onExecSuccess=true hidden=true />
         </div>
