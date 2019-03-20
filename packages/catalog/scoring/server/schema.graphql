@@ -24,6 +24,11 @@ input ShowScoreInput {
   targetId: ID
 }
 
+input ShowTargetInput {
+  id: ID!
+  sourceId: ID
+}
+
 # If targetIds are provided, the targets will be loaded and sorted by score
 # If sourceId is provided, the targets associated with that source
 #   will be loaded and sorted by score
@@ -35,7 +40,7 @@ input TargetsByScoreInput {
 
 type Query {
   score(input: ShowScoreInput!): Score
-  target(id: ID!): Target
+  target(input: ShowTargetInput!): Target
   targetsByScore(input: TargetsByScoreInput!): [Target!]
 }
 
