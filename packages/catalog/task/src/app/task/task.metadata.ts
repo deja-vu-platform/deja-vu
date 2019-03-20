@@ -39,15 +39,28 @@ import {
 export { ShowTasksComponent };
 import { UpdateTaskComponent } from './update-task/update-task.component';
 export { UpdateTaskComponent };
-import { ShowTaskCountComponent } from './show-task-count/show-task-count.component';
+import {
+  ShowTaskCountComponent
+} from './show-task-count/show-task-count.component';
 export { ShowTaskCountComponent };
+import {
+  CreateTasksForAssigneesComponent
+} from './create-tasks-for-assignees/create-tasks-for-assignees.component';
+export { CreateTasksForAssigneesComponent };
+import { StageComponent } from './stage/stage.component';
+export { StageComponent };
+import {
+  InputAssigneeComponent
+} from './input-assignee/input-assignee.component';
+export { InputAssigneeComponent };
 
 
 const allComponents = [
   ApproveTaskComponent, ClaimTaskComponent,
   CompleteTaskComponent, CreateDueDateComponent, CreateTaskComponent,
   ShowAssigneeComponent, ShowTaskComponent, ShowTasksComponent,
-  UpdateTaskComponent, ShowTaskCountComponent
+  UpdateTaskComponent, ShowTaskCountComponent, CreateTasksForAssigneesComponent,
+  StageComponent, InputAssigneeComponent
 ];
 
 const metadata = {

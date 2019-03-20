@@ -1,0 +1,48 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createTasksForAssigneesForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newTasksSaved">
+      <i class="material-icons">done</i>
+        {{newTasksSavedText}}
+    </div>
+    <mat-error *ngIf="newTasksError">
+      <i class="material-icons">report_problem</i>
+      {{newTasksError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{assignerLabel}}</mat-label>
+      <input matInput required formControlName="assignerControl" />
+    </mat-form-field>
+
+    <div *ngIf="showOptionToAddAssignees" class="form-group">
+      <task-stage
+        [initialStageIds]="initialAssigneeIds"
+        [buttonLabel]="stageAssigneeButtonLabel"
+        [showAssignee]="showAssignee"
+        default-showAssignee="{tag: task-show-assignee}"
+        [stageHeader]="stageHeader" no-default-stageHeader
+        formControlName="assigneesControl">
+      </task-stage>
+    </div>
+
+    <div *ngIf="showOptionToInputDueDate" class="form-group">
+      <task-create-due-date formControlName="dueDateControl">
+      </task-create-due-date>
+    </div>
+
+    <div *ngIf="assignerControl.invalid && assignerControl.touched">
+      <mat-error *ngIf="assignerControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit"
+      [disabled]="!createTasksForAssigneesForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
