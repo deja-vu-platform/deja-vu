@@ -1,31 +1,36 @@
-<dv.action name="spectator-navbar" loggedInCompCode$=competitioncode.logged-in.passkey.code>
+<dv.action name="spectator-navbar"
+  competitionId$=competitioncode.logged-in.passkey.id>
   <dv.tx>
     <competitioncode.logged-in hidden=true />
     <dv.redirect href="/login/spectator" onEvalFailure=true />
   </dv.tx>
 
-  <!-- <nav class="navbar navbar-inverse navbar-fixed-top bug-fix">
+  <nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container">
-      <div class="navbar-header">
-        <dv.link href="/host" class="navbar-brand">Spectator</dv.link>
+      <div class="navbar-brand">
+        <dv.link href="/host">Spectator</dv.link>
       </div>
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-          <dv.link href="/spectator">Leaderboard</dv.link>
-        </li>
-        <li>
-          <dv.link href="/spectator/rules"
-            params={ id: competitioncode.logged-in.passkey.code }>
+
+      <div class="navbar-nav navbar-right inline-block">
+        <div class="nav-item">
+          <dv.link class="nav-link" href="/spectator">Leaderboard</dv.link>
+        </div>
+        <div class="nav-item">
+          <dv.link class="nav-link" href="/spectator/rules"
+            params={
+              id: competitioncode.logged-in.passkey?.id,
+              isSpectator: true
+            }>
             Rules
           </dv.link>
-        </li>
-        <li>
+        </div>
+        <div class="nav-item">
           <dv.tx>
             <competitioncode.sign-out hidden=true />
-            <dv.link href="/login/spectator">Log Out</dv.link>
+            <dv.link class="nav-link" href="/login/spectator">Log Out</dv.link>
           </dv.tx>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
-  </nav> -->
+  </nav>
 </dv.action>

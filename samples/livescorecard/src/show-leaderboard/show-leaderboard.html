@@ -5,6 +5,9 @@
   <dv.if condition=$isClimber>
     <livescorecard.climber-navbar />
   </dv.if>
+  <dv.if condition=!$isHost && !$isClimber>
+    <livescorecard.spectator-navbar />
+  </dv.if>
 
   <div class="container below-navbar">
     <div class="row">
