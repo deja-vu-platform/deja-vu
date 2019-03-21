@@ -18,6 +18,7 @@
           <dv.if condition=!$task.completed>
             <dv.if condition=falls.show-target.loadedTarget>
               <dv.tx>
+                <!-- TODO: get rid of success text? -->
                 <dv.status savedText="Climb completed!" />
                 <task.complete-task id=$task.id hidden=true />
                 <climberscore.create-score
@@ -35,6 +36,7 @@
 
             <dv.if condition=!falls.show-target.loadedTarget>
               <dv.tx>
+                <!-- TODO: get rid of success text? -->
                 <dv.status savedText="Climb completed!" />
                 <task.complete-task as complete-climb-no-falls-task
                   id=$task.id hidden=true />
@@ -89,7 +91,7 @@
           <!-- increment falls if not completed -->
           <dv.if condition=!$task.completed class="inline-block falls">
             <dv.tx>
-              <!-- get rid of success text? -->
+              <!-- TODO: get rid of success text? -->
               <falls.create-score
                 sourceId=$climber?.id
                 targetId=$task.id

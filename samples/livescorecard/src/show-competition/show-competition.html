@@ -16,13 +16,13 @@
           <competitioncode.show-passkey id=$id showId=false />
         </div>
         <div class="col-1">
-          <!-- Competition Participants -->
+          <!-- Competition Climbers -->
           <dv.link href="/host/competition-participants"
             params={ competitionId: $id }>
             <img src="assets/sent.png" class="hostcompentry" />
           </dv.link>
           <span class="inline-block">
-            <competitionclimbs.show-member-count inGroupId=$id />
+            <competitionclimbers.show-member-count inGroupId=$id />
           </span>
         </div>
         <div class="col-1">
@@ -33,7 +33,7 @@
               class="hostcompentry inline-block" />
           </dv.link>
           <span class="inline-block">
-            <competitionclimbers.show-member-count inGroupId=$id />
+            <competitionclimbs.show-member-count inGroupId=$id />
           </span>
         </div>
         <div class="col-1">
