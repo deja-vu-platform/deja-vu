@@ -31,10 +31,6 @@ nav a.dvlink {
   color: lightgrey;
 }
 
-.space-filler {
-  padding: 0px 20px;
-}
-
 dv-link.btn.btn-outline-secondary.choice.active,
 dv-link.btn-outline-secondary:hover {
   background-color: #4FB5C3;
@@ -95,16 +91,6 @@ authentication-sign-in button.mat-button {
 
 .add img:hover {
   opacity: 1;
-}
-
-img.hostcompentry {
-  height: 1.3em;
-  display: inline-block;
-  padding-right: .2em;
-}
-
-img.trophy {
-  height: 1.1em;
 }
 
 .edit img {
@@ -168,20 +154,6 @@ img.trophy {
   }
 }
 
-.mycode {
-  display: inline-block !important;
-}
-
-.competition-entry {
-  height: 1.3em;
-  display: inline-block;
-  padding-right: .2em;
-}
-
-.right {
-  text-align: right;
-}
-
 a {
   cursor: pointer;
   text-decoration: none;
@@ -189,10 +161,6 @@ a {
 
 a:hover {
   text-decoration: none;
-}
-
-.inv-border {
-  border: 1px;
 }
 
 .left-space {
@@ -206,21 +174,6 @@ a:hover {
 
 .red {
   color: #871515;
-}
-
-.edit-status {
-  display: inline;
-}
-
-.others {
-  height: 1.3em;
-  margin-right: .2em;
-  display: inline-block;
-}
-
-.others:hover {
-  opacity: .5;
-  cursor: pointer;
 }
 
 .round-checkbox {
@@ -241,11 +194,6 @@ a:hover {
 
 .round-checkbox:hover {
   background-color: #ecf0f1;
-}
-
-.tall {
-  height: 100%;
-  flex: 1;
 }
 
 .center {
