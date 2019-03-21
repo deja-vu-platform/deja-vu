@@ -211,12 +211,18 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
    */
   ioReferenced(
     from: ActionInstance | Row
-  ): { ioName: string, fromAction?: ActionInstance }[] {
+  ): { ioName: string, fromAction?: ActionInstance, byChild?: boolean }[] {
     if (from instanceof ActionInstance) {
       return uniqKey(
         Array.from(this.scopeIO.outReferences[from.id] || []),
         (r) => r.ioName
-      );
+      )
+        .map(({ ioName, byAction }) => ({
+          ioName,
+          byChild: (this.actionInstance.of as AppActionDefinition)
+            .getChildren(false)
+            .indexOf(byAction) === -1
+        }));
     } else {
       const ids = new Set(from.actions.map((a) => a.id));
 

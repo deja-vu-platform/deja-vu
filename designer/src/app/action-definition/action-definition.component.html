@@ -112,7 +112,7 @@
               color: color(action, ioRef.ioName)
             }"
           >
-            → {{ioRef.ioName}}
+            {{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}
           </div>
         </div>
       </div>

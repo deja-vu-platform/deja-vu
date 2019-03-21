@@ -125,7 +125,6 @@ implements OnInit, AfterViewInit, OnDestroy {
   private loadClicheAction() {
     // create component and add to DOM
     const actionDefinition = <ClicheActionDefinition>this.actionInstance.of;
-    console.log(actionDefinition);
     const { component } = actionDefinition;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
