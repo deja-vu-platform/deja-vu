@@ -29,9 +29,12 @@ input ShowTargetInput {
   sourceId: ID
 }
 
-# If targetIds are provided, the targets will be loaded and sorted by score
-# If sourceId is provided, the targets associated with that source
-#   will be loaded and sorted by score
+# If both targetIds and sourceId are provided, it will only list the targets
+#   in `targetIds` that have scores made by `sourceId`.
+# If `targetIds` is provided alone, it will load the list of targets (and all
+#   of its associated scores regardless of which source gave it to them).
+# If sourceId is provided alone, it would load all targets that have scores
+#   made by `sourceId`.
 input TargetsByScoreInput {
   asc: Boolean
   targetIds: [ID]
