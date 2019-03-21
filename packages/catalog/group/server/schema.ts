@@ -4,11 +4,6 @@ export interface GroupDoc {
   pending?: PendingDoc;
 }
 
-export interface MemberDoc {
-  id: string;
-  groupIds: string[];
-}
-
 export interface PendingDoc {
   reqId: string;
   type: 'create-group' | 'add-member' | 'remove-member';

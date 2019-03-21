@@ -3,11 +3,6 @@ type Group {
   memberIds: [ID!]
 }
 
-type Member {
-  id: ID!
-  groupIds: [ID!]
-}
-
 input MembersInput {
   inGroupId: ID
 }
@@ -32,7 +27,6 @@ type Query {
   groupCount(input: GroupsInput!): Int
   members(input: MembersInput!): [ID!]
   memberCount(input: MembersInput!): Int
-  member(id: ID!): Member
 }
 
 type Mutation {
