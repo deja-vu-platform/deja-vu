@@ -2,6 +2,9 @@
   <dv.if condition=$isHost>
     <livescorecard.host-navbar />
   </dv.if>
+  <dv.if condition=$isClimber>
+    <livescorecard.climber-navbar />
+  </dv.if>
 
   <div class="container below-navbar">
     <div class="row">
@@ -27,24 +30,28 @@
         </div>
       </div>
 
-      <div class="col-lg-6">
+      <div class="col-lg-9">
         <!-- Leaderboard Header -->
         <div class="row">
           <div class="col-3 center">rank</div>
-          <div class="offset-6 col-3">score</div>
+          <div class="col-6">climber name</div>
+          <div class="col-3 center">score</div>
         </div>
 
         <!-- Leaderboard -->
-        <!-- TODO: Might need to use show-items -->
-        <climberscore.show-targets-by-score showAscending=false
-          targetIds=sex.search-items-by-labels.searchResultItems || category.search-items-by-labels.searchResultItems
+        <!-- need to use sourceId as competitionId  -->
+        <!-- filter by sex; need to implement waitOn for this to work -->
+        <!-- filter by category; see above -->
+
+        <!-- show all -->
+        <climberscore.show-targets-by-score
+          class="leaderboard-items"
+          sourceId=$competitionId
+          showAscending=false
           showScores=false
           noTargetsText=""
-          showTarget=<livescorecard.show-climber-entry
-            climber=$target rank=$index /> />
+          showTarget=<livescorecard.show-climber-entry climber=$target rank=$index /> />
       </div>
-
-      <div class="col-lg-3"></div>
     </div>
   </div>
 </dv.action>

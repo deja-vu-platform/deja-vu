@@ -47,6 +47,12 @@
         "reinitDbOnStartup": true
       }
     },
+    "competitionclimbs": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
     "sex": {
       "name": "label",
       "config": {
@@ -58,7 +64,7 @@
       "name": "label",
       "config": {
         "reinitDbOnStartup": true,
-        "initialLabelIds": ["Beginner", "Intermediate", "Advanced", "Open"]
+        "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
       }
     },
     "userprofile": {
@@ -121,7 +127,7 @@
     "climberscore" : {
       "name": "scoring",
       "config": {
-        "oneToOneScoring": true
+        "oneToOneScoring": false
       }
     },
     "falls" : {

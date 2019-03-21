@@ -4,7 +4,6 @@
       <dv.tx>
         <dv.status savedText="New competition created!" />
         <dv.gen-id />
-        <!-- TODO: Allow Passkey to use ID -->
         <div class="row">
           <div class="col-3">
             <!-- Competition Name -->
@@ -45,11 +44,10 @@
               }
               hidden=true /> -->
 
-            <competitionhosts.create-group
-              id=dv.gen-id.id
+            <competitionhosts.create-group id=dv.gen-id.id
               memberIds=[$loggedInUserId] hidden=true />
-            <competitionclimbers.create-group
-              id=dv.gen-id.id hidden=true />
+            <competitionclimbers.create-group id=dv.gen-id.id hidden=true />
+            <competitionclimbs.create-group id=dv.gen-id.id hidden=true />
             <authorization.create-resource
               id=dv.gen-id.id
               ownerId=$loggedInUserId

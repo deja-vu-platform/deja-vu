@@ -12,7 +12,8 @@
       competitionId=$competitionId
       loggedInUserId=livescorecard.host-navbar.loggedInUserId />
 
-    <climb.show-objects noObjectsToShowText=""
-      showObject=<livescorecard.show-climb climb=$object /> />
+    <competitionclimbs.show-members inGroupId=$competitionId
+      noMembersText=""
+      showMember=<livescorecard.show-climb climbId=$id /> />
   </div>
 </dv.action>

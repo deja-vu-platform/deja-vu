@@ -1,18 +1,22 @@
 <dv.action name="show-climb">
+  <climb.show-object id=$climbId hidden=true />
+
   <div class="card">
     <div class="card-body">
       <div class="row">
         <div class="col-2 center">
-          <climb.show-object object=$climb showOnly=['climbNumber'] />
+          <climb.show-object object=climb.show-object.loadedObject
+            showOnly=['climbNumber'] />
         </div>
         <div class="col-3 center">
-          <climb.show-object object=$climb showOnly=['score'] />
+          <climb.show-object object=climb.show-object.loadedObject
+            showOnly=['score'] />
         </div>
         <div class="col-3">
-          <category.show-labels itemId=$climb.id class="climb-label"/>
+          <category.show-labels itemId=$climbId class="climb-label"/>
         </div>
         <div class="col-2">
-          <dv.link href="/host/edit-climb" params={ id: $climb.id }>
+          <dv.link href="/host/edit-climb" params={ id: $climbId }>
             <img src="assets/edit.png" class="edit" />
           </dv.link>
         </div>

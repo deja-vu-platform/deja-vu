@@ -101,6 +101,10 @@ export class RegisterUserComponent
   }
 
   async dvOnExec(): Promise<void> {
+    if (this.passwordControl.value !== this.retypePasswordControl.value) {
+      throw new Error('Passwords do not match.');
+    }
+
     const inputs = {
       input: {
         id: this.id,

@@ -20,7 +20,7 @@ Team Reach
 - Passkey (x2)
 - Event
 - Task
-- Group (x2)
+- Group (x3)
 - Label (x2)
 - Property (x3)
 - Scoring (x2)
@@ -36,12 +36,8 @@ Team Reach
 - Sort climbers in alphabetical order -> Needs a Sort or Filter cliche
 
 ### Climber
-<!-- All for now -->
-- Record number of falls per climb -> Scoring cliche
-- Leaderboard -> Scoring cliche
-- Sort climbs by name/ points -> Needs a Sort or Filter cliche
+- Sort climbs by number -> Needs a Sort cliche
+- Filter climbers by sex and category (also filter climbs by categoery) ->
+Use `search-items-by label` action, but need to add `waitOn` input to
+`show-tasks` action.
 - Give approval by entering credentials -> Needs new widget in the Task cliche
-
-### Spectator
-<!-- All for now -->
-- Leaderboard -> Scoring cliche

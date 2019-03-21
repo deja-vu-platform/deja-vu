@@ -1,7 +1,5 @@
 <dv.action name="show-competition">
 
-  <climb.show-objects hidden=true />
-
   <div class="card">
     <div class="card-body">
       <div class="row">
@@ -14,10 +12,8 @@
           <event.show-event id=$id showId=false showStartDate=false />
         </div>
         <div class="col-2">
-          <!-- TODO: Competition Code -->
-          <dv.link href="/host/competition-hosts" params={ competitionId: $id }>
-            Hosts
-          </dv.link>
+          <!-- Competition Code -->
+          <competitioncode.show-passkey id=$id showId=false />
         </div>
         <div class="col-1">
           <!-- Competition Participants -->
@@ -26,7 +22,7 @@
             <img src="assets/sent.png" class="hostcompentry" />
           </dv.link>
           <span class="inline-block">
-            <competitionclimbers.show-member-count inGroupId=$id />
+            <competitionclimbs.show-member-count inGroupId=$id />
           </span>
         </div>
         <div class="col-1">
@@ -36,7 +32,7 @@
             <img src="assets/mountainsgray.png" class="hostcompentry" />
           </dv.link>
           <span class="inline-block">
-              <dv.show-count array=climb.show-objects.objects />
+            <competitionclimbers.show-member-count inGroupId=$id />
           </span>
         </div>
         <div class="col-1">
@@ -54,10 +50,14 @@
           </dv.link>
         </div>
         <div class="col-1">
-          <!-- Edit Competition -->
-          <dv.link href="/host/edit-competition" params={ id: $id }>
-            <img src="assets/edit.png" class="edit" />
+          <dv.link href="/host/competition-hosts" params={ competitionId: $id }>
+            Hosts
           </dv.link>
+
+          <!-- Edit Competition -->
+          <!-- <dv.link href="/host/edit-competition" params={ id: $id }>
+            <img src="assets/edit.png" class="edit" />
+          </dv.link> -->
         </div>
       </div>
     </div>

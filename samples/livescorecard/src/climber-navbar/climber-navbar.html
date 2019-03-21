@@ -15,6 +15,7 @@
         <userprofile.show-object class="inline-block"
           id=climbercode.logged-in.passkey?.id
           showOnly=['firstName'] />
+
         (<climberscore.show-target
           class="inline-block"
           id=climbercode.logged-in.passkey?.id
@@ -36,7 +37,13 @@
         </div>
 
         <div class="nav-item">
-          <dv.link class="nav-link" href="/climber/leaderboard">Leaderboard</dv.link>
+          <dv.link class="nav-link" href="/climber/leaderboard"
+            params={
+              isClimber: true,
+              competitionId: competitioncode.logged-in.passkey?.id
+            }>
+           Leaderboard
+          </dv.link>
         </div>
 
         <div class="nav-item">
