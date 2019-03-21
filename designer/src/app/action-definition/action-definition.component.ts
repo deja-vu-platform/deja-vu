@@ -17,7 +17,6 @@ import {
   ActionInstance,
   App,
   AppActionDefinition,
-  AppActionInstance,
   flexAlign,
   flexJustify,
   Row
@@ -87,7 +86,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
   private lastNumActions = 0;
-  actionInstance: AppActionInstance;
+  actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   readonly flexAlignEntries = Object.entries(flexAlign);
   readonly flexJustifyEntries = Object.entries(flexJustify);
@@ -102,7 +101,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   @Input()
   set openAction(action: AppActionDefinition) {
-    this.actionInstance = new AppActionInstance(action, this.app);
+    this.actionInstance = new ActionInstance(action, this.app);
     this.link();
   }
 
@@ -197,7 +196,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
    */
   ioReferences(by: ActionInstance | Row): Resolution[] {
     const resolutions: Resolution[] = (by instanceof ActionInstance)
-      ? _.filter(this.scopeIO.references[by.id], (r) => !!r)
+      ? _.filter(this.scopeIO.inReferences[by.id], (r) => !!r)
       : [].concat(...by.actions.map((a) => this.ioReferences(a)))
           .filter((r) => r.fromAction === this.actionInstance);
 
@@ -215,7 +214,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   ): { ioName: string, fromAction?: ActionInstance }[] {
     if (from instanceof ActionInstance) {
       return uniqKey(
-        Array.from(this.scopeIO.referenced[from.id] || []),
+        Array.from(this.scopeIO.outReferences[from.id] || []),
         (r) => r.ioName
       );
     } else {
@@ -262,7 +261,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     // free colors assigned to IOs that are no longer referenced
     _.forOwn(this.colorAssignments, (obj, actionID) => {
       _.forOwn(obj, (color, ioName) => {
-        const ios = this.scopeIO.referenced[actionID] || [];
+        const ios = this.scopeIO.outReferences[actionID] || [];
         if (!ios.find((r) => r.ioName === ioName)) {
           this.availableColors.add(color);
         }
@@ -271,7 +270,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
     // allocate colors to new references
     this.colorAssignments = _.mapValues(
-      this.scopeIO.referenced,
+      this.scopeIO.outReferences,
       (ioNames, aID) => {
         const ioToColor = {};
         ioNames.forEach(({ ioName: ioN }) => {

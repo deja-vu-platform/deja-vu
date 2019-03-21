@@ -2,27 +2,23 @@ import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   ActionInstance,
-  AppActionInstance
+  AppActionDefinition,
+  InInput
 } from './datatypes';
 
 
-interface References {
+interface InReferences {
   [actionID: string]: {
     [ioName: string]: Resolution;
   };
 }
 
 // the dual of references
-interface Referenced {
+interface OutReferences {
   [actionID: string]: {
     byAction: ActionInstance,
     ioName: string;
   }[];
-}
-
-export interface InInput {
-  name: string;
-  of: ActionInstance;
 }
 
 export interface Resolution {
@@ -51,10 +47,14 @@ export class ScopeIO {
 
   private readonly rep: { [actionID: string]: ActionIO } = {};
   private subscriptions: Subscription[] = [];
-  private actionInstance: AppActionInstance;
+  private actionInstance: ActionInstance;
 
-  readonly references: References = {};
-  readonly referenced: Referenced = {};
+  readonly inReferences: InReferences = {};
+  readonly outReferences: OutReferences = {};
+
+  get actionDefinition(): AppActionDefinition {
+    return this.actionInstance.of as AppActionDefinition;
+  }
 
   /**
    * Used to link scopes when an app action is instantiated
@@ -94,22 +94,22 @@ export class ScopeIO {
    * This also sets the context to the action you give it
    * @param actionInstance
    */
-  link(actionInstance: AppActionInstance): void {
+  link(actionInstance: ActionInstance): void {
     this.unlink();
     this.actionInstance = actionInstance;
     this.resolveReferences();
 
     // child inputs (expression or action)
-    this.actionInstance.of.getChildren()
-      .forEach((c) => this.sendInputs(c));
+    this.actionDefinition.getChildren(false)
+      .forEach((c) => { this.sendInputs(c); });
 
     // parent outputs (expression)
-    this.actionInstance.of.outputSettings.forEach((io) => {
+    this.actionDefinition.outputSettings.forEach((io) => {
       this.sendExpression(io.value, actionInstance, io.name);
     });
 
     // parent inputs (default constant value)
-    this.actionInstance.of.inputSettings.forEach((io) => {
+    this.actionDefinition.inputSettings.forEach((io) => {
       const toSubject = this.getSubject(actionInstance, io.name);
       toSubject.subscribe((val) => {
         if (val === undefined && io.value !== undefined) {
@@ -144,42 +144,42 @@ export class ScopeIO {
     // the IDs of actions in scope
     const ids = new Set([
       this.actionInstance.id,
-      ..._.map(this.actionInstance.of.getChildren(true), (c) => c.id)
+      ..._.map(this.actionDefinition.getChildren(true), (c) => c.id)
     ]);
     // delete all records of actions no longer in the scope
-    [this.referenced, this.references].forEach((obj) => {
+    [this.outReferences, this.inReferences].forEach((obj) => {
       Object.keys(obj)
         .filter((id) => !ids.has(id))
         .forEach((id) => delete obj[id]);
     });
     // create empty records for all actions in the scope
     ids.forEach((id) => {
-      if (this.references[id] === undefined) {
-        this.references[id] = {};
+      if (this.inReferences[id] === undefined) {
+        this.inReferences[id] = {};
       } else {
-        Object.keys(this.references[id])
+        Object.keys(this.inReferences[id])
           .forEach((inputName) => {
-            delete this.references[id][inputName];
+            delete this.inReferences[id][inputName];
           });
       }
-      if (this.referenced[id] === undefined) {
-        this.referenced[id] = [];
+      if (this.outReferences[id] === undefined) {
+        this.outReferences[id] = [];
       } else {
-        this.referenced[id].length = 0;
+        this.outReferences[id].length = 0;
       }
     });
 
     // set state
-    this.actionInstance.of.getChildren(true)
-      .forEach((actionInstance) => {
-        actionInstance.walkInputs(true, (inN, inV, inInput) => {
+    this.actionDefinition.getChildren()
+      .forEach((child) => {
+        child.walkInputs(true, (inN, inV, ofA, inInput) => {
           if (_.isString(inV)) {
-            this.resolveOneReference(actionInstance, inN, inV, inInput);
+            this.resolveOneReference(inN, inV, ofA, inInput);
           }
         });
       });
-    this.actionInstance.of.outputSettings.forEach(({ name, value }) => {
-      this.resolveOneReference(this.actionInstance, name, value);
+    this.actionDefinition.outputSettings.forEach(({ name, value }) => {
+      this.resolveOneReference(name, value, this.actionInstance);
     });
   }
 
@@ -187,18 +187,18 @@ export class ScopeIO {
    * Helper for resolveReferences
    */
   private resolveOneReference (
-    toAction: ActionInstance,
     inputName: string,
     inputValue: string,
+    toAction: ActionInstance,
     inInput?: InInput
   ) {
       const resolution = this.resolveExpression(inputValue, inInput);
-      this.references[toAction.id][inputName] = resolution;
+      this.inReferences[toAction.id][inputName] = resolution;
       if (resolution) {
-        if (!this.referenced[resolution.fromAction.id].find((r) =>
+        if (!this.outReferences[resolution.fromAction.id].find((r) =>
           r.ioName === resolution.ioName && r.byAction.id === toAction.id
         )) {
-          this.referenced[resolution.fromAction.id].push({
+          this.outReferences[resolution.fromAction.id].push({
             ioName: resolution.ioName,
             byAction: toAction
           });
@@ -236,7 +236,7 @@ export class ScopeIO {
       let clicheN: string;
       let actionN: string;
       [clicheN, actionN, ioName, ...objectPath] = expr.split('.');
-      const maybeFromAction = this.actionInstance.of
+      const maybeFromAction = this.actionDefinition
         .findChild(clicheN, actionN);
       if (maybeFromAction && maybeFromAction.of.outputs.includes(ioName)) {
         fromAction = maybeFromAction;
@@ -262,9 +262,8 @@ export class ScopeIO {
         if (_.isString(inputVal)) {
           this.sendExpression(inputVal, toAction, input);
         } else {
-          const inInput = { name: input, of: toAction };
           this.sendInputs(inputVal);
-          this.sendAction(inputVal, toSubject, inInput);
+          this.sendAction(inputVal, toSubject, { of: toAction, name: input });
         }
       } else {
         toSubject.next(undefined);
@@ -283,7 +282,7 @@ export class ScopeIO {
     toAction: ActionInstance,
     toIO: string
   ) {
-    const resolution = this.references[toAction.id][toIO];
+    const resolution = this.inReferences[toAction.id][toIO];
     const toSubject = this.getSubject(toAction, toIO);
 
     if (resolution) {

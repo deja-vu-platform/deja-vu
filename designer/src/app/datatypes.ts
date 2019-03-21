@@ -58,6 +58,11 @@ export interface IO {
   value: string; // default constant for input, epression for output
 }
 
+export interface InInput {
+  name: string;
+  of: ActionInstance;
+}
+
 export const defaultAppActionStyles = {
   backgroundColor: 'white',
   borderWidth: '0',
@@ -371,16 +376,17 @@ export class ActionInstance {
     callback: (
       name: string,
       value: string | ActionInstance,
-      inInput?: { name: string, of: ActionInstance }
+      ofAction: ActionInstance,
+      inInput?: InInput
     ) => void,
-    inInput?: { name: string, of: ActionInstance }
+    inInput?: InInput
   ): void {
     this.of.inputs.forEach((name) => {
       const value = this.inputSettings[name];
       if (deep && value instanceof ActionInstance) {
         value.walkInputs(true, callback, { name, of: this });
       }
-      callback(name, value, inInput);
+      callback(name, value, this, inInput);
     });
   }
 
@@ -394,11 +400,6 @@ export class ActionInstance {
 
     return inputtedActions;
   }
-}
-
-export class AppActionInstance extends ActionInstance {
-  readonly of: AppActionDefinition;
-  readonly from: App;
 }
 
 // AppActionInstance vs ClicheActionInstance isn't relevant
