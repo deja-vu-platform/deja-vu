@@ -1,8 +1,3 @@
-.nav-item {
-  display: inline-block;
-  margin: 0 1em;
-}
-
 .popuptext {
   background-color: #555;
   color: #fff;
@@ -10,8 +5,4 @@
   border-radius: 6px;
   padding: 0.5em 1em;
   z-index: 1;
-}
-
-.navbar-brand {
-  color: lightgrey;
 }

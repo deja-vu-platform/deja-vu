@@ -378,3 +378,12 @@ task-show-tasks .list-group-item {
 .scorecard-category .list-group-item {
   border: none;
 }
+
+.nav-item {
+  display: inline-block;
+  margin: 0 1em;
+}
+
+.navbar-brand {
+  color: lightgrey;
+}

@@ -138,12 +138,12 @@
     }
   },
   "routes": [
-    { "path": "climber", "action": "climber-scorecard" },
+    { "path": "climber", "action": "show-scorecard" },
     { "path": "climber/leaderboard", "action": "show-leaderboard" },
     { "path": "climber/rules", "action": "show-rules" },
 
     { "path": "host", "action": "show-competitions" },
-    { "path": "host/competition-participants", "action": "show-participants" },
+    { "path": "host/competition-participants", "action": "show-climbers" },
     { "path": "host/competition-climbs", "action": "show-climbs" },
     { "path": "host/competition-leaderboard", "action": "show-leaderboard" },
     { "path": "host/competition-hosts", "action": "show-hosts" },
