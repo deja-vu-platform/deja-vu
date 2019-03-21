@@ -30,7 +30,13 @@ export interface ShowScoreInput {
   targetId?: string;
 }
 
+export interface ShowTargetInput {
+  id: string;
+  sourceId?: string;
+}
+
 export interface TargetsByScoreInput {
   asc?: boolean;
   targetIds?: string[];
+  sourceId?: string;
 }

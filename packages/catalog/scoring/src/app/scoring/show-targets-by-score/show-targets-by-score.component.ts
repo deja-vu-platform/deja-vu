@@ -21,8 +21,11 @@ import { Target } from '../shared/scoring.model';
 })
 export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   OnInit, OnChanges {
+  @Input() sourceId: string | undefined;
   @Input() targetIds: string[] | undefined;
+
   @Input() targets: Target[];
+
   @Input() showAscending = true;
 
   @Input() showId = true;
@@ -82,7 +85,8 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
           inputs: JSON.stringify({
             input: {
               asc: this.showAscending,
-              targetIds: this.targetIds
+              targetIds: this.targetIds,
+              sourceId: this.sourceId
             }
           }),
           extraInfo: {

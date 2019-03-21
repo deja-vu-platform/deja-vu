@@ -1,8 +1,8 @@
-<dv.action name="show-climber-entry">
+<dv.action name="show-leaderboard-entry">
   <userprofile.show-object id=$climber.id hidden=true />
 
   <div class="card">
-    <div class="card-body">
+    <div class="card-body entry-card-body">
       <div class="row">
         <div class="col-3 center">
           <h2 class="teal">
@@ -28,19 +28,20 @@
           </h2>
         </div>
 
-        <div class="col-3">
+        <div class="col-3 center">
           <!-- Climber Score -->
           <climberscore.show-target target=$climber
+            showIndex=false
             showId=false
             showScores=false
-            totalLabel='' />
+            totalLabel="" />
         </div>
       </div>
 
-      <div class="row">
-        <!-- TODO: more details - Top Five Climbs -->
+      <!-- TODO: more details - Top Five Climbs -->
+      <!-- <div class="row">
         Top Five Climbs coming soon!
-      </div>
+      </div> -->
     </div>
   </div>
 </dv.action>

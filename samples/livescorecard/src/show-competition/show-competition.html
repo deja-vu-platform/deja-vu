@@ -1,8 +1,5 @@
 <dv.action name="show-competition">
 
-  <problemscore.show-targets-by-score hidden=true
-    showScores=false showTotal=false />
-
   <div class="card">
     <div class="card-body">
       <div class="row">
@@ -15,13 +12,11 @@
           <event.show-event id=$id showId=false showStartDate=false />
         </div>
         <div class="col-2">
-          <!-- TODO: Competition Code -->
-          <dv.link href="/host/competition-hosts" params={ competitionId: $id }>
-            Hosts
-          </dv.link>
+          <!-- Competition Code -->
+          <competitioncode.show-passkey id=$id showId=false />
         </div>
         <div class="col-1">
-          <!-- Competition Participants -->
+          <!-- Competition Climbers -->
           <dv.link href="/host/competition-participants"
             params={ competitionId: $id }>
             <img src="assets/sent.png" class="hostcompentry" />
@@ -31,13 +26,14 @@
           </span>
         </div>
         <div class="col-1">
-          <!-- Competition Problems -->
-          <dv.link href="/host/competition-problems"
+          <!-- Competition Climbs -->
+          <dv.link href="/host/competition-climbs"
             params={ competitionId: $id }>
-            <img src="assets/mountainsgray.png" class="hostcompentry" />
+            <img src="assets/mountainsgray.png"
+              class="hostcompentry inline-block" />
           </dv.link>
           <span class="inline-block">
-              <dv.show-count array=problemscore.show-targets-by-score.loadedTargets />
+            <competitionclimbs.show-member-count inGroupId=$id />
           </span>
         </div>
         <div class="col-1">
@@ -55,10 +51,14 @@
           </dv.link>
         </div>
         <div class="col-1">
-          <!-- Edit Competition -->
-          <dv.link href="/host/edit-competition" params={ id: $id }>
-            <img src="assets/edit.png" class="edit" />
+          <dv.link href="/host/competition-hosts" params={ competitionId: $id }>
+            Hosts
           </dv.link>
+
+          <!-- Edit Competition -->
+          <!-- <dv.link href="/host/edit-competition" params={ id: $id }>
+            <img src="assets/edit.png" class="edit" />
+          </dv.link> -->
         </div>
       </div>
     </div>

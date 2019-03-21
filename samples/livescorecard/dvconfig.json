@@ -47,6 +47,12 @@
         "reinitDbOnStartup": true
       }
     },
+    "competitionclimbs": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
     "sex": {
       "name": "label",
       "config": {
@@ -58,7 +64,7 @@
       "name": "label",
       "config": {
         "reinitDbOnStartup": true,
-        "initialLabelIds": ["Beginner", "Intermediate", "Advanced", "Open"]
+        "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
       }
     },
     "userprofile": {
@@ -80,19 +86,22 @@
         }
       }
     },
-    "problem": {
+    "climb": {
       "name": "property",
       "config": {
         "reinitDbOnStartup": true,
         "schema": {
-          "title": "Problem",
+          "title": "Climb",
           "type": "object",
           "properties": {
             "climbNumber": {
               "type": "number"
+            },
+            "score": {
+              "type": "number"
             }
           },
-          "required": ["climbNumber"]
+          "required": ["climbNumber", "score"]
         }
       }
     },
@@ -115,33 +124,33 @@
         }
       }
     },
-    "problemscore" : {
-      "name": "scoring",
-      "config": {
-        "oneToOneScoring": true
-      }
-    },
     "climberscore" : {
       "name": "scoring",
       "config": {
-        "oneToOneScoring": true
+        "oneToOneScoring": false
+      }
+    },
+    "falls" : {
+      "name": "scoring",
+      "config": {
+        "oneToOneScoring": false
       }
     }
   },
   "routes": [
-    { "path": "climber", "action": "climber-scorecard" },
+    { "path": "climber", "action": "show-scorecard" },
     { "path": "climber/leaderboard", "action": "show-leaderboard" },
     { "path": "climber/rules", "action": "show-rules" },
 
     { "path": "host", "action": "show-competitions" },
-    { "path": "host/competition-participants", "action": "show-participants" },
-    { "path": "host/competition-problems", "action": "show-problems" },
+    { "path": "host/competition-participants", "action": "show-climbers" },
+    { "path": "host/competition-climbs", "action": "show-climbs" },
     { "path": "host/competition-leaderboard", "action": "show-leaderboard" },
     { "path": "host/competition-hosts", "action": "show-hosts" },
     { "path": "host/competition-rules", "action": "show-rules" },
     { "path": "host/edit-competition", "action": "edit-competition" },
     { "path": "host/edit-participant", "action": "edit-participant" },
-    { "path": "host/edit-problem", "action": "edit-problem" },
+    { "path": "host/edit-climb", "action": "edit-climb" },
 
     { "path": "register", "action": "register" },
 

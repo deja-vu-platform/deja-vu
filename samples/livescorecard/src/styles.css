@@ -93,16 +93,6 @@ authentication-sign-in button.mat-button {
   opacity: 1;
 }
 
-img.hostcompentry {
-  height: 1.3em;
-  display: inline-block;
-  padding-right: .2em;
-}
-
-img.trophy {
-  height: 1.1em;
-}
-
 .edit img {
   opacity: .3;
   height: 1.5em;
@@ -164,20 +154,6 @@ img.trophy {
   }
 }
 
-.mycode {
-  display: inline-block !important;
-}
-
-.competition-entry {
-  height: 1.3em;
-  display: inline-block;
-  padding-right: .2em;
-}
-
-.right {
-  text-align: right;
-}
-
 a {
   cursor: pointer;
   text-decoration: none;
@@ -185,10 +161,6 @@ a {
 
 a:hover {
   text-decoration: none;
-}
-
-.inv-border {
-  border: 1px;
 }
 
 .left-space {
@@ -202,21 +174,6 @@ a:hover {
 
 .red {
   color: #871515;
-}
-
-.edit-status {
-  display: inline;
-}
-
-.others {
-  height: 1.3em;
-  margin-right: .2em;
-  display: inline-block;
-}
-
-.others:hover {
-  opacity: .5;
-  cursor: pointer;
 }
 
 .round-checkbox {
@@ -237,11 +194,6 @@ a:hover {
 
 .round-checkbox:hover {
   background-color: #ecf0f1;
-}
-
-.tall {
-  height: 100%;
-  flex: 1;
 }
 
 .center {
@@ -341,9 +293,9 @@ group-show-members ul {
   margin: 0em 0.125em;
 }
 
-livescorecard-show-problem .property-show-object-property,
-livescorecard-show-problem scoring-show-score div.ng-star-inserted,
-livescorecard-show-problem .edit img {
+livescorecard-show-climb .property-show-object-property,
+livescorecard-show-climb scoring-show-score div.ng-star-inserted,
+livescorecard-show-climb .edit img {
   padding-top: 0.625em;
 }
 
@@ -351,3 +303,35 @@ scoring-show-targets-by-score .container {
   padding: 0;
 }
 
+.participant-label .list-group-item,
+.climb-label .list-group-item {
+  padding: 0;
+  border: none;
+}
+
+.climb-label ul {
+  margin-top: 0.5em;
+}
+
+task-show-tasks .list-group-item {
+  padding: 0;
+}
+
+.entry-card-body,
+.leaderboard-items .list-group-item {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.scorecard-category .list-group-item {
+  border: none;
+}
+
+.nav-item {
+  display: inline-block;
+  margin: 0 1em;
+}
+
+.navbar-brand {
+  color: lightgrey;
+}

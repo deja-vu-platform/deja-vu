@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="validatePasskeyForm"
   class="form-horizontal">
 
-  <div *ngIf="showOptionToSubmit" class="form-group">
+  <div class="form-group">
     <div *ngIf="passkeyValidated">
       <i class="material-icons">done</i>
       {{passkeyValidatedText}}

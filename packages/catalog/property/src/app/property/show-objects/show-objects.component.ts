@@ -25,6 +25,8 @@ import { API_PATH } from '../property.config';
 })
 export class ShowObjectsComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  @Input() noObjectsToShowText = 'No objects';
+
   @Input() showObject: Action = {
     type: <Type<Component>> ShowObjectComponent
   };

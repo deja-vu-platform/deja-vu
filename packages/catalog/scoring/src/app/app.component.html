@@ -1,24 +1,33 @@
 <div class="container">
   <h1>Scoring</h1>
 
-  <h2>Create Score (id win1, sourceId competition1, targetId ben)</h2>
-  <scoring-create-score id="win1"
+  <h2>Create Score (id scoreId, sourceId competition1, targetId ben)</h2>
+  <scoring-create-score id="scoreId"
     sourceId="competition1"
     targetId="ben">
   </scoring-create-score>
 
-  <h2>Create score by targetId alice</h2>
+  <h2>Create score by targetId alice, sourceId competition1</h2>
   <scoring-create-score sourceId="competition1"
     targetId="alice">
   </scoring-create-score>
 
-  <h2>Create score by targetId cat</h2>
+  <h2>Create score by targetId alice, sourceId competition2</h2>
+  <scoring-create-score sourceId="competition2"
+    targetId="alice">
+  </scoring-create-score>
+
+  <h2>Create score by targetId cat, sourceId competition1</h2>
   <scoring-create-score sourceId="competition1"
     targetId="cat">
   </scoring-create-score>
 
   <h2>Show Target (id ben)</h2>
   <scoring-show-target id="ben"></scoring-show-target>
+
+  <h2>Show Target of id alice, sourceId competition2</h2>
+  <scoring-show-target id="alice" sourceId="competition2">
+  </scoring-show-target>
 
   <h2>Show Targets By Score</h2>
   <scoring-show-targets-by-score [showIndex]="true">

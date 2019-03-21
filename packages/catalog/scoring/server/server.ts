@@ -12,6 +12,7 @@ import {
   CreateScoreInput,
   ScoreDoc,
   ShowScoreInput,
+  ShowTargetInput,
   Target,
   TargetsByScoreInput
 } from './schema';
@@ -42,8 +43,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-target': (extraInfo) => `
-    query ShowTarget($id: ID!) {
-      target(id: $id) ${getReturnFields(extraInfo)}
+    query ShowTarget($input: ShowTargetInput!) {
+      target(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-targets-by-score': (extraInfo) => `
@@ -98,16 +99,33 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         return score;
       },
 
-      target: async (_root, { id }): Promise<Target> => {
-        const targetScores: ScoreDoc[] = await scores.find({
-          targetId: id, pending: { $exists: false }
-        })
-          .toArray();
+      target: async (
+        _root, { input }: { input: ShowTargetInput }) => {
+        const filter = { targetId: input.id, pending: { $exists: false } };
+        if (!_.isNil(input.sourceId)) {
+          filter['sourceId'] = input.sourceId;
+        }
 
-        return {
-          id: id,
-          scores: targetScores
-        };
+        const target = await scores.aggregate([
+          { $match: filter },
+          {
+            $group: {
+              _id: '$targetId',
+              scores: { $push: '$$ROOT' },
+              total: { $sum: '$value' }
+            }
+          },
+          {
+            $project: {
+              id: '$_id',
+              scores: '$scores',
+              total: '$total'
+            }
+          }
+        ])
+          .next();
+
+        return target;
       },
 
       // TODO: pagination, max num results
@@ -115,8 +133,15 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
         const query = { pending: { $exists: false } };
-        if (!_.isNil(input) && !_.isNil(input.targetIds)) {
-          query['targetId'] = { $in: input.targetIds };
+
+        if (!_.isNil(input)) {
+          if (!_.isNil(input.targetIds)) {
+            query['targetId'] = { $in: input.targetIds };
+          }
+
+          if (!_.isNil(input.sourceId)) {
+            query['sourceId'] = input.sourceId;
+          }
         }
 
         const targets: any = await scores.aggregate([
