@@ -95,7 +95,7 @@
             </app-floating-menu>
           </div>
           <div
-            class="input-ref-indicator hide-on-drag"
+            class="ref-indicator input-ref-indicator hide-on-drag"
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
@@ -105,7 +105,7 @@
             {{ioRef.ioName}} →
           </div>
           <div
-            class="output-ref-indicator hide-on-drag"
+            class="ref-indicator output-ref-indicator hide-on-drag"
             *ngFor="let ioRef of ioReferenced(action); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
