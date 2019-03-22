@@ -130,7 +130,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
       this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
       this.snackBar.open('Save has been loaded.', 'dismiss', {
-        duration: 30000
+        duration: 2500
       });
     });
   }

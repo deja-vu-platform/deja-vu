@@ -102,7 +102,8 @@
               color: color(ioRef.fromAction, ioRef.ioName)
             }"
           >
-            {{ioRef.ioName}} →
+            <div class="ref-for-io">{{ioRef.forIO}}</div>
+            <div class="ref-io-name">{{ioRef.ioName}} →</div>
           </div>
           <div
             class="ref-indicator output-ref-indicator hide-on-drag"
@@ -112,7 +113,7 @@
               color: color(action, ioRef.ioName)
             }"
           >
-            {{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}
+            <div class="ref-io-name">{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
           </div>
         </div>
       </div>
@@ -154,7 +155,8 @@
         color: color(ioRef.fromAction, ioRef.ioName)
       }"
     >
-      {{ioRef.ioName}} →
+      <div class="ref-for-io">{{ioRef.forIO}}</div>
+      <div class="ref-io-name">{{ioRef.ioName}} →</div>
     </div>
     <div
       class="ref-indicator output-ref-indicator hide-on-drag"
@@ -163,7 +165,7 @@
         color: color(actionInstance, ioRef.ioName)
       }"
     >
-      {{ioRef.ioName}} ←
+      <div class="ref-io-name">{{ioRef.ioName}} ←</div>
     </div>
   </div>
 </div>

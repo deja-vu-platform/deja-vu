@@ -12,6 +12,7 @@ import {
 import { MatMenuTrigger, MatTabGroup } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
+import * as tinycolor from 'tinycolor2';
 
 import {
   ActionInstance,
@@ -108,6 +109,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   @Input()
   set openAction(action: AppActionDefinition) {
+    document
+      .querySelector('body').style
+      .setProperty(
+        '--text-stroke-color',
+        tinycolor(action.styles.backgroundColor)
+          .isDark() ? 'white' : 'black'
+      );
     this.actionInstance = new ActionInstance(action, this.app);
     this.link();
   }
@@ -207,15 +215,15 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     }
 
     const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
-    const resolutions = ([] as Resolution[]).concat(...ids
+    const resolutions: (Resolution & { forIO: string})[] = [].concat(...ids
       .map((id) => _.filter(
         this.scopeIO.inReferences[id],
-        (r) => r && r.fromAction !== by
+        (r, ioName) => r && (r['forIO'] = ioName) && r.fromAction !== by
       ))
     ); // flatten
     const uniqueResolutions = uniqKey(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.fromAction.id])
+      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 

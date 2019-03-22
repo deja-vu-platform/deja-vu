@@ -150,20 +150,14 @@ mat-checkbox {
   cursor: default;
 }
 
-// see https://stackoverflow.com/questions/4919076/outline-effect-to-text
-// ancestral's answer
-@function strongShadow($thickness, $color, $strength) {
-  $val: $color 0 0 $thickness;
-  @for $i from 1 through $strength {
-    $val: #{$val}, $color 0 0 $thickness;
-  }
-  @return $val;
+.ref-for-io {
+  font-size: 50%;
+  transform: translateY(4px);
+  -webkit-text-stroke-width: 0.2px;
+  -webkit-text-stroke-color: var(--text-stroke-color);
 }
 
-.ref-indicator {
-  // gives it two outlines to help visibility regardless of background
-  // method 1 is OK because we are targeting electron only
-  -webkit-text-stroke: 0.4px black;
-  text-shadow: strongShadow(0.5px, white, 20);
-  -webkit-font-smoothing: antialiased;
+.ref-io-name {
+  -webkit-text-stroke-width: 0.4px;
+  -webkit-text-stroke-color: var(--text-stroke-color);
 }
