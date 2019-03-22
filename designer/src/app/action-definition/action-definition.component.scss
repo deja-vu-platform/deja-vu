@@ -7,6 +7,12 @@ $main-view-padding: 24px;
   background: darkgray;
   padding: $main-view-padding;
   padding-left: 0; // because there is the offpage button on the left
+  position: relative;
+  .parent-refs {
+    position: absolute;
+    right: 0;
+    top: $main-view-padding;
+  }
 }
 
 #page {
@@ -34,11 +40,6 @@ $main-view-padding: 24px;
 // contains both the control ("offpage") and content
 .row-container {
   display: flex;
-  .row-refs {
-    position: relative;
-    right: -$main-view-padding;
-    text-align: right;
-  }
   &:hover {
     // override global
     box-shadow: none !important;
@@ -148,5 +149,3 @@ mat-checkbox {
 .no-drag {
   cursor: default;
 }
-
-

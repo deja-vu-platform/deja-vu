@@ -74,6 +74,11 @@ function uniqKey<T>(
   return Object.values(keyToVal);
 }
 
+interface ResolutionDual {
+  ioName: string;
+  byChild: boolean;
+}
+
 @Component({
   selector: 'app-action-definition',
   templateUrl: './action-definition.component.html',
@@ -93,6 +98,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   // if we don't have a consistent object, angular freaks out
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
+  private ioReferencesCache: {[id: string]: Resolution[]} = {};
+  private ioReferencedCache: {[id: string]: ResolutionDual[]} = {};
 
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
@@ -194,53 +201,60 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   /**
    * Get all sibling outputs / parent inputs referenced by an action
    */
-  ioReferences(by: ActionInstance | Row): Resolution[] {
-    const resolutions: Resolution[] = (by instanceof ActionInstance)
-      ? _.filter(this.scopeIO.inReferences[by.id], (r) => !!r)
-      : [].concat(...by.actions.map((a) => this.ioReferences(a)))
-          .filter((r) => r.fromAction === this.actionInstance);
+  ioReferences(by: ActionInstance): Resolution[] {
+    if (by.id in this.ioReferencesCache) {
+      return this.ioReferencesCache[by.id];
+    }
 
-    return uniqKey<Resolution>(
+    const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
+    const resolutions = ([] as Resolution[]).concat(...ids
+      .map((id) => _.filter(
+        this.scopeIO.inReferences[id],
+        (r) => r && r.fromAction !== by
+      ))
+    ); // flatten
+    const uniqueResolutions = uniqKey(
       resolutions,
       (r) => JSON.stringify([r.ioName, r.fromAction.id])
     );
+    this.ioReferencesCache[by.id] = uniqueResolutions;
+
+    return uniqueResolutions;
   }
 
   /**
    * Get all outputs of an action which are referenced in this scope
    */
   ioReferenced(
-    from: ActionInstance | Row
-  ): { ioName: string, fromAction?: ActionInstance, byChild?: boolean }[] {
-    if (from instanceof ActionInstance) {
-      return uniqKey(
-        Array.from(this.scopeIO.outReferences[from.id] || []),
-        (r) => r.ioName
-      )
-        .map(({ ioName, byAction }) => ({
-          ioName,
-          byChild: (this.actionInstance.of as AppActionDefinition)
-            .getChildren(false)
-            .indexOf(byAction) === -1
-        }));
-    } else {
-      const ids = new Set(from.actions.map((a) => a.id));
-
-      return this.ioReferences(this.actionInstance)
-        .filter((r) => ids.has(r.fromAction.id));
+    from: ActionInstance
+  ): { ioName: string, byChild?: boolean }[] {
+    if (from.id in this.ioReferencedCache) {
+      return this.ioReferencedCache[from.id];
     }
-  }
 
+    const ret = uniqKey(
+      Array.from(this.scopeIO.outReferences[from.id] || []),
+      (r) => r.ioName
+    )
+      .map(({ ioName, byAction }) => ({
+        ioName,
+        byChild: from.getInputtedActions(true)
+          .indexOf(byAction) >= 0
+      }));
+    this.ioReferencedCache[from.id] = ret;
+
+    return ret;
+  }
 
   /**
    * Used for color-coding I/O
    * Each action x ioName combo should have a unique color
    */
-  color(action: ActionInstance, ioName: string): string {
+  color(fromAction: ActionInstance, ioName: string): string {
     return _.get(
       this.colorAssignments,
-      [action.id, ioName],
-      '#a9a9a9' // transparent default, solves async issues
+      [fromAction.id, ioName],
+      '#a9a9a9' // default, solves async issues and > 20 outputs to show
     ) as string; // the default typing is wrong
   }
 
@@ -257,6 +271,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
    */
   private link() {
     this.scopeIO.link(this.actionInstance);
+    this.ioReferencedCache = {};
+    this.ioReferencesCache = {};
     this.allocateColors();
   }
 

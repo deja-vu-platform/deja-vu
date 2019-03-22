@@ -81,3 +81,8 @@ button.mat-small-y {
   display: flex;
   align-items: center;
 }
+
+.mat-snack-bar-handset {
+  width: fit-content !important;
+  transform: translateX(-132); // side menu size / 2
+}
