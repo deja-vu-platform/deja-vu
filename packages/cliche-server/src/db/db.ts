@@ -76,8 +76,8 @@ export interface Collection<T extends Object> {
   createIndex(fieldOrSpec: string | any,
     options?: mongodb.IndexOptions): Promise<string>;
 
-  // deleteMany(context: Context, filter: Query<T>,
-  //   options?: mongodb.CommonOptions): Promise<boolean>;
+  deleteMany(context: Context, filter: Query<T>,
+    options?: mongodb.CommonOptions): Promise<boolean>;
 
   deleteOne(context: Context, filter: Query<T>): Promise<boolean>;
 

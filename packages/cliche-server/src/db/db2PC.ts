@@ -62,10 +62,38 @@ export class Collection2PC<T> implements Collection<T> {
     return this._collection.createIndex(fieldOrSpec, options);
   }
 
-  // async deleteMany(context: Context, filter: Query<T>,
-  //   options?: mongodb.CommonOptions): Promise<boolean> {
-  //   // TODO
-  // }
+  async deleteMany(context: Context, filter: Query<T>,
+    options?: mongodb.CommonOptions): Promise<boolean> {
+    switch (context.reqType) {
+      case 'vote':
+        // make sure we can update and no one else touches it before we commit
+        await this.getLockForUpdate(context, filter, 'delete', false, true);
+
+        return true;
+      case undefined:
+        // try to lock on it first to throw
+        // either not found or concurrent update error if needed
+        await this.getLockForUpdate(context, filter, 'delete', false, true);
+        const res = await this._collection.deleteMany(filter, options);
+
+        if (res.deletedCount === 0) {
+          await this.releaseLock(context, filter, true);
+          // unknown because the delete shouldn't fail if the lock succeeded
+          throw new ClicheDbUnknownUpdateError();
+        }
+
+        return true;
+      case 'commit':
+        await this._collection.deleteMany(
+          getReqIdPendingFilter(context, filter));
+        break;
+      case 'abort':
+        await this.releaseLock(context, filter, true);
+        break;
+    }
+
+    return undefined;
+  }
 
   async deleteOne(context: Context, filter: Query<T>): Promise<boolean> {
     switch (context.reqType) {
@@ -81,10 +109,10 @@ export class Collection2PC<T> implements Collection<T> {
         const res = await this._collection.deleteOne(filter);
 
         if (res.deletedCount === 0) {
+          await this.releaseLock(context, filter);
           // unknown because the delete shouldn't fail if the lock succeeded
           throw new ClicheDbUnknownUpdateError();
         }
-        await this.releaseLock(context, filter);
 
         return true;
       case 'commit':
@@ -185,7 +213,7 @@ export class Collection2PC<T> implements Collection<T> {
     options?: mongodb.CommonOptions & { upsert?: boolean }): Promise<boolean> {
     switch (context.reqType) {
       case 'vote':
-        // make we can update and that no one else touches it before we commit
+        // make sure we can update and no one else touches it before we commit
         await this.getLockForUpdate(context, filter, 'update',
           options && options.upsert, true);
 
