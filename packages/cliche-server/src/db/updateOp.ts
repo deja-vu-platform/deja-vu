@@ -1,13 +1,7 @@
 import * as mongodb from 'mongodb';
+import { Context, Query } from './db';
+import { DbDoc, unsetPendingOp } from './db2PC';
 
-import { Context, DbDoc, Query } from '../db';
-
-const unsetPendingOp: Object = { $unset:
-  {
-    _pending: '',
-    _pendingDetails: ''
-  }
-};
 
 export interface UpdateOp<T> {
   filter: Query<DbDoc<T>>;

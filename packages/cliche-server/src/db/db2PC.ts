@@ -1,71 +1,20 @@
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
 import {
+  ClicheDbConcurrentUpdateError,
+  ClicheDbDuplicateKeyError,
+  ClicheDbNotFoundError,
+  ClicheDbUnknownUpdateError,
+  Collection,
+  Context,
+  Query
+} from './db';
+import {
   /*addPendingDetailsOp, getPendingLockOp,*/
   getReqIdPendingFilter,
   releaseLockOp,
   UpdateOp
-} from './db/updateOp';
-
-export type Query<T> = mongodb.FilterQuery<T>;
-
-export interface Context {
-  reqType: 'vote' | 'commit' | 'abort' | undefined; // undefined if not a tx
-  runId: string;
-  reqId: string;
-}
-
-/**
- * The empty Context to use when it isn't applicable,
- * e.g. when populating a Collection with initial objects on initialization.
- */
-export const EMPTY_CONTEXT: Context = {
-  reqType: undefined, runId: '', reqId: ''
-};
-
-export class ClicheDbError extends Error {
-  public readonly errorCode: number;
-
-  constructor(message: string, errorCode: number) {
-    super(message);
-    // tslint:disable-next-line
-    // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
-    this.errorCode = errorCode;
-  }
-}
-export class ClicheDbNotFoundError extends ClicheDbError {
-  public static readonly ERROR_CODE = 404;
-  constructor(collectionName: string) {
-    // remove the 's', assumes collectionName ends with one
-    const entityName = collectionName.substr(0, collectionName.length - 1);
-    super(`${_.capitalize(entityName)} not found`,
-      ClicheDbNotFoundError.ERROR_CODE);
-  }
-}
-export class ClicheDbConcurrentUpdateError extends ClicheDbError {
-  public static readonly ERROR_CODE = 500;
-  constructor() {
-    super('An error has occurred. Please try again later.',
-      ClicheDbConcurrentUpdateError.ERROR_CODE);
-  }
-}
-export class ClicheDbUnknownUpdateError extends ClicheDbError {
-  public static readonly ERROR_CODE = 500;
-  constructor() {
-    super('An unknown error has occurred. Please contact an administrator.',
-      ClicheDbUnknownUpdateError.ERROR_CODE);
-  }
-}
-export class ClicheDbDuplicateKeyError extends ClicheDbError {
-  public static readonly ERROR_CODE = 400;
-  constructor() {
-    super('Write violates the collection\'s uniqueness constraints',
-      ClicheDbDuplicateKeyError.ERROR_CODE);
-  }
-}
+} from './updateOp';
 
 export interface PendingDoc {
   _pending?: boolean;
@@ -75,7 +24,7 @@ export interface PendingDoc {
   };
 }
 
-const unsetPendingOp: Object = { $unset:
+export const unsetPendingOp: Object = { $unset:
   {
     _pending: '',
     _pendingDetails: ''
@@ -91,7 +40,7 @@ export type DbDoc<T> = PendingDoc & T;
  *
  * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html
  */
-export class Collection<T extends Object> {
+export class Collection2PC<T> implements Collection<T> {
   private readonly _db: mongodb.Db;
   private readonly _name: string;
   private readonly _collection: mongodb.Collection<DbDoc<T>>;
@@ -354,13 +303,12 @@ export class Collection<T extends Object> {
     // (probably because mongodb's updateMany and updateOne fns are overloaded)
     // const updateFn = updateMany ?
     //     this._collection.updateMany : this._collection.updateOne;
-
     if (updateMany) {
-      return this._collection.updateMany(
+      return await this._collection.updateMany(
         op.filter, op.update, { upsert: op.upsert });
     }
 
-    return this._collection.updateOne(
+    return await this._collection.updateOne(
       op.filter, op.update, { upsert: op.upsert });
   }
 
@@ -440,6 +388,7 @@ export class Collection<T extends Object> {
     } catch (err) {
       if (options && options.upsert &&
         err.errorCode === ClicheDbNotFoundError.ERROR_CODE) {
+        // the filter should not have any mongodb $ operators
         await this.insertOne(
           context, Object.assign({}, filter, update['$set']), options);
 
@@ -479,26 +428,5 @@ export class Collection<T extends Object> {
       reqId: context.reqId,
       type: `create-${this._name}`
     };
-  }
-}
-
-export class ClicheDb {
-  private readonly _db: mongodb.Db;
-  private readonly _collections: Map<string, Collection<any>> =
-    new Map<string, Collection<any>>();
-
-  constructor(db: mongodb.Db) {
-    this._db = db;
-  }
-
-  /**
-   * Get the collection with the given name from the database.
-   */
-  collection(name: string): Collection<any> {
-    if (!this._collections.has(name)) {
-      this._collections.set(name, new Collection(this._db, name));
-    }
-
-    return this._collections.get(name);
   }
 }

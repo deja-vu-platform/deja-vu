@@ -7,7 +7,7 @@ import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
 
 import { Config } from './config';
-import { ClicheDb } from './db';
+import { ClicheDb } from './db/db';
 
 // GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
 // tslint:disable-next-line:no-var-requires
