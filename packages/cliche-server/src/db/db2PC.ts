@@ -289,34 +289,57 @@ export class Collection2PC<T> implements Collection<T> {
    *
    * Note: This is not reentrant yet.
    *
-   * @param  filter the filter to get the desired document
+   * @param  context the context trying to acquire the lock
+   * @param  filter  the filter to get the desired document
+   * @param  upsert  whether or not the update should do an upsert
+   * @param  updateMany whether or not to apply the update to many documents
    * @return the promise that will resolve when the method is done
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
-  private async getPendingLock(
-    filter: Query<T>, updateMany: boolean): Promise<void> {
+  private async getPendingLock(context: Context,
+    filter: Query<T>, upsert: boolean, updateMany: boolean): Promise<boolean> {
     // use the _pending field as the lock
     // if it is set to true, that means someone owns the lock to that doc
-    const pendingUpdateObj = await this._update(
-        { filter, update: { $set: { _pending: true } } }, updateMany);
+    const setPendingRes = await this._update(
+    {
+      filter,
+      update: {
+        $set: { _pending: true },
+        $setOnInsert: this.getPendingCreateFilter(context)
+      },
+      upsert
+    }, updateMany);
 
-    if (pendingUpdateObj.matchedCount === 0) {
+    if (setPendingRes.upsertedId) {
+      return true;
+    }
+
+    if (setPendingRes.matchedCount === 0) {
       throw new ClicheDbNotFoundError(this._name);
     }
     // if not all matches were modified, it means that _pending: true
     // was already previously set on at least one of the intended documents,
     // meaning some other tx has the lock/s so we fail
-    if (pendingUpdateObj.matchedCount !== pendingUpdateObj.modifiedCount) {
-      if (pendingUpdateObj.modifiedCount !== 0) {
-        // TODO: release lock for the documents included in modifiedCount
-        // BUT we can't just unlock all documents that match filter +
-        // { _pendingDetails: { $exists: false } } because what if
-        // other txs that are supposed to be successful haven't put
-        // their pendingDetails yet?
+    if (setPendingRes.matchedCount !== setPendingRes.modifiedCount) {
+      if (setPendingRes.modifiedCount !== 0) {
+        // release lock for the documents included in modifiedCount
+        const unsetPendingRes = await this._update({
+          filter: Object.assign({}, filter,
+            { _pending: true, _pendingDetails: { $exists: false } }),
+          update: unsetPendingOp
+        });
+
+        if (unsetPendingRes.modifiedCount !== setPendingRes.modifiedCount) {
+          // TODO: it's possible that other txs in progress could match
+          // the filter, and the update would remove the lock they've just
+          // acquired. We need to figure out what to do in this case.
+        }
       }
       throw new ClicheDbConcurrentUpdateError();
     }
+
+    return false;
   }
 
   private async releaseLock(context: Context, filter: Query<T>,
@@ -350,6 +373,8 @@ export class Collection2PC<T> implements Collection<T> {
    * @param  context the context trying to acquire the lock
    * @param  filter  the filter to get the document to lock
    * @param  updateType whether the update is for an update or a delete
+   * @param  upsert  whether or not the update should do an upsert
+   * @param  updateMany whether or not to apply the update to many documents
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
@@ -373,6 +398,8 @@ export class Collection2PC<T> implements Collection<T> {
    * @param  filter  the filter to get the document to lock
    * @param  updateType whether the update is for an update or a delete
    * @param  update  the update to apply to the locked document
+   * @param  options update op options
+   * @param  updateMany whether or not to apply the update to many documents
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
@@ -384,45 +411,36 @@ export class Collection2PC<T> implements Collection<T> {
     // with the information from the context and the given update.
     // Separating these actions allows us to differentiate between
     // not found errors and concurrent update errors
-    try {
-      await this.getPendingLock(filter, updateMany);
-      const updateSetOp = {
-        ...update['$set'], // make sure to include any $set ops from `update`
-        _pendingDetails: {
-          reqId: context.reqId,
-          type: `${updateType}-${this._name}`
-        }
-      };
-      // upsert shouldn't be an option here anymore
-      // because that's handled by getPendingLock and the catch block
-      const updateResult = await this._update({
-        filter,
-        update: {
-          ...update,
-          $set: updateSetOp
-        } as Object
-      }, updateMany);
+    const didUpsert = await this.getPendingLock(
+      context, filter, options && options.upsert, updateMany);
 
-      if (updateResult.matchedCount === 0 ||
-        (updateResult.matchedCount !== updateResult.modifiedCount)) {
-        // Unknown because the update to get the lock
-        // had just been successfully applied on the same object.
-        // No other update should have gone through in between,
-        // so there is no reason for this update to have failed in most cases.
-        // It could fail if this was an updateMany and a new document that
-        // match the filter was recently inserted and is pending
-        throw new ClicheDbUnknownUpdateError();
+    // if there was an upsert, no need to set _pendingDetails
+    // because it should have already been set
+    const updateSetOp = didUpsert ? {} : { $set: {
+      ...update['$set'], // make sure to include any $set ops from `update`
+      _pendingDetails: {
+        reqId: context.reqId,
+        type: `${updateType}-${this._name}`
       }
-    } catch (err) {
-      if (options && options.upsert &&
-        err.errorCode === ClicheDbNotFoundError.ERROR_CODE) {
-        // the filter should not have any mongodb $ operators
-        await this.insertOne(
-          context, Object.assign({}, filter, update['$set']), options);
+    }};
 
-        return;
-      }
-      throw err;
+    const updateResult = await this._update({
+      filter,
+      update: {
+        ...update,
+        ...updateSetOp
+      } as Object
+    }, updateMany);
+
+    if (updateResult.matchedCount === 0 ||
+      (updateResult.matchedCount !== updateResult.modifiedCount)) {
+      // Unknown because the update to get the lock
+      // had just been successfully applied on the same object.
+      // No other update should have gone through in between,
+      // so there is no reason for this update to have failed in most cases.
+      // It could fail if this was an updateMany and a new document that
+      // matched the filter was recently inserted and is pending
+      throw new ClicheDbUnknownUpdateError();
     }
   }
 
@@ -434,7 +452,7 @@ export class Collection2PC<T> implements Collection<T> {
     });
   }
 
-  private getPendingCreateFilter(context: Context, filter: Query<T>) {
+  private getPendingCreateFilter(context: Context, filter: Query<T> = {}) {
     return Object.assign(
       {}, filter, { _pendingDetails: {
         reqId: context.reqId,
@@ -448,7 +466,7 @@ export class Collection2PC<T> implements Collection<T> {
    * i.e. it is not actually part of the collection yet,
    * and that the given context owns the lock to the document.
    * @param context the context trying to creating the document
-   * @param doc the document to create and on which to set pending fields
+   * @param doc     the document to create and on which to set pending fields
    */
   private setPendingCreate(context: Context, doc: DbDoc<T>): void {
     doc._pending = true;
