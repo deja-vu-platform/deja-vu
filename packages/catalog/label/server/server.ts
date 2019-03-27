@@ -1,15 +1,15 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  EMPTY_CONTEXT,
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   AddLabelsToItemInput,
   ItemsInput,
@@ -20,19 +20,12 @@ import {
 import { v4 as uuid } from 'uuid';
 
 interface LabelConfig extends Config {
-  initialLabelIds: LabelDoc[];
+  initialLabelIds: string[];
 }
 
 function standardizeLabel(id: string): string {
   return id.trim()
     .toLowerCase();
-}
-
-class LabelValidation {
-  static async labelExistsOrFail(
-    labels: mongodb.Collection<LabelDoc>, id: string): Promise<LabelDoc> {
-    return Validation.existsOrFail(labels, id, 'Label');
-  }
 }
 
 const actionRequestTable: ActionRequestTable = {
@@ -76,24 +69,13 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function isPendingCreate(doc: LabelDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-label';
-}
-
-function resolvers(db: mongodb.Db, _config: LabelConfig): object {
-  const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
+function resolvers(db: ClicheDb, _config: LabelConfig): object {
+  const labels: Collection<LabelDoc> = db.collection('labels');
 
   return {
     Query: {
-      label: async (_root, { id }) => {
-        const label = await LabelValidation.labelExistsOrFail(
-          labels, standardizeLabel(id));
-        if (_.isNil(label) || isPendingCreate(label)) {
-          throw new Error(`Label ${id} not found`);
-        }
-
-        return label;
-      },
+      label: async (_root, { id }) =>
+        await labels.findOne({ id : standardizeLabel(id)}),
 
       items: async (_root, { input }: { input: ItemsInput }) => {
         const matchQuery = {};
@@ -105,7 +87,6 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
           // Items matching all labelIds
           const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
           matchQuery['id'] = { $in: standardizedLabelIds };
-          matchQuery['pending'] = { $exists: false };
           groupQuery['initialSet'] = { $first: '$itemIds' };
           initialValue = '$initialSet';
           reduceOperator['$setIntersection'] = ['$$value', '$$this'];
@@ -131,20 +112,19 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
             }
           }
         ])
-          .toArray();
+        .toArray();
 
         return !_.isEmpty(results) ? results[0].itemIds : [];
       },
 
       labels: async (_root, { input }: { input: LabelsInput }) => {
-        const query = { pending: { $exists: false } };
+        const query = {};
         if (input.itemId) {
           // Labels of an item
           query['itemIds'] = input.itemId;
         }
 
-        return labels.find(query)
-          .toArray();
+        return labels.find(query);
       }
     },
 
@@ -158,132 +138,51 @@ function resolvers(db: mongodb.Db, _config: LabelConfig): object {
         _root, { input }: { input: AddLabelsToItemInput },
         context: Context) => {
         const labelIds = _.map(input.labelIds, standardizeLabel);
+        const updateOp = { $push: { itemIds: input.itemId } };
+        const errors = await Promise.all(_.map(labelIds, async (id) => {
+          try {
+            // cannot use updateMany because we need to upsert labels
+            await labels.updateOne(context, { id }, updateOp, { upsert: true });
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+            return undefined;
+          } catch (err) {
+            console.error(err);
 
-        const bulkUpdateBaseOps = _.map(labelIds, (labelId) => {
-          return {
-            updateOne: {
-              filter: { id: labelId, pending: { $exists: false } },
-              update: {
-                $push: { itemIds: input.itemId }
-              },
-              upsert: true
-            }
-          };
-        });
-
-        switch (context.reqType) {
-          case 'vote':
-            const bulkPendingUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-              const newOp = _.cloneDeep(op);
-              _.set(newOp, 'updateOne.update.$set', {
-                pending: {
-                  reqId: context.reqId,
-                  type: 'add-labels-to-item'
-                }
-              });
-
-              return newOp;
-            });
-
-            const pendingResult = await labels.bulkWrite(bulkPendingUpdateOps);
-            const pendingModified =
-              pendingResult.modifiedCount ? pendingResult.modifiedCount : 0;
-            const pendingUpserted =
-              pendingResult.upsertedCount ? pendingResult.upsertedCount : 0;
-
-            if (pendingModified + pendingUpserted !== labelIds.length) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-
-          case undefined:
-            const result = await labels.bulkWrite(bulkUpdateBaseOps);
-            const modified = result.modifiedCount ? result.modifiedCount : 0;
-            const upserted = result.upsertedCount ? result.upsertedCount : 0;
-
-            if (modified + upserted !== labelIds.length) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-
-          case 'commit':
-            const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-              const newOp = _.cloneDeep(op);
-              _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
-              _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
-              _.set(newOp, 'updateOne.update.$unset', { pending: '' });
-
-              return newOp;
-            });
-
-            await labels.bulkWrite(bulkCommitUpdateOps);
-
-            return true;
-
-          case 'abort':
-            const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-              const newOp = _.cloneDeep(op);
-              _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
-              _.set(newOp, 'updateOne.update.$unset', { pending: '' });
-
-              return newOp;
-            });
-
-            await labels.bulkWrite(bulkAbortUpdateOps);
-
-            return true;
+            return err;
+          }
+        }));
+        if (errors.filter((err) => !!err).length === 0) {
+          return true;
         }
+        const errMsg = _.reduce(errors, (prev, curr, index) => {
+          if (!curr) {
+            return prev;
+          }
+          const delimiter = index ? ', ' : '';
 
-        return true;
+          return `${prev}${delimiter}${labelIds[index]}`;
+        }, 'Could not add the following labels to the item: ');
+        throw new Error(errMsg);
       },
 
       createLabel: async (_root, { id }, context: Context) => {
         const labelId = id ? standardizeLabel(id) : uuid();
         const newLabel: LabelDoc = { id: labelId };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newLabel.pending = {
-              reqId: context.reqId,
-              type: 'create-label'
-            };
-          /* falls through */
-          case undefined:
-            await labels.insertOne(newLabel);
-
-            return newLabel;
-          case 'commit':
-            await labels.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return true;
-          case 'abort':
-            await labels.deleteOne(reqIdPendingFilter);
-
-            return true;
-        }
-
-        return newLabel;
+        return await labels.insertOne(context, newLabel);
       }
     }
   };
 }
 
 const labelCliche: ClicheServer = new ClicheServerBuilder('label')
-  .initDb(async (db: mongodb.Db, _config: LabelConfig): Promise<any> => {
-    const labels: mongodb.Collection<LabelDoc> = db.collection('labels');
+  .initDb(async (db: ClicheDb, config: LabelConfig): Promise<any> => {
+    const labels: Collection<LabelDoc> = db.collection('labels');
     await labels.createIndex({ id: 1 }, { unique: true, sparse: true });
     await labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
-    if (!_.isEmpty(_config.initialLabelIds)) {
-      return labels.insertMany(_.map(_config.initialLabelIds, (id) => {
-        return { id: id };
-      }));
+    if (!_.isEmpty(config.initialLabelIds)) {
+      return labels.insertMany(EMPTY_CONTEXT,
+        _.map(config.initialLabelIds, (id) => ({ id: id })));
     }
 
     return Promise.resolve();
