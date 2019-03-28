@@ -11,7 +11,6 @@ import {
   UpsertOptions
 } from './db';
 import {
-  /*addPendingDetailsOp, getPendingLockOp,*/
   getReqIdPendingFilter,
   releaseLockOp,
   UpdateOp
@@ -35,13 +34,44 @@ export const unsetPendingOp: Object = { $unset:
 export type DbDoc<T> = PendingDoc & T;
 
 /**
- * Wrapper around the MongoDb Node.js driver
- * to add support for Déjà Vu's transaction handling,
- * exposing only the relevant methods for DV cliché servers.
+ * An implementation of Déjà Vu's Collection,
+ * a wrapper around the MongoDb Node.js driver for transaction handling.
  *
- * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html
+ * This uses a `_pending` boolean field as a lock for each document,
+ * and stores the request ID and type (e.g. create-foo, update-foo) under
+ * the `_pendingDetails` field of the document.
+ *
+ * More specifically,
+ * - Before creating/updating/deleting a document, acquire the lock
+ *   to that document, i.e. set `_pending: true`
+ * - If the modified count is 0, another tx has the lock, so throw a concurrent
+ *   update error.
+ *   Else, locking was a success so the scheme sets the `_pendingDetails` field
+ *   and applies any relevant updates, depending on which phase of 2PC it is.
+ *   Create operations specify that a document is pending create under
+ *   `_pendingDetails` which find operations will take care not to return.
+ *   Updates only happen on commit so find operations will only return the
+ *   current version of docs, without the pending update.
+ * - Release the lock, i.e. unset `_pending` and `_pendingDetails`, when the tx
+ *   is over (on abort and at the end of the commit) or at the end of a non-tx
+ *   operation, if needed (see below).
+ * - Non-tx updates still need to follow the locking scheme so that it can throw
+ *   a not found error, or a concurrent update error since you can't perform an
+ *   update on a document which has another update in progress/is locked by a tx
+ *
+ * The locking scheme above ensures that once a tx successfully locks on a doc,
+ * no other tx or non-tx operation can touch it. Those concurrent operations
+ * will fail with a concurrent update error.
+ *
+ * The only constraint that can be enforced atomically for inserts
+ * are the uniqueness constraints set by the created indices.
+ * Clichés would have to check other preconditions separately,
+ * without the guarantee that those conditions would not have changed
+ * by the time the insert happens. If the cliché does not allow certain fields
+ * to be mutated, then preconditions that rely on those field values could be
+ * checked outside of a transaction.
  */
-export class Collection2PC<T> implements Collection<T> {
+export class CollectionWithPendingLocks<T> implements Collection<T> {
   private readonly _db: mongodb.Db;
   private readonly _name: string;
   private readonly _collection: mongodb.Collection<DbDoc<T>>;
@@ -342,7 +372,7 @@ export class Collection2PC<T> implements Collection<T> {
    * @param  filter  the filter to get the desired document
    * @param  upsert  whether or not the update should do an upsert
    * @param  updateMany whether or not to apply the update to many documents
-   * @return the promise that will resolve when the method is done
+   * @return the promise that will resolve to whether or not there was an upsert
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
@@ -359,6 +389,7 @@ export class Collection2PC<T> implements Collection<T> {
         $setOnInsert: {
           ...setOnInsert,
           ...this.getPendingCreateFilter(context)
+          // make sure we mark as pending create if we do an upsert
         }
       },
       upsert

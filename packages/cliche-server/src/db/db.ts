@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import { Collection2PC } from './db2PC';
+import { CollectionWithPendingLocks } from './db2PC';
 
 export type Query<T> = mongodb.FilterQuery<T>;
 
@@ -122,7 +122,8 @@ export class ClicheDb {
    */
   collection<T>(name: string): Collection<T> {
     if (!this._collections.has(name)) {
-      this._collections.set(name, new Collection2PC<T>(this._db, name));
+      this._collections.set(
+        name, new CollectionWithPendingLocks<T>(this._db, name));
     }
 
     return this._collections.get(name);
