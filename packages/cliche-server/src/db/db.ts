@@ -62,6 +62,11 @@ export class ClicheDbDuplicateKeyError extends ClicheDbError {
   }
 }
 
+export interface UpsertOptions {
+  upsert: boolean;
+  setOnInsert?: Object;
+}
+
 /**
  * Wrapper around the MongoDb Node.js driver
  * to add support for Déjà Vu's transaction handling,
@@ -84,6 +89,11 @@ export interface Collection<T extends Object> {
   find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]>;
 
   findOne(query: Query<T>, options?: mongodb.FindOneOptions): Promise<T>;
+
+  findOneAndUpdateWithFn(context: Context, filter: Query<T>,
+    updateFn: (doc: T) => Object,
+    options?: mongodb.ReplaceOneOptions & UpsertOptions,
+    validationFn?: (doc: T) => any): Promise<T | undefined>;
 
   insertMany(context: Context, docs: T[],
     options?: mongodb.CollectionInsertManyOptions): Promise<T[]>;

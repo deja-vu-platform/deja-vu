@@ -7,7 +7,8 @@ import {
   ClicheDbUnknownUpdateError,
   Collection,
   Context,
-  Query
+  Query,
+  UpsertOptions
 } from './db';
 import {
   /*addPendingDetailsOp, getPendingLockOp,*/
@@ -67,13 +68,15 @@ export class Collection2PC<T> implements Collection<T> {
     switch (context.reqType) {
       case 'vote':
         // make sure we can update and no one else touches it before we commit
-        await this.getLockForUpdate(context, filter, 'delete', false, true);
+        await this.getLockForUpdate(context, filter, 'delete',
+          { upsert: false }, true);
 
         return true;
       case undefined:
         // try to lock on it first to throw
         // either not found or concurrent update error if needed
-        await this.getLockForUpdate(context, filter, 'delete', false, true);
+        await this.getLockForUpdate(context, filter, 'delete',
+          { upsert: false }, true);
         const res = await this._collection.deleteMany(filter, options);
 
         if (res.deletedCount === 0) {
@@ -149,6 +152,64 @@ export class Collection2PC<T> implements Collection<T> {
     return doc;
   }
 
+  async findOneAndUpdateWithFn(
+    context: Context, filter: Query<T>,
+    updateFn: (doc: T) => Object | undefined,
+    options?: mongodb.ReplaceOneOptions & UpsertOptions,
+    validationFn?: (doc: T | null) => any): Promise<T | undefined> {
+
+    switch (context.reqType) {
+      case 'vote':
+        /* falls through */
+      case undefined: {
+        const setOnInsert = {
+          $setOnInsert: options && options.setOnInsert || {}
+        };
+        // make sure doc exists and lock on it before we apply update
+        await this.getLockAndUpdate(
+          context, filter, 'update', setOnInsert, options);
+        // we can fetch the doc safely because we know we have the lock
+        const doc: T = await this._collection.findOne(filter);
+        try {
+          validationFn(doc);
+        } catch (err) {
+          await this.abortUpdate(context, filter);
+          throw err;
+        }
+        if (context.reqType === undefined) {
+          const update = updateFn(doc);
+          if (!update) {
+            await this._collection.deleteOne(filter);
+          } else {
+            await this._collection.updateOne(filter, update, options);
+            await this.releaseLock(context, filter);
+          }
+        }
+
+        return doc;
+      }
+      case 'commit':
+        // we can fetch the doc safely because we know we have the lock
+        const doc: T = await this._collection.findOne(filter);
+        const update = updateFn(doc);
+        if (!update) {
+          await this._collection.deleteOne(
+            getReqIdPendingFilter(context, filter));
+          break;
+        }
+        // apply the update and remove the pending lock at the same time
+        await this._collection.updateOne(
+          getReqIdPendingFilter(context, filter),
+          { ...updateFn(doc), ...unsetPendingOp } as Object);
+        break;
+      case 'abort':
+        await this.abortUpdate(context, filter);
+        break;
+    }
+
+    return undefined;
+  }
+
   async insertMany(context: Context, docs: T[],
     options?: mongodb.CollectionInsertManyOptions): Promise<T[]> {
     switch (context.reqType) {
@@ -215,7 +276,7 @@ export class Collection2PC<T> implements Collection<T> {
       case 'vote':
         // make sure we can update and no one else touches it before we commit
         await this.getLockForUpdate(context, filter, 'update',
-          options && options.upsert, true);
+          this.getUpsertOptions(update, options), true);
 
         return true;
       case undefined:
@@ -233,13 +294,7 @@ export class Collection2PC<T> implements Collection<T> {
           { ...update, ...unsetPendingOp } as Object);
         break;
       case 'abort':
-        // delete in case of upsert; remove lock(s) if no upsert
-        const deleteResult =
-          await this._collection.deleteOne(
-            this.getPendingCreateFilter(context,filter));
-        if (deleteResult.deletedCount === 0) {
-          await this.releaseLock(context, filter, true);
-        }
+        await this.abortUpdate(context, filter, true);
         break;
     }
     
@@ -253,7 +308,7 @@ export class Collection2PC<T> implements Collection<T> {
       case 'vote':
         // make sure doc exists and that no one else touches it before we commit
         await this.getLockForUpdate(context, filter, 'update',
-          options && options.upsert);
+          this.getUpsertOptions(update, options));
 
         return true;
       case undefined:
@@ -270,13 +325,7 @@ export class Collection2PC<T> implements Collection<T> {
           { ...update, ...unsetPendingOp } as Object);
         break;
       case 'abort':
-        // delete in case of upsert; remove lock if no upsert
-        const deleteResult =
-          await this._collection.deleteOne(
-            this.getPendingCreateFilter(context, filter));
-        if (deleteResult.deletedCount === 0) {
-          await this.releaseLock(context, filter);
-        }
+        await this.abortUpdate(context, filter);
         break;
     }
 
@@ -297,8 +346,9 @@ export class Collection2PC<T> implements Collection<T> {
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
-  private async getPendingLock(context: Context,
-    filter: Query<T>, upsert: boolean, updateMany: boolean): Promise<boolean> {
+  private async getPendingLock(context: Context, filter: Query<T>,
+    upsert: boolean, setOnInsert: Object,
+    updateMany: boolean): Promise<boolean> {
     // use the _pending field as the lock
     // if it is set to true, that means someone owns the lock to that doc
     const setPendingRes = await this._update(
@@ -306,7 +356,10 @@ export class Collection2PC<T> implements Collection<T> {
       filter,
       update: {
         $set: { _pending: true },
-        $setOnInsert: this.getPendingCreateFilter(context)
+        $setOnInsert: {
+          ...setOnInsert,
+          ...this.getPendingCreateFilter(context)
+        }
       },
       upsert
     }, updateMany);
@@ -373,16 +426,18 @@ export class Collection2PC<T> implements Collection<T> {
    * @param  context the context trying to acquire the lock
    * @param  filter  the filter to get the document to lock
    * @param  updateType whether the update is for an update or a delete
-   * @param  upsert  whether or not the update should do an upsert
+   * @param  upsertOptions  the upsert options
    * @param  updateMany whether or not to apply the update to many documents
    * @throws ClicheDbNotFoundError if the filter does not return any documents
    * @throws ClicheDbConcurrentUpdateError if the lock is held by another tx
    */
   private async getLockForUpdate(context: Context, filter: Query<T>,
-    updateType: 'update' | 'delete', upsert: boolean = false,
+    updateType: 'update' | 'delete',
+    upsertOptions: UpsertOptions = { upsert: false },
     updateMany: boolean = false): Promise<void> {
-    return await this.getLockAndUpdate(context, filter, updateType, updateMany,
-      { upsert });
+    return await this.getLockAndUpdate(context, filter, updateType,
+      { $setOnInsert: upsertOptions.setOnInsert || {} },
+      { upsert: upsertOptions.upsert }, updateMany);
   }
 
   /**
@@ -411,11 +466,18 @@ export class Collection2PC<T> implements Collection<T> {
     // with the information from the context and the given update.
     // Separating these actions allows us to differentiate between
     // not found errors and concurrent update errors
-    const didUpsert = await this.getPendingLock(
-      context, filter, options && options.upsert, updateMany);
+    const didUpsert = await this.getPendingLock(context, filter,
+      options && options.upsert, _.get(update, '$setOnInsert', {}), updateMany);
 
-    // if there was an upsert, no need to set _pendingDetails
-    // because it should have already been set
+    // if there was an upsert:
+    // no need to update anything if setOnInsert is the only update
+    if (didUpsert && update['$setOnInsert'] &&
+      Object.keys(update).length === 1) {
+      return;
+    }
+
+    // if there was an upsert:
+    // no need to set _pendingDetails because it should have already been set
     const updateSetOp = didUpsert ? {} : { $set: {
       ...update['$set'], // make sure to include any $set ops from `update`
       _pendingDetails: {
@@ -452,7 +514,8 @@ export class Collection2PC<T> implements Collection<T> {
     });
   }
 
-  private getPendingCreateFilter(context: Context, filter: Query<T> = {}) {
+  private getPendingCreateFilter(
+    context: Context, filter: Query<T> = {}): Object {
     return Object.assign(
       {}, filter, { _pendingDetails: {
         reqId: context.reqId,
@@ -473,6 +536,28 @@ export class Collection2PC<T> implements Collection<T> {
     doc._pendingDetails = {
       reqId: context.reqId,
       type: `create-${this._name}`
+    };
+  }
+
+  private async abortUpdate(context: Context, filter: Query<T>,
+    updateMany: boolean = false): Promise<void> {
+    // delete in case of upsert; remove lock if no upsert
+    // we only need to deleteOne even for updateMany=true
+    // because only <= 1 document is upserted in all cases
+    const deleteResult =
+      await this._collection.deleteOne(
+        this.getPendingCreateFilter(context, filter));
+    if (deleteResult.deletedCount === 0) {
+      await this.releaseLock(context, filter, updateMany);
+    }
+  }
+
+  private getUpsertOptions(update: Object,
+    options: mongodb.ReplaceOneOptions |
+      mongodb.UpdateManyOptions | undefined) {
+    return {
+      upsert: options && options.upsert,
+      setOnInsert: update['$setOnInsert']
     };
   }
 }
