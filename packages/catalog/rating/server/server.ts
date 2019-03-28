@@ -57,6 +57,23 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
+function getRatingFilter(input: RatingsInput) {
+  const filter = {};
+  if (!_.isNil(input)) {
+    if (input.bySourceId) {
+      // All ratings by a source
+      filter['sourceId'] = input.bySourceId;
+    }
+
+    if (input.ofTargetId) {
+      // All ratings of a target
+      filter['targetId'] = input.ofTargetId;
+    }
+  }
+
+  return filter;
+}
+
 function resolvers(db: ClicheDb, _config: Config): object {
   const ratings: Collection<RatingDoc> = db.collection('ratings');
 
@@ -66,22 +83,11 @@ function resolvers(db: ClicheDb, _config: Config): object {
           .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
       ratings: async (_root, { input }: { input: RatingsInput }) => {
-        const filter = {};
-        if (input.bySourceId) {
-          // All ratings by a source
-          filter['sourceId'] = input.bySourceId;
-        }
-
-        if (input.ofTargetId) {
-          // All ratings of a target
-          filter['targetId'] = input.ofTargetId;
-        }
-
-        return await ratings.find(filter);
+        return await ratings.find(getRatingFilter(input));
       },
 
-      ratingCount: (_root, { input }: { input: RatingsInput }) => {
-        return ratings.count(getRatingFilter(input));
+      ratingCount: async (_root, { input }: { input: RatingsInput }) => {
+        return await ratings.countDocuments(getRatingFilter(input));
       },
 
       averageRatingForTarget: async (_root, { targetId }) => {

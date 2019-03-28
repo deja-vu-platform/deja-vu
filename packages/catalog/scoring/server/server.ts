@@ -72,18 +72,10 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
 
         return await scores.findOne(input);
       },
-      target: async (_root, { id }): Promise<Target> => {
-        const targetScores: ScoreDoc[] = await scores.find({ targetId: id });
 
-      target: async (
-        _root, { input }: { input: ShowTargetInput }) => {
-        const filter = { targetId: input.id, pending: { $exists: false } };
-        if (!_.isNil(input.sourceId)) {
-          filter['sourceId'] = input.sourceId;
-        }
-
+      target: async (_root, { input }: { input: ShowTargetInput }) => {
         const target = await scores.aggregate([
-          { $match: filter },
+          { $match: input },
           {
             $group: {
               _id: '$targetId',
@@ -108,7 +100,7 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
       targetsByScore: async (
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
-        const query = { pending: { $exists: false } };
+        const query = {};
 
         if (!_.isNil(input)) {
           if (!_.isNil(input.targetIds)) {
@@ -138,7 +130,7 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
             id: target._id
           };
         })
-        .orderBy(['total'], [ asc ? 'asc' : 'desc' ])
+        .orderBy(['total'], [ input.asc ? 'asc' : 'desc' ])
         .value();
       }
     },

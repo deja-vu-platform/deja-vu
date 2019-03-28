@@ -106,7 +106,10 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         return await tasks.find(filterOp);
       },
-      task: async (_root, { id }) => await tasks.findOne({ id: id })
+      task: async (_root, { id }) => await tasks.findOne({ id: id }),
+      taskCount: async (_root, { input }: { input: TasksInput }) => {
+        return await tasks.countDocuments(getTaskFilter(input));
+      }
     },
     Task: {
       id: (task: TaskDoc) => task.id,
@@ -131,7 +134,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       createTasksForAssignees: async (
         _root, { input }: { input: CreateTasksForAssigneesInput },
         context: Context) => {
-        let newTasks: TaskDoc[] = _.map(input.assigneeIds, (assigneeId) => {
+        const newTasks: TaskDoc[] = _.map(input.assigneeIds, (assigneeId) => {
           return {
             id: uuid(),
             assignerId: input.assignerId,
@@ -142,34 +145,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
           };
         });
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newTasks = _.map(newTasks, (task) => {
-              _.set(task, 'pending', {
-                reqId: context.reqId, type: 'create-task'
-              });
-
-              return task;
-            });
-
-          case undefined:
-            const res = await tasks.insertMany(newTasks);
-
-            return newTasks;
-          case 'commit':
-            await tasks.updateMany(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return newTasks;
-          case 'abort':
-            await tasks.deleteMany(reqIdPendingFilter);
-
-            return newTasks;
-        }
-
-        return newTasks;
+        return await tasks.insertMany(context, newTasks);
       },
       updateTask: async (
         _root, { input }: { input: UpdateTaskInput }, context: Context) => {
