@@ -183,11 +183,13 @@ export interface Collection<T extends Object> {
 }
 
 export class ClicheDb {
+  private readonly _client: mongodb.MongoClient;
   private readonly _db: mongodb.Db;
   private readonly _collections: Map<string, Collection<any>> =
     new Map<string, Collection<any>>();
 
-  constructor(db: mongodb.Db) {
+  constructor(client: mongodb.MongoClient, db: mongodb.Db) {
+    this._client = client;
     this._db = db;
   }
 
@@ -201,5 +203,29 @@ export class ClicheDb {
     }
 
     return this._collections.get(name);
+  }
+
+  /**
+   * Execute operations within a transaction.
+   * Recommended for use only when applying operations to multiple collections.
+   * @param  fn the function to execute
+   * @return the value return by the given function
+   */
+  async inTransaction(fn: () => Promise<any>): Promise<any> {
+    let returnVal = undefined;
+    this._client.withSession(async (session) => {
+      session.startTransaction();
+      try {
+        returnVal = await fn();
+        await session.commitTransaction();
+
+        return;
+      } catch (err) {
+        await session.abortTransaction();
+        throw err;
+      }
+    });
+
+    return returnVal;
   }
 }

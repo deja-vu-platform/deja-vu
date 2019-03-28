@@ -173,7 +173,7 @@ export class ClicheServer<C extends Config = Config> {
       `mongodb://${mongoServer}`);
 
     this._db = client.db(this._config.dbName);
-    const clicheDb: ClicheDb = new ClicheDb(this._db);
+    const clicheDb: ClicheDb = new ClicheDb(client, this._db);
 
     if (this._config.reinitDbOnStartup) {
       await this._db.dropDatabase();
