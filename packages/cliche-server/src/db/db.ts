@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import { CollectionWithPendingLocks } from './db2PC';
+import { CollectionWithPendingLocks } from './dbWithPendingLocks';
 
 export type Query<T> = mongodb.FilterQuery<T>;
 

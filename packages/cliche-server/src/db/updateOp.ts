@@ -1,6 +1,6 @@
 import * as mongodb from 'mongodb';
 import { Context, Query } from './db';
-import { DbDoc, unsetPendingOp } from './db2PC';
+import { DbDoc, unsetPendingOp } from './dbWithPendingLocks';
 
 
 export interface UpdateOp<T> {
