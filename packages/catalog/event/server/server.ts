@@ -92,8 +92,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
   return {
     Query: {
       // TODO: search between dates
-      events: () => events.find(),
-      series: () => series.find(),
+      events: async () => await events.find(),
+      series: async () => await series.find(),
       event: async (_root, { id }) => await events.findOne({ id: id }),
       oneSeries: async (_root, { id }) => await series.findOne({ id: id })
     },
@@ -127,7 +127,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
           endDate: unixTimeToDate(input.endDate)
         };
 
-        return events.insertOne(context, e);
+        return await events.insertOne(context, e);
       },
       updateEvent: async (
         _root, { input }: { input: UpdateEventInput }, context: Context) => {
