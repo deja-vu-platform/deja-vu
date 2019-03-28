@@ -1172,21 +1172,12 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/mongodb@^3.0.7":
-  version "3.1.19"
-  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.1.19.tgz#40c4310986888975771857810aa47fd3ea8e1acf"
-  integrity sha512-H54hQEovAhyLrIZOhPNfGyCCDoTqKsjb8GQBy8nptJqfxrYCp5WVcPJf9v0kfTPR72xOhaz9+WcYxOXWwEg1Vg==
+"@types/mongodb@^3.1.8":
+  version "3.1.22"
+  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.1.22.tgz#66f96c7acbf7135ce6295a8d6c26f1d97388a84b"
+  integrity sha512-hvNR0txBlJJAy1eZOeIDshW4dnQaC694COou4eHHaMdIcteCfoCQATD7sYNlXxNxfTc1iIbHUi7A8CAhQe08uA==
   dependencies:
     "@types/bson" "*"
-    "@types/node" "*"
-
-"@types/mongodb@~3.0.7":
-  version "3.0.23"
-  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.0.23.tgz#22885a5b6693d4957767d9124dd18bf9c269bce8"
-  integrity sha512-ZEXxdtqb5gY24XugzHwWjTVIqeSiN4WfrNma7qAGkpUOq4475a1hSHvoywpow3Pe47G+u2DyseNfB+yKLDgAQQ==
-  dependencies:
-    "@types/bson" "*"
-    "@types/events" "*"
     "@types/node" "*"
 
 "@types/node@*":
