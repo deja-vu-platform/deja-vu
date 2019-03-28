@@ -2,11 +2,13 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   Input,
   OnInit,
   QueryList,
   ViewChildren
 } from '@angular/core';
+import { MatMenuTrigger, MatTabGroup } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -14,6 +16,8 @@ import {
   ActionInstance,
   App,
   AppActionDefinition,
+  flexAlign,
+  flexJustify,
   Row
 } from '../datatypes';
 import { ScopeIO } from '../io';
@@ -32,25 +36,41 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   private readonly _rows: Row[] = [];
+  private readonly keysDown: Set<string> = new Set();
+  flexAlignEntries = Object.entries(flexAlign);
+  flexJustifyEntries = Object.entries(flexJustify);
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
+  @Input()
+  set openAction(action: AppActionDefinition) {
+    this.actionInstance = new ActionInstance(action, this.app);
+    this.scopeIO.link(this.actionInstance);
+  }
+
   ngOnInit() {
-    this.rs.registerAppAction(this.elem, this);
+    if (this.actionInstance && this.actionInstance.isAppAction) {
+      this.rs.registerAppAction(this.elem, this);
+    }
   }
 
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
+      // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
         this.calcShowHint();
       });
     });
   }
 
-  @Input()
-  set openAction(action: AppActionDefinition) {
-    this.actionInstance = new ActionInstance(action, this.app);
-    this.scopeIO.link(this.actionInstance);
+  @HostListener('document:keydown', ['$event.key'])
+  handleKeyDown(key: string) {
+    this.keysDown.add(key);
+  }
+
+  @HostListener('document:keyup', ['$event.key'])
+  handleKeyUp(key: string) {
+    this.keysDown.delete(key);
   }
 
   get rows() {
@@ -64,11 +84,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     return this._rows;
   }
 
-  onMenuClosed() {
+  onActionMenuClosed() {
     this.scopeIO.link(this.actionInstance);
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint());
   }
+
+  onRowMenuClosed() { }
 
   private calcShowHint() {
     let rowActions = 0;
@@ -91,4 +113,30 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     });
   }
 
+  stopPropIfShift(event: Event) {
+    if (this.keysDown.has('Shift')) {
+      event.stopPropagation();
+    }
+  }
+
+  openMenu(trigger: MatMenuTrigger) {
+    trigger.openMenu();
+  }
+
+  closeMenu(trigger: MatMenuTrigger) {
+    trigger.closeMenu();
+  }
+
+  clickFirstTab(mtg: MatTabGroup) {
+    // the selected tab is not highlighted unless we touch it
+    const tabGroupEl: HTMLElement = mtg._elementRef.nativeElement;
+    const firstTabEl = tabGroupEl.querySelector('.mat-tab-label');
+    firstTabEl.dispatchEvent(new Event('mousedown'));
+    // the not-selected tab does not load the first time for some reason
+    const numTabs = 2;
+    mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs;
+    // selectedIndex seems to be a setter
+    // we need to let it resolve before updating again
+    setTimeout(() => mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs);
+  }
 }

@@ -1,60 +1,120 @@
+$row-control-width: 32px; // we need this fixed for the pseudo background
+
+// the region outside of the page
 #main-view {
   width: 100%;
   background: darkgray;
-  padding: 16px;
+  padding: 24px;
+  padding-left: 0; // because there is the offpage button on the left
 }
 
 #page {
   width: 100%;
-  min-height: 100vh;
-  background: white; /* TODO: configurable */
-  padding: 8px;
+  min-height: 100vh; // will exceed its parent a bit
   display: flex;
   flex-direction: column;
+  // put a white background behind the page
+  // (in case they set the background to something transparent)
+  position: relative;
+  box-sizing: content-box;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: $row-control-width;
+    bottom: 0;
+    right: 0;
+    background: white;
+    z-index: -1;
+  }
 }
 
-.dvd-row {
-  min-height: 100px;
-  border-width: 1px 0;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.dvd-row:first-child {
-  border-top: none;
-}
-
-.dvd-row:last-child {
-  border-bottom: none;
+// contains both the control ("offpage") and content
+.row-container {
   display: flex;
+}
+
+// looks like it's outside of the page
+.row-control {
+  width: $row-control-width;
+  button {
+    cursor: grab;
+    padding: 0 4px;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+// the content on the page
+.dvd-row {
   flex: 1;
+  display: flex;
+}
+// dvd-row has "page" styles applied to it which we must override sometimes
+.row-container:not(:first-child) .dvd-row {
+  border-top: none !important;
+  padding-top: 0 !important;
+}
+.row-container:not(:last-child) .dvd-row {
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.2) !important;
+  padding-bottom: 0 !important;
+}
+
+// we have a giant invisible last row for dragging content into
+.row-container:last-child {
+  flex: 1;
+  .row-control {
+    visibility: hidden;
+  }
 }
 
 .action {
-  border: 3px solid white; /* TODO: configurable */
+  // start with invisible border to avoid shifts on hover
+  border: 3px solid rgba(255,255,255,0);
   border-radius: 5px;
-  width: fit-content;
-}
-
-.action:hover {
-  border-color:rgba(16, 219, 255, .5);
+  &:hover {
+    border-color:rgba(16, 219, 255, .5);
+  }
 }
 
 .popup-menu {
-  height: 200px;
-  padding: 0 16px;
+  height: 250px;
+  width: 256px; // chosen emperically
+  mat-form-field {
+    width: 100%;
+  }
 }
-
-.popup-menu > mat-form-field {
-  width: 100%;
+.row-menu, .inputtables {
+  padding: 16px;
 }
 
 // need clickable area for menu
 .instance-container {
   min-height: 25px;
-  min-width: 100px;
+  min-width: 150px;
 }
 
+// text showing where invisible actions are
 .hint {
   color: rgba(0,0,0,.25);
 }
+
+mat-tab-group {
+  padding: 0;
+}
+
+mat-tab {
+  height: 100%;
+}
+
+mat-checkbox {
+  display: block;
+  margin: 8px;
+}
+
+.no-drag {
+  cursor: default;
+}
+
+

@@ -1,0 +1,23 @@
+<dv.action name="host-login">
+  <div class="white-back">
+    <livescorecard.banner hostLogin=true />
+    <div class="container text-center">
+      <div class="row">
+        <div class="offset-lg-4 col-lg-4 offset-lg-4">
+          <hr class="user-form" />
+          <dv.tx>
+            <hostauthentication.sign-in
+              class="full"
+              inputLabel="username"
+              passwordLabel="password"
+              buttonLabel="LOGIN" />
+            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+          </dv.tx>
+          <p>Don't have an account? Sign up
+             <dv.link href="/register" class="link inline-block">here</dv.link>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

@@ -82,6 +82,11 @@ const actionRequestTable: ActionRequestTable = {
     query ShowEvents($input: EventsInput!) {
       events(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-event-count': (extraInfo) => `
+    query ShowEventCount($input: EventsInput!) {
+      eventCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 

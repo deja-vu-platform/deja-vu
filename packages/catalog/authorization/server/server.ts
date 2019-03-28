@@ -89,6 +89,11 @@ const actionRequestTable: ActionRequestTable = {
       resource(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-resource-count': (extraInfo) => `
+    query ShowResourceCount($input: ResourcesInput!) {
+      resourceCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-resources': (extraInfo) => `
     query ShowResources($input: ResourcesInput!) {
       resources(input: $input) ${getReturnFields(extraInfo)}
@@ -113,6 +118,10 @@ function resolvers(db: ClicheDb, _config: Config): object {
       },
 
       resource: async (_root, { id }) => await resources.findOne({ id }),
+
+      resourceCount: (_root, { input }: { input: ResourcesInput }) => {
+        return resources.count(getResourceFilter(input));
+      },
 
       owner: async (_root, { resourceId }) => {
         const resource = await resources

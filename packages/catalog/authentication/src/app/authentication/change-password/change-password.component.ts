@@ -1,21 +1,20 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
+  Component, ElementRef, Inject, Input, OnInit, ViewChild
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  FormBuilder, FormControl, FormGroup, FormGroupDirective,
   NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecFailure,
-  OnExecSuccess, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec,
+  OnExecFailure, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
 
 import * as _ from 'lodash';
 
-import { User } from '../shared/authentication.model';
 
 import {
   PasswordValidator, RetypePasswordValidator

@@ -1,9 +1,8 @@
 <div class="container">
   <h1>Create Task With Assigner ben</h1>
   <task-create-task assignerId="ben"></task-create-task>
-  <h1>Show All Tasks</h1>
-  <task-show-tasks
-    claimAssigneeId="ben"
+  <h1>Show All Tasks assigned by Ben</h1>
+  <task-show-tasks assignerId="ben"
     [showOptionToComplete]="true"
     [showOptionToApprove]="true">
   </task-show-tasks>
@@ -11,4 +10,10 @@
   <task-create-task id="getPizza" assignerId="ben"></task-create-task>
   <h1>Update getPizza Task</h1>
   <task-update-task id="getPizza"></task-update-task>
+  <h1>Show Task Count</h1>
+  <task-show-task-count></task-show-task-count>
+  <h1>Create Tasks for Multiple Assignees</h1>
+  <task-create-tasks-for-assignees></task-create-tasks-for-assignees>
+  <h1>Show All Tasks</h1>
+  <task-show-tasks></task-show-tasks>
 </div>

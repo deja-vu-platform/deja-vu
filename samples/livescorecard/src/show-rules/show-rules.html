@@ -1,0 +1,30 @@
+<dv.action name="show-rules">
+  <dv.if condition=$isHost>
+    <livescorecard.host-navbar />
+  </dv.if>
+  <dv.if condition=$isClimber>
+    <livescorecard.climber-navbar />
+  </dv.if>
+  <dv.if condition=$isSpectator>
+    <livescorecard.spectator-navbar />
+  </dv.if>
+
+  <div class="container below-navbar">
+    <div class="row">
+      <div class="offset-lg-2 col-lg-8">
+        <div id="rules">
+          <div class="row">
+            <h1 class="padded inline-block">Competition Rules</h1>
+            <dv.if condition=$canEdit class="inline-block">
+              <img src="assets/edit.png" class="edit edit-rules" />
+            </dv.if>
+          </div>
+          <div class="row">
+            <competition.show-object id=$competitionId showOnly=['rules'] />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2"></div>
+  </div>
+</dv.action>

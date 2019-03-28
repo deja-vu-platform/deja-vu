@@ -1,0 +1,77 @@
+<dv.action name="show-scorecard">
+  <livescorecard.climber-navbar />
+
+  <div class="container below-navbar">
+    <!-- Top 5 Climbs -->
+    <div class="row">
+      <div class="col-3">
+        <h2>My Top 5</h2>
+      </div>
+      <div class="col-6">
+        Coming Soon
+      </div>
+      <div class="col-3"></div>
+    </div>
+
+    <div class="row">
+      <!-- Filters -->
+      <div class="col-3">
+        <h2>All Climbs</h2>
+        <p>Sort by: (soon)</p>
+        <div class="row left-space">
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="climb number" />
+              climb number
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="points: high to low" />
+              <!-- TODO: Trigger loading in desc order -->
+              points: high to low
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="sortradio" value="points: low to high" />
+              <!-- TODO: Trigger loading in asc order -->
+              points: low to high
+            </label>
+          </div>
+          <label>
+            <input type="checkbox" />
+            <span>show only incomplete climbs</span>
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" />
+            <span>show only climbs that add to your score</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- All Climbs -->
+      <div class="col-9">
+        <div class="row">
+          <div class="col-2 labels center">status</div>
+          <div class="col-2 labels center">climb #</div>
+          <div class="col-3 labels">category</div>
+          <div class="col-2 labels center">score</div>
+          <div class="col-3 labels center red offset-falls">falls</div>
+        </div>
+
+        <task.show-tasks noTasksToShowText=""
+          showTask=<livescorecard.show-scorecard-entry task=$task
+            climber=livescorecard.climber-navbar.climber
+            competitionId=livescorecard.climber-navbar.competitionId />
+          assigneeId=livescorecard.climber-navbar.climber?.id
+          approved=false />
+      </div>
+
+    </div>
+  </div>
+
+
+
+</dv.action>

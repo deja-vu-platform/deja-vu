@@ -37,49 +37,63 @@
       </mat-checkbox>
     </div>
 
-    <div *ngFor="let ioType of ioTypes" class="mat-form-field">
-      <div style="display:flex">
-        <h2>{{ioType + 's'}}</h2>
-        <button
-          class="mat-small mat-small-y"
-          mat-button
-          color="primary"
-          (click)="addIO(ioType)"
-          type="button"
-        >
-          <mat-icon>add_circle_outline</mat-icon>
-        </button>
-      </div>
-      <mat-list>
-        <mat-list-item *ngFor="let io of currentIO[ioType]; let i = index">
-          <mat-form-field class="io-name">
-            <input
-              matInput
-              [name]="ioType + i + 'Name'"
-              placeholder="Name"
-              [(ngModel)]="io.name"
-            >
-          </mat-form-field>
-          <mat-form-field>
-            <input
-              matInput
-              [name]="ioType + i + 'Value'"
-              [placeholder]="(ioType === 'Input' ? 'Default' : '') + ' Value'"
-              [(ngModel)]="io.value"
-            >
-          </mat-form-field>
-          <button
-            mat-button
-            color="warn"
-            class="mat-small mat-small-y"
-            (click)="removeIO(ioType, i)"
-            type="button"
+    <mat-form-field>
+      <input
+        matInput
+        required
+        name="backgroundColor"
+        #ngFormName="ngModel"
+        placeholder="Background Color"
+        [(ngModel)]="styles.backgroundColor"
+      >
+    </mat-form-field>
+
+    <div class="mat-form-field">
+      <label>Border</label>
+      <div class="compound-input">
+        <mat-form-field>
+          <input
+            matInput
+            required
+            name="borderWidth"
+            #ngFormName="ngModel"
+            placeholder="Width"
+            [(ngModel)]="styles.borderWidth"
           >
-            <mat-icon>remove_circle_outline</mat-icon>
-          </button>
-        </mat-list-item>
-      </mat-list>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            required
+            name="borderColor"
+            #ngFormName="ngModel"
+            placeholder="Color"
+            [(ngModel)]="styles.borderColor"
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            required
+            name="borderStyle"
+            #ngFormName="ngModel"
+            placeholder="Style"
+            [(ngModel)]="styles.borderStyle"
+          >
+        </mat-form-field>
+      </div>
     </div>
+
+    <mat-form-field>
+      <input
+        matInput
+        required
+        name="padding"
+        #ngFormName="ngModel"
+        placeholder="Padding"
+        [(ngModel)]="styles.padding"
+      >
+    </mat-form-field>
   </mat-dialog-content>
 
   <mat-dialog-actions>

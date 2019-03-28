@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>Assignee</mat-label>
+  <input matInput required
+    [formControl]="assigneeIdControl"
+    name="assigneeIdControl">
+  <mat-error *ngIf="assigneeIdControl.hasError('required')">
+    Assignee is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

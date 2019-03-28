@@ -28,12 +28,16 @@ import { ChooseUserComponent } from './choose-user/choose-user.component';
 export { ChooseUserComponent };
 import { ShowUsersComponent } from './show-users/show-users.component';
 export { ShowUsersComponent };
+import {
+  ShowUserCountComponent
+} from './show-user-count/show-user-count.component';
+export { ShowUserCountComponent };
 
 
 const allComponents = [
   AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
   RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
-  ShowUsersComponent, ChooseUserComponent
+  ShowUsersComponent, ChooseUserComponent, ShowUserCountComponent
 ];
 
 const metadata = {

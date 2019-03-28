@@ -10,8 +10,7 @@
           <hr class="post-separator" />
 
           <comment.create-comment
-            authorId=hackernews.navbar.loggedInUser ?
-              hackernews.navbar.loggedInUser.username : ''
+            authorId=hackernews.navbar.loggedInUser?.username
             buttonLabel="Add comment"
             showOptionToSubmit=!!hackernews.navbar.loggedInUser
             targetId=$id />
@@ -27,7 +26,7 @@
           <comment.show-comments
             ofTargetId=$id
             showComment=<hackernews.show-comment
-            comment=$comment loggedInUser=hackernews.navbar.loggedInUser /> />
+            hnComment=$comment loggedInUser=hackernews.navbar.loggedInUser /> />
         </div>
       </dv.if>
     </div>

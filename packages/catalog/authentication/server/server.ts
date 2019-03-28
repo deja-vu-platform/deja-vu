@@ -138,6 +138,11 @@ const actionRequestTable: ActionRequestTable = {
       userById(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-user-count': (extraInfo) => `
+    query ShowUserCount {
+      userCount ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-users': (extraInfo) => `
     query ShowUsers($input: UsersInput!) {
       users(input: $input) ${getReturnFields(extraInfo)}

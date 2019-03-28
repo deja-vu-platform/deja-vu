@@ -85,6 +85,11 @@ const actionRequestTable: ActionRequestTable = {
     query ShowComments($input: CommentsInput!) {
       comments(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-comment-count': (extraInfo) => `
+    query ShowCommentCount($input: CommentsInput!) {
+      commentCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 

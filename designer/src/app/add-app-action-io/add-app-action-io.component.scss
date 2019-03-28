@@ -1,0 +1,17 @@
+form {
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: space-between;
+}

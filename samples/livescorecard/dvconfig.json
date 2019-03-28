@@ -1,0 +1,166 @@
+{
+  "name": "livescorecard",
+  "type": "app",
+  "usedCliches": {
+    "hostauthentication": {
+      "name": "authentication",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "climbercode": {
+      "name": "passkey",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "competitioncode": {
+      "name": "passkey",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "event": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "task": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "competitionhosts": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "competitionclimbers": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "competitionclimbs": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "sex": {
+      "name": "label",
+      "config": {
+        "reinitDbOnStartup": true,
+        "initialLabelIds": ["female", "male"]
+      }
+    },
+    "category": {
+      "name": "label",
+      "config": {
+        "reinitDbOnStartup": true,
+        "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
+      }
+    },
+    "userprofile": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "UserProfile",
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            }
+          },
+          "required": ["firstName", "lastName"]
+        }
+      }
+    },
+    "climb": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Climb",
+          "type": "object",
+          "properties": {
+            "climbNumber": {
+              "type": "number"
+            },
+            "score": {
+              "type": "number"
+            }
+          },
+          "required": ["climbNumber", "score"]
+        }
+      }
+    },
+    "competition": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Competition",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "rules": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "climberscore" : {
+      "name": "scoring",
+      "config": {
+        "oneToOneScoring": false
+      }
+    },
+    "falls" : {
+      "name": "scoring",
+      "config": {
+        "oneToOneScoring": false
+      }
+    }
+  },
+  "routes": [
+    { "path": "climber", "action": "show-scorecard" },
+    { "path": "climber/leaderboard", "action": "show-leaderboard" },
+    { "path": "climber/rules", "action": "show-rules" },
+
+    { "path": "host", "action": "show-competitions" },
+    { "path": "host/competition-participants", "action": "show-climbers" },
+    { "path": "host/competition-climbs", "action": "show-climbs" },
+    { "path": "host/competition-leaderboard", "action": "show-leaderboard" },
+    { "path": "host/competition-hosts", "action": "show-hosts" },
+    { "path": "host/competition-rules", "action": "show-rules" },
+    { "path": "host/edit-competition", "action": "edit-competition" },
+    { "path": "host/edit-participant", "action": "edit-participant" },
+    { "path": "host/edit-climb", "action": "edit-climb" },
+
+    { "path": "register", "action": "register" },
+
+    { "path": "spectator", "action": "show-leaderboard" },
+    { "path": "spectator/rules", "action": "show-rules" },
+
+    { "path": "login/climber", "action": "climber-login" },
+    { "path": "login/host", "action": "host-login" },
+    { "path": "login/spectator", "action": "spectator-login" },
+
+    { "path": "", "action": "climber-login" }
+  ]
+}

@@ -17,8 +17,8 @@ import * as _ from 'lodash';
 import { Task } from '../shared/task.model';
 
 interface CreateTaskResponse {
-  data: {createTask: Task};
-  errors: {message: string}[];
+  data: { createTask: Task[] };
+  errors: { message: string }[];
 }
 
 
@@ -68,7 +68,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -95,7 +95,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
       },
       extraInfo: { returnFields: 'id' }
     })
-    .toPromise();
+      .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

@@ -1,0 +1,76 @@
+<dv.action name="parent-home">
+  <div class="body">
+    <chorestar.parent-navbar />
+    <div class="container-fluid main">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="white-box">
+            <h2>Add a New Chore</h2>
+            <chorestar.create-chore parent=chorestar.parent-navbar.user />
+          </div>
+
+          <div class="white-box">
+            <dv.tx>
+              <h2>Add a New Reward</h2>
+              <dv.gen-id />
+              <dv.status savedText="Reward created" />
+              <reward.create-object
+                id=dv.gen-id.id showOptionToSubmit=false />
+              <dv.button>Create Reward</dv.button>
+            </dv.tx>
+          </div>
+
+          <div class="white-box">
+            <dv.tx>
+              <h2>Add a New Child</h2>
+              <dv.gen-id />
+              <dv.status savedText="Child created" />
+              <child.create-object
+                id=dv.gen-id.id showOptionToSubmit=false />
+              <childauthentication.register-user
+                id=dv.gen-id.id
+                signIn=false
+                showOptionToSubmit=false />
+              <group.add-to-group
+                id=chorestar.parent-navbar.user?.id
+                memberId=dv.gen-id.id
+                hidden=true />
+              <dv.button>Create Child</dv.button>
+            </dv.tx>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="white-box">
+            <h2>Chores to Approve</h2>
+            <task.show-tasks
+              approved=false
+              completed=true
+              assignerId=chorestar.parent-navbar.user?.id
+              noTasksToShowText="No chores to approve"
+              showTask=<chorestar.show-chore
+                chore=$task showOptionToApprove=true
+                view="parent" /> />
+          </div>
+
+          <!-- TODO: rewards to approve -->
+          <div class="white-box">
+            <h2>Assigned Chores</h2>
+            <task.show-tasks
+              completed=false
+              assignerId=chorestar.parent-navbar.user?.id
+              noTasksToShowText="No assigned chores"
+              showTask=<chorestar.show-chore chore=$task /> />
+          </div>
+
+          <div class="white-box">
+            <h2>Offered Rewards</h2>
+            <reward.show-objects
+              showObject=<chorestar.show-reward reward=$object /> />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

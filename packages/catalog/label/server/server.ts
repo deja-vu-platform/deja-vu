@@ -62,9 +62,19 @@ const actionRequestTable: ActionRequestTable = {
       items(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-item-count': (extraInfo) => `
+    query ShowItemCount($input: ItemsInput!) {
+      itemCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-labels': (extraInfo) => `
     query ShowLabels($input: LabelsInput!) {
       labels(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-label-count': (extraInfo) => `
+    query ShowLabelCount($input: LabelsInput!) {
+      labelCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -114,7 +124,7 @@ function resolvers(db: ClicheDb, _config: LabelConfig): object {
         ])
         .toArray();
 
-        return !_.isEmpty(results) ? results[0].itemIds : [];
+        return res[0] ? res[0].itemIds : [];
       },
 
       labels: async (_root, { input }: { input: LabelsInput }) => {

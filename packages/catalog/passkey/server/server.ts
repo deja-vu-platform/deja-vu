@@ -13,11 +13,14 @@ import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as shajs from 'sha.js';
 import {
+  CreatePasskeyInput,
   PasskeyDoc,
   SignInOutput,
   VerifyInput
 } from './schema';
 import { WORDS } from './words';
+
+import { v4 as uuid } from 'uuid';
 
 
 // TODO: Update passkey.validate.ts if any changes made
@@ -79,13 +82,20 @@ function sign(code: string): string {
   return jwt.sign(code, SECRET_KEY);
 }
 
-function verify(token: string, code: string): boolean {
-  if (_.isNil(token)) {
-    return false;
+  if (_.isEmpty(input.code)) {
+    input.code = await getRandomPasscode(passkeys);
   }
-  const tokenUserId: string = jwt.verify(token, SECRET_KEY);
 
-  return tokenUserId === code;
+  PasskeyValidation.isCodeValid(input.code);
+
+  const id = input.id ? input.id : uuid();
+
+  await PasskeyValidation.passkeyIsNew(passkeys, id, input.code);
+
+  return {
+    id: id,
+    code: input.code
+  };
 }
 
 /**
@@ -137,6 +147,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
     },
 
     Passkey: {
+      id: (passkey: PasskeyDoc) => passkey.id,
       code: (passkey: PasskeyDoc) => passkey.code
     },
 
@@ -150,8 +161,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
         return await createPasskey(passkeys, code, context);
       },
 
-      createAndValidatePasskey: async (_root, { code }, context: Context) => {
-        const passkey = await createPasskey(passkeys, code, context);
+      createAndValidatePasskey: async (
+        _root, { input }: { input: CreatePasskeyInput }, context: Context) => {
+        const passkey = await createPasskey(passkeys, input, context);
 
         return {
           token: sign(passkey.code),

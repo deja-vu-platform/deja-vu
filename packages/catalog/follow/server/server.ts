@@ -80,14 +80,29 @@ const actionRequestTable: ActionRequestTable = {
       followers(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-follower-count': (extraInfo) => `
+    query ShowFollowerCount($input: FollowersInput!) {
+      followerCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-messages': (extraInfo) => `
     query ShowMessages($input: MessagesInput!) {
       messages(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-message-count': (extraInfo) => `
+    query ShowMessageCount($input: MessagesInput!) {
+      messageCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-publishers': (extraInfo) => `
-    query ShowPublishers($input: PublishersInput!) {
+    query ShowPublisherCount($input: PublishersInput!) {
       publishers(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-publisher-count': (extraInfo) => `
+    query ShowPublishers($input: PublishersInput!) {
+      publisherCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -138,7 +153,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       },
 
       followers: async (_root, { input }: { input: FollowersInput }) => {
-        if (input.ofPublisherId) {
+        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
           // A publisher's followers
           const publisher = await publishers.findOne(
             { id: input.ofPublisherId },
@@ -181,6 +196,10 @@ function resolvers(db: ClicheDb, _config: Config): object {
         }
 
         return await publishers.find(filter);
+      },
+
+      publisherCount: (_root, { input }: { input: PublishersInput }) => {
+        return publishers.count(getPublisherFilter(input));
       },
 
       messages: async (_root, { input }: { input: MessagesInput }) => {
@@ -286,7 +305,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
 
     return Promise.all([
       publishers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      publishers.createIndex({ id: 1 , 'messages.id': 1 }, { unique: true })
+      publishers.createIndex({ id: 1, 'messages.id': 1 }, { unique: true })
     ]);
   })
   .actionRequestTable(actionRequestTable)

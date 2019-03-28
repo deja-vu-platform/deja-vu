@@ -12,6 +12,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
   CreateTaskInput,
+  CreateTasksForAssigneesInput,
   TaskDoc,
   TasksInput,
   UpdateTaskInput
@@ -39,9 +40,19 @@ const actionRequestTable: ActionRequestTable = {
       createTask (input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'create-tasks-for-assignees': (extraInfo) => `
+    mutation CreateTasksForAssignees($input: CreateTasksForAssigneesInput!) {
+      createTasksForAssignees (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-tasks': (extraInfo) => `
     query ShowTasks($input: TasksInput!) {
       tasks(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'show-task-count': (extraInfo) => `
+    query ShowTaskCount($input: TasksInput!) {
+      taskCount(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'update-task': (extraInfo) => {
@@ -63,6 +74,16 @@ const actionRequestTable: ActionRequestTable = {
     }
   }
 };
+
+function getTaskFilter(input: TasksInput) {
+  const filter = _.omit(input, ['assigned']);
+  if (input.assigned === false) {
+    filter['assigneeId'] = null;
+  }
+  filter['pending'] = { $in: [null, { type: { $ne: 'create-task' } }] };
+
+  return filter;
+}
 
 async function updateTask(
   tasks: Collection<TaskDoc>, id: string, updateOp: object,
@@ -95,7 +116,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
     },
     Mutation: {
       createTask: async (
-        _root, { input }: {input: CreateTaskInput}, context: Context) => {
+        _root, { input }: { input: CreateTaskInput }, context: Context) => {
         const newTask: TaskDoc = {
           id: input.id ? input.id : uuid(),
           assignerId: input.assignerId,
@@ -106,6 +127,49 @@ function resolvers(db: ClicheDb, _config: Config): object {
         };
 
         return await tasks.insertOne(context, newTask);
+      },
+      createTasksForAssignees: async (
+        _root, { input }: { input: CreateTasksForAssigneesInput },
+        context: Context) => {
+        let newTasks: TaskDoc[] = _.map(input.assigneeIds, (assigneeId) => {
+          return {
+            id: uuid(),
+            assignerId: input.assignerId,
+            assigneeId: assigneeId,
+            dueDate: input.dueDate,
+            completed: false,
+            approved: false
+          };
+        });
+
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+        switch (context.reqType) {
+          case 'vote':
+            newTasks = _.map(newTasks, (task) => {
+              _.set(task, 'pending', {
+                reqId: context.reqId, type: 'create-task'
+              });
+
+              return task;
+            });
+
+          case undefined:
+            const res = await tasks.insertMany(newTasks);
+
+            return newTasks;
+          case 'commit':
+            await tasks.updateMany(
+              reqIdPendingFilter,
+              { $unset: { pending: '' } });
+
+            return newTasks;
+          case 'abort':
+            await tasks.deleteMany(reqIdPendingFilter);
+
+            return newTasks;
+        }
+
+        return newTasks;
       },
       updateTask: async (
         _root, { input }: { input: UpdateTaskInput }, context: Context) => {

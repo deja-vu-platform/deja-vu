@@ -45,6 +45,11 @@ const actionRequestTable: ActionRequestTable = {
       rating(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-rating-count': (extraInfo) => `
+    query ShowRatingCount($input: RatingsInput!) {
+      ratingCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-ratings-by-target': (extraInfo) => `
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
@@ -73,6 +78,10 @@ function resolvers(db: ClicheDb, _config: Config): object {
         }
 
         return await ratings.find(filter);
+      },
+
+      ratingCount: (_root, { input }: { input: RatingsInput }) => {
+        return ratings.count(getRatingFilter(input));
       },
 
       averageRatingForTarget: async (_root, { targetId }) => {

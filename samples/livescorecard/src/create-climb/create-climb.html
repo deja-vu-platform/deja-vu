@@ -1,0 +1,41 @@
+<dv.action name="create-climb">
+  <category.show-labels hidden=true />
+  <competitionclimbers.show-members inGroupId=$competitionId hidden=true />
+
+  <div class="card">
+    <div class="card-body">
+      <dv.tx>
+        <dv.status savedText="New climb created" />
+        <dv.gen-id />
+        <div class="row">
+          <div class="col-5 col-3-input-fields">
+            <climb.create-object id=dv.gen-id.id
+              showOptionToSubmit=false />
+          </div>
+          <div class="col-5 category-labels">
+            <category.attach-labels itemId=dv.gen-id.id
+              inputLabel=""
+              labels=category.show-labels.labels
+              showOptionToSubmit=false />
+          </div>
+
+          <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+
+          <task.create-tasks-for-assignees showOptionToInputDueDate=false
+            assigneeIds=competitionclimbers.show-members.loadedMemberIds
+            assignerId=dv.gen-id.id
+            hidden=true />
+          <competitionclimbs.add-to-group id=$competitionId
+            memberId=dv.gen-id.id
+            hidden=true />
+          <dv.button class="add">
+            <img src="assets/add.png" />
+          </dv.button>
+          <dv.callback defaultHref="/host/competition-climbs"
+            params={ competitionId: $competitionId }
+            onExecSuccess=true hidden=true />
+        </div>
+      </dv.tx>
+    </div>
+  </div>
+</dv.action>

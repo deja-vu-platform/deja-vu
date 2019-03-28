@@ -30,13 +30,22 @@ import { ShowMembersComponent } from './show-members/show-members.component';
 export { ShowMembersComponent };
 import { StageComponent } from './stage/stage.component';
 export { StageComponent };
+import {
+  ShowGroupCountComponent
+} from './show-group-count/show-group-count.component';
+export { ShowGroupCountComponent };
+import {
+  ShowMemberCountComponent
+} from './show-member-count/show-member-count.component';
+export { ShowMemberCountComponent };
 
 
 const allComponents = [
   AddToGroupComponent, ChooseGroupComponent, CreateGroupComponent,
   DeleteGroupComponent, InputMemberComponent, JoinLeaveComponent,
   ShowGroupComponent, ShowGroupsComponent, ShowMemberComponent,
-  ShowMembersComponent, StageComponent
+  ShowMembersComponent, StageComponent, ShowGroupCountComponent,
+  ShowMemberCountComponent
 ];
 
 

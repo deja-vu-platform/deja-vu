@@ -43,13 +43,19 @@ import {
   ShowPublishersComponent
 } from './show-publishers/show-publishers.component';
 export { ShowPublishersComponent };
+import { ShowFollowerCountComponent } from './show-follower-count/show-follower-count.component';
+export { ShowFollowerCountComponent };
+import { ShowMessageCountComponent } from './show-message-count/show-message-count.component';
+export { ShowMessageCountComponent };
+import { ShowPublisherCountComponent } from './show-publisher-count/show-publisher-count.component';
+export { ShowPublisherCountComponent };
 
 
 const allComponents = [
   CreateMessageComponent, CreatePublisherComponent, EditMessageComponent,
   FollowUnfollowComponent, ShowFollowerComponent, ShowFollowersComponent,
   ShowMessageComponent, ShowMessagesComponent, ShowPublisherComponent,
-  ShowPublishersComponent
+  ShowPublishersComponent, ShowFollowerCountComponent, ShowMessageCountComponent, ShowPublisherCountComponent
 ];
 
 const metadata = {

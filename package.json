@@ -60,6 +60,7 @@
     "packages/*",
     "packages/catalog/*",
     "samples/chorestar",
+    "samples/chorestar/.dv",
     "samples/hackernews",
     "samples/hackernews/.dv",
     "samples/listify",
@@ -73,6 +74,8 @@
     "samples/rendezvous/.dv",
     "samples/sweetspots",
     "samples/sweetspots/.dv",
+    "samples/livescorecard",
+    "samples/livescorecard/.dv",
     "designer",
     "designer-apps/*",
     "designer-apps/*/.dv"

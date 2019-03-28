@@ -14,7 +14,9 @@ import {
   CreateScoreInput,
   ScoreDoc,
   ShowScoreInput,
-  Target
+  ShowTargetInput,
+  Target,
+  TargetsByScoreInput
 } from './schema';
 
 interface ScoringConfig extends Config {
@@ -41,13 +43,13 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-target': (extraInfo) => `
-    query ShowTarget($id: ID!) {
-      target(id: $id) ${getReturnFields(extraInfo)}
+    query ShowTarget($input: ShowTargetInput!) {
+      target(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-targets-by-score': (extraInfo) => `
-    query ShowTargetsByScore($asc: Boolean) {
-      targetsByScore(asc: $asc) ${getReturnFields(extraInfo)}
+    query ShowTargetsByScore($input: TargetsByScoreInput!) {
+      targetsByScore(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -73,15 +75,53 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
       target: async (_root, { id }): Promise<Target> => {
         const targetScores: ScoreDoc[] = await scores.find({ targetId: id });
 
-        return {
-          id: id,
-          scores: targetScores
-        };
+      target: async (
+        _root, { input }: { input: ShowTargetInput }) => {
+        const filter = { targetId: input.id, pending: { $exists: false } };
+        if (!_.isNil(input.sourceId)) {
+          filter['sourceId'] = input.sourceId;
+        }
+
+        const target = await scores.aggregate([
+          { $match: filter },
+          {
+            $group: {
+              _id: '$targetId',
+              scores: { $push: '$$ROOT' },
+              total: { $sum: '$value' }
+            }
+          },
+          {
+            $project: {
+              id: '$_id',
+              scores: '$scores',
+              total: '$total'
+            }
+          }
+        ])
+          .next();
+
+        return target;
       },
+
       // TODO: pagination, max num results
       targetsByScore: async (
-        _root, { asc }: { asc: boolean }): Promise<Target[]> => {
+        _root,
+        { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
+        const query = { pending: { $exists: false } };
+
+        if (!_.isNil(input)) {
+          if (!_.isNil(input.targetIds)) {
+            query['targetId'] = { $in: input.targetIds };
+          }
+
+          if (!_.isNil(input.sourceId)) {
+            query['sourceId'] = input.sourceId;
+          }
+        }
+
         const targets: any = await scores.aggregate([
+          { $match: query },
           {
             $group: {
               _id: '$targetId', scores: { $push: '$$ROOT' }

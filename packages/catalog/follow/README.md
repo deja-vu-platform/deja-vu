@@ -5,12 +5,15 @@ Receive updates from sources
 ## Actions
 
 - create-message
-- follow-unfollow
-- show-message
-- show-publishers
 - create-publisher
-- show-follower
-- show-messages
 - edit-message
+- follow-unfollow
+- show-follower
+- show-follower-count
 - show-followers
+- show-message
+- show-message-count
+- show-messages
 - show-publisher
+- show-publisher-count
+- show-publishers

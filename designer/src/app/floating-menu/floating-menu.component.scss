@@ -1,0 +1,29 @@
+.floating-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  border-bottom: 1px solid black;
+  button {
+    padding: 0;
+    font-size: 16px;
+    height: 24px;
+    width: 24px;
+  }
+  .handle {
+    flex: 1;
+    background: lightgray;
+    cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 90%;
+  }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+}

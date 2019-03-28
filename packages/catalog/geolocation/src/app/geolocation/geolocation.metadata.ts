@@ -26,6 +26,8 @@ import { ShowMarkerComponent } from './show-marker/show-marker.component';
 export { ShowMarkerComponent };
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 export { ShowMarkersComponent };
+import { ShowMarkerCountComponent } from './show-marker-count/show-marker-count.component';
+export { ShowMarkerCountComponent };
 
 import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
 
@@ -36,7 +38,7 @@ const allComponents = [
   DisplayMapComponent,
   GetCurrentLocationComponent,
   ShowMarkerComponent,
-  ShowMarkersComponent
+  ShowMarkersComponent, ShowMarkerCountComponent
 ];
 
 const metadata = {

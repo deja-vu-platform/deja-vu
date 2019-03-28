@@ -28,8 +28,8 @@ interface ResourcesRes {
 })
 export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
-  @Input() createdBy: string;
-  @Input() viewableBy: string;
+  @Input() createdBy: string | undefined;
+  @Input() viewableBy: string | undefined;
   @Input() showResource: Action = {
     type: <Type<Component>> ShowResourceComponent
   };

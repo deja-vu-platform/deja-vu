@@ -22,6 +22,12 @@ export interface CreateTaskInput {
   dueDate: string;
 }
 
+export interface CreateTasksForAssigneesInput {
+  assignerId: string;
+  assigneeIds: string[];
+  dueDate: string;
+}
+
 export interface UpdateTaskInput {
   id: string;
   assignerId: string | undefined;

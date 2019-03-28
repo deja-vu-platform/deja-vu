@@ -1,0 +1,24 @@
+<dv.action name="show-competitions">
+  <livescorecard.host-navbar />
+
+  <div class="container below-navbar">
+    <br />
+    <div class="row">
+      <div class="col-3 white">name</div>
+      <div class="col-2 white">date</div>
+      <div class="col-2 white">code</div>
+      <div class="col-1"></div>
+      <div class="col-1"></div>
+      <div class="col-1"></div>
+      <div class="col-2"></div>
+    </div>
+
+    <livescorecard.create-competition
+      loggedInUserId=livescorecard.host-navbar.loggedInUserId />
+
+    <authorization.show-resources
+      noResourcesText=""
+      viewableBy=livescorecard.host-navbar.loggedInUserId
+      showResource=<livescorecard.show-competition id=$id /> />
+  </div>
+</dv.action>

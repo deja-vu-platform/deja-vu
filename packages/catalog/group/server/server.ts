@@ -65,12 +65,96 @@ const actionRequestTable: ActionRequestTable = {
       groups(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-group-count': (extraInfo) => `
+    query ShowGroupCount($input: GroupsInput!) {
+      groupCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-members': (extraInfo) => `
     query ShowMembers($input: MembersInput!) {
       members(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'show-member-count': (extraInfo) => `
+    query ShowMemberCount($input: MembersInput!) {
+      memberCount(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
+
+function getGroupFilter(input: GroupsInput) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+
+  const filter = (!_.isNil(input) && !_.isNil(input.withMemberId)) ?
+    { $and: [{ memberIds: input.withMemberId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  return filter;
+}
+
+function getMemberAggregationPipeline(input: MembersInput,
+  getCount = false) {
+  const noCreateGroupPending = {
+    $or: [
+      { pending: { $exists: false } },
+      { pending: { type: { $ne: 'create-group' } } }
+    ]
+  };
+  const filter = (!_.isNil(input) && !_.isNil(input.inGroupId)) ?
+    { $and: [{ id: input.inGroupId }, noCreateGroupPending] } :
+    noCreateGroupPending;
+
+  const pipeline: any = [
+    { $match: filter },
+    {
+      $group: {
+        _id: 0,
+        memberIds: { $push: '$memberIds' }
+      }
+    },
+    {
+      $project: {
+        memberIds: {
+          $reduce: {
+            input: '$memberIds',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ];
+
+  if (getCount) {
+    pipeline.push({ $project: { count: { $size: '$memberIds' } } });
+  }
+
+  return pipeline;
+}
+
+async function getMembers(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input))
+    .toArray();
+
+  return res[0] ? res[0].memberIds : [];
+}
+
+async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
+  input: MembersInput) {
+  const res = await groups
+    .aggregate(getMemberAggregationPipeline(input, true))
+    .next();
+
+  return res ? res['count'] : 0;
+}
 
 async function addOrRemoveMember(
   groups: Collection<GroupDoc>, groupId: string, memberId: string,
@@ -114,9 +198,13 @@ function resolvers(db: ClicheDb, _config: Config): object {
         ])
           .toArray();
 
-        const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
+      groups: async (_root, { input }: { input: GroupsInput }) => {
+        return groups.find(getGroupFilter(input))
+          .toArray();
+      },
 
-        return matchingMembers;
+      groupCount: (_root, { input }: { input: GroupsInput }) => {
+        return groups.count(getGroupFilter(input));
       },
       groups: async (_root, { input }: { input: GroupsInput }) => {
         const filter = input.withMemberId ?
@@ -124,6 +212,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         return await groups.find(filter);
       }
+
     },
     Group: {
       id: (group: GroupDoc) => group.id,
