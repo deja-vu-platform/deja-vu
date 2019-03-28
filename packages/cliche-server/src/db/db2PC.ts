@@ -84,8 +84,21 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
 
   aggregate(pipeline: Object[], options?: mongodb.CollectionAggregationOptions):
     mongodb.AggregationCursor<T> {
-    // TODO
-    return this._collection.aggregate(pipeline, options);
+    const isFirstStageAQuery = pipeline.length > 0 && pipeline[0]['$match'];
+    const originalQuery = isFirstStageAQuery ? pipeline[0]['$match'] : {}
+    const queryNotPendingCreate: Query<DbDoc<T>> =
+      this.getNotPendingCreateFilter(originalQuery);
+
+    let newPipeline;
+    if (isFirstStageAQuery) {
+      pipeline[0]['$match'] = queryNotPendingCreate;
+      newPipeline = pipeline;
+    } else {
+      const newFirstStage: Object = { $match: queryNotPendingCreate };
+      newPipeline = [newFirstStage].concat(pipeline);
+    }
+
+    return this._collection.aggregate(newPipeline, options);
   }
 
   async createIndex(fieldOrSpec: string | any,
