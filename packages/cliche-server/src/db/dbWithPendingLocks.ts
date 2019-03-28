@@ -106,6 +106,13 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
     return this._collection.createIndex(fieldOrSpec, options);
   }
 
+  async countDocuments(query: Query<T> = {},
+    options?: mongodb.MongoCountPreferences): Promise<number>{
+    const queryNotPendingCreate = this.getNotPendingCreateFilter(query);
+
+    return this._collection.countDocuments(queryNotPendingCreate, options);
+  }
+
   async deleteMany(context: Context, filter: Query<T>,
     options?: mongodb.CommonOptions): Promise<boolean> {
     switch (context.reqType) {
@@ -553,7 +560,6 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
   private getNotPendingCreateFilter(
     filter: Query<T> | undefined): Query<DbDoc<T>> {
     return Object.assign({}, filter, {
-      _pending: { $exists: false },
       '_pendingDetails.type': { $ne: `create-${this._name}` }
     });
   }

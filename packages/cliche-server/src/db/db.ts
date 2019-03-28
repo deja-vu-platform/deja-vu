@@ -83,6 +83,10 @@ export interface Collection<T extends Object> {
   createIndex(fieldOrSpec: string | any,
     options?: mongodb.IndexOptions): Promise<string>;
 
+  /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#countDocuments */
+  countDocuments(
+    query?: Query<T>, options?: mongodb.MongoCountPreferences): Promise<number>;
+
   /**
    * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#deleteMany
    *
