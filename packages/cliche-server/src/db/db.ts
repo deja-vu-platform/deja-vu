@@ -75,35 +75,109 @@ export interface UpsertOptions {
  * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html
  */
 export interface Collection<T extends Object> {
+  /** http://mongodb.github.io/node-mongodb-native/3.0/api/Collection.html#aggregate */
   aggregate(pipeline: Object[], options?: mongodb.CollectionAggregationOptions):
     mongodb.AggregationCursor<T>;
 
+  /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#createIndex */
   createIndex(fieldOrSpec: string | any,
     options?: mongodb.IndexOptions): Promise<string>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#deleteMany
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses). This fails if a document that would have
+   * been deleted cannot be deleted because another update on it is in progress.
+   */
   deleteMany(context: Context, filter: Query<T>,
     options?: mongodb.CommonOptions): Promise<boolean>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#deleteOne
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses). This fails if a document that would have
+   * been deleted cannot be deleted because another update on it is in progress.
+   */
   deleteOne(context: Context, filter: Query<T>): Promise<boolean>;
 
+  /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#find */
   find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOne
+   *
+   * @throws ClicheDbNotFoundError if there were no matches to the query
+   */
   findOne(query: Query<T>, options?: mongodb.FindOneOptions): Promise<T>;
 
+  /**
+   * Similar to:
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate
+   *
+   * @param updateFn called on the fetched doc to generate the update operation
+   *                        to apply to the document. If the return value is
+   *                        undefined, the doc is deleted. Else, that is the
+   *                        update operation used as defined by mongodb.
+   *                        If a doc is upserted, the doc with only the
+   *                        options.setOnInsert fields are passed in.
+   * @param options the regular mongodb updateOne options,
+   *                    plus setOnInsert which is equivalent to
+   *                    the mongodb update operation $setOnInsert
+   * @param validationFn called on the fetched or upserted doc as defined above.
+   *                            Errors thrown by the function are caught so that
+   *                            the method can roll back any changes,
+   *                            then rethrows the error.
+   * @return the document passed into the updateFn and the validationFn
+   *                      if in the voting phase or not in a transaction,
+   *                      undefined otherwise
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses)
+   */
   findOneAndUpdateWithFn(context: Context, filter: Query<T>,
-    updateFn: (doc: T) => Object,
+    updateFn: (doc: T) => Object | undefined,
     options?: mongodb.ReplaceOneOptions & UpsertOptions,
     validationFn?: (doc: T) => any): Promise<T | undefined>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#insertMany
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses),
+   * including enforcement of uniqueness constraints by created indices
+   */
   insertMany(context: Context, docs: T[],
     options?: mongodb.CollectionInsertManyOptions): Promise<T[]>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#insertOne
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses),
+   * including enforcement of uniqueness constraints by created indices
+   */
   insertOne(context: Context, doc: T,
     options?: mongodb.CollectionInsertOneOptions): Promise<T>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#updateMany
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses). This fails if a document that would have
+   * been changed cannot be updated because another update on it is in progress.
+   */
   updateMany(context: Context, filter: Query<T>, update: Object,
-    options?: mongodb.CommonOptions & { upsert?: boolean }): Promise<boolean>;
+    options?: mongodb.UpdateManyOptions): Promise<boolean>;
 
+  /**
+   * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#deleteMany
+   *
+   * @throws ClicheDbError with the relevant error code and error message
+   * (see ClicheDbError subclasses). This fails if a document that would have
+   * been changed cannot be updated because another update on it is in progress.
+   */
   updateOne(context: Context, filter: Query<T>, update: Object,
     options?: mongodb.ReplaceOneOptions): Promise<boolean>;
 }

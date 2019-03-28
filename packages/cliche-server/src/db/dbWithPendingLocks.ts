@@ -314,7 +314,7 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
   }
 
   async updateMany(context: Context, filter: Query<T>, update: Object,
-    options?: mongodb.CommonOptions & { upsert?: boolean }): Promise<boolean> {
+    options?: mongodb.UpdateManyOptions): Promise<boolean> {
     switch (context.reqType) {
       case 'vote':
         // make sure we can update and no one else touches it before we commit
