@@ -1,6 +1,7 @@
 import {
   ActionRequestTable,
   ClicheDb,
+  ClicheDbDuplicateKeyError,
   ClicheServer,
   ClicheServerBuilder,
   Collection,
@@ -118,8 +119,15 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
   } else {
     PasskeyValidation.isCodeValid(input.code);
     code = input.code;
-    await passkeys.insertOne(
-      context, { id: input.id, code: input.code, used: true });
+    try {
+      await passkeys.insertOne(
+        context, { id: input.id, code: input.code, used: true });
+    } catch (err) {
+      if (err.errorCode === ClicheDbDuplicateKeyError.ERROR_CODE) {
+        throw new Error('Code is already in use. Please try another one.');
+      }
+      throw err;
+    }
   }
 
   const id = input.id ? input.id : uuid();

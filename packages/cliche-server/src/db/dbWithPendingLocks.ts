@@ -33,6 +33,8 @@ export const unsetPendingOp: Object = { $unset:
 
 export type DbDoc<T> = PendingDoc & T;
 
+const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
+
 /**
  * An implementation of Déjà Vu's Collection,
  * a wrapper around the MongoDb Node.js driver for transaction handling.
@@ -295,15 +297,19 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
         this.setPendingCreate(context, doc);
         /* falls through */
       case undefined:
-        const insertResult: mongodb.InsertOneWriteOpResult =
-          await this._collection.insertOne(doc, options);
+        try {
+          const insertResult: mongodb.InsertOneWriteOpResult =
+            await this._collection.insertOne(doc, options);
 
-        if (insertResult.insertedCount === 0) {
-          // TODO: if the insert fails does it necessarily mean
-          // it was a duplicate key error?
-          // it could be that there's another that's pending create,
-          // so the error then should be a concurrent update error instead
-          throw new ClicheDbDuplicateKeyError();
+          if (insertResult.insertedCount === 0) {
+            throw new ClicheDbUnknownUpdateError();
+          }
+        } catch (err) {
+          if (err.code === MONGODB_DUPLICATE_KEY_ERROR_CODE) {
+            // TODO: it's possible that the duplicate is still pending create
+            throw new ClicheDbDuplicateKeyError();
+          }
+          throw err;
         }
 
         return doc;
