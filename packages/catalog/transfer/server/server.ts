@@ -65,6 +65,7 @@ type ZeroBalanceFn<Balance> = () => Balance;
 type IsZeroBalanceFn<Balance> = (balance: Balance) => boolean;
 
 function getResolvers<Balance>(
+  db: ClicheDb,
   accounts: Collection<AccountDoc<Balance>>,
   transfers: Collection<TransferDoc<Balance>>,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
@@ -104,7 +105,7 @@ function getResolvers<Balance>(
           toId: input.accountId,
           amount: input.amount
         };
-        await addToBalance<Balance>(context,
+        await addToBalance<Balance>(db, context,
           accounts, transfers, input.accountId, input.amount, transfer, true,
           accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
@@ -121,35 +122,59 @@ function getResolvers<Balance>(
         };
         transfer.fromId = input.fromId;
 
-        /*
-         * It is important that we apply the update to the source account
-         * first so that we don't need to rollback the update to the other
-         * account if the account has insufficient funds
-         */
-        await addToBalance<Balance>(context, accounts, transfers, input.fromId,
-          negateBalanceFn(input.amount), transfer, true,
-          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
-
-        // FIXME: this does not work because db could be seen in an inconsistent
+        // Do these in a tx so that db won't be seen in an inconsistent
         // state, e.g. transfer object is seen but toId account does not have
-        // the funds yet (could be ok in some situations)
+        // the funds yet
+        return await db.inTransaction(async () => {
+          /*
+           * It is important that we apply the update to the source account
+           * first so that we don't need to rollback the update to the other
+           * account if the account has insufficient funds
+           */
+          await addToBalance<Balance>(
+            db, context, accounts, transfers, input.fromId,
+            negateBalanceFn(input.amount), transfer, true,
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
-        /*
-         * At this point we know that the transfer is going to work, because
-         * we are adding a positive number to `toId`. There's no need to do
-         * the updates in a tx because even if the server fails with an
-         * internal error before doing the second update, there will be a
-         * record of the pending transfer that can be used to reconcile the
-         * data
-         */
-        await addToBalance<Balance>(context,
-          accounts, transfers, input.toId, input.amount, transfer, false,
-          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+          /*
+           * At this point we know that the transfer is going to work, because
+           * we are adding a positive number to `toId`.
+           */
+          await addToBalance<Balance>(db, context,
+            accounts, transfers, input.toId, input.amount, transfer, false,
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
-        return transfer;
+          return transfer;
+        });
       }
     }
   };
+}
+
+async function addToBalanceOperation<Balance>(context: Context,
+  accounts: Collection<AccountDoc<Balance>>,
+  accountId: string, amount: Balance,
+  accountHasFundsFn: AccountHasFundsFn<Balance>,
+  newBalanceFn: NewBalanceFn<Balance>,
+  zeroBalanceFn: ZeroBalanceFn<Balance>,
+  isZeroBalanceFn: IsZeroBalanceFn<Balance>): Promise<AccountDoc<Balance>> {
+  return await accounts.findOneAndUpdateWithFn(
+    context, { id: accountId }, (fetchedAccount: AccountDoc<Balance>) => {
+      const newBalance = newBalanceFn(fetchedAccount.balance, amount);
+      if (isZeroBalanceFn(newBalance)) {
+        return undefined;
+      }
+
+      return { $set: { balance: newBalance } };
+    },
+    { upsert: true, setOnInsert: { balance: zeroBalanceFn() } },
+    (fetchedAccount: AccountDoc<Balance>) => {
+    // Throw an error if the balance in acct would be negative after updating
+    if (!accountHasFundsFn(fetchedAccount.balance, amount)) {
+      // ClicheDb will take care of rolling back
+      throw new Error(`Account ${accountId} has insufficient funds`);
+    }
+  });
 }
 
 /**
@@ -173,7 +198,7 @@ function getResolvers<Balance>(
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
  */
-async function addToBalance<Balance>(context: Context,
+async function addToBalance<Balance>(db: ClicheDb, context: Context,
   accounts: Collection<AccountDoc<Balance>>,
   transfers: Collection<TransferDoc<Balance>>,
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
@@ -189,31 +214,21 @@ async function addToBalance<Balance>(context: Context,
 
   console.log(`Adding ${JSON.stringify(amount)} to ${accountId}`);
 
-  const account = await accounts.findOneAndUpdateWithFn(
-    context, { id: accountId }, (fetchedAccount: AccountDoc<Balance>) => {
-      const newBalance = newBalanceFn(fetchedAccount.balance, amount);
-      if (isZeroBalanceFn(newBalance)) {
-        return undefined;
-      }
-
-      return { $set: { balance: newBalance } };
-    },
-    { upsert: true, setOnInsert: { balance: zeroBalanceFn() } },
-    (fetchedAccount: AccountDoc<Balance>) => {
-    // Throw an error if the balance in acct would be negative after updating
-    if (!accountHasFundsFn(fetchedAccount.balance, amount)) {
-      // ClicheDb will take care of rolling back
-      throw new Error(`Account ${accountId} has insufficient funds`);
-    }
-  });
-
-  // TODO: this is not atomic yet
   if ((context.reqType === undefined || context.reqType === 'commit') &&
-    onCommitAddTransferToLog) {
-    await transfers.insertOne(EMPTY_CONTEXT, transfer);
+      onCommitAddTransferToLog) {
+    return db.inTransaction(async () => {
+      const account = await addToBalanceOperation<Balance>(
+        context, accounts, accountId, amount,
+        accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+      await transfers.insertOne(EMPTY_CONTEXT, transfer);
+
+      return account;
+    });
   }
 
-  return account;
+  return await addToBalanceOperation<Balance>(
+    context, accounts, accountId, amount,
+    accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 }
 
 function getDynamicTypeDefs(config: TransferConfig): string[] {
@@ -273,7 +288,7 @@ function resolvers(db: ClicheDb, config: TransferConfig): object {
       (balance: number) => balance === 0;
 
     return getResolvers<number>(
-      accounts, transfers,
+      db, accounts, transfers,
       accountHasFundsFn, newBalanceFn, negateBalanceFn,
       zeroBalanceFn, isZeroBalanceFn);
 
@@ -329,7 +344,7 @@ function resolvers(db: ClicheDb, config: TransferConfig): object {
       (balance: ItemCount[]) => _.isEmpty(balance);
 
     const baseResolvers = getResolvers<ItemCount[]>(
-      accounts, transfers,
+      db, accounts, transfers,
       accountHasFundsFn, newBalanceFn,
       negateBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
