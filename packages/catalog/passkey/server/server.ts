@@ -11,7 +11,6 @@ import {
 } from '@deja-vu/cliche-server';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
-import * as shajs from 'sha.js';
 import {
   CreatePasskeyInput,
   PasskeyDoc,
@@ -30,39 +29,8 @@ const PASSKEY_MAX_LENGTH = 15;
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
 
-const actionRequestTable: ActionRequestTable = {
-  'create-passkey': (extraInfo) => {
-    switch (extraInfo.action) {
-      case 'create':
-        return `
-          mutation CreatePasskey($code: String!) {
-            createPasskey(code: $code) ${getReturnFields(extraInfo)}
-          }
-        `;
-      case 'createAndValidate':
-        return `
-          mutation CreateAndValidatePasskey($code: String!) {
-            createAndValidatePasskey(code: $code) ${getReturnFields(extraInfo)}
-          }
-        `;
-      default:
-        throw new Error('Need to specify extraInfo.action');
-    }
-  },
-  'sign-in': (extraInfo) => `
-    mutation ValidatePasskey($code: String!) {
-      validatePasskey(code: $code) ${getReturnFields(extraInfo)}
-    }
-  `,
-  validate: (_extraInfo) => `
-    query Verify($input: VerifyInput!) {
-      verify(input: $input)
-    }
-  `
-};
-
 class PasskeyValidation {
-  static passkeyIsValidOrFail(value: string): void {
+  static isCodeValid(value: string): void {
     const length: number = value.length;
 
     if (length < PASSKEY_MIN_LENGTH || length > PASSKEY_MAX_LENGTH) {
@@ -72,30 +40,54 @@ class PasskeyValidation {
   }
 }
 
-function getHashedCode(code: string): string {
-  return shajs('sha256')
-    .update(code)
-    .digest('hex');
-}
+const actionRequestTable: ActionRequestTable = {
+  'create-passkey': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'login':
+        return `
+          mutation Register($input: CreatePasskeyInput!) {
+            createAndValidatePasskey(input: $input)
+              ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'register-only':
+        return `
+          mutation Register($input: CreatePasskeyInput!) {
+            createPasskey(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'show-passkey': (extraInfo) => `
+    query ShowPasskey($id: ID!) {
+      passkey(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'sign-in': (extraInfo) => `
+    mutation SignIn($code: String!) {
+      validatePasskey(code: $code) ${getReturnFields(extraInfo)}
+    }
+  `,
+  validate: (extraInfo) => `
+    query Validate($input: VerifyInput!) {
+      verify(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
+};
 
 function sign(code: string): string {
   return jwt.sign(code, SECRET_KEY);
 }
 
-  if (_.isEmpty(input.code)) {
-    input.code = await getRandomPasscode(passkeys);
+function verify(token: string, code: string): boolean {
+  if (_.isNil(token)) {
+    return false;
   }
+  const tokenUserId: string = jwt.verify(token, SECRET_KEY);
 
-  PasskeyValidation.isCodeValid(input.code);
-
-  const id = input.id ? input.id : uuid();
-
-  await PasskeyValidation.passkeyIsNew(passkeys, id, input.code);
-
-  return {
-    id: id,
-    code: input.code
-  };
+  return tokenUserId === code;
 }
 
 /**
@@ -117,20 +109,22 @@ async function getRandomPasscode(passkeys: Collection<PasskeyDoc>) {
 }
 
 async function createPasskey(passkeys: Collection<PasskeyDoc>,
-  code: string, context: Context): Promise<PasskeyDoc> {
-  let hashedCode;
-  if (_.isEmpty(code)) {
-    hashedCode = await getRandomPasscode(passkeys);
+  input: CreatePasskeyInput, context: Context): Promise<PasskeyDoc> {
+  let code;
+  if (_.isEmpty(input.code)) {
+    code = await getRandomPasscode(passkeys);
     await passkeys.updateOne(
-      context, { code: hashedCode }, { $set: { used: true } });
+      context, { code }, { $set: { used: true } });
   } else {
-    PasskeyValidation.passkeyIsValidOrFail(code);
-    hashedCode = getHashedCode(code);
+    PasskeyValidation.isCodeValid(input.code);
+    code = input.code;
     await passkeys.insertOne(
-      context, { code: hashedCode, used: true });
+      context, { id: input.id, code: input.code, used: true });
   }
 
-  return { code: hashedCode };
+  const id = input.id ? input.id : uuid();
+
+  return { id, code };
 }
 
 function resolvers(db: ClicheDb, _config: Config): object {
@@ -140,7 +134,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
     Query: {
       passkeys: () => passkeys.find(),
 
-      passkey: async (_root, { code }) => await passkeys.findOne({ code }),
+      passkey: async (_root, { id }) => await passkeys.findOne({ id }),
 
       verify: (_root, { input }: { input: VerifyInput }) =>
         verify(input.token, input.code)
@@ -157,8 +151,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
     },
 
     Mutation: {
-      createPasskey: async (_root, { code }, context: Context) => {
-        return await createPasskey(passkeys, code, context);
+      createPasskey: async (
+        _root, { input }: { input: CreatePasskeyInput }, context: Context) => {
+        return await createPasskey(passkeys, input, context);
       },
 
       createAndValidatePasskey: async (
@@ -172,8 +167,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       },
 
       validatePasskey: async (_root, { code }) => {
-        const passkey = await passkeys.findOne(
-          { code: getHashedCode(code), used: true });
+        const passkey = await passkeys.findOne({ code, used: true });
 
         return {
           token: sign(code),
@@ -188,12 +182,13 @@ const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
   .initDb(async (db: ClicheDb, _config: Config): Promise<any> => {
     const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
     await Promise.all([
+      passkeys.createIndex({ id: 1 }, { unique: true, sparse: true }),
       passkeys.createIndex({ code: 1 }, { unique: true, sparse: true }),
       passkeys.createIndex({ used: 1 }, { sparse: true })
     ]);
 
     await passkeys.insertMany(EMPTY_CONTEXT, _.map(WORDS, (code) => {
-      return { code: getHashedCode(code), used: false };
+      return { id: code, code: code, used: false };
     }));
 
     return Promise.resolve();

@@ -63,7 +63,7 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
             code: this.code,
             token: token
           }
-        }
+        })
       }
     })
     .subscribe((res) => {
