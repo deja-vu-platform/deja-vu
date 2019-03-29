@@ -75,7 +75,10 @@ export class SignInComponent
     const res = await this.gs.post<ValidatePasskeyRes>(this.apiPath, {
       inputs: { code: this.passkeyControl.value },
       extraInfo: {
-        returnFields: 'passkey { code }, token'
+        returnFields: `
+          passkey { id, code }
+          token
+        `
       }
     })
     .toPromise();
