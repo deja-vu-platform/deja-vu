@@ -59,22 +59,6 @@ interface ColorAssignments {
   };
 }
 
-/**
- * Like _.uniq but you provide a key function
- * It is on you to insure that each element gets a unique key
- */
-function uniqKey<T>(
-  arr: T[],
-  keyFn: (e: T, i: number, a: T[]) => string
-): T[] {
-  const keyToVal: { [key: string]: T } = {};
-  arr.forEach((e, i, a) => {
-    keyToVal[keyFn(e, i, a)] = e;
-  });
-
-  return Object.values(keyToVal);
-}
-
 interface ResolutionDual {
   ioName: string;
   byChild: boolean;
@@ -221,7 +205,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
         (r, ioName) => r && (r['forIO'] = ioName) && r.fromAction !== by
       ))
     ); // flatten
-    const uniqueResolutions = uniqKey(
+    const uniqueResolutions = _.uniqBy(
       resolutions,
       (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO])
     );
@@ -240,7 +224,7 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
       return this.ioReferencedCache[from.id];
     }
 
-    const ret = uniqKey(
+    const ret = _.uniqBy(
       Array.from(this.scopeIO.outReferences[from.id] || []),
       (r) => r.ioName
     )
