@@ -46,6 +46,9 @@
             #actionMenuTrigger="matMenuTrigger"
             [matMenuTriggerFor]="actionMenu.matMenu"
             (contextmenu)="openMenu(actionMenuTrigger)"
+            [ngStyle]="{
+              'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
+            }"
           >
             <!-- below is same as above -->
             <app-action-instance
@@ -91,12 +94,32 @@
               </mat-tab-group>
             </app-floating-menu>
           </div>
+          <div
+            class="ref-indicator input-ref-indicator hide-on-drag"
+            *ngFor="let ioRef of ioReferences(action); let refNum = index"
+            [ngStyle]="{
+              'grid-row': 1 + refNum,
+              color: color(ioRef.fromAction, ioRef.ioName)
+            }"
+          >
+            <div class="ref-for-io">{{ioRef.forIO}}</div>
+            <div class="ref-io-name">{{ioRef.ioName}} →</div>
+          </div>
+          <div
+            class="ref-indicator output-ref-indicator hide-on-drag"
+            *ngFor="let ioRef of ioReferenced(action); let refNum = index"
+            [ngStyle]="{
+              'grid-row': 1 + refNum,
+              color: color(action, ioRef.ioName)
+            }"
+          >
+            <div class="ref-io-name">{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
+          </div>
         </div>
       </div>
       <app-floating-menu
         #rowMenu="matMenu"
         [title]="'Row ' + (rowNum + 1)"
-        (closed)="onRowMenuClosed()"
         (shouldClose)="closeMenu(rowMenuTrigger)"
       >
         <div class="popup-menu row-menu" (click)="$event.stopPropagation()">
@@ -122,6 +145,27 @@
           </mat-form-field>
         </div>
       </app-floating-menu>
+    </div>
+  </div>
+  <div class="parent-refs">
+    <div
+      class="ref-indicator input-ref-indicator hide-on-drag"
+      *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"
+      [ngStyle]="{
+        color: color(ioRef.fromAction, ioRef.ioName)
+      }"
+    >
+      <div class="ref-for-io">{{ioRef.forIO}}</div>
+      <div class="ref-io-name">{{ioRef.ioName}} →</div>
+    </div>
+    <div
+      class="ref-indicator output-ref-indicator hide-on-drag"
+      *ngFor="let ioRef of ioReferenced(actionInstance); let refNum = index"
+      [ngStyle]="{
+        color: color(actionInstance, ioRef.ioName)
+      }"
+    >
+      <div class="ref-io-name">{{ioRef.ioName}} ←</div>
     </div>
   </div>
 </div>

@@ -24,6 +24,11 @@
 //   while upstream dragula still relies on global.
 (window as any).global = window;
 
+// actually show something when you console.log(JSON.stringify(set))
+Set.prototype['toJSON'] = function() {
+  return Array.from(this);
+};
+
 // E9, IE10 and IE11 requires all of the following polyfills.
 // import 'core-js/es6/symbol';
 // import 'core-js/es6/object';

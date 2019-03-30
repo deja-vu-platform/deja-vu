@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
   OnInit,
@@ -11,6 +12,7 @@ import {
 import { MatMenuTrigger, MatTabGroup } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
+import * as tinycolor from 'tinycolor2';
 
 import {
   ActionInstance,
@@ -20,9 +22,47 @@ import {
   flexJustify,
   Row
 } from '../datatypes';
-import { ScopeIO } from '../io';
+import { Resolution, ScopeIO } from '../io';
 
 const emptyRow = new Row();
+const emptySet = new Set<string>();
+
+// perceptually distinct colors
+// https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+// I've ordered them to mostly have most accessible first
+const COLORS = [
+  '#4363d8', // blue
+  '#800000', // maroon
+  '#f58231', // orange
+  '#e6beff', // lavender
+  '#000075', // navy
+  '#fabebe', // pink
+  '#ffe119', // yellow
+  '#3cb44b', // green
+  '#e6194B', // red
+  '#42d4f4', // cyan
+  '#f032e6', // magenta
+  '#469990', // teal
+  '#9A6324', // brown
+  '#aaffc3', // mint
+  '#fffac8', // beige
+  '#911eb4', // purple
+  '#808000', // olive
+  '#bfef45', // lime
+  '#ffd8b1', // apricot
+  '#a9a9a9' // grey
+];
+
+interface ColorAssignments {
+  [actionID: string]: {
+    [ioName: string]: string;
+  };
+}
+
+interface ResolutionDual {
+  ioName: string;
+  byChild: boolean;
+}
 
 @Component({
   selector: 'app-action-definition',
@@ -31,35 +71,59 @@ const emptyRow = new Row();
 })
 export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   @Input() app: App;
+  @Input() ioChange: EventEmitter<void>;
+
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
+  private lastNumActions = 0;
   actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
+  readonly flexAlignEntries = Object.entries(flexAlign);
+  readonly flexJustifyEntries = Object.entries(flexJustify);
+  // if we don't have a consistent object, angular freaks out
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
-  flexAlignEntries = Object.entries(flexAlign);
-  flexJustifyEntries = Object.entries(flexJustify);
+  private ioReferencesCache: {[id: string]: Resolution[]} = {};
+  private ioReferencedCache: {[id: string]: ResolutionDual[]} = {};
+
+  private availableColors: Set<string> = new Set(COLORS);
+  private colorAssignments: ColorAssignments = {};
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
   @Input()
   set openAction(action: AppActionDefinition) {
+    document
+      .querySelector('body').style
+      .setProperty(
+        '--text-stroke-color',
+        tinycolor(action.styles.backgroundColor)
+          .isDark() ? 'white' : 'black'
+      );
     this.actionInstance = new ActionInstance(action, this.app);
-    this.scopeIO.link(this.actionInstance);
+    this.link();
   }
 
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
       this.rs.registerAppAction(this.elem, this);
     }
+    if (this.ioChange) {
+      this.ioChange.subscribe(() => this.link());
+    }
   }
 
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
+      const instanceContainersArr = this.instanceContainers.toArray();
+      // if an action was removed we need to re-do the data layer
+      if (this.lastNumActions > instanceContainersArr.length) {
+        this.link();
+      }
+      this.lastNumActions = instanceContainersArr.length;
+      // show the name of any action on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
-      setTimeout(() => {
-        this.calcShowHint();
-      });
+      setTimeout(() => this.calcShowHint(instanceContainersArr));
     });
   }
 
@@ -73,6 +137,9 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     this.keysDown.delete(key);
   }
 
+  /**
+   * If we don't have a consistent object, angular freaks out
+   */
   get rows() {
     this._rows.length = 0;
     this._rows.push.apply(
@@ -84,33 +151,13 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     return this._rows;
   }
 
+  /**
+   * re-link when an io menu is closed
+   */
   onActionMenuClosed() {
-    this.scopeIO.link(this.actionInstance);
+    this.link();
     // need to wait for values to propogate
-    setTimeout(() => this.calcShowHint());
-  }
-
-  onRowMenuClosed() { }
-
-  private calcShowHint() {
-    let rowActions = 0;
-    this.rows.forEach((row) => {
-      row.actions.forEach((action, actionNum) => {
-        const index = rowActions + actionNum;
-        const actionContainer = this.instanceContainers.toArray()[index];
-        const firstChild = actionContainer
-          && actionContainer.nativeElement.firstElementChild.firstElementChild;
-        const showHint = (
-          firstChild
-          && (
-            firstChild.offsetHeight === 0
-            || firstChild.offsetWidth === 0
-          )
-        );
-        action['showHint'] = showHint;
-      });
-      rowActions += row.actions.length;
-    });
+    setTimeout(() => this.calcShowHint(this.instanceContainers.toArray()));
   }
 
   stopPropIfShift(event: Event) {
@@ -127,6 +174,9 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     trigger.closeMenu();
   }
 
+  /**
+   * A hack to fix issues MatTabs has inside of MatMenu
+   */
   clickFirstTab(mtg: MatTabGroup) {
     // the selected tab is not highlighted unless we touch it
     const tabGroupEl: HTMLElement = mtg._elementRef.nativeElement;
@@ -138,5 +188,144 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
     // selectedIndex seems to be a setter
     // we need to let it resolve before updating again
     setTimeout(() => mtg.selectedIndex = (mtg.selectedIndex + 1) % numTabs);
+  }
+
+  /**
+   * Get all sibling outputs / parent inputs referenced by an action
+   */
+  ioReferences(by: ActionInstance): Resolution[] {
+    if (by.id in this.ioReferencesCache) {
+      return this.ioReferencesCache[by.id];
+    }
+
+    const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
+    const resolutions: (Resolution & { forIO: string})[] = [].concat(...ids
+      .map((id) => _.filter(
+        this.scopeIO.inReferences[id],
+        (r, ioName) => r && (r['forIO'] = ioName) && r.fromAction !== by
+      ))
+    ); // flatten
+    const uniqueResolutions = _.uniqBy(
+      resolutions,
+      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO])
+    );
+    this.ioReferencesCache[by.id] = uniqueResolutions;
+
+    return uniqueResolutions;
+  }
+
+  /**
+   * Get all outputs of an action which are referenced in this scope
+   */
+  ioReferenced(
+    from: ActionInstance
+  ): { ioName: string, byChild?: boolean }[] {
+    if (from.id in this.ioReferencedCache) {
+      return this.ioReferencedCache[from.id];
+    }
+
+    const ret = _.uniqBy(
+      Array.from(this.scopeIO.outReferences[from.id] || []),
+      (r) => r.ioName
+    )
+      .map(({ ioName, byAction }) => ({
+        ioName,
+        byChild: from.getInputtedActions(true)
+          .indexOf(byAction) >= 0
+      }));
+    this.ioReferencedCache[from.id] = ret;
+
+    return ret;
+  }
+
+  /**
+   * Used for color-coding I/O
+   * Each action x ioName combo should have a unique color
+   */
+  color(fromAction: ActionInstance, ioName: string): string {
+    return _.get(
+      this.colorAssignments,
+      [fromAction.id, ioName],
+      '#a9a9a9' // default, solves async issues and > 20 outputs to show
+    ) as string; // the default typing is wrong
+  }
+
+  /**
+   * Expose Math.max so we can use it in the template
+   */
+  max(...numbers: number[]): number {
+    return Math.max(...numbers);
+  }
+
+  /**
+   * Create data layer for this app action's context
+   * Allocate colors to referenced parent inputs / sibling outputs
+   */
+  private link() {
+    this.scopeIO.link(this.actionInstance);
+    this.ioReferencedCache = {};
+    this.ioReferencesCache = {};
+    this.allocateColors();
+  }
+
+  /**
+   * Allocate colors to referenced parent inputs / sibling outputs
+   */
+  private allocateColors() {
+    // free colors assigned to IOs that are no longer referenced
+    _.forOwn(this.colorAssignments, (obj, actionID) => {
+      _.forOwn(obj, (color, ioName) => {
+        const ios = this.scopeIO.outReferences[actionID] || [];
+        if (!ios.find((r) => r.ioName === ioName)) {
+          this.availableColors.add(color);
+        }
+      });
+    });
+
+    // allocate colors to new references
+    this.colorAssignments = _.mapValues(
+      this.scopeIO.outReferences,
+      (ioNames, aID) => {
+        const ioToColor = {};
+        ioNames.forEach(({ ioName: ioN }) => {
+          let color = _.get(this.colorAssignments, [aID, ioN], '');
+          if (!color) {
+            color = this.availableColors.values()
+              .next().value; // get first color
+            this.availableColors.delete(color);
+          }
+          ioToColor[ioN] = color;
+        });
+
+        return ioToColor;
+      }
+    );
+  }
+
+  /**
+   * Set the showHint property on each child action
+   * This property is set to true if the action is not rednering anything
+   * Since actions are broken up into rows but the ViewChildren gives us
+   *   one array it makes the most sense to do this all at once in a loop
+   */
+  private calcShowHint(instanceContainersArr: ElementRef[]) {
+    let rowActions = 0;
+    this.rows.forEach((row) => {
+      row.actions.forEach((action, actionNum) => {
+        const index = rowActions + actionNum;
+        const actionContainer = instanceContainersArr[index];
+        const firstChild = actionContainer
+          && actionContainer.nativeElement.firstElementChild.firstElementChild;
+        const showHint = (
+          firstChild
+          && (
+            firstChild.offsetHeight === 0
+            || firstChild.offsetWidth === 0
+          )
+        );
+        action['showHint'] = showHint;
+      });
+      rowActions += row.actions.length;
+    });
   }
 }

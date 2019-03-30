@@ -58,8 +58,10 @@ button.mat-small-y {
   z-index: 1000;
 }
 
-.gu-mirror button.rm {
-  display: none !important;
+.gu-mirror, .gu-transit {
+  .hide-on-drag {
+    display: none !important;
+  }
 }
 
 .mat-form-field-wrapper {
@@ -78,4 +80,9 @@ button.mat-small-y {
   height: 48px;
   display: flex;
   align-items: center;
+}
+
+.mat-snack-bar-handset {
+  width: fit-content !important;
+  transform: translateX(-132px); // side menu size / 2
 }
