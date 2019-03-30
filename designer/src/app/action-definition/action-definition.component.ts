@@ -24,6 +24,11 @@ import {
 } from '../datatypes';
 import { Resolution, ScopeIO } from '../io';
 
+interface Reference extends Resolution {
+  forIO: string;
+  forActionID: string;
+}
+
 const emptyRow = new Row();
 const emptySet = new Set<string>();
 
@@ -59,11 +64,6 @@ interface ColorAssignments {
   };
 }
 
-interface ResolutionDual {
-  ioName: string;
-  byChild: boolean;
-}
-
 @Component({
   selector: 'app-action-definition',
   templateUrl: './action-definition.component.html',
@@ -83,8 +83,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   // if we don't have a consistent object, angular freaks out
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
-  private ioReferencesCache: {[id: string]: Resolution[]} = {};
-  private ioReferencedCache: {[id: string]: ResolutionDual[]} = {};
+  private ioReferencesCache: {[id: string]: Reference[]} = {};
+  private ioReferencedCache: {[id: string]: { ioName: string }[]} = {};
 
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
@@ -193,21 +193,28 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
   /**
    * Get all sibling outputs / parent inputs referenced by an action
    */
-  ioReferences(by: ActionInstance): Resolution[] {
+  ioReferences(by: ActionInstance): Reference[] {
     if (by.id in this.ioReferencesCache) {
       return this.ioReferencesCache[by.id];
     }
 
     const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
-    const resolutions: (Resolution & { forIO: string})[] = [].concat(...ids
+    const resolutions: Reference[] = [].concat(...ids
       .map((id) => _.filter(
         this.scopeIO.inReferences[id],
-        (r, ioName) => r && (r['forIO'] = ioName) && r.fromAction !== by
+        (r, ioName) => {
+          if (r) {
+            r['forIO'] = ioName;
+            r['forActionID'] = id;
+          }
+
+          return !!r;
+        }
       ))
     ); // flatten
     const uniqueResolutions = _.uniqBy(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO])
+      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO, r.forActionID])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 
@@ -219,20 +226,20 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
    */
   ioReferenced(
     from: ActionInstance
-  ): { ioName: string, byChild?: boolean }[] {
+  ): { ioName: string }[] {
     if (from.id in this.ioReferencedCache) {
       return this.ioReferencedCache[from.id];
     }
 
     const ret = _.uniqBy(
-      Array.from(this.scopeIO.outReferences[from.id] || []),
+      Array
+        .from(this.scopeIO.outReferences[from.id] || [])
+        .filter(({ ioName, byAction }) => from
+          .getInputtedActions(true)
+          .indexOf(byAction) === -1
+        ),
       (r) => r.ioName
-    )
-      .map(({ ioName, byAction }) => ({
-        ioName,
-        byChild: from.getInputtedActions(true)
-          .indexOf(byAction) >= 0
-      }));
+    );
     this.ioReferencedCache[from.id] = ret;
 
     return ret;
