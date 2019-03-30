@@ -233,7 +233,6 @@ function resolvers(db: ClicheDb, _config: Config): object {
       },
 
       signIn: async (_root, { input }: { input: SignInInput }) => {
-        // TODO: is it ok this isn't atomic?
         const user = await UserValidation
           .userExistsByUsername(users, input.username);
         await UserValidation.verifyPassword(input.password, user.password);
@@ -249,15 +248,15 @@ function resolvers(db: ClicheDb, _config: Config): object {
       changePassword: async (
         _root, { input }: { input: ChangePasswordInput }, context: Context) => {
         UserValidation.isPasswordValid(input.newPassword);
-        // TODO: these action aren't atomic. should they be?
-        const user = await UserValidation.userExistsById(users, input.id);
-        await UserValidation.verifyPassword(input.oldPassword, user.password);
         const newPasswordHash = await bcrypt
           .hash(input.newPassword, SALT_ROUNDS);
 
-        const updateOp = { $set: { password: newPasswordHash } };
-
-        return await users.updateOne(context, { id: input.id }, updateOp);
+        return users.findOneAndUpdateWithFn(context, { id: input.id },
+          (_user) => ({ $set: { password: newPasswordHash }}), {},
+          async (user: UserDoc) => {
+            await UserValidation.verifyPassword(
+              input.oldPassword, user.password);
+          });
       }
     }
   };
