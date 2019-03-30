@@ -214,12 +214,12 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
       case 'vote':
         /* falls through */
       case undefined: {
-        const setOnInsert = {
-          $setOnInsert: options && options.setOnInsert || {}
-        };
+        const setOnInsertVal = options && options.setOnInsert;
+        const getLockUpdateObj = setOnInsertVal ?
+          { $setOnInsert: setOnInsertVal } : {};
         // make sure doc exists and lock on it before we apply update
         await this.getLockAndUpdate(
-          context, filter, 'update', setOnInsert, options);
+          context, filter, 'update', getLockUpdateObj, options);
         // we can fetch the doc safely because we know we have the lock
         const doc: T = await this._collection.findOne(filter);
         try {

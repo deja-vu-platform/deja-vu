@@ -63,7 +63,7 @@ export class ClicheDbDuplicateKeyError extends ClicheDbError {
 }
 
 export interface UpsertOptions {
-  upsert: boolean;
+  upsert?: boolean;
   setOnInsert?: Object;
 }
 
