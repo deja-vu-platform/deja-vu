@@ -103,7 +103,7 @@
             }"
           >
             <div class="ref-for-io">{{ioRef.forIO}}</div>
-            <div class="ref-io-name">{{ioRef.ioName}} →</div>
+            <div class="ref-io-name">{{ioRef.ioName}} {{ioRef.forActionID === action.id ? '→' : '↓'}}</div>
           </div>
           <div
             class="ref-indicator output-ref-indicator hide-on-drag"
