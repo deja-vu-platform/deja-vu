@@ -72,6 +72,10 @@ export interface UpsertOptions {
  * to add support for Déjà Vu's transaction handling,
  * exposing only the relevant methods for DV cliché servers.
  *
+ * Each of the methods exposed are individually guaranteed to be atomic.
+ * To perform operations across Collection<T>s in a transaction,
+ * use ClicheDb.inTransaction()
+ *
  * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html
  */
 export interface Collection<T extends Object> {
@@ -126,10 +130,16 @@ export interface Collection<T extends Object> {
    *                        update operation used as defined by mongodb.
    *                        If a doc is upserted, the doc with only the
    *                        options.setOnInsert fields are passed in.
+   *                        This method ensures that the doc passed into
+   *                        updateFn is locked and has not and will not change
+   *                        from the time the method voted 'yes' to the update,
+   *                        until the update operation finishes.
    * @param options the regular mongodb updateOne options,
    *                    plus setOnInsert which is equivalent to
    *                    the mongodb update operation $setOnInsert
    * @param validationFn called on the fetched or upserted doc as defined above.
+   *                            This method ensures that the doc passed into
+   *                            validationFn is locked and will not change.
    *                            Errors thrown by the function are caught so that
    *                            the method can roll back any changes,
    *                            then rethrows the error.

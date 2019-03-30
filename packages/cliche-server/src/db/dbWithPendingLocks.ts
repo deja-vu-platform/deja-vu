@@ -33,6 +33,7 @@ export const unsetPendingOp: Object = { $unset:
 
 export type DbDoc<T> = PendingDoc & T;
 
+// https://docs.mongodb.com/manual/core/index-unique/
 const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
 
 /**
@@ -71,7 +72,10 @@ const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
  * without the guarantee that those conditions would not have changed
  * by the time the insert happens. If the cliché does not allow certain fields
  * to be mutated, then preconditions that rely on those field values could be
- * checked outside of a transaction.
+ * checked outside of a transaction. Alternatively, clichés could handle
+ * transactions by themselves and not rely on this library. They could also
+ * perform operations across Collection<T>s in a transaction by using
+ * ClicheDb.inTransaction()
  */
 export class CollectionWithPendingLocks<T> implements Collection<T> {
   private readonly _db: mongodb.Db;
@@ -519,7 +523,7 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
     updateType: 'update' | 'delete', update: Object = {},
     options?: mongodb.ReplaceOneOptions,
     updateMany: boolean = false): Promise<void> {
-    // Get the lock on the document first, then udpate the document
+    // Get the lock on the document first, then update the document
     // with the information from the context and the given update.
     // Separating these actions allows us to differentiate between
     // not found errors and concurrent update errors
