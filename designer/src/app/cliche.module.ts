@@ -69,6 +69,19 @@ function isComponent(f: any) {
   return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
 }
 
+function removeSurroundingQuotes(s: string): string {
+  if (s.length <= 1) { return s; }
+
+  const first = _.first(s);
+  const last = _.last(s);
+  // tslint:disable-next-line quotemark
+  if (first === last && (last === '"' || last === "'")) {
+    return s.slice(1, -1);
+  }
+
+  return s;
+}
+
 function clicheDefinitionFromModule(
   importedModule: Object,
   name: string
@@ -113,10 +126,13 @@ function clicheDefinitionFromModule(
             actionInputs[actionInputNames[0]] = _.fromPairs(
               inputMapMatch[1]
                 .split(',')
-                .map((s1) => s1.split(':')
-                  .map((s2) => s2.trim())
-                  .reverse()
-                )
+                .map((s1) => {
+                  let [ioName, propertyName] = s1.split(':');
+                  ioName = removeSurroundingQuotes(ioName.trim());
+                  propertyName = propertyName.trim();
+
+                  return [propertyName, ioName];
+                })
             );
           } else {
             actionInputs[actionInputNames[0]] = {};
