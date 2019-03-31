@@ -201,7 +201,7 @@ implements OnInit, AfterViewInit, OnDestroy {
                 ) || (
                   // action input, new action means changed
                   actionDefinition.actionInputs[input]
-                  && val.inputs.actionInstance !== _.get(
+                  && _.get(val, ['inputs', 'actionInstance']) !== _.get(
                     componentRef.instance[input],
                     ['inputs', 'actionInstance']
                   )
