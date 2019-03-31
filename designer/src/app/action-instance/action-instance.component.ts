@@ -77,7 +77,7 @@ implements OnInit, AfterViewInit, OnDestroy {
    */
   private registerRunService() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
-      this.rs.registerAppAction(this.elem, this);
+      this.rs.registerAppAction(this.elem, {});
     }
   }
 
@@ -192,7 +192,23 @@ implements OnInit, AfterViewInit, OnDestroy {
                 );
               }
             } else {
-              componentRef.instance[input] = val;
+              // only pass the new value if it actually changed
+              if (
+                (
+                  // expression input, not equal means changed
+                  !actionDefinition.actionInputs[input]
+                  && componentRef.instance[input] !== val
+                ) || (
+                  // action input, new action means changed
+                  actionDefinition.actionInputs[input]
+                  && val.inputs.actionInstance !== _.get(
+                    componentRef.instance[input],
+                    ['inputs', 'actionInstance']
+                  )
+                )
+              ) {
+                componentRef.instance[input] = val;
+              }
             }
           })
       );

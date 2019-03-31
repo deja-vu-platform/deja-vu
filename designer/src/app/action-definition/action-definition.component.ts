@@ -107,7 +107,7 @@ implements AfterViewInit, OnChanges, OnInit {
 
   ngOnInit() {
     if (this.actionInstance && this.actionInstance.isAppAction) {
-      this.rs.registerAppAction(this.elem, this);
+      this.rs.registerAppAction(this.elem, {});
     }
     if (this.ioChange) {
       this.ioChange.subscribe(() => this.link());
