@@ -1,15 +1,16 @@
-<div id="designer" class="flex">
+<div id="designer" class="flex" *ngIf="!previewMode">
   <div class="flex dir-col grow">
     <app-top-bar
       [app]="app"
       [openAction]="openAction"
       (load)="load($event)"
       (ioChange)="ioChange.emit()"
+      (preview)="showPreview()"
     ></app-top-bar>
     <div class="grow scroll">
       <app-action-definition
         class="grow"
-        [openAction]="openAction"
+        [actionInstance]="openActionInstance"
         [app]="app"
         [ioChange]="ioChange"
       >
@@ -25,3 +26,8 @@
   >
   </app-side-menu>
 </div>
+<app-action-instance
+  *ngIf="previewMode"
+  [actionInstance]="openActionInstance"
+>
+</app-action-instance>

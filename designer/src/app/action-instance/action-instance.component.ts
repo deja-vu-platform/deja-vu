@@ -86,8 +86,10 @@ implements OnInit, AfterViewInit, OnDestroy {
    * Should only be called once
    */
   private linkScopes() {
-    if (this.actionInstance && this.actionIO) {
-      this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
+    if (this.actionInstance) {
+      if (this.actionInstance) {
+        this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
+      }
       if (this.extraInputs && this.extraInputsScope) {
         _.forEach(this.extraInputs, (thisProp, ioName) => {
           this.extraInputsScope.getSubject(ioName)
@@ -110,7 +112,7 @@ implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => this.loadClicheAction());
       }
       setTimeout(() => {
-        const sub = this.actionIO.getSubject('hidden')
+        const sub = this.scopeIO.getSubject(this.actionInstance, 'hidden')
           .subscribe((value) => {
             this.hidden = value;
           });

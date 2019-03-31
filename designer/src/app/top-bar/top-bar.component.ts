@@ -40,7 +40,8 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
-  @Output() readonly ioChange = new EventEmitter<void>(); // async
+  @Output() readonly ioChange = new EventEmitter<void>();
+  @Output() readonly preview = new EventEmitter<void>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
   readonly fs: any;
@@ -60,6 +61,10 @@ export class TopBarComponent {
     if (this.electronService.remote) {
       this.fs = this.electronService.remote.require('fs');
     }
+  }
+
+  showPreview() {
+    this.preview.emit();
   }
 
   onSelectAction() {

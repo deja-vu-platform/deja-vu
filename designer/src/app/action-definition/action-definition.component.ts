@@ -5,6 +5,7 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
   OnInit,
   QueryList,
   ViewChildren
@@ -69,14 +70,15 @@ interface ColorAssignments {
   templateUrl: './action-definition.component.html',
   styleUrls: ['./action-definition.component.scss']
 })
-export class ActionDefinitionComponent implements AfterViewInit, OnInit {
+export class ActionDefinitionComponent
+implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
   @Input() ioChange: EventEmitter<void>;
+  @Input() actionInstance: ActionInstance;
 
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
   private lastNumActions = 0;
-  actionInstance: ActionInstance;
   readonly scopeIO: ScopeIO = new ScopeIO();
   readonly flexAlignEntries = Object.entries(flexAlign);
   readonly flexJustifyEntries = Object.entries(flexJustify);
@@ -91,8 +93,8 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
 
   constructor(private elem: ElementRef, private rs: RunService) { }
 
-  @Input()
-  set openAction(action: AppActionDefinition) {
+  ngOnChanges() {
+    const action = this.actionInstance.of as AppActionDefinition;
     document
       .querySelector('body').style
       .setProperty(
@@ -100,7 +102,6 @@ export class ActionDefinitionComponent implements AfterViewInit, OnInit {
         tinycolor(action.styles.backgroundColor)
           .isDark() ? 'white' : 'black'
       );
-    this.actionInstance = new ActionInstance(action, this.app);
     this.link();
   }
 
