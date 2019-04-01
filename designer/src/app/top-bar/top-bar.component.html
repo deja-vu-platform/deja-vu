@@ -96,7 +96,12 @@
                 (addOutput)="addOutput(output, $event)"
               >
             </mat-form-field>
-            <button mat-button color="warn" (click)="removeIO(output)" class="mat-small rm">
+            <button
+              mat-button
+              color="warn"
+              (click)="removeIO(output)"
+              class="mat-small hide-on-drag"
+            >
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>
@@ -118,7 +123,12 @@
             <div>
                 {{input.name}}
             </div>
-            <button mat-button color="warn" (click)="removeIO(input)" class="mat-small rm">
+            <button
+              mat-button
+              color="warn"
+              (click)="removeIO(input)"
+              class="mat-small hide-on-drag"
+            >
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>

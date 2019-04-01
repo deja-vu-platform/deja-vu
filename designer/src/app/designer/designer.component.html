@@ -4,9 +4,15 @@
       [app]="app"
       [openAction]="openAction"
       (load)="load($event)"
+      (ioChange)="ioChange.emit()"
     ></app-top-bar>
     <div class="grow scroll">
-      <app-action-definition class="grow" [openAction]="openAction" [app]="app">
+      <app-action-definition
+        class="grow"
+        [openAction]="openAction"
+        [app]="app"
+        [ioChange]="ioChange"
+      >
       </app-action-definition>
     </div>
   </div>

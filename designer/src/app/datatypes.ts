@@ -58,6 +58,11 @@ export interface IO {
   value: string; // default constant for input, epression for output
 }
 
+export interface InInput {
+  name: string;
+  of: ActionInstance;
+}
+
 export const defaultAppActionStyles = {
   backgroundColor: 'white',
   borderWidth: '0',
@@ -100,8 +105,17 @@ export class AppActionDefinition implements ActionDefinition {
     return this._rows;
   }
 
-  get children(): ActionInstance[] {
-    return (<ActionInstance[]>[]).concat(...this.rows.map((r) => r.actions));
+  getChildren(includeInputs = false): ActionInstance[] {
+    return (<ActionInstance[]>[]).concat(
+      ...this.rows.map(
+        (r) => (<ActionInstance[]>[]).concat(
+          ...r.actions.map((a) => includeInputs
+            ? [a, ...a.getInputtedActions(true)]
+            : a
+          )
+        )
+      )
+    );
   }
 
   /**
@@ -351,6 +365,40 @@ export class ActionInstance {
     }
 
     return json;
+  }
+
+  /**
+   * @param deep also walk the inputs of any inputted actions
+   * @param callback function called at each input
+   * (inInput) is a private arg
+   */
+  walkInputs(deep: boolean,
+    callback: (
+      name: string,
+      value: string | ActionInstance,
+      ofAction: ActionInstance,
+      inInput?: InInput
+    ) => void,
+    inInput?: InInput
+  ): void {
+    this.of.inputs.forEach((name) => {
+      const value = this.inputSettings[name];
+      if (deep && value instanceof ActionInstance) {
+        value.walkInputs(true, callback, { name, of: this });
+      }
+      callback(name, value, this, inInput);
+    });
+  }
+
+  getInputtedActions(deep: boolean): ActionInstance[] {
+    const inputtedActions: ActionInstance[] = [];
+    this.walkInputs(deep, (name, value) => {
+      if (value instanceof ActionInstance) {
+        inputtedActions.push(value);
+      }
+    });
+
+    return inputtedActions;
   }
 }
 

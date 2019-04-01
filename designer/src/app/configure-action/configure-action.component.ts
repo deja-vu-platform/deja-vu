@@ -4,6 +4,7 @@ import {
   MatDialogRef
 } from '@angular/material';
 import * as _ from 'lodash';
+import * as tinycolor from 'tinycolor2';
 
 import {
   App,
@@ -108,6 +109,13 @@ export class ConfigureActionComponent implements OnInit {
     action.transaction = this.transaction;
 
     Object.assign(action.styles, this.styles);
+    document
+      .querySelector('body').style
+      .setProperty(
+        '--text-stroke-color',
+        tinycolor(this.styles.backgroundColor)
+          .isDark() ? 'white' : 'black'
+      );
 
     this.dialogRef.close();
   }

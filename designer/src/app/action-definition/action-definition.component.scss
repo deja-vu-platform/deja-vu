@@ -1,11 +1,18 @@
 $row-control-width: 32px; // we need this fixed for the pseudo background
+$main-view-padding: 24px;
 
 // the region outside of the page
 #main-view {
   width: 100%;
   background: darkgray;
-  padding: 24px;
+  padding: $main-view-padding;
   padding-left: 0; // because there is the offpage button on the left
+  position: relative;
+  .parent-refs {
+    position: absolute;
+    right: 0;
+    top: $main-view-padding;
+  }
 }
 
 #page {
@@ -33,6 +40,10 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 // contains both the control ("offpage") and content
 .row-container {
   display: flex;
+  &:hover {
+    // override global
+    box-shadow: none !important;
+  }
 }
 
 // looks like it's outside of the page
@@ -70,11 +81,33 @@ $row-control-width: 32px; // we need this fixed for the pseudo background
 }
 
 .action {
-  // start with invisible border to avoid shifts on hover
-  border: 3px solid rgba(255,255,255,0);
-  border-radius: 5px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-auto-rows: 1fr;
+  .instance-container {
+    grid-column: 2;
+    // grid-row: 1 / -1 does not work so we set the row span in ngStyle
+    // start with invisible border to avoid shifts on hover
+    border: 3px solid rgba(255,255,255,0);
+    border-radius: 5px;
+  }
+  .input-ref-indicator {
+    grid-column: 1;
+    justify-self: end;
+  }
+  .output-ref-indicator {
+    grid-column: 3;
+    justify-self: start;
+  }
   &:hover {
-    border-color:rgba(16, 219, 255, .5);
+    // override global
+    box-shadow: none !important;
+    .instance-container {
+      // reapply global
+      box-shadow: inset 0 0 100px 100px rgba(0,0,0,.15);
+      // show bounds of action
+      border-color:rgba(16, 219, 255, .5);
+    }
   }
 }
 
@@ -117,4 +150,14 @@ mat-checkbox {
   cursor: default;
 }
 
+.ref-for-io {
+  font-size: 50%;
+  transform: translateY(4px);
+  -webkit-text-stroke-width: 0.2px;
+  -webkit-text-stroke-color: var(--text-stroke-color);
+}
 
+.ref-io-name {
+  -webkit-text-stroke-width: 0.4px;
+  -webkit-text-stroke-color: var(--text-stroke-color);
+}
