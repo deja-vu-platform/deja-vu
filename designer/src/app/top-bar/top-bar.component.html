@@ -64,6 +64,14 @@
     <button
       mat-button
       class="mat-small"
+      (click)="showPreview()"
+      matTooltip="Preview"
+    >
+      <mat-icon>devices</mat-icon>
+    </button>
+    <button
+      mat-button
+      class="mat-small"
       (click)="export()"
       [disabled]="!this.fs || exporting"
       matTooltip="Export"

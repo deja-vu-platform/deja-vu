@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  HostListener,
   NgZone,
   OnDestroy,
   OnInit
@@ -14,6 +15,7 @@ import { ElectronService } from 'ngx-electron';
 import {
   ActionInstance,
   App,
+  AppActionDefinition,
   ClicheInstance,
   Row
 } from '../datatypes';
@@ -27,9 +29,11 @@ import {
 })
 export class DesignerComponent implements OnInit, OnDestroy {
   app = new App('newapp');
-  openAction = this.app.homepage;
-  readonly ioChange = new EventEmitter<void>();
+  openActionInstance: ActionInstance;
+  previewMode = false;
 
+  readonly ioChange = new EventEmitter<void>();
+  private _openAction: AppActionDefinition;
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
   private readonly setElectronState: (state: any) => void;
@@ -45,6 +49,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
     private readonly electronService: ElectronService,
     private readonly router: Router
   ) {
+    this.openAction = this.app.homepage;
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
 
@@ -56,6 +61,15 @@ export class DesignerComponent implements OnInit, OnDestroy {
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
     }
+  }
+
+  get openAction(): AppActionDefinition {
+    return this._openAction;
+  }
+
+  set openAction(action: AppActionDefinition) {
+    this._openAction = action;
+    this.openActionInstance = new ActionInstance(action, this.app);
   }
 
   ngOnInit() {
@@ -315,4 +329,18 @@ export class DesignerComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  showPreview() {
+    this.snackBar
+      .open('Entering preview mode. Press escape to exit.', 'dismiss');
+    this.previewMode = true;
+  }
+
+  @HostListener('document:keyup', ['$event.key'])
+  handleKeyUp(key: string) {
+    if (key === 'Escape') {
+      this.previewMode = false;
+    }
+  }
+
 }
