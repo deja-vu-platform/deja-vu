@@ -1,6 +1,93 @@
 {
   "name": "phoenix",
   "type": "app",
-  "usedCliches": {},
-  "routes": []
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "comment": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "topic": {
+      "name": "label",
+      "config": {
+        "reinitDbOnStartup": true,
+        "initialLabelIds": [
+          "sexuality", "gender", "body image", "politics", "family"
+        ]
+      }
+    },
+    "geolocation": {
+      "config": {
+        "mapType": "leaflet",
+        "reinitDbOnStartup": true
+      }
+    },
+    "event": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+
+    "personalinfo": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "PersonalInfo",
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "zipCode": {
+              "type": "number"
+            },
+            "locationRadius": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["description", "zipCode", "locationRadius"]
+      }
+    },
+
+    "emailinfo": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Email",
+          "type": "object",
+          "properties": {
+            "emailAddress": {
+              "type": "string"
+            },
+            "publicEmailAddress": {
+              "type": "string"
+            }
+          },
+          "required": ["emailAddress", "publicEmailAddress"]
+        }
+      }
+    }
+  },
+  "routes": [
+    { "path": "dashboard", "action": "show-dashboard" },
+    { "path": "faq", "action": "show-faq" },
+    { "path": "journal", "action": "show-journal" },
+    { "path": "personal", "action": "show-personal-info" },
+    { "path": "signin", "action": "signin" },
+    { "path": "register", "action": "register" },
+    { "path": "", "action": "show-dashboard" }
+  ]
 }
