@@ -1,48 +1,24 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
 import {
   AllocationDoc,
   Assignment,
   ConsumerOfResourceInput,
   CreateAllocationInput,
   DeleteResourceInput,
-  EditConsumerOfResourceInput,
-  PendingDoc
+  EditConsumerOfResourceInput
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
-
-class AllocationValidation {
-  static async allocationExistsOrFail(
-    allocations: mongodb.Collection<AllocationDoc>,
-    id: string): Promise<AllocationDoc> {
-    return Validation.existsOrFail(allocations, id, 'Allocation');
-  }
-
-  static async resourceIsPartOfAllocationOrFail(
-    allocations: mongodb.Collection<AllocationDoc>,
-    allocationId: string, resourceId: string): Promise<void> {
-    const alloc: AllocationDoc | null = await allocations
-      .findOne(
-        { id: allocationId, 'assignments.resourceId': resourceId },
-        { projection: { _id: 1 } });
-    if (alloc === null) {
-      throw new Error(
-        `Resource ${resourceId} is not part of allocation ` +
-        `${allocationId}`);
-    }
-  }
-}
 
 const actionRequestTable: ActionRequestTable = {
   'create-allocation': (extraInfo) => `
@@ -59,7 +35,8 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'edit':
         return `
-          mutation EditConsumerOfResource($input: EditConsumerOfResourceInput!) {
+          mutation EditConsumerOfResource(
+            $input: EditConsumerOfResourceInput!) {
             editConsumerOfResource (input: $input) ${getReturnFields(extraInfo)}
           }
         `;
@@ -78,41 +55,23 @@ const actionRequestTable: ActionRequestTable = {
       consumerOfResource(input: $input) ${getReturnFields(extraInfo)}
     }
   `
-}
+};
 
-function isPendingCreate(alloc: AllocationDoc | null) {
-  return _.get(alloc, 'pending.type') === 'create-allocation';
-}
-
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const allocations: mongodb.Collection<AllocationDoc> =
-    db.collection('allocations');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
   return {
     Query: {
-      allocation: async (_root, { id }) => {
-        const alloc: AllocationDoc | null = await allocations
-          .findOne({ id: id });
-        if (isPendingCreate(alloc)) {
-          return null;
-        }
-
-        return alloc;
-      },
+      allocation: async (_root, { id }) => allocations.findOne({ id: id }),
       consumerOfResource: async (
         _root, { input: { resourceId, allocationId } }
           : { input: ConsumerOfResourceInput }) => {
-        const alloc: AllocationDoc | null = await allocations
+        const alloc = await allocations
           .findOne(
             { id: allocationId, 'assignments.resourceId': resourceId },
-            { projection: { 'assignments.$.consumerId': 1, 'pending.type': 1 } });
+            { projection: { 'assignments.$.consumerId': 1 } });
 
-        if (_.isNil(alloc) || isPendingCreate(alloc)) {
-          throw new Error(
-            `Allocation ${allocationId} or resource ${resourceId} not found`);
-        }
-
-        return alloc!.assignments[0].consumerId;
+        return alloc.assignments[0].consumerId;
       }
     },
     Allocation: {
@@ -133,108 +92,37 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         const updateOp = {
           $set: { 'assignments.$.consumerId': newConsumerId }
         };
-        const notPendingAllocFilter = {
+        const allocFilter = {
           id: allocationId,
-          'assignments.resourceId': resourceId,
-          pending: { $exists: false }
+          'assignments.resourceId': resourceId
         };
-        switch (context.reqType) {
-          case 'vote':
-            await AllocationValidation.resourceIsPartOfAllocationOrFail(
-              allocations, allocationId, resourceId);
-            const pendingUpdateObj = await allocations
-              .updateOne(
-                notPendingAllocFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'edit-consumer'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
 
-            return true;
-          case undefined:
-            await AllocationValidation.resourceIsPartOfAllocationOrFail(
-              allocations, allocationId, resourceId);
-            const updateObj = await allocations
-              .updateOne(notPendingAllocFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await allocations.updateOne(
-              {
-                id: allocationId,
-                'assignments.resourceId': resourceId,
-                'pending.reqId': context.reqId
-              },
-              { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await allocations.updateOne(
-              { 'pending.reqId': context.reqId },
-              { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await allocations.updateOne(context, allocFilter, updateOp);
       },
       createAllocation: async (
         _root, { input: { id, resourceIds, consumerIds } }
           : { input: CreateAllocationInput }, context: Context) => {
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        let pending: PendingDoc | undefined;
-        switch (context.reqType) {
-          case 'vote':
-            pending = { reqId: context.reqId, type: 'create-allocation' };
-          /* falls through */
-          case undefined:
-            const assignments: Assignment[] = [];
-            if (!_.isEmpty(consumerIds)) {
-              let currentConsumerIndex = 0;
-              for (const resourceId of resourceIds) {
-                const consumerId = consumerIds[currentConsumerIndex];
-                console.log(`Allocating ${resourceId} to ${consumerId}`);
-                assignments.push({
-                  resourceId: resourceId, consumerId: consumerId
-                });
-                currentConsumerIndex = (
-                  currentConsumerIndex + 1) % consumerIds.length;
-              }
+          const assignments: Assignment[] = [];
+          if (!_.isEmpty(consumerIds)) {
+            let currentConsumerIndex = 0;
+            for (const resourceId of resourceIds) {
+              const consumerId = consumerIds[currentConsumerIndex];
+              console.log(`Allocating ${resourceId} to ${consumerId}`);
+              assignments.push({
+                resourceId: resourceId, consumerId: consumerId
+              });
+              currentConsumerIndex = (
+                currentConsumerIndex + 1) % consumerIds.length;
             }
-            const newAllocation: AllocationDoc = {
-              id: id ? id : uuid(),
-              resourceIds: resourceIds,
-              consumerIds: consumerIds,
-              assignments: assignments
-            };
-            if (pending) {
-              newAllocation.pending = pending;
-            }
-            await allocations.insertOne(newAllocation);
+          }
+          const newAllocation: AllocationDoc = {
+            id: id ? id : uuid(),
+            resourceIds: resourceIds,
+            consumerIds: consumerIds,
+            assignments: assignments
+          };
 
-            return newAllocation;
-          case 'commit':
-            await allocations.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await allocations.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-        }
-
-        return undefined;
+          return await allocations.insertOne(context, newAllocation);
       },
       deleteResource: async (
         _root, { input: { resourceId, allocationId } }
@@ -245,62 +133,18 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             assignments: { resourceId: resourceId }
           }
         };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        const notPendingAllocationIdFilter = {
-          id: allocationId, pending: { $exists: false }
-        }
-        switch (context.reqType) {
-          case 'vote':
-            await AllocationValidation.allocationExistsOrFail(
-              allocations, allocationId);
-            const pendingUpdateObj = await allocations.updateOne(
-              notPendingAllocationIdFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'delete-resource'
-                  }
-                }
-              });
+        const allocationIdFilter = { id: allocationId };
 
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await AllocationValidation.allocationExistsOrFail(
-              allocations, allocationId);
-            const updateObj = await allocations.updateOne(
-              notPendingAllocationIdFilter, updateOp);
-
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await allocations.updateOne(
-              reqIdPendingFilter, { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await allocations.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await allocations.updateOne(
+          context, allocationIdFilter, updateOp);
       }
     }
   };
 }
 
 const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const allocations = db.collection('allocations');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
     return Promise.all([
       allocations.createIndex({ id: 1 }, { unique: true }),

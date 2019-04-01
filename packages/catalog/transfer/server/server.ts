@@ -1,27 +1,27 @@
-import * as assert from 'assert';
 import {
   ActionRequestTable,
+  ClicheDb,
+  ClicheDbNotFoundError,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
+  EMPTY_CONTEXT,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import { readFileSync } from 'fs';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import * as path from 'path';
+import { v4 as uuid } from 'uuid';
 import {
   AccountDoc,
-  AccountPendingDoc,
   AddToBalanceInput,
   CreateTransferInput,
   ItemCount,
-  PendingTransfer,
   TransferDoc,
   TransfersInput
 } from './schema';
-import { v4 as uuid } from 'uuid';
 
 
 interface TransferConfig extends Config {
@@ -65,8 +65,9 @@ type ZeroBalanceFn<Balance> = () => Balance;
 type IsZeroBalanceFn<Balance> = (balance: Balance) => boolean;
 
 function getResolvers<Balance>(
-  accounts: mongodb.Collection<AccountDoc<Balance>>,
-  transfers: mongodb.Collection<TransferDoc<Balance>>,
+  db: ClicheDb,
+  accounts: Collection<AccountDoc<Balance>>,
+  transfers: Collection<TransferDoc<Balance>>,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
   negateBalanceFn: NegateBalanceFn<Balance>,
@@ -75,17 +76,24 @@ function getResolvers<Balance>(
   return {
     Query: {
       balance: async (_root, { accountId }) => {
-        const account: AccountDoc<Balance> | null = await accounts
+        try {
+          const account: AccountDoc<Balance> = await accounts
           .findOne({ id: accountId });
 
-        return account === null ? zeroBalanceFn() : account.balance;
+          return account.balance;
+        } catch (err) {
+          if (err.errorCode !== ClicheDbNotFoundError.ERROR_CODE) {
+            throw err;
+          }
+
+          return zeroBalanceFn();
+        }
       },
       transfers: async (_root, { input }: { input: TransfersInput }) => {
-        return transfers.find({ ...input, pending: { $exists: false } })
-          .toArray();
+        return await transfers.find(input);
       },
       transfer: async (_root, { id }) => {
-        return transfers.findOne({ id: id });
+        return await transfers.findOne({ id: id });
       }
     },
     Mutation: {
@@ -97,25 +105,15 @@ function getResolvers<Balance>(
           toId: input.accountId,
           amount: input.amount
         };
-        const updateId = _.get(context, 'reqId', uuid());
-        try {
-          await addToBalance<Balance>(
-            accounts, transfers,
-            input.accountId, input.amount, transfer,
-            updateId, context.reqType, true,
-            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
-        } catch (e) {
-          console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortUpdate(accounts, transfers, updateId);
-          throw e;
-        }
+        await addToBalance<Balance>(db, context,
+          accounts, transfers, input.accountId, input.amount, transfer, true,
+          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
         return transfer;
       },
       createTransfer: async (
         _root, {input}: { input: CreateTransferInput<Balance> },
         context: Context): Promise<TransferDoc<Balance>> => {
-        const updateId = _.get(context, 'reqId', uuid());
         const transfer: TransferDoc<Balance> = {
           id: input.id ? input.id : uuid(),
           fromId: input.fromId,
@@ -124,161 +122,59 @@ function getResolvers<Balance>(
         };
         transfer.fromId = input.fromId;
 
-        try {
+        // Do these in a tx so that db won't be seen in an inconsistent
+        // state, e.g. transfer object is seen but toId account does not have
+        // the funds yet
+        return await db.inTransaction(async () => {
           /*
            * It is important that we apply the update to the source account
            * first so that we don't need to rollback the update to the other
            * account if the account has insufficient funds
            */
           await addToBalance<Balance>(
-            accounts, transfers,
-            input.fromId, negateBalanceFn(input.amount), transfer,
-            updateId, context.reqType, true,
+            db, context, accounts, transfers, input.fromId,
+            negateBalanceFn(input.amount), transfer, true,
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
-        } catch (e) {
-          console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortUpdate(accounts, transfers, updateId);
-          throw e;
-       }
 
-       /*
-        * At this point we know that the transfer is going to work, because
-        * we are adding a positive number to `toId`. There's no need to do
-        * the updates in a tx because even if the server fails with an
-        * internal error before doing the second update, there will be a
-        * record of the pending transfer that can be used to reconcile the
-        * data
-        */
-       await addToBalance<Balance>(
-         accounts, transfers,
-         input.toId, input.amount, transfer, updateId, context.reqType, false,
-         accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+          /*
+           * At this point we know that the transfer is going to work, because
+           * we are adding a positive number to `toId`.
+           */
+          await addToBalance<Balance>(db, context,
+            accounts, transfers, input.toId, input.amount, transfer, false,
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
-       return transfer;
+          return transfer;
+        });
       }
     }
   };
 }
 
-async function voteAccountUpdate<Balance>(
-  accounts /* no type because of usage of AccountDoc vs AccountPendingDoc */,
-  accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
-  updateId: string,
+async function addToBalanceOperation<Balance>(context: Context,
+  accounts: Collection<AccountDoc<Balance>>,
+  accountId: string, amount: Balance,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
-  zeroBalanceFn: ZeroBalanceFn<Balance>)
-  : Promise<AccountPendingDoc<Balance>> {
-  // Error messages
-  const noFundsMsg = (accountIdWithError) =>
-    `Account ${accountIdWithError} has insufficient funds`;
-  const pendingTransferMsg = (accountIdWithError) =>
-    `Account ${accountIdWithError} has a pending transfer, try again later`;
+  newBalanceFn: NewBalanceFn<Balance>,
+  zeroBalanceFn: ZeroBalanceFn<Balance>,
+  isZeroBalanceFn: IsZeroBalanceFn<Balance>): Promise<AccountDoc<Balance>> {
+  return await accounts.findOneAndUpdateWithFn(
+    context, { id: accountId }, (fetchedAccount: AccountDoc<Balance>) => {
+      const newBalance = newBalanceFn(fetchedAccount.balance, amount);
+      if (isZeroBalanceFn(newBalance)) {
+        return undefined;
+      }
 
-  const pendingTransfer: PendingTransfer<Balance> = {
-    updateId: updateId,
-    transfer: transfer
-  };
-  let voteAccount: AccountPendingDoc<Balance>;
-
-  const accountExists = (await accounts
-    .findOne({ id: accountId }, { projection: { _id: 1 } })) !== null;
-  if (accountExists) {
-    const accountFilter = {
-      id: accountId, pendingTransfer: { $exists: false }
-    };
-    const voteUpdateOp = { $set: { pendingTransfer: pendingTransfer } };
-    voteAccount = (await accounts
-      .findOneAndUpdate(accountFilter, voteUpdateOp, { returnOriginal: false }))
-      .value;
-    if (voteAccount === undefined) {
-      throw new Error(pendingTransferMsg(accountId));
+      return { $set: { balance: newBalance } };
+    },
+    { upsert: true, setOnInsert: { balance: zeroBalanceFn() } },
+    (fetchedAccount: AccountDoc<Balance>) => {
+    // Throw an error if the balance in acct would be negative after updating
+    if (!accountHasFundsFn(fetchedAccount.balance, amount)) {
+      // ClicheDb will take care of rolling back
+      throw new Error(`Account ${accountId} has insufficient funds`);
     }
-  } else {
-    const newAccount: AccountPendingDoc<Balance> = {
-      id: accountId,
-      balance: zeroBalanceFn(),
-      pending: updateId,
-      pendingTransfer: pendingTransfer
-    };
-    await accounts.insertOne(newAccount);
-    voteAccount = newAccount;
-  }
-
-  // Throw an error if the balance in acct would be negative after updating
-  if (!accountHasFundsFn(voteAccount.balance, amount)) {
-    await abortAccountUpdate(accounts, updateId);
-    throw new Error(noFundsMsg(accountId));
-  }
-
-  return voteAccount;
-}
-
-async function commitAccountUpdate<Balance>(
-  accounts: mongodb.Collection<AccountDoc<Balance>>,
-  account: AccountPendingDoc<Balance>, newBalance: Balance,
-  isZeroBalanceFn: IsZeroBalanceFn<Balance>) {
-  const reqIdPendingFilter = {
-    'pendingTransfer.updateId': account.pendingTransfer.updateId
-  };
-  console.log(
-    `New balance for account ${account.id} is ${JSON.stringify(newBalance)}`);
-  if (isZeroBalanceFn(newBalance)) {
-    console.log(`Balance is 0, deleting ${account.id}`);
-    const res = await accounts.deleteOne(reqIdPendingFilter);
-    assert.ok(
-      res.deletedCount === 1,
-      `Expected deletedCount of update to be 1, ` +
-      `but got ${res.deletedCount}`);
-  } else {
-    const commitUpdateOp = {
-      $set: { balance: newBalance },
-      $unset: { pendingTransfer: '', pending: '' }
-    };
-    const res = await accounts
-      .updateOne(reqIdPendingFilter, commitUpdateOp);
-    assert.ok(
-      res.matchedCount === 1,
-      `Expected matchedCount of update to be 1, ` +
-      `but got ${res.matchedCount}`);
-    assert.ok(
-      res.modifiedCount === 1,
-      `Expected modifiedCount of update to be 1, ` +
-      `but got ${res.modifiedCount}`);
-  }
-
-  return;
-}
-
-async function abortUpdate<Balance>(
-  accounts: mongodb.Collection<AccountDoc<Balance>>,
-  transfers: mongodb.Collection<TransferDoc<Balance>>,
-  updateId: string): Promise<void> {
-  await Promise.all([
-    abortAccountUpdate(accounts, updateId),
-    abortTransferUpdate(transfers, updateId)]);
-
-  return;
-}
-
-async function abortAccountUpdate<Balance>(
-  accounts: mongodb.Collection<AccountDoc<Balance>>, updateId: string) {
-  const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
-  await accounts
-    .updateMany(reqIdPendingFilter, { $unset: { pendingTransfer: '' } });
-
-  // Also delete any new accounts that were created
-  const res = await accounts
-    .deleteMany({ pending: updateId });
-  assert.ok(
-    res.result.n === undefined || res.result.n <= 2,
-    `Expected the number of deleted accounts to be less than 2, ` +
-    `but got ${res.result.n}`);
-
-  return res;
-}
-
-function abortTransferUpdate<Balance>(
-  transfers: mongodb.Collection<TransferDoc<Balance>>,updateId: string) {
-  return transfers.deleteMany({ pending: updateId });
+  });
 }
 
 /**
@@ -286,12 +182,13 @@ function abortTransferUpdate<Balance>(
  * to the transfer log if the account has sufficient funds (amount could be
  * negative)
  *
+ * @param context the context performing the operation
+ * @param accounts the accounts collection
+ * @param transfers the transfers collection
  * @param accountId the id of the account that will receive `amount`
  * @param amount the balance to add to the account. Use a negative balance to
  *               subtract from the account.
  * @param transfer the transfer object to add to the log
- * @param updateId the id of the update
- * @param action the action to perform
  * @param onCommitAddTransferToLog whether to add the transfer to the log or not
  * @param accountHasFundsFn fn that returns true if the account has funds
  * @param newBalanceFn fn to compute the new account balance
@@ -301,11 +198,10 @@ function abortTransferUpdate<Balance>(
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
  */
-async function addToBalance<Balance>(
-  accounts /* no type because of usage of AccountDoc vs AccountPendingDoc */,
-  transfers: mongodb.Collection<TransferDoc<Balance>>,
+async function addToBalance<Balance>(db: ClicheDb, context: Context,
+  accounts: Collection<AccountDoc<Balance>>,
+  transfers: Collection<TransferDoc<Balance>>,
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
-  updateId: string, action: 'vote' | 'commit' | 'abort' | undefined,
   onCommitAddTransferToLog: boolean,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
@@ -315,66 +211,24 @@ async function addToBalance<Balance>(
   if (_.isEmpty(accountId)) {
     throw new Error(`Invalid account id ${accountId}`);
   }
-  if (_.isEmpty(updateId)) {
-    throw new Error(`Invalid update id ${updateId}`);
-  }
 
   console.log(`Adding ${JSON.stringify(amount)} to ${accountId}`);
-  switch (action) {
-    case 'vote':
-      return await voteAccountUpdate<Balance>(
-        accounts, accountId, amount, transfer, updateId,
-        accountHasFundsFn, zeroBalanceFn);
-    case undefined:
-      /*
-       * We can't apply the update directly because we need to check that the
-       * account has sufficient funds. But if we do the check and then the
-       * update, the balance could have changed between the check and update.
-       * If we do vote + commit then we ensure that the balance won't change in
-       * the middle (because voting on an update puts a "lock" on that account)
-       */
-      try {
-        const account: AccountPendingDoc<Balance> = await
-          voteAccountUpdate<Balance>(
-            accounts, accountId, amount, transfer, updateId,
-            accountHasFundsFn, zeroBalanceFn);
 
-        if (onCommitAddTransferToLog) {
-          await transfers.insertOne(transfer);
-        }
-        const newBalance = newBalanceFn(account.balance, amount);
-        await commitAccountUpdate<Balance>(
-          accounts, account, newBalance, isZeroBalanceFn);
+  if ((context.reqType === undefined || context.reqType === 'commit') &&
+      onCommitAddTransferToLog) {
+    return db.inTransaction(async () => {
+      const account = await addToBalanceOperation<Balance>(
+        context, accounts, accountId, amount,
+        accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+      await transfers.insertOne(EMPTY_CONTEXT, transfer);
 
-        return account;
-      } catch (e) {
-        console.error(
-          `Balance update ${updateId} aborted, error: ${e.message}`);
-        await abortUpdate(accounts, transfers, updateId);
-        throw e;
-      }
-    case 'commit':
-      const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
-      const commitAccount: AccountPendingDoc<Balance> | null = await accounts
-        .findOne(reqIdPendingFilter);
-      if (commitAccount === null) {
-        console.error(`Couldn't find account for update id ${updateId}`);
-        throw new Error('An internal error has occurred');
-      }
-
-      if (onCommitAddTransferToLog) {
-        await transfers.insertOne(transfer);
-      }
-      const newCommitBalance = newBalanceFn(commitAccount.balance, amount);
-      await commitAccountUpdate<Balance>(
-        accounts, commitAccount, newCommitBalance, isZeroBalanceFn);
-
-      return undefined;
-    case 'abort':
-      await abortUpdate(accounts, transfers, updateId);
-
-      return undefined;
+      return account;
+    });
   }
+
+  return await addToBalanceOperation<Balance>(
+    context, accounts, accountId, amount,
+    accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 }
 
 function getDynamicTypeDefs(config: TransferConfig): string[] {
@@ -412,11 +266,11 @@ function getDynamicTypeDefs(config: TransferConfig): string[] {
   }
 }
 
-function resolvers(db: mongodb.Db, config: TransferConfig): object {
+function resolvers(db: ClicheDb, config: TransferConfig): object {
   if (config.balanceType === 'money') {
-    const accounts: mongodb.Collection<AccountDoc<number>> =
+    const accounts: Collection<AccountDoc<number>> =
       db.collection('accounts');
-    const transfers: mongodb.Collection<TransferDoc<number>> =
+    const transfers: Collection<TransferDoc<number>> =
       db.collection('transfers');
 
     const newBalanceFn: NewBalanceFn<number> =
@@ -434,16 +288,16 @@ function resolvers(db: mongodb.Db, config: TransferConfig): object {
       (balance: number) => balance === 0;
 
     return getResolvers<number>(
-      accounts, transfers,
+      db, accounts, transfers,
       accountHasFundsFn, newBalanceFn, negateBalanceFn,
       zeroBalanceFn, isZeroBalanceFn);
 
   } else {
-    const accounts: mongodb.Collection<AccountDoc<ItemCount[]>> =
+    const accounts: Collection<AccountDoc<ItemCount[]>> =
       db.collection('accounts');
-    const transfers: mongodb.Collection<TransferDoc<ItemCount[]>> =
+    const transfers: Collection<TransferDoc<ItemCount[]>> =
       db.collection('transfers');
-    
+
     const newBalanceFn: NewBalanceFn<ItemCount[]> =
       (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
         const accountBalanceMap = _
@@ -489,12 +343,12 @@ function resolvers(db: mongodb.Db, config: TransferConfig): object {
     const isZeroBalanceFn: IsZeroBalanceFn<ItemCount[]> =
       (balance: ItemCount[]) => _.isEmpty(balance);
 
-    let resolvers = getResolvers<ItemCount[]>(
-      accounts, transfers,
+    const baseResolvers = getResolvers<ItemCount[]>(
+      db, accounts, transfers,
       accountHasFundsFn, newBalanceFn,
       negateBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
-    return _.merge(resolvers, {
+    return _.merge(baseResolvers, {
       ItemCount: {
         id: (itemCount: ItemCount) => itemCount.id,
         count: (itemCount: ItemCount) => itemCount.count
@@ -504,20 +358,21 @@ function resolvers(db: mongodb.Db, config: TransferConfig): object {
 }
 
 const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
     /**
-     * `transfers` is the main collection, the only reason why we have an `accounts`
+     * `transfers` is the main collection,
+     * the only reason why we have an `accounts`
      * collection is to keep track of the balance (to avoid having to compute it
      * every time) and to be able to lock accounts when processing transfers.
      */
     const accounts = db.collection('accounts');
     const transfers = db.collection('transfers');
-    
+
     return Promise.all([
       accounts.createIndex({ id: 1 }, { unique: true, sparse: true }),
       transfers.createIndex({ id: 1 }, { unique: true, sparse: true }),
       transfers.createIndex({ fromId: 1 }, { sparse: true }),
-      transfers.createIndex({ toId: 1 }, { sparse: true }),
+      transfers.createIndex({ toId: 1 }, { sparse: true })
     ]);
   })
   .actionRequestTable(actionRequestTable)

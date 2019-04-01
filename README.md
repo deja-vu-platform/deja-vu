@@ -49,7 +49,7 @@ everything from source. Good news is that if you want to contribute code, you'll
 be all set to do so.
 
 You are going to need [yarn](https://yarnpkg.com) v1.10+,
-[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 3.4+.
+[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+.
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything

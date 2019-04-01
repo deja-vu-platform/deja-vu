@@ -58,16 +58,16 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
 
     this.gs.get<VerifyRes>(this.apiPath, {
       params: {
-        inputs: {
+        inputs: JSON.stringify({
           input: {
             code: this.code,
             token: token
           }
-        }
+        })
       }
     })
-      .subscribe((res) => {
-        this.isValidated = res.data.verify;
-      });
+    .subscribe((res) => {
+      this.isValidated = res.data.verify;
+    });
   }
 }

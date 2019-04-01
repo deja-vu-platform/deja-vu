@@ -3,12 +3,6 @@ export interface AllocationDoc {
   resourceIds: string[];
   consumerIds: string[];
   assignments: Assignment[];
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-allocation' | 'delete-resource' | 'edit-consumer';
 }
 
 export interface Assignment {

@@ -1,13 +1,15 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
 import {
   CreateScoreInput,
   ScoreDoc,
@@ -16,8 +18,6 @@ import {
   Target,
   TargetsByScoreInput
 } from './schema';
-
-import { v4 as uuid } from 'uuid';
 
 interface ScoringConfig extends Config {
   /* Function body that calculates the total score
@@ -54,12 +54,8 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function isPendingCreate(doc: ScoreDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-score';
-}
-
-function resolvers(db: mongodb.Db, config: ScoringConfig): object {
-  const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+function resolvers(db: ClicheDb, config: ScoringConfig): object {
+  const scores: Collection<ScoreDoc> = db.collection('scores');
   const totalScoreFn = config.totalScoreFn ?
     new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;
 
@@ -74,40 +70,12 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           throw new Error('Insufficient inputs to query a score');
         }
 
-        let query;
-        if (_.isNil(input.id)) {
-          query = {
-            sourceId: input.sourceId,
-            targetId: input.targetId,
-            pending: { $exists: false }
-          };
-        } else {
-          query = {
-            id: input.id,
-            pending: { $exists: false }
-          };
-        }
-
-        const score = await scores.findOne(query);
-
-        if (_.isNil(score) || isPendingCreate(score)) {
-          const scoreInfo = !_.isNil(input.id) ? input.id :
-            `with targetId: ${input.targetId}, sourceId: ${input.sourceId}`;
-          throw new Error(`Score ${scoreInfo} not found`);
-        }
-
-        return score;
+        return await scores.findOne(input);
       },
 
-      target: async (
-        _root, { input }: { input: ShowTargetInput }) => {
-        const filter = { targetId: input.id, pending: { $exists: false } };
-        if (!_.isNil(input.sourceId)) {
-          filter['sourceId'] = input.sourceId;
-        }
-
+      target: async (_root, { input }: { input: ShowTargetInput }) => {
         const target = await scores.aggregate([
-          { $match: filter },
+          { $match: input },
           {
             $group: {
               _id: '$targetId',
@@ -132,7 +100,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
       targetsByScore: async (
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
-        const query = { pending: { $exists: false } };
+        const query = {};
 
         if (!_.isNil(input)) {
           if (!_.isNil(input.targetIds)) {
@@ -152,18 +120,18 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
             }
           }
         ])
-          .toArray();
+        .toArray();
 
         return _(targets)
-          .map((target) => {
-            return {
-              ...target,
-              total: totalScoreFn(_.map(target.scores, 'value')),
-              id: target._id
-            };
-          })
-          .orderBy(['total'], [input.asc ? 'asc' : 'desc'])
-          .value();
+        .map((target) => {
+          return {
+            ...target,
+            total: totalScoreFn(_.map(target.scores, 'value')),
+            id: target._id
+          };
+        })
+        .orderBy(['total'], [ input.asc ? 'asc' : 'desc' ])
+        .value();
       }
     },
     Score: {
@@ -186,31 +154,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           targetId: input.targetId
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newScore.pending = {
-              reqId: context.reqId,
-              type: 'create-score'
-            };
-          /* falls through */
-          case undefined:
-            await scores.insertOne(newScore);
-
-            return newScore;
-          case 'commit':
-            await scores.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return newScore;
-          case 'abort':
-            await scores.deleteOne(reqIdPendingFilter);
-
-            return newScore;
-        }
-
-        return newScore;
+        return await scores.insertOne(context, newScore);
       }
     }
   };
@@ -218,8 +162,8 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
 const scoringCliche: ClicheServer<ScoringConfig> =
   new ClicheServerBuilder<ScoringConfig>('scoring')
-    .initDb((db: mongodb.Db, config: ScoringConfig): Promise<any> => {
-      const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+    .initDb((db: ClicheDb, config: ScoringConfig): Promise<any> => {
+      const scores: Collection<ScoreDoc> = db.collection('scores');
       const sourceTargetIndexOptions = config.oneToOneScoring ?
         { unique: true, sparse: true } : {};
 

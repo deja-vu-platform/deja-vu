@@ -3,12 +3,6 @@ export interface CommentDoc {
   authorId: string;
   targetId: string;
   content: string;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-comment' | 'edit-comment' | 'delete-comment';
 }
 
 export interface CreateCommentInput {

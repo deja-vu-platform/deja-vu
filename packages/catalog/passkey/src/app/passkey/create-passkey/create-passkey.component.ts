@@ -144,9 +144,9 @@ export class CreatePasskeyComponent
 
   dvOnExecSuccess() {
     this.newPasskeyCreated = true;
+    this.newPasskeyError = '';
     window.setTimeout(() => {
       this.newPasskeyCreated = false;
-      this.newPasskeyError = '';
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190

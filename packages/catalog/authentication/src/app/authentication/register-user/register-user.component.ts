@@ -155,6 +155,7 @@ export class RegisterUserComponent
 
   dvOnExecSuccess() {
     this.newUserRegistered = true;
+    this.newUserRegisteredError = '';
     window.setTimeout(() => {
       this.newUserRegistered = false;
     }, SAVED_MSG_TIMEOUT);

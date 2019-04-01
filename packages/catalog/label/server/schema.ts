@@ -1,12 +1,6 @@
 export interface LabelDoc {
   id: string;
   itemIds?: string[];
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-label' | 'add-labels-to-item';
 }
 
 export interface LabelsInput {

@@ -1,14 +1,14 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   CreateMessageInput,
   EditMessageInput,
@@ -107,52 +107,10 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function isPendingCreate(doc: PublisherDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-publisher';
-}
-
-function getPublisherFilter(input: PublishersInput) {
-  // No publisher filter
-  const filter = { pending: { $exists: false } };
-  if (!_.isNil(input) && !_.isNil(input.followedById)) {
-    // Get all publishers of a follower
-    filter['followerIds'] = input.followedById;
-  }
-
-  return filter;
-}
-
-function getFollowerAggregationPipeline(getCount = false) {
-  const pipeline: any = [
-    { $match: { pending: { $exists: false } } },
-    {
-      $group: {
-        _id: 0,
-        followerIds: { $push: '$followerIds' }
-      }
-    },
-    {
-      $project: {
-        followerIds: {
-          $reduce: {
-            input: '$followerIds',
-            initialValue: [],
-            in: { $setUnion: ['$$value', '$$this'] }
-          }
-        }
-      }
-    }
-  ];
-
-  if (getCount) {
-    pipeline.push({ $project: { count: { $size: '$followerIds' } } });
-  }
-
-  return pipeline;
-}
-
-function getMessageAggregationPipeline(matchQuery: any, getCount = false) {
-  const pipeline: any = [
+async function getAggregatedMessages(
+  publishers: Collection<PublisherDoc>,
+  matchQuery: any): Promise<PublisherDoc[]> {
+  return await publishers.aggregate([
     { $match: matchQuery },
     {
       $group: {
@@ -171,38 +129,23 @@ function getMessageAggregationPipeline(matchQuery: any, getCount = false) {
         }
       }
     }
-];
-
-  if (getCount) {
-    pipeline.push({ $project: { count: { $size: '$messages' } } });
-  }
-
-  return pipeline;
+  ])
+    .toArray();
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const publishers: mongodb.Collection<PublisherDoc> =
-    db.collection('publishers');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
   return {
     Query: {
-      publisher: async (_root, { id }) => {
-        const publisher: PublisherDoc | null =
-          await publishers.findOne({ id: id });
-        if (_.isNil(publisher) || isPendingCreate(publisher)) {
-          throw new Error(`Publisher ${id} not found`);
-        }
-
-        return publisher;
-      },
+      publisher: async (_root, { id }) => await publishers.findOne({ id: id }),
 
       message: async (_root, { id }) => {
         const publisher =
           await publishers.findOne({ 'messages.id': id },
             { projection: { 'messages.$': 1 } });
 
-        if (_.isNil(publisher) || isPendingCreate(publisher)
-          || _.isEmpty(publisher!.messages)) {
+        if (_.isEmpty(publisher!.messages)) {
           throw new Error(`Message ${id} does not exist`);
         }
 
@@ -213,55 +156,46 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
           // A publisher's followers
           const publisher = await publishers.findOne(
-            { id: input.ofPublisherId, pending: { $exists: false } },
+            { id: input.ofPublisherId },
             { projection: { followerIds: 1 } }
           );
 
-          if (_.isNil(publisher) || isPendingCreate(publisher)) {
-            throw new Error(`Publisher ${input.ofPublisherId} not found`);
-          }
-
-          return !_.isEmpty(publisher!.followerIds) ?
-            publisher!.followerIds : [];
+          return publisher.followerIds;
         }
 
         // No follower filter
-        const results = await publishers
-          .aggregate(getFollowerAggregationPipeline())
+        const results = await publishers.aggregate([
+          {
+            $group: {
+              _id: 0,
+              followerIds: { $push: '$followerIds' }
+            }
+          },
+          {
+            $project: {
+              followerIds: {
+                $reduce: {
+                  input: '$followerIds',
+                  initialValue: [],
+                  in: { $setUnion: ['$$value', '$$this'] }
+                }
+              }
+            }
+          }
+        ])
           .toArray();
 
         return results[0] ? results[0].followerIds : [];
       },
 
-      followerCount: async (_root, { input }: { input: FollowersInput }) => {
-
-        if (!_.isNil(input) && !_.isNil(input.ofPublisherId)) {
-          // A publisher's followers
-          const res = await publishers.aggregate([
-            {
-              $match: {
-                id: input.ofPublisherId,
-                pending: { $exists: false }
-              }
-            },
-            { $project: { count: { $size: '$memberIds' } } }
-          ])
-            .next();
-
-          return res ? res['count'] : 0;
+      publishers: async (_root, { input }: { input: PublishersInput }) => {
+        const filter = {};
+        if (input.followedById) {
+          // Get all publishers of a follower
+          filter['followerIds'] = input.followedById;
         }
 
-        // No follower filter
-        const results = await publishers
-          .aggregate(getFollowerAggregationPipeline(true))
-          .next();
-
-        return results ? results['count'] : 0;
-      },
-
-      publishers: async (_root, { input }: { input: PublishersInput }) => {
-        return publishers.find(getPublisherFilter(input))
-          .toArray();
+        return await publishers.find(filter);
       },
 
       publisherCount: (_root, { input }: { input: PublishersInput }) => {
@@ -269,70 +203,33 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       },
 
       messages: async (_root, { input }: { input: MessagesInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
-          filter['id'] = input.byPublisherId;
-
+        if (input.byPublisherId) {
           // Get messages by a specific publisher
           const publisher = await publishers.findOne(
-            filter,
+            { id: input.byPublisherId },
             { projection: { messages: 1 } });
 
-          if (_.isNil(publisher) || isPendingCreate(publisher)) {
-            throw new Error(`Publisher ${input.byPublisherId} not found`);
-          }
+          return publisher.messages;
 
-          return !_.isEmpty(publisher!.messages) ? publisher!.messages : [];
-
-        } else {
-          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
-            // Get all the messages of publishers that a user follows
-            filter['followerIds'] = input.ofPublishersFollowedById;
-          }
-
-          const results = await publishers
-            .aggregate(getMessageAggregationPipeline(filter))
-            .toArray();
-
-          return results[0] ? results[0].messages : [];
         }
-      },
 
-      messageCount: async (_root, { input }: { input: MessagesInput }) => {
-        const filter = { pending: { $exists: false } };
-
-        if (!_.isNil(input) && !_.isNil(input.byPublisherId)) {
-          filter['id'] = input.byPublisherId;
-          // A publisher's messages
-          const res = await publishers.aggregate([
-            { $match: filter },
-            { $project: { count: { $size: '$messages' } } }
-          ])
-            .next();
-
-          return res ? res['count'] : 0;
-        } else {
-          if (!_.isNil(input) && !_.isNil(input.ofPublishersFollowedById)) {
-            // Get all the messages of publishers that a user follows
-            filter['followerIds'] = input.ofPublishersFollowedById;
-          }
-
-          const results = await publishers
-            .aggregate(getMessageAggregationPipeline(filter, true))
-            .next();
-
-          return results ? results['count'] : 0;
+        const filter = {};
+        if (input.ofPublishersFollowedById) {
+          filter['followerIds'] = input.ofPublishersFollowedById;
         }
+
+        const results = await getAggregatedMessages(publishers, filter);
+
+        return results[0] ? results[0].messages : [];
       },
 
       isFollowing: async (_root, { input }: { input: FollowUnfollowInput }) => {
         const publisher = await publishers
           .findOne({
             id: input.publisherId,
-            followerIds: input.followerId,
-            pending: { $exists: false }
+            followerIds: input.followerId
           },
-            { projection: { _id: 1 } });
+          { projection: { _id: 1 } });
 
         return !_.isNil(publisher);
       }
@@ -354,32 +251,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
       createPublisher: async (_root, { id }, context: Context) => {
         const publisherId = id ? id : uuid();
         const newPublisher: PublisherDoc = { id: publisherId };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            newPublisher.pending = {
-              reqId: context.reqId,
-              type: 'create-publisher'
-            };
-          /* falls through */
-          case undefined:
-            await publishers.insertOne(newPublisher);
-
-            return newPublisher;
-          case 'commit':
-            await publishers.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await publishers.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-        }
-
-        return newPublisher;
+        return await publishers.insertOne(context, newPublisher);
       },
 
       createMessage: async (
@@ -390,50 +263,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           content: input.content
         };
         const updateOperation = { $push: { messages: newMessage } };
-        const notPendingPublisherFilter = {
-          id: input.publisherId,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            const pendingUpdateObj = await publishers
-              .updateOne(
-                notPendingPublisherFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'create-message'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return newMessage;
-          case undefined:
-            const updateObj = await publishers
-              .updateOne(notPendingPublisherFilter, updateOperation);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return newMessage;
-          case 'commit':
-            await publishers.updateOne(
-              reqIdPendingFilter,
-              { ...updateOperation, $unset: { pending: '' } });
-
-            return newMessage;
-          case 'abort':
-            await publishers.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return newMessage;
-        }
+        await publishers.updateOne(
+          context, { id: input.publisherId }, updateOperation);
 
         return newMessage;
       },
@@ -443,165 +274,34 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         const updateOperation = {
           $set: { 'messages.$.content': input.content }
         };
-        const notPendingPublisherFilter = {
-          id: input.publisherId,
-          'messages.id': input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            const pendingUpdateObj = await publishers
-              .updateOne(
-                notPendingPublisherFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'edit-message'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            const updateObj = await publishers
-              .updateOne(notPendingPublisherFilter, updateOperation);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await publishers.updateOne(
-              reqIdPendingFilter,
-              { ...updateOperation, $unset: { pending: '' } });
-
-            return true;
-          case 'abort':
-            await publishers.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return true;
-        }
-
-        return true;
+        return await publishers.updateOne(
+          context, { id: input.publisherId, 'messages.id': input.id },
+          updateOperation);
       },
 
       follow: async (
         _root, { input }: { input: FollowUnfollowInput }, context: Context) => {
         const updateOperation = { $push: { followerIds: input.followerId } };
 
-        const notPendingPublisherFilter = {
-          id: input.publisherId,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            const pendingUpdateObj = await publishers
-              .updateOne(
-                notPendingPublisherFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'follow'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            const updateObj = await publishers
-              .updateOne(notPendingPublisherFilter, updateOperation);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await publishers.updateOne(
-              reqIdPendingFilter,
-              { ...updateOperation, $unset: { pending: '' } });
-
-            return true;
-          case 'abort':
-            await publishers.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return true;
-        }
-
-        return true;
+        return await publishers.updateOne(
+          context, { id: input.publisherId }, updateOperation);
       },
 
       unfollow: async (
         _root, { input }: { input: FollowUnfollowInput }, context: Context) => {
         const updateOperation = { $pull: { followerIds: input.followerId } };
-        const notPendingPublisherFilter = {
-          id: input.publisherId,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            const pendingUpdateObj = await publishers
-              .updateOne(
-                notPendingPublisherFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'unfollow'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            const updateObj = await publishers
-              .updateOne(notPendingPublisherFilter, updateOperation);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await publishers.updateOne(
-              reqIdPendingFilter,
-              { ...updateOperation, $unset: { pending: '' } });
-
-            return true;
-          case 'abort':
-            await publishers.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return true;
-        }
-
-        return true;
+        return await publishers.updateOne(
+          context, { id: input.publisherId }, updateOperation);
       }
     }
   };
 }
 
 const followCliche: ClicheServer = new ClicheServerBuilder('follow')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const publishers: mongodb.Collection<PublisherDoc> =
-      db.collection('publishers');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
     return Promise.all([
       publishers.createIndex({ id: 1 }, { unique: true, sparse: true }),

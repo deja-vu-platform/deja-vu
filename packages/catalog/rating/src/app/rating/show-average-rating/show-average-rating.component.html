@@ -1,6 +1,6 @@
 <div *ngIf="showStars && showValue">
   <star-rating-comp [showHalfStars]="true" [rating]="averageRatingValue"
-    [starType]="'svg'">
+    [readOnly]="true" [starType]="'svg'">
   </star-rating-comp>
 </div>
 <div *ngIf="!showStars && showValue">

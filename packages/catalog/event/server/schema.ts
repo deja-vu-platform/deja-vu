@@ -2,7 +2,6 @@ export interface EventDoc {
   id: string;
   startDate: Date;
   endDate: Date;
-  pending?: PendingDoc;
 }
 
 export interface SeriesDoc {
@@ -10,13 +9,6 @@ export interface SeriesDoc {
   startsOn: Date;
   endsOn: Date;
   events: EventDoc[];
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-event' | 'update-event' | 'delete-event' |
-    'delete-series-event' | 'create-series';
 }
 
 export interface GraphQlEvent extends EventDoc {

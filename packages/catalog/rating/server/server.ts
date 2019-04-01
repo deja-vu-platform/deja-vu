@@ -1,13 +1,14 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
   RatingDoc,
   RatingInput,
@@ -56,12 +57,8 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function isPendingUpdate(doc: RatingDoc | null) {
-  return _.get(doc, 'pending.type') === 'update-rating';
-}
-
 function getRatingFilter(input: RatingsInput) {
-  const filter = { pending: { $exists: false } };
+  const filter = {};
   if (!_.isNil(input)) {
     if (input.bySourceId) {
       // All ratings by a source
@@ -77,36 +74,25 @@ function getRatingFilter(input: RatingsInput) {
   return filter;
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+function resolvers(db: ClicheDb, _config: Config): object {
+  const ratings: Collection<RatingDoc> = db.collection('ratings');
 
   return {
     Query: {
-      rating: async (_root, { input }: { input: RatingInput }) => {
-        const rating = await ratings
-          .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
-
-        if (_.isNil(rating) || isPendingUpdate(rating)) {
-          throw new Error(`Rating by ${input.bySourceId} for target
-           ${input.ofTargetId} does not exist`);
-        }
-
-        return rating;
-      },
+      rating: async (_root, { input }: { input: RatingInput }) => await ratings
+          .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
       ratings: async (_root, { input }: { input: RatingsInput }) => {
-        return await ratings.find(getRatingFilter(input))
-          .toArray();
+        return await ratings.find(getRatingFilter(input));
       },
 
-      ratingCount: (_root, { input }: { input: RatingsInput }) => {
-        return ratings.count(getRatingFilter(input));
+      ratingCount: async (_root, { input }: { input: RatingsInput }) => {
+        return await ratings.countDocuments(getRatingFilter(input));
       },
 
       averageRatingForTarget: async (_root, { targetId }) => {
         const results = await ratings.aggregate([
-          // Ignore ratings that are currently being updated
-          { $match: { targetId: targetId, pending: { $exists: false } } },
+          { $match: { targetId: targetId } },
           {
             $group:
             {
@@ -136,75 +122,27 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     Mutation: {
       setRating: async (
         _root, { input }: { input: SetRatingInput }, context: Context) => {
-        const notPendingRatingFilter = {
+        const filter = {
           sourceId: input.sourceId,
-          targetId: input.targetId,
-          pending: { $exists: false }
+          targetId: input.targetId
         };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            await ratings.updateOne(
-              notPendingRatingFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'set-rating'
-                  }
-                }
-              },
-              { upsert: true }
-            );
+        return await ratings.updateOne(
+          context,
+          filter,
+          { $set: { rating: input.newRating } },
+          { upsert: true });
 
-            // If there's a concurrent update then the upsert will fail because
-            // of the (sourceId, targetId) index
-
-            return true;
-
-          case undefined:
-            await ratings.updateOne(
-              notPendingRatingFilter,
-              { $set: { rating: input.newRating } },
-              { upsert: true });
-
-            // If there's a concurrent update then the upsert will fail because
-            // of the (sourceId, targetId) index
-
-            return true;
-
-          case 'commit':
-            await ratings.updateMany(
-              reqIdPendingFilter,
-              {
-                $set: { rating: input.newRating },
-                $unset: { pending: '' }
-              },
-              { upsert: true }
-            );
-
-            return false;
-
-          case 'abort':
-            await ratings.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } },
-              { upsert: true }
-            );
-
-            return false;
-        }
-
-        return false;
+        // If there's a concurrent update then the upsert will fail because
+        // of the (sourceId, targetId) index
       }
     }
   };
 }
 
 const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const ratings: Collection<RatingDoc> = db.collection('ratings');
 
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
