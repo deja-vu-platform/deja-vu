@@ -63,8 +63,9 @@ const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
  *   update on a document which has another update in progress/is locked by a tx
  *
  * The locking scheme above ensures that once a tx successfully locks on a doc,
- * no other tx or non-tx operation can touch it. Those concurrent operations
- * will fail with a concurrent update error.
+ * no other tx or non-tx operation can modify it. Those concurrent operations
+ * will fail with a concurrent update error. Reads will still be able to read
+ * the unupdated value.
  *
  * The only constraint that can be enforced atomically for inserts
  * are the uniqueness constraints set by the created indices.
@@ -74,8 +75,8 @@ const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
  * to be mutated, then preconditions that rely on those field values could be
  * checked outside of a transaction. Alternatively, clichés could handle
  * transactions by themselves and not rely on this library. They could also
- * perform operations across Collection<T>s in a transaction by using
- * ClicheDb.inTransaction()
+ * perform operations that involve multiple documents or multiple Collection<T>s
+ * in a transaction by using ClicheDb.inTransaction()
  */
 export class CollectionWithPendingLocks<T> implements Collection<T> {
   private readonly _db: mongodb.Db;
