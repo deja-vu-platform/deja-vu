@@ -107,6 +107,17 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
+function getPublisherFilter(input: PublishersInput) {
+  // No publisher filter
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input) && !_.isNil(input.followedById)) {
+    // Get all publishers of a follower
+    filter['followerIds'] = input.followedById;
+  }
+
+  return filter;
+}
+
 async function getAggregatedMessages(
   publishers: Collection<PublisherDoc>,
   matchQuery: any): Promise<PublisherDoc[]> {
@@ -199,7 +210,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       },
 
       publisherCount: (_root, { input }: { input: PublishersInput }) => {
-        return publishers.count(getPublisherFilter(input));
+        return publishers.countDocuments(getPublisherFilter(input));
       },
 
       messages: async (_root, { input }: { input: MessagesInput }) => {
