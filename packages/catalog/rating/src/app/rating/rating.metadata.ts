@@ -1,4 +1,3 @@
-import { ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -22,9 +21,13 @@ import {
   ShowRatingsByTargetComponent
 } from './show-ratings-by-target/show-ratings-by-target.component';
 export { ShowRatingsByTargetComponent };
-import { ShowRatingCountComponent } from './show-rating-count/show-rating-count.component';
+import {
+  ShowRatingCountComponent
+} from './show-rating-count/show-rating-count.component';
 export { ShowRatingCountComponent };
-import { DeleteRatingsComponent } from './delete-ratings/delete-ratings.component';
+import {
+  DeleteRatingsComponent
+} from './delete-ratings/delete-ratings.component';
 export { DeleteRatingsComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
@@ -33,8 +36,8 @@ import { DvModule } from '@deja-vu/core';
 
 
 const allComponents = [
-  RateTargetComponent, ShowAverageRatingComponent,
-  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent, DeleteRatingsComponent
+  DeleteRatingsComponent, RateTargetComponent, ShowAverageRatingComponent,
+  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent
 ];
 
 
