@@ -498,7 +498,7 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
     upsertOptions: UpsertOptions = { upsert: false },
     updateMany: boolean = false): Promise<void> {
     return await this.getLockAndUpdate(context, filter, updateType,
-      { $setOnInsert: upsertOptions.setOnInsert || {} },
+      upsertOptions.setOnInsert ? { $setOnInsert: upsertOptions.setOnInsert } : {},
       { upsert: upsertOptions.upsert }, updateMany);
   }
 
