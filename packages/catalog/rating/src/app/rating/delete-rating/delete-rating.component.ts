@@ -9,19 +9,19 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../rating.config';
 
-interface DeleteRatingsRes {
-  data: { deleteRatings: boolean };
+interface DeleteRatingRes {
+  data: { deleteRating: boolean };
   errors: { message: string }[];
 }
 
 @Component({
-  selector: 'rating-delete-ratings',
-  templateUrl: './delete-ratings.component.html',
-  styleUrls: ['./delete-ratings.component.css']
+  selector: 'rating-delete-rating',
+  templateUrl: './delete-rating.component.html',
+  styleUrls: ['./delete-rating.component.css']
 })
-export class DeleteRatingsComponent implements OnInit, OnExec {
-  @Input() sourceId: string | undefined;
-  @Input() targetId: string | undefined;
+export class DeleteRatingComponent implements OnInit, OnExec {
+  @Input() sourceId: string;
+  @Input() targetId: string;
 
   private gs: GatewayService;
 
@@ -34,13 +34,12 @@ export class DeleteRatingsComponent implements OnInit, OnExec {
     this.rs.register(this.elem, this);
   }
 
-  deleteRatings() {
+  deleteRating() {
     this.rs.exec(this.elem);
   }
 
   async dvOnExec() {
-    if (this.canExec()) {
-      const res = await this.gs.post<DeleteRatingsRes>(this.apiPath, {
+    const res = await this.gs.post<DeleteRatingRes>(this.apiPath, {
         inputs: {
           input: {
             bySourceId: this.sourceId,
@@ -48,18 +47,11 @@ export class DeleteRatingsComponent implements OnInit, OnExec {
           }
         }
       })
-        .toPromise();
+      .toPromise();
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')
           .join());
       }
-    } else {
-      throw new Error('Must include either sourceId or targetId');
-    }
-  }
-
-  private canExec() {
-    return this.sourceId || this.targetId;
   }
 }

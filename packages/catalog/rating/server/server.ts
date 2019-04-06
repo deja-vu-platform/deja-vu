@@ -10,6 +10,7 @@ import {
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import {
+  DeleteRatingInput,
   DeleteRatingsInput,
   RatingDoc,
   RatingInput,
@@ -54,6 +55,11 @@ const actionRequestTable: ActionRequestTable = {
   'show-ratings-by-target': (extraInfo) => `
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-rating': (extraInfo) => `
+    mutation DeleteRating($input: DeleteRatingInput!) {
+      deleteRating(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'delete-ratings': (extraInfo) => `
@@ -144,12 +150,23 @@ function resolvers(db: ClicheDb, _config: Config): object {
         // of the (sourceId, targetId) index
       },
 
+      deleteRating: async (
+        _root, { input }: { input: DeleteRatingInput }, context: Context) => {
+        const filter = getRatingFilter(input);
+        const rating = await ratings.findOne(filter);
+        if (_.isNil(rating)) {
+          throw new Error('There is no such rating.');
+        }
+
+        return await ratings.deleteOne(context, filter);
+      },
+
       deleteRatings: async (
         _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
         const filter = getRatingFilter(input);
         const numRatings = await ratings.countDocuments(filter);
         if (_.isNil(numRatings) || numRatings === 0) {
-          throw new Error('No events match the filter');
+          throw new Error('No ratings match the filter');
         }
 
         return await ratings.deleteMany(context, filter);
