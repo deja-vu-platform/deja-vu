@@ -137,7 +137,7 @@ function getMemberAggregationPipeline(input: MembersInput,
   return pipeline;
 }
 
-async function getMembers(groups: mongodb.Collection<GroupDoc>,
+async function getMembers(groups: Collection<GroupDoc>,
   input: MembersInput) {
 
   const res = await groups
@@ -147,7 +147,7 @@ async function getMembers(groups: mongodb.Collection<GroupDoc>,
   return res[0] ? res[0].memberIds : [];
 }
 
-async function getMemberCount(groups: mongodb.Collection<GroupDoc>,
+async function getMemberCount(groups: Collection<GroupDoc>,
   input: MembersInput) {
   const res = await groups
     .aggregate(getMemberAggregationPipeline(input, true))
@@ -173,46 +173,22 @@ function resolvers(db: ClicheDb, _config: Config): object {
   return {
     Query: {
       group: async (_root, { id }) => await groups.findOne({ id: id }),
-      members: async (_root, { input }: { input: MembersInput }) => {
-        const filter = input.inGroupId ? { id: input.inGroupId } : {};
 
-        const pipelineResults = await groups.aggregate([
-          { $match: filter },
-          {
-            $group: {
-              _id: 0,
-              memberIds: { $push: '$memberIds' }
-            }
-          },
-          {
-            $project: {
-              memberIds: {
-                $reduce: {
-                  input: '$memberIds',
-                  initialValue: [],
-                  in: { $setUnion: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
-          .toArray();
+      members: async (_root, { input }: { input: MembersInput }) => {
+        return await getMembers(groups, input);
+      },
 
       groups: async (_root, { input }: { input: GroupsInput }) => {
-        return groups.find(getGroupFilter(input))
-          .toArray();
+        return await groups.find(getGroupFilter(input));
       },
 
       groupCount: (_root, { input }: { input: GroupsInput }) => {
-        return groups.count(getGroupFilter(input));
+        return groups.countDocuments(getGroupFilter(input));
       },
-      groups: async (_root, { input }: { input: GroupsInput }) => {
-        const filter = input.withMemberId ?
-          { memberIds: input.withMemberId } : {};
 
-        return await groups.find(filter);
+      memberCount:  async (_root, { input }: { input: MembersInput }) => {
+        return getMemberCount(groups, input);
       }
-
     },
     Group: {
       id: (group: GroupDoc) => group.id,
