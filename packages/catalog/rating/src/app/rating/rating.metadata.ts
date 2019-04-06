@@ -24,6 +24,8 @@ import {
 export { ShowRatingsByTargetComponent };
 import { ShowRatingCountComponent } from './show-rating-count/show-rating-count.component';
 export { ShowRatingCountComponent };
+import { DeleteRatingsComponent } from './delete-ratings/delete-ratings.component';
+export { DeleteRatingsComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 
@@ -32,7 +34,7 @@ import { DvModule } from '@deja-vu/core';
 
 const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent,
-  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent
+  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent, DeleteRatingsComponent
 ];
 
 

@@ -10,6 +10,7 @@ import {
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import {
+  DeleteRatingsInput,
   RatingDoc,
   RatingInput,
   RatingsInput,
@@ -54,7 +55,13 @@ const actionRequestTable: ActionRequestTable = {
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'delete-ratings': (extraInfo) => `
+    mutation DeleteRatings($input: DeleteRatingsInput!) {
+      deleteRatings(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
+
 };
 
 function getRatingFilter(input: RatingsInput) {
@@ -135,6 +142,17 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         // If there's a concurrent update then the upsert will fail because
         // of the (sourceId, targetId) index
+      },
+
+      deleteRatings: async (
+        _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
+        const filter = getRatingFilter(input);
+        const numRatings = await ratings.countDocuments(filter);
+        if (_.isNil(numRatings) || numRatings === 0) {
+          throw new Error('No events match the filter');
+        }
+
+        return await ratings.deleteMany(context, filter);
       }
     }
   };
