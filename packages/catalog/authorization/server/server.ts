@@ -101,6 +101,19 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
+function getResourceFilter(input: ResourcesInput) {
+  const filter = { pending: { $exists: false } };
+  if (!_.isNil(input)) {
+    if (input.createdBy) {
+      filter['ownerId'] = input.createdBy;
+    } else if (input.viewableBy) {
+      filter['viewerIds'] = input.viewableBy;
+    }
+  }
+
+  return filter;
+}
+
 function resolvers(db: ClicheDb, _config: Config): object {
   const resources: Collection<ResourceDoc> = db.collection('resources');
 
@@ -120,7 +133,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       resource: async (_root, { id }) => await resources.findOne({ id }),
 
       resourceCount: (_root, { input }: { input: ResourcesInput }) => {
-        return resources.count(getResourceFilter(input));
+        return resources.countDocuments(getResourceFilter(input));
       },
 
       owner: async (_root, { resourceId }) => {
