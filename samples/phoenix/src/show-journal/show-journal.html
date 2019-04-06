@@ -1,4 +1,35 @@
 <dv.action name="show-journal">
-  <phoenix.show-sidebar />
+  <phoenix.show-sidebar isJournal=true />
 
+  <div id="journal-sort-search-container" class="col-md-9 offset-md-2">
+    <div id="search-container">
+      <!-- TODO: only include people with whom you have made a connection -->
+      <!-- TODO: get those users, and update choose user to use those users -->
+      <authentication.choose-user addButtonLabel="Search"
+        chooseSelectPlaceholder='Find a user by username' />
+    </div>
+
+    <div id="sort-dropdown">
+      <!-- TODO: sory by username, when connection was made -->
+      Sort by: Coming Soon
+    </div>
+
+    <div id="journal-container">
+      <table id="connections-history" class="table table-hover">
+        <thead>
+          <tr>
+            <th>With</th>
+            <th>Time Opened</th>
+            <th>Time Closed</th>
+            <th>Connect again?</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="connections-history-body">
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </dv.action>

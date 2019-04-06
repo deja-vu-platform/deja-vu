@@ -234,7 +234,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
             });
 
           case undefined:
-            const res = await tasks.insertMany(newTasks);
+            await tasks.insertMany(newTasks);
 
             return newTasks;
           case 'commit':

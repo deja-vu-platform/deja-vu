@@ -1,4 +1,4 @@
-<dv.action name="show-sidebar" loggedInUserId$=authentication.logged-in.user.id>
+<dv.action name="show-sidebar" loggedInUser$=authentication.logged-in.user>
   <div id="sidebar-container">
     <dv.tx>
       <authentication.logged-in hidden=true />
@@ -12,16 +12,16 @@
 
     <ul>
       <li id="dashboard-item">
-        <dv.link class=$isDashboard ? "sidebar-link" : "sidebar-link white" href="/dashboard">Dashboard</dv.link>
+        <dv.link class=$isDashboard ? "sidebar-link white" : "sidebar-link" href="/dashboard">Dashboard</dv.link>
       </li>
       <li id="personal-item">
-        <dv.link class=$isPersonalInfo ? "sidebar-link" : "sidebar-link white" href="/personal">Personal</dv.link>
+        <dv.link class=$isPersonalInfo ? "sidebar-link white" : "sidebar-link" href="/personal">Personal</dv.link>
       </li>
       <li id="journal-item">
-        <dv.link class=$isJournal ? "sidebar-link" : "sidebar-link white" href="/journal">Journal</dv.link>
+        <dv.link class=$isJournal ? "sidebar-link white" : "sidebar-link" href="/journal">Journal</dv.link>
       </li>
       <li id="faq-item">
-        <dv.link class=$isFAQ ? "sidebar-link" : "sidebar-link white" href="/faq">FAQ</dv.link>
+        <dv.link class=$isFAQ ? "sidebar-link white" : "sidebar-link" href="/faq">FAQ</dv.link>
       </li>
     </ul>
 

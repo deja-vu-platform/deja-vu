@@ -83,6 +83,10 @@ phoenix-signin {
   transition: all 0.1s linear;
 }
 
+dv-button.btn.btn-register {
+  width: 100%;
+}
+
 authentication-sign-in .mat-button,
 .btn-register .mat-button {
   background-color: #029f5b;
@@ -157,4 +161,8 @@ authentication-sign-out .mat-button {
 
 authentication-sign-out .mat-button:hover {
   background-color: #029756;
+}
+
+#personal-and-calendar-container mat-form-field {
+  width: 80%;
 }

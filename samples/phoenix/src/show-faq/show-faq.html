@@ -1,3 +1,104 @@
 <dv.action name="show-faq">
-  <phoenix.show-sidebar />
+  <phoenix.show-sidebar isFAQ=true />
+
+  <div id="faq-container" class="col-md-8 offset-md-3">
+    <h3>FAQ</h3>
+    <div class="question-answer">
+      <p class="question">Q: How does this work?</p>
+      <p class="answer">
+        We use four things from your
+        <dv.link href="/personal">personal page</dv.link> to suggest people to
+        you whom you might be interested in talking to:
+      </p>
+      <ul>
+        <li>how far away they are from you</li>
+        <li>your topics of interest</li>
+        <li>how you want those topics to overlap with a conversation partner</li>
+        <li>your calendar availability for the next week</li>
+      </ul>
+      <p class="answer">
+        You can find these suggestions on your
+        <dv.link href="/dashboard">dashboard</dv.link> under "Your Suggestions."
+      </p>
+      <p class="answer">
+        From there, users who we suggest to you, and to whom you are suggested
+        have access to the "about me" section, which you can also update from
+        your personal page. You can then indicate your interest in further
+        pursuing a conversation with another user by clicking on the
+        "Interested?" checkbox. If the other user is also interested in you,
+        and you're both ready for a connection, you'll be able to e-mail each
+        other, either directly using your public e-mail address, or through
+        Phoenix.
+
+        <br />
+      </p>
+    </div>
+    <div class="question-answer">
+      <p class="question">
+        Q: I have a very regular schedule. Why do I have to keep putting in my
+        calendar availabilities every week?
+      </p>
+      <p class="answer">
+        Even the most regular schedules are interrupted by things like holidays
+        and vacations, the occasional sick day, or just in general not feeling
+        like interacting with people. We want availabilities listed to be
+        accurate, since other users get suggestions based on yours! In the case
+        that someone hits a busy time of year or just doesn't feel up to
+        talking, we want this app to reflect that by defaulting to no
+        availabilities.
+      </p>
+      <p>
+        Additionally, to avoid suggesting someone to you who might only be able
+        to meet three months from now, we will only suggest to you people who
+        have availabilities that overlap with you in the upcoming seven days.
+      </p>
+    </div>
+    <div class="question-answer">
+      <p class="question">
+        Q: The calendar won't let me select certain times today!
+      </p>
+      <p class="answer">
+        Time machines are a luxury item, so we don't allow people to mark
+        availabilities for times that have already passed. We also won't suggest
+        you to users if you have overlapping availabilities in the past.
+      </p>
+    </div>
+    <div class="question-answer">
+      <p class="question">
+        Q: Your app is messed up! I don't have any available times to meet my
+        current connection!
+      </p>
+      <p class="answer">We connect two people who are interested in each other
+        when they both have an overlap in availability in overlap. If those
+        overlapping availabilities pass and there are no more, though, we won't
+        just close your connection without your consent. If you'd like to meet
+        up with someone who is available, you can close your connection. You'll
+        still be able to interact with this person online via e-mail or through
+        our app.</p>
+    </div>
+    <div class="question-answer">
+      <p class="question">Q: What is this journal thing? Can people read it?</p>
+      <p class="answer">Other users can't read your journal. It's purely for you
+        to be able to make notes. Did you feel kind of awkward talking to the
+        person? Did you have a lot of fun? What do you think made these
+        interactions the way they were? This journal also serves as a history of
+        your past connections, when you made them, and when you closed them.
+      </p>
+    </div>
+    <div class="question-answer">
+      <p class="question">Q: What's up with the green?</p>
+      <p class="answer">It's a happy color, okay?</p>
+    </div>
+    <div class="question-answer">
+      <p class="question">Q: Who are you guys, anyways?</p>
+      <p class="answer">We're just three nerds getting through MIT one day at a
+        time. This is the final project for 6.170, also known as Software
+        Studio, also known as "How to Be a Good Web Designer and Full-Stack
+        Developer." We see people who are struggling every day to connect with
+        others, and to feel like those connections are meaningful in the crazy
+        whirlwind of life, especially life at MIT. We hope this app helps with
+        that.
+      </p>
+    </div>
+  </div>
 </dv.action>

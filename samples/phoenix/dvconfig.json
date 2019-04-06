@@ -79,6 +79,18 @@
           "required": ["emailAddress", "publicEmailAddress"]
         }
       }
+    },
+
+    "interest": {
+      "config": {
+        "oneToOneScoring": false
+      }
+    },
+
+    "connection": {
+      "config": {
+        "oneToOneScoring": false
+      }
     }
   },
   "routes": [
