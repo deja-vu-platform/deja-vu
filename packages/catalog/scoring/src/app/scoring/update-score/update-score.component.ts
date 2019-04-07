@@ -1,11 +1,10 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
-  ViewChild
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective, NG_VALIDATORS,
+  NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 
 import {
@@ -102,12 +101,12 @@ export class UpdateScoreComponent implements
         }
       }
     })
-    .subscribe((res) => {
-      const score = res.data.score;
-      if (score) {
-        this.valueControl.setValue(score.value);
-      }
-    });
+      .subscribe((res) => {
+        const score = res.data.score;
+        if (score) {
+          this.valueControl.setValue(score.value);
+        }
+      });
 
   }
 
@@ -135,7 +134,7 @@ export class UpdateScoreComponent implements
         action: 'update'
       }
     })
-    .toPromise();
+      .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

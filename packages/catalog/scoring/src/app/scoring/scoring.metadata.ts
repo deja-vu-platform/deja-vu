@@ -27,7 +27,8 @@ export { UpdateScoreComponent };
 
 const allComponents = [
   CreateScoreComponent, ShowScoreComponent, ShowTargetComponent,
-  ShowTargetsByScoreComponent, DeleteScoresComponent, DeleteScoreComponent, UpdateScoreComponent
+  ShowTargetsByScoreComponent, DeleteScoresComponent, DeleteScoreComponent,
+  UpdateScoreComponent
 ];
 
 const metadata = {

@@ -38,8 +38,9 @@ import { DvModule } from '@deja-vu/core';
 
 
 const allComponents = [
-  DeleteRatingsComponent, RateTargetComponent, ShowAverageRatingComponent,
-  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent, DeleteRatingComponent
+  RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
+  ShowRatingsByTargetComponent, ShowRatingCountComponent,
+  DeleteRatingsComponent, DeleteRatingComponent
 ];
 
 
