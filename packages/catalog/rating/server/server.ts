@@ -93,7 +93,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
   return {
     Query: {
       rating: async (_root, { input }: { input: RatingInput }) => await ratings
-          .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
+        .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
       ratings: async (_root, { input }: { input: RatingsInput }) => {
         return await ratings.find(getRatingFilter(input));
@@ -153,23 +153,23 @@ function resolvers(db: ClicheDb, _config: Config): object {
       deleteRating: async (
         _root, { input }: { input: DeleteRatingInput }, context: Context) => {
         const filter = getRatingFilter(input);
-        const rating = await ratings.findOne(filter);
-        if (_.isNil(rating)) {
-          throw new Error('There is no such rating.');
+        const result = await ratings.deleteOne(context, filter);
+        if (!result) {
+          throw new Error('Rating not found');
         }
 
-        return await ratings.deleteOne(context, filter);
+        return result;
       },
 
       deleteRatings: async (
         _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
-        const filter = getRatingFilter(input);
-        const numRatings = await ratings.countDocuments(filter);
-        if (_.isNil(numRatings) || numRatings === 0) {
-          throw new Error('No ratings match the filter');
+        const result = await ratings
+          .deleteMany(context, getRatingFilter(input));
+        if (!result) {
+          throw new Error('Ratings not found');
         }
 
-        return await ratings.deleteMany(context, filter);
+        return result;
       }
     }
   };

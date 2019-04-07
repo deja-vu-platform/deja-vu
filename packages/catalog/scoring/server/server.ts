@@ -195,24 +195,26 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
 
       updateScore: async (
         _root, { input }: { input: UpdateScoreInput }, context: Context) => {
-        const score = await scores.findOne({ id: input.id });
-        if (_.isNil(score)) {
+        const updateOp = { $set: { value: input.value } };
+
+        const result = await scores
+          .updateOne(context, { id: input.id }, updateOp);
+
+        if (!result) {
           throw new Error(`Score ${input.id} does not exist`);
         }
 
-        const updateOp = { $set: { value: input.value } };
-
-        return await scores.updateOne(context, { id: input.id }, updateOp);
+        return result;
       },
 
       deleteScore: async (
         _root, { input }: { input: DeleteScoreInput }, context: Context) => {
-        const score = await scores.findOne({ id: input.id });
-        if (_.isNil(score)) {
+        const result = await scores.deleteOne(context, { id: input.id });
+        if (!result) {
           throw new Error(`Score ${input.id} not found`);
         }
 
-        return await scores.deleteOne(context, { id: input.id });
+        return result;
       },
 
       deleteScores: async (
@@ -228,13 +230,13 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
             filter['sourceId'] = input.sourceId;
           }
         }
-        const possibleScores = await scores
-          .find(filter, { projection: { _id: 1 } });
-        if (_.isNil(possibleScores)) {
+
+        const result = await scores.deleteMany(context, filter);
+        if (!result) {
           throw new Error(`Scores not found`);
         }
 
-        return await scores.deleteMany(context, filter);
+        return result;
       }
     }
   };
