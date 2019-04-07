@@ -152,24 +152,12 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       deleteRating: async (
         _root, { input }: { input: DeleteRatingInput }, context: Context) => {
-        const filter = getRatingFilter(input);
-        const result = await ratings.deleteOne(context, filter);
-        if (!result) {
-          throw new Error('Rating not found');
-        }
-
-        return result;
+        return await ratings.deleteOne(context, getRatingFilter(input));
       },
 
       deleteRatings: async (
         _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
-        const result = await ratings
-          .deleteMany(context, getRatingFilter(input));
-        if (!result) {
-          throw new Error('Ratings not found');
-        }
-
-        return result;
+        return await ratings.deleteMany(context, getRatingFilter(input))
       }
     }
   };
