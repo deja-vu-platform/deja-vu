@@ -4,6 +4,7 @@ Crowdsource evaluation of items
 
 ## Actions
 
+- delete-rating
 - delete-ratings
 - rate-target
 - show-average-rating
