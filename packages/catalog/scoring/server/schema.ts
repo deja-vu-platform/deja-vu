@@ -34,3 +34,17 @@ export interface TargetsByScoreInput {
   targetIds?: string[];
   sourceId?: string;
 }
+
+export interface UpdateScoreInput {
+  id: string;
+  value: number;
+}
+
+export interface DeleteScoreInput {
+  id: string;
+}
+
+export interface DeleteScoresInput {
+  sourceId?: string;
+  targetId?: string;
+}
