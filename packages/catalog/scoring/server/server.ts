@@ -197,24 +197,13 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
         _root, { input }: { input: UpdateScoreInput }, context: Context) => {
         const updateOp = { $set: { value: input.value } };
 
-        const result = await scores
+        return await scores
           .updateOne(context, { id: input.id }, updateOp);
-
-        if (!result) {
-          throw new Error(`Score ${input.id} does not exist`);
-        }
-
-        return result;
       },
 
       deleteScore: async (
         _root, { input }: { input: DeleteScoreInput }, context: Context) => {
-        const result = await scores.deleteOne(context, { id: input.id });
-        if (!result) {
-          throw new Error(`Score ${input.id} not found`);
-        }
-
-        return result;
+        return await scores.deleteOne(context, { id: input.id });
       },
 
       deleteScores: async (
@@ -230,13 +219,8 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
             filter['sourceId'] = input.sourceId;
           }
         }
-
-        const result = await scores.deleteMany(context, filter);
-        if (!result) {
-          throw new Error(`Scores not found`);
-        }
-
-        return result;
+        
+        return await scores.deleteMany(context, filter);
       }
     }
   };
