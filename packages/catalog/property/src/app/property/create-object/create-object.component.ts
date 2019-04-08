@@ -43,8 +43,15 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateObjectComponent
   implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  /**
+   * The ID which should be used by the created object.
+   * If not given, a random ID is generated.
+   */
   @Input() id: string | undefined;
   savedInitialValue: ValueMap;
+  /**
+   * (Optional) default values to populate each property input with
+   */
   @Input() set initialValue(value: ValueMap) {
     if (!this.formInitialized) {
       this.savedInitialValue = value;
