@@ -10,6 +10,8 @@ import {
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
 import {
+  DeleteRatingInput,
+  DeleteRatingsInput,
   RatingDoc,
   RatingInput,
   RatingsInput,
@@ -54,7 +56,18 @@ const actionRequestTable: ActionRequestTable = {
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'delete-rating': (extraInfo) => `
+    mutation DeleteRating($input: DeleteRatingInput!) {
+      deleteRating(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-ratings': (extraInfo) => `
+    mutation DeleteRatings($input: DeleteRatingsInput!) {
+      deleteRatings(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
+
 };
 
 function getRatingFilter(input: RatingsInput) {
@@ -80,7 +93,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
   return {
     Query: {
       rating: async (_root, { input }: { input: RatingInput }) => await ratings
-          .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
+        .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
       ratings: async (_root, { input }: { input: RatingsInput }) => {
         return await ratings.find(getRatingFilter(input));
@@ -135,6 +148,16 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         // If there's a concurrent update then the upsert will fail because
         // of the (sourceId, targetId) index
+      },
+
+      deleteRating: async (
+        _root, { input }: { input: DeleteRatingInput }, context: Context) => {
+        return await ratings.deleteOne(context, getRatingFilter(input));
+      },
+
+      deleteRatings: async (
+        _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
+        return await ratings.deleteMany(context, getRatingFilter(input))
       }
     }
   };

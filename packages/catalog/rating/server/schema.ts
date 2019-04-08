@@ -19,3 +19,13 @@ export interface SetRatingInput {
   targetId: string;
   newRating?: number;
 }
+
+export interface DeleteRatingInput {
+  bySourceId: string;
+  ofTargetId: string;
+}
+
+export interface DeleteRatingsInput {
+  bySourceId?: string;
+  ofTargetId?: string;
+}

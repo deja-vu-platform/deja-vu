@@ -10,6 +10,9 @@ Keep track of scores
 ## Actions
 
 - create-score
+- delete-score
+- delete-scores
 - show-score
 - show-target
 - show-targets-by-score
+- update-score

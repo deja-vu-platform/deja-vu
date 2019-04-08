@@ -41,6 +41,21 @@ input TargetsByScoreInput {
   sourceId: ID
 }
 
+input UpdateScoreInput {
+  id: ID!
+  value: Float!
+}
+
+input DeleteScoreInput {
+  id: ID!
+}
+
+# delete all scores created by a source or for a target
+input DeleteScoresInput {
+  sourceId: ID
+  targetId: ID
+}
+
 type Query {
   score(input: ShowScoreInput!): Score
   target(input: ShowTargetInput!): Target
@@ -49,4 +64,7 @@ type Query {
 
 type Mutation {
   createScore(input: CreateScoreInput!): Score
+  updateScore(input: UpdateScoreInput!): Boolean
+  deleteScore(input: DeleteScoreInput!): Boolean
+  deleteScores(input: DeleteScoresInput!): Boolean
 }

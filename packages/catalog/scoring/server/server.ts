@@ -12,11 +12,14 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
   CreateScoreInput,
+  DeleteScoreInput,
+  DeleteScoresInput,
   ScoreDoc,
   ShowScoreInput,
   ShowTargetInput,
   Target,
-  TargetsByScoreInput
+  TargetsByScoreInput,
+  UpdateScoreInput
 } from './schema';
 
 interface ScoringConfig extends Config {
@@ -51,6 +54,34 @@ const actionRequestTable: ActionRequestTable = {
     query ShowTargetsByScore($input: TargetsByScoreInput!) {
       targetsByScore(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'update-score': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateScore($input: UpdateScoreInput!) {
+            updateScore (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Score($input: ShowScoreInput!) {
+            score (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'delete-score': (extraInfo) => `
+    mutation DeleteScore($input: DeleteScoreInput!) {
+      deleteScore (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-scores': (extraInfo) => `
+    mutation DeleteScores($input: DeleteScoresInput!) {
+      deleteScores (input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 
@@ -74,8 +105,13 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
       },
 
       target: async (_root, { input }: { input: ShowTargetInput }) => {
+        const filter = { targetId: input.id };
+        if (!_.isNil(input.sourceId)) {
+          filter['sourceId'] = input.sourceId;
+        }
+
         const target = await scores.aggregate([
-          { $match: input },
+          { $match: filter },
           {
             $group: {
               _id: '$targetId',
@@ -120,18 +156,18 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
             }
           }
         ])
-        .toArray();
+          .toArray();
 
         return _(targets)
-        .map((target) => {
-          return {
-            ...target,
-            total: totalScoreFn(_.map(target.scores, 'value')),
-            id: target._id
-          };
-        })
-        .orderBy(['total'], [ input.asc ? 'asc' : 'desc' ])
-        .value();
+          .map((target) => {
+            return {
+              ...target,
+              total: totalScoreFn(_.map(target.scores, 'value')),
+              id: target._id
+            };
+          })
+          .orderBy(['total'], [input.asc ? 'asc' : 'desc'])
+          .value();
       }
     },
     Score: {
@@ -155,6 +191,36 @@ function resolvers(db: ClicheDb, config: ScoringConfig): object {
         };
 
         return await scores.insertOne(context, newScore);
+      },
+
+      updateScore: async (
+        _root, { input }: { input: UpdateScoreInput }, context: Context) => {
+        const updateOp = { $set: { value: input.value } };
+
+        return await scores
+          .updateOne(context, { id: input.id }, updateOp);
+      },
+
+      deleteScore: async (
+        _root, { input }: { input: DeleteScoreInput }, context: Context) => {
+        return await scores.deleteOne(context, { id: input.id });
+      },
+
+      deleteScores: async (
+        _root, { input }: { input: DeleteScoresInput }, context: Context) => {
+        const filter = {};
+
+        if (!_.isNil(input)) {
+          if (!_.isNil(input.targetId)) {
+            filter['targetId'] = input.targetId;
+          }
+
+          if (!_.isNil(input.sourceId)) {
+            filter['sourceId'] = input.sourceId;
+          }
+        }
+        
+        return await scores.deleteMany(context, filter);
       }
     }
   };

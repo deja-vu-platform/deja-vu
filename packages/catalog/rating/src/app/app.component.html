@@ -1,16 +1,36 @@
 <div class="container">
-  <h1>Rate target <i>pizza</i> by source <i>ben</i></h1>
+  <h2>Rate target <i>pizza</i> by source <i>ben</i></h2>
   <rating-rate-target sourceId="ben" targetId="pizza"
   (rating)="pizzaRating=$event">
   </rating-rate-target>
   Rating for pizza is {{pizzaRating}}
-  <h1>Average rating of target <i>pizza</i></h1>
+
+  <h2>Rate target <i>burger</i> by source <i>ben</i></h2>
+  <rating-rate-target sourceId="ben" targetId="burger"></rating-rate-target>
+
+  <h2>Rate target <i>pizza</i> by source <i>alice</i></h2>
+  <rating-rate-target sourceId="alice" targetId="pizza"></rating-rate-target>
+
+  <h2>Average rating of target <i>pizza</i></h2>
   <rating-show-average-rating targetId="pizza"></rating-show-average-rating>
-  <h1>Rating of target <i>pizza</i> by source <i>ben</i></h1>
+
+  <h2>Rating of target <i>pizza</i> by source <i>ben</i></h2>
   <rating-show-rating sourceId="ben" targetId="pizza"></rating-show-rating>
-  <h1>Show all ratings of target <i>pizza</i></h1>
+
+  <h2>Show all ratings of target <i>pizza</i></h2>
   <rating-show-ratings-by-target targetId="pizza">
   </rating-show-ratings-by-target>
-  <h1>Show Rating Count</h1>
+
+  <h2>Show Rating Count</h2>
   <rating-show-rating-count></rating-show-rating-count>
+
+  <h2>Delete Rating by source <i>ben</i> for target <i>burger</i></h2>
+  <rating-delete-rating sourceId="ben" targetId="burger">
+  </rating-delete-rating>
+
+  <h2>Delete Ratings by source <i>ben</i></h2>
+  <rating-delete-ratings sourceId="ben"></rating-delete-ratings>
+
+  <h2>Delete Ratings by source <i>pizza</i></h2>
+  <rating-delete-ratings targetId="pizza"></rating-delete-ratings>
 </div>
