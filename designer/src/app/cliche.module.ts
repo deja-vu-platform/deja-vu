@@ -198,7 +198,9 @@ function clicheDefinitionFromModule(
           .slice(0, componentSuffix.length * -1));
 
         let description = '';
-        const ioDescriptions = {};
+        const ioDescriptions = {
+          hidden: '(boolean) If true, do not display the action'
+        };
         const moduleDocs = importedModule['documentation'];
         if (moduleDocs) {
           const componentDocs = moduleDocs.components
