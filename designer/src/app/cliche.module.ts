@@ -83,6 +83,8 @@ const importedCliches: { [name: string]: Object} = {
   transfer
 };
 
+const outputTypeRegex = /EventEmitter<(.*)>/;
+
 /**
  * Converts a string of HTML to a string of the text it would render
  * (i.e. strips tags and converts codes to characters)
@@ -207,6 +209,14 @@ function clicheDefinitionFromModule(
             .find((c) => c.name === component.name);
           if (componentDocs) {
             description = htmlToText(componentDocs.description);
+            // extract type argument from EventEmitter for outputs
+            // the default value is tried first because type is sometimes
+            //   missing the type argument
+            componentDocs.outputsClass.forEach((ioDocs) => {
+              ioDocs.type = _.get(outputTypeRegex.exec(ioDocs.defaultValue), 1)
+                || _.get(outputTypeRegex.exec(ioDocs.type), 1)
+                || 'any';
+            });
             [
               ...componentDocs.inputsClass,
               ...componentDocs.outputsClass
