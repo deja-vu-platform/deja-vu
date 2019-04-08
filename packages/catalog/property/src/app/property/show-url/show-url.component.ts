@@ -48,13 +48,23 @@ const URL_REGEX = new RegExp(
   "$", "i"
 );
 
+/**
+ * Display a URL property
+ */
 @Component({
   selector: 'property-show-url',
   templateUrl: './show-url.component.html',
   styleUrls: ['./show-url.component.css']
 })
 export class ShowUrlComponent {
+  /**
+   * The URL to display
+   */
   @Input() url: string;
+  /**
+   * If false, show the whole URL. If true, show the URL without the
+   * protocol and path
+   */
   @Input() showBaseUrlOnly: boolean = false;
 
   getBaseUrl(url: string): string {

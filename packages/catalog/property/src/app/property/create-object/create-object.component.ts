@@ -33,6 +33,9 @@ export interface ValueMap {
 
 const SAVED_MSG_TIMEOUT = 3000;
 
+/**
+ * Create an object, which has one or more properties
+ */
 @Component({
   selector: 'property-create-object',
   templateUrl: './create-object.component.html',
@@ -54,12 +57,29 @@ export class CreateObjectComponent
       }
     }
   }
+  /**
+   * List of property names to not show input fields for
+   */
   @Input() showExclude: string[] = [];
-
+  /**
+   * Text for the button to create an object
+   */
   @Input() buttonLabel = 'Create Object';
+  /**
+   * Text to show when an object is successfully created
+   */
   @Input() newObjectSavedText = 'New object saved';
+  /**
+   * Whether or not the create object button should be shown
+   */
   @Input() showOptionToSubmit = true;
+  /**
+   * Whether or not the created object should be saved to the database
+   */
   @Input() save = true;
+  /**
+   * The created object
+   */
   @Output() object = new EventEmitter<any>();
 
   @ViewChild(FormGroupDirective) form;
