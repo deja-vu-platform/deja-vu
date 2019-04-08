@@ -18,8 +18,7 @@
     "concurrently": "concurrently",
     "tsc": "tsc",
     "ng": "ng",
-    "dv": "dv",
-    "document": "compodoc"
+    "dv": "dv"
   },
   "dependencies": {
     "ajv": "^6.2.1",
@@ -63,7 +62,6 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@compodoc/compodoc": "^1.1.9",
     "@deja-vu/cli": "0.0.1",
     "@deja-vu/cliche-server": "0.0.1",
     "@deja-vu/core": "0.0.1",

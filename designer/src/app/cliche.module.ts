@@ -21,8 +21,39 @@ import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
-import * as propertyDocs from '@deja-vu/property/documentation.json';
+import * as dvDocs from '@deja-vu/core/pkg/documentation.json';
+dv['documentation'] = dvDocs;
+
+import * as authenDocs from '@deja-vu/authentication/pkg/documentation.json';
+authentication['documentation'] = authenDocs;
+import * as authoriDocs from '@deja-vu/authorization/pkg/documentation.json';
+authorization['documentation'] = authoriDocs;
+import * as commentDocs from '@deja-vu/comment/pkg/documentation.json';
+comment['documentation'] = commentDocs;
+import * as eventDocs from '@deja-vu/event/pkg/documentation.json';
+event['documentation'] = eventDocs;
+import * as followDocs from '@deja-vu/follow/pkg/documentation.json';
+follow['documentation'] = followDocs;
+import * as geolocDocs from '@deja-vu/geolocation/pkg/documentation.json';
+geolocation['documentation'] = geolocDocs;
+import * as groupDocs from '@deja-vu/group/pkg/documentation.json';
+group['documentation'] = groupDocs;
+import * as labelDocs from '@deja-vu/label/pkg/documentation.json';
+label['documentation'] = labelDocs;
+import * as passkeyDocs from '@deja-vu/passkey/pkg/documentation.json';
+passkey['documentation'] = passkeyDocs;
+import * as propertyDocs from '@deja-vu/property/pkg/documentation.json';
 property['documentation'] = propertyDocs;
+import * as rankingDocs from '@deja-vu/ranking/pkg/documentation.json';
+ranking['documentation'] = rankingDocs;
+import * as ratingDocs from '@deja-vu/rating/pkg/documentation.json';
+rating['documentation'] = ratingDocs;
+import * as scoringDocs from '@deja-vu/scoring/pkg/documentation.json';
+scoring['documentation'] = scoringDocs;
+import * as taskDocs from '@deja-vu/task/pkg/documentation.json';
+task['documentation'] = taskDocs;
+import * as transferDocs from '@deja-vu/transfer/pkg/documentation.json';
+transfer['documentation'] = transferDocs;
 
 import {
   ActionInputs,
@@ -178,7 +209,23 @@ function clicheDefinitionFromModule(
               ...componentDocs.inputsClass,
               ...componentDocs.outputsClass
             ].forEach((ioDocs) => {
-              ioDescriptions[ioDocs.name] = htmlToText(ioDocs.description);
+              let { type, description: ioDescription } = ioDocs;
+              const { defaultValue, name } = ioDocs;
+              // compodoc doesn't infer types based on defaults
+              if (!type) {
+                if (defaultValue) {
+                  try {
+                    // tslint:disable-next-line no-eval
+                    type = typeof eval(defaultValue);
+                  } catch (e) {
+                    type = 'any';
+                  }
+                } else {
+                  type = 'any';
+                }
+              }
+              ioDescription = ioDescription || '';
+              ioDescriptions[name] = `(${type}) ${htmlToText(ioDescription)}`;
             });
           }
         }
