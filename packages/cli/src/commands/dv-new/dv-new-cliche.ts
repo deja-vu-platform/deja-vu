@@ -30,13 +30,13 @@ exports.handler = ({ name, pathToDv }) => {
   const schematicsPkgName = getDvPackageName('schematics');
   yarn(['link', '--silent'], schematicsPath);
   yarn(['link', '--silent', schematicsPkgName]);
-  
+
   try {
     const catalogPath = `${pathToDv}/packages/catalog/`;
     // create outside monorepo first to satisfy new Angular project constraints,
     // then move it to the catalog
     ng(['new', `--collection=${schematicsPkgName}`,
-      `--clicheName=${name}`, name]);
+      `--clicheName=${name}`]);
     cmd('mv', [name, catalogPath]);
 
     // install and package new cliche
