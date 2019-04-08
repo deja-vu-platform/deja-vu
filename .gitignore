@@ -8,6 +8,7 @@ out-tsc
 pkg
 .ng_pkg_build
 pkg.tgz
+documentation.json
 
 # dependencies
 node_modules

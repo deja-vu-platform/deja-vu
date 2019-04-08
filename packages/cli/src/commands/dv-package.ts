@@ -32,5 +32,13 @@ exports.handler = () => {
       assetsDir,
       path.join(pkgDir, 'assets'));
   }
+
+  if (existsSync('documentation')) {
+    console.log('Copying documentation');
+    copySync(
+      'documentation',
+      path.join(pkgDir, 'documentation'));
+  }
+
   console.log('Done');
 };

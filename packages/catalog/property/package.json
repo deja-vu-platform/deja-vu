@@ -18,7 +18,8 @@
     "concurrently": "concurrently",
     "tsc": "tsc",
     "ng": "ng",
-    "dv": "dv"
+    "dv": "dv",
+    "document": "compodoc"
   },
   "dependencies": {
     "ajv": "^6.2.1",

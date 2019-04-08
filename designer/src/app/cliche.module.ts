@@ -21,6 +21,9 @@ import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
+import * as propertyDocs from '@deja-vu/property/documentation.json';
+property['documentation'] = propertyDocs;
+
 import {
   ActionInputs,
   App,
@@ -49,6 +52,19 @@ const importedCliches: { [name: string]: Object} = {
   transfer
 };
 
+/**
+ * Converts a string of HTML to a string of the text it would render
+ * (i.e. strips tags and converts codes to characters)
+ */
+function htmlToText(html: string): string {
+  const div = document.createElement('div');
+  div.style.display = 'none';
+  div.innerHTML = html;
+  const text = div.innerText;
+  div.remove();
+
+  return text;
+}
 
 // each imported Cliche Module has an Angular Module
 // which we need to import and export
@@ -84,10 +100,10 @@ function removeSurroundingQuotes(s: string): string {
 
 function clicheDefinitionFromModule(
   importedModule: Object,
-  name: string
+  moduleName: string
 ): ClicheDefinition {
   return {
-    name,
+    name: moduleName,
     actions: Object.values(importedModule)
       .filter(isComponent)
       .map((component): ClicheActionDefinition => {
@@ -147,13 +163,34 @@ function clicheDefinitionFromModule(
         inputs.sort();
         outputs.sort();
 
+        const actionName = _.kebabCase(component.name
+          .slice(0, componentSuffix.length * -1));
+
+        let description = '';
+        const ioDescriptions = {};
+        const moduleDocs = importedModule['documentation'];
+        if (moduleDocs) {
+          const componentDocs = moduleDocs.components
+            .find((c) => c.name === component.name);
+          if (componentDocs) {
+            description = htmlToText(componentDocs.description);
+            [
+              ...componentDocs.inputsClass,
+              ...componentDocs.outputsClass
+            ].forEach((ioDocs) => {
+              ioDescriptions[ioDocs.name] = htmlToText(ioDocs.description);
+            });
+          }
+        }
+
         return {
-          name: _.kebabCase(component.name
-            .slice(0, componentSuffix.length * -1)),
+          name: actionName,
           component,
           inputs,
           outputs,
-          actionInputs
+          actionInputs,
+          description,
+          ioDescriptions
         };
       })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
@@ -178,7 +215,9 @@ dvCliche.actions.push(({
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: {}
+  actionInputs: {},
+  description: 'Display custom text, images, and other content',
+  ioDescriptions: {}
 }));
 
 @NgModule({

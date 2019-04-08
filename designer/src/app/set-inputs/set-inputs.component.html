@@ -81,6 +81,7 @@
       dragula="expression-io"
       (addOutput)="addOutput(input, $event)"
       [attr.data-context]="context"
+      [matTooltip]="actionInstance.of?.ioDescriptions[input]"
     >
   </mat-form-field>
 </div>
