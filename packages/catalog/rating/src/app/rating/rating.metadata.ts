@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { ModuleWithProviders } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule
