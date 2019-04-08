@@ -166,27 +166,40 @@ function clicheDefinitionFromModule(
           isComponent(_.get(instance, [input, 'type']))
         );
 
+        // parse the template to get the action map
+        // since angular uses valid HTML, we can use built-in dom methods
         const template: string = component.decorators[0].args[0].template;
-        // parse the template string to extract the object map
-        // TODO: stop assuming zero or one action input per action
         if (actionInputNames.length > 0) {
-          const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
-          if (inputMapMatch) {
-            actionInputs[actionInputNames[0]] = _.fromPairs(
-              inputMapMatch[1]
-                .split(',')
-                .map((s1) => {
-                  let [ioName, propertyName] = s1.split(':');
-                  ioName = removeSurroundingQuotes(ioName.trim());
-                  propertyName = propertyName.trim();
-
-                  return [propertyName, ioName];
-                })
-            );
-          } else {
-            actionInputs[actionInputNames[0]] = {};
-          }
+          const div = document.createElement('div');
+          div.innerHTML = template;
+          const includes = Array.from(div.getElementsByTagName('dv-include'));
+          includes.forEach((include) => {
+            const inputName = include.getAttribute('[action]');
+            const inputsAttr = (include.getAttribute('[inputs]') || '');
+            const inputsRes = /{([\s\S]*?)}/.exec(inputsAttr);
+            if (inputsRes && inputsRes[1]) {
+              // TODO: handle legitimate uses of : or , (e.g. in strings)
+              actionInputs[inputName] = _.fromPairs(
+                inputsRes[1]
+                  .split(',')
+                  .map((s1) => s1.split(':'))
+                  .filter(([ioName, propertyName]) => ioName && propertyName)
+                  .map(([ioName, propertyName]) => [
+                    removeSurroundingQuotes(ioName.trim()),
+                    propertyName.trim()
+                  ])
+                  .filter(([ioName, propertyName]) => ioName && propertyName)
+              );
+            }
+          });
+          div.remove();
         }
+
+        actionInputNames.forEach((actionInputName) => {
+          if (!actionInputs[actionInputName]) {
+            actionInputs[actionInputName] = {};
+          }
+        });
 
         if (template.includes('ng-content')) {
           inputs.push('*content');

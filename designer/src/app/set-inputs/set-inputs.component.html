@@ -60,6 +60,9 @@
                 {{name}}
               </div>
             </div>
+            <div *ngIf="actionInput(input).length === 0">
+              There are none.
+            </div>
           </div>
           <app-set-inputs
             [app]="app"
