@@ -21,6 +21,9 @@ export class SetInputsComponent implements OnChanges {
 
   expressionInputs: string[];
   actionInputs: string[];
+  actionInputsIODescriptions: {
+    [actionInputName: string]: { [ioName: string]: string }
+  };
 
   constructor(private readonly dialog: MatDialog) { }
 
@@ -33,6 +36,13 @@ export class SetInputsComponent implements OnChanges {
     // get the names
     this.expressionInputs = expressionInputs;
     this.actionInputs = actionInputs;
+    this.actionInputsIODescriptions = _.zipObject(
+      actionInputs,
+      actionInputs.map((ioName) => this.app.newActionInstanceByName(
+        _.kebabCase(ioName),
+        this.actionInstance.from.name
+      ).of['ioDescriptions'])
+    );
   }
 
   inputAction(inputName: string, event: CustomEvent) {

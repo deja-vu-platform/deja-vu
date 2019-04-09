@@ -47,6 +47,8 @@ export interface ActionDefinition {
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
+  description: string;
+  ioDescriptions: { [ioName: string]: string };
 }
 
 /**
