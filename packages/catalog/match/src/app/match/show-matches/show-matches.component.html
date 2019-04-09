@@ -1,0 +1,16 @@
+<ul *ngIf="matches && matches.length > 0" class="list-group">
+  <li *ngFor="let match of matches" class="list-group-item">
+    <dv-include
+      [action]="showMatch"
+      default-showMatch="{ tag: match-show-match }"
+      [inputs]="{
+        match: match, showId: showId, showUserIds: showUserIds
+      }"
+      [parent]="showMatches">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!matches || matches.length === 0">
+  <span>{{noMatchesToShowText}}</span>
+</div>
