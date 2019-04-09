@@ -36,7 +36,7 @@ exports.handler = ({ name, pathToDv }) => {
     // create outside monorepo first to satisfy new Angular project constraints,
     // then move it to the catalog
     ng(['new', `--collection=${schematicsPkgName}`,
-      `--clicheName=${name}`]);
+      `--clicheName=${name}`, name]);
     cmd('mv', [name, catalogPath]);
 
     // install and package new cliche

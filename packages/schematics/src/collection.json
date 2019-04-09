@@ -6,7 +6,7 @@
       "factory": "./action/index#action",
       "schema": "./action/schema.json"
     },
-    "ng-new": {
+    "application": {
       "description": "Create a new cliché",
       "factory": "./application/index#cliche",
       "schema": "./application/schema.json"
