@@ -111,6 +111,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
             sourceId: input.targetId,
             targetId: input.sourceId
           };
+
+          // if the delete operation succeeds, we found an attempt necessary
+          // to create a match
           await attempts.deleteOne(context, filter);
 
           const match: MatchDoc = {
@@ -122,6 +125,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
           return true;
         } catch (error) {
+          // there was no other attempt to make a match with sourceId + targetId
           const attempt: AttemptDoc = {
             id: input.id ? input.id : uuid(),
             sourceId: input.sourceId,
