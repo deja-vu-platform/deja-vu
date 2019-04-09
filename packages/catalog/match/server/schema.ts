@@ -1,14 +1,34 @@
 export interface MatchDoc {
   id: string;
-  content: string;
+  userIds: string[];
+}
+
+export interface AttemptDoc {
+  id: string;
+  sourceId: string;
+  targetId: string;
+}
+
+export interface AttemptsInput {
+  sourceId?: string;
+  targetId?: string;
+}
+
+export interface MatchesInput {
+  userId: string;
+}
+
+export interface AttemptMatchInput {
+  id?: string;
+  sourceId: string;
+  targetId: string;
+}
+
+export interface WithdrawAttemptInput {
+  id: string;
 }
 
 export interface CreateMatchInput {
   id?: string;
-  content: string;
-}
-
-export interface UpdateMatchInput {
-  id: string;
-  content: string;
+  userIds: string[];
 }

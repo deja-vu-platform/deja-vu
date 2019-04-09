@@ -26,8 +26,6 @@ input AttemptMatchInput {
 
 input WithdrawAttemptInput {
   id: ID
-  sourceId: ID
-  targetId: ID
 }
 
 # only two userIds must be provided
@@ -44,8 +42,9 @@ type Query {
 }
 
 type Mutation {
-  attemptMatch(input: AttemptMatchInput!): Attempt
-  withdrawAttempt(input: WithdrawAttemptInput!): Boolean
+  # true if a match was made, false otherwise
+  attemptMatch(input: AttemptMatchInput!): Boolean
+  withdrawAttempt(id: ID!): Boolean
   createMatch(input: CreateMatchInput!): Match
   deleteMatch(id: ID!): Boolean
 }
