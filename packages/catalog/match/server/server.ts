@@ -14,8 +14,7 @@ import {
   AttemptsInput,
   CreateMatchInput,
   MatchDoc,
-  MatchesInput,
-  WithdrawAttemptInput
+  MatchesInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
@@ -61,7 +60,7 @@ const actionRequestTable: ActionRequestTable = {
   `,
   'withdraw-attempt': (extraInfo) => `
     mutation WithdrawAttempt($id: ID!) {
-      withdrawMatch(id: $id) ${getReturnFields(extraInfo)}
+      withdrawAttempt(id: $id) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -135,10 +134,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
         }
       },
 
-      withdrawAttempt: async (
-        _root, { input }: { input: WithdrawAttemptInput },
-        context: Context) => {
-        return await attempts.deleteOne(context, { id: input.id });
+      withdrawAttempt: async (_root, { id }, context: Context) => {
+        return await attempts.deleteOne(context, { id: id });
       },
 
       createMatch: async (
@@ -165,8 +162,6 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
     return Promise.all([
       matches.createIndex({ id: 1 }, { unique: true, sparse: true }),
       attempts.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      // one match per userIds pair
-      matches.createIndex({ userIds: 1}, { unique: true, sparse: true }),
       // one attempt per source, target pair
       attempts.createIndex({ sourceId: 1, targetId: 1 },
         { unique: true, sparse: true })

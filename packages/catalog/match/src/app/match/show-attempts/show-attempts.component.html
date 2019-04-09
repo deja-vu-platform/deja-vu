@@ -1,9 +1,17 @@
-<span *ngIf="attempts">
-  <div *ngIf="showId">
-    {{attempts.id}}
-  </div>
+<ul *ngIf="attempts && attempts.length > 0" class="list-group">
+  <li *ngFor="let attempt of attempts" class="list-group-item">
+    <dv-include
+      [action]="showAttempt"
+      default-showAttempt="{ tag: match-show-attempt }"
+      [inputs]="{
+        attempt: attempt, showId: showId,
+        showSourceId: showSourceId, showTargetId: showTargetId
+      }"
+      [parent]="showAttempts">
+    </dv-include>
+  </li>
+</ul>
 
-  <div *ngIf="showContent">
-    {{attempts.content}}
-  </div>
-</span>
+<div *ngIf="!attempts || attempts.length === 0">
+  <span>{{noAttemptsToShowText}}</span>
+</div>

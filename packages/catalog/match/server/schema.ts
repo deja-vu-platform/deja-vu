@@ -24,10 +24,6 @@ export interface AttemptMatchInput {
   targetId: string;
 }
 
-export interface WithdrawAttemptInput {
-  id: string;
-}
-
 export interface CreateMatchInput {
   id?: string;
   userIds: string[];

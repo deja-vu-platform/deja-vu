@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
+  Component, ElementRef, Inject, Input, OnInit, ViewChild
 } from '@angular/core';
 import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective,
@@ -43,21 +43,27 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
   OnExecSuccess {
   @Input() id: string | undefined;
-  @Input() set content(inputContent: string) {
-    this.contentControl.setValue(inputContent);
+  @Input() set userAId(inputContent: string) {
+    this.userAIdControl.setValue(inputContent);
+  }
+  @Input() set userBId(inputContent: string) {
+    this.userBIdControl.setValue(inputContent);
   }
   @Input() showOptionToSubmit = true;
 
   // Presentation inputs
   @Input() buttonLabel = 'Create Match';
-  @Input() inputContentLabel = 'Content';
+  @Input() inputUserAIdLabel = 'User A Id';
+  @Input() inputUserBIdLabel = 'User B Id';
   @Input() newMatchSavedText = 'New match saved';
 
   @ViewChild(FormGroupDirective) form;
 
-  contentControl = new FormControl('', Validators.required);
+  userAIdControl = new FormControl('', Validators.required);
+  userBIdControl = new FormControl('', Validators.required);
   createMatchForm: FormGroup = this.builder.group({
-    contentControl: this.contentControl
+    userAIdControl: this.userAIdControl,
+    userBIdControl: this.userBIdControl
   });
 
 
@@ -85,10 +91,10 @@ export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
       inputs: {
         input: {
           id: this.id,
-          content: this.contentControl.value
+          userIds: [this.userAIdControl.value, this.userBIdControl.value]
         }
       },
-      extraInfo: { returnFields: 'id' }
+      extraInfo: { returnFields: 'id, userIds' }
     })
     .toPromise();
 

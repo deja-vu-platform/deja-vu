@@ -1,18 +1,18 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output
+  OnInit, Output, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../match.config';
-import { Attempts } from '../shared/match.model';
+import { Attempt } from '../shared/match.model';
+import { ShowAttemptComponent } from '../show-attempt/show-attempt.component';
 
 interface AttemptsRes {
-  data: { attempts: Attempts };
+  data: { attempts: Attempt[] };
 }
 
 
@@ -21,14 +21,23 @@ interface AttemptsRes {
   templateUrl: './show-attempts.component.html'
 })
 export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
-  // Provide one of the following: id or attempts
-  @Input() id: string | undefined;
-  @Input() attempts: Attempts | undefined;
+  OnInit {
+  // Provide at most one of the following: sourceId or targetId
+  @Input() sourceId: string | undefined;
+  @Input() targetId: string | undefined;
   @Output() loadedAttempts = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showSourceId = true;
+  @Input() showTargetId = true;
+
+  @Input() showAttempt: Action = {
+    type: <Type<Component>> ShowAttemptComponent
+  };
+  @Input() noAttemptsToShowText = 'No attempts to show';
+  attempts: Attempt[] = [];
+
+  showAttempts;
 
   private gs: GatewayService;
 
@@ -36,7 +45,9 @@ OnInit {
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) {
+    this.showAttempts = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -61,26 +72,30 @@ OnInit {
     if (this.canEval()) {
       this.gs.get<AttemptsRes>(this.apiPath, {
         params: {
-          inputs: {
-            id: this.id
-          },
+          inputs: JSON.stringify({
+            input: {
+              source: this.sourceId,
+              targetId: this.targetId
+            }
+          }),
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showSourceId ? 'sourceId' : ''}
+              ${this.showTargetId ? 'targetId' : ''}
             `
           }
-        },
+        }
       })
-      .pipe(map((res: AttemptsRes) => res.data.attempts))
-      .subscribe((attempts) => {
-        this.attempts = attempts;
-        this.loadedAttempts.emit(attempts);
-      });
+        .pipe(map((res: AttemptsRes) => res.data.attempts))
+        .subscribe((attempts) => {
+          this.attempts = attempts;
+          this.loadedAttempts.emit(attempts);
+        });
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.attempts && this.id && this.gs);
+    return !!(this.gs);
   }
 }

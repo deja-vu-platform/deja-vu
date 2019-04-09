@@ -5,8 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../match.config';
 import { Match } from '../shared/match.model';
@@ -21,14 +20,14 @@ interface ShowMatchRes {
   templateUrl: './show-match.component.html'
 })
 export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+  OnInit {
   // Provide one of the following: id or match
   @Input() id: string | undefined;
   @Input() match: Match | undefined;
   @Output() loadedMatch = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showUserIds = true;
 
   private gs: GatewayService;
 
@@ -36,7 +35,7 @@ OnInit {
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -67,16 +66,16 @@ OnInit {
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showUserIds ? 'userIds' : ''}
             `
           }
-        },
+        }
       })
-      .pipe(map((res: ShowMatchRes) => res.data.match))
-      .subscribe((match) => {
-        this.match = match;
-        this.loadedMatch.emit(match);
-      });
+        .pipe(map((res: ShowMatchRes) => res.data.match))
+        .subscribe((match) => {
+          this.match = match;
+          this.loadedMatch.emit(match);
+        });
     }
   }
 

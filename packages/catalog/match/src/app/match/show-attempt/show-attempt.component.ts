@@ -5,8 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../match.config';
 import { Attempt } from '../shared/match.model';
@@ -28,7 +27,8 @@ OnInit {
   @Output() loadedAttempt = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showSourceId = true;
+  @Input() showTargetId = true;
 
   private gs: GatewayService;
 
@@ -67,10 +67,11 @@ OnInit {
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showSourceId ? 'sourceId' : ''}
+              ${this.showTargetId ? 'targetId' : ''}
             `
           }
-        },
+        }
       })
       .pipe(map((res: AttemptRes) => res.data.attempt))
       .subscribe((attempt) => {

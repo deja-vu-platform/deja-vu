@@ -1,4 +1,10 @@
 export interface Match {
   id: string;
-  content: string;
+  userIds: string[];
+}
+
+export interface Attempt {
+  id: string;
+  sourceId: string;
+  targetId: string;
 }

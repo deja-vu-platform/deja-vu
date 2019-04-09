@@ -24,10 +24,6 @@ input AttemptMatchInput {
   targetId: ID!
 }
 
-input WithdrawAttemptInput {
-  id: ID
-}
-
 # only two userIds must be provided
 input CreateMatchInput {
   id: ID
