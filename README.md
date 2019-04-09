@@ -21,8 +21,7 @@ app. Read the [tutorial](docs/tutorial.md) for more information.
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we would love to hear what you think!
 You can play around with it and shoot us an email or create an issue with your
-feedback or questions. See the [roadmap](ROADMAP.md) for a list of things
-we plan to work on next.
+feedback or questions.
 
 ## Motivation
 
