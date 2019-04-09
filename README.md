@@ -1,6 +1,6 @@
 # Déjà Vu
 
-Déjà Vu is an experimental language for building web apps. It features
+Déjà Vu is an experimental platform for building web apps. It features
 built-in user functionality for rapid construction of apps
 with complex behavior and rich user interfaces.
 
