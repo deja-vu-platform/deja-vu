@@ -56,6 +56,7 @@
               <div
                 *ngFor="let name of actionInput(input)"
                 [attr.data-output]="'$' + name"
+                [matTooltip]="actionInputsIODescriptions[input][name]"
               >
                 {{name}}
               </div>

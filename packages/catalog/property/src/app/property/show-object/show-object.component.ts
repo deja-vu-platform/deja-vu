@@ -64,7 +64,11 @@ OnChanges {
   @Output() loadedObject = new EventEmitter<any>();
 
   /**
-   * @ignore internal input
+   * List of property names.
+   * If given, causes exactly these properties to be shown.
+   * Takes precedence over showOnly and showExclude.
+   * Primarily intended for use within the cliché.
+   * App creators probably want showOnly.
    */
   @Input() properties: string[];
   propertySchemas: { [propName: string]: {

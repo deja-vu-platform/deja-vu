@@ -51,10 +51,6 @@ exports.handler = () => {
         '--disableSourceCode',
         '--disableDomTree',
         '--disableTemplateTab',
-        '--disablePrivate',
-        '--disableProtected',
-        '--disableInternal',
-        '--disableLifeCycleHooks',
         '--silent'
       ],
       {
