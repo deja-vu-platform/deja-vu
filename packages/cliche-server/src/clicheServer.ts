@@ -2,16 +2,17 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
+import * as path from 'path';
 
+import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { readFileSync } from 'fs';
-import { makeExecutableSchema } from 'graphql-tools';
+import { execute, subscribe } from 'graphql';
+import { IResolvers, makeExecutableSchema } from 'graphql-tools';
+import { createServer } from 'http';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 import { Config } from './config';
 import { ClicheDb } from './db/db';
-
-// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
-// tslint:disable-next-line:no-var-requires
-const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 
 /**
  * The type of the table that maps action names to
@@ -44,7 +45,7 @@ export type InitDbCallbackFn<C = Config> =
  * @return the resolvers object
  */
 export type InitResolversFn<C = Config> =
-  (db: ClicheDb, config: C) => object;
+  (db: ClicheDb, config: C) => IResolvers;
 
 /**
  * The server for a cliche that contains its associated db (if applicable)
@@ -56,7 +57,7 @@ export class ClicheServer<C extends Config = Config> {
   private readonly _actionRequestTable: ActionRequestTable;
   private readonly _config: C;
   private _db: mongodb.Db | undefined;
-  private _resolvers: object | undefined;
+  private _resolvers: IResolvers | undefined;
   private readonly _initDbCallback: InitDbCallbackFn<C> | undefined;
   private readonly _initResolvers: InitResolversFn<C> | undefined;
   private readonly _dynamicTypeDefs: string[];
@@ -79,24 +80,37 @@ export class ClicheServer<C extends Config = Config> {
    * @param fullActionName the action name that includes/begins
    *                           with the cliché name and a separator
    */
-  private static GetActionName(fullActionName: string) {
+  private getActionName(fullActionName: string) {
     return fullActionName
       .split('-')
       .slice(1)
       .join('-');
   }
 
-  // needs clicheServer passed in because `this` is not in scope
-  // when this function is used
-  private static SetGraphqlQuery(clicheServer: ClicheServer) {
+  private getGraphqlRequest(fullActionName: string, extraInfo: any) {
+    const actionName = this.getActionName(fullActionName);
+    if (this._actionRequestTable[actionName]) {
+      return this._actionRequestTable[actionName](extraInfo);
+    }
+    throw new Error(`Action ${actionName} request not defined`);
+  }
+
+  private setGraphqlQuery() {
+    const getGraphqlRequest = this.getGraphqlRequest.bind(this);
+
     return (req, _res, next) => {
       const reqField = req.method === 'GET' ? 'query' : 'body';
-      req[reqField].query = clicheServer._actionRequestTable[
-        ClicheServer.GetActionName(req['fullActionName'])
-      ](req[reqField].extraInfo);
+      req[reqField].query = getGraphqlRequest(
+        req['fullActionName'], req[reqField].extraInfo);
       req[reqField].variables = req[reqField].inputs;
       next();
     };
+  }
+
+  private setGraphqlSubscription(graphqlParams, fullActionName, extraInfo) {
+    graphqlParams.query = this.getGraphqlRequest(fullActionName, extraInfo);
+
+    return graphqlParams;
   }
 
   private startApp(schema) {
@@ -112,7 +126,7 @@ export class ClicheServer<C extends Config = Config> {
         next();
       },
       bodyParser.json(),
-      ClicheServer.SetGraphqlQuery(this),
+      this.setGraphqlQuery(),
       graphqlExpress((req) => {
         return {
           schema: schema,
@@ -148,16 +162,34 @@ export class ClicheServer<C extends Config = Config> {
         req['fullActionName'] = req.params.fullActionName;
         next();
       },
-      ClicheServer.SetGraphqlQuery(this),
+      this.setGraphqlQuery(),
       graphqlExpress({ schema })
     );
 
-    app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+    app.use('/graphiql', graphiqlExpress({
+      endpointURL: '/graphql',
+      subscriptionsEndpoint:
+        `ws://localhost:${this._config.wsPort}/subscriptions`
+    }));
 
-
-    app.listen(this._config.wsPort, () => {
+    const server = createServer(app);
+    server.listen(this._config.wsPort, () => {
       console.log(`Running ${this._name} with config
         ${JSON.stringify(this._config)}`);
+      SubscriptionServer.create({
+        execute,
+        subscribe,
+        schema,
+        onOperation: (msg, graphqlParams, _webSocket) => {
+          const dvParams = msg.payload.params;
+
+          return this.setGraphqlSubscription(
+            graphqlParams, dvParams['fullActionName'], dvParams['extraInfo']);
+        }
+      }, {
+        server: server,
+        path: '/subscriptions'
+      });
     });
   }
 
@@ -187,6 +219,7 @@ export class ClicheServer<C extends Config = Config> {
       this._resolvers = this._initResolvers(
         clicheDb, this._config);
       const typeDefs = [
+        readFileSync(path.join(__dirname, 'schema.base.graphql'), 'utf8'),
         readFileSync(this._schemaPath, 'utf8'), ...this._dynamicTypeDefs];
       const schema = makeExecutableSchema(
         { typeDefs, resolvers: this._resolvers });
