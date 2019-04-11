@@ -1,0 +1,24 @@
+type Chat {
+  id: ID!
+  content: String!
+}
+
+input CreateChatInput {
+  id: ID
+  content: String!
+}
+
+input UpdateChatInput {
+  id: ID!
+  content: String!
+}
+
+type Query {
+  chat(id: ID!): Chat
+}
+
+type Mutation {
+  createChat(input: CreateChatInput!): Chat
+  deleteChat(id: ID!): Boolean
+  updateChat(input: UpdateChatInput!): Boolean
+}
