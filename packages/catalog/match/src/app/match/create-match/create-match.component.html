@@ -1,0 +1,41 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createMatchForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newMatchSaved">
+      <i class="material-icons">done</i>
+        {{newMatchSavedText}}
+    </div>
+    <mat-error *ngIf="newMatchError">
+      <i class="material-icons">report_problem</i>
+      {{newMatchError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputUserAIdLabel}}</mat-label>
+      <input matInput required formControlName="userAIdControl" />
+    </mat-form-field>
+    <div *ngIf="userAIdControl.invalid && userAIdControl.touched">
+      <mat-error *ngIf="userAIdControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputUserBIdLabel}}</mat-label>
+      <input matInput required formControlName="userBIdControl" />
+    </mat-form-field>
+    <div *ngIf="userBIdControl.invalid && userBIdControl.touched">
+      <mat-error *ngIf="userBIdControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createMatchForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

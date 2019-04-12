@@ -17,7 +17,9 @@ import { ShowUrlComponent } from '../show-url/show-url.component';
 
 import { API_PATH } from '../property.config';
 
-
+/**
+ * Displays an object
+ */
 @Component({
   selector: 'property-show-object',
   templateUrl: './show-object.component.html',
@@ -25,17 +27,49 @@ import { API_PATH } from '../property.config';
 })
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
+  /**
+   * Action to use to show URL properties
+   */
   @Input() showUrl: Action = {
     type: <Type<Component>> ShowUrlComponent
   };
+  /**
+   * The ID of the object to show
+   */
   @Input() id: string;
+  /**
+   * The actual data of the object to show. Can be given instead of ID to avoid
+   * needing to retrieve object data from the database that you already have
+   */
   @Input() object: any;
+  /**
+   * List of property names.
+   * If given, causes only these properties to be shown.
+   */
   @Input() showOnly: string[];
+  /**
+   * List of property names.
+   * If given, causes these properties to not be shown.
+   */
   @Input() showExclude: string[];
+  /**
+   * Passed to showUrl
+   * (For the default showUrl, this will cause any URL properties
+   * to display without the protocol and path)
+   */
   @Input() showBaseUrlsOnly: boolean = false;
+  /**
+   * The object being shown
+   */
   @Output() loadedObject = new EventEmitter<any>();
 
-  // Internal input
+  /**
+   * List of property names.
+   * If given, causes exactly these properties to be shown.
+   * Takes precedence over showOnly and showExclude.
+   * Primarily intended for use within the cliché.
+   * App creators probably want showOnly.
+   */
   @Input() properties: string[];
   propertySchemas: { [propName: string]: {
     type: string,

@@ -1,12 +1,6 @@
 export interface GroupDoc {
   id: string;
   memberIds: string[];
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-group' | 'add-member' | 'remove-member';
 }
 
 export interface GroupsInput {

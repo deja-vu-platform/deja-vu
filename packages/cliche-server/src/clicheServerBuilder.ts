@@ -23,7 +23,8 @@ export type GetDynamicTypeDefsFn<C = Config> = (config: C) => string[];
 export class ClicheServerBuilder<C extends Config = Config> {
   private readonly _name: string;
   private _schemaPath: string = path.join(
-    path.dirname(callsite()[1].getFileName()), 'schema.graphql');
+    path.dirname(callsite()[1]
+        .getFileName()), 'schema.graphql');
   private _actionRequestTable: ActionRequestTable = {};
   private _config: C;
   private _initDbCallback?: InitDbCallbackFn<C>;

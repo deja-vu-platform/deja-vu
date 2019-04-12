@@ -1,23 +1,26 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
 import {
   CreateScoreInput,
+  DeleteScoreInput,
+  DeleteScoresInput,
   ScoreDoc,
   ShowScoreInput,
   ShowTargetInput,
   Target,
-  TargetsByScoreInput
+  TargetsByScoreInput,
+  UpdateScoreInput
 } from './schema';
-
-import { v4 as uuid } from 'uuid';
 
 interface ScoringConfig extends Config {
   /* Function body that calculates the total score
@@ -51,15 +54,39 @@ const actionRequestTable: ActionRequestTable = {
     query ShowTargetsByScore($input: TargetsByScoreInput!) {
       targetsByScore(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'update-score': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateScore($input: UpdateScoreInput!) {
+            updateScore (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Score($input: ShowScoreInput!) {
+            score (input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
+  'delete-score': (extraInfo) => `
+    mutation DeleteScore($input: DeleteScoreInput!) {
+      deleteScore (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-scores': (extraInfo) => `
+    mutation DeleteScores($input: DeleteScoresInput!) {
+      deleteScores (input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 
-function isPendingCreate(doc: ScoreDoc | null) {
-  return _.get(doc, 'pending.type') === 'create-score';
-}
-
-function resolvers(db: mongodb.Db, config: ScoringConfig): object {
-  const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+function resolvers(db: ClicheDb, config: ScoringConfig): object {
+  const scores: Collection<ScoreDoc> = db.collection('scores');
   const totalScoreFn = config.totalScoreFn ?
     new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;
 
@@ -74,34 +101,11 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           throw new Error('Insufficient inputs to query a score');
         }
 
-        let query;
-        if (_.isNil(input.id)) {
-          query = {
-            sourceId: input.sourceId,
-            targetId: input.targetId,
-            pending: { $exists: false }
-          };
-        } else {
-          query = {
-            id: input.id,
-            pending: { $exists: false }
-          };
-        }
-
-        const score = await scores.findOne(query);
-
-        if (_.isNil(score) || isPendingCreate(score)) {
-          const scoreInfo = !_.isNil(input.id) ? input.id :
-            `with targetId: ${input.targetId}, sourceId: ${input.sourceId}`;
-          throw new Error(`Score ${scoreInfo} not found`);
-        }
-
-        return score;
+        return await scores.findOne(input);
       },
 
-      target: async (
-        _root, { input }: { input: ShowTargetInput }) => {
-        const filter = { targetId: input.id, pending: { $exists: false } };
+      target: async (_root, { input }: { input: ShowTargetInput }) => {
+        const filter = { targetId: input.id };
         if (!_.isNil(input.sourceId)) {
           filter['sourceId'] = input.sourceId;
         }
@@ -132,7 +136,7 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
       targetsByScore: async (
         _root,
         { input }: { input: TargetsByScoreInput }): Promise<Target[]> => {
-        const query = { pending: { $exists: false } };
+        const query = {};
 
         if (!_.isNil(input)) {
           if (!_.isNil(input.targetIds)) {
@@ -186,31 +190,37 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
           targetId: input.targetId
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newScore.pending = {
-              reqId: context.reqId,
-              type: 'create-score'
-            };
-          /* falls through */
-          case undefined:
-            await scores.insertOne(newScore);
+        return await scores.insertOne(context, newScore);
+      },
 
-            return newScore;
-          case 'commit':
-            await scores.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
+      updateScore: async (
+        _root, { input }: { input: UpdateScoreInput }, context: Context) => {
+        const updateOp = { $set: { value: input.value } };
 
-            return newScore;
-          case 'abort':
-            await scores.deleteOne(reqIdPendingFilter);
+        return await scores
+          .updateOne(context, { id: input.id }, updateOp);
+      },
 
-            return newScore;
+      deleteScore: async (
+        _root, { input }: { input: DeleteScoreInput }, context: Context) => {
+        return await scores.deleteOne(context, { id: input.id });
+      },
+
+      deleteScores: async (
+        _root, { input }: { input: DeleteScoresInput }, context: Context) => {
+        const filter = {};
+
+        if (!_.isNil(input)) {
+          if (!_.isNil(input.targetId)) {
+            filter['targetId'] = input.targetId;
+          }
+
+          if (!_.isNil(input.sourceId)) {
+            filter['sourceId'] = input.sourceId;
+          }
         }
-
-        return newScore;
+        
+        return await scores.deleteMany(context, filter);
       }
     }
   };
@@ -218,8 +228,8 @@ function resolvers(db: mongodb.Db, config: ScoringConfig): object {
 
 const scoringCliche: ClicheServer<ScoringConfig> =
   new ClicheServerBuilder<ScoringConfig>('scoring')
-    .initDb((db: mongodb.Db, config: ScoringConfig): Promise<any> => {
-      const scores: mongodb.Collection<ScoreDoc> = db.collection('scores');
+    .initDb((db: ClicheDb, config: ScoringConfig): Promise<any> => {
+      const scores: Collection<ScoreDoc> = db.collection('scores');
       const sourceTargetIndexOptions = config.oneToOneScoring ?
         { unique: true, sparse: true } : {};
 

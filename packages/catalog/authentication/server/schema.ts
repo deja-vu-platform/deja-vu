@@ -2,12 +2,6 @@ export interface UserDoc {
   id: string;
   username: string;
   password: string;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'register' | 'change-password';
 }
 
 export interface User {

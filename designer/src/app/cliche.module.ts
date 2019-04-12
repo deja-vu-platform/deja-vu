@@ -21,6 +21,40 @@ import * as scoring from '@deja-vu/scoring';
 import * as task from '@deja-vu/task';
 import * as transfer from '@deja-vu/transfer';
 
+import * as dvDocs from '@deja-vu/core/pkg/documentation.json';
+dv['documentation'] = dvDocs;
+
+import * as authenDocs from '@deja-vu/authentication/pkg/documentation.json';
+authentication['documentation'] = authenDocs;
+import * as authoriDocs from '@deja-vu/authorization/pkg/documentation.json';
+authorization['documentation'] = authoriDocs;
+import * as commentDocs from '@deja-vu/comment/pkg/documentation.json';
+comment['documentation'] = commentDocs;
+import * as eventDocs from '@deja-vu/event/pkg/documentation.json';
+event['documentation'] = eventDocs;
+import * as followDocs from '@deja-vu/follow/pkg/documentation.json';
+follow['documentation'] = followDocs;
+import * as geolocDocs from '@deja-vu/geolocation/pkg/documentation.json';
+geolocation['documentation'] = geolocDocs;
+import * as groupDocs from '@deja-vu/group/pkg/documentation.json';
+group['documentation'] = groupDocs;
+import * as labelDocs from '@deja-vu/label/pkg/documentation.json';
+label['documentation'] = labelDocs;
+import * as passkeyDocs from '@deja-vu/passkey/pkg/documentation.json';
+passkey['documentation'] = passkeyDocs;
+import * as propertyDocs from '@deja-vu/property/pkg/documentation.json';
+property['documentation'] = propertyDocs;
+import * as rankingDocs from '@deja-vu/ranking/pkg/documentation.json';
+ranking['documentation'] = rankingDocs;
+import * as ratingDocs from '@deja-vu/rating/pkg/documentation.json';
+rating['documentation'] = ratingDocs;
+import * as scoringDocs from '@deja-vu/scoring/pkg/documentation.json';
+scoring['documentation'] = scoringDocs;
+import * as taskDocs from '@deja-vu/task/pkg/documentation.json';
+task['documentation'] = taskDocs;
+import * as transferDocs from '@deja-vu/transfer/pkg/documentation.json';
+transfer['documentation'] = transferDocs;
+
 import {
   ActionInputs,
   App,
@@ -49,6 +83,21 @@ const importedCliches: { [name: string]: Object} = {
   transfer
 };
 
+const outputTypeRegex = /EventEmitter<(.*)>/;
+
+/**
+ * Converts a string of HTML to a string of the text it would render
+ * (i.e. strips tags and converts codes to characters)
+ */
+function htmlToText(html: string): string {
+  const div = document.createElement('div');
+  div.style.display = 'none';
+  div.innerHTML = html;
+  const text = div.innerText;
+  div.remove();
+
+  return text;
+}
 
 // each imported Cliche Module has an Angular Module
 // which we need to import and export
@@ -69,12 +118,25 @@ function isComponent(f: any) {
   return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
 }
 
+function removeSurroundingQuotes(s: string): string {
+  if (s.length <= 1) { return s; }
+
+  const first = _.first(s);
+  const last = _.last(s);
+  // tslint:disable-next-line quotemark
+  if (first === last && (last === '"' || last === "'")) {
+    return s.slice(1, -1);
+  }
+
+  return s;
+}
+
 function clicheDefinitionFromModule(
   importedModule: Object,
-  name: string
+  moduleName: string
 ): ClicheDefinition {
   return {
-    name,
+    name: moduleName,
     actions: Object.values(importedModule)
       .filter(isComponent)
       .map((component): ClicheActionDefinition => {
@@ -104,24 +166,40 @@ function clicheDefinitionFromModule(
           isComponent(_.get(instance, [input, 'type']))
         );
 
+        // parse the template to get the action map
+        // since angular uses valid HTML, we can use built-in dom methods
         const template: string = component.decorators[0].args[0].template;
-        // parse the template string to extract the object map
-        // TODO: stop assuming zero or one action input per action
         if (actionInputNames.length > 0) {
-          const inputMapMatch = template.match(/\[inputs\]="{([\s\S]*?)}"/);
-          if (inputMapMatch) {
-            actionInputs[actionInputNames[0]] = _.fromPairs(
-              inputMapMatch[1]
-                .split(',')
-                .map((s1) => s1.split(':')
-                  .map((s2) => s2.trim())
-                  .reverse()
-                )
-            );
-          } else {
-            actionInputs[actionInputNames[0]] = {};
-          }
+          const div = document.createElement('div');
+          div.innerHTML = template;
+          const includes = Array.from(div.getElementsByTagName('dv-include'));
+          includes.forEach((include) => {
+            const inputName = include.getAttribute('[action]');
+            const inputsAttr = (include.getAttribute('[inputs]') || '');
+            const inputsRes = /{([\s\S]*?)}/.exec(inputsAttr);
+            if (inputsRes && inputsRes[1]) {
+              // TODO: handle legitimate uses of : or , (e.g. in strings)
+              actionInputs[inputName] = _.fromPairs(
+                inputsRes[1]
+                  .split(',')
+                  .map((s1) => s1.split(':'))
+                  .filter(([ioName, propertyName]) => ioName && propertyName)
+                  .map(([ioName, propertyName]) => [
+                    removeSurroundingQuotes(ioName.trim()),
+                    propertyName.trim()
+                  ])
+                  .filter(([ioName, propertyName]) => ioName && propertyName)
+              );
+            }
+          });
+          div.remove();
         }
+
+        actionInputNames.forEach((actionInputName) => {
+          if (!actionInputs[actionInputName]) {
+            actionInputs[actionInputName] = {};
+          }
+        });
 
         if (template.includes('ng-content')) {
           inputs.push('*content');
@@ -131,13 +209,60 @@ function clicheDefinitionFromModule(
         inputs.sort();
         outputs.sort();
 
+        const actionName = _.kebabCase(component.name
+          .slice(0, componentSuffix.length * -1));
+
+        let description = '';
+        const ioDescriptions = {
+          hidden: '(boolean) If true, do not display the action'
+        };
+        const moduleDocs = importedModule['documentation'];
+        if (moduleDocs) {
+          const componentDocs = moduleDocs.components
+            .find((c) => c.name === component.name);
+          if (componentDocs) {
+            description = htmlToText(componentDocs.description);
+            // extract type argument from EventEmitter for outputs
+            // the default value is tried first because type is sometimes
+            //   missing the type argument
+            componentDocs.outputsClass.forEach((ioDocs) => {
+              ioDocs.type = _.get(outputTypeRegex.exec(ioDocs.defaultValue), 1)
+                || _.get(outputTypeRegex.exec(ioDocs.type), 1)
+                || 'any';
+            });
+            [
+              ...componentDocs.inputsClass,
+              ...componentDocs.outputsClass
+            ].forEach((ioDocs) => {
+              let { type, description: ioDescription } = ioDocs;
+              const { defaultValue, name } = ioDocs;
+              // compodoc doesn't infer types based on defaults
+              if (!type) {
+                if (defaultValue) {
+                  try {
+                    // tslint:disable-next-line no-eval
+                    type = typeof eval(defaultValue);
+                  } catch (e) {
+                    type = 'any';
+                  }
+                } else {
+                  type = 'any';
+                }
+              }
+              ioDescription = ioDescription || '';
+              ioDescriptions[name] = `(${type}) ${htmlToText(ioDescription)}`;
+            });
+          }
+        }
+
         return {
-          name: _.kebabCase(component.name
-            .slice(0, componentSuffix.length * -1)),
+          name: actionName,
           component,
           inputs,
           outputs,
-          actionInputs
+          actionInputs,
+          description,
+          ioDescriptions
         };
       })
       .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
@@ -162,7 +287,9 @@ dvCliche.actions.push(({
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: {}
+  actionInputs: {},
+  description: 'Display custom text, images, and other content',
+  ioDescriptions: {}
 }));
 
 @NgModule({

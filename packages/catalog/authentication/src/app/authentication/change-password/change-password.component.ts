@@ -111,6 +111,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   dvOnExecSuccess() {
     this.newPasswordSaved = true;
+    this.newPasswordSavedError = '';
     window.setTimeout(() => {
       this.newPasswordSaved = false;
     }, SAVED_MSG_TIMEOUT);

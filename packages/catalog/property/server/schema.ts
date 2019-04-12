@@ -1,11 +1,3 @@
-export interface Pending {
-  _pending?: PendingDoc;
-}
-
-export interface ObjectDoc extends Pending {
+export interface ObjectDoc {
   [field: string]: any;
-}
-
-export interface PendingDoc {
-  reqId: string;
 }

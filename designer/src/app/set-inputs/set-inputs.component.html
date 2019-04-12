@@ -23,6 +23,7 @@
     class="action-input mat-form-field"
     dragula="action"
     (inputAction)="inputAction(input, $event)"
+    [matTooltip]="actionInstance.of?.ioDescriptions[input]"
   >
     <span class="prompt no-drag">Replace {{input}}</span>
     <div
@@ -55,9 +56,13 @@
               <div
                 *ngFor="let name of actionInput(input)"
                 [attr.data-output]="'$' + name"
+                [matTooltip]="actionInputsIODescriptions[input][name]"
               >
                 {{name}}
               </div>
+            </div>
+            <div *ngIf="actionInput(input).length === 0">
+              There are none.
             </div>
           </div>
           <app-set-inputs
@@ -81,6 +86,7 @@
       dragula="expression-io"
       (addOutput)="addOutput(input, $event)"
       [attr.data-context]="context"
+      [matTooltip]="actionInstance.of?.ioDescriptions[input]"
     >
   </mat-form-field>
 </div>

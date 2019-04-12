@@ -81,7 +81,7 @@ export class SignInComponent
         `
       }
     })
-      .toPromise();
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

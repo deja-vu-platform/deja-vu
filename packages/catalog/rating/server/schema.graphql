@@ -25,6 +25,17 @@ input SetRatingInput {
   newRating: Float
 }
 
+input DeleteRatingInput {
+  bySourceId: ID!
+  ofTargetId: ID!
+}
+
+# delete all the ratings associated with a source or target
+input DeleteRatingsInput {
+  bySourceId: ID
+  ofTargetId: ID
+}
+
 type Query {
   rating(input: RatingInput!): Rating
   ratings(input: RatingsInput!): [Rating]
@@ -34,4 +45,6 @@ type Query {
 
 type Mutation {
   setRating(input: SetRatingInput!): Boolean
+  deleteRating(input: DeleteRatingInput!): Boolean
+  deleteRatings(input: DeleteRatingsInput!): Boolean
 }

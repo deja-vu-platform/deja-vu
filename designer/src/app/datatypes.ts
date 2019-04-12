@@ -47,6 +47,8 @@ export interface ActionDefinition {
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
+  description: string;
+  ioDescriptions: { [ioName: string]: string };
 }
 
 /**
@@ -162,10 +164,10 @@ export class AppActionDefinition implements ActionDefinition {
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
+    html += '</div>\n';
     if (this.transaction) {
       html += '</dv.tx>\n';
     }
-    html += '</div>\n';
     html += '</dv.action>';
 
     return html;

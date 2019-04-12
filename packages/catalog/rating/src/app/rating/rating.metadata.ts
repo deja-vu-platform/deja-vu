@@ -1,5 +1,6 @@
-import { ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
+// import required for packaging
+import { ModuleWithProviders } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule
@@ -22,8 +23,16 @@ import {
   ShowRatingsByTargetComponent
 } from './show-ratings-by-target/show-ratings-by-target.component';
 export { ShowRatingsByTargetComponent };
-import { ShowRatingCountComponent } from './show-rating-count/show-rating-count.component';
+import {
+  ShowRatingCountComponent
+} from './show-rating-count/show-rating-count.component';
 export { ShowRatingCountComponent };
+import {
+  DeleteRatingsComponent
+} from './delete-ratings/delete-ratings.component';
+export { DeleteRatingsComponent };
+import { DeleteRatingComponent } from './delete-rating/delete-rating.component';
+export { DeleteRatingComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 
@@ -31,8 +40,9 @@ import { DvModule } from '@deja-vu/core';
 
 
 const allComponents = [
-  RateTargetComponent, ShowAverageRatingComponent,
-  ShowRatingComponent, ShowRatingsByTargetComponent, ShowRatingCountComponent
+  RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
+  ShowRatingsByTargetComponent, ShowRatingCountComponent,
+  DeleteRatingsComponent, DeleteRatingComponent
 ];
 
 

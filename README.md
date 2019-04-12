@@ -1,6 +1,6 @@
 # Déjà Vu
 
-Déjà Vu is an experimental language for building web apps. It features
+Déjà Vu is an experimental platform for building web apps. It features
 built-in user functionality for rapid construction of apps
 with complex behavior and rich user interfaces.
 
@@ -21,8 +21,7 @@ app. Read the [tutorial](docs/tutorial.md) for more information.
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we would love to hear what you think!
 You can play around with it and shoot us an email or create an issue with your
-feedback or questions. See the [roadmap](ROADMAP.md) for a list of things
-we plan to work on next.
+feedback or questions.
 
 ## Motivation
 
@@ -49,7 +48,7 @@ everything from source. Good news is that if you want to contribute code, you'll
 be all set to do so.
 
 You are going to need [yarn](https://yarnpkg.com) v1.10+,
-[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 3.4+.
+[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+.
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything

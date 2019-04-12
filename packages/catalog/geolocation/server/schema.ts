@@ -6,12 +6,6 @@ export interface MarkerDoc {
     coordinates: [number, number]   // [longitude, latitude]
   };
   mapId: string;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-marker' | 'delete-marker';
 }
 
 export interface Marker {
