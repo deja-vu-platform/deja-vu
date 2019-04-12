@@ -38,15 +38,26 @@ export { ShowObjectsComponent };
 import { ShowUrlComponent } from './show-url/show-url.component';
 export { ShowUrlComponent };
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
+import {
+  TriStateCheckboxComponent
+} from './tri-state-checkbox/tri-state-checkbox.component';
 
 
-const allComponents = [
-  ChooseObjectComponent, CreateObjectComponent, CreateObjectsComponent,
-  CreatePropertyComponent, ObjectAutocompleteComponent,
-  ShowObjectComponent, ShowObjectsComponent, ShowUrlComponent,
+const publicComponents = [
+  ChooseObjectComponent,
+  CreateObjectComponent,
+  CreateObjectsComponent,
+  CreatePropertyComponent,
+  ObjectAutocompleteComponent,
+  ShowObjectComponent,
+  ShowObjectsComponent,
+  ShowUrlComponent,
   ConfigWizardComponent
 ];
 
+const privateComponents = [
+  TriStateCheckboxComponent
+];
 
 const metadata = {
   imports: [
@@ -66,9 +77,13 @@ const metadata = {
     MatTableModule,
     MatTooltipModule
   ],
-  declarations: [...allComponents, CamelToTitleCasePipe],
-  entryComponents: allComponents,
-  exports: [...allComponents, CamelToTitleCasePipe]
+  declarations: [
+    ...publicComponents,
+    ...privateComponents,
+    CamelToTitleCasePipe
+  ],
+  entryComponents: [...publicComponents, ...privateComponents],
+  exports: [...publicComponents, CamelToTitleCasePipe]
 };
 
 export { metadata };

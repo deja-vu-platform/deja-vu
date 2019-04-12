@@ -94,6 +94,7 @@ export class ConfigWizardComponent implements OnInit {
 
   ngOnInit(): void {
     this.config.schema.title = this.clicheName;
+    this.change.subscribe((v) => console.log(v)); // DEBUG
   }
 
   /**
@@ -167,7 +168,6 @@ export class ConfigWizardComponent implements OnInit {
    * Sends null otherwise
    */
   postUpdateIfValid(): void {
-    console.log(this.config);
     if (this.isValid()) {
       this.change.next(this.config);
     } else {
@@ -197,15 +197,11 @@ export class ConfigWizardComponent implements OnInit {
       });
     });
     this.properties = properties;
-    // force a table refresh
-    // const { initialObjects } = this.config;
-    // this.config.initialObjects = [];
-    // setTimeout(() => this.config.initialObjects = initialObjects);
     this.postUpdateIfValid();
   }
 
   /**
-   * Whether or not the configuration is completed
+   * Whether or not the configurat ion is completed
    * This **is not** a checkRep. Constraints like
    *   "required contains only keys of properties"
    *   are enforced by the UI logic

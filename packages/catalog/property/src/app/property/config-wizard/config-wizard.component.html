@@ -111,11 +111,26 @@
     </mat-header-cell>
     <mat-cell *matCellDef="let obj">
       <mat-checkbox
-        *ngIf="property.type === 'Boolean'"
+        *ngIf="property.type === 'Boolean' && property.required"
         [name]="property.name"
         [(ngModel)]="obj[property.name]"
+        [matTooltip]="obj[property.name] === true ? 'True' : 'False'"
       >
       </mat-checkbox>
+      <property-tri-state-checkbox
+        *ngIf="property.type === 'Boolean' && !property.required"
+        [name]="property.name"
+        [(ngModel)]="obj[property.name]"
+        [matTooltip]="
+          obj[property.name] === true
+            ? 'True'
+            : (obj[property.name] === false
+              ? 'False'
+              : 'Unset'
+            )
+        "
+      >
+      </property-tri-state-checkbox>
       <mat-form-field *ngIf="property.type !== 'Boolean'">
         <input
           matInput
@@ -160,6 +175,7 @@
   matTooltip="Add Initial Object"
   (click)="addInitialObject()"
   [disabled]="properties.length === 0"
+  class="right"
 >
   <mat-icon>add</mat-icon>
 </button>
