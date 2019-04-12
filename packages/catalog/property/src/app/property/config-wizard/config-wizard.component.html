@@ -17,7 +17,7 @@
 
   <ng-container matColumnDef="type">
     <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-    <mat-cell *matCellDef="let property">{{types[property.type]}}</mat-cell>
+    <mat-cell *matCellDef="let property">{{property.type}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="required">
@@ -71,7 +71,7 @@
       [(ngModel)]="newPropertyType"
     >
       <mat-option
-        *ngFor="let type of typesEntries"
+        *ngFor="let type of types"
         [value]="type[0]"
       >
         {{type[1]}}

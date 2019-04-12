@@ -36,7 +36,10 @@
       >
     </mat-form-field>
 
-    <mat-form-field>
+    <ng-template propertyDynamicComponent>
+    </ng-template>
+
+    <mat-form-field [hidden]="!of || !!of.configWizardComponent">
       <textarea
         matInput
         name="config"

@@ -9,7 +9,7 @@ export interface Config {
   schema: Schema;
   initalObjects: Object[];
 }
-type propertyType = keyof typeof jsonSchemaTypeToGraphQlType;
+export type propertyType = keyof typeof jsonSchemaTypeToGraphQlType;
 
 const types: Readonly<typeof jsonSchemaTypeToGraphQlType>
   = jsonSchemaTypeToGraphQlType;
@@ -25,12 +25,18 @@ const displayedColumns: ReadonlyArray<string>
 })
 export class ConfigWizardComponent implements OnInit {
   // constants
-  readonly types = types;
-  readonly typesEntries = typesEntries;
+  readonly types = typesEntries;
   readonly displayedColumns = displayedColumns;
 
   // I/O
+  /**
+   * The name the cliche is being *instantiated* with
+   * (Obviously the cliche is named property)
+   */
   @Input() readonly clicheName: string;
+  /**
+   * Object that should be included in the dvconfig
+   */
   @Output() readonly change = new EventEmitter<Config>();
 
   // state
@@ -47,7 +53,7 @@ export class ConfigWizardComponent implements OnInit {
   newPropertyType: propertyType;
 
   // dependent state
-  properties: { name: string, type: propertyType, required: boolean }[] = [];
+  properties: { name: string, type: string, required: boolean }[] = [];
 
   ngOnInit(): void {
     this.config.schema.title = this.clicheName;
@@ -117,7 +123,7 @@ export class ConfigWizardComponent implements OnInit {
     _.forOwn(this.config.schema.properties, (prop, name) => {
       properties.push({
         name,
-        type: prop.type,
+        type: types[prop.type],
         required: required.has(name)
       });
     });

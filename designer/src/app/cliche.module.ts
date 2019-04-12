@@ -113,9 +113,18 @@ const modules: any[] = Object.values(importedCliches)
 // create Cliche Definitions from imported Cliche Modules
 importedCliches['dv'] = dv;
 const componentSuffix = 'Component';
+const configWizardComponentName = 'ConfigWizardComponent';
 
 function isComponent(f: any) {
   return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
+}
+
+function isAction(f: any) {
+  return isComponent(f) && f.name !== configWizardComponentName;
+}
+
+function isConfigWizardComponent(f: any) {
+  return isComponent(f) && f.name === configWizardComponentName;
 }
 
 function removeSurroundingQuotes(s: string): string {
@@ -138,7 +147,7 @@ function clicheDefinitionFromModule(
   return {
     name: moduleName,
     actions: Object.values(importedModule)
-      .filter(isComponent)
+      .filter(isAction)
       .map((component): ClicheActionDefinition => {
         // get inputs and outputs
         const inputs = OMNIPRESENT_INPUTS.slice();
@@ -265,7 +274,9 @@ function clicheDefinitionFromModule(
           ioDescriptions
         };
       })
-      .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1)
+      .sort((cd1, cd2) => cd1.name < cd2.name ? -1 : 1),
+    configWizardComponent: Object.values(importedModule)
+      .find(isConfigWizardComponent)
   };
 }
 

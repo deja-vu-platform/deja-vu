@@ -1,4 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  Component,
+  ComponentFactoryResolver,
+  EventEmitter,
+  Inject,
+  Injector,
+  OnInit,
+  Type,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import {
   ErrorStateMatcher,
@@ -7,9 +17,11 @@ import {
   MatSelectChange
 } from '@angular/material';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
 
 import { clicheDefinitions } from '../cliche.module';
 import { App, ClicheDefinition, ClicheInstance } from '../datatypes';
+import { DynamicComponentDirective } from '../dynamic-component.directive';
 
 
 export interface DialogData {
@@ -59,14 +71,19 @@ class JSONValidator extends ErrorStateMatcher {
   styleUrls: ['./configure-cliche.component.scss']
 })
 export class ConfigureClicheComponent implements OnInit {
+  @ViewChild(DynamicComponentDirective)
+    private readonly configWizardComponentHost: DynamicComponentDirective;
   of: ClicheDefinition;
   name: string;
   configString: string;
   readonly jsonValidator: JSONValidator;
+  sub: Subscription;
 
   constructor(
     private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
-    @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
+    @Inject(MAT_DIALOG_DATA) public readonly data: DialogData,
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    private readonly injector: Injector
   ) {
     this.jsonValidator = new JSONValidator(this);
   }
@@ -89,6 +106,11 @@ export class ConfigureClicheComponent implements OnInit {
 
   onSelectCliche(event: MatSelectChange) {
     this.name = event.value.name;
+    if (this.of.configWizardComponent) {
+      this.loadConfigWizard();
+    } else {
+      this.clearConfigWizard();
+    }
   }
 
   cancel() {
@@ -131,6 +153,34 @@ export class ConfigureClicheComponent implements OnInit {
       _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
       this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
     }
+  }
+
+  private clearConfigWizard(): ViewContainerRef {
+    if (this.sub) {
+      this.sub.unsubscribe();
+      this.sub = undefined;
+    }
+    this.configString = '';
+    const { viewContainerRef } = this.configWizardComponentHost;
+    viewContainerRef.clear();
+
+    return viewContainerRef;
+  }
+
+  private loadConfigWizard() {
+    const viewContainerRef = this.clearConfigWizard();
+    const componentFactory = this.componentFactoryResolver
+      .resolveComponentFactory(<Type<{}>>this.of.configWizardComponent);
+    const componentRef = viewContainerRef.createComponent(
+      componentFactory,
+      0,
+      this.injector
+    );
+    componentRef.instance['clicheName'] = this.name;
+    const changeOutput: EventEmitter<Object> = componentRef.instance['change'];
+    this.sub = changeOutput.subscribe((config) => {
+      this.configString = config ? JSON.stringify(config) : ' '; // ' ' will err
+    });
   }
 
 }
