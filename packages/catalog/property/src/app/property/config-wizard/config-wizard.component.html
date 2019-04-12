@@ -1,0 +1,90 @@
+<mat-form-field>
+  <input
+    matInput
+    required
+    placeholder="Object Name"
+    [(ngModel)]="config.schema.title"
+    (ngModelChange)="postUpdateIfValid()"
+  >
+</mat-form-field>
+
+<mat-table #table [dataSource]="properties" *ngIf="properties.length > 0">
+
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-cell *matCellDef="let property">{{property.name}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="type">
+    <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+    <mat-cell *matCellDef="let property">{{types[property.type]}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="required">
+    <mat-header-cell *matHeaderCellDef>Required</mat-header-cell>
+    <mat-cell *matCellDef="let property">
+      <mat-checkbox
+        [checked]="property.required"
+        (change)="toggleRequired(property.name)"
+      >
+      </mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="remove">
+    <mat-header-cell *matHeaderCellDef>Remove</mat-header-cell>
+    <mat-cell *matCellDef="let property">
+      <button
+        mat-button
+        color="warn"
+        matTooltip="Remove Property"
+        (click)="remove(property.name)"
+      >
+        <mat-icon>remove</mat-icon>
+      </button>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+
+<p *ngIf="properties.length === 0">
+  Add a property!
+</p>
+
+<form class="cfg-wiz-row">
+  <mat-form-field>
+    <input
+      matInput
+      [required]="properties.length === 0"
+      name="property-name"
+      placeholder="Property Name"
+      [(ngModel)]="newPropertyName"
+    >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select
+      [required]="properties.length === 0"
+      name="property-type"
+      placeholder="Property Type"
+      [(ngModel)]="newPropertyType"
+    >
+      <mat-option
+        *ngFor="let type of typesEntries"
+        [value]="type[0]"
+      >
+        {{type[1]}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button
+    mat-button
+    color="primary"
+    matTooltip="Add Property"
+    (click)="add()"
+    [disabled]="!newPropertyName || !newPropertyType"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</form>

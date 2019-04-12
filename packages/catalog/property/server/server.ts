@@ -4,7 +4,6 @@ import {
   ClicheServer,
   ClicheServerBuilder,
   Collection,
-  Config,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
@@ -12,31 +11,11 @@ import {
 import * as Ajv from 'ajv';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
+import {
+  jsonSchemaTypeToGraphQlType,
+  PropertyConfig
+} from './config-types';
 import { ObjectDoc } from './schema';
-
-const jsonSchemaTypeToGraphQlType = {
-  integer: 'Int',
-  number: 'Float',
-  string: 'String',
-  boolean: 'Boolean'
-  /* Not supported yet: object, array, null */
-};
-
-interface Property {
-  type: keyof typeof jsonSchemaTypeToGraphQlType;
-}
-
-interface Schema {
-  properties: { [name: string]: Property };
-  required?: string[];
-  title: string;
-  type: 'object';
-}
-
-interface PropertyConfig extends Config {
-  initialObjects: Object[];
-  schema: Schema;
-}
 
 const loadSchemaQuery = (extraInfo) => `
   query Properties {

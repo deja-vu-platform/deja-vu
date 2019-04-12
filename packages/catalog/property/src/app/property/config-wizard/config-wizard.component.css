@@ -1,0 +1,13 @@
+mat-form-field {
+  width: 100%;
+}
+
+.cfg-wiz-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cfg-wiz-row > *:not(:last-child) {
+  margin-right: 16px;
+}

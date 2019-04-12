@@ -1,10 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatAutocompleteModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-  MatSelectModule
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatCheckboxModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatSelectModule,
+  MatTableModule,
+  MatTooltipModule
 } from '@angular/material';
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from '@deja-vu/core';
@@ -31,12 +37,14 @@ import { ShowObjectsComponent } from './show-objects/show-objects.component';
 export { ShowObjectsComponent };
 import { ShowUrlComponent } from './show-url/show-url.component';
 export { ShowUrlComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 
 
 const allComponents = [
   ChooseObjectComponent, CreateObjectComponent, CreateObjectsComponent,
   CreatePropertyComponent, ObjectAutocompleteComponent,
-  ShowObjectComponent, ShowObjectsComponent, ShowUrlComponent
+  ShowObjectComponent, ShowObjectsComponent, ShowUrlComponent,
+  ConfigWizardComponent
 ];
 
 
@@ -44,11 +52,19 @@ const metadata = {
   imports: [
     CommonModule,
     DvModule,
-    FormsModule, ReactiveFormsModule,
+    FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatAutocompleteModule, MatButtonModule, MatInputModule, MatFormFieldModule,
-    MatSelectModule
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatSelectModule,
+    MatTableModule,
+    MatTooltipModule
   ],
   declarations: [...allComponents, CamelToTitleCasePipe],
   entryComponents: allComponents,
