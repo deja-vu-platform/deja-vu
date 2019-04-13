@@ -3,7 +3,7 @@ import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
   Schema
@@ -14,7 +14,7 @@ export interface Config {
   initialObjects: Object[];
 }
 export type propertyType = keyof typeof jsonSchemaTypeToGraphQlType;
-interface Property {
+export interface Property {
   name: string;
   type: string;
   required: boolean;
@@ -37,7 +37,7 @@ const initialObjectsTableRemoveColumnName = uuidv4(); // avoid name clashes
 const intRegex = /^\d*$/;
 const floatRegex = /^\d*\.?\d*$/;
 
-class RegexMatcher extends ErrorStateMatcher {
+export class RegexMatcher extends ErrorStateMatcher {
 
   constructor(private regex: RegExp) {
     super();
