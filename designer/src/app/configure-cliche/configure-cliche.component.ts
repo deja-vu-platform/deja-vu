@@ -178,9 +178,12 @@ export class ConfigureClicheComponent implements OnInit {
     );
     componentRef.instance['clicheName'] = this.name;
     const changeOutput: EventEmitter<Object> = componentRef.instance['change'];
-    this.sub = changeOutput.subscribe((config) => {
-      this.configString = config ? JSON.stringify(config) : ' '; // ' ' will err
-    });
+    if (changeOutput) {
+      this.sub = changeOutput.subscribe((config) => {
+        // ' ' just aims to invalidate the form
+        this.configString = config ? JSON.stringify(config) : ' ';
+      });
+    }
   }
 
 }
