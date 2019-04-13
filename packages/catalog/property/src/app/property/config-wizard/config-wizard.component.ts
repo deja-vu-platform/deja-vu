@@ -101,7 +101,6 @@ export class ConfigWizardComponent implements OnInit {
 
   ngOnInit(): void {
     this.config.schema.title = this.clicheName;
-    this.change.subscribe((v) => console.log(v)); // DEBUG
   }
 
   /**
