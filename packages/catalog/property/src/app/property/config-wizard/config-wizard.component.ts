@@ -1,5 +1,9 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import {
+  FormControl,
+  FormGroupDirective,
+  NgForm
+} from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -73,15 +77,13 @@ export class ConfigWizardComponent implements OnInit {
 
   // I/O
   /**
-   * The name the cliche is being *instantiated* with
-   * (Obviously the cliche is named property)
+   * JSON string; initial config
    */
-  @Input() readonly clicheName: string;
+  @Input() readonly value: string;
   /**
-   * Object that should be included in the dvconfig
-   * Null is the initial value because the state starts invalid
+   * JSON string, or null if configuration is not valid
    */
-  @Output() readonly change = new BehaviorSubject<Config>(null);
+  @Output() readonly change = new BehaviorSubject<string>(null);
 
   // state
   readonly config: { schema: Schema, initialObjects: Object[] } = {
@@ -99,10 +101,6 @@ export class ConfigWizardComponent implements OnInit {
   // dependent state
   properties: Property[] = [];
 
-  ngOnInit(): void {
-    this.config.schema.title = this.clicheName;
-  }
-
   /**
    * The columns of the initial objects table
    * All property names plus a column for the remove button
@@ -112,6 +110,13 @@ export class ConfigWizardComponent implements OnInit {
       ...this.properties.map(this.columnName),
       initialObjectsTableRemoveColumnName
     ];
+  }
+
+  ngOnInit() {
+    if (this.value) {
+      Object.assign(this.config, JSON.parse(this.value));
+      setTimeout(() => this.updatedProperties());
+    }
   }
 
   /**
@@ -210,7 +215,9 @@ export class ConfigWizardComponent implements OnInit {
 
         return parsedInitialObject;
       });
-      this.change.next(Object.assign({}, this.config, { initialObjects }));
+      this.change.next(JSON.stringify(Object.assign(
+        {}, this.config, { initialObjects }
+      )));
     } else {
       this.change.next(null); // not valid
     }

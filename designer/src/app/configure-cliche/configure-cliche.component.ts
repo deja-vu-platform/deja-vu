@@ -93,6 +93,9 @@ export class ConfigureClicheComponent implements OnInit {
       this.of = this.data.cliche.of;
       this.name = this.data.cliche.name;
       this.configString = JSON.stringify(this.data.cliche.config);
+      if (this.of.configWizardComponent) {
+        this.loadConfigWizard();
+      }
     }
   }
 
@@ -106,6 +109,7 @@ export class ConfigureClicheComponent implements OnInit {
 
   onSelectCliche(event: MatSelectChange) {
     this.name = event.value.name;
+    this.configString = '';
     if (this.of.configWizardComponent) {
       this.loadConfigWizard();
     } else {
@@ -160,7 +164,6 @@ export class ConfigureClicheComponent implements OnInit {
       this.sub.unsubscribe();
       this.sub = undefined;
     }
-    this.configString = '';
     const { viewContainerRef } = this.configWizardComponentHost;
     viewContainerRef.clear();
 
@@ -176,12 +179,13 @@ export class ConfigureClicheComponent implements OnInit {
       0,
       this.injector
     );
-    componentRef.instance['clicheName'] = this.name;
+    if (this.data.cliche) {
+      componentRef.instance['value'] = this.configString;
+    }
     const changeOutput: EventEmitter<Object> = componentRef.instance['change'];
     if (changeOutput) {
       this.sub = changeOutput.subscribe((config) => {
-        // ' ' just aims to invalidate the form
-        this.configString = config ? JSON.stringify(config) : ' ';
+        this.configString = config || ' '; // cause form to be invalid
       });
     }
   }
