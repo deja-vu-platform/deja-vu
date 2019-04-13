@@ -249,7 +249,11 @@ export class ConfigWizardComponent implements OnInit {
       && this.config.initialObjects.every((initialObject) =>
         _.every(this.config.schema.properties, (prop, name) => {
           const value = initialObject[name];
-          const given = isGiven(value);
+          let given = isGiven(value);
+          if (!given && required.has(name) && prop.type === 'boolean') {
+            initialObject[name] = false;
+            given = true;
+          }
           if (!given) { return !required.has(name); }
           switch (prop.type) {
             case 'integer':
