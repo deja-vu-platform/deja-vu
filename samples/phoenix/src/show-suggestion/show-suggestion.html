@@ -1,63 +1,26 @@
 <dv.action name="show-suggestion">
-  <topic.show-labels itemId=$id hidden=true />
-
+  <!-- Only show other people, not oneself -->
   <dv.if condition=$loggedInUser?.id !== $id class="suggestion-card">
-    <div class="user-info">
-      <h4 class="inline-block username">About <authentication.show-user
-        class="inline-block" user=$loggedInUser showId=false/> -
-        <personalinfo.show-object class="inline-block about-me"
-          id=$id showId=false showOnly=['description'] />
-      </h4>
+    <phoenix.show-user-info id=$id />
 
-      <dv.condition if=topics.show-labels.labels>
-        <h5 class="inline-block">
-          <authentication.show-user class="inline-block" user=$loggedInUser
-            showId=false/>'s topics of interest
-        </h5>
-
-        <topic.show-labels itemId=$id />
-      </dv.condition>
-    </div>
-
-    <dv.if class="interest">
-      <!-- my score -->
-      <interest.show-target as current-users-score
-        id=$id sourceId=$loggedInUser?.id
-        showIndex=false showId=false showScores=false hidden=true />
-      <!-- other person's score -->
-      <interest.show-target as suggested-users-score
-        id=loggedInUser?.id sourceId=$id
-        showIndex=false showId=false showScores=false hidden=true />
+    <div class="interest">
+      <match.show-attempts sourceId=$id targetId=$loggedInUser?.id hidden=true />
 
       <!-- The current user already has indicated interest -->
-      <dv.if condition=current-users-score.loadedTarget.total !== 0>
+      <dv.if condition=match.show-attempts.loadedAttempts>
         Indicated interest!
       </dv.if>
 
       <!-- The current user has not indicated interest -->
-      <dv.if condition=current-users-score.loadedTarget.total === 0>
+      <dv.if condition=!match.show-attempts.loadedAttempts>
         <dv.tx>
-          <!-- The current user indicates interest -->
-          <interest.create-score sourceId=$loggedInUser?.id targetId=$id
-            value=1 hidden=true />
-
-            <!-- Both users have indicated interest - Create the connection -->
-            <dv.if condition=current-users-score.loadedTarget.total+1 === suggested-users-score.loadedTarget.total>
-              <!-- use show-target and replace show-score for journal
-
-                TODO: DO NOT SHOW SUGGESTION IF CONNECTION IS MADE AND INTEREST = 1
-            -->
-              <connection.create-score as current-suggested-connection
-                sourceId=$loggedInUser?.id targetId=$id value=1 hidden=true />
-              <connection.create-score as suggested-current-connection
-                sourceId=$id targetId=$loggedInUser?.id value=1 hidden=true />
-            </dv.if>
-
+          <match.attempt-match sourceId=$id targetId=$loggedInUser?.id
+            hidden=true/>
           <authentication.authenticate id=$loggedInUser?.id hidden=true />
           <dv.button>Interested?</dv.button>
           <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
         </dv.tx>
       </dv.if>
-    </dv.if>
+    </div>
   </dv.if>
 </dv.action>

@@ -32,12 +32,6 @@
         "reinitDbOnStartup": true
       }
     },
-    "event": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-
     "personalinfo": {
       "name": "property",
       "config": {
@@ -60,7 +54,6 @@
         "required": ["description", "zipCode", "locationRadius"]
       }
     },
-
     "emailinfo": {
       "name": "property",
       "config": {
@@ -80,16 +73,28 @@
         }
       }
     },
-
-    "interest": {
+    "match": {
       "config": {
-        "oneToOneScoring": false
+        "reinitDbOnStartup": true
       }
     },
-
-    "connection": {
+    "connectionhistory": {
+      "name": "property",
       "config": {
-        "oneToOneScoring": false
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Connection History",
+          "type": "object",
+          "properties": {
+            "userA": {
+              "type": "string"
+            },
+            "userB": {
+              "type": "string"
+            }
+          },
+          "required": ["userA", "userB"]
+        }
       }
     }
   },

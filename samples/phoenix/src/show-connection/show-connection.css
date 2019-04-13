@@ -1,0 +1,21 @@
+.connection-options {
+  padding: 20px;
+}
+
+.matching-time-and-connection-options {
+  float: right;
+  position: absolute;
+  top: 30%;
+  right: 10%;
+  width: 20%;
+}
+
+.connection-card {
+  position: relative;
+  box-shadow: inset -4px -6px 20px 5px #ff9a75;
+  text-align: left;
+}
+
+.connection-card .user-info {
+  width: 80%;
+}

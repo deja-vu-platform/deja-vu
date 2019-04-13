@@ -3,10 +3,13 @@
 
   <div id="journal-sort-search-container" class="col-md-9 offset-md-2">
     <div id="search-container">
-      <!-- TODO: only include people with whom you have made a connection -->
-      <!-- TODO: get those users, and update choose user to use those users -->
-      <authentication.choose-user addButtonLabel="Search"
-        chooseSelectPlaceholder='Find a user by username' />
+      Search by user: Coming Soon
+      <!-- TODO: search people with whom you've made a connection
+          Idea - choose-user -> only show objects with that user
+          Need to implement waitOn
+      -->
+      <!-- <authentication.choose-user addButtonLabel="Search"
+        chooseSelectPlaceholder='Find a user by username' /> -->
     </div>
 
     <div id="sort-dropdown">
@@ -26,7 +29,10 @@
           </tr>
         </thead>
         <tbody id="connections-history-body">
-
+          <connectionhistory.show-objects
+            showObject=<phoenix.show-past-connection
+              sourceId=phoenix.show-sidebar.loggedInUser?.id
+              targetId=$object.userA === phoenix.show-sidebar.loggedInUser?.id ? $object.userB : $object.userA  /> />
         </tbody>
       </table>
     </div>

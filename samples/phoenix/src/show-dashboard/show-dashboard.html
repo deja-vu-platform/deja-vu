@@ -8,64 +8,45 @@
     selectedLabelIds=topic.show-labels.labels hidden=true />
 
   <div class="container" id="index-container">
-    <!-- TODO: fix this -->
     <div id="connection-ready" class="hidden">
-      <div id="signal-ready-for-next">
-        <span>Are you ready to look for a new connection?</span>
-        <button class="btn" id="signal-ready-btn">Ready</button>
-      </div>
-      <div id="cancel-ready-for-next">
-        <span>We're looking for new connections for you!</span>
-        <button class="btn" id="cancel-ready-btn">Cancel</button>
-      </div>
+      <!-- TODO: indicate when ready; right now, you're always ready -->
     </div>
-    <!--connection-ready-->
 
     <div id="dashboard-container">
-      <!--
-        1. You have suggestions (no connection yet)
-        2. You say that you are ready
-        2.1. You are ready but there are no suggestions
-        2.2. You are ready and there are suggestions
-        2.2.1. You click interested
-        2.2.1.1. The person has not indicated that they are interested
-        2.2.1.2. The person has indicated that they are interested - connection made here
-        3. Show My Connections
-        3.1. Need to be able to close connection, but remember that they were once a connection
-
-      -->
       <div class="connection">
         <h3><span id="connection-header">Your Connections</span></h3>
         <div id="connection-container">
-          <!-- show-items but check to see if they together like when creating connection -->
+          <match.show-matches userId=phoenix.show-sidebar.loggedInUser?.id
+            noMatchesToShowText="We're looking for new connections for you!"
+            showMatch=<phoenix.show-connection connection=$match />/>
         </div>
       </div>
 
       <div class="suggestions">
         <h3><span id="suggestion-header">Your Suggestions</span></h3>
+        <!-- TODO: don't show a given suggestion if there's a connection
+          between the source and target. -->
+
+        <!-- Suggestions that aren't connections -->
         <div id="suggestions-container">
+          <dv.if condition=topic.search-items-by-labels.searchResultItems>
+            <topic.show-items
+              itemIds=topic.search-items-by-labels.searchResultItems
+              showItem=<phoenix.show-suggestion id=$id
+                loggedInUser=phoenix.show-sidebar.loggedInUser />/>
+          </dv.if>
 
-            <!-- Need to not include self... -->
-
-            <dv.if condition=topic.search-items-by-labels.searchResultItems>
-              <topic.show-items itemIds=topic.search-items-by-labels.searchResultItems
-                showItem=<phoenix.show-suggestion id=$id
-                  loggedInUser=phoenix.show-sidebar.loggedInUser />/>
-            </dv.if>
-
-            <dv.if condition=!topic.search-items-by-labels.searchResultItems>
-              <p id="empty-suggestion" class="inline-block">
-                Looks like you don't have any suggestions yet.
-                Try going to your
-                <dv.link class="inline-block" href="personal.html">profile page
-                </dv.link> and making your preferences a bit less strict?
-              </p>
-            </dv.if>
+          <!-- No Suggestions -->
+          <dv.if condition=!topic.search-items-by-labels.searchResultItems>
+            <p id="empty-suggestion" class="inline-block">
+              Looks like you don't have any suggestions yet.
+              Try going to your
+              <dv.link class="inline-block" href="personal.html">profile page
+              </dv.link> and making your preferences a bit less strict?
+            </p>
+          </dv.if>
         </div>
       </div>
     </div>
-
-
-
   </div>
 </dv.action>

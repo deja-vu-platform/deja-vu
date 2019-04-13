@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css?family=Asap');
+
+body {
+  font-family: 'Asap', sans-serif;
+}
+
+.hidden {
+  display: none;
+}
+
+#connection-ready {
+  margin: auto;
+}
+
+#dashboard-container {
+  margin: auto;
+  width: 100%;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 6px 2px #e6e6e6;
+  text-align: center;
+}
+
+.connection-card,
+.suggestion-card {
+  margin: 10px auto;
+  border-radius: 5px;
+}
+
+.suggestion-card .interest,
+.connection-card .matching-time-and-connection-options {
+  display: inline-block;
+}
+
+.container {
+  position: relative;
+  left: 16vh;
+  width: 70%;
+  margin: auto;
+  text-align: center;
+}

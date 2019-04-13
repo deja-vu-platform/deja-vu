@@ -5,6 +5,7 @@
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 @import url('https://fonts.googleapis.com/css?family=Mogra');
+@import url('https://fonts.googleapis.com/css?family=Asap');
 
 md-icon {
   font-family: 'Material Icons' !important;
@@ -17,8 +18,6 @@ md-icon {
 .center {
   text-align: center;
 }
-
-@import url('https://fonts.googleapis.com/css?family=Asap');
 
 phoenix-register,
 phoenix-signin {
@@ -136,11 +135,11 @@ authentication-sign-in .mat-button,
 }
 
 #sidebar-container ul a.dvlink {
-	text-decoration: none;
-	color: #d9d9d9;
-	text-shadow: -1px 1px 3px #999999;
-	transition: color .25s linear;
-	line-height: 150%;
+  text-decoration: none;
+  color: #d9d9d9;
+  text-shadow: -1px 1px 3px #999999;
+  transition: color .25s linear;
+  line-height: 150%;
 }
 
 #sidebar-container ul .white a.dvlink {
@@ -148,8 +147,8 @@ authentication-sign-in .mat-button,
 }
 
 #sidebar-container ul a.dvlink:hover {
-	text-decoration: none;
-	color: #a6a6a6;
+  text-decoration: none;
+  color: #a6a6a6;
 }
 
 authentication-sign-out .mat-button {
