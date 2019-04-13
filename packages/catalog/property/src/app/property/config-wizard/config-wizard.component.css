@@ -1,3 +1,5 @@
+/* 16px is an arbitrarily chosen value for consistent spacing */
+
 mat-form-field {
   width: 100%;
 }
@@ -12,11 +14,6 @@ mat-form-field {
   margin-right: 16px;
 }
 
-mat-checkbox, property-tri-state-checkbox {
-  margin-left: 16px;
-  margin-right: 16px;
-}
-
 button.right {
   display: block;
   margin-left: auto;
@@ -24,4 +21,14 @@ button.right {
 
 mat-table {
   margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+mat-header-cell, mat-cell {
+  min-width: 116px; /* a reasonable minimum input width */
+  padding-right: 16px;
+}
+
+mat-header-cell.sm-col, mat-cell.sm-col {
+  min-width: 69px; /* chosen emperically to fit text */
 }

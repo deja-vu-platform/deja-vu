@@ -20,6 +20,13 @@ interface Property {
   required: boolean;
 }
 
+/**
+ * Custom function for checking that the user provided a property value
+ */
+function isGiven(value: string | boolean) {
+  return !(value === '' || value == null);
+}
+
 const types: Readonly<typeof jsonSchemaTypeToGraphQlType>
   = jsonSchemaTypeToGraphQlType;
 const typesEntries: ReadonlyArray<Readonly<[string, string]>>
@@ -109,34 +116,15 @@ export class ConfigWizardComponent implements OnInit {
   }
 
   /**
-   * Remove the property with the given name.
+   * What the column in the initialObjects table for a property
+   *   should be called / identified with
+   * Angular actually cares that this changes when the property's
+   *   required status changes
    */
-  removeProperty(propertyName: string): void {
-    delete this.config.schema.properties[propertyName];
-    _.pull(this.config.schema.required, propertyName);
-    this.updatedProperties();
-  }
+  columnName = (property: Property): string => {
+    const reqAnnot = property.required ? '*' : '';
 
-  /**
-   * Remove the given initialObject
-   */
-  removeInitialObject(object: Object): void {
-    this.config.initialObjects = this.config.initialObjects
-      .filter((o) => o !== object);
-  }
-
-  /**
-   * If the property with the given name is not required, make it required.
-   * If it is, make it optional.
-   */
-  toggleRequired(propertyName: string): void {
-    const indexInRequired = this.config.schema.required.indexOf(propertyName);
-    if (indexInRequired >= 0) {
-      this.config.schema.required.splice(indexInRequired, 1);
-    } else {
-      this.config.schema.required.push(propertyName);
-    }
-    this.updatedProperties();
+    return `${property.name} (${property.type}) ${reqAnnot}`;
   }
 
   /**
@@ -156,11 +144,51 @@ export class ConfigWizardComponent implements OnInit {
   }
 
   /**
+   * If the property with the given name is not required, make it required.
+   * If it is, make it optional.
+   */
+  toggleRequired(propertyName: string): void {
+    const indexInRequired = this.config.schema.required.indexOf(propertyName);
+    if (indexInRequired >= 0) {
+      this.config.schema.required.splice(indexInRequired, 1);
+    } else {
+      this.config.schema.required.push(propertyName);
+    }
+    this.updatedProperties();
+  }
+
+  /**
+   * Remove the property with the given name.
+   */
+  removeProperty(propertyName: string): void {
+    delete this.config.schema.properties[propertyName];
+    _.pull(this.config.schema.required, propertyName);
+    if (_.size(this.config.schema.properties) === 0) {
+      this.config.initialObjects = [];
+    } else {
+      this.config.initialObjects.forEach((initialObject) => {
+        delete initialObject[propertyName];
+      });
+    }
+    this.updatedProperties();
+  }
+
+  /**
    * Add an initial object
    * TODO: default values for required properties or validation
    */
   addInitialObject(): void {
     this.config.initialObjects = [...this.config.initialObjects, {}];
+    this.postUpdateIfValid();
+  }
+
+  /**
+   * Remove the given initialObject
+   */
+  removeInitialObject(object: Object): void {
+    this.config.initialObjects = this.config.initialObjects
+      .filter((o) => o !== object);
+    this.postUpdateIfValid();
   }
 
   /**
@@ -169,16 +197,24 @@ export class ConfigWizardComponent implements OnInit {
    */
   postUpdateIfValid(): void {
     if (this.isValid()) {
-      this.change.next(this.config);
+      // since inputs store state as strings, we must parse number inputs
+      const initialObjects = this.config.initialObjects.map((initialObject) => {
+        const parsedInitialObject = {};
+        _.forOwn(this.config.schema.properties, (prop, name) => {
+          let value =  initialObject[name];
+          if (!isGiven(value)) { return; }
+          if (prop.type === 'integer' || prop.type === 'number') {
+            value = parseFloat(value);
+          }
+          parsedInitialObject[name] = value;
+        });
+
+        return parsedInitialObject;
+      });
+      this.change.next(Object.assign({}, this.config, { initialObjects }));
     } else {
       this.change.next(null); // not valid
     }
-  }
-
-  columnName = (property: Property): string => {
-    const reqAnnot = property.required ? '*' : '';
-
-    return `${property.name} (${property.type}) ${reqAnnot}`;
   }
 
   /**
@@ -207,6 +243,24 @@ export class ConfigWizardComponent implements OnInit {
    *   are enforced by the UI logic
    */
   private isValid(): boolean {
-    return !!this.config.schema.title;
+    const required = new Set(this.config.schema.required);
+
+    return this.config.schema.title
+      && _.size(this.config.schema.properties) > 0
+      && this.config.initialObjects.every((initialObject) =>
+        _.every(this.config.schema.properties, (prop, name) => {
+          const value = initialObject[name];
+          const given = isGiven(value);
+          if (!given) { return !required.has(name); }
+          switch (prop.type) {
+            case 'integer':
+              return intRegex.test(value);
+            case 'number': // float
+              return floatRegex.test(value);
+            default: // booleans and strings are always valid
+              return true;
+          }
+        })
+      );
   }
 }
