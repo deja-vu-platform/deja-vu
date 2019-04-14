@@ -4,6 +4,10 @@ body {
   font-family: 'Asap', sans-serif;
 }
 
+h2 {
+  padding: 0.5em;
+}
+
 .hidden {
   display: none;
 }

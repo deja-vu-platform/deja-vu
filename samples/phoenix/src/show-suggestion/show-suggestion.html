@@ -1,24 +1,23 @@
 <dv.action name="show-suggestion">
   <!-- Only show other people, not oneself -->
-  <dv.if condition=$loggedInUser?.id !== $id class="suggestion-card">
-    <phoenix.show-user-info id=$id />
+  <dv.if condition=$loggedInUserId !== $id class="suggestion-card">
+    <phoenix.show-user-info userId=$id />
 
     <div class="interest">
-      <match.show-attempts sourceId=$id targetId=$loggedInUser?.id hidden=true />
+      <match.show-attempts sourceId=$loggedInUserId targetId=$id hidden=true />
 
       <!-- The current user already has indicated interest -->
-      <dv.if condition=match.show-attempts.loadedAttempts>
+      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length !== 0>
         Indicated interest!
       </dv.if>
 
       <!-- The current user has not indicated interest -->
-      <dv.if condition=!match.show-attempts.loadedAttempts>
+      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length === 0>
         <dv.tx>
-          <match.attempt-match sourceId=$id targetId=$loggedInUser?.id
+          <dv.status savedText="Indicated interest!" />
+          <match.attempt-match sourceId=$loggedInUserId targetId=$id
             hidden=true/>
-          <authentication.authenticate id=$loggedInUser?.id hidden=true />
-          <dv.button>Interested?</dv.button>
-          <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
+          <dv.button class="btn-interested">Interested?</dv.button>
         </dv.tx>
       </dv.if>
     </div>

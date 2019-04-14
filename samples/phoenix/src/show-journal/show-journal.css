@@ -1,16 +1,17 @@
-#search-container {
-  float: left;
-}
 
 #sort-dropdown {
-  float: right;
+  padding-bottom: 1em;
 }
 
 #journal-sort-search-container {
   font-family: 'Asap', sans-serif;
   position: absolute;
-  margin-left: 23vw;
   margin-top: 10px;
   max-width: 78%;
   min-width: 50vw;
+}
+
+.bold {
+  font-weight: bold;
+  text-align: center;
 }

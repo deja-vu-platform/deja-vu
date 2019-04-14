@@ -82,12 +82,8 @@ phoenix-signin {
   transition: all 0.1s linear;
 }
 
-dv-button.btn.btn-register {
-  width: 100%;
-}
-
 authentication-sign-in .mat-button,
-.btn-register .mat-button {
+.authentication-register .mat-button {
   background-color: #029f5b;
   outline: none;
   color: #fff;
@@ -164,4 +160,28 @@ authentication-sign-out .mat-button:hover {
 
 #personal-and-calendar-container mat-form-field {
   width: 80%;
+}
+
+comment-create-comment mat-form-field {
+  width: 90%;
+}
+
+.personal-info-desc span {
+  border-left: 6px solid #ffbd00;
+  padding: 0.5em 1em;
+}
+
+label-show-labels ul,
+comment-show-comments ul {
+  width: 80%;
+  padding-bottom: 1em;
+}
+
+label-show-items li.list-group-item {
+  border: none;
+}
+
+.btn-interested button.mat-button,
+#close-connection-btn button.mat-button {
+  background-color: lavender;
 }

@@ -1,27 +1,28 @@
 <dv.action name="show-past-connection">
-  <tr class="connection">
+  <div class="connection">
     <!-- Connection Name -->
-    <authentication.show-user id=$targetId showId=false />
+    <div class="col-md-2">
+      <authentication.show-user id=$targetId showId=false />
+    </div>
 
     <!-- TODO: Connection Opened -->
-    <td>coming soon</td>
+    <div class="col-md-2">coming soon</div>
 
     <!-- TODO: Connection Ended -->
-    <td>coming soon</td>
+    <div class="col-md-2">coming soon</div>
 
     <!-- Connect again? -->
-    <td>
+    <div class="col-md-2">
       <dv.tx>
-        <match.create-match userAId=$sourceId
-          userBId=$targetId hidden=true />
+        <match.create-match userAId=$sourceId userBId=$targetId hidden=true />
         <authentication.authenticate id=$sourceId hidden=true />
         <dv.button>Connect Again?</dv.button>
         <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
       </dv.tx>
-    </td>
+    </div>
 
     <!-- Notes -->
-    <td>
+    <div class="col-md-4">
       <dv.tx>
         <!-- TODO: Limit message length -->
         <comment.create-comment authorId=$sourceId
@@ -34,6 +35,6 @@
       <comment.show-comments byAuthorId=$sourceId
         showId=false showAuthorId=false showTargetId=false
         noCommentsToShowText=""/>
-    </td>
-  </tr>
+    </div>
+  </div>
 </dv.action>

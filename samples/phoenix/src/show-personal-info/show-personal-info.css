@@ -95,6 +95,7 @@ button:hover {
 #topics-container {
   float: left;
   padding: 8px;
+  width: 100%;
 }
 
 #topics-info {
@@ -121,4 +122,10 @@ td {
 
 p {
   font-size: 0.8em;
+}
+
+.personal-info-label {
+  font-weight: bold;
+  font-size: 1em;
+  margin-top: 0.5em;
 }

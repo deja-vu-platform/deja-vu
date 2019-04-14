@@ -26,12 +26,13 @@
     </ul>
 
     <div class="row" id="sidebar-username-and-signout">
-      <authentication.show-user class="sidebar-username" user=authentication.logged-in.user showId=false />
+      <authentication.show-user class="sidebar-username"
+        user=authentication.logged-in.user
+        showId=false />
       <dv.tx>
         <authentication.sign-out id="signout" buttonLabel="Log Out" />
         <dv.link href="/signin" hidden=true />
       </dv.tx>
-
     </div>
   </div>
 </dv.action>

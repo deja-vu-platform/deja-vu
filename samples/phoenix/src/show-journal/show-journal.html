@@ -2,39 +2,37 @@
   <phoenix.show-sidebar isJournal=true />
 
   <div id="journal-sort-search-container" class="col-md-9 offset-md-2">
-    <div id="search-container">
-      Search by user: Coming Soon
-      <!-- TODO: search people with whom you've made a connection
-          Idea - choose-user -> only show objects with that user
-          Need to implement waitOn
-      -->
-      <!-- <authentication.choose-user addButtonLabel="Search"
-        chooseSelectPlaceholder='Find a user by username' /> -->
-    </div>
+    <div class="row">
+      <div id="search-container" class="col-md-3">
+        Search by user: Coming Soon
+        <!-- TODO: search people with whom you've made a connection
+            Idea - choose-user -> only show objects with that user
+            Need to implement waitOn
+        -->
+        <!-- <authentication.choose-user addButtonLabel="Search"
+          chooseSelectPlaceholder='Find a user by username' /> -->
+      </div>
 
-    <div id="sort-dropdown">
-      <!-- TODO: sory by username, when connection was made -->
-      Sort by: Coming Soon
+      <div id="sort-dropdown" class="col-md-3 offset-md-6">
+        <!-- TODO: sory by username, when connection was made -->
+        Sort by: Coming Soon
+      </div>
     </div>
 
     <div id="journal-container">
-      <table id="connections-history" class="table table-hover">
-        <thead>
-          <tr>
-            <th>With</th>
-            <th>Time Opened</th>
-            <th>Time Closed</th>
-            <th>Connect again?</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="connections-history-body">
-          <connectionhistory.show-objects
-            showObject=<phoenix.show-past-connection
-              sourceId=phoenix.show-sidebar.loggedInUser?.id
-              targetId=$object.userA === phoenix.show-sidebar.loggedInUser?.id ? $object.userB : $object.userA  /> />
-        </tbody>
-      </table>
+      <div class="row">
+        <div class="col-md-2 bold">With</div>
+        <div class="col-md-2 bold">Time Opened</div>
+        <div class="col-md-2 bold">Time Closed</div>
+        <div class="col-md-2 bold">Connect Again?</div>
+        <div class="col-md-4 bold">Notes</div>
+      </div>
+
+      <connectionhistory.show-objects
+        noObjectsToShowText=""
+        showObject=<phoenix.show-past-connection
+          sourceId=phoenix.show-sidebar.loggedInUser?.id
+          targetId=$object?.pastConnection  /> />
     </div>
 
   </div>

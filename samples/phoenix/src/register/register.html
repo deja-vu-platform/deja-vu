@@ -29,12 +29,7 @@
               <div class="row">
                 <div class="col-lg-12">
                   <dv.tx>
-                    <dv.gen-id />
-                    <emailinfo.create-object id=dv.gen-id.id
-                      showOptionToSubmit=false />
-                    <authentication.register-user id=dv.gen-id.id
-                      showOptionToSubmit=false />
-                    <dv.button class="btn btn-register">Register Now</dv.button>
+                    <authentication.register-user buttonLabel="Register Now" />
                     <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
                   </dv.tx>
                 </div>

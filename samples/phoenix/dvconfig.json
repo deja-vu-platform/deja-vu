@@ -44,7 +44,7 @@
               "type": "string"
             },
             "zipCode": {
-              "type": "number"
+              "type": "string"
             },
             "locationRadius": {
               "type": "number"
@@ -52,25 +52,6 @@
           }
         },
         "required": ["description", "zipCode", "locationRadius"]
-      }
-    },
-    "emailinfo": {
-      "name": "property",
-      "config": {
-        "reinitDbOnStartup": true,
-        "schema": {
-          "title": "Email",
-          "type": "object",
-          "properties": {
-            "emailAddress": {
-              "type": "string"
-            },
-            "publicEmailAddress": {
-              "type": "string"
-            }
-          },
-          "required": ["emailAddress", "publicEmailAddress"]
-        }
       }
     },
     "match": {
@@ -86,14 +67,11 @@
           "title": "Connection History",
           "type": "object",
           "properties": {
-            "userA": {
-              "type": "string"
-            },
-            "userB": {
+            "pastConnection": {
               "type": "string"
             }
           },
-          "required": ["userA", "userB"]
+          "required": ["pastConnection"]
         }
       }
     }

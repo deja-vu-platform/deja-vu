@@ -42,16 +42,35 @@
             showId=false class="inline-block"/>
         </h3>
         <div id="about-me">
-          <dv.if condition="personalinfo.show-object.loadedObject">
-            <personalinfo.show-object
-              object=personalinfo.show-object.loadedObject />
+          <dv.if condition=personalinfo.show-object.loadedObject>
+            <personalinfo.show-object as show-description-property
+              class="personal-info-desc"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['description'] />
+
+            <br/>
+            <p class="personal-info-label inline-block">Zip Code:</p>
+            <personalinfo.show-object as show-zipcode-property
+              class="inline-block"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['zipCode'] />
+
+            <br/>
+            <p class="personal-info-label inline-block">Location Radius:</p>
+            <personalinfo.show-object as show-locationradius-property
+              class="inline-block"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['locationRadius'] />
+            <p class="inline-block">miles</p>
           </dv.if>
-          <dv.if condition="!personalinfo.show-object.loadedObject">
+
+          <dv.if condition=!personalinfo.show-object.loadedObject>
             <dv.tx>
               <!-- TODO: update-object -->
               <personalinfo.create-object
                 id=phoenix.show-sidebar.loggedInUser?.id
-                buttonLabel="Add Personal Info"/>
+                buttonLabel="Add Personal Info"
+                newObjectSavedText="Profile Updated!" />
             </dv.tx>
           </dv.if>
         </div>
@@ -59,15 +78,18 @@
         <div id="all-topics-stuff">
           <div id="topics-container">
             <h3>Topics</h3>
-            <p>Already Chosen Topics</p>
+            <h4>Already Chosen Topics</h4>
             <topic.show-labels as current-item-labels
-              itemId=phoenix.show-sidebar.loggedInUser?.id />
+              itemId=phoenix.show-sidebar.loggedInUser?.id
+              noLabelsToShowText="No topics selected"/>
 
             <dv.tx>
               <!-- TODO: Update labels for item -->
               <topic.attach-labels itemId=phoenix.show-sidebar.loggedInUser?.id
                 labels=topic.show-labels.labels
-                buttonLabel="Choose Topics" />
+                buttonLabel="Submit"
+                inputLabel="Choose Topics"
+                labelsAttachedSavedText="Topics saved!"/>
             </dv.tx>
           </div>
         </div>

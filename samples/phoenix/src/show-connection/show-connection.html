@@ -1,11 +1,6 @@
 <dv.action name="show-connection">
+  <!-- TODO: Fix match -->
   <phoenix.show-user-info id=$connection?.targetId />
-
-  <p class="public-email-container">
-    Email: <emailinfo.show-object class="inline-block"
-      id=$connection?.targetId showId=false
-      showOnly=['publicEmailAddress'] />
-  </p>
 
   <div class="write-email-container">
     <!-- TODO: send email using template -->
@@ -20,10 +15,10 @@
         <match.delete-match id=$connection?.id hidden=true />
         <connectionhistory.create-object
           initialValue={
-            userA: $connection?.sourceId,
-            userB: $connection?.targetId
+            pastConnection: $connection
           }
-          hidden=true />
+          showExclude=['pastConnection']
+          showOptionToSubmit=false />
         <authentication.authenticate id=$connection?.sourceId hidden=true />
         <dv.button id="close-connection-btn" class="btn">
           Close Connection
