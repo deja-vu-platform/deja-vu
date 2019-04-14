@@ -87,7 +87,7 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
 
   ngAfterViewInit() {
     if (!_.isNil(this.initialValue)) {
-      this.onSubmit();
+      this.search();
     } else {
       this.loadLabels();
     }
@@ -95,7 +95,7 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
 
   ngOnChanges() {
     if (!_.isNil(this.initialValue)) {
-      this.onSubmit();
+      this.search();
     }
   }
 
@@ -103,7 +103,7 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
     this.selectedLabelIds = selectedLabelIds;
   }
 
-  onSubmit() {
+  search() {
     this.rs.exec(this.elem);
   }
 
