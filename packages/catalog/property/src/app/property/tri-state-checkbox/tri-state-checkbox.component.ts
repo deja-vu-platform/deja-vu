@@ -1,6 +1,6 @@
 /* tslint:disable max-line-length */
 /**
- * @author smnbbrv
+ * Copied from Stack Overflow, answerer smnbbrv
  * @see https://stackoverflow.com/questions/49296051/angular-5-angular-material-checkbox-with-3-states-checked-unchecked-indeterm
  */
 /* tslint:enable max-line-length */
