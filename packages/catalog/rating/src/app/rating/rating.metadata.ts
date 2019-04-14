@@ -37,12 +37,13 @@ export { DeleteRatingComponent };
 import { StarRatingModule } from 'angular-star-rating';
 
 import { DvModule } from '@deja-vu/core';
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 
 
 const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
   ShowRatingsByTargetComponent, ShowRatingCountComponent,
-  DeleteRatingsComponent, DeleteRatingComponent
+  DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent
 ];
 
 

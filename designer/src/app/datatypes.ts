@@ -413,6 +413,7 @@ export class ActionInstance {
 export interface ClicheDefinition {
   readonly name: string;
   readonly actions: ClicheActionDefinition[];
+  readonly configWizardComponent: any;
   // TODO: config options
 }
 

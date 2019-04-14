@@ -1,9 +1,9 @@
 import { Directive, ViewContainerRef } from '@angular/core';
 
 @Directive({
-  selector: '[propertyClicheAction]'
+  selector: '[propertyDynamicComponent]'
 })
-export class ClicheActionDirective {
+export class DynamicComponentDirective {
 
   constructor(public viewContainerRef: ViewContainerRef) { }
 

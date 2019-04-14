@@ -1,0 +1,206 @@
+<div class="config-wizard">
+  <mat-form-field>
+    <input
+      matInput
+      required
+      placeholder="Object Name"
+      [(ngModel)]="config.schema.title"
+      (ngModelChange)="postUpdateIfValid()"
+    >
+  </mat-form-field>
+  
+  <mat-table
+    #propertiesTable
+    [dataSource]="properties"
+    *ngIf="properties.length > 0"
+  >
+  
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let property">{{property.name}}</mat-cell>
+    </ng-container>
+  
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-cell *matCellDef="let property">{{property.type}}</mat-cell>
+    </ng-container>
+  
+    <ng-container matColumnDef="required">
+      <mat-header-cell *matHeaderCellDef class="sm-col">
+        Required
+      </mat-header-cell>
+      <mat-cell *matCellDef="let property" class="sm-col">
+        <mat-checkbox
+          [checked]="property.required"
+          (change)="toggleRequired(property.name)"
+        >
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+  
+    <ng-container matColumnDef="remove">
+      <mat-header-cell *matHeaderCellDef class="sm-col">
+        Remove
+      </mat-header-cell>
+      <mat-cell *matCellDef="let property" class="sm-col">
+        <button
+          mat-icon-button
+          color="warn"
+          matTooltip="Remove Property"
+          (click)="removeProperty(property.name)"
+          type="button"
+        >
+          <mat-icon>remove</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+  
+    <mat-header-row *matHeaderRowDef="propertiesTableColumns">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: propertiesTableColumns;">
+    </mat-row>
+  </mat-table>
+  
+  <h2>Properties</h2>
+  <p *ngIf="properties.length === 0">
+    Add a property!
+  </p>
+  
+  <form class="cfg-wiz-row">
+    <mat-form-field>
+      <input
+        matInput
+        [required]="properties.length === 0"
+        name="property-name"
+        placeholder="Property Name"
+        [(ngModel)]="newPropertyName"
+      >
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select
+        [required]="properties.length === 0"
+        name="property-type"
+        placeholder="Property Type"
+        [(ngModel)]="newPropertyType"
+      >
+        <mat-option
+          *ngFor="let type of types"
+          [value]="type[0]"
+        >
+          {{type[1]}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button
+      mat-icon-button
+      color="primary"
+      matTooltip="Add Property"
+      (click)="addProperty()"
+      [disabled]="!newPropertyName || !newPropertyType"
+      type="button"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </form>
+  
+  <h2>Initial Objects</h2>
+  <mat-table
+    #initialObjectsTable
+    [dataSource]="config.initialObjects"
+    *ngIf="config.initialObjects.length > 0"
+  >
+    <ng-container
+      *ngFor="let property of properties"
+      [matColumnDef]="columnName(property)"
+    >
+      <mat-header-cell
+        *matHeaderCellDef
+        [ngClass]="{
+          'sm-col': property.type === 'Boolean'
+        }"
+      >
+        {{columnName(property)}}
+      </mat-header-cell>
+      <mat-cell
+        *matCellDef="let obj"
+        [ngClass]="{
+          'sm-col': property.type === 'Boolean'
+        }"
+      >
+        <mat-checkbox
+          *ngIf="property.type === 'Boolean' && property.required"
+          [name]="property.name"
+          [(ngModel)]="obj[property.name]"
+          (ngModelChange)="postUpdateIfValid()"
+          [matTooltip]="obj[property.name] === true ? 'True' : 'False'"
+        >
+        </mat-checkbox>
+        <property-tri-state-checkbox
+          *ngIf="property.type === 'Boolean' && !property.required"
+          [name]="property.name"
+          [(ngModel)]="obj[property.name]"
+          (ngModelChange)="postUpdateIfValid()"
+          [matTooltip]="
+            obj[property.name] === true
+              ? 'True'
+              : (obj[property.name] === false
+                ? 'False'
+                : 'Unset'
+              )
+          "
+        >
+        </property-tri-state-checkbox>
+        <mat-form-field *ngIf="property.type !== 'Boolean'">
+          <input
+            matInput
+            [name]="property.name"
+            [required]="property.required ? 'required' : null"
+            [(ngModel)]="obj[property.name]"
+            (ngModelChange)="postUpdateIfValid()"
+            [errorStateMatcher]="property.type === 'String'
+              ? null
+              : (property.type === 'Int'
+                ? intMatcher
+                : floatMatcher
+              )
+            "
+          >
+        </mat-form-field>
+      </mat-cell>
+    </ng-container>
+  
+    <ng-container [matColumnDef]="initialObjectsTableRemoveColumnName">
+      <mat-header-cell *matHeaderCellDef class="sm-col">
+        Remove
+      </mat-header-cell>
+      <mat-cell *matCellDef="let obj" class="sm-col">
+        <button
+          mat-icon-button
+          color="warn"
+          matTooltip="Remove Object"
+          (click)="removeInitialObject(obj)"
+          type="button"
+        >
+          <mat-icon>remove</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+  
+    <mat-header-row *matHeaderRowDef="initialObjectsTableColumns">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: initialObjectsTableColumns;">
+    </mat-row>
+  </mat-table>
+  
+  <button
+    mat-icon-button
+    color="primary"
+    matTooltip="Add Initial Object"
+    (click)="addInitialObject()"
+    [disabled]="properties.length === 0"
+    class="right"
+    type="button"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

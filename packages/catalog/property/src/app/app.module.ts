@@ -4,10 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import { GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL } from '@deja-vu/core';
 import { PropertyModule } from './property/property.module';
-
-import { DvModule } from '@deja-vu/core';
 
 @NgModule({
   declarations: [

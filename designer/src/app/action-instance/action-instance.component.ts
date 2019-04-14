@@ -17,12 +17,12 @@ import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { ClicheActionDirective } from '../cliche-action.directive';
 import {
   ActionInstance,
   AppActionDefinition,
   ClicheActionDefinition
 } from '../datatypes';
+import { DynamicComponentDirective } from '../dynamic-component.directive';
 import { ActionIO, ScopeIO} from '../io';
 
 
@@ -34,8 +34,8 @@ import { ActionIO, ScopeIO} from '../io';
 export class ActionInstanceComponent
 implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(ClicheActionDirective)
-    private readonly actionHost: ClicheActionDirective;
+  @ViewChild(DynamicComponentDirective)
+    private readonly actionHost: DynamicComponentDirective;
   @Input() actionInstance: ActionInstance;
   @Input() actionIO: ActionIO;
   private readonly scopeIO: ScopeIO = new ScopeIO();

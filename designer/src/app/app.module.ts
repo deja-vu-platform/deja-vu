@@ -13,7 +13,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';
 
-import { ClicheActionDirective } from './cliche-action.directive';
+import { DynamicComponentDirective } from './dynamic-component.directive';
 
 import {
   ActionDefinitionComponent
@@ -46,7 +46,7 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
 
 @NgModule({
   declarations: [
-    ClicheActionDirective,
+    DynamicComponentDirective,
     ActionDefinitionComponent,
     ActionInstanceComponent,
     AppComponent,
