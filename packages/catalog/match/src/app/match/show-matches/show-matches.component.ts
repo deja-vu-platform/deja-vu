@@ -75,7 +75,8 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showUserIds ? 'userIds' : ''}
+              ${this.showUserIds ? 'userAId' : ''}
+              ${this.showUserIds ? 'userBId' : ''}
             `
           }
         }

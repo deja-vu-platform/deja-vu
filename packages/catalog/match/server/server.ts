@@ -93,7 +93,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
     Match: {
       id: (match: MatchDoc) => match.id,
-      userIds: (match: MatchDoc) => match.userIds
+      userAId: (match: MatchDoc) => match.userAId,
+      userBId: (match: MatchDoc) => match.userBId
     },
 
     Attempt: {
@@ -118,6 +119,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
           const match: MatchDoc = {
             id: uuid(),
+            userAId: input.sourceId,
+            userBId: input.targetId,
             userIds: [input.sourceId, input.targetId]
           };
 
@@ -146,7 +149,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
         _root, { input }: { input: CreateMatchInput }, context: Context) => {
         const match: MatchDoc = {
           id: input.id ? input.id : uuid(),
-          userIds: input.userIds
+          userAId: input.userAId,
+          userBId: input.userBId,
+          userIds: [input.userAId, input.userBId]
         };
 
         return await matches.insertOne(context, match);

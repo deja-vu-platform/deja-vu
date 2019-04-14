@@ -91,10 +91,11 @@ export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
       inputs: {
         input: {
           id: this.id,
-          userIds: [this.userAIdControl.value, this.userBIdControl.value]
+          userAId: this.userAIdControl.value,
+          userBId: this.userBIdControl.value
         }
       },
-      extraInfo: { returnFields: 'id, userIds' }
+      extraInfo: { returnFields: 'id, userAId, userBId' }
     })
     .toPromise();
 

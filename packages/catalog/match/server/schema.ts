@@ -1,6 +1,9 @@
 export interface MatchDoc {
   id: string;
-  userIds: string[];
+  userAId: string;
+  userBId: string;
+  // allows for easier filtering
+  userIds?: string[];
 }
 
 export interface AttemptDoc {
@@ -26,5 +29,6 @@ export interface AttemptMatchInput {
 
 export interface CreateMatchInput {
   id?: string;
-  userIds: string[];
+  userAId: string;
+  userBId: string;
 }
