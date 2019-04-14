@@ -13,8 +13,16 @@
   </match-attempt-match>
   <h2>Show Matches</h2>
   <match-show-matches></match-show-matches>
-  <h2>Show Attempts</h2>
+  <h2>Show Matches with alice</h2>
+  <match-show-matches userId="alice"></match-show-matches>
+  <h2>Show All Attempts</h2>
   <match-show-attempts></match-show-attempts>
+  <h2>Show Attempts by alice</h2>
+  <match-show-attempts sourceId="alice"></match-show-attempts>
+  <h2>Show Attempts with alice</h2>
+  <match-show-attempts targetId="alice"></match-show-attempts>
+  <h2>Show Attempts between alice and ben</h2>
+  <match-show-attempts sourceId="alice" targetId="ben"></match-show-attempts>
   <h2>Create Match with id matchId, userIds ben and carol</h2>
   <match-create-match id="matchId" userAId="ben" userBId="carol">
   </match-create-match>
@@ -22,6 +30,4 @@
   <match-show-match id="matchId"></match-show-match>
   <h2>Delete Match with id matchId</h2>
   <match-delete-match id="matchId"></match-delete-match>
-
-
 </div>

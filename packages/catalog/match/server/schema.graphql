@@ -32,7 +32,7 @@ input CreateMatchInput {
 
 type Query {
   attempt(id: ID!): Attempt
-  attempts(input: AttemptsInput): [Attempt]
+  attempts(input: AttemptsInput!): [Attempt]
   match(id: ID!): Match
   matches(input: MatchesInput!): [Match]
 }

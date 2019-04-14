@@ -85,7 +85,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       matches: async (_root, { input }: { input: MatchesInput }) => {
         const filter = {};
-        if (!_.isNil(input.userId)) { filter['userId'] = input.userId; }
+        if (!_.isNil(input.userId)) { filter['userIds'] = input.userId; }
 
         return await matches.find(filter);
       }

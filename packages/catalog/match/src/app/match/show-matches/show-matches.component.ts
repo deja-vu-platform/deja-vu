@@ -23,7 +23,7 @@ interface MatchesRes {
 export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
   OnInit {
   @Input() userId: string | undefined;
-  @Output() loadedMatches = new EventEmitter();
+  @Output() loadedMatches = new EventEmitter<Match[]>();
 
   @Input() showId = true;
   @Input() showUserIds = true;
@@ -31,7 +31,7 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
   @Input() showMatch: Action = {
     type: <Type<Component>> ShowMatchComponent
   };
-  @Input() noMatchsToShowText = 'No matches to show';
+  @Input() noMatchesToShowText = 'No matches to show';
   matches: Match[] = [];
 
   showMatches;
