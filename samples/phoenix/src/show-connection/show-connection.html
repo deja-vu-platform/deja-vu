@@ -1,6 +1,10 @@
 <dv.action name="show-connection">
-  <!-- TODO: Fix match -->
-  <phoenix.show-user-info id=$connection?.targetId />
+  <dv.if condition=$connection?.userAId === $loggedInUserId>
+    <phoenix.show-user-info userId=$connection.userBId />
+  </dv.if>
+  <dv.if condition=$connection?.userAId !== $loggedInUserId>
+    <phoenix.show-user-info userId=$connection.userAId />
+  </dv.if>
 
   <div class="write-email-container">
     <!-- TODO: send email using template -->
@@ -11,15 +15,20 @@
     <!-- TODO: show earliest overlaps in schedules -->
 
     <div class="connection-options">
+      <!-- TODO: closing a connection should delete match + create connectionhistory
+        Unfortunately, these two actions wrapped in one tx somehow doesn't allow
+        both to happen at the same time -->
       <dv.tx>
-        <match.delete-match id=$connection?.id hidden=true />
         <connectionhistory.create-object
           initialValue={
-            pastConnection: $connection
+            pastConnection: $connection.userAId === $loggedInUserId ? $connection.userBId : $connection.userAId
           }
           showExclude=['pastConnection']
-          showOptionToSubmit=false />
-        <authentication.authenticate id=$connection?.sourceId hidden=true />
+          newObjectSavedText="Connection arhived in journal!"
+          buttonLabel="Archive Connection" />
+      </dv.tx>
+      <dv.tx>
+        <match.delete-match id=$connection?.id hidden=true />
         <dv.button id="close-connection-btn" class="btn">
           Close Connection
         </dv.button>

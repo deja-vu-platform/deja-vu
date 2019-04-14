@@ -21,7 +21,8 @@
         <div id="connection-container">
           <match.show-matches userId=phoenix.show-sidebar.loggedInUser?.id
             noMatchesToShowText="No connections just yet!"
-            showMatch=<phoenix.show-connection connection=$match />/>
+            showMatch=<phoenix.show-connection connection=$match
+              loggedInUserId=phoenix.show-sidebar.loggedInUser?.id />/>
 
           <dv.if condition=match.show-matches.loadedMatches?.length === 0>
             <br/>

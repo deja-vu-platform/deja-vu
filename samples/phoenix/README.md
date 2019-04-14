@@ -33,3 +33,5 @@ Team invalids
 - Sort journal entries by username, when connection was made (sort/ log cliche)
 - Show when the connection was made and ended (log cliche)
 - Limit input length (general)
+- Update personal information (property-update-object)
+- Update topics (labels-update-labels)

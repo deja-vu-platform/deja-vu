@@ -1,6 +1,9 @@
 <dv.action name="show-suggestion">
-  <!-- Only show other people, not oneself -->
-  <dv.if condition=$loggedInUserId !== $id class="suggestion-card">
+  <match.show-match userAId=$loggedInUserId userBId=$id hidden=true />
+
+  <!-- Only show other people, not oneself; shouldn't be matched -->
+  <dv.if condition=$loggedInUserId !== $id && !match.show-match.loadedMatch
+    class="suggestion-card">
     <phoenix.show-user-info userId=$id />
 
     <div class="interest">
