@@ -25,6 +25,7 @@ import {
   CreateTaskComponent
 } from './create-task/create-task.component';
 export { CreateTaskComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   ShowAssigneeComponent
 } from './show-assignee/show-assignee.component';
@@ -60,7 +61,7 @@ const allComponents = [
   CompleteTaskComponent, CreateDueDateComponent, CreateTaskComponent,
   ShowAssigneeComponent, ShowTaskComponent, ShowTasksComponent,
   UpdateTaskComponent, ShowTaskCountComponent, CreateTasksForAssigneesComponent,
-  StageComponent, InputAssigneeComponent
+  StageComponent, InputAssigneeComponent, ConfigWizardComponent
 ];
 
 const metadata = {

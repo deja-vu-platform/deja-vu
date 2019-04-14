@@ -14,6 +14,7 @@ import {
   ChangePasswordComponent
 } from './change-password/change-password.component';
 export { ChangePasswordComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { LoggedInComponent } from './logged-in/logged-in.component';
 export { LoggedInComponent };
 import { RegisterUserComponent } from './register-user/register-user.component';
@@ -37,7 +38,8 @@ export { ShowUserCountComponent };
 const allComponents = [
   AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
   RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
-  ShowUsersComponent, ChooseUserComponent, ShowUserCountComponent
+  ShowUsersComponent, ChooseUserComponent, ShowUserCountComponent,
+  ConfigWizardComponent
 ];
 
 const metadata = {

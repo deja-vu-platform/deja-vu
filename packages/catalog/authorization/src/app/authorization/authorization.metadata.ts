@@ -24,6 +24,7 @@ import {
   CanViewComponent
 } from './can-view/can-view.component';
 export { CanViewComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   CreateResourceComponent
 } from './create-resource/create-resource.component';
@@ -48,7 +49,9 @@ import {
   ShowResourcesComponent
 } from './show-resources/show-resources.component';
 export { ShowResourcesComponent };
-import { ShowResourceCountComponent } from './show-resource-count/show-resource-count.component';
+import {
+  ShowResourceCountComponent
+} from './show-resource-count/show-resource-count.component';
 export { ShowResourceCountComponent };
 
 
@@ -57,7 +60,8 @@ const allComponents = [
   CanEditComponent, CanViewComponent,
   CreateResourceComponent, DeleteResourceComponent,
   RemoveViewerComponent, ShowOwnerComponent,
-  ShowResourceComponent, ShowResourcesComponent, ShowResourceCountComponent
+  ShowResourceComponent, ShowResourcesComponent, ShowResourceCountComponent,
+  ConfigWizardComponent
 ];
 
 const metadata = {

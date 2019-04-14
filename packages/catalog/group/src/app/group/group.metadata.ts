@@ -14,6 +14,7 @@ import { ChooseGroupComponent } from './choose-group/choose-group.component';
 export { ChooseGroupComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
 export { CreateGroupComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteGroupComponent } from './delete-group/delete-group.component';
 export { DeleteGroupComponent };
 import { InputMemberComponent } from './input-member/input-member.component';
@@ -45,7 +46,7 @@ const allComponents = [
   DeleteGroupComponent, InputMemberComponent, JoinLeaveComponent,
   ShowGroupComponent, ShowGroupsComponent, ShowMemberComponent,
   ShowMembersComponent, StageComponent, ShowGroupCountComponent,
-  ShowMemberCountComponent
+  ShowMemberCountComponent, ConfigWizardComponent
 ];
 
 
