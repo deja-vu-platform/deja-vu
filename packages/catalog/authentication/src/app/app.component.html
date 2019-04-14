@@ -6,7 +6,11 @@
   <h1>Sign in</h1>
   <authentication-sign-in></authentication-sign-in>
   <h1>Show user of id ben</h1>
-  <authentication-show-user id="ben"></authentication-show-user>
+  <authentication-show-user id="ben" (loadedUser)="result=$event">
+  </authentication-show-user>
+  <h1>Show loaded user</h1>
+  <authentication-show-user [user]="result">
+  </authentication-show-user>
   <h1>Change password of the logged in user</h1>
   <authentication-logged-in (user)="user=$event">
   </authentication-logged-in>

@@ -42,9 +42,7 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges() {
-    if (!this.user) {
-      this.load();
-    }
+    this.load();
   }
 
   load() {
