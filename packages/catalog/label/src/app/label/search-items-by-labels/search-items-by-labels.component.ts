@@ -1,6 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit,
-  Output, ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -49,7 +49,7 @@ interface LabelsRes {
   ]
 })
 export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
-  OnExec, OnInit, ControlValueAccessor, Validator {
+  OnExec, OnInit, OnChanges, ControlValueAccessor, Validator {
   @Input() initialValue;
   @Input() showLabel = {
     type: ShowLabelComponent
@@ -80,11 +80,23 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.selectedLabelIds = this.initialValue;
+    if (!_.isNil(this.initialValue)) {
+      this.selectedLabelIds = _.map(this.initialValue, 'id');
+    }
   }
 
   ngAfterViewInit() {
-    this.loadLabels();
+    if (!_.isNil(this.initialValue)) {
+      this.onSubmit();
+    } else {
+      this.loadLabels();
+    }
+  }
+
+  ngOnChanges() {
+    if (!_.isNil(this.initialValue)) {
+      this.onSubmit();
+    }
   }
 
   updateSelected(selectedLabelIds: string[]) {
