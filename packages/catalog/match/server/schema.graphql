@@ -15,6 +15,12 @@ input AttemptsInput {
   targetId: ID
 }
 
+input MatchInput {
+  id: ID
+  userAId: ID
+  userBId: ID
+}
+
 input MatchesInput {
   userId: ID
 }
@@ -34,7 +40,7 @@ input CreateMatchInput {
 type Query {
   attempt(id: ID!): Attempt
   attempts(input: AttemptsInput!): [Attempt]
-  match(id: ID!): Match
+  match(input: MatchInput!): Match
   matches(input: MatchesInput!): [Match]
 }
 

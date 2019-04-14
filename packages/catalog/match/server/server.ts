@@ -14,7 +14,8 @@ import {
   AttemptsInput,
   CreateMatchInput,
   MatchDoc,
-  MatchesInput
+  MatchesInput,
+  MatchInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
@@ -49,8 +50,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-match': (extraInfo) => `
-    query ShowMatch($id: ID!) {
-      match(id: $id) ${getReturnFields(extraInfo)}
+    query ShowMatch($input: MatchInput!) {
+      match(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-matches': (extraInfo) => `
@@ -81,7 +82,14 @@ function resolvers(db: ClicheDb, _config: Config): object {
         return await attempts.find(filter);
       },
 
-      match: async (_root, { id }) => await matches.findOne({ id }),
+      match: async (_root, { input }: { input: MatchInput }) => {
+        if (!_.isNil(input.id)) {
+          return await matches.findOne({ id: input.id });
+        } else {
+          return await matches
+            .findOne({ userIds: { $all: [input.userAId, input.userBId]} });
+        }
+      },
 
       matches: async (_root, { input }: { input: MatchesInput }) => {
         const filter = {};
@@ -170,6 +178,8 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
 
     return Promise.all([
       matches.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      matches.createIndex({ userAId: 1, userBId: 1 },
+        { unique: true, sparse: true }),
       attempts.createIndex({ id: 1 }, { unique: true, sparse: true }),
       // one attempt per source, target pair
       attempts.createIndex({ sourceId: 1, targetId: 1 },

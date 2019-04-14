@@ -17,6 +17,12 @@ export interface AttemptsInput {
   targetId?: string;
 }
 
+export interface MatchInput {
+  id?: string;
+  userAId?: string;
+  userBId?: string;
+}
+
 export interface MatchesInput {
   userId: string;
 }
