@@ -1,0 +1,103 @@
+<dv.action name="show-personal-info">
+  <phoenix.show-sidebar isPersonalInfo=true />
+
+  <personalinfo.show-object id=phoenix.show-sidebar.loggedInUser?.id
+    hidden=true />
+  <topic.show-labels hidden=true />
+
+  <div id="personal-and-calendar-container">
+    <div class="row">
+      <!-- Availability -->
+      <div id="calendar-and-bounds-container" class="col-md-6">
+        <h3>Availability</h3>
+
+        <!-- TODO: Availability -->
+        <div id="calendar-container"></div>
+
+        <div id="bounds-container">
+          <p>
+            <span class="warning">How availabilities are used:</span>
+            We only use your availabilities for the next week to find your
+            suggestions.
+          </p>
+          <p>
+            <span class="warning">Changing the calendar range:</span>
+            This does not change availabilities you have already entered, so if
+            you entered availabilities outside of the range you have set, they
+            will still be used to find suggestions.
+            Hint: If you don't want that, change the range from 12am to 12am and
+            clear out availabilities for the times you are unavailable
+            and set your range again.
+          </p>
+          <div id="bounds-input">
+            <!-- TODO: Update bounds -->
+          </div>
+        </div>
+      </div>
+
+      <div id="personal-container" class="col-md-6">
+        <!-- About User -->
+        <h3 class="inline-block">About
+          <authentication.show-user user=phoenix.show-sidebar.loggedInUser
+            showId=false class="inline-block"/>
+        </h3>
+        <div id="about-me">
+          <dv.if condition=personalinfo.show-object.loadedObject>
+            <personalinfo.show-object as show-description-property
+              class="personal-info-desc"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['description'] />
+
+            <br/>
+            <p class="personal-info-label inline-block">Zip Code:</p>
+            <personalinfo.show-object as show-zipcode-property
+              class="inline-block"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['zipCode'] />
+
+            <br/>
+            <p class="personal-info-label inline-block">Location Radius:</p>
+            <personalinfo.show-object as show-locationradius-property
+              class="inline-block"
+              object=personalinfo.show-object.loadedObject
+              showOnly=['locationRadius'] />
+            <p class="inline-block">miles</p>
+          </dv.if>
+
+          <dv.if condition=!personalinfo.show-object.loadedObject>
+            <dv.tx>
+              <!-- TODO: update-object -->
+              <personalinfo.create-object
+                id=phoenix.show-sidebar.loggedInUser?.id
+                buttonLabel="Add Personal Info"
+                newObjectSavedText="Profile Updated!" />
+            </dv.tx>
+          </dv.if>
+        </div>
+
+        <div id="all-topics-stuff">
+          <div id="topics-container">
+            <h3>Topics</h3>
+            <h4>Already Chosen Topics</h4>
+            <topic.show-labels as current-item-labels
+              itemId=phoenix.show-sidebar.loggedInUser?.id
+              noLabelsToShowText="No topics selected"/>
+
+            <dv.tx>
+              <!-- TODO: Update labels for item -->
+              <topic.attach-labels itemId=phoenix.show-sidebar.loggedInUser?.id
+                labels=topic.show-labels.labels
+                buttonLabel="Submit"
+                inputLabel="Choose Topics"
+                labelsAttachedSavedText="Topics saved!"/>
+            </dv.tx>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="topics-info">
+        <!-- TODO: Offer users ways to get suggestions -->
+      </div>
+  </div>
+</dv.action>

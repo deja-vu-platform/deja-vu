@@ -1,0 +1,63 @@
+<dv.action name="show-dashboard">
+  <phoenix.show-sidebar isDashboard=true />
+
+  <topic.show-labels itemId=phoenix.show-sidebar.loggedInUser?.id
+    hidden=true/>
+  <dv.if condition=topic.show-labels.labels && topic.show-labels.labels.length !== 0>
+    <topic.search-items-by-labels
+      initialValue=topic.show-labels.labels
+      hidden=true />
+  </dv.if>
+
+  <div class="container" id="index-container">
+    <div id="connection-ready">
+      <!-- TODO: indicate when ready; right now, you're always ready -->
+      <h2>We're looking for new connections for you!</h2>
+    </div>
+
+    <div id="dashboard-container">
+      <div class="connection">
+        <h3><span id="connection-header">Your Connections</span></h3>
+        <div id="connection-container">
+          <match.show-matches userId=phoenix.show-sidebar.loggedInUser?.id
+            noMatchesToShowText="No connections just yet!"
+            showMatch=<phoenix.show-connection connection=$match
+              loggedInUserId=phoenix.show-sidebar.loggedInUser?.id />/>
+
+          <dv.if condition=match.show-matches.loadedMatches?.length === 0>
+            <br/>
+            Remember, in order to connect you must <b>express your interest</b> in meeting some of your suggestions.
+          </dv.if>
+        </div>
+      </div>
+
+      <br/>
+
+      <div class="suggestions">
+        <h3><span id="suggestion-header">Your Suggestions</span></h3>
+        <!-- TODO: don't show a given suggestion if there's a connection
+          between the source and target. -->
+
+        <div id="suggestions-container">
+          <!-- Suggestions that aren't connections -->
+          <dv.if condition=topic.search-items-by-labels.searchResultItems && topic.search-items-by-labels.searchResultItems.length !== 0>
+            <topic.show-items
+              itemIds=topic.search-items-by-labels.searchResultItems
+              showItem=<phoenix.show-suggestion id=$id
+                loggedInUserId=phoenix.show-sidebar.loggedInUser?.id />/>
+          </dv.if>
+
+          <!-- No Suggestions -->
+          <dv.if condition=!topic.search-items-by-labels.searchResultItems>
+            <p id="empty-suggestion" class="inline-block">
+              Looks like you don't have any suggestions yet.
+              Try going to your
+              <dv.link class="inline-block" href="/personal">profile page
+              </dv.link> and making your preferences a bit less strict?
+            </p>
+          </dv.if>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

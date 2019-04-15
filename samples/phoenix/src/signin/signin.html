@@ -1,0 +1,55 @@
+<dv.action name="signin">
+  <div id="background-image"></div>
+  <div class="wrap">
+    <div id="intro" class="container">
+      <div class="logo"><img src="assets/phoenix-cc-2.png" /></div>
+    </div>
+    <div class="container login-container">
+      <div class="row">
+        <div class="col-md-6 offset-md-3">
+          <h1 class="h1 title"><em>Phoenix</em></h1>
+          <p class="slogan">People want to meet you.</p>
+          <div class="card panel-login">
+            <div class="card-header">
+              <div class="row">
+                <div class="col-6">
+                  <dv.link href="/signin" class="active" id="login-form-link">
+                    Login
+                  </dv.link>
+                </div>
+                <div class="col-6">
+                  <dv.link href="/register" id="register-form-link">
+                    Register
+                  </dv.link>
+                </div>
+              </div>
+              <hr />
+            </div>
+            <div class="card-body center">
+              <div class="row">
+                <div class="col-lg-12">
+                  <dv.tx>
+                    <authentication.sign-in buttonLabel="Log In" />
+                    <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
+                  </dv.tx>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-10 about-us">
+        <h2>Welcome to Phoenix</h2>
+        <p>
+          Phoenix is a social networking app designed for people who normally might find social situations
+          anxiety-inducing or intimidating. We've taken several measures to lower the activation energy to making new
+          friends and developing meaningful relationships. On Phoenix, you can escape the stigma of separate your
+          gender, sexual orientation, socioeconomic status, appearance, etc. if you so choose. You can choose to talk
+          to people you are similar to, or who you are completely different from. We hope that Phoenix enables people
+          to overcome the barriers of activation energy, social anxiety, depression, or whatever else may be keeping
+          them from opening up and sharing their whole selves with the world.
+        </p>
+      </div>
+    </div>
+  </div>
+</dv.action>

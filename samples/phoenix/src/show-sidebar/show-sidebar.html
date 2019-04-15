@@ -1,0 +1,38 @@
+<dv.action name="show-sidebar" loggedInUser$=authentication.logged-in.user>
+  <div id="sidebar-container">
+    <dv.tx>
+      <authentication.logged-in hidden=true />
+      <dv.redirect href="/signin" onEvalFailure=true />
+    </dv.tx>
+
+
+    <dv.link href="/dashboard">
+      <img src="/assets/phoenix-cc-2.png" />
+    </dv.link>
+
+    <ul>
+      <li id="dashboard-item">
+        <dv.link class=$isDashboard ? "sidebar-link white" : "sidebar-link" href="/dashboard">Dashboard</dv.link>
+      </li>
+      <li id="personal-item">
+        <dv.link class=$isPersonalInfo ? "sidebar-link white" : "sidebar-link" href="/personal">Personal</dv.link>
+      </li>
+      <li id="journal-item">
+        <dv.link class=$isJournal ? "sidebar-link white" : "sidebar-link" href="/journal">Journal</dv.link>
+      </li>
+      <li id="faq-item">
+        <dv.link class=$isFAQ ? "sidebar-link white" : "sidebar-link" href="/faq">FAQ</dv.link>
+      </li>
+    </ul>
+
+    <div class="row" id="sidebar-username-and-signout">
+      <authentication.show-user class="sidebar-username"
+        user=authentication.logged-in.user
+        showId=false />
+      <dv.tx>
+        <authentication.sign-out id="signout" buttonLabel="Log Out" />
+        <dv.link href="/signin" hidden=true />
+      </dv.tx>
+    </div>
+  </div>
+</dv.action>

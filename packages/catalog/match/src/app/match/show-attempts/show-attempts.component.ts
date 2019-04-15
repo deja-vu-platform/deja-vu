@@ -25,7 +25,7 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
   // Provide at most one of the following: sourceId or targetId
   @Input() sourceId: string | undefined;
   @Input() targetId: string | undefined;
-  @Output() loadedAttempts = new EventEmitter();
+  @Output() loadedAttempts = new EventEmitter<Attempt[]>();
 
   @Input() showId = true;
   @Input() showSourceId = true;
@@ -74,7 +74,7 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
         params: {
           inputs: JSON.stringify({
             input: {
-              source: this.sourceId,
+              sourceId: this.sourceId,
               targetId: this.targetId
             }
           }),

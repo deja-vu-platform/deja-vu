@@ -1,0 +1,131 @@
+#personal-and-calendar-container {
+  font-family: 'Asap', sans-serif;
+  z-index: 200;
+  position: absolute;
+  right: 3vh;
+  width: 78%;
+  padding: 10px;
+}
+
+#calendar-and-bounds-container {
+  max-width: 55%;
+  min-width: 425px;
+  float: left;
+}
+
+#calendar-and-bounds-container>h3 {
+  text-align: center;
+}
+
+#calendar-and-bounds-container>*>p {
+  width: 90%;
+  margin: auto;
+}
+
+.time-bound,
+.form-group {
+  margin-top: 1vh;
+  float: left;
+}
+
+#bounds-input {
+  width: 95%;
+  margin: auto;
+}
+
+#update-calendar-bounds {
+  position: relative;
+  right: 4%;
+}
+
+#personal-container {
+  min-width: 400px;
+  float: left;
+  position: relative;
+}
+
+button {
+  transition: background .25s linear;
+  float: right;
+  margin: 7px;
+}
+
+button:hover {
+  background-color: #bfbfbf;
+}
+
+.radio {
+  padding: 3px 6px 3px 6px;
+}
+
+#location-info {
+  margin: 20px;
+  float: clear;
+}
+
+#location-info>label {
+  margin: 4px;
+}
+
+#location-input {
+  width: 40%;
+}
+
+#location-radius-input {
+  width: 20%;
+}
+
+#information-update-container .btn {
+  float: right;
+}
+
+#information-update-container p {
+  margin: auto;
+}
+
+#information-update-loader {
+  font-size: 5px;
+  margin: 25px;
+}
+
+#all-topics-stuff {
+  width: 100%;
+}
+
+#topics-container {
+  float: left;
+  padding: 8px;
+  width: 100%;
+}
+
+#topics-info {
+  float: left;
+  padding: 8px;
+}
+
+.warning {
+  font-weight: bold;
+}
+
+tr {
+  padding: 3px;
+}
+
+td {
+  padding: 3px;
+}
+
+.topicRow,
+#connection-ready-row>* {
+  padding: 3px;
+}
+
+p {
+  font-size: 0.8em;
+}
+
+.personal-info-label {
+  font-weight: bold;
+  font-size: 1em;
+  margin-top: 0.5em;
+}

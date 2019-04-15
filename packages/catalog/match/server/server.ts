@@ -14,7 +14,8 @@ import {
   AttemptsInput,
   CreateMatchInput,
   MatchDoc,
-  MatchesInput
+  MatchesInput,
+  MatchInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
@@ -49,8 +50,8 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'show-match': (extraInfo) => `
-    query ShowMatch($id: ID!) {
-      match(id: $id) ${getReturnFields(extraInfo)}
+    query ShowMatch($input: MatchInput!) {
+      match(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'show-matches': (extraInfo) => `
@@ -81,11 +82,36 @@ function resolvers(db: ClicheDb, _config: Config): object {
         return await attempts.find(filter);
       },
 
-      match: async (_root, { id }) => await matches.findOne({ id }),
+      match: async (_root, { input }: { input: MatchInput }) => {
+        if (!_.isNil(input.id)) {
+          return await matches.findOne({ id: input.id });
+        } else {
+          return await matches
+            .findOne({
+              $or: [
+                {
+                  $and: [
+                    { userAId: input.userAId }, { userBId: input.userBId }
+                  ]
+                },
+                {
+                  $and: [
+                    { userAId: input.userBId }, { userBId: input.userAId }
+                  ]
+                }
+              ]
+            });
+        }
+      },
 
       matches: async (_root, { input }: { input: MatchesInput }) => {
         const filter = {};
-        if (!_.isNil(input.userId)) { filter['userId'] = input.userId; }
+        if (!_.isNil(input.userId)) {
+          filter['$or'] = [
+            { userAId: input.userId },
+            { userBId: input.userId }
+          ];
+        }
 
         return await matches.find(filter);
       }
@@ -93,7 +119,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
     Match: {
       id: (match: MatchDoc) => match.id,
-      userIds: (match: MatchDoc) => match.userIds
+      userAId: (match: MatchDoc) => match.userAId,
+      userBId: (match: MatchDoc) => match.userBId
     },
 
     Attempt: {
@@ -118,7 +145,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
           const match: MatchDoc = {
             id: uuid(),
-            userIds: [input.sourceId, input.targetId]
+            userAId: input.sourceId,
+            userBId: input.targetId
           };
 
           await matches.insertOne(context, match);
@@ -146,7 +174,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
         _root, { input }: { input: CreateMatchInput }, context: Context) => {
         const match: MatchDoc = {
           id: input.id ? input.id : uuid(),
-          userIds: input.userIds
+          userAId: input.userAId,
+          userBId: input.userBId
         };
 
         return await matches.insertOne(context, match);
@@ -165,6 +194,8 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
 
     return Promise.all([
       matches.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      matches.createIndex({ userAId: 1, userBId: 1 },
+        { unique: true, sparse: true }),
       attempts.createIndex({ id: 1 }, { unique: true, sparse: true }),
       // one attempt per source, target pair
       attempts.createIndex({ sourceId: 1, targetId: 1 },

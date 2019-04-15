@@ -1,0 +1,12 @@
+.interest {
+  float: right;
+  position: absolute;
+  top: 45%;
+  right: 10%;
+}
+
+.suggestion-card {
+  position: relative;
+  box-shadow: inset -4px -4px 10px 1px #ffd2c1;
+  text-align: left;
+}
