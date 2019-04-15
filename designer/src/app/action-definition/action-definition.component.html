@@ -83,7 +83,7 @@
                     <div
                       *ngFor="let output of action.of.outputs"
                       [attr.data-output]="action.from.name + '.' + action.of.name + '.' + output"
-                      [matTooltip]="action.of?.ioDescriptions[output]"
+                      [matTooltip]="action.of.ioDescriptions[output]"
                     >
                       {{output}}
                     </div>

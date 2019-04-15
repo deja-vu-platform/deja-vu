@@ -23,7 +23,7 @@
     class="action-input mat-form-field"
     dragula="action"
     (inputAction)="inputAction(input, $event)"
-    [matTooltip]="actionInstance.of?.ioDescriptions[input]"
+    [matTooltip]="actionInstance.of.ioDescriptions[input]"
   >
     <span class="prompt no-drag">Replace {{input}}</span>
     <div
@@ -86,7 +86,7 @@
       dragula="expression-io"
       (addOutput)="addOutput(input, $event)"
       [attr.data-context]="context"
-      [matTooltip]="actionInstance.of?.ioDescriptions[input]"
+      [matTooltip]="actionInstance.of.ioDescriptions[input]"
     >
   </mat-form-field>
 </div>
