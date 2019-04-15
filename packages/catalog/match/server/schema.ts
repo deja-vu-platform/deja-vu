@@ -2,8 +2,6 @@ export interface MatchDoc {
   id: string;
   userAId: string;
   userBId: string;
-  // allows for easier filtering
-  userIds?: string[];
 }
 
 export interface AttemptDoc {

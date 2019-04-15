@@ -87,13 +87,31 @@ function resolvers(db: ClicheDb, _config: Config): object {
           return await matches.findOne({ id: input.id });
         } else {
           return await matches
-            .findOne({ userIds: { $all: [input.userAId, input.userBId]} });
+            .findOne({
+              $or: [
+                {
+                  $and: [
+                    { userAId: input.userAId }, { userBId: input.userBId }
+                  ]
+                },
+                {
+                  $and: [
+                    { userAId: input.userBId }, { userBId: input.userAId }
+                  ]
+                }
+              ]
+            });
         }
       },
 
       matches: async (_root, { input }: { input: MatchesInput }) => {
         const filter = {};
-        if (!_.isNil(input.userId)) { filter['userIds'] = input.userId; }
+        if (!_.isNil(input.userId)) {
+          filter['$or'] = [
+            { userAId: input.userId },
+            { userBId: input.userId }
+          ];
+        }
 
         return await matches.find(filter);
       }
@@ -128,8 +146,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
           const match: MatchDoc = {
             id: uuid(),
             userAId: input.sourceId,
-            userBId: input.targetId,
-            userIds: [input.sourceId, input.targetId]
+            userBId: input.targetId
           };
 
           await matches.insertOne(context, match);
@@ -158,8 +175,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
         const match: MatchDoc = {
           id: input.id ? input.id : uuid(),
           userAId: input.userAId,
-          userBId: input.userBId,
-          userIds: [input.userAId, input.userBId]
+          userBId: input.userBId
         };
 
         return await matches.insertOne(context, match);
