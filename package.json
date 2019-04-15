@@ -76,6 +76,8 @@
     "samples/sweetspots/.dv",
     "samples/livescorecard",
     "samples/livescorecard/.dv",
-    "designer"
+    "designer",
+    "designer/samples/*",
+    "designer/samples/*/.dv"
   ]
 }
