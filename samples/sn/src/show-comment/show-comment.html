@@ -1,0 +1,41 @@
+<dv.action name="show-comment">
+  <div class="comment-container">
+    <dv.if condition=!$snComment>Comment not found</dv.if>
+
+    <dv.if condition=$snComment>
+      <div class="inline-block">
+        <sn.upvote
+          disabled=!$loggedInUser ||
+            $snComment.authorId === $loggedInUser.username
+          id=$snComment.id loggedInUser=$loggedInUser isPost=false />
+      </div>
+
+      <div class="inline-block">
+        <span class="subtext">
+          <comment.show-comment comment=$snComment
+            showId=false showTargetId=false showContent=false />
+        </span>
+        <dv.if condition=$showAncestorSummary>
+          | <dv.link href="/item" params={ id: $snComment.targetId }>parent</dv.link>
+          <!-- TODO: get original post title and link to it as well -->
+        </dv.if>
+        <!-- TODO: specify how long ago -->
+        <comment.show-comment comment=$snComment
+          showId=false showAuthorId=false showTargetId=false />
+      </div>
+
+      <div class="reply-container">
+        <div class="subtext">
+          <dv.link href="/reply" params={ id: $snComment.id }>Reply</dv.link>
+        </div>
+        <div>
+          <comment.show-comments
+            ofTargetId=$snComment.id
+            noCommentsToShowText=''
+            showComment=<sn.show-comment
+              snComment=$comment loggedInUser=$loggedInUser /> />
+        </div>
+      </div>
+    </dv.if>
+  </div>
+</dv.action>

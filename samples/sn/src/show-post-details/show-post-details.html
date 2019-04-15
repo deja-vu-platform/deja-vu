@@ -1,0 +1,34 @@
+<dv.action name="show-post-details">
+  <sn.navbar />
+
+  <div class="main">
+    <div class="container">
+      <sn.show-post id=$id loggedInUser=sn.navbar.loggedInUser />
+
+      <dv.if condition=sn.show-post.loadedPost>
+        <div class="write-comment-container">
+          <hr class="post-separator" />
+
+          <comment.create-comment
+            authorId=sn.navbar.loggedInUser?.username
+            buttonLabel="Add comment"
+            showOptionToSubmit=!!sn.navbar.loggedInUser
+            targetId=$id />
+
+          <dv.if condition=!sn.navbar.loggedInUser>
+            <dv.callback-link class="black-link" href="/login">
+              Add comment
+            </dv.callback-link>
+          </dv.if>
+        </div>
+
+        <div class="post-show-comments">
+          <comment.show-comments
+            ofTargetId=$id
+            showComment=<sn.show-comment
+            snComment=$comment loggedInUser=sn.navbar.loggedInUser /> />
+        </div>
+      </dv.if>
+    </div>
+  </div>
+</dv.action>
