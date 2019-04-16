@@ -323,6 +323,9 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
       case 'commit':
         // release lock/remove pending fields
         // to indicate that the document is now actually created
+        // cannot use the doc's id as filter here and in abort
+        // because it could be different from the unique id
+        // generated for the vote phase
         await this.releaseLock(context, {});
         break;
       case 'abort':
