@@ -49,6 +49,3 @@ e2e/*.map
 # System Files
 .DS_Store
 Thumbs.db
-
-# apps created with the designer
-designer-apps

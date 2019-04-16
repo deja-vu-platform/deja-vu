@@ -42,13 +42,13 @@ export interface ActionDefinition {
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
   readonly actionInputs: ActionInputs;
+  ioDescriptions: { [ioName: string]: string };
 }
 
 
 export interface ClicheActionDefinition extends ActionDefinition {
   readonly component: Component;
   description: string;
-  ioDescriptions: { [ioName: string]: string };
 }
 
 /**
@@ -84,6 +84,7 @@ export class AppActionDefinition implements ActionDefinition {
   readonly actionInputs: Readonly<ActionInputs> = {};
   // TODO: export styles
   readonly styles = _.cloneDeep(defaultAppActionStyles);
+  readonly ioDescriptions = {};
 
   constructor(name: string) {
     this.name = name;
@@ -458,6 +459,8 @@ export class App {
   readonly pages: AppActionDefinition[]; // subset of actions
   homepage: AppActionDefinition; // member of pages
   readonly cliches: ClicheInstance[] = [];
+  readonly ioDescriptions = {};
+
   // need consistent object to return
   private readonly _actionCollections: ActionCollection[] = [];
 
