@@ -8,7 +8,7 @@
 
     <dv.if condition=property.show-object.loadedObject class="post-container">
       <div class="inline-block">
-        <hackernews.upvote
+        <sn.upvote
           disabled=!$loggedInUser ||
             property.show-object.loadedObject.author === $loggedInUser.username
           id=$id isPost=true loggedInUser=$loggedInUser />
@@ -28,7 +28,7 @@
             url=property.show-object.loadedObject.url />)</span>
         </div>
         <div class="subtext">
-          <scoringposts.show-target
+          <scoreposts.show-target
             class="inline-block"
             id=$id
             showId=false

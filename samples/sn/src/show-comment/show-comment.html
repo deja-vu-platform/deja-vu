@@ -1,39 +1,39 @@
 <dv.action name="show-comment">
   <div class="comment-container">
-    <dv.if condition=!$hnComment>Comment not found</dv.if>
+    <dv.if condition=!$snComment>Comment not found</dv.if>
 
-    <dv.if condition=$hnComment>
+    <dv.if condition=$snComment>
       <div class="inline-block">
-        <hackernews.upvote
+        <sn.upvote
           disabled=!$loggedInUser ||
-            $hnComment.authorId === $loggedInUser.username
-          id=$hnComment.id loggedInUser=$loggedInUser isPost=false />
+            $snComment.authorId === $loggedInUser.username
+          id=$snComment.id loggedInUser=$loggedInUser isPost=false />
       </div>
 
       <div class="inline-block">
         <span class="subtext">
-          <comment.show-comment comment=$hnComment
+          <comment.show-comment comment=$snComment
             showId=false showTargetId=false showContent=false />
         </span>
         <dv.if condition=$showAncestorSummary>
-          | <dv.link href="/item" params={ id: $hnComment.targetId }>parent</dv.link>
+          | <dv.link href="/item" params={ id: $snComment.targetId }>parent</dv.link>
           <!-- TODO: get original post title and link to it as well -->
         </dv.if>
         <!-- TODO: specify how long ago -->
-        <comment.show-comment comment=$hnComment
+        <comment.show-comment comment=$snComment
           showId=false showAuthorId=false showTargetId=false />
       </div>
 
       <div class="reply-container">
         <div class="subtext">
-          <dv.link href="/reply" params={ id: $hnComment.id }>Reply</dv.link>
+          <dv.link href="/reply" params={ id: $snComment.id }>Reply</dv.link>
         </div>
         <div>
           <comment.show-comments
-            ofTargetId=$hnComment.id
+            ofTargetId=$snComment.id
             noCommentsToShowText=''
-            showComment=<hackernews.show-comment
-              hnComment=$comment loggedInUser=$loggedInUser /> />
+            showComment=<sn.show-comment
+              snComment=$comment loggedInUser=$loggedInUser /> />
         </div>
       </div>
     </dv.if>

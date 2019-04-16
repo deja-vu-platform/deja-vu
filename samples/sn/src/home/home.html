@@ -1,17 +1,17 @@
 <dv.action name="home">
-  <hackernews.navbar />
+  <sn.navbar />
 
   <div class="main">
     <div class="container">
-      <scoringposts.show-targets-by-score
+      <scoreposts.show-targets-by-score
         noTargetsText="No posts yet."
         showAscending=false
         showScores=false
-        showTarget=<hackernews.show-post
+        showTarget=<sn.show-post
           id=$id
-          loggedInUser=hackernews.navbar.loggedInUser />
+          loggedInUser=sn.navbar.loggedInUser />
       >
-      </scoringposts.show-targets-by-score>
+      </scoreposts.show-targets-by-score>
     </div>
   </div>
 </dv.action>
