@@ -326,7 +326,7 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
         await this.releaseLock(context, {});
         break;
       case 'abort':
-        await this._collection.deleteOne(getReqIdPendingFilter(context, doc));
+        await this._collection.deleteOne(getReqIdPendingFilter(context, {}));
         break;
     }
 
