@@ -87,6 +87,8 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
     this._db = db;
     this._name = name;
     this._collection = this._db.collection(this._name);
+    this._collection
+      .createIndex({ '_pendingDetails.reqId': 1 }, { sparse: true });
   }
 
   aggregate(pipeline: Object[], options?: mongodb.CollectionAggregationOptions):
@@ -321,10 +323,13 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
       case 'commit':
         // release lock/remove pending fields
         // to indicate that the document is now actually created
-        await this.releaseLock(context, doc);
+        // cannot use the doc's id as filter here and in abort
+        // because it could be different from the unique id
+        // generated for the vote phase
+        await this.releaseLock(context, {});
         break;
       case 'abort':
-        await this._collection.deleteOne(getReqIdPendingFilter(context, doc));
+        await this._collection.deleteOne(getReqIdPendingFilter(context, {}));
         break;
     }
 
