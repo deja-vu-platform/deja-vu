@@ -1,0 +1,49 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~angular-calendar/css/angular-calendar.css";
+/* @import "~angular-calendar-week-hours-view/angular-calendar-week-hours-view.scss"; */
+
+
+
+.cal-week-hours-view .cal-day-headers {
+  display: flex;
+}
+
+.cal-week-hours-view .cal-header {
+  flex: 1;
+  text-align: center;
+}
+
+.cal-week-hours-view .cal-header:first-child {
+  flex: 0.5;
+  text-align: center;
+}
+
+.cal-week-hours-view .cal-days-container {
+  display: flex;
+}
+
+.cal-week-hours-view .cal-day-container {
+  flex: 1;
+}
+
+.cal-week-hours-view .cal-day-container:first-child {
+  flex: 0.5;
+}
+
+.cal-week-hours-view .cal-day-view .cal-week-hour-odd {
+  background: #ffffff;
+}
+
+.cal-week-hours-view .cal-day-view .cal-week-hour-even {
+  background: #fafafa;
+}
+
+.cal-week-hours-view .cal-day-view .cal-hour:not(:last-child) .cal-hour-segment,
+.cal-week-hours-view .cal-day-view .cal-hour:last-child :not(:last-child) .cal-hour-segment {
+  border-bottom: 1px dotted #e1e1e1;
+}
+
+.cal-week-hours-view .cal-day-view .cal-hour-rows {
+  overflow-y: hidden;
+}

@@ -1,0 +1,24 @@
+{{ viewDate | calendarDate:(view + 'ViewTitle') }}
+
+<button mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+  back
+</button>
+<button mwlCalendarToday [(viewDate)]="viewDate">Today</button>
+<button mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+  forward
+</button>
+<!-- *ngSwitchCase="'week'" -->
+
+<iq-calendar-week-hours-view
+    [viewDate]="viewDate"
+    [events]="events"
+    [hourSegments]="2"
+    [dayStartHour]="6"
+    [dayEndHour]="20"
+    (eventClicked)="handleEvent($event.event)"
+    (hourSegmentClicked)="hourSegmentClicked($event)"
+    (eventTimesChanged)="eventTimesChanged($event)"
+    [weekStartsOn]="1"
+    [refresh]="refresh"
+    [locale]="locale">
+  </iq-calendar-week-hours-view>

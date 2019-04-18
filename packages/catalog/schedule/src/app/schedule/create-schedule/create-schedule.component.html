@@ -1,0 +1,31 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createScheduleForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newScheduleSaved">
+      <i class="material-icons">done</i>
+        {{newScheduleSavedText}}
+    </div>
+    <mat-error *ngIf="newScheduleError">
+      <i class="material-icons">report_problem</i>
+      {{newScheduleError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputContentLabel}}</mat-label>
+      <textarea matInput required formControlName="contentControl">
+      </textarea>
+    </mat-form-field>
+    <div *ngIf="contentControl.invalid && contentControl.touched">
+      <mat-error *ngIf="contentControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createScheduleForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

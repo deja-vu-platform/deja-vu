@@ -1,0 +1,24 @@
+type Schedule {
+  id: ID!
+  content: String!
+}
+
+input CreateScheduleInput {
+  id: ID
+  content: String!
+}
+
+input UpdateScheduleInput {
+  id: ID!
+  content: String!
+}
+
+type Query {
+  schedule(id: ID!): Schedule
+}
+
+type Mutation {
+  createSchedule(input: CreateScheduleInput!): Schedule
+  deleteSchedule(id: ID!): Boolean
+  updateSchedule(input: UpdateScheduleInput!): Boolean
+}
