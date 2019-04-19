@@ -1,0 +1,66 @@
+type Schedule {
+    id: ID!
+    slots: [Slot!]
+}
+
+type Slot {
+    id: ID!
+    startDate: String!
+    endDate: String!
+    available: Boolean!
+}
+
+input SlotsInput {
+    scheduleId: ID!
+    # can limit the start and end dates for the slots that we're interested in
+    startDate: String
+    endDate: String
+    available: Boolean
+}
+
+input NextAvailablityInput {
+    # need to only fetch from current day/ start day (whichever is later) onwards
+    scheduleIds: [ID!]
+}
+
+input AllAvailablityInput {
+    # need to only fetch from current day/ start day (whichever is later) onwards
+    scheduleIds: [ID!]
+    startDate: String
+    endDate: String
+}
+
+input CreateScheduleInput {
+    id: ID
+    slots: [Slot]
+}
+
+input AddSlotsInput {
+    scheduleId: ID!
+    slots: [Slot!]
+}
+
+input UpdateSlotsInput {
+    scheduleId: ID!
+    slots: [Slot!]
+}
+
+input DeleteSlotInput {
+    slotId: ID!
+    scheduleId: ID!
+}
+
+type Query {
+    schedule(id: ID!): Schedule
+    slot(id: ID!): Slot
+    slots(input: SlotsInput!): [Slot]
+    nextAvailability(input: NextAvailabilityInput!): Slot
+    allAvailability(input: AllAvailablityInput!): [Slot]
+}
+
+type Mutation {
+    createSchedule(input: CreateScheduleInput!): Schedule
+    addSlots(input: AddSlotsInput!): [Slot]
+    updateSlots(input: UpdateSlotsInput!): [Slot]
+    deleteSlot(input: DeleteSlotsInput!): Boolean
+}
