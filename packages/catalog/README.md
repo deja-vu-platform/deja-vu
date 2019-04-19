@@ -5,7 +5,7 @@
 | [Allocator](allocator/README.md) | Distribute resources among consumers |
 | [Authentication](authentication/README.md) | Verify the user's identity with a username and password |
 | [Authorization](authorization/README.md) | Control access to resources |
-| [Comment](comment/README.md) | Express an opinion or reaction in writing |
+| [Comment](comment/README.md) | Share reactions to items |
 | [Event](event/README.md) | Schedule events |
 | [Follow](follow/README.md) | Receive updates from sources |
 | [Geolocation](geolocation/README.md) | Locate points of interest |
