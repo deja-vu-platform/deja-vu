@@ -1,13 +1,12 @@
 type Schedule {
     id: ID!
-    slots: [Slot!]
+    availability: [Slot!]
 }
 
 type Slot {
     id: ID!
     startDate: String!
     endDate: String!
-    available: Boolean!
 }
 
 input SlotsInput {
@@ -35,19 +34,11 @@ input CreateScheduleInput {
     slots: [Slot]
 }
 
-input AddSlotsInput {
-    scheduleId: ID!
-    slots: [Slot!]
-}
-
-input UpdateSlotsInput {
-    scheduleId: ID!
-    slots: [Slot!]
-}
-
-input DeleteSlotInput {
-    slotId: ID!
-    scheduleId: ID!
+input UpdateScheduleInput {
+  id: ID!
+  add: [Slot!]
+  update: [Slot!]
+  delete: [ID!]
 }
 
 type Query {
@@ -60,7 +51,5 @@ type Query {
 
 type Mutation {
     createSchedule(input: CreateScheduleInput!): Schedule
-    addSlots(input: AddSlotsInput!): [Slot]
-    updateSlots(input: UpdateSlotsInput!): [Slot]
-    deleteSlot(input: DeleteSlotsInput!): Boolean
+    updateSchedule(input: UpdateScheduleInput!): Schedule
 }
