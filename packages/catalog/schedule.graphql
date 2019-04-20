@@ -18,13 +18,13 @@ input SlotsInput {
 }
 
 input NextAvailablityInput {
-    # need to only fetch from current day/ start day (whichever is later) onwards
+    # from current day onwards
     scheduleIds: [ID!]
 }
 
 input AllAvailablityInput {
-    # need to only fetch from current day/ start day (whichever is later) onwards
     scheduleIds: [ID!]
+    # startDate defaults to current date
     startDate: String
     endDate: String
 }
