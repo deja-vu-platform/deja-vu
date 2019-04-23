@@ -1,0 +1,9 @@
+<span *ngIf="slot">
+  <div *ngIf="showId">
+    {{slot.id}}
+  </div>
+
+  <div *ngIf="showContent">
+    {{slot.content}}
+  </div>
+</span>

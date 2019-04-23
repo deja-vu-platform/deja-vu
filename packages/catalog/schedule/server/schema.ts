@@ -1,14 +1,38 @@
 export interface ScheduleDoc {
   id: string;
-  content: string;
+  availability: SlotDoc[];
+}
+
+export interface SlotDoc {
+  id: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+export interface SlotsInput {
+  scheduleId: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface NextAvailabilityInput {
+  scheduleIds: string[];
+}
+
+export interface AllAvailabilityInput {
+  scheduleIds: string[];
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface CreateScheduleInput {
   id?: string;
-  content: string;
+  slots?: SlotDoc[];
 }
 
 export interface UpdateScheduleInput {
   id: string;
-  content: string;
+  add?: SlotDoc[];
+  update?: SlotDoc[];
+  delete?: string[];
 }

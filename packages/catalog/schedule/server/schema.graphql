@@ -1,24 +1,57 @@
 type Schedule {
-  id: ID!
-  content: String!
+    id: ID!
+    availability: [Slot!]
+}
+
+type Slot {
+    id: ID!
+    startDate: String!
+    endDate: String!
+}
+
+input SlotsInput {
+    scheduleId: ID!
+    # can limit the start and end dates for the slots that we're interested in
+    startDate: String
+    endDate: String
+}
+
+input NextAvailablityInput {
+    # from current day onwards
+    scheduleIds: [ID!]
+}
+
+input AllAvailablityInput {
+    scheduleIds: [ID!]
+    # startDate defaults to current date
+    startDate: String
+    endDate: String
 }
 
 input CreateScheduleInput {
-  id: ID
-  content: String!
+    id: ID
+    slots: [Slot]
 }
 
 input UpdateScheduleInput {
+  # add/update/delete slots in a schedule
   id: ID!
-  content: String!
+  add: [Slot]
+  # slots to be updated must have an ID
+  update: [Slot]
+  delete: [ID]
 }
 
 type Query {
-  schedule(id: ID!): Schedule
+    schedule(id: ID!): Schedule
+    slot(id: ID!): Slot
+    slots(input: SlotsInput!): [Slot]
+    nextAvailability(input: NextAvailabilityInput!): Slot
+    allAvailability(input: AllAvailablityInput!): [Slot]
 }
 
 type Mutation {
-  createSchedule(input: CreateScheduleInput!): Schedule
-  deleteSchedule(id: ID!): Boolean
-  updateSchedule(input: UpdateScheduleInput!): Boolean
+    createSchedule(input: CreateScheduleInput!): Schedule
+    updateSchedule(input: UpdateScheduleInput!): Schedule
+    deleteSchedule(id: ID!): Boolean
 }
