@@ -9,10 +9,10 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
-import { Slots } from '../shared/schedule.model';
+import { Slot } from '../shared/schedule.model';
 
 interface SlotsRes {
-  data: { slots: Slots };
+  data: { slots: Slot[] };
 }
 
 
@@ -24,7 +24,7 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
 OnInit {
   // Provide one of the following: id or slots
   @Input() id: string | undefined;
-  @Input() slots: Slots | undefined;
+  @Input() slots: Slot[] | undefined;
   @Output() loadedSlots = new EventEmitter();
 
   @Input() showId = true;

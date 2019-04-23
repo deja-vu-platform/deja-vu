@@ -102,7 +102,7 @@ export class UpdateScheduleComponent implements
     .subscribe((res) => {
       const schedule = res.data.schedule;
       if (schedule) {
-        this.contentControl.setValue(schedule.content);
+        this.contentControl.setValue(schedule);
       }
     });
 

@@ -1,4 +1,10 @@
 export interface Schedule {
-  id: string;
-  content: string;
+  id?: string;
+  availability?: Slot[];
+}
+
+export interface Slot {
+  id?: string;
+  startDate: Date;
+  endDate: Date;
 }

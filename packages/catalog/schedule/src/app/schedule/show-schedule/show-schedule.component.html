@@ -3,7 +3,85 @@
     {{schedule.id}}
   </div>
 
-  <div *ngIf="showContent">
-    {{schedule.content}}
+  <div *ngIf="showAvailability">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <div class="btn btn-primary"
+            mwlCalendarPreviousView
+            [view]="view"
+            [(viewDate)]="viewDate">
+            Previous
+          </div>
+          <div class="btn btn-outline-secondary"
+            mwlCalendarToday
+            [(viewDate)]="viewDate">
+            Today
+          </div>
+          <div class="btn btn-primary"
+            mwlCalendarNextView
+            [view]="view"
+            [(viewDate)]="viewDate">
+            Next
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <h5>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h5>
+      </div>
+
+      <div class="col-md-4">
+        <div class="btn-group">
+          <div class="btn btn-primary"
+            (click)="view = 'month'"
+            [class.active]="view === 'month'">
+            Month
+          </div>
+          <div class="btn btn-primary"
+            (click)="view = 'week'"
+            [class.active]="view === 'week'">
+            Week
+          </div>
+          <div class="btn btn-primary"
+            (click)="view = 'day'"
+            [class.active]="view === 'day'">
+            Day
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <mwl-calendar-month-view
+      *ngIf="view === 'month'"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      [locale]="locale">
+    </mwl-calendar-month-view>
+
+    <iq-calendar-week-hours-view
+      *ngIf="view === 'week'"
+      [viewDate]="viewDate"
+      [events]="events"
+      [hourSegments]="hourSegments"
+      [dayStartHour]="dayStartHour"
+      [dayEndHour]="dayEndHour"
+      [refresh]="refresh"
+      [locale]="locale">
+    </iq-calendar-week-hours-view>
+
+    <mwl-calendar-day-view
+      *ngIf="view === 'day'"
+      [viewDate]="viewDate"
+      [events]="events"
+      [hourSegments]="hourSegments"
+      [dayStartHour]="dayStartHour"
+      [dayEndHour]="dayEndHour"
+      [refresh]="refresh"
+      [locale]="locale">
+    </mwl-calendar-day-view>
   </div>
 </span>

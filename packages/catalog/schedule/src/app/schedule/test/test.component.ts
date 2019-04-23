@@ -1,57 +1,17 @@
-
 import { Component, Input } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
 import {
   CalendarDateFormatter, CalendarEvent, CalendarEventTimesChangedEvent,
-  CalendarEventTitleFormatter, DateFormatterParams
+  CalendarEventTitleFormatter
 } from 'angular-calendar';
-import {
-  addDays,
-  addHours,
-  endOfDay,
-  endOfMonth,
-  getISOWeek,
-  isSameDay,
-  isSameMonth,
-  startOfDay,
-  subDays
-} from 'date-fns';
+import { addHours, endOfDay, startOfDay } from 'date-fns';
 
-import { DatePipe } from '@angular/common';
 import { MonthViewDay } from 'calendar-utils';
-
-export class CustomDateFormatterProvider extends CalendarDateFormatter {
-
-  public dayViewHour({ date, locale }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'HH:mm', locale);
-  }
-
-  public weekViewTitle({ date, locale }: DateFormatterParams): string {
-    const year: string = new DatePipe(locale).transform(date, 'y', locale);
-    const weekNumber: number = getISOWeek(date);
-
-    return `Week ${weekNumber} in ${year}`;
-  }
-
-  public weekViewColumnHeader({ date, locale }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'E', locale);
-  }
-
-  public weekViewColumnSubHeader(
-    { date, locale }: DateFormatterParams): string {
-    return new DatePipe(locale).transform(date, 'MM/dd', locale);
-  }
-
-}
-
-export class CustomEventTitleFormatterProvider extends
-  CalendarEventTitleFormatter {
-
-  dayTooltip(event: CalendarEvent): string {
-    return;
-  }
-}
+import {
+  CustomDateFormatterProvider, CustomEventTitleFormatterProvider
+} from '../shared/schedule.provider';
+import { timeRange } from '../shared/schedule.util';
 
 @Component({
   selector: 'schedule-test',
@@ -70,15 +30,15 @@ export class CustomEventTitleFormatterProvider extends
 })
 export class TestComponent {
   @Input() view: 'day' | 'week' | 'month' = 'week';
-  @Input() locale: string = 'en';
+  @Input() locale = 'en';
   // The number of 60/num minute segments in an hour. Must be <= 6
-  @Input() hourSegments: number = 2;
+  @Input() hourSegments = 2;
   // The day start hours in 24 hour time. Must be 0-23
-  @Input() dayStartHour: number = 9;
+  @Input() dayStartHour = 9;
   // The day end hours in 24 hour time. Must be 0-23
-  @Input() dayEndHour: number = 17;
-  // The default length of a newly added event
-  @Input() eventLength: number = 1;
+  @Input() dayEndHour = 17;
+  // The default length of a newly added event (in hours)
+  @Input() eventLength = 1;
 
   viewDate: Date = new Date();
   isDragging = false;
@@ -131,6 +91,7 @@ export class TestComponent {
 
     event.start = newStart;
     event.end = newEnd;
+    event.title = timeRange(newStart, newEnd);
     this.refresh.next();
 
     setTimeout(() => {
@@ -139,11 +100,11 @@ export class TestComponent {
   }
 
   hourSegmentClicked(event): void {
-    console.log(JSON.stringify(event))
+    console.log(JSON.stringify(event));
     const newEvent: CalendarEvent = {
       start: event.date,
       end: addHours(event.date, this.eventLength),
-      title: 'TEST EVENT',
+      title: timeRange(event.date, addHours(event.date, this.eventLength)),
       cssClass: 'custom-event',
       color: {
         primary: '#488aff',
@@ -161,11 +122,11 @@ export class TestComponent {
   }
 
   dayClicked(event: { day: MonthViewDay }): void {
-    console.log('day', JSON.stringify(event))
+    console.log('day', JSON.stringify(event));
     const newEvent: CalendarEvent = {
       start: startOfDay(event.day.date),
       end: endOfDay(event.day.date),
-      title: 'TEST EVENT',
+      title: timeRange(startOfDay(event.day.date), endOfDay(event.day.date)),
       cssClass: 'custom-event',
       color: {
         primary: '#488aff',

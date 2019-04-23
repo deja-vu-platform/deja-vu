@@ -9,10 +9,10 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
-import { AllAvailability } from '../shared/schedule.model';
+import { Slot } from '../shared/schedule.model';
 
 interface AllAvailabilityRes {
-  data: { allAvailability: AllAvailability };
+  data: { allAvailability: Slot[] };
 }
 
 
@@ -24,7 +24,7 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges, O
 OnInit {
   // Provide one of the following: id or all-availability
   @Input() id: string | undefined;
-  @Input() allAvailability: AllAvailability | undefined;
+  @Input() allAvailability: Slot[] | undefined;
   @Output() loadedAllAvailability = new EventEmitter();
 
   @Input() showId = true;
@@ -70,7 +70,7 @@ OnInit {
               ${this.showContent ? 'content' : ''}
             `
           }
-        },
+        }
       })
       .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
       .subscribe((allAvailability) => {

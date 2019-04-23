@@ -9,10 +9,10 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
-import { NextAvailability } from '../shared/schedule.model';
+import { Slot } from '../shared/schedule.model';
 
 interface NextAvailabilityRes {
-  data: { nextAvailability: NextAvailability };
+  data: { nextAvailability: Slot };
 }
 
 
@@ -24,7 +24,7 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges, 
 OnInit {
   // Provide one of the following: id or next-availability
   @Input() id: string | undefined;
-  @Input() nextAvailability: NextAvailability | undefined;
+  @Input() nextAvailability: Slot | undefined;
   @Output() loadedNextAvailability = new EventEmitter();
 
   @Input() showId = true;
