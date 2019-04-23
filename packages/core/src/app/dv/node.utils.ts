@@ -82,12 +82,9 @@ export class NodeUtils {
 
   static GetClicheAliasOfNode(node): string {
     const clicheOfTag = NodeUtils.GetClicheFromTag(NodeUtils.GetTag(node));
-    const dvAlias = NodeUtils.GetAttribute(node, ALIAS_ATTR);
     const dvOf = NodeUtils.GetAttribute(node, OF_ATTR);
 
-    return !_.isEmpty(dvAlias) ?
-      dvAlias :
-      (!_.isEmpty(dvOf) ? dvOf : clicheOfTag);
+    return !_.isEmpty(dvOf) ? dvOf : clicheOfTag;
   }
 
   static GetFqTagOfNode(node): string {

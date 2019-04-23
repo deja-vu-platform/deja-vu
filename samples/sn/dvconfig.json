@@ -1,5 +1,5 @@
 {
-  "name": "hackernews",
+  "name": "sn",
   "type": "app",
   "usedCliches": {
     "authentication": {},
@@ -25,13 +25,13 @@
         }
       }
     },
-    "scoringposts": {
+    "scoreposts": {
       "name": "scoring",
       "config": {
         "oneToOneScoring": true
       }
     },
-    "scoringcomments": {
+    "scorecomments": {
       "name": "scoring",
       "config": {
         "oneToOneScoring": true

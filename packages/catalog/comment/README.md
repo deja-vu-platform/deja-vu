@@ -1,6 +1,6 @@
 # Comment
 
-Express an opinion or reaction in writing
+Share reactions to items
 
 ## Actions
 

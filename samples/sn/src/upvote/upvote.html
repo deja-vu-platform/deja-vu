@@ -4,7 +4,7 @@
       <dv.tx>
         <authentication.authenticate as upvote-post-authenticate
           id=$loggedInUser?.id hidden=true />
-        <scoringposts.create-score as upvote-post-create-score
+        <scoreposts.create-score as upvote-post-create-score
           buttonDisabled=$disabled || !$loggedInUser
           class="upvote-button"
           newScoreSavedText=""
@@ -20,7 +20,7 @@
       <dv.tx>
         <authentication.authenticate
           id=$loggedInUser?.id hidden=true />
-        <scoringcomments.create-score
+        <scorecomments.create-score
           buttonDisabled=$disabled || !$loggedInUser
           class="upvote-button"
           newScoreSavedText=""
