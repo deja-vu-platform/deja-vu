@@ -7,7 +7,7 @@ import { DragulaModule } from 'ng2-dragula';
 import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
-import { DvModule, GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { ClicheModule, dvCoreActions } from './cliche.module';
@@ -29,7 +29,7 @@ import {
   ConfigureActionComponent
 } from './configure-action/configure-action.component';
 import {
-  ConfigureClicheComponent
+  ConfigureClicheComponent, usedClichesConfig
 } from './configure-cliche/configure-cliche.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
@@ -41,6 +41,10 @@ import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
 import { ScopeIO } from './io';
+
+export function getUsedClichesConfig() {
+  return usedClichesConfig;
+}
 
 ScopeIO.actionInstanceComponent = ActionInstanceComponent;
 
@@ -78,6 +82,10 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
       // the designer is served at 4200
       // requests are proxied to the gateway running at 3000
       useValue: 'http://localhost:4200/api'
+    },
+    {
+      provide: USED_CLICHES_CONFIG,
+      useFactory: getUsedClichesConfig
     }
   ],
   bootstrap: [AppComponent],

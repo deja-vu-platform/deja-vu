@@ -39,6 +39,9 @@ interface ControlGroup {
 }
 
 
+export const usedClichesConfig = {};
+
+
 class JSONValidator extends ErrorStateMatcher {
   constructor(private icc: ConfigureClicheComponent) {
     super();
@@ -132,6 +135,7 @@ export class ConfigureClicheComponent implements OnInit {
         });
       } else {
         clicheInstance = new ClicheInstance(this.name, this.of);
+        usedClichesConfig[this.name] = { config: clicheInstance.config };
         this.data.app.cliches.push(clicheInstance);
       }
       if (this.configString) { // guaranteed to be valid JSON of object
