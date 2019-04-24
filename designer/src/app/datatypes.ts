@@ -109,16 +109,15 @@ export class AppActionDefinition implements ActionDefinition {
   }
 
   getChildren(includeInputs = false): ActionInstance[] {
-    return (<ActionInstance[]>[]).concat(
-      ...this.rows.map(
-        (r) => (<ActionInstance[]>[]).concat(
-          ...r.actions.map((a) => includeInputs
-            ? [a, ...a.getInputtedActions(true)]
-            : a
-          )
+    return this.rows
+      .map((r) => r.actions
+        .map((a) => includeInputs
+        ? [a, ...a.getInputtedActions(true)]
+        : [a]
         )
+        .flat()
       )
-    );
+      .flat();
   }
 
   /**

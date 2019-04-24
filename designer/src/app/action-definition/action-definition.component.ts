@@ -23,9 +23,11 @@ import {
   flexJustify,
   Row
 } from '../datatypes';
-import { Resolution, ScopeIO } from '../io';
+import { ScopeIO } from '../io';
 
-interface Reference extends Resolution {
+interface Reference {
+  fromAction: ActionInstance;
+  ioName: string;
   forIO: string;
   forActionID: string;
 }
@@ -200,19 +202,15 @@ implements AfterViewInit, OnChanges, OnInit {
     }
 
     const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
-    const resolutions: Reference[] = [].concat(...ids
-      .map((id) => _.filter(
-        this.scopeIO.inReferences[id],
-        (r, ioName) => {
-          if (r) {
-            r['forIO'] = ioName;
-            r['forActionID'] = id;
-          }
-
-          return !!r;
-        }
-      ))
-    ); // flatten
+    const resolutions: Reference[] = ids
+      .map((id) => Object
+        .entries(this.scopeIO.inReferences[id] || {})
+        .map(([ioName, references]) => references
+          .map((r): Reference => ({ ...r, forIO: ioName, forActionID: id }))
+        )
+        .flat()
+      )
+      .flat();
     const uniqueResolutions = _.uniqBy(
       resolutions,
       (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO, r.forActionID])
