@@ -13,6 +13,8 @@ import {
 } from '../shared/schedule.provider';
 import { timeRange } from '../shared/schedule.util';
 
+import * as _ from 'lodash';
+
 @Component({
   selector: 'schedule-test',
   templateUrl: './test.component.html',
@@ -78,7 +80,13 @@ export class TestComponent {
   ];
 
   handleEvent(event: CalendarEvent): void {
-    alert(event.title + ' ' + event.start + ' to ' + event.end);
+    console.log('an event', event)
+    if (confirm(`Do you want to delete the following slot:
+    ${timeRange(event.start, event.end)}?`)) {
+      _.pull(this.events, event);
+      this.refresh.next();
+    }
+    // alert(event.title + ' ' + event.start + ' to ' + event.end);
   }
 
   // Sad note: Cannot drag event to another week

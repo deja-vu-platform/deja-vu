@@ -25,14 +25,18 @@ export interface AllAvailabilityInput {
   endDate?: string;
 }
 
+export interface AddSlotInput {
+  startDate: string;
+  endDate: string;
+}
+
 export interface CreateScheduleInput {
   id?: string;
-  slots?: SlotDoc[];
+  slots?: AddSlotInput[];
 }
 
 export interface UpdateScheduleInput {
   id: string;
-  add?: SlotDoc[];
-  update?: SlotDoc[];
+  add?: AddSlotInput[];
   delete?: string[];
 }

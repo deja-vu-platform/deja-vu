@@ -5,6 +5,6 @@ export interface Schedule {
 
 export interface Slot {
   id?: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }

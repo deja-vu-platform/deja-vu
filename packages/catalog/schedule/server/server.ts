@@ -198,8 +198,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
           availability = _.map(input.slots, (slot) => {
             const dateSlot: SlotDoc = {
               id: uuid(),
-              startDate: slot.startDate,
-              endDate: slot.endDate
+              startDate: new Date(slot.startDate),
+              endDate: new Date(slot.endDate)
             };
 
             return dateSlot;
@@ -226,8 +226,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
           const availability = _.map(input.add, (slot) => {
             const newSlot: SlotDoc = {
               id: uuid(),
-              startDate: slot.startDate,
-              endDate: slot.endDate
+              startDate: new Date(slot.startDate),
+              endDate: new Date(slot.endDate)
             };
 
             return newSlot;
@@ -240,7 +240,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
           updateOp['$pull'] = { 'availability.id': { $in: input.delete } };
         }
 
-        return await schedules.updateOne(context, filter, updateOp);
+        return await schedules
+          .updateOne(context, filter, updateOp, { upsert: true });
       },
 
       deleteSchedule: async (_root, { id }, context: Context) =>
@@ -253,7 +254,8 @@ const scheduleCliche: ClicheServer = new ClicheServerBuilder('schedule')
   .initDb((db: ClicheDb, _config: Config): Promise<any> => {
     const schedules: Collection<ScheduleDoc> = db.collection('schedules');
 
-    return schedules.createIndex({ id: 1 }, { unique: true, sparse: true });
+    return schedules.createIndex({ id: 1, 'availability.id': 1 },
+      { unique: true, sparse: true });
   })
   .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)

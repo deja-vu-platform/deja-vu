@@ -73,7 +73,6 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
 
   _schedule: Schedule;
   viewDate: Date = new Date();
-  isDragging = false;
   refresh: Subject<any> = new Subject();
   events: CalendarEvent[] = [];
 
