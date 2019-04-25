@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatRadioModule } from '@angular/material';
+import { MatLabel, MatRadioModule } from '@angular/material';
 import { ConfigWizardComponent } from './config-wizard.component';
 
 describe('ConfigWizardComponent', () => {
@@ -8,7 +8,7 @@ describe('ConfigWizardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfigWizardComponent ],
+      declarations: [ ConfigWizardComponent, MatLabel ],
       imports: [ MatRadioModule ]
     })
     .compileComponents();

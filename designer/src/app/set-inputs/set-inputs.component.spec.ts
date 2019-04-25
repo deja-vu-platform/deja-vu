@@ -5,7 +5,8 @@ import {
   MatDialogModule,
   MatIconModule,
   MatInputModule,
-  MatMenuModule
+  MatMenuModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import {
@@ -29,7 +30,8 @@ describe('SetInputsComponent', () => {
         MatDialogModule,
         MatMenuModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        MatTooltipModule
       ]
     })
     .compileComponents();

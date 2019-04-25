@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material';
 
 import { TriStateCheckboxComponent } from './tri-state-checkbox.component';
 
@@ -8,7 +10,11 @@ describe('TriStateCheckboxComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TriStateCheckboxComponent ]
+      declarations: [ TriStateCheckboxComponent ],
+      imports: [
+        FormsModule,
+        MatCheckboxModule
+      ]
     })
     .compileComponents();
   }));

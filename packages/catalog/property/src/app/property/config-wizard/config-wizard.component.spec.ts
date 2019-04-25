@@ -1,6 +1,21 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import {
+  MatCheckboxModule,
+  MatIconModule,
+  MatInputModule,
+  MatOptionModule,
+  MatSelectModule,
+  MatTableModule,
+  MatTooltipModule
+} from '@angular/material';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ConfigWizardComponent } from './config-wizard.component';
+
+import {
+  TriStateCheckboxComponent
+} from '../tri-state-checkbox/tri-state-checkbox.component';
 
 describe('ConfigWizardComponent', () => {
   let component: ConfigWizardComponent;
@@ -8,7 +23,21 @@ describe('ConfigWizardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfigWizardComponent ]
+      declarations: [
+        ConfigWizardComponent,
+        TriStateCheckboxComponent
+      ],
+      imports: [
+        FormsModule,
+        MatCheckboxModule,
+        MatIconModule,
+        MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatTableModule,
+        MatTooltipModule,
+        NoopAnimationsModule
+      ]
     })
     .compileComponents();
   }));
