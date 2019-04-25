@@ -132,17 +132,37 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       slots: async (_root, { input }: { input: SlotsInput }) => {
         const filter = { id: input.scheduleId };
+        const condition = {};
         if (!_.isNil(input.startDate)) {
-          filter['availability.startDate']['$gte'] = new Date(input.startDate);
+          condition['$gte'] = ['$$slot.startDate', new Date(input.startDate)];
         }
         if (!_.isNil(input.endDate)) {
-          filter['availability.endDate']['$lte'] = new Date(input.endDate);
+          condition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
-        const slots = await schedules.findOne(filter,
-          { projection: { availability: 1 } });
+        const res = await schedules.aggregate([
+          { $match: filter },
+          {
+            $project: {
+              availability: {
+                $filter: {
+                  input: '$availability',
+                  as: 'slot',
+                  cond: condition
+                }
+              }
+            }
+          },
+          {
+            $sort: {
+              'availability.startDate': input.sortByStartDate,
+              'availability.endDate': input.sortByEndDate
+            }
+          }
+        ])
+          .next();
 
-        return slots.availability;
+        return res ? res.availability : [];
       },
 
       nextAvailability: async (
@@ -219,12 +239,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
         let addSlotsSuccess = true;
         let deleteSlotsSuccess = true;
 
-        // idea for now: in the front end, if the slot is updated
-        // (moved, time diff), delete the original and add the updated ones
-
-        // TODO: either two updates (push + pull) OR one update (set)
-        // https://stackoverflow.com/questions/34217874/mongodb-array-push-and-pull
-
+        // StackOverflow post for doing two updates: https://bit.ly/2IJIVZR
         // add slots
         if (!_.isNil(input.add) && !_.isEmpty(input.add)) {
           const availability = _.map(input.add, (slot) => {

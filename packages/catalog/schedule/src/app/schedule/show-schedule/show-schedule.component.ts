@@ -16,7 +16,7 @@ import {
 import {
   CustomDateFormatterProvider, CustomEventTitleFormatterProvider
 } from '../shared/schedule.provider';
-import { slotsToCalendarEvents } from '../shared/schedule.util';
+import { slotsToCalendarEvents } from '../shared/schedule.utils';
 
 import { API_PATH } from '../schedule.config';
 import { Schedule } from '../shared/schedule.model';

@@ -8,9 +8,9 @@ export function timeRange(start: Date, end: Date): string {
   return `${format(start, 'h[:]mm A')} - ${format(end, 'h[:]mm A')}`;
 }
 
-// TODO: date time range for delete
 export function dateTimeRange(start: Date, end: Date): string {
   const formatString = 'dddd do MM Mh[:]mm A';
+
   return `${format(start, formatString)} - ${format(end, formatString)}`;
 }
 

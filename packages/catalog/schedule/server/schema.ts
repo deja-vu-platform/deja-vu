@@ -11,8 +11,10 @@ export interface SlotDoc {
 
 export interface SlotsInput {
   scheduleId: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
+  sortByStartDate: number;
+  sortByEndDate: number;
 }
 
 export interface NextAvailabilityInput {

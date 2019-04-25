@@ -11,7 +11,7 @@ import { MonthViewDay } from 'calendar-utils';
 import {
   CustomDateFormatterProvider, CustomEventTitleFormatterProvider
 } from '../shared/schedule.provider';
-import { timeRange } from '../shared/schedule.util';
+import { timeRange } from '../shared/schedule.utils';
 
 import * as _ from 'lodash';
 

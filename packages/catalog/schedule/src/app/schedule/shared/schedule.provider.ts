@@ -29,7 +29,6 @@ export class CustomDateFormatterProvider extends CalendarDateFormatter {
     { date, locale }: DateFormatterParams): string {
     return new DatePipe(locale).transform(date, 'MM/dd', locale);
   }
-
 }
 
 export class CustomEventTitleFormatterProvider extends

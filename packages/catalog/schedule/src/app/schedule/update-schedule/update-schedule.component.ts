@@ -17,7 +17,7 @@ import {
 import {
   calendarEventsToSlots, createNewCalendarEvent,
   dateTimeRange, slotsToCalendarEvents, timeRange
-} from '../shared/schedule.util';
+} from '../shared/schedule.utils';
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,

@@ -19,6 +19,8 @@ input SlotsInput {
     # can limit the start and end dates for the slots that we're interested in
     startDate: String
     endDate: String
+    sortByStartDate: Int!
+    sortByEndDate: Int!
 }
 
 input NextAvailabilityInput {

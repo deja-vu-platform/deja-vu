@@ -5,8 +5,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
 import { Slot } from '../shared/schedule.model';
@@ -18,7 +17,8 @@ interface SlotRes {
 
 @Component({
   selector: 'schedule-show-slot',
-  templateUrl: './show-slot.component.html'
+  templateUrl: './show-slot.component.html',
+  styleUrls: ['./show-slot.component.css']
 })
 export class ShowSlotComponent implements AfterViewInit, OnChanges, OnEval,
 OnInit {
@@ -28,7 +28,11 @@ OnInit {
   @Output() loadedSlot = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showStartDate = true;
+  @Input() showEndDate = true;
+
+  // See https://angular.io/api/common/DatePipe
+  @Input() dateTimeFormatString = 'medium';
 
   private gs: GatewayService;
 
@@ -67,10 +71,11 @@ OnInit {
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showStartDate ? 'startDate' : ''}
+              ${this.showEndDate ? 'endDate' : ''}
             `
           }
-        },
+        }
       })
       .pipe(map((res: SlotRes) => res.data.slot))
       .subscribe((slot) => {

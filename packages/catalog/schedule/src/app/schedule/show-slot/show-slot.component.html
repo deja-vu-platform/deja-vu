@@ -1,9 +1,13 @@
 <span *ngIf="slot">
   <div *ngIf="showId">
-    {{slot.id}}
+    {{ slot.id }}
   </div>
 
-  <div *ngIf="showContent">
-    {{slot.content}}
+  <div *ngIf="showStartDate">
+    {{ slot.startDate | date: dateTimeFormatString }}
+  </div>
+
+  <div *ngIf="showEndDate">
+    {{ slot.endDate | date: dateTimeFormatString }}
   </div>
 </span>

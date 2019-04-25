@@ -1,10 +1,19 @@
-<span *ngIf="slots">
-  <!-- TODO: use show schedule; remember id is optional so it should work -->
-  <div *ngIf="showId">
-    {{slots.id}}
-  </div>
+<ul *ngIf="slots && slots.length > 0" class="list-group">
+  <li *ngFor="let slot of slots" class="list-group-item">
+    <dv-include
+      [action]="showSlot"
+      default-showSlot="{ tag: schedule-show-slot }"
+      [inputs]="{
+        slot: slot, showId: showId,
+        showStartDate: showStartDate,
+        showEndDate: showEndDate,
+        dateTimeFormatString: dateTimeFormatString
+      }"
+      [parent]="showSlots">
+    </dv-include>
+  </li>
+</ul>
 
-  <div *ngIf="showContent">
-    {{slots.content}}
-  </div>
-</span>
+<div *ngIf="!slots || slots.length === 0">
+  <span>{{noSlotsToShowText}}</span>
+</div>
