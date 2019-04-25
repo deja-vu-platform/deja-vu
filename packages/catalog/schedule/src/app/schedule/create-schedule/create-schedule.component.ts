@@ -15,7 +15,7 @@ import {
   CustomDateFormatterProvider, CustomEventTitleFormatterProvider
 } from '../shared/schedule.provider';
 import {
-  calendarEventsToSlots, createNewCalendarEvent, timeRange
+  calendarEventsToSlots, createNewCalendarEvent, dateTimeRange, timeRange
 } from '../shared/schedule.util';
 
 import {
@@ -94,7 +94,7 @@ export class CreateScheduleComponent implements OnInit, OnExec, OnExecFailure,
 
   handleEvent(event: CalendarEvent): void {
     if (confirm(`${this.removeSlotText}
-    ${timeRange(event.start, event.end)}?`)) {
+    ${dateTimeRange(event.start, event.end)}?`)) {
       _.pull(this.events, event);
       this.refresh.next();
     }

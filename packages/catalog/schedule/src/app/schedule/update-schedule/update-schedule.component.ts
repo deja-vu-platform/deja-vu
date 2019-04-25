@@ -16,7 +16,7 @@ import {
 } from '../shared/schedule.provider';
 import {
   calendarEventsToSlots, createNewCalendarEvent,
-  slotsToCalendarEvents, timeRange
+  dateTimeRange, slotsToCalendarEvents, timeRange
 } from '../shared/schedule.util';
 
 import {
@@ -65,6 +65,7 @@ export class UpdateScheduleComponent implements
   // Presentation inputs
   @Input() buttonLabel = 'Update Schedule';
   @Input() updateScheduleSavedText = 'Schedule updated';
+  @Input() deleteSlotText = 'Do you want to delete the following slot:';
   @Input() view: 'day' | 'week' | 'month' = 'week';
   @Input() locale = 'en';
   // The number of 60/num minute segments in an hour. Must be <= 6
@@ -127,8 +128,8 @@ export class UpdateScheduleComponent implements
   }
 
   handleEvent(event: CalendarEvent): void {
-    if (confirm(`Do you want to delete the following slot:
-    ${timeRange(event.start, event.end)}?`)) {
+    if (confirm(`${this.deleteSlotText}
+    ${dateTimeRange(event.start, event.end)}?`)) {
       _.pull(this.events, event);
       this.deletedEventIds.push(event.id.toString());
       this.refresh.next();
@@ -183,9 +184,6 @@ export class UpdateScheduleComponent implements
   }
 
   async dvOnExec(): Promise<boolean> {
-    console.log('all events', JSON.stringify(this.events))
-    console.log('\n to add', JSON.stringify(calendarEventsToSlots(this.newEvents)))
-    console.log('\n to delete', JSON.stringify(_.uniq(this.deletedEventIds)))
     const res = await this.gs.post<UpdateScheduleRes>(this.apiPath, {
       inputs: {
         input: {
