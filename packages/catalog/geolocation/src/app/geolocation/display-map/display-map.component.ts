@@ -3,7 +3,11 @@ import {
   OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  ConfigService, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ConfigServiceFactory,
+  GatewayService,
+  GatewayServiceFactory,
+  OnEval,
+  RunService
 } from '@deja-vu/core';
 
 import { MouseEvent as AgmMouseEvent } from '@agm/core';
@@ -13,7 +17,7 @@ import 'leaflet-control-geocoder';
 import 'leaflet-routing-machine';
 declare let L;
 
-import { API_PATH, GeolocationConfig } from '../geolocation.config';
+import { API_PATH } from '../geolocation.config';
 import { Location, Marker } from '../shared/geolocation.model';
 
 import * as _ from 'lodash';
@@ -85,7 +89,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private cs: ConfigService,
+    private csf: ConfigServiceFactory,
     private rs: RunService, private zone: NgZone,
     @Inject(API_PATH) private apiPath) {
   }
@@ -94,7 +98,8 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
 
-    this.mapType = this.cs.getConfig<GeolocationConfig>(this.elem).mapType;
+    this.mapType = this.csf.createConfigService(this.elem)
+      .getConfig().mapType;
     if (this.mapType === 'leaflet') { this.setUpLeafletMap(); }
   }
 

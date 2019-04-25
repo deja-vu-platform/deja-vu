@@ -2,6 +2,7 @@
   *ngIf="actionInstance"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
+  [attr.dvOf]="actionInstance.from.name"
   [ngStyle]="actionInstance.of.styles || {}"
   [hidden]="hidden"
 >

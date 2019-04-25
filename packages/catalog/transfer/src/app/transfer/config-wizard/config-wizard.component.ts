@@ -1,6 +1,5 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 /**
  * Config Wizard is used by the Designer to configure the cliche.
@@ -18,18 +17,19 @@ export class ConfigWizardComponent implements OnInit {
   /**
    * JSON string; new configuration; falsy means invalid
    */
-  @Output() readonly change = new BehaviorSubject<string>(this.configJSON);
+  @Output() readonly change = new EventEmitter<string>();
   balanceType: 'money' | 'items' = 'items';
 
   ngOnInit() {
-    if (this.value) { // guaranteed to by from us if defined
+    if (this.value) { // guaranteed to be from us if defined
       this.balanceType = JSON.parse(this.value).balanceType;
     }
+    this.change.emit(this.configJSON);
   }
 
   onChange(event: MatRadioChange) {
     this.balanceType = event.value;
-    this.change.next(this.configJSON);
+    this.change.emit(this.configJSON);
   }
 
   private get configJSON() {
