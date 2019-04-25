@@ -38,10 +38,13 @@ export class SetInputsComponent implements OnChanges {
     this.actionInputs = actionInputs;
     this.actionInputsIODescriptions = _.zipObject(
       actionInputs,
-      actionInputs.map((ioName) => this.app.newActionInstanceByName(
-        _.kebabCase(ioName),
-        this.actionInstance.from.name
-      ).of['ioDescriptions'])
+      actionInputs.map((ioName) => ioName === '*content'
+        ? {}
+        : this.app.newActionInstanceByName(
+          _.kebabCase(ioName),
+          this.actionInstance.from.name
+        ).of['ioDescriptions']
+      )
     );
   }
 
