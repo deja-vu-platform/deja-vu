@@ -15,7 +15,8 @@ import {
   CustomDateFormatterProvider, CustomEventTitleFormatterProvider
 } from '../shared/schedule.provider';
 import {
-  calendarEventsToSlots, slotsToCalendarEvents, slotToCalendarEvent, timeRange, createNewCalendarEvent
+  calendarEventsToSlots, createNewCalendarEvent,
+  slotsToCalendarEvents, timeRange
 } from '../shared/schedule.util';
 
 import {
@@ -59,6 +60,7 @@ interface UpdateScheduleRes {
 export class UpdateScheduleComponent implements
   OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
   @Input() id: string;
+  @Input() showOptionToSubmit = true;
 
   // Presentation inputs
   @Input() buttonLabel = 'Update Schedule';
@@ -81,6 +83,7 @@ export class UpdateScheduleComponent implements
   updateScheduleSaved = false;
   updateScheduleError: string;
 
+  schedule: Schedule;
   events: CalendarEvent[] = [];
   newEvents: CalendarEvent[] = [];
   deletedEventIds: string[] = [];
@@ -116,8 +119,10 @@ export class UpdateScheduleComponent implements
       }
     })
       .subscribe((res) => {
-        const schedule = res.data.schedule;
-        this.events = slotsToCalendarEvents(schedule.availability, true);
+        if (!_.isNil(res.data.schedule)) {
+          this.schedule = res.data.schedule;
+          this.events = slotsToCalendarEvents(this.schedule.availability, true);
+        }
       });
   }
 
@@ -178,10 +183,9 @@ export class UpdateScheduleComponent implements
   }
 
   async dvOnExec(): Promise<boolean> {
-    console.log(this.id)
-    console.log(JSON.stringify(this.events))
-    console.log(JSON.stringify(calendarEventsToSlots(this.newEvents)))
-    console.log(JSON.stringify(_.uniq(this.deletedEventIds)))
+    console.log('all events', JSON.stringify(this.events))
+    console.log('\n to add', JSON.stringify(calendarEventsToSlots(this.newEvents)))
+    console.log('\n to delete', JSON.stringify(_.uniq(this.deletedEventIds)))
     const res = await this.gs.post<UpdateScheduleRes>(this.apiPath, {
       inputs: {
         input: {

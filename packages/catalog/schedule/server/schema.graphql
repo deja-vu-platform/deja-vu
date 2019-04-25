@@ -55,6 +55,6 @@ type Query {
 
 type Mutation {
     createSchedule(input: CreateScheduleInput!): Schedule
-    updateSchedule(input: UpdateScheduleInput!): Schedule
+    updateSchedule(input: UpdateScheduleInput!): Boolean
     deleteSchedule(id: ID!): Boolean
 }

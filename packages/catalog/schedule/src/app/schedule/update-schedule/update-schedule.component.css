@@ -1,3 +1,7 @@
+.update-schedule-submit-button {
+  float: right;
+}
+
 .update-schedule-success {
   color: green;
 }

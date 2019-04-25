@@ -216,13 +216,17 @@ function resolvers(db: ClicheDb, _config: Config): object {
       updateSchedule: async (
         _root, { input }: { input: UpdateScheduleInput }, context: Context) => {
         const filter = { id: input.id };
+        let addSlotsSuccess = true;
+        let deleteSlotsSuccess = true;
 
-        const updateOp = {};
         // idea for now: in the front end, if the slot is updated
         // (moved, time diff), delete the original and add the updated ones
 
+        // TODO: either two updates (push + pull) OR one update (set)
+        // https://stackoverflow.com/questions/34217874/mongodb-array-push-and-pull
+
         // add slots
-        if (!_.isNil(input.add)) {
+        if (!_.isNil(input.add) && !_.isEmpty(input.add)) {
           const availability = _.map(input.add, (slot) => {
             const newSlot: SlotDoc = {
               id: uuid(),
@@ -232,16 +236,21 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
             return newSlot;
           });
-          updateOp['$addToSet'] = { availability: availability };
+          const updateOp = { $push: { availability: { $each: availability } } };
+          addSlotsSuccess = await schedules
+            .updateOne(context, filter, updateOp);
         }
 
         // delete slots
-        if (!_.isNil(input.delete)) {
-          updateOp['$pull'] = { 'availability.id': { $in: input.delete } };
+        if (!_.isNil(input.delete) && !_.isEmpty(input.delete)) {
+          const updateOp = {
+            $pull: { availability: { id: { $in: input.delete } } }
+          };
+          deleteSlotsSuccess = await schedules
+            .updateOne(context, filter, updateOp);
         }
 
-        return await schedules
-          .updateOne(context, filter, updateOp, { upsert: true });
+        return addSlotsSuccess && deleteSlotsSuccess;
       },
 
       deleteSchedule: async (_root, { id }, context: Context) =>
@@ -254,8 +263,7 @@ const scheduleCliche: ClicheServer = new ClicheServerBuilder('schedule')
   .initDb((db: ClicheDb, _config: Config): Promise<any> => {
     const schedules: Collection<ScheduleDoc> = db.collection('schedules');
 
-    return schedules.createIndex({ id: 1, 'availability.id': 1 },
-      { unique: true, sparse: true });
+    return schedules.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
   .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)
