@@ -9,6 +9,11 @@ export interface SlotDoc {
   endDate: Date;
 }
 
+export interface AddSlotInput {
+  startDate: string;
+  endDate: string;
+}
+
 export interface SlotsInput {
   scheduleId: string;
   startDate?: string;
@@ -27,11 +32,6 @@ export interface AllAvailabilityInput {
   endDate?: string;
   sortByStartDate: number;
   sortByEndDate: number;
-}
-
-export interface AddSlotInput {
-  startDate: string;
-  endDate: string;
 }
 
 export interface CreateScheduleInput {

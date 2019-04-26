@@ -31,6 +31,7 @@ interface ShowScheduleRes {
 @Component({
   selector: 'schedule-show-schedule',
   templateUrl: './show-schedule.component.html',
+  styleUrls: ['./show-schedule.component.css'],
   providers: [
     {
       provide: CalendarDateFormatter,

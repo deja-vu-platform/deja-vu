@@ -1,8 +1,6 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "~angular-calendar/css/angular-calendar.css";
-/* @import "~angular-calendar-week-hours-view/angular-calendar-week-hours-view.scss"; */
-
 
 
 .cal-week-hours-view .cal-day-headers {
