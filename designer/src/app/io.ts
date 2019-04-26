@@ -1,72 +1,12 @@
-import * as expressions from 'angular-expressions';
 import * as _ from 'lodash';
-import * as ohm from 'ohm-js';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   ActionInstance,
   AppActionDefinition,
   InInput
 } from './datatypes';
-import grammarString from './expression.grammar.ohm';
-
-/**
- * `-` is legal in dv but not ng
- * `$` is legal in ng but not dv
- *   ($ is used in dv but not considered part of a name)
- */
-function dvToNgName(dvName: string) {
-  return dvName.replace(/-/g, '$');
-}
-const grammar = ohm.grammar(grammarString);
-const semantics = grammar.createSemantics();
-/**
- * Converts a DV expression to an Ng expression
- */
-semantics.addOperation('toNgExpr', {
-  _iter: (args) => args.map((arg) => arg.toNgExpr())
-    .join(''),
-  _nonterminal: (args) => args.map((arg) => arg.toNgExpr())
-    .join(''),
-  _terminal: function() { return this.sourceString; },
-  name: (leadingLetter, rest) => dvToNgName(
-    leadingLetter.toNgExpr() + rest.toNgExpr()
-  ),
-  BinExpr_lt: (left, lt, right) => left.toNgExpr() + '<' + right.toNgExpr(),
-  BinExpr_gt: (left, gt, right) => left.toNgExpr() + '>' + right.toNgExpr(),
-  BinExpr_le: (left, le, right) => left.toNgExpr() + '<=' + right.toNgExpr(),
-  BinExpr_ge: (left, ge, right) => left.toNgExpr() + '>=' + right.toNgExpr()
-});
-/**
- * Returns an array of strings, the names (inputs & outputs)
- *    referenced in the expression
- */
-semantics.addOperation('getNames', {
-  _iter: (args) => args.map((arg) => arg.getNames())
-    .flat(),
-  _nonterminal: (args) => args.map((arg) => arg.getNames())
-    .flat(),
-  _terminal: () => [],
-  MemberExpr: function(nameOrInput, nav) { return [this.sourceString]; },
-  input: function(dollarSign, name) { return [this.sourceString]; }
-});
-
-interface InReferences {
-  [actionID: string]: {
-    [ioName: string]: {
-      fromAction: ActionInstance;
-      ioName: string
-    }[];
-  };
-}
-
-// the dual of InReferences
-interface OutReferences {
-  [actionID: string]: {
-    byAction: ActionInstance,
-    ioName: string;
-  }[];
-}
-
+import compileDvExpr, { dvToNgName } from './expression.compiler';
+import { resolveName } from './io-references';
 
 export class ActionIO {
   private readonly subjects: { [ioName: string]: BehaviorSubject<any> } = {};
@@ -90,9 +30,6 @@ export class ScopeIO {
 
   private subscriptions: Subscription[] = [];
   private actionInstance: ActionInstance;
-
-  readonly inReferences: InReferences = {};
-  readonly outReferences: OutReferences = {};
 
   get actionDefinition(): AppActionDefinition {
     return this.actionInstance.of as AppActionDefinition;
@@ -138,7 +75,6 @@ export class ScopeIO {
   link(actionInstance: ActionInstance): void {
     this.unlink();
     this.actionInstance = actionInstance;
-    this.resolveReferences();
 
     // child inputs (expression or action)
     this.actionDefinition.getChildren(false)
@@ -157,46 +93,6 @@ export class ScopeIO {
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.subscriptions = [];
     this.actionInstance = undefined;
-  }
-
-  /**
-   * Examine the input settings of this app action's children
-   * (and their inputted actions) and this action's output settings
-   * to find all references to inputs / outputs of other actions
-   */
-  resolveReferences() {
-    // initialize / clear state
-    // the IDs of actions in scope
-    const actions = [
-      this.actionInstance,
-      ...this.actionDefinition.getChildren(true)
-    ];
-    const ids = new Set(actions.map((a) => a.id));
-    // delete all records of actions no longer in the scope
-    [this.outReferences, this.inReferences].forEach((obj) => {
-      Object.keys(obj)
-        .filter((id) => !ids.has(id))
-        .forEach((id) => delete obj[id]);
-    });
-    // create empty records for all actions in the scope
-    actions.forEach((action) => {
-      if (this.inReferences[action.id] === undefined) {
-        this.inReferences[action.id] = {};
-        action.of.inputs.forEach((inputName) => {
-          this.inReferences[action.id][inputName] = [];
-        });
-      } else {
-        Object.keys(this.inReferences[action.id])
-          .forEach((inputName) => {
-            this.inReferences[action.id][inputName].length = 0;
-          });
-      }
-      if (this.outReferences[action.id] === undefined) {
-        this.outReferences[action.id] = [];
-      } else {
-        this.outReferences[action.id].length = 0;
-      }
-    });
   }
 
   /**
@@ -233,68 +129,30 @@ export class ScopeIO {
     toIO: string,
     inInput?: InInput
   ) {
-    const parsedExpr = semantics(grammar.match(expr));
-    const names: string[] = parsedExpr.getNames();
-    const ngExpr: string = parsedExpr.toNgExpr();
-    const evaluate: (scope: Object) => any = expressions.compile(ngExpr);
+    const { names, evaluate } = compileDvExpr(expr);
     const scope = {};
     const toSubject = this.getSubject(toAction, toIO);
     const sendValue = () => toSubject.next(evaluate(scope));
 
     names.forEach((name) => {
-      // parse the name
-      let ioName: string;
-      let fromAction: ActionInstance;
-      let objectPath: string[];
-      const splitName = name.replace(/\?/g, '')
-        .split('.');
-      const fromAbove = splitName[0].startsWith('$');
-      if (fromAbove) {
-        // getting an input from above
-        [ioName, ...objectPath] = splitName;
-        ioName = ioName.slice(1); // strip leading '$'
-        if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
-          // getting an input from within an action input
-          fromAction = inInput.of;
-        } else if (this.actionInstance.of.inputs.includes(ioName)) {
-          // getting an input from the parent
-          fromAction = this.actionInstance;
-        }
-      } else {
-        // getting an output from a sibling
-        let clicheN: string;
-        let actionN: string;
-        [clicheN, actionN, ioName, ...objectPath] = splitName;
-        const maybeFromAction = this.actionDefinition
-          .findChild(clicheN, actionN);
-        if (maybeFromAction && maybeFromAction.of.outputs.includes(ioName)) {
-          fromAction = maybeFromAction;
-        }
-      }
+      const { fromAction, ioName } = resolveName(
+        name,
+        this.actionInstance,
+        inInput
+      );
 
       if (!fromAction) { return; }
-
-      // save references (so they can be displayed in the UI)
-      if (!this.inReferences[toAction.id][toIO].find((r) =>
-        r.ioName === ioName && r.fromAction.id === fromAction.id
-      )) {
-        this.inReferences[toAction.id][toIO].push({ fromAction, ioName });
-      }
-      if (!this.outReferences[fromAction.id].find((r) =>
-        r.ioName === ioName && r.byAction.id === toAction.id
-      )) {
-        this.outReferences[fromAction.id].push({
-          ioName,
-          byAction: toAction
-        });
-      }
 
       // add current value to scope
       let objectToModify: Object;
       const subject = this.getSubject(fromAction, ioName);
-      if (fromAbove) {
+      let ioNameInScope = ioName;
+      if (
+        fromAction.id === this.actionInstance.id
+        || (inInput && fromAction.id === inInput.of.id)
+      ) {
         objectToModify = scope;
-        ioName = '$' + ioName;
+        ioNameInScope = '$' + ioName;
       } else {
         const clicheName = dvToNgName(fromAction.from.name);
         const actionName = dvToNgName(fromAction.of.name);
@@ -302,9 +160,9 @@ export class ScopeIO {
         scope[clicheName][actionName] = scope[clicheName][actionName] || {};
         objectToModify = scope[clicheName][actionName];
       }
-      objectToModify[ioName] = subject.value;
+      objectToModify[ioNameInScope] = subject.value;
       const sub = subject.subscribe((value) => {
-        objectToModify[ioName] = value;
+        objectToModify[ioNameInScope] = value;
         sendValue();
       });
       this.subscriptions.push(sub);

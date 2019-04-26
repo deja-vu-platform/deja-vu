@@ -24,10 +24,13 @@ import {
   Row
 } from '../datatypes';
 import { ScopeIO } from '../io';
+import findReferences, {
+  InReferences,
+  OutReferences,
+  Reference as IOReference
+} from '../io-references';
 
-interface Reference {
-  fromAction: ActionInstance;
-  ioName: string;
+interface Reference extends IOReference {
   forIO: string;
   forActionID: string;
 }
@@ -87,9 +90,10 @@ implements AfterViewInit, OnChanges, OnInit {
   // if we don't have a consistent object, angular freaks out
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
+  private inReferences: InReferences;
+  private outReferences: OutReferences;
   private ioReferencesCache: {[id: string]: Reference[]} = {};
   private ioReferencedCache: {[id: string]: { ioName: string }[]} = {};
-
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
 
@@ -204,7 +208,7 @@ implements AfterViewInit, OnChanges, OnInit {
     const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
     const resolutions: Reference[] = ids
       .map((id) => Object
-        .entries(this.scopeIO.inReferences[id] || {})
+        .entries(this.inReferences[id] || {})
         .map(([ioName, references]) => references
           .map((r): Reference => ({ ...r, forIO: ioName, forActionID: id }))
         )
@@ -213,7 +217,7 @@ implements AfterViewInit, OnChanges, OnInit {
       .flat();
     const uniqueResolutions = _.uniqBy(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO, r.forActionID])
+      (r) => JSON.stringify([r.ioName, r.action.id, r.forIO, r.forActionID])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 
@@ -232,10 +236,10 @@ implements AfterViewInit, OnChanges, OnInit {
 
     const ret = _.uniqBy(
       Array
-        .from(this.scopeIO.outReferences[from.id] || [])
-        .filter(({ ioName, byAction }) => from
+        .from(this.outReferences[from.id] || [])
+        .filter(({ ioName, action }) => from
           .getInputtedActions(true)
-          .indexOf(byAction) === -1
+          .indexOf(action) === -1
         ),
       (r) => r.ioName
     );
@@ -269,6 +273,9 @@ implements AfterViewInit, OnChanges, OnInit {
    */
   private link() {
     this.scopeIO.link(this.actionInstance);
+    const { inReferences, outReferences} = findReferences(this.actionInstance);
+    this.inReferences = inReferences;
+    this.outReferences = outReferences;
     this.ioReferencedCache = {};
     this.ioReferencesCache = {};
     this.allocateColors();
@@ -281,7 +288,7 @@ implements AfterViewInit, OnChanges, OnInit {
     // free colors assigned to IOs that are no longer referenced
     _.forOwn(this.colorAssignments, (obj, actionID) => {
       _.forOwn(obj, (color, ioName) => {
-        const ios = this.scopeIO.outReferences[actionID] || [];
+        const ios = this.outReferences[actionID] || [];
         if (!ios.find((r) => r.ioName === ioName)) {
           this.availableColors.add(color);
         }
@@ -290,7 +297,7 @@ implements AfterViewInit, OnChanges, OnInit {
 
     // allocate colors to new references
     this.colorAssignments = _.mapValues(
-      this.scopeIO.outReferences,
+      this.outReferences,
       (ioNames, aID) => {
         const ioToColor = {};
         ioNames.forEach(({ ioName: ioN }) => {

@@ -100,7 +100,7 @@
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
-              color: color(ioRef.fromAction, ioRef.ioName)
+              color: color(ioRef.action, ioRef.ioName)
             }"
           >
             <div class="ref-for-io">{{ioRef.forIO}}</div>
@@ -153,7 +153,7 @@
       class="ref-indicator input-ref-indicator hide-on-drag"
       *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"
       [ngStyle]="{
-        color: color(ioRef.fromAction, ioRef.ioName)
+        color: color(ioRef.action, ioRef.ioName)
       }"
     >
       <div class="ref-for-io">{{ioRef.forIO}}</div>
