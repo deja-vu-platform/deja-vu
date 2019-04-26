@@ -25,6 +25,8 @@ export interface AllAvailabilityInput {
   scheduleIds: string[];
   startDate?: string;
   endDate?: string;
+  sortByStartDate: number;
+  sortByEndDate: number;
 }
 
 export interface AddSlotInput {

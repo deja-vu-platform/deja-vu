@@ -1,9 +1,29 @@
 <span *ngIf="allAvailability">
-  <div *ngIf="showId">
-    {{allAvailability.id}}
-  </div>
+  <span *ngIf="showScheduleView">
+    <dv-include
+      [action]="showSchedule"
+      default-showSchedule="{ tag: schedule-show-schedule }"
+      [inputs]="{
+        schedule: schedule, showId: showScheduleId,
+        view: view, locale: locale, hourSegments: hourSegments,
+        dayStartHour: dayStartHour, dayEndHour: dayEndHour,
+        eventLength: eventLength
+      }"
+      [parent]="showAllAvailability">
+    </dv-include>
+  </span>
 
-  <div *ngIf="showContent">
-    {{allAvailability.content}}
-  </div>
+  <span *ngIf="showSlotsView">
+    <dv-include
+      [action]="showSlots"
+      default-showSlots="{ tag: schedule-show-slots }"
+      [inputs]="{
+        slots: allAvailability, showId: showSlotId,
+        showStartDate: showStartDate, showEndDate: showEndDate,
+        dateTimeFormatString: dateTimeFormatString,
+        showSlot: showSlot
+      }"
+      [parent]="showAllAvailability">
+    </dv-include>
+  </span>
 </span>

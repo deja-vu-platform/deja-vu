@@ -1,9 +1,13 @@
 <span *ngIf="nextAvailability">
-  <div *ngIf="showId">
-    {{nextAvailability.id}}
-  </div>
-
-  <div *ngIf="showContent">
-    {{nextAvailability.content}}
-  </div>
+  <dv-include
+    [action]="showSlot"
+    default-showSlot="{ tag: schedule-show-slot }"
+    [inputs]="{
+      slot: nextAvailability, showId: showId,
+      showStartDate: showStartDate,
+      showEndDate: showEndDate,
+      dateTimeFormatString: dateTimeFormatString
+    }"
+    [parent]="showNextAvailability">
+  </dv-include>
 </span>

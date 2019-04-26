@@ -1,42 +1,53 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output
+  OnInit, Output, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
 import { Slot } from '../shared/schedule.model';
+import { ShowSlotComponent } from '../show-slot/show-slot.component';
 
 interface NextAvailabilityRes {
   data: { nextAvailability: Slot };
 }
 
+const MAX_NUM_SCHEDULE_IDS = 2;
+
 
 @Component({
   selector: 'schedule-show-next-availability',
-  templateUrl: './show-next-availability.component.html'
+  templateUrl: './show-next-availability.component.html',
+  styleUrls: ['./show-next-availability.component.css']
 })
-export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
-  // Provide one of the following: id or next-availability
-  @Input() id: string | undefined;
-  @Input() nextAvailability: Slot | undefined;
+export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
+  OnEval, OnInit {
+  @Input() scheduleIds: string[];
   @Output() loadedNextAvailability = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showStartDate = true;
+  @Input() showEndDate = true;
 
+  // See https://angular.io/api/common/DatePipe
+  @Input() dateTimeFormatString = 'medium';
+
+  @Input() showSlot: Action = {
+    type: <Type<Component>> ShowSlotComponent
+  };
+
+  nextAvailability: Slot;
+
+  showNextAvailability;
   private gs: GatewayService;
 
-  constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    this.showNextAvailability = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -58,29 +69,36 @@ OnInit {
   }
 
   async dvOnEval(): Promise<void> {
+    if (this.scheduleIds.length !== MAX_NUM_SCHEDULE_IDS) {
+      throw new Error('Incorrect number of schedule IDs provided');
+    }
+
     if (this.canEval()) {
       this.gs.get<NextAvailabilityRes>(this.apiPath, {
         params: {
-          inputs: {
-            id: this.id
-          },
+          inputs: JSON.stringify({
+            input: {
+              scheduleIds: this.scheduleIds
+            }
+          }),
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showStartDate ? 'startDate' : ''}
+              ${this.showEndDate ? 'endDate' : ''}
             `
           }
-        },
+        }
       })
-      .pipe(map((res: NextAvailabilityRes) => res.data.nextAvailability))
-      .subscribe((nextAvailability) => {
-        this.nextAvailability = nextAvailability;
-        this.loadedNextAvailability.emit(nextAvailability);
-      });
+        .pipe(map((res: NextAvailabilityRes) => res.data.nextAvailability))
+        .subscribe((nextAvailability) => {
+          this.nextAvailability = nextAvailability;
+          this.loadedNextAvailability.emit(nextAvailability);
+        });
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.nextAvailability && this.id && this.gs);
+    return !!(!this.nextAvailability && this.scheduleIds && this.gs);
   }
 }

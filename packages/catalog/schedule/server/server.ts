@@ -18,6 +18,7 @@ import {
   UpdateScheduleInput
 } from './schema';
 
+import { areRangesOverlapping, isAfter, isBefore } from 'date-fns';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -79,35 +80,40 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-function getAggregatedAvailableSlotsPipeline(matchQuery: any,
-  nextAvailability = false) {
-  const pipeline: any = [
+function getLaterStart(first: SlotDoc, second: SlotDoc): Date {
+  const comparison = isAfter(first.startDate, second.startDate);
+
+  return comparison ? first.startDate : second.startDate;
+}
+
+function getEarlierEnd(first: SlotDoc, second: SlotDoc): Date {
+  const comparison = isBefore(first.endDate, second.endDate);
+
+  return comparison ? first.endDate : second.endDate;
+}
+
+function getSlotsPipeline(matchQuery: any, filterCondition: any,
+  sortByStartDate: number, sortByEndDate: number) {
+  return [
     { $match: matchQuery },
-    {
-      $group: {
-        _id: 0,
-        availability: { $push: '$availability' }
-      }
-    },
     {
       $project: {
         availability: {
-          $reduce: {
+          $filter: {
             input: '$availability',
-            initialValue: [],
-            in: { $setUnion: ['$$value', '$$this'] }
+            as: 'slot',
+            cond: filterCondition
           }
         }
       }
     },
-    { $sort: { 'availability.startDate': 'asc' } }
+    {
+      $sort: {
+        'availability.startDate': sortByStartDate,
+        'availability.endDate': sortByEndDate
+      }
+    }
   ];
-
-  if (nextAvailability) {
-    pipeline.push({ $limit: 1 });
-  }
-
-  return pipeline;
 }
 
 function resolvers(db: ClicheDb, _config: Config): object {
@@ -140,26 +146,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
           condition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
-        const res = await schedules.aggregate([
-          { $match: filter },
-          {
-            $project: {
-              availability: {
-                $filter: {
-                  input: '$availability',
-                  as: 'slot',
-                  cond: condition
-                }
-              }
-            }
-          },
-          {
-            $sort: {
-              'availability.startDate': input.sortByStartDate,
-              'availability.endDate': input.sortByEndDate
-            }
-          }
-        ])
+        const res = await schedules
+          .aggregate(getSlotsPipeline(filter, condition, input.sortByStartDate,
+            input.sortByEndDate))
           .next();
 
         return res ? res.availability : [];
@@ -167,35 +156,89 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       nextAvailability: async (
         _root, { input }: { input: NextAvailabilityInput }) => {
-        const filter = {
-          id: { $in: input.scheduleIds },
-          'availability.startDate': { $gte: new Date() }
-        };
+        // assume between two schedules
+        const matchQuery = { id: { $in: input.scheduleIds } };
+        const filterCondition = { $gte: ['$$slot.startDate', new Date()] };
 
-        const res = await schedules
-          .aggregate(getAggregatedAvailableSlotsPipeline(filter, true))
+        const pipeline = getSlotsPipeline(matchQuery, filterCondition, 1, 1);
+
+        const res = await schedules.aggregate(pipeline)
           .toArray();
 
-        return res[0] ? res[0].availability : null;
+        let next: SlotDoc;
+
+        if (!_.isEmpty(res) && res.length === 2) {
+          const firstScheduleSlots = res[0].availability;
+          const secondScheduleSlots = res[1].availability;
+
+          firstScheduleSlots.some((first) => {
+            secondScheduleSlots.some((second) => {
+
+              if (areRangesOverlapping(
+                first.startDate, first.endDate,
+                second.startDate, second.endDate)) {
+                next = {
+                  id: uuid(),
+                  startDate: getLaterStart(first, second),
+                  endDate: getEarlierEnd(first, second)
+                };
+              }
+
+              return !_.isNil(next);
+            });
+
+            return !_.isNil(next);
+          });
+        }
+
+        return next;
       },
 
       allAvailability: async (
         _root, { input }: { input: AllAvailabilityInput }) => {
-        const filter = {
-          id: { $in: input.scheduleIds },
-          'availability.startDate': {
-            $gte: input.startDate ? input.startDate : new Date()
-          }
+        // assume between two schedules
+        const matchQuery = { id: { $in: input.scheduleIds } };
+        const filterCondition = {
+          $gte: [
+            '$$slot.startDate',
+            input.startDate ? new Date(input.startDate) : new Date()
+          ]
         };
+
         if (!_.isNil(input.endDate)) {
-          filter['availability.endDate']['$lte'] = new Date(input.endDate);
+          filterCondition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
-        const res = await schedules
-          .aggregate(getAggregatedAvailableSlotsPipeline(filter, true))
+        const pipeline = getSlotsPipeline(matchQuery, filterCondition,
+          input.sortByStartDate, input.sortByEndDate);
+
+        const res = await schedules.aggregate(pipeline)
           .toArray();
 
-        return res[0] ? res[0].availability : [];
+        const overlaps: SlotDoc[] = [];
+
+        if (!_.isEmpty(res) && res.length === 2) {
+          const firstScheduleSlots = res[0].availability;
+          const secondScheduleSlots = res[1].availability;
+
+          firstScheduleSlots.forEach((first) => {
+            secondScheduleSlots.forEach((second) => {
+
+              if (areRangesOverlapping(
+                first.startDate, first.endDate,
+                second.startDate, second.endDate)) {
+
+                overlaps.push({
+                  id: uuid(),
+                  startDate: getLaterStart(first, second),
+                  endDate: getEarlierEnd(first, second)
+                });
+              }
+            });
+          });
+        }
+
+        return overlaps;
       }
     },
 
