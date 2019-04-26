@@ -80,13 +80,15 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-function getLaterStart(first: SlotDoc, second: SlotDoc): Date {
+const MAX_NUM_SCHEDULE_IDS = 2;
+
+function getLaterStartDate(first: SlotDoc, second: SlotDoc): Date {
   const comparison = isAfter(first.startDate, second.startDate);
 
   return comparison ? first.startDate : second.startDate;
 }
 
-function getEarlierEnd(first: SlotDoc, second: SlotDoc): Date {
+function getEarlierEndDate(first: SlotDoc, second: SlotDoc): Date {
   const comparison = isBefore(first.endDate, second.endDate);
 
   return comparison ? first.endDate : second.endDate;
@@ -167,7 +169,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         let next: SlotDoc;
 
-        if (!_.isEmpty(res) && res.length === 2) {
+        if (!_.isEmpty(res) && res.length === MAX_NUM_SCHEDULE_IDS) {
           const firstScheduleSlots = res[0].availability;
           const secondScheduleSlots = res[1].availability;
 
@@ -179,8 +181,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
                 second.startDate, second.endDate)) {
                 next = {
                   id: uuid(),
-                  startDate: getLaterStart(first, second),
-                  endDate: getEarlierEnd(first, second)
+                  startDate: getLaterStartDate(first, second),
+                  endDate: getEarlierEndDate(first, second)
                 };
               }
 
@@ -217,7 +219,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
         const overlaps: SlotDoc[] = [];
 
-        if (!_.isEmpty(res) && res.length === 2) {
+        if (!_.isEmpty(res) && res.length === MAX_NUM_SCHEDULE_IDS) {
           const firstScheduleSlots = res[0].availability;
           const secondScheduleSlots = res[1].availability;
 
@@ -230,8 +232,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
                 overlaps.push({
                   id: uuid(),
-                  startDate: getLaterStart(first, second),
-                  endDate: getEarlierEnd(first, second)
+                  startDate: getLaterStartDate(first, second),
+                  endDate: getEarlierEndDate(first, second)
                 });
               }
             });

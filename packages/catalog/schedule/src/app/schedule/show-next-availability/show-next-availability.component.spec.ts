@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowNextAvailabilityComponent } from './show-next-availability.component';
+import {
+  ShowNextAvailabilityComponent
+} from './show-next-availability.component';
 
 import { config } from '../testing/testbed.config';
 

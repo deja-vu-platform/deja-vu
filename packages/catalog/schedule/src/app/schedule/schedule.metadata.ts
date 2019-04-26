@@ -33,8 +33,6 @@ import {
   UpdateScheduleComponent
 } from './update-schedule/update-schedule.component';
 export { UpdateScheduleComponent };
-import { TestComponent } from './test/test.component';
-export { TestComponent };
 import { ShowSlotComponent } from './show-slot/show-slot.component';
 export { ShowSlotComponent };
 import { ShowSlotsComponent } from './show-slots/show-slots.component';
@@ -51,7 +49,7 @@ export { ShowAllAvailabilityComponent };
 // add all cliché actions here
 const allComponents = [
   CreateScheduleComponent, DeleteScheduleComponent,
-  ShowScheduleComponent, UpdateScheduleComponent, TestComponent,
+  ShowScheduleComponent, UpdateScheduleComponent,
   ShowSlotComponent, ShowSlotsComponent, ShowNextAvailabilityComponent,
   ShowAllAvailabilityComponent
 ];
