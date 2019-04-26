@@ -268,11 +268,10 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Create data layer for this app action's context
+   * Update references to show in the UI
    * Allocate colors to referenced parent inputs / sibling outputs
    */
   private link() {
-    this.scopeIO.link(this.actionInstance);
     const { inReferences, outReferences} = findReferences(this.actionInstance);
     this.inReferences = inReferences;
     this.outReferences = outReferences;

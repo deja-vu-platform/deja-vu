@@ -1,3 +1,8 @@
+/**
+ * For parsing Deja Vu expressions
+ * (which are slightly different than Angular expressions)
+ */
+
 import * as expressions from 'angular-expressions';
 import * as ohm from 'ohm-js';
 import grammarString from './expression.grammar.ohm';

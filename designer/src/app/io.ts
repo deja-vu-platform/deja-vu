@@ -1,194 +1,169 @@
+/**
+ * For dynamically linking inputs and outputs.
+ */
+
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import {
-  ActionInstance,
-  AppActionDefinition,
-  InInput
-} from './datatypes';
-import compileDvExpr, { dvToNgName } from './expression.compiler';
-import { resolveName } from './io-references';
+import { ActionInstance, AppActionDefinition } from './datatypes';
+import compileExprDV, { dvToNgName } from './expression.compiler';
 
-export class ActionIO {
+/**
+ * ioName + action => cliche.action.ioName
+ * @todo handle name collisions
+ */
+export function fullyQualifyName(
+  ioName: string,
+  actionInstance: ActionInstance
+  ): string {
+    return `${actionInstance.from.name}.${actionInstance.of.name}.${ioName}`;
+}
+
+export class ScopeIO {
   private readonly subjects: { [ioName: string]: BehaviorSubject<any> } = {};
 
+  /**
+   * Get a subject, creating one if it doesn't exist.
+   */
   getSubject(ioName: string): BehaviorSubject<any> {
     if (!this.subjects[ioName]) {
-      const subject = new BehaviorSubject<any>(undefined);
-      this.subjects[ioName] = subject;
+      this.subjects[ioName] = new BehaviorSubject(undefined);
     }
 
     return this.subjects[ioName];
   }
 
+  hasSubject(ioName: string): boolean {
+    return !!this.subjects[ioName];
+  }
 }
 
-export class ScopeIO {
+export class ChildScopeIO extends ScopeIO {
   // populated in app.module.ts to avoid cyclic imports
   static actionInstanceComponent: any;
 
-  private readonly rep: { [actionID: string]: ActionIO } = {};
+  private readonly subscriptions: Subscription[] = [];
 
-  private subscriptions: Subscription[] = [];
-  private actionInstance: ActionInstance;
-
-  get actionDefinition(): AppActionDefinition {
-    return this.actionInstance.of as AppActionDefinition;
+  /**
+   * @param actionInstance
+   * @param parentScope
+   * @param extra - only present if this action was given to an input
+   */
+  constructor(
+    private readonly actionInstance: ActionInstance,
+    private readonly parentScope: ScopeIO,
+    private readonly extra?: { inputs: string[], scope: ScopeIO }
+  ) {
+    super();
   }
 
   /**
-   * Public because used to link scopes when an app action is instantiated
-   * in another app action
+   * Parses all expressions.
+   * Retrieves values from the parent scope to set inputs here.
+   * Sets values on the parent scope from outputs here (if app action).
    */
-  setActionIO(action: ActionInstance, actionIO: ActionIO): void {
-    this.rep[action.id] = actionIO;
-  }
-
-  /**
-   * Get only the I/O settings of a single action
-   * Public so setActionIO can be used
-   */
-  getActionIO(action: ActionInstance): ActionIO {
-    if (!this.rep[action.id]) {
-      this.setActionIO(action, new ActionIO());
-    }
-
-    return this.rep[action.id];
-  }
-
-  /**
-   * Get the RxJS subject for a single input/output
-   * Public so values can be sent to / gotten from cliche actions
-   * And because we need some values (e.g. hidden)
-   */
-  getSubject(action: ActionInstance, ioName: string): BehaviorSubject<any> {
-    const actionIO = this.getActionIO(action);
-
-    return actionIO.getSubject(ioName);
-  }
-
-  /**
-   * Take an instance of an app action
-   * and set up subscriptions so that all values flow to/between
-   * this action and its children as they should
-   * This also sets the context to the action you give it
-   */
-  link(actionInstance: ActionInstance): void {
+  link() {
     this.unlink();
-    this.actionInstance = actionInstance;
-
-    // child inputs (expression or action)
-    this.actionDefinition.getChildren(false)
-      .forEach((c) => { this.sendInputs(c); });
-
-    // parent outputs (expression)
-    this.actionDefinition.outputSettings.forEach((io) => {
-      this.sendExpression(io.value, actionInstance, io.name);
-    });
+    this.linkInputs();
+    if (this.actionInstance.of instanceof AppActionDefinition) {
+      this.linkOutputsForAppAction();
+    }
   }
 
   /**
-   * Unset the action and delete all I/O links
+   * Remove all links.
    */
   unlink() {
     this.subscriptions.forEach((s) => s.unsubscribe());
-    this.subscriptions = [];
-    this.actionInstance = undefined;
+    this.subscriptions.length = 0;
   }
 
   /**
-   * Gets the action's input settings, resolves the values,
-   *   and sends them to the IO subjects
+   * Retrieves values from the parent scope to set inputs here.
+   * Cannot be called externally because it does not clean up subs.
    */
-  private sendInputs(toAction: ActionInstance, inInput?: InInput) {
-    toAction.of.inputs.forEach((input) => {
-      const toSubject = this.getSubject(toAction, input);
-      const inputVal = toAction.inputSettings[input];
-      if (inputVal) {
-        if (_.isString(inputVal)) {
-          this.sendExpression(inputVal, toAction, input, inInput);
-        } else {
-          const newInInput: InInput = { of: toAction, name: input };
-          this.sendInputs(inputVal, newInInput);
-          this.sendAction(inputVal, toSubject, newInInput);
-        }
-      } else {
-        toSubject.next(undefined);
+  private linkInputs() {
+    this.actionInstance.walkInputs(false, (inputName, value) => {
+      if (_.isString(value)) { // expression input
+        const toSubject = this.getSubject(inputName);
+        this.sendExpression(value, toSubject, this.parentScope);
+      } else { // action input
+        this.sendAction(value, inputName);
       }
     });
   }
 
   /**
-   * @param expr an expression
-   * @param toSubject where to send its value
-   * @param inInput given if this expression is going to a replacing action
-   * If the expression cannot be parsed it just sends the raw string
+   * Sets values on the parent scope from outputs here (if app action).
+   * Cannot be called externally because it does not clean up subs.
+   */
+  private linkOutputsForAppAction() {
+    if (!(this.actionInstance.of instanceof AppActionDefinition)) {
+      throw new Error('Action is not an app action.');
+    }
+
+    this.actionInstance.of.outputSettings.forEach(({ name, value }) => {
+      const fqName = fullyQualifyName(name, this.actionInstance);
+      const toSubject = this.parentScope.getSubject(fqName);
+      this.sendExpression(value, toSubject, this);
+    });
+  }
+
+  /**
+   * Parse an expression and set its value on the subject
+   *   (from this or another ScopeIO probably) using values
+   *   from the given scope.
+   * It updates the value when any referenced value changes.
+   * Cannot be called externally because it does not clean up subs.
    */
   private sendExpression(
-    expr: string,
-    toAction: ActionInstance,
-    toIO: string,
-    inInput?: InInput
+    dvExpression: string,
+    toSubject: BehaviorSubject<any>,
+    fromScope: ScopeIO
   ) {
-    const { names, evaluate } = compileDvExpr(expr);
-    const scope = {};
-    const toSubject = this.getSubject(toAction, toIO);
-    const sendValue = () => toSubject.next(evaluate(scope));
-
-    names.forEach((name) => {
-      const { fromAction, ioName } = resolveName(
-        name,
-        this.actionInstance,
-        inInput
-      );
-
-      if (!fromAction) { return; }
-
-      // add current value to scope
-      let objectToModify: Object;
-      const subject = this.getSubject(fromAction, ioName);
-      let ioNameInScope = ioName;
+    const { names, evaluate } = compileExprDV(dvExpression);
+    const ngScope = {};
+    const send = () => toSubject.next(evaluate(ngScope));
+    names.forEach((refdName) => {
+      const fromAbove = refdName.startsWith('$');
+      // keys for subjects in ScopeIO do not have leading $
+      const scopeName = fromAbove ? refdName.slice(1) : refdName;
+      // if in an action input, $ gets extra input to replaced action
+      //   falling back to parent input
       if (
-        fromAction.id === this.actionInstance.id
-        || (inInput && fromAction.id === inInput.of.id)
+        fromAbove
+        && fromScope === this.parentScope
+        && this.extra
+        && this.extra.inputs.indexOf(scopeName) >= 0
       ) {
-        objectToModify = scope;
-        ioNameInScope = '$' + ioName;
-      } else {
-        const clicheName = dvToNgName(fromAction.from.name);
-        const actionName = dvToNgName(fromAction.of.name);
-        scope[clicheName] = scope[clicheName] || {};
-        scope[clicheName][actionName] = scope[clicheName][actionName] || {};
-        objectToModify = scope[clicheName][actionName];
+        fromScope = this.extra.scope;
       }
-      objectToModify[ioNameInScope] = subject.value;
-      const sub = subject.subscribe((value) => {
-        objectToModify[ioNameInScope] = value;
-        sendValue();
+      const refdSubject = fromScope.getSubject(scopeName);
+      const sub = refdSubject.subscribe((refdValue) => {
+        ngScope[dvToNgName(refdName)] = refdValue; // ngExpr will have $
+        send();
       });
       this.subscriptions.push(sub);
     });
-
-    sendValue();
+    send();
   }
 
   /**
-   * @param action an action instance
-   * @param toSubject where to send a component to render
+   * Send an action instance to the given input (on this action).
+   * It's less general than sendExpression since actions can only
+   *   be inputted.
    */
   private sendAction(
-    action: ActionInstance,
-    toSubject: BehaviorSubject<any>,
-    inInput?: InInput
+    actionInstance: ActionInstance,
+    toInputName: string
   ) {
+    const toSubject = this.getSubject(toInputName);
     toSubject.next({
-      type: ScopeIO.actionInstanceComponent,
+      type: ChildScopeIO.actionInstanceComponent,
       inputs: {
-        actionInstance: action,
-        actionIO: this.getActionIO(action),
-        extraInputs: inInput.of.of.actionInputs[inInput.name],
-        extraInputsScope: this.getActionIO(inInput.of)
+        actionInstance: actionInstance,
+        parentScope: this,
+        extraInputs: this.actionInstance.of.actionInputs[toInputName]
       }
     });
   }
-
 }

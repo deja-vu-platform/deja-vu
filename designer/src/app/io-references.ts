@@ -1,3 +1,8 @@
+/**
+ * For determining which actions and their inputs/outputs are referenced by
+ * expressions.
+ */
+
 import * as _ from 'lodash';
 import { ActionInstance, AppActionDefinition, InInput } from './datatypes';
 import compileDvExpr from './expression.compiler';
@@ -19,7 +24,7 @@ export interface OutReferences {
 }
 
 export function resolveName(
-  name,
+  name: string,
   appActionInstance: ActionInstance,
   inInput?: InInput
 ) {
@@ -31,7 +36,7 @@ export function resolveName(
   // parse the name
   let ioName: string;
   let fromAction: ActionInstance;
-  let objectPath: string[]
+  let objectPath: string[];
   const splitName = name.replace(/\?/g, '')
     .split('.');
   if (splitName[0].startsWith('$')) {

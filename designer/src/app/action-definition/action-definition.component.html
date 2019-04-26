@@ -53,7 +53,7 @@
             <!-- below is same as above -->
             <app-action-instance
               [actionInstance]="action"
-              [actionIO]="scopeIO.getActionIO(action)"
+              [parentScopeIO]="scopeIO"
               (click)="stopPropIfShift($event)"
               [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
             >

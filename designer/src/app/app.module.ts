@@ -40,13 +40,13 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
-import { ScopeIO } from './io';
+import { ChildScopeIO } from './io';
 
 export function getUsedClichesConfig() {
   return usedClichesConfig;
 }
 
-ScopeIO.actionInstanceComponent = ActionInstanceComponent;
+ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
 
 @NgModule({
   declarations: [
