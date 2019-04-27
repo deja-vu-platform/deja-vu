@@ -1,4 +1,4 @@
-<div id="designer" class="flex" *ngIf="!previewMode">
+<div *ngIf="!previewMode" class="designer flex" >
   <div class="flex dir-col grow">
     <app-top-bar
       [app]="app"
@@ -26,6 +26,7 @@
 </div>
 <app-action-instance
   *ngIf="previewMode"
+  class="designer"
   [actionInstance]="openActionInstance"
 >
 </app-action-instance>
