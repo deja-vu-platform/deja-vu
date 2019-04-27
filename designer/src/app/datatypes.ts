@@ -330,7 +330,7 @@ export class ActionInstance {
       html += `\n${xIdnt}      class="stretch"`;
     }
     _.forEach(this.inputSettings, (val, key) => {
-      if (key === '*content') { return; }
+      if (key === '*content' || !val) { return; }
       numAttrs += 1;
       const strVal = _.isString(val)
         ? val
