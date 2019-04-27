@@ -30,10 +30,14 @@ semantics.addOperation('toNgExpr', {
   name: (leadingLetter, rest) => dvToNgName(
     leadingLetter.toNgExpr() + rest.toNgExpr()
   ),
+  // dv uses lt for < and gt for > since < and > conflict with HTML tags
   BinExpr_lt: (left, lt, right) => left.toNgExpr() + '<' + right.toNgExpr(),
   BinExpr_gt: (left, gt, right) => left.toNgExpr() + '>' + right.toNgExpr(),
   BinExpr_le: (left, le, right) => left.toNgExpr() + '<=' + right.toNgExpr(),
-  BinExpr_ge: (left, ge, right) => left.toNgExpr() + '>=' + right.toNgExpr()
+  BinExpr_ge: (left, ge, right) => left.toNgExpr() + '>=' + right.toNgExpr(),
+  // angular-expressions is angular.js and does not support ?.
+  // (angular.js treats . like angular treats ?. as far as I can tell)
+  nav: (nav) => '.'
 });
 /**
  * Returns an array of strings, the names (inputs & outputs)
