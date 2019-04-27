@@ -40,7 +40,6 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
-  @Output() readonly ioChange = new EventEmitter<void>();
   @Output() readonly preview = new EventEmitter<void>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('directoryInput') readonly directoryInput: ElementRef;
@@ -209,7 +208,6 @@ export class TopBarComponent {
 
   closeMenu(trigger: MatMenuTrigger) {
     trigger.closeMenu();
-    this.ioChange.emit();
   }
 
   clickFirstTab(mtg: MatTabGroup) {

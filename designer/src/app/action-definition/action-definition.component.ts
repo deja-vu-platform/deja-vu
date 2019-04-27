@@ -78,7 +78,6 @@ interface ColorAssignments {
 export class ActionDefinitionComponent
 implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
-  @Input() ioChange: EventEmitter<void>;
   @Input() actionInstance: ActionInstance;
 
   @ViewChildren('instanceContainer')
@@ -112,12 +111,7 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   ngOnInit() {
-    if (this.actionInstance && this.actionInstance.isAppAction) {
-      this.rs.registerAppAction(this.elem, {});
-    }
-    if (this.ioChange) {
-      this.ioChange.subscribe(() => this.link());
-    }
+    this.rs.registerAppAction(this.elem, {});
   }
 
   ngAfterViewInit() {

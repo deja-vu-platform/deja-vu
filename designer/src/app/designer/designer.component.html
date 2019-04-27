@@ -4,7 +4,6 @@
       [app]="app"
       [openAction]="openAction"
       (load)="load($event)"
-      (ioChange)="ioChange.emit()"
       (preview)="showPreview()"
     ></app-top-bar>
     <div class="grow scroll">
@@ -12,7 +11,6 @@
         class="grow"
         [actionInstance]="openActionInstance"
         [app]="app"
-        [ioChange]="ioChange"
       >
       </app-action-definition>
     </div>

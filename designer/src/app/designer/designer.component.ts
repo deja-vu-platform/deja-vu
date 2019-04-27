@@ -32,7 +32,6 @@ export class DesignerComponent implements OnInit, OnDestroy {
   openActionInstance: ActionInstance;
   previewMode = false;
 
-  readonly ioChange = new EventEmitter<void>();
   private _openAction: AppActionDefinition;
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
