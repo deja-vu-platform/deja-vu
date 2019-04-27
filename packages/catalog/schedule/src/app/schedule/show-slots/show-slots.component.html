@@ -1,3 +1,53 @@
+<div *ngIf="showDateTimePicker">
+  <form (ngSubmit)="filterSlots()" [formGroup]="dateTimeFilterForm"
+    class="form-horizontal">
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startDatePicker"
+         [formControl]="startDateControl">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+        </mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Start Time</mat-label>
+        <input matInput type="time" [formControl]="startTimeControl">
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endDatePicker"
+          [formControl]="endDateControl">
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+        </mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+        <mat-error *ngIf="endDateControl.hasError('endDateBeforeStartDate')">
+          End Date should be <strong>after</strong> Start Date
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>End Time</mat-label>
+        <input matInput type="time" [formControl]="endTimeControl">
+        <mat-error *ngIf="endTimeControl.hasError('endTimeBeforeStartTime')">
+          End Time should be <strong>after</strong> Start Time
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <button mat-button type="submit">
+        {{buttonLabel}}
+      </button>
+    </div>
+  </form>
+</div>
+
 <ul *ngIf="slots && slots.length > 0" class="list-group">
   <li *ngFor="let slot of slots" class="list-group-item">
     <dv-include

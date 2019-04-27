@@ -18,6 +18,8 @@ input SlotsInput {
   scheduleId: ID!
   startDate: String
   endDate: String
+  startTime: String
+  endTime: String
   sortByStartDate: Int!
   sortByEndDate: Int!
 }

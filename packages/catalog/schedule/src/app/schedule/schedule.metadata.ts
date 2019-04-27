@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule,
-  MatSelectModule
+  MatButtonModule, MatDatepickerModule, MatFormFieldModule,
+  MatInputModule, MatSelectModule
 } from '@angular/material';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from '@deja-vu/core';
@@ -61,7 +62,8 @@ const metadata = {
     DvModule,
     FormsModule,
     ReactiveFormsModule,
-    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule,
+    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatSelectModule, MatDatepickerModule, MatMomentDateModule,
     CalendarModule.forRoot(),
     CalendarWeekHoursViewModule
   ],

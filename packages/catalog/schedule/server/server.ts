@@ -18,7 +18,9 @@ import {
   UpdateScheduleInput
 } from './schema';
 
-import { areRangesOverlapping, isAfter, isBefore } from 'date-fns';
+import {
+  areRangesOverlapping, getHours, getMinutes, isAfter, isBefore
+ } from 'date-fns';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -141,10 +143,10 @@ function resolvers(db: ClicheDb, _config: Config): object {
       slots: async (_root, { input }: { input: SlotsInput }) => {
         const filter = { id: input.scheduleId };
         const condition = {};
-        if (!_.isNil(input.startDate)) {
+        if (!_.isNil(input.startDate) && !_.isEmpty(input.startDate)) {
           condition['$gte'] = ['$$slot.startDate', new Date(input.startDate)];
         }
-        if (!_.isNil(input.endDate)) {
+        if (!_.isNil(input.endDate) && !_.isEmpty(input.endDate)) {
           condition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
@@ -153,7 +155,39 @@ function resolvers(db: ClicheDb, _config: Config): object {
             input.sortByEndDate))
           .next();
 
-        return res ? res.availability : [];
+        let filteredByTime = res ? res.availability : [];
+
+        if (!_.isNil(input.startTime) && !_.isEmpty(input.startTime)) {
+          const [startHh, startMm] = input.startTime.split(':');
+          filteredByTime = _.filter(filteredByTime, (slot) => {
+            if (getHours(slot.startDate) < parseInt(startHh, 10)) {
+              return false;
+            }
+            if ((getHours(slot.startDate) === parseInt(startHh, 10)) &&
+              (getMinutes(slot.startDate) < parseInt(startMm, 10))) {
+              return false;
+            }
+
+            return true;
+          });
+        }
+
+        if (!_.isNil(input.endTime) && !_.isEmpty(input.endTime)) {
+          const [endHh, endMm] = input.endTime.split(':');
+          filteredByTime = _.filter(filteredByTime, (slot) => {
+            if (getHours(slot.endDate) > parseInt(endHh, 10)) {
+              return false;
+            }
+            if ((getHours(slot.endDate) === parseInt(endHh, 10)) &&
+              (getMinutes(slot.endDate) > parseInt(endMm, 10))) {
+              return false;
+            }
+
+            return true;
+          });
+        }
+
+        return filteredByTime;
       },
 
       nextAvailability: async (

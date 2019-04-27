@@ -18,6 +18,8 @@ export interface SlotsInput {
   scheduleId: string;
   startDate?: string;
   endDate?: string;
+  startTime?: string;
+  endTime?: string;
   sortByStartDate: number;
   sortByEndDate: number;
 }
