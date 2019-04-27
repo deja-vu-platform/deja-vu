@@ -67,7 +67,7 @@ export interface InInput {
 }
 
 export const defaultAppActionStyles = {
-  backgroundColor: 'white',
+  backgroundColor: 'transparent',
   borderWidth: '0',
   borderColor: 'black',
   borderStyle: 'solid',
