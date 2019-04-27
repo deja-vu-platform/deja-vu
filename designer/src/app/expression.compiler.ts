@@ -85,6 +85,7 @@ export default function compileDvExpr(dvExpr: string): {
     .map((name) => name
         .replace(/\?/g, '') // ignore elvis operator
         .split('.')
+        // tslint:disable-next-line no-magic-numbers
         .slice(0, name.startsWith('$') ? 1 : 3) // $input or cliche.action.input
         .join('.')
     ); // drop object path
