@@ -40,6 +40,9 @@ implements OnInit, AfterViewInit, OnDestroy {
   @Input() actionInstance: ActionInstance;
   // default exists because action instance is top-level in preivew mode
   @Input() parentScopeIO: ScopeIO = new ScopeIO();
+  // not passed to children because their inputs are not editable in this
+  //   context (but it is passed to inputted actions because theirs are)
+  @Input() shouldReLink: EventEmitter<any>;
   // for when rendered in dv-include only
   @Input() extraInputs?: { [ioName: string]: string };
 
@@ -67,11 +70,15 @@ implements OnInit, AfterViewInit, OnDestroy {
     this.scopeIO = new ChildScopeIO(
       this.actionInstance,
       this.parentScopeIO,
+      this.shouldReLink,
       extraScopeIO
         ? { scope: extraScopeIO, inputs: Object.keys(this.extraInputs) }
         : undefined
     );
     this.scopeIO.link();
+    if (this.shouldReLink) { // not given for top level
+      this.shouldReLink.subscribe(() => this.scopeIO.link());
+    }
     this.registerRunService();
   }
 

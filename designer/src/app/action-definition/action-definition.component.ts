@@ -107,7 +107,7 @@ implements AfterViewInit, OnChanges, OnInit {
         tinycolor(action.styles.backgroundColor)
           .isDark() ? 'white' : 'black'
       );
-    this.link();
+    this.updateReferences();
   }
 
   ngOnInit() {
@@ -119,7 +119,7 @@ implements AfterViewInit, OnChanges, OnInit {
       const instanceContainersArr = this.instanceContainers.toArray();
       // if an action was removed we need to re-do the data layer
       if (this.lastNumActions > instanceContainersArr.length) {
-        this.link();
+        this.updateReferences();
       }
       this.lastNumActions = instanceContainersArr.length;
       // show the name of any action on the screen with size 0
@@ -152,11 +152,9 @@ implements AfterViewInit, OnChanges, OnInit {
     return this._rows;
   }
 
-  /**
-   * re-link when an io menu is closed
-   */
-  onActionMenuClosed() {
-    this.link();
+  onActionMenuClosed(forAction: ActionInstance) {
+    forAction.shouldReLink.emit();
+    this.updateReferences();
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint(this.instanceContainers.toArray()));
   }
@@ -265,7 +263,7 @@ implements AfterViewInit, OnChanges, OnInit {
    * Update references to show in the UI
    * Allocate colors to referenced parent inputs / sibling outputs
    */
-  private link() {
+  private updateReferences() {
     const { inReferences, outReferences} = findReferences(this.actionInstance);
     this.inReferences = inReferences;
     this.outReferences = outReferences;

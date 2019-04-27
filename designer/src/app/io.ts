@@ -2,6 +2,7 @@
  * For dynamically linking inputs and outputs.
  */
 
+import { EventEmitter } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { ActionInstance, AppActionDefinition } from './datatypes';
@@ -51,6 +52,7 @@ export class ChildScopeIO extends ScopeIO {
   constructor(
     private readonly actionInstance: ActionInstance,
     private readonly parentScope: ScopeIO,
+    private readonly shouldReLink?: EventEmitter<void>,
     private readonly extra?: { inputs: string[], scope: ScopeIO }
   ) {
     super();
@@ -179,6 +181,7 @@ export class ChildScopeIO extends ScopeIO {
       inputs: {
         actionInstance: actionInstance,
         parentScope: this,
+        shouldReLink: this.shouldReLink,
         extraInputs: this.actionInstance.of.actionInputs[toInputName]
       }
     });

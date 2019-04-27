@@ -1,4 +1,5 @@
 import { Component } from '@angular/compiler/src/core';
+import { EventEmitter } from '@angular/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
@@ -264,6 +265,9 @@ export class ActionInstance {
   // TODO: export styles
   data?: any; // currently only used for the text widget
   readonly styles = { stretch: false };
+  // used to tell UI when input settings change
+  // not data, but putting it elsewhere requires uglier code
+  readonly shouldReLink: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     ofAction: ActionDefinition,
