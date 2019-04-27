@@ -71,6 +71,7 @@ implements OnInit, AfterViewInit, OnDestroy {
         ? { scope: extraScopeIO, inputs: Object.keys(this.extraInputs) }
         : undefined
     );
+    this.scopeIO.link();
     this.registerRunService();
   }
 
@@ -102,21 +103,17 @@ implements OnInit, AfterViewInit, OnDestroy {
    * Should only be called once
    */
   private loadContent() {
-    if (this.actionInstance) {
-      if (this.actionInstance.of instanceof AppActionDefinition) {
-        this.scopeIO.link();
-      } else {
-        // setTimeout is necessary to avoid angular change detection errors
-        setTimeout(() => this.loadClicheAction());
-      }
-      setTimeout(() => {
-        const sub = this.scopeIO.getSubject('hidden')
-          .subscribe((value) => {
-            this.hidden = value;
-          });
-        this.subscriptions.push(sub);
-      });
+    if (!(this.actionInstance.of instanceof AppActionDefinition)) {
+      // setTimeout is necessary to avoid angular change detection errors
+      setTimeout(() => this.loadClicheAction());
     }
+    setTimeout(() => {
+      const sub = this.scopeIO.getSubject('hidden')
+        .subscribe((value) => {
+          this.hidden = value;
+        });
+      this.subscriptions.push(sub);
+    });
   }
 
   /**
