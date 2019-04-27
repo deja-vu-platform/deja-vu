@@ -36,13 +36,9 @@ export function resolveName(
   // parse the name
   let ioName: string;
   let fromAction: ActionInstance;
-  let objectPath: string[];
-  const splitName = name.replace(/\?/g, '')
-    .split('.');
-  if (splitName[0].startsWith('$')) {
+  if (name[0].startsWith('$')) {
     // getting an input from above
-    [ioName, ...objectPath] = splitName;
-    ioName = ioName.slice(1); // strip leading '$'
+    ioName = name.slice(1); // strip leading '$'
     if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
       // getting an input from within an action input
       fromAction = inInput.of;
@@ -54,7 +50,7 @@ export function resolveName(
     // getting an output from a sibling
     let clicheN: string;
     let actionN: string;
-    [clicheN, actionN, ioName, ...objectPath] = splitName;
+    [clicheN, actionN, ioName] = name.split('.');
     const maybeFA = appActionDefinition.findChild(clicheN, actionN);
     if (maybeFA && maybeFA.of.outputs.includes(ioName)) {
       fromAction = maybeFA;
@@ -63,8 +59,7 @@ export function resolveName(
 
   return {
     fromAction,
-    ioName,
-    objectPath
+    ioName
   };
 }
 

@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
 import dvdAppStyles from './dvd-app-styles';
+import { exportDvExpr } from './expression.compiler';
 
 /**
  * A named collection of actions
@@ -333,7 +334,7 @@ export class ActionInstance {
       if (key === '*content' || !val) { return; }
       numAttrs += 1;
       const strVal = _.isString(val)
-        ? val
+        ? exportDvExpr(val)
         : val.toHTML(extraIndents + 1)
           .slice(baseNumIndents, -1); // strip leading indent and ending newline
       html += `\n${xIdnt}      ${key}=${strVal}`;

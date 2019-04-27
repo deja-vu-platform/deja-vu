@@ -42,6 +42,7 @@ semantics.addOperation('toNgExpr', {
 /**
  * Returns an array of strings, the names (inputs & outputs)
  *    referenced in the expression
+ * Note that this returns object paths as well.
  */
 semantics.addOperation('getNames', {
   _iter: (args) => args.map((arg) => arg.getNames())
@@ -52,16 +53,61 @@ semantics.addOperation('getNames', {
   MemberExpr: function(nameOrInput, nav) { return [this.sourceString]; },
   input: function(dollarSign, name) { return [this.sourceString]; }
 });
+/**
+ * We allow users of the designer to write > and < rather than gt and lt
+ * The angular-expressions module treats . as ?. so we export . as ?.
+ */
+semantics.addOperation('toDvExpr', {
+  _iter: (args) => args.map((arg) => arg.toDvExpr())
+    .join(''),
+  _nonterminal: (args) => args.map((arg) => arg.toDvExpr())
+    .join(''),
+  _terminal: function() { return this.sourceString; },
+  name: (leadingLetter, rest) => leadingLetter.toDvExpr() + rest.toDvExpr(),
+  // dv uses lt for < and gt for > since < and > conflict with HTML tags
+  BinExpr_lt: (left, lt, right) => left.toDvExpr() + ' lt ' + right.toDvExpr(),
+  BinExpr_gt: (left, gt, right) => left.toDvExpr() + ' gt ' + right.toDvExpr(),
+  BinExpr_le: (left, le, right) => left.toDvExpr() + ' lt= ' + right.toDvExpr(),
+  BinExpr_ge: (left, ge, right) => left.toDvExpr() + ' gt= ' + right.toDvExpr(),
+  // angular-expressions is angular.js and does not support ?.
+  // (angular.js treats . like angular treats ?. as far as I can tell)
+  nav: (nav) => '?.'
+});
 
-export default function compileDvExpr(dvExpr: string) {
+export default function compileDvExpr(dvExpr: string): {
+  names: string[];
+  evaluate: (scope: Object) => any;
+  parsedExpr?: ohm.Dict
+} {
   if (!dvExpr) { return { names: [], evaluate: () => undefined }; }
   const parsedExpr = semantics(grammar.match(dvExpr));
-  const names: string[] = parsedExpr.getNames();
+  const names: string[] = (parsedExpr.getNames() as string[])
+    .map((name) => name
+        .replace(/\?/g, '') // ignore elvis operator
+        .split('.')
+        .slice(0, name.startsWith('$') ? 1 : 3) // $input or cliche.action.input
+        .join('.')
+    ); // drop object path
   const ngExpr: string = parsedExpr.toNgExpr();
   const evaluate: (scope: Object) => any = expressions.compile(ngExpr);
 
   return {
     names,
-    evaluate
+    evaluate,
+    parsedExpr
   };
+}
+
+export function exportDvExpr(dvdExpr: string): string {
+  if (!dvdExpr) { return dvdExpr; }
+  const { names, parsedExpr } = compileDvExpr(dvdExpr);
+  let dvExpr: string = parsedExpr.toDvExpr();
+
+  names.forEach((name) => {
+    const nameWithElvis = name.replace(/\./g, '?.');
+    dvExpr = dvExpr.split(nameWithElvis)
+      .join(name); // replace all
+  });
+
+  return dvExpr;
 }

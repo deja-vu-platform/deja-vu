@@ -44,7 +44,7 @@ describe('ActionDefinitionComponent', () => {
         MatTooltipModule
       ],
       providers: [
-        { provide: RunService, useValue: {} }
+        { provide: RunService, useValue: { registerAppAction: () => {} } }
       ]
     })
     .compileComponents();

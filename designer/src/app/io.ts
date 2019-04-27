@@ -6,7 +6,7 @@ import { EventEmitter } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { ActionInstance, AppActionDefinition } from './datatypes';
-import compileExprDV, { dvToNgName } from './expression.compiler';
+import compileDvExpr, { dvToNgName } from './expression.compiler';
 
 /**
  * ioName + action => cliche.action.ioName
@@ -123,22 +123,14 @@ export class ChildScopeIO extends ScopeIO {
     toSubject: BehaviorSubject<any>,
     fromScope: ScopeIO
   ) {
-    const { names, evaluate } = compileExprDV(dvExpression);
+    const { names, evaluate } = compileDvExpr(dvExpression);
     const ngScope = {};
     const send = () => toSubject.next(evaluate(ngScope));
     names.forEach((refdName) => {
       // $ means get input to parent or replaced action
       const fromAbove = refdName.startsWith('$');
-      // key for the subject in ScopeIO
-      const refdNameParts = refdName
-        .replace(/\?/g, '') // don't care about elvis (?.) operator
-        .split('.')
-        .slice(0, fromAbove ? 1 : 3); // $io or cliche.action.io (ignore path)
-      let ioScopeName = refdNameParts.join('.');
       // keys for subjects in ScopeIO do not have leading $
-      if (fromAbove) {
-        ioScopeName = ioScopeName.slice(1);
-      }
+      const ioScopeName = fromAbove ? refdName.slice(1) : refdName;
       // if in an action input, $ gets input to replaced action
       //   falling back to parent input
       if (
@@ -156,7 +148,8 @@ export class ChildScopeIO extends ScopeIO {
       //   so we want to set ngScope.c.a.o = v
       // dvToNgName converts dv-legal names to ng-legal names
       //   it wants the $
-      const ngScopePath = refdNameParts.map(dvToNgName);
+      const ngScopePath = refdName.split('.')
+        .map(dvToNgName);
       const sub = refdSubject.subscribe((refdValue) => {
         _.set(ngScope, ngScopePath, refdValue);
         send();

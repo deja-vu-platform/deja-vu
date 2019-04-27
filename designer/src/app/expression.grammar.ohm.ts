@@ -5,6 +5,7 @@
  *
  * **Changes:**
  * - I added navname because by default ohm was grouping (nav name)+ weird
+ * - I added support for < and > for convenience (they are converted on export)
  */
 
 export default String.raw`
@@ -29,10 +30,10 @@ Expression {
     | Expr "/" Expr   -- div
     | Expr "%" Expr   -- mod
     // Relational Expr
-    | Expr "lt" Expr -- lt
-    | Expr "gt" Expr -- gt
-    | Expr "lt=" Expr -- le
-    | Expr "gt=" Expr -- ge
+    | Expr ("lt" | "<") Expr -- lt
+    | Expr ("gt" | ">") Expr -- gt
+    | Expr ("lt=" | "<=") Expr -- le
+    | Expr ("gt=" | ">=") Expr -- ge
     // Equality Expr
     | Expr "===" Expr -- eq
     | Expr "!==" Expr -- neq
