@@ -50,6 +50,7 @@ semantics.addOperation('getNames', {
 });
 
 export default function compileDvExpr(dvExpr: string) {
+  if (!dvExpr) { return { names: [], evaluate: () => undefined }; }
   const parsedExpr = semantics(grammar.match(dvExpr));
   const names: string[] = parsedExpr.getNames();
   const ngExpr: string = parsedExpr.toNgExpr();
