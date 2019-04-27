@@ -20,7 +20,7 @@ import {
 
 import {
   areRangesOverlapping, getHours, getMinutes, isAfter, isBefore
- } from 'date-fns';
+} from 'date-fns';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -96,6 +96,46 @@ function getEarlierEndDate(first: SlotDoc, second: SlotDoc): Date {
   return comparison ? first.endDate : second.endDate;
 }
 
+function filterByStartTime(slots: SlotDoc[], startTime: string): SlotDoc[] {
+  let filteredSlots = [];
+  if (!_.isNil(startTime) && !_.isEmpty(startTime)) {
+    const [startHh, startMm] = startTime.split(':');
+    filteredSlots = _.filter(slots, (slot) => {
+      if (getHours(slot.startDate) < parseInt(startHh, 10)) {
+        return false;
+      }
+      if ((getHours(slot.startDate) === parseInt(startHh, 10)) &&
+        (getMinutes(slot.startDate) < parseInt(startMm, 10))) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  return filteredSlots;
+}
+
+function filterByEndTime(slots: SlotDoc[], endTime: string): SlotDoc[] {
+  let filteredSlots = [];
+  if (!_.isNil(endTime) && !_.isEmpty(endTime)) {
+    const [endHh, endMm] = endTime.split(':');
+    filteredSlots = _.filter(slots, (slot) => {
+      if (getHours(slot.endDate) > parseInt(endHh, 10)) {
+        return false;
+      }
+      if ((getHours(slot.endDate) === parseInt(endHh, 10)) &&
+        (getMinutes(slot.endDate) > parseInt(endMm, 10))) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  return filteredSlots;
+}
+
 function getSlotsPipeline(matchQuery: any, filterCondition: any,
   sortByStartDate: number, sortByEndDate: number) {
   return [
@@ -156,36 +196,8 @@ function resolvers(db: ClicheDb, _config: Config): object {
           .next();
 
         let filteredByTime = res ? res.availability : [];
-
-        if (!_.isNil(input.startTime) && !_.isEmpty(input.startTime)) {
-          const [startHh, startMm] = input.startTime.split(':');
-          filteredByTime = _.filter(filteredByTime, (slot) => {
-            if (getHours(slot.startDate) < parseInt(startHh, 10)) {
-              return false;
-            }
-            if ((getHours(slot.startDate) === parseInt(startHh, 10)) &&
-              (getMinutes(slot.startDate) < parseInt(startMm, 10))) {
-              return false;
-            }
-
-            return true;
-          });
-        }
-
-        if (!_.isNil(input.endTime) && !_.isEmpty(input.endTime)) {
-          const [endHh, endMm] = input.endTime.split(':');
-          filteredByTime = _.filter(filteredByTime, (slot) => {
-            if (getHours(slot.endDate) > parseInt(endHh, 10)) {
-              return false;
-            }
-            if ((getHours(slot.endDate) === parseInt(endHh, 10)) &&
-              (getMinutes(slot.endDate) > parseInt(endMm, 10))) {
-              return false;
-            }
-
-            return true;
-          });
-        }
+        filteredByTime = filterByStartTime(filteredByTime, input.startTime);
+        filteredByTime = filterByEndTime(filteredByTime, input.endTime);
 
         return filteredByTime;
       },
@@ -254,8 +266,17 @@ function resolvers(db: ClicheDb, _config: Config): object {
         const overlaps: SlotDoc[] = [];
 
         if (!_.isEmpty(res) && res.length === MAX_NUM_SCHEDULE_IDS) {
-          const firstScheduleSlots = res[0].availability;
-          const secondScheduleSlots = res[1].availability;
+          let firstScheduleSlots = res[0].availability;
+          firstScheduleSlots = filterByStartTime(firstScheduleSlots,
+            input.startTime);
+          firstScheduleSlots = filterByEndTime(firstScheduleSlots,
+            input.endTime);
+
+          let secondScheduleSlots = res[1].availability;
+          secondScheduleSlots = filterByStartTime(secondScheduleSlots,
+            input.startTime);
+          secondScheduleSlots = filterByEndTime(secondScheduleSlots,
+            input.endTime);
 
           firstScheduleSlots.forEach((first) => {
             secondScheduleSlots.forEach((second) => {

@@ -37,7 +37,7 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
   @Input() slots: Slot[] | undefined;
   @Input() showDateTimePicker = true;
 
-  @Input() buttonLabel = 'Filter Slots';
+  @Input() buttonLabel = 'Filter Availability';
 
   // Must be of the following format: https://en.wikipedia.org/wiki/ISO_8601
   // Example: YYYY-MM-DD

@@ -1,7 +1,11 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, Type
+  OnInit, Output, Type, ViewChild
 } from '@angular/core';
+import {
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
+} from '@angular/forms';
+
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
@@ -9,12 +13,18 @@ import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
 import { Schedule, Slot } from '../shared/schedule.model';
+import {
+  endDateValidator, endTimeValidator
+} from '../shared/schedule.validator';
 
 import {
   ShowScheduleComponent
 } from '../show-schedule/show-schedule.component';
 import { ShowSlotComponent } from '../show-slot/show-slot.component';
 import { ShowSlotsComponent } from '../show-slots/show-slots.component';
+
+import * as moment from 'moment';
+
 
 interface AllAvailabilityRes {
   data: { allAvailability: Slot[] };
@@ -31,9 +41,26 @@ const MAX_NUM_SCHEDULE_IDS = 2;
 export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   OnEval, OnInit {
   @Input() scheduleIds: string[];
+  @Input() showDateTimePicker = true;
+
+  @Input() buttonLabel = 'Filter Slots';
+
   // Must be of the following format: https://en.wikipedia.org/wiki/ISO_8601
-  @Input() startDate: string | undefined;
-  @Input() endDate: string | undefined;
+  // Example: YYYY-MM-DD
+  @Input() set startDate(value: string) {
+    this.startDateControl.setValue(moment(value));
+  }
+  @Input() set endDate(value: string) {
+    this.endDateControl.setValue(moment(value));
+  }
+
+  // Must be in 24 hour format (HH:MM)
+  @Input() set startTime(value: string) {
+    this.startTimeControl.setValue(value);
+  }
+  @Input() set endTime(value: string) {
+    this.endTimeControl.setValue(value);
+  }
 
   // Choose how to sort the slots
   @Input() sortByStartDate: 'asc' | 'desc' = 'asc';
@@ -70,6 +97,24 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
     type: <Type<Component>> ShowSlotComponent
   };
 
+  @ViewChild(FormGroupDirective) form;
+
+  startDateControl = new FormControl('');
+  endDateControl = new FormControl('', [
+    endDateValidator(() => this.startDateControl.value)
+  ]);
+  startTimeControl = new FormControl('');
+  endTimeControl = new FormControl('', [
+    endTimeValidator(() => this.startTimeControl.value)
+  ]);
+
+  dateTimeFilterForm: FormGroup = this.builder.group({
+    startsOn: this.startDateControl,
+    endsOn: this.endDateControl,
+    startTime: this.startTimeControl,
+    endTime: this.endTimeControl
+  });
+
   allAvailability: Slot[];
   schedule: Schedule;
 
@@ -78,7 +123,8 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {
     this.showAllAvailability = this;
   }
 
@@ -101,36 +147,45 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
     }
   }
 
+  filterSlots() {
+    this.rs.eval(this.elem);
+  }
+
   async dvOnEval(): Promise<void> {
     if (this.scheduleIds.length !== MAX_NUM_SCHEDULE_IDS) {
       throw new Error('Incorrect number of schedule IDs provided');
     }
 
-    if (this.canEval()) {
-      this.gs.get<AllAvailabilityRes>(this.apiPath, {
-        params: {
-          inputs: JSON.stringify({
-            input: {
-              scheduleIds: this.scheduleIds,
-              startDate: this.startDate,
-              endDate: this.endDate,
-              sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
-              sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
-            }
-          }),
-          extraInfo: { returnFields: 'id, startDate, endDate' }
-        }
-      })
-        .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
-        .subscribe((allAvailability) => {
-          this.allAvailability = allAvailability;
-          this.schedule = {
-            id: 'all-availability',
-            availability: this.allAvailability
-          };
-          this.loadedAllAvailability.emit(allAvailability);
-        });
-    }
+    const startDate = this.startDateControl.value ?
+      this.startDateControl.value.format('YYYY-MM-DD') : '';
+    const endDate = this.endDateControl.value ?
+      this.endDateControl.value.format('YYYY-MM-DD') : '';
+
+    this.gs.get<AllAvailabilityRes>(this.apiPath, {
+      params: {
+        inputs: JSON.stringify({
+          input: {
+            scheduleIds: this.scheduleIds,
+            startDate: startDate,
+            endDate: endDate,
+            startTime: this.startTimeControl.value,
+            endTime: this.endTimeControl.value,
+            sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
+            sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
+          }
+        }),
+        extraInfo: { returnFields: 'id, startDate, endDate' }
+      }
+    })
+      .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
+      .subscribe((allAvailability) => {
+        this.allAvailability = allAvailability;
+        this.schedule = {
+          id: 'all-availability',
+          availability: this.allAvailability
+        };
+        this.loadedAllAvailability.emit(allAvailability);
+      });
   }
 
   private canEval(): boolean {

@@ -32,6 +32,8 @@ input AllAvailabilityInput {
   scheduleIds: [ID!]
   startDate: String
   endDate: String
+  startTime: String
+  endTime: String
   sortByStartDate: Int!
   sortByEndDate: Int!
 }
