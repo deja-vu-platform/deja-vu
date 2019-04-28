@@ -23,11 +23,13 @@ export abstract class ConfigService {
   abstract getConfig(): any;
 }
 
-class AppConfigService implements ConfigService {
+class AppConfigService extends ConfigService {
   constructor(
     private readonly usedClichesConfig: UsedClichesConfig,
     protected readonly forNode: ElementRef
-  ) {}
+  ) {
+    super();
+  }
 
   getConfig(): any {
     const alias = this.getClicheAlias();
