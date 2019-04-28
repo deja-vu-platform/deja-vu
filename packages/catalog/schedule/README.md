@@ -1,6 +1,6 @@
 # Schedule
 
-Description of the cliché
+Find times to meet
 
 ## Actions
 
