@@ -23,7 +23,8 @@ import {
 import { ShowSlotComponent } from '../show-slot/show-slot.component';
 import { ShowSlotsComponent } from '../show-slots/show-slots.component';
 
-import * as moment from 'moment';
+// https://github.com/dherges/ng-packagr/issues/217
+import * as momentImported from 'moment'; const moment = momentImported;
 
 
 interface AllAvailabilityRes {

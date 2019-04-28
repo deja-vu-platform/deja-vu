@@ -1,11 +1,10 @@
 import { AbstractControl, ValidationErrors } from '@angular/forms';
-import * as moment from 'moment';
 
-export function endDateValidator(getStartDate: () => moment.Moment)
+export function endDateValidator(getStartDate: () => any)
   : ((control: AbstractControl) => ValidationErrors) {
   return (control: AbstractControl): { [key: string]: any } => {
-    const startDate: moment.Moment = getStartDate();
-    const endDate: moment.Moment = control.value;
+    const startDate = getStartDate();
+    const endDate = control.value;
     if (!(startDate && endDate)) {
       return null;
     }

@@ -18,7 +18,8 @@ import {
 
 import { ShowSlotComponent } from '../show-slot/show-slot.component';
 
-import * as moment from 'moment';
+// https://github.com/dherges/ng-packagr/issues/217
+import * as momentImported from 'moment'; const moment = momentImported;
 
 interface SlotsRes {
   data: { slots: Slot[] };
