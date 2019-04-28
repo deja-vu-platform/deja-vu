@@ -23,9 +23,14 @@ import {
   flexJustify,
   Row
 } from '../datatypes';
-import { Resolution, ScopeIO } from '../io';
+import { ScopeIO } from '../io';
+import findReferences, {
+  InReferences,
+  OutReferences,
+  Reference as IOReference
+} from '../io-references';
 
-interface Reference extends Resolution {
+interface Reference extends IOReference {
   forIO: string;
   forActionID: string;
 }
@@ -73,7 +78,6 @@ interface ColorAssignments {
 export class ActionDefinitionComponent
 implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
-  @Input() ioChange: EventEmitter<void>;
   @Input() actionInstance: ActionInstance;
 
   @ViewChildren('instanceContainer')
@@ -85,9 +89,10 @@ implements AfterViewInit, OnChanges, OnInit {
   // if we don't have a consistent object, angular freaks out
   private readonly _rows: Row[] = [];
   private readonly keysDown: Set<string> = new Set();
+  private inReferences: InReferences;
+  private outReferences: OutReferences;
   private ioReferencesCache: {[id: string]: Reference[]} = {};
   private ioReferencedCache: {[id: string]: { ioName: string }[]} = {};
-
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
 
@@ -102,16 +107,11 @@ implements AfterViewInit, OnChanges, OnInit {
         tinycolor(action.styles.backgroundColor)
           .isDark() ? 'white' : 'black'
       );
-    this.link();
+    this.updateReferences();
   }
 
   ngOnInit() {
-    if (this.actionInstance && this.actionInstance.isAppAction) {
-      this.rs.registerAppAction(this.elem, {});
-    }
-    if (this.ioChange) {
-      this.ioChange.subscribe(() => this.link());
-    }
+    this.rs.registerAppAction(this.elem, {});
   }
 
   ngAfterViewInit() {
@@ -119,7 +119,7 @@ implements AfterViewInit, OnChanges, OnInit {
       const instanceContainersArr = this.instanceContainers.toArray();
       // if an action was removed we need to re-do the data layer
       if (this.lastNumActions > instanceContainersArr.length) {
-        this.link();
+        this.updateReferences();
       }
       this.lastNumActions = instanceContainersArr.length;
       // show the name of any action on the screen with size 0
@@ -152,11 +152,9 @@ implements AfterViewInit, OnChanges, OnInit {
     return this._rows;
   }
 
-  /**
-   * re-link when an io menu is closed
-   */
-  onActionMenuClosed() {
-    this.link();
+  onActionMenuClosed(forAction: ActionInstance) {
+    forAction.shouldReLink.emit();
+    this.updateReferences();
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint(this.instanceContainers.toArray()));
   }
@@ -200,22 +198,18 @@ implements AfterViewInit, OnChanges, OnInit {
     }
 
     const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
-    const resolutions: Reference[] = [].concat(...ids
-      .map((id) => _.filter(
-        this.scopeIO.inReferences[id],
-        (r, ioName) => {
-          if (r) {
-            r['forIO'] = ioName;
-            r['forActionID'] = id;
-          }
-
-          return !!r;
-        }
-      ))
-    ); // flatten
+    const resolutions: Reference[] = ids
+      .map((id) => Object
+        .entries(this.inReferences[id] || {})
+        .map(([ioName, references]) => references
+          .map((r): Reference => ({ ...r, forIO: ioName, forActionID: id }))
+        )
+        .flat()
+      )
+      .flat();
     const uniqueResolutions = _.uniqBy(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.fromAction.id, r.forIO, r.forActionID])
+      (r) => JSON.stringify([r.ioName, r.action.id, r.forIO, r.forActionID])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 
@@ -234,10 +228,10 @@ implements AfterViewInit, OnChanges, OnInit {
 
     const ret = _.uniqBy(
       Array
-        .from(this.scopeIO.outReferences[from.id] || [])
-        .filter(({ ioName, byAction }) => from
+        .from(this.outReferences[from.id] || [])
+        .filter(({ ioName, action }) => from
           .getInputtedActions(true)
-          .indexOf(byAction) === -1
+          .indexOf(action) === -1
         ),
       (r) => r.ioName
     );
@@ -266,11 +260,13 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Create data layer for this app action's context
+   * Update references to show in the UI
    * Allocate colors to referenced parent inputs / sibling outputs
    */
-  private link() {
-    this.scopeIO.link(this.actionInstance);
+  private updateReferences() {
+    const { inReferences, outReferences} = findReferences(this.actionInstance);
+    this.inReferences = inReferences;
+    this.outReferences = outReferences;
     this.ioReferencedCache = {};
     this.ioReferencesCache = {};
     this.allocateColors();
@@ -283,7 +279,7 @@ implements AfterViewInit, OnChanges, OnInit {
     // free colors assigned to IOs that are no longer referenced
     _.forOwn(this.colorAssignments, (obj, actionID) => {
       _.forOwn(obj, (color, ioName) => {
-        const ios = this.scopeIO.outReferences[actionID] || [];
+        const ios = this.outReferences[actionID] || [];
         if (!ios.find((r) => r.ioName === ioName)) {
           this.availableColors.add(color);
         }
@@ -292,7 +288,7 @@ implements AfterViewInit, OnChanges, OnInit {
 
     // allocate colors to new references
     this.colorAssignments = _.mapValues(
-      this.scopeIO.outReferences,
+      this.outReferences,
       (ioNames, aID) => {
         const ioToColor = {};
         ioNames.forEach(({ ioName: ioN }) => {

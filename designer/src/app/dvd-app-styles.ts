@@ -62,4 +62,8 @@ export default `
 .dvd-row > .stretch {
   flex-grow: 1;
 }
+
+body > * > * > .dvd-action {
+  min-height: 100vh;
+}
 `;

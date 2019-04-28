@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {
   Action,
-  ConfigService,
+  ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
   OnEval,
@@ -19,8 +19,6 @@ import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
-
-import { TransferConfig } from '../transfer.config';
 
 
 interface BalanceRes {
@@ -54,14 +52,14 @@ OnInit, OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath,
-    private cs: ConfigService) { }
+    private csf: ConfigServiceFactory) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
 
-    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
-      .balanceType;
+    this.balanceType = this.csf.createConfigService(this.elem)
+      .getConfig().balanceType;
   }
 
   ngAfterViewInit() {

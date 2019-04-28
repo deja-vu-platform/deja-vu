@@ -3,7 +3,8 @@ import {
   MatDialogModule,
   MatExpansionModule,
   MatIconModule,
-  MatListModule
+  MatListModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { SideMenuComponent } from './side-menu.component';
@@ -21,7 +22,8 @@ describe('SideMenuComponent', () => {
         MatDialogModule,
         MatExpansionModule,
         MatIconModule,
-        MatListModule
+        MatListModule,
+        MatTooltipModule
       ]
     })
     .compileComponents();

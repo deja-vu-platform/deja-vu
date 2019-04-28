@@ -1,7 +1,9 @@
 <div
   *ngIf="actionInstance"
+  class="action-instance"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
+  [attr.dvOf]="actionInstance.from.name"
   [ngStyle]="actionInstance.of.styles || {}"
   [hidden]="hidden"
 >
@@ -24,7 +26,7 @@
         >
           <app-action-instance
             [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
+            [parentScopeIO]="scopeIO"
           >
           </app-action-instance>
         </div>

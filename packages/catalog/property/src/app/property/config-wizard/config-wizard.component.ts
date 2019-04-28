@@ -62,6 +62,7 @@ export class RegexMatcher extends ErrorStateMatcher {
 }
 
 @Component({
+  selector: 'property-config-wizard',
   templateUrl: './config-wizard.component.html',
   styleUrls: ['./config-wizard.component.css']
 })

@@ -2,7 +2,7 @@ import { Renderer2 } from '@angular/core';
 
 import * as _ from 'lodash';
 
-const OF_ATTR = 'dvOf';
+export const OF_ATTR = 'dvOf';
 const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
 
@@ -20,15 +20,6 @@ export class NodeUtils {
     return tag.substring(tag.indexOf('-') + 1);
   }
 
-  private static GetAttribute(node, attribute: string): string | undefined {
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
-    if (node.hasAttribute && node.hasAttribute(attribute)) {
-      return node.getAttribute(attribute);
-    }
-
-    return undefined;
-  }
-
   private static GetTag(node): string {
     return node.nodeName.toLowerCase();
   }
@@ -41,6 +32,15 @@ export class NodeUtils {
     } else {
       return tag;
     }
+  }
+
+  static GetAttribute(node, attribute: string): string | undefined {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
+    if (node.hasAttribute && node.hasAttribute(attribute)) {
+      return node.getAttribute(attribute);
+    }
+
+    return undefined;
   }
 
   static SetActionId(node, actionId: string): void {
