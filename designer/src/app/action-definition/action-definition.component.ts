@@ -153,8 +153,8 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   onActionMenuClosed(forAction: ActionInstance) {
-    this.updateReferences(); // must come first (in case of auto-quote)
-    forAction.shouldReLink.emit(); // must come after
+    forAction.shouldReLink.emit();
+    this.updateReferences();
     // need to wait for values to propogate
     setTimeout(() => this.calcShowHint(this.instanceContainers.toArray()));
   }
