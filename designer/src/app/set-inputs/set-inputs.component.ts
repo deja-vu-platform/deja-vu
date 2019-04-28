@@ -61,10 +61,12 @@ export class SetInputsComponent implements OnChanges {
   }
 
   addOutput(inputName: string, event: CustomEvent) {
-    this.actionInstance.inputSettings[inputName] = (
-      (this.actionInstance.inputSettings[inputName] || '')
-      + event.detail.output
-    );
+    let expr = (this.actionInstance.inputSettings[inputName] as string) || '';
+    if (!expr.startsWith('=')) {
+      expr = '=' + expr;
+    }
+    expr = expr + event.detail.output;
+    this.actionInstance.inputSettings[inputName] = expr;
   }
 
   closeMenu(trigger: MatMenuTrigger) {

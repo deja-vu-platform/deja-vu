@@ -75,7 +75,8 @@ export default function findReferences(appActionInstance: ActionInstance) {
     .getChildren(true)
     .forEach((action) => {
       action.walkInputs(true, (inputName, inputValue, ofAction, inInput) => {
-        if (!_.isString(inputValue)) { return; }
+        if (!_.isString(inputValue) || !inputValue.startsWith('=')) { return; }
+        inputValue = inputValue.slice(1); // remove leading =
         const { names } = compileDvExpr(inputValue);
         names.forEach((name) => {
           const { fromAction, ioName } = resolveName(
