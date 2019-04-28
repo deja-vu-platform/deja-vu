@@ -88,9 +88,9 @@ export class ChildScopeIO extends ScopeIO {
       const inputValue = this.actionInstance.inputSettings[inputName];
       if (_.isString(inputValue)) { // expression input
         const toSubject = this.getSubject(inputName);
-        this.sendExpression(inputValue, toSubject, this.parentScope);
+        this.emitExpressionValue(inputValue, toSubject, this.parentScope);
       } else if (inputValue instanceof ActionInstance) { // action input
-        this.sendAction(inputValue, inputName);
+        this.emitAction(inputValue, inputName);
       }
     });
   }
@@ -107,7 +107,7 @@ export class ChildScopeIO extends ScopeIO {
     this.actionInstance.of.outputSettings.forEach(({ name, value }) => {
       const fqName = fullyQualifyName(name, this.actionInstance);
       const toSubject = this.parentScope.getSubject(fqName);
-      this.sendExpression(value, toSubject, this);
+      this.emitExpressionValue(value, toSubject, this);
     });
   }
 
@@ -118,7 +118,7 @@ export class ChildScopeIO extends ScopeIO {
    * It updates the value when any referenced value changes.
    * Cannot be called externally because it does not clean up subs.
    */
-  private sendExpression(
+  private emitExpressionValue(
     dvExpression: string,
     toSubject: BehaviorSubject<any>,
     fromScope: ScopeIO
@@ -161,10 +161,10 @@ export class ChildScopeIO extends ScopeIO {
 
   /**
    * Send an action instance to the given input (on this action).
-   * It's less general than sendExpression since actions can only
+   * It's less general than emitExpressionValue since actions can only
    *   be inputted.
    */
-  private sendAction(
+  private emitAction(
     actionInstance: ActionInstance,
     toInputName: string
   ) {
