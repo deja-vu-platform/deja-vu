@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule
+  MatButtonModule, MatFormFieldModule, MatInputModule, MatRadioModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -45,13 +45,17 @@ import {
   ShowTransfersComponent
 } from './show-transfers/show-transfers.component';
 export { ShowTransfersComponent };
+import {
+  ConfigWizardComponent
+} from './config-wizard/config-wizard.component';
 
 
 const allComponents = [
   CreateTransferComponent, InputMoneyComponent, AddToBalanceComponent,
   ShowTransfersComponent, ShowTransferComponent, ShowBalanceComponent,
   InputAmountComponent, InputItemCountsComponent, CreateItemCountComponent,
-  ShowItemCountComponent, ShowItemCountsComponent, ShowAmountComponent
+  ShowItemCountComponent, ShowItemCountsComponent, ShowAmountComponent,
+  ConfigWizardComponent
 ];
 
 const metadata = {
@@ -61,7 +65,10 @@ const metadata = {
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatFormFieldModule, MatInputModule
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatRadioModule
   ],
   declarations: allComponents,
   entryComponents: allComponents,

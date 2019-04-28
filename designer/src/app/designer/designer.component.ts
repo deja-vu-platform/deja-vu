@@ -32,11 +32,9 @@ export class DesignerComponent implements OnInit, OnDestroy {
   openActionInstance: ActionInstance;
   previewMode = false;
 
-  readonly ioChange = new EventEmitter<void>();
   private _openAction: AppActionDefinition;
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
-  private readonly setElectronState: (state: any) => void;
   private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
   private readonly path: any; // path module
   private readonly cp: any; // child_process module
@@ -75,7 +73,8 @@ export class DesignerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationStart) {
-        const name = e.url.slice(1);
+        const [name] = (e.url.startsWith('/') ? e.url.slice(1) : e.url)
+          .split(';');
         if (name === '') {
           this.openAction = this.app.homepage;
         } else {
@@ -93,6 +92,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         }
       }
     });
+    this.router.navigateByUrl('');
   }
 
   ngOnDestroy() {

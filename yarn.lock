@@ -1508,6 +1508,11 @@ amqplib@^0.5.2:
     safe-buffer "~5.1.2"
     url-parse "~1.4.3"
 
+angular-expressions@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/angular-expressions/-/angular-expressions-1.0.0.tgz#3430436e4d8108ff7cf30c6b8b9dbfa7b437d395"
+  integrity sha512-ihYJFCr1S7vfBJTS7dE+zGQ3oNAMIL+NJ5aWs52Cz7frmvpVVA1NTMXBP9BFSP/Wk/zIJBeYn2o5Fo8txCka3A==
+
 angular-star-rating@^3.0.8:
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/angular-star-rating/-/angular-star-rating-3.0.8.tgz#c33ea9bb5b61d7a2f8cf4cc60faa0048716c96b0"

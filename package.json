@@ -78,8 +78,6 @@
     "samples/rendezvous/.dv",
     "samples/sweetspots",
     "samples/sweetspots/.dv",
-    "designer",
-    "designer/samples/*",
-    "designer/samples/*/.dv"
+    "designer"
   ]
 }

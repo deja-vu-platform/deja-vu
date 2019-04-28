@@ -1,7 +1,6 @@
 import {
   Component,
   ComponentFactoryResolver,
-  EventEmitter,
   Inject,
   Injector,
   OnInit,
@@ -17,7 +16,8 @@ import {
   MatSelectChange
 } from '@angular/material';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
+import { Subscribable } from 'rxjs/Observable';
+import { AnonymousSubscription } from 'rxjs/Subscription';
 
 import { clicheDefinitions } from '../cliche.module';
 import { App, ClicheDefinition, ClicheInstance } from '../datatypes';
@@ -37,6 +37,9 @@ export interface AfterClosedData {
 interface ControlGroup {
   form: { valid: boolean };
 }
+
+
+export const usedClichesConfig = {};
 
 
 class JSONValidator extends ErrorStateMatcher {
@@ -77,7 +80,7 @@ export class ConfigureClicheComponent implements OnInit {
   name: string;
   configString: string;
   readonly jsonValidator: JSONValidator;
-  sub: Subscription;
+  sub: AnonymousSubscription;
 
   constructor(
     private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
@@ -132,6 +135,7 @@ export class ConfigureClicheComponent implements OnInit {
         });
       } else {
         clicheInstance = new ClicheInstance(this.name, this.of);
+        usedClichesConfig[this.name] = { config: clicheInstance.config };
         this.data.app.cliches.push(clicheInstance);
       }
       if (this.configString) { // guaranteed to be valid JSON of object
@@ -179,15 +183,21 @@ export class ConfigureClicheComponent implements OnInit {
       0,
       this.injector
     );
+    const changeOutput: Subscribable<string> = componentRef.instance['change'];
+    let onThisMicrotask = true;
+    if (changeOutput) {
+      this.sub = changeOutput.subscribe((config) => {
+        if (onThisMicrotask) {
+          setTimeout(() => this.configString = config || ' ');
+        } else {
+          this.configString = config || ' ';
+        }
+      });
+    }
     if (this.data.cliche) {
       componentRef.instance['value'] = this.configString;
     }
-    const changeOutput: EventEmitter<Object> = componentRef.instance['change'];
-    if (changeOutput) {
-      this.sub = changeOutput.subscribe((config) => {
-        this.configString = config || ' '; // cause form to be invalid
-      });
-    }
+    setTimeout(() => onThisMicrotask = false);
   }
 
 }

@@ -1,9 +1,11 @@
 import { Component } from '@angular/compiler/src/core';
+import { EventEmitter } from '@angular/core';
 import * as graphlib from 'graphlib';
 import * as _ from 'lodash';
 import * as uuidv4 from 'uuid/v4';
 
 import dvdAppStyles from './dvd-app-styles';
+import { exportDvExpr } from './expression.compiler';
 
 /**
  * A named collection of actions
@@ -66,7 +68,7 @@ export interface InInput {
 }
 
 export const defaultAppActionStyles = {
-  backgroundColor: 'white',
+  backgroundColor: 'transparent',
   borderWidth: '0',
   borderColor: 'black',
   borderStyle: 'solid',
@@ -109,16 +111,15 @@ export class AppActionDefinition implements ActionDefinition {
   }
 
   getChildren(includeInputs = false): ActionInstance[] {
-    return (<ActionInstance[]>[]).concat(
-      ...this.rows.map(
-        (r) => (<ActionInstance[]>[]).concat(
-          ...r.actions.map((a) => includeInputs
-            ? [a, ...a.getInputtedActions(true)]
-            : a
-          )
+    return this.rows
+      .map((r) => r.actions
+        .map((a) => includeInputs
+        ? [a, ...a.getInputtedActions(true)]
+        : [a]
         )
+        .flat()
       )
-    );
+      .flat();
   }
 
   /**
@@ -265,6 +266,9 @@ export class ActionInstance {
   // TODO: export styles
   data?: any; // currently only used for the text widget
   readonly styles = { stretch: false };
+  // used to tell UI when input settings change
+  // not data, but putting it elsewhere requires uglier code
+  readonly shouldReLink: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     ofAction: ActionDefinition,
@@ -327,10 +331,10 @@ export class ActionInstance {
       html += `\n${xIdnt}      class="stretch"`;
     }
     _.forEach(this.inputSettings, (val, key) => {
-      if (key === '*content') { return; }
+      if (key === '*content' || !val) { return; }
       numAttrs += 1;
       const strVal = _.isString(val)
-        ? val
+        ? exportDvExpr(val)
         : val.toHTML(extraIndents + 1)
           .slice(baseNumIndents, -1); // strip leading indent and ending newline
       html += `\n${xIdnt}      ${key}=${strVal}`;

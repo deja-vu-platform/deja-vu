@@ -50,10 +50,10 @@
               'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
             }"
           >
-            <!-- below is same as above -->
             <app-action-instance
               [actionInstance]="action"
-              [actionIO]="scopeIO.getActionIO(action)"
+              [parentScopeIO]="scopeIO"
+              [shouldReLink]="action.shouldReLink"
               (click)="stopPropIfShift($event)"
               [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
             >
@@ -61,12 +61,11 @@
             <div *ngIf="action.showHint" class="hint">
               Hidden: {{action.fqtag}}
             </div>
-            <!-- above is same as above -->
             <app-floating-menu
               #actionMenu
               [title]="action.fqtag"
               (opened)="clickFirstTab(actionMenuContent)"
-              (closed)="onActionMenuClosed()"
+              (closed)="onActionMenuClosed(action)"
               (shouldClose)="closeMenu(actionMenuTrigger)"
             >
               <mat-tab-group #actionMenuContent class="popup-menu action-menu">
@@ -100,7 +99,7 @@
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
-              color: color(ioRef.fromAction, ioRef.ioName)
+              color: color(ioRef.action, ioRef.ioName)
             }"
           >
             <div class="ref-for-io">{{ioRef.forIO}}</div>
@@ -153,7 +152,7 @@
       class="ref-indicator input-ref-indicator hide-on-drag"
       *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"
       [ngStyle]="{
-        color: color(ioRef.fromAction, ioRef.ioName)
+        color: color(ioRef.action, ioRef.ioName)
       }"
     >
       <div class="ref-for-io">{{ioRef.forIO}}</div>

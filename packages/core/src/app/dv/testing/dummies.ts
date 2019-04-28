@@ -1,4 +1,8 @@
-import { ConfigService, USED_CLICHES_CONFIG } from '../config.service';
+import {
+  ConfigService,
+  ConfigServiceFactory,
+  USED_CLICHES_CONFIG
+} from '../config.service';
 import { GatewayServiceFactory } from '../gateway.service';
 
 import 'rxjs/add/observable/of';
@@ -29,11 +33,11 @@ export class DummyGatewayService {
   }
 }
 
-export class DummyConfigService {
+class DummyConfigServiceFactory {
   constructor(private readonly getConfigResp) { }
 
-  getConfig(_forNode) {
-    return this.getConfigResp;
+  createConfigService(): ConfigService {
+    return { getConfig: () => this.getConfigResp };
   }
 }
 
@@ -46,8 +50,8 @@ export function getConfigBuilder(
       { provide: GatewayServiceFactory,
         useValue: new DummyGatewayServiceFactory(getResp, postResp) },
       { provide: USED_CLICHES_CONFIG, useValue: {} },
-      { provide: ConfigService,
-        useValue: new DummyConfigService(configResp) }
+      { provide: ConfigServiceFactory,
+        useValue: new DummyConfigServiceFactory(configResp) }
     ])
   });
 }

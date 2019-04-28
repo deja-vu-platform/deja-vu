@@ -6,10 +6,9 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { ConfigService, OnExecSuccess, RunService } from '@deja-vu/core';
+import { ConfigServiceFactory, OnExecSuccess, RunService } from '@deja-vu/core';
 
 import { startWith } from 'rxjs/operators';
-import { TransferConfig } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
 
@@ -45,13 +44,13 @@ export class InputAmountComponent
 
   constructor(
     private elem: ElementRef, private rs: RunService,
-    private cs: ConfigService) { }
+    private csf: ConfigServiceFactory) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
 
-    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
-      .balanceType;
+    this.balanceType = this.csf.createConfigService(this.elem)
+      .getConfig().balanceType;
 
     this.amountControl.valueChanges.subscribe((value: Amount) => {
       this.amount.emit(_.cloneDeep(value));
