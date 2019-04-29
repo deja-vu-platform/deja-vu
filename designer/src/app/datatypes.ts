@@ -76,6 +76,12 @@ export const defaultAppActionStyles = {
 };
 export type AppActionStyles = typeof defaultAppActionStyles;
 
+function exportStr(str: string): string {
+  return str.startsWith('=')
+    ? exportDvExpr(str.slice(1))
+    : JSON.stringify(str);
+}
+
 export class AppActionDefinition implements ActionDefinition {
   name: string;
   readonly inputSettings: IO[] = [];
@@ -153,7 +159,7 @@ export class AppActionDefinition implements ActionDefinition {
     let html = `<dv.action name="${this.name}"`;
     const outputs = this.outputSettings.filter(({ value }) => !!value);
     outputs.forEach(({ name, value }) => {
-      html += `\n  ${name}$=${value}`;
+      html += `\n  ${name}$=${exportStr(value)}`;
     });
     if (outputs.length > 0) {
       html += '\n';
@@ -334,7 +340,7 @@ export class ActionInstance {
       if (key === '*content' || !val) { return; }
       numAttrs += 1;
       const strVal = _.isString(val)
-        ? exportDvExpr(val)
+        ? exportStr(val)
         : val.toHTML(extraIndents + 1)
           .slice(baseNumIndents, -1); // strip leading indent and ending newline
       html += `\n${xIdnt}      ${key}=${strVal}`;

@@ -59,25 +59,8 @@
   "workspaces": [
     "packages/*",
     "packages/catalog/*",
-    "samples/chorestar",
-    "samples/chorestar/.dv",
-    "samples/sn",
-    "samples/sn/.dv",
-    "samples/listify",
-    "samples/listify/.dv",
-    "samples/livescorecard",
-    "samples/livescorecard/.dv",
-    "samples/morg",
-    "samples/morg/.dv",
-    "samples/potluck",
-    "samples/mapmit",
-    "samples/mapmit/.dv",
-    "samples/phoenix",
-    "samples/phoenix/.dv",
-    "samples/rendezvous",
-    "samples/rendezvous/.dv",
-    "samples/sweetspots",
-    "samples/sweetspots/.dv",
+    "samples/*",
+    "samples/*/.dv",
     "designer"
   ]
 }
