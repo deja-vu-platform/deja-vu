@@ -18,9 +18,7 @@ import {
   UpdateScheduleInput
 } from './schema';
 
-import {
-  areRangesOverlapping, getHours, getMinutes, isAfter, isBefore
-} from 'date-fns';
+import { getHours, getMinutes } from 'date-fns';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -82,25 +80,96 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-const MAX_NUM_SCHEDULE_IDS = 2;
+function intersection(setA, setB) {
+  const _intersection = new Set();
+  for (const elem of setB) {
+    if (setA.has(elem)) {
+      _intersection.add(elem);
+    }
+  }
 
-function getLaterStartDate(first: SlotDoc, second: SlotDoc): Date {
-  const comparison = isAfter(first.startDate, second.startDate);
-
-  return comparison ? first.startDate : second.startDate;
+  return _intersection;
 }
 
-function getEarlierEndDate(first: SlotDoc, second: SlotDoc): Date {
-  const comparison = isBefore(first.endDate, second.endDate);
+function combineFilterConditions(condition) {
+  if (condition['$gte'] && condition['$lte']) {
+    return {
+      $and: [
+        { $gte: condition['$gte'] },
+        { $lte: condition['$lte'] }
+      ]
+    };
+  }
 
-  return comparison ? first.endDate : second.endDate;
+  return condition;
+}
+
+// Reference: https://bit.ly/2ZTmOWu
+async function getOverlappingAvailabilities(
+  schedules: Collection<ScheduleDoc>,
+  input: NextAvailabilityInput | AllAvailabilityInput,
+  pipeline: any[]) {
+
+  const res = await schedules.aggregate(pipeline)
+    .toArray();
+
+  let points = [];
+  res.forEach((schedule, i) => {
+    schedule.availability.forEach((slot) => {
+      points.push({ time: slot.startDate, isStart: true, sId: i });
+      points.push({ time: slot.endDate, isStart: false, sId: i });
+    });
+  });
+
+  points = _.sortBy(points, (p) => p.time);
+
+  const activeSpans = {};
+  const intersections = [];
+
+  points.forEach((point) => {
+    const lastIndex = intersections.length - 1;
+    if (intersections.length !== 0 &&
+      intersections[lastIndex]['time'] === point.time) {
+      intersections[lastIndex]['sIds'].add(point.sId.toString());
+    } else {
+      const sIds = new Set(_.keys(activeSpans));
+      sIds.add(point.sId.toString());
+      intersections.push({ time: point.time, sIds: sIds });
+    }
+
+    if (!point.isStart) {
+      activeSpans[point.sId] -= 1;
+      if (activeSpans[point.sId] === 0) { delete activeSpans[point.sId]; }
+    } else {
+      if (point.sId in activeSpans) {
+        activeSpans[point.sId] += 1;
+      } else {
+        activeSpans[point.sId] = 1;
+      }
+    }
+  });
+
+  const result = [];
+  for (let i = 1; i < intersections.length; i++) {
+    const start = intersections[i - 1];
+    const end = intersections[i];
+    const overlaps = intersection(start.sIds, end.sIds);
+    if (overlaps.size >= input.scheduleIds.length) {
+      result.push({
+        id: uuid(),
+        startDate: start.time,
+        endDate: end.time
+      });
+    }
+  }
+
+  return result;
 }
 
 function filterByStartTime(slots: SlotDoc[], startTime: string): SlotDoc[] {
-  let filteredSlots = [];
-  if (!_.isNil(startTime) && !_.isEmpty(startTime)) {
+  if (!_.isEmpty(startTime)) {
     const [startHh, startMm] = startTime.split(':');
-    filteredSlots = _.filter(slots, (slot) => {
+    slots = _.filter(slots, (slot) => {
       if (getHours(slot.startDate) < parseInt(startHh, 10)) {
         return false;
       }
@@ -113,14 +182,13 @@ function filterByStartTime(slots: SlotDoc[], startTime: string): SlotDoc[] {
     });
   }
 
-  return filteredSlots;
+  return slots;
 }
 
 function filterByEndTime(slots: SlotDoc[], endTime: string): SlotDoc[] {
-  let filteredSlots = [];
-  if (!_.isNil(endTime) && !_.isEmpty(endTime)) {
+  if (!_.isEmpty(endTime)) {
     const [endHh, endMm] = endTime.split(':');
-    filteredSlots = _.filter(slots, (slot) => {
+    slots = _.filter(slots, (slot) => {
       if (getHours(slot.endDate) > parseInt(endHh, 10)) {
         return false;
       }
@@ -133,7 +201,7 @@ function filterByEndTime(slots: SlotDoc[], endTime: string): SlotDoc[] {
     });
   }
 
-  return filteredSlots;
+  return slots;
 }
 
 function getSlotsPipeline(matchQuery: any, filterCondition: any,
@@ -183,16 +251,19 @@ function resolvers(db: ClicheDb, _config: Config): object {
       slots: async (_root, { input }: { input: SlotsInput }) => {
         const filter = { id: input.scheduleId };
         const condition = {};
-        if (!_.isNil(input.startDate) && !_.isEmpty(input.startDate)) {
+        if (!_.isEmpty(input.startDate)) {
           condition['$gte'] = ['$$slot.startDate', new Date(input.startDate)];
         }
-        if (!_.isNil(input.endDate) && !_.isEmpty(input.endDate)) {
+        if (!_.isEmpty(input.endDate)) {
           condition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
         const res = await schedules
-          .aggregate(getSlotsPipeline(filter, condition, input.sortByStartDate,
-            input.sortByEndDate))
+          .aggregate(
+            getSlotsPipeline(filter,
+              combineFilterConditions(condition),
+              input.sortByStartDate,
+              input.sortByEndDate))
           .next();
 
         let filteredByTime = res ? res.availability : [];
@@ -204,98 +275,37 @@ function resolvers(db: ClicheDb, _config: Config): object {
 
       nextAvailability: async (
         _root, { input }: { input: NextAvailabilityInput }) => {
-        // assume between two schedules
         const matchQuery = { id: { $in: input.scheduleIds } };
         const filterCondition = { $gte: ['$$slot.startDate', new Date()] };
 
         const pipeline = getSlotsPipeline(matchQuery, filterCondition, 1, 1);
 
-        const res = await schedules.aggregate(pipeline)
-          .toArray();
+        const overlaps = await getOverlappingAvailabilities(
+          schedules, input, pipeline);
 
-        let next: SlotDoc;
-
-        if (!_.isEmpty(res) && res.length === MAX_NUM_SCHEDULE_IDS) {
-          const firstScheduleSlots = res[0].availability;
-          const secondScheduleSlots = res[1].availability;
-
-          firstScheduleSlots.some((first) => {
-            secondScheduleSlots.some((second) => {
-
-              if (areRangesOverlapping(
-                first.startDate, first.endDate,
-                second.startDate, second.endDate)) {
-                next = {
-                  id: uuid(),
-                  startDate: getLaterStartDate(first, second),
-                  endDate: getEarlierEndDate(first, second)
-                };
-              }
-
-              return !_.isNil(next);
-            });
-
-            return !_.isNil(next);
-          });
-        }
-
-        return next;
+        return !_.isEmpty(overlaps) ? overlaps[0] : undefined;
       },
 
       allAvailability: async (
         _root, { input }: { input: AllAvailabilityInput }) => {
-        // assume between two schedules
         const matchQuery = { id: { $in: input.scheduleIds } };
-        const filterCondition = {
+        const condition = {
           $gte: [
             '$$slot.startDate',
             input.startDate ? new Date(input.startDate) : new Date()
           ]
         };
 
-        if (!_.isNil(input.endDate)) {
-          filterCondition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
+        if (!_.isEmpty(input.endDate)) {
+          condition['$lte'] = ['$$slot.endDate', new Date(input.endDate)];
         }
 
-        const pipeline = getSlotsPipeline(matchQuery, filterCondition,
-          input.sortByStartDate, input.sortByEndDate);
+        const pipeline = getSlotsPipeline(matchQuery,
+          combineFilterConditions(condition),
+          input.sortByStartDate,
+          input.sortByEndDate);
 
-        const res = await schedules.aggregate(pipeline)
-          .toArray();
-
-        const overlaps: SlotDoc[] = [];
-
-        if (!_.isEmpty(res) && res.length === MAX_NUM_SCHEDULE_IDS) {
-          let firstScheduleSlots = res[0].availability;
-          firstScheduleSlots = filterByStartTime(firstScheduleSlots,
-            input.startTime);
-          firstScheduleSlots = filterByEndTime(firstScheduleSlots,
-            input.endTime);
-
-          let secondScheduleSlots = res[1].availability;
-          secondScheduleSlots = filterByStartTime(secondScheduleSlots,
-            input.startTime);
-          secondScheduleSlots = filterByEndTime(secondScheduleSlots,
-            input.endTime);
-
-          firstScheduleSlots.forEach((first) => {
-            secondScheduleSlots.forEach((second) => {
-
-              if (areRangesOverlapping(
-                first.startDate, first.endDate,
-                second.startDate, second.endDate)) {
-
-                overlaps.push({
-                  id: uuid(),
-                  startDate: getLaterStartDate(first, second),
-                  endDate: getEarlierEndDate(first, second)
-                });
-              }
-            });
-          });
-        }
-
-        return overlaps;
+        return await getOverlappingAvailabilities(schedules, input, pipeline);
       }
     },
 
@@ -314,7 +324,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
       createSchedule: async (
         _root, { input }: { input: CreateScheduleInput }, context: Context) => {
         let availability = [];
-        if (!_.isNil(input.slots)) {
+        if (!_.isEmpty(input.slots)) {
           availability = _.map(input.slots, (slot) => {
             const dateSlot: SlotDoc = {
               id: uuid(),
@@ -339,9 +349,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
         let addSlotsSuccess = true;
         let deleteSlotsSuccess = true;
 
-        // StackOverflow post for doing two updates: https://bit.ly/2IJIVZR
+        // Reason for two separate updates: https://bit.ly/2IJIVZR
         // add slots
-        if (!_.isNil(input.add) && !_.isEmpty(input.add)) {
+        if (!_.isEmpty(input.add)) {
           const availability = _.map(input.add, (slot) => {
             const newSlot: SlotDoc = {
               id: uuid(),
@@ -357,7 +367,7 @@ function resolvers(db: ClicheDb, _config: Config): object {
         }
 
         // delete slots
-        if (!_.isNil(input.delete) && !_.isEmpty(input.delete)) {
+        if (!_.isEmpty(input.delete)) {
           const updateOp = {
             $pull: { availability: { id: { $in: input.delete } } }
           };

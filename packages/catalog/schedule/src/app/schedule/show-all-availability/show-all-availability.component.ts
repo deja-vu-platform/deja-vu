@@ -31,8 +31,6 @@ interface AllAvailabilityRes {
   data: { allAvailability: Slot[] };
 }
 
-const MAX_NUM_SCHEDULE_IDS = 2;
-
 
 @Component({
   selector: 'schedule-show-all-availability',
@@ -118,6 +116,7 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
 
   allAvailability: Slot[];
   schedule: Schedule;
+  showSlotsDateTimePicker = false;
 
   showAllAvailability;
 
@@ -153,10 +152,6 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   }
 
   async dvOnEval(): Promise<void> {
-    if (this.scheduleIds.length !== MAX_NUM_SCHEDULE_IDS) {
-      throw new Error('Incorrect number of schedule IDs provided');
-    }
-
     const startDate = this.startDateControl.value ?
       this.startDateControl.value.format('YYYY-MM-DD') : '';
     const endDate = this.endDateControl.value ?

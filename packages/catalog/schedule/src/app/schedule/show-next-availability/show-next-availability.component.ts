@@ -15,8 +15,6 @@ interface NextAvailabilityRes {
   data: { nextAvailability: Slot };
 }
 
-const MAX_NUM_SCHEDULE_IDS = 2;
-
 
 @Component({
   selector: 'schedule-show-next-availability',
@@ -69,10 +67,6 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
   }
 
   async dvOnEval(): Promise<void> {
-    if (this.scheduleIds.length !== MAX_NUM_SCHEDULE_IDS) {
-      throw new Error('Incorrect number of schedule IDs provided');
-    }
-
     if (this.canEval()) {
       this.gs.get<NextAvailabilityRes>(this.apiPath, {
         params: {
