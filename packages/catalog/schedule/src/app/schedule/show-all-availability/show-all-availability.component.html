@@ -1,0 +1,80 @@
+<div *ngIf="showDateTimePicker">
+  <form (ngSubmit)="filterSlots()" [formGroup]="dateTimeFilterForm"
+    class="form-horizontal">
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startDatePicker"
+         [formControl]="startDateControl">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker">
+        </mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Start Time</mat-label>
+        <input matInput type="time" [formControl]="startTimeControl">
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endDatePicker"
+          [formControl]="endDateControl">
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker">
+        </mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+        <mat-error *ngIf="endDateControl.hasError('endDateBeforeStartDate')">
+          End Date should be <strong>after</strong> Start Date
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>End Time</mat-label>
+        <input matInput type="time" [formControl]="endTimeControl">
+        <mat-error *ngIf="endTimeControl.hasError('endTimeBeforeStartTime')">
+          End Time should be <strong>after</strong> Start Time
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <button mat-button type="submit">
+        {{buttonLabel}}
+      </button>
+    </div>
+  </form>
+</div>
+
+<span *ngIf="allAvailability">
+  <span *ngIf="showScheduleView">
+    <dv-include
+      [action]="showSchedule"
+      default-showSchedule="{ tag: schedule-show-schedule }"
+      [inputs]="{
+        schedule: schedule, showId: showScheduleId,
+        view: view, locale: locale, hourSegments: hourSegments,
+        dayStartHour: dayStartHour, dayEndHour: dayEndHour,
+        eventLength: eventLength
+      }"
+      [parent]="showAllAvailability">
+    </dv-include>
+  </span>
+
+  <span *ngIf="showSlotsView">
+    <dv-include
+      [action]="showSlots"
+      default-showSlots="{ tag: schedule-show-slots }"
+      [inputs]="{
+        slots: allAvailability, showId: showSlotId,
+        showStartDate: showStartDate, showEndDate: showEndDate,
+        showDateTimePicker: showSlotsDateTimePicker,
+        dateTimeFormatString: dateTimeFormatString,
+        showSlot: showSlot
+      }"
+      [parent]="showAllAvailability">
+    </dv-include>
+  </span>
+</span>
