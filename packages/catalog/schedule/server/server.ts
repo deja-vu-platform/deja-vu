@@ -108,7 +108,8 @@ function combineFilterConditions(condition) {
 async function getOverlappingAvailabilities(
   schedules: Collection<ScheduleDoc>,
   input: NextAvailabilityInput | AllAvailabilityInput,
-  pipeline: any[]) {
+  pipeline: any[],
+  next = false) {
 
   const res = await schedules.aggregate(pipeline)
     .toArray();
@@ -160,6 +161,8 @@ async function getOverlappingAvailabilities(
         startDate: start.time,
         endDate: end.time
       });
+
+      if (next) { return result; }
     }
   }
 
@@ -281,9 +284,9 @@ function resolvers(db: ClicheDb, _config: Config): object {
         const pipeline = getSlotsPipeline(matchQuery, filterCondition, 1, 1);
 
         const overlaps = await getOverlappingAvailabilities(
-          schedules, input, pipeline);
+          schedules, input, pipeline, true);
 
-        return !_.isEmpty(overlaps) ? overlaps[0] : undefined;
+        return !_.isEmpty(overlaps) ? overlaps : undefined;
       },
 
       allAvailability: async (
