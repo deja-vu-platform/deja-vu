@@ -1,6 +1,5 @@
 {
   "name": "phoenix",
-  "type": "app",
   "usedCliches": {
     "authentication": {
       "config": {

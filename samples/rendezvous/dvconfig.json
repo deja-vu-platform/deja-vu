@@ -1,6 +1,5 @@
 {
   "name": "rendezvous",
-  "type": "app",
   "usedCliches": {
     "authentication": {
       "config": {
