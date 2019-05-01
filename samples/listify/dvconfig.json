@@ -1,6 +1,5 @@
 {
   "name": "listify",
-  "type": "app",
   "usedCliches": {
     "authentication": {},
     "group": {},
@@ -49,7 +48,7 @@
       "config": {
         "oneToOneScoring": true
       }
-    } 
+    }
   },
   "routes": [
     { "path": "login", "action": "login" },

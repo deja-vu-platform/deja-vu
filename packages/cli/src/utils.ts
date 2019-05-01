@@ -162,7 +162,6 @@ export function concurrentlyCmd(...cmds: string[]): string {
 
 export interface DvConfig {
   name?: string;
-  type?: 'cliche' | 'app';
   startServer?: boolean;
   watch?: boolean;
   config?: any;

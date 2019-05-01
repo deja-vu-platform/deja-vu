@@ -1,6 +1,5 @@
 {
   "name": "livescorecard",
-  "type": "app",
   "usedCliches": {
     "hostauthentication": {
       "name": "authentication",
