@@ -25,16 +25,10 @@
       }
     },
     "scoreposts": {
-      "name": "scoring",
-      "config": {
-        "oneToOneScoring": true
-      }
+      "name": "scoring"
     },
     "scorecomments": {
-      "name": "scoring",
-      "config": {
-        "oneToOneScoring": true
-      }
+      "name": "scoring"
     }
   },
   "routes": [

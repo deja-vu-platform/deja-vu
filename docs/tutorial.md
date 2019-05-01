@@ -39,7 +39,6 @@ The app's config file (dvconfig.json) is shown below:
 ```json
 {
   "name": "sn",
-  "type": "app",
   "usedCliches": {
     "authentication": {},
     "comment": {},
@@ -61,11 +60,10 @@ The app's config file (dvconfig.json) is shown below:
       }
     },
     "scoringposts": {
-      "name": "scoring",
-      "config": { "oneToOneScoring": true }
+      "name": "scoring"
     },
     "scoringcomments": {
-      "config": { "oneToOneScoring": true }
+      "name": "scoring"
     }
   },
   "routes": [
