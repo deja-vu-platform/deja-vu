@@ -1,6 +1,4 @@
-import {
-  Inject, Injectable, InjectionToken
-} from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { WebSocketSubject } from 'rxjs/observable/dom/WebSocketSubject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
@@ -18,10 +16,10 @@ interface Subscription extends SubscriptionParams {}
 
 @Injectable()
 export class SubscriptionService {
-  private readonly websocket: WebSocketSubject<any>;
+  private websocket: WebSocketSubject<any>;
   private actionSubscriptions: {[key: string]: Subject<any>} = {};
 
-  constructor(@Inject(GATEWAY_URL) gatewayUrl: string) {
+  constructor(@Inject(GATEWAY_URL) private gatewayUrl: string) {
     this.websocket = WebSocketSubject.create(`ws://${gatewayUrl}`);
     this.websocket.subscribe(
       (msg) => this.handleMessage(msg),
@@ -56,7 +54,7 @@ export class SubscriptionService {
   }
 
   private sendSubscription(subscription: Subscription) {
-    this.websocket.next(JSON.stringify(subscription));
+    this.getWebSocket().next(JSON.stringify(subscription));
   }
 
   private handleMessage(msg): void {
@@ -65,5 +63,17 @@ export class SubscriptionService {
     if (msg.subscriptionId && this.actionSubscriptions[msg.subscriptionId]) {
       this.actionSubscriptions[msg.subscriptionId].next(msg.data);
     }
+  }
+
+  private getWebSocket(): WebSocketSubject<any> {
+    if (this.websocket.closed) {
+      this.websocket = this.createWebSocket();
+    }
+
+    return this.websocket;
+  }
+
+  private createWebSocket(): WebSocketSubject<any> {
+    return WebSocketSubject.create(`ws://${this.gatewayUrl}`)
   }
 }
