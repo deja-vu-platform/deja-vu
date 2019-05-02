@@ -95,22 +95,27 @@ export class ClicheServer<C extends Config = Config> {
     throw new Error(`Action ${actionName} request not defined`);
   }
 
-  private setGraphqlQuery() {
-    const getGraphqlRequest = this.getGraphqlRequest.bind(this);
+  private setGraphqlQueryAndVariables(
+    graphqlParams, variables: object, fullActionName: string, extraInfo: any) {
+    graphqlParams.query = this.getGraphqlRequest(fullActionName, extraInfo);
+    if (variables) {
+      graphqlParams.variables = variables;
+    }
+
+    return graphqlParams;
+  }
+
+  private getGraphqlExpressMiddleware() {
+    const setGraphqlQueryAndVariables =
+      this.setGraphqlQueryAndVariables.bind(this);
 
     return (req, _res, next) => {
       const reqField = req.method === 'GET' ? 'query' : 'body';
-      req[reqField].query = getGraphqlRequest(
+
+      setGraphqlQueryAndVariables(req[reqField], req[reqField].inputs,
         req['fullActionName'], req[reqField].extraInfo);
-      req[reqField].variables = req[reqField].inputs;
       next();
-    };
-  }
-
-  private setGraphqlSubscription(graphqlParams, fullActionName, extraInfo) {
-    graphqlParams.query = this.getGraphqlRequest(fullActionName, extraInfo);
-
-    return graphqlParams;
+    }
   }
 
   private startApp(schema) {
@@ -126,7 +131,7 @@ export class ClicheServer<C extends Config = Config> {
         next();
       },
       bodyParser.json(),
-      this.setGraphqlQuery(),
+      this.getGraphqlExpressMiddleware(),
       graphqlExpress((req) => {
         return {
           schema: schema,
@@ -162,7 +167,7 @@ export class ClicheServer<C extends Config = Config> {
         req['fullActionName'] = req.params.fullActionName;
         next();
       },
-      this.setGraphqlQuery(),
+      this.getGraphqlExpressMiddleware(),
       graphqlExpress({ schema })
     );
 
@@ -181,13 +186,16 @@ export class ClicheServer<C extends Config = Config> {
         subscribe,
         schema,
         onOperation: (msg, graphqlParams, _webSocket) => {
-          const dvParams = msg.payload.params;
+          const dvParams = msg.payload;
 
-          return this.setGraphqlSubscription(
-            graphqlParams, dvParams['fullActionName'], dvParams['extraInfo']);
+          return this.setGraphqlQueryAndVariables(
+            graphqlParams,
+            dvParams.inputs,
+            dvParams.fullActionName,
+            dvParams.extraInfo);
         }
       }, {
-        server: server,
+        server,
         path: '/subscriptions'
       });
     });

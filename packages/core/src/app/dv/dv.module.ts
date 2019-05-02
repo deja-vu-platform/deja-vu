@@ -33,6 +33,7 @@ import { ZipComponent } from './zip/zip.component';
 import { ConfigService } from './config.service';
 import { OfDirective } from './of.directive';
 import { StorageService } from './storage.service';
+import { SubscriptionService } from './subscription.service';
 
 
 const allComponents = [
@@ -55,7 +56,8 @@ const allComponents = [
   ],
   declarations: [...allComponents, OfDirective],
   providers: [
-    GatewayServiceFactory, RunService, ConfigService, StorageService
+    GatewayServiceFactory, RunService, ConfigService, StorageService,
+    SubscriptionService
   ],
   exports: [...allComponents, OfDirective]
 })
