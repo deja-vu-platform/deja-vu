@@ -552,6 +552,9 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
         type: `${updateType}-${this._name}`
       }
     }};
+    
+    // if there's nothing to update, then return
+    if (_.isEmpty(updateSetOp) && _.isEmpty(update)) { return; }
 
     const updateResult = await this._update({
       filter,
