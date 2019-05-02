@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Inject, Input, OnInit
+  AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';
@@ -51,8 +51,8 @@ interface CreateScheduleRes {
     }
   ]
 })
-export class CreateScheduleComponent implements OnInit, OnExec, OnExecFailure,
-  OnExecSuccess {
+export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
+  OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() showOptionToSubmit = true;
 
@@ -85,11 +85,16 @@ export class CreateScheduleComponent implements OnInit, OnExec, OnExecFailure,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private rs: RunService, private cd: ChangeDetectorRef,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.cd.detectChanges();
   }
 
   handleEvent(event: CalendarEvent): void {
