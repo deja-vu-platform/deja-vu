@@ -34,6 +34,14 @@ export class CustomDateFormatterProvider extends CalendarDateFormatter {
 export class CustomEventTitleFormatterProvider extends
   CalendarEventTitleFormatter {
 
+  monthTooltip(event: CalendarEvent): string {
+    return;
+  }
+
+  weekTooltip(event: CalendarEvent): string {
+    return;
+  }
+
   dayTooltip(event: CalendarEvent): string {
     return;
   }

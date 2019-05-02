@@ -4,6 +4,8 @@
   <personalinfo.show-object id=phoenix.show-sidebar.loggedInUser?.id
     hidden=true />
   <topic.show-labels hidden=true />
+  <schedule.show-schedule id=phoenix.show-sidebar.loggedInUser?.id
+    hidden=true />
 
   <div id="personal-and-calendar-container">
     <div class="row">
@@ -11,8 +13,24 @@
       <div id="calendar-and-bounds-container" class="col-md-6">
         <h3>Availability</h3>
 
-        <!-- TODO: Availability -->
-        <div id="calendar-container"></div>
+        <div id="calendar-container">
+          <dv.if condition=schedule.show-schedule.loadedSchedule>
+            <dv.tx>
+              <schedule.update-schedule
+                id=phoenix.show-sidebar.loggedInUser?.id
+                dayStartHour=0
+                dayEndHour=23 />
+            </dv.tx>
+          </dv.if>
+          <dv.if condition=!schedule.show-schedule.loadedSchedule>
+            <dv.tx>
+              <schedule.create-schedule
+                id=phoenix.show-sidebar.loggedInUser?.id
+                dayStartHour=0
+                dayEndHour=23 />
+            </dv.tx>
+          </dv.if>
+        </div>
 
         <div id="bounds-container">
           <p>

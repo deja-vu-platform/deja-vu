@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, Input,
+  OnChanges, OnInit
 } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';
@@ -27,7 +28,7 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../schedule.config';
-import { Schedule, Slot } from '../shared/schedule.model';
+import { Schedule } from '../shared/schedule.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 const DRAG_TIMEOUT = 1000;
@@ -57,7 +58,7 @@ interface UpdateScheduleRes {
     }
   ]
 })
-export class UpdateScheduleComponent implements
+export class UpdateScheduleComponent implements AfterViewInit,
   OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
   @Input() id: string;
   @Input() showOptionToSubmit = true;
@@ -93,7 +94,8 @@ export class UpdateScheduleComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private rs: RunService, private cd: ChangeDetectorRef,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -103,6 +105,10 @@ export class UpdateScheduleComponent implements
 
   ngOnChanges() {
     this.loadSchedule();
+  }
+
+  ngAfterViewInit() {
+    this.cd.detectChanges();
   }
 
   loadSchedule() {

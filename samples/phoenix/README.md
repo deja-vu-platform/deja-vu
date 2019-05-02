@@ -20,10 +20,10 @@ Team invalids
 - Geolocaiton
 - Match
 - Property (x2)
+- Schedule
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
-- Select availability (scheduling cliche)
 - Send email to connection (email cliche)
 - Indicate when you are ready to make connections
 - Suggestions should be based on some choice of topics and/ positions, location and availability (filter cliche)

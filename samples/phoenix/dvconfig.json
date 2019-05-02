@@ -73,6 +73,11 @@
           "required": ["pastConnection"]
         }
       }
+    },
+    "schedule": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
     }
   },
   "routes": [
