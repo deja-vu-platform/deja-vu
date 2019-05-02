@@ -20,6 +20,7 @@ Team invalids
 - Geolocaiton
 - Match
 - Property (x2)
+- Schedule
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
