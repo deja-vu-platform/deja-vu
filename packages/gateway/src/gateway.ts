@@ -4,9 +4,10 @@ import * as minimist from 'minimist';
 
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-
 import { readFileSync } from 'fs';
+import { createServer } from 'http';
 import * as path from 'path';
+import * as WebSocket from 'ws';
 
 import { ActionTable } from './actionHelper';
 import { DvConfig, GatewayConfig } from './gateway.model';
@@ -81,6 +82,27 @@ export function startGateway(
     }
   });
 
+  const server = createServer(app);
+
+  const wss = new WebSocket.Server({ server });
+  wss.on('connection', (ws: WebSocket) => {
+    ws.on('message', (message: string) => {
+        console.log('Gateway received message from client: %s', message);
+        const subscriptionObj = JSON.parse(message);
+        const subscriptionId = subscriptionObj.subscriptionId;
+
+        requestProcessor
+        .processSubscription(subscriptionObj)
+        .subscribe({
+          next: (res) => {
+            const response = Object.assign({}, res, { subscriptionId });
+            ws.send(JSON.stringify(response));
+          },
+          error: (e) => console.log(e)
+        });
+    });
+  });
+
   // serve the SPA
   if (info) {
     app.use(express.static(path.join(info.distFolder, 'app')));
@@ -93,7 +115,7 @@ export function startGateway(
   const port = gatewayConfig.wsPort;
   requestProcessor.start()
     .then(() => {
-      app.listen(port, async () => {
+      server.listen(port, async () => {
         console.log(`Running gateway on port ${port}`);
         if (info) {
           console.log(`Using config ${stringify(info.dvConfig)}`);

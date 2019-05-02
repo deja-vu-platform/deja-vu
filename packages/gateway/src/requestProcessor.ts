@@ -1,4 +1,6 @@
 import * as express from 'express';
+import { ExecutionResult } from 'graphql';
+import { Observable } from 'subscriptions-transport-ws';
 import * as request from 'superagent';
 import { v4 as uuid } from 'uuid';
 
@@ -12,6 +14,7 @@ import {
   ActionTag,
   ActionTagPath
 } from './actionHelper';
+import { SubscriptionCoordinator } from './subscriptionCoordinator';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 import { ActionPath } from './actionPath';
@@ -142,6 +145,7 @@ export abstract class RequestProcessor {
   protected readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch>;
   protected readonly dstTable: { [cliche: string]: port } = {};
+  protected readonly subscriptionCoordinator: SubscriptionCoordinator;
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
     if (node === undefined) {
@@ -225,6 +229,7 @@ export abstract class RequestProcessor {
     const txConfig = this.getTxConfig(config);
     this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
       ClicheResponse<string>, ResponseBatch>(txConfig);
+    this.subscriptionCoordinator = new SubscriptionCoordinator();
   }
 
   start(): Promise<void> {
@@ -238,6 +243,16 @@ export abstract class RequestProcessor {
     return req.query.isTx ?
       this.processTxRequest(req, res) :
       this.processNonTxRequest(req, res);
+  }
+
+  processSubscription(request: Object): Observable<ExecutionResult> {
+    if (!request['from']) {
+      throw new RequestInvalidError('No from specified');
+    }
+    const port = this.getToPort(ActionPath.fromString(request['from']));
+    const url = this.getUrl(port, request['path'], true);
+
+    return this.subscriptionCoordinator.forwardRequest(url, request);
   }
 
   protected async processTxRequest(
@@ -330,25 +345,16 @@ export abstract class RequestProcessor {
 
   protected validateRequest(req: express.Request | ChildRequest)
     : GatewayToClicheRequest {
-     if (!req.query.from) {
+    if (!req.query.from) {
       throw new RequestInvalidError('No from specified');
     }
 
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
     const { runId, from: actionPath } = gatewayRequest;
-    const actionTag = this.getActionFromPath(actionPath);
-    const to = RequestProcessor.ClicheOf(actionTag);
-    const toPort: port | undefined = _.get(this.dstTable, to);
+    const toPort: port = this.getToPort(actionPath);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!actionTag) {
-      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
-    }
-    if (toPort === undefined) {
-      throw new RequestInvalidError(
-        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
-    }
 
     console.log(
       `Valid request: port: ${toPort}, ` +
@@ -358,11 +364,33 @@ export abstract class RequestProcessor {
     return {
       ...gatewayRequest,
       ...{
-        url: `http://localhost:${toPort}`,
+        url: `${this.getUrl(toPort)}`,
         method: req.method,
         body: req.body
       }
     };
+  }
+
+  private getToPort(actionPath: ActionPath): port {
+    const actionTag = this.getActionFromPath(actionPath);
+    const to = RequestProcessor.ClicheOf(actionTag);
+    const toPort: port | undefined = _.get(this.dstTable, to);
+
+    if (!actionTag) {
+      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
+    }
+    if (toPort === undefined) {
+      throw new RequestInvalidError(
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
+    }
+
+    return toPort;
+  }
+
+  private getUrl(port: port, path: string = '', isSubscription?: boolean) {
+    const protocol = isSubscription ? 'ws' : 'http';
+
+    return `${protocol}://localhost:${port}${path}`;
   }
 
   private getTxConfig(config: GatewayConfig):
