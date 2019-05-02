@@ -8,6 +8,8 @@ import {
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { PubSub, withFilter } from 'graphql-subscriptions';
+import { IResolvers } from 'graphql-tools';
 import {
   ChatDoc,
   CreateChatInput,
@@ -16,6 +18,8 @@ import {
 
 import { v4 as uuid } from 'uuid';
 
+const pubsub = new PubSub();
+const UPDATED_CHAT_TOPIC = 'updated-chat';
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
@@ -29,11 +33,18 @@ const actionRequestTable: ActionRequestTable = {
       deleteChat(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
-  'show-chat': (extraInfo) => `
-    query ShowChat($id: ID!) {
-      chat(id: $id) ${getReturnFields(extraInfo)}
+  'show-chat': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'subscribe':
+        return `subscription updatedChat($id: ID!) { updatedChat(id: $id) }`;
+      default:
+        return `
+          query ShowChat($id: ID!) {
+            chat(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `
     }
-  `,
+  },
   'update-chat': (extraInfo) => {
     switch (extraInfo.action) {
       case 'update':
@@ -54,7 +65,7 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const chats: Collection<ChatDoc> = db.collection('chats');
 
   return {
@@ -83,11 +94,32 @@ function resolvers(db: ClicheDb, _config: Config): object {
         _root, { input }: { input: UpdateChatInput }, context: Context) => {
         const updateOp = { $set: { content: input.content } };
 
-        return await chats.updateOne(context, { id: input.id }, updateOp);
+        return await chats.updateOne(context, { id: input.id }, updateOp)
+          .then((result) => {
+            if (context.reqType == 'commit' || context.reqType == undefined) {
+              pubsub.publish(UPDATED_CHAT_TOPIC, { updatedChat: input.id });
+            }
+
+            return result;
+          });
       },
 
       deleteChat: async (_root, { id }, context: Context) =>
         await chats.deleteOne(context, { id })
+    },
+
+    Subscription: {
+      updatedChat: {
+        resolve: (_payload, _args, _context, _info) => {
+          // for security, just return true to subscribers and
+          // make them do another query to get the new info
+          return true;
+        },
+        subscribe: withFilter(
+          () => pubsub.asyncIterator(UPDATED_CHAT_TOPIC),
+          (payload, variables) => payload.updatedChat === variables.id
+        ),
+      },
     }
   };
 }

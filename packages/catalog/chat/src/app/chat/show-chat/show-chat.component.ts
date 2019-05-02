@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
-import { API_PATH } from '../chat.config';
+import { API_PATH, SUBSCRIPTIONS_PATH } from '../chat.config';
 import { Chat } from '../shared/chat.model';
 
 interface ShowChatRes {
@@ -30,13 +30,15 @@ OnInit {
   @Input() showId = true;
   @Input() showContent = true;
 
+  private shouldUpdate = false;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath,
+    @Inject(SUBSCRIPTIONS_PATH) private subscriptionsPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -59,6 +61,7 @@ OnInit {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      this.shouldUpdate = false;
       this.gs.get<ShowChatRes>(this.apiPath, {
         params: {
           inputs: {
@@ -76,11 +79,19 @@ OnInit {
       .subscribe((chat) => {
         this.chat = chat;
         this.loadedChat.emit(chat);
+
+        this.gs.subscribe<boolean>(this.subscriptionsPath, {
+          inputs: { id: this.id }
+        })
+        .subscribe(() => {
+          this.shouldUpdate = true;
+          this.load();
+        });
       });
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.chat && this.id && this.gs);
+    return !!((!this.chat || this.shouldUpdate) && this.id && this.gs);
   }
 }
