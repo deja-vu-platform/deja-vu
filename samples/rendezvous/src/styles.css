@@ -4,7 +4,6 @@
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 @import url('https://fonts.googleapis.com/css?family=Raleway');
-
 md-icon {
   font-family: 'Material Icons' !important;
 }
