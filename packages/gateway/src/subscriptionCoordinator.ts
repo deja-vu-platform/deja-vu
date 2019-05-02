@@ -12,6 +12,14 @@ export class SubscriptionCoordinator {
     return this.getClient(url).request(request);
   }
 
+  unsubscribeAll() {
+    Object.keys(this.wsClientTable)
+      .forEach((url: string) => {
+        this.wsClientTable[url].unsubscribeAll();
+        delete this.wsClientTable[url];
+      });
+  }
+
   private getClient(url: string): SubscriptionClient {
     if (!this.wsClientTable[url]) {
       const newClient = this.initializeClient(url);

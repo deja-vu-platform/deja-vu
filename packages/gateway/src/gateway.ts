@@ -86,6 +86,8 @@ export function startGateway(
 
   const wss = new WebSocket.Server({ server });
   wss.on('connection', (ws: WebSocket) => {
+    console.log('New gateway ws connection');
+
     ws.on('message', (message: string) => {
         console.log('Gateway received message from client: %s', message);
         const subscriptionObj = JSON.parse(message);
@@ -95,12 +97,17 @@ export function startGateway(
         .processSubscription(subscriptionObj)
         .subscribe({
           next: (res) => {
-            const response = Object.assign({}, res, { subscriptionId });
-            ws.send(JSON.stringify(response));
+            if (ws.readyState == WebSocket.OPEN) {
+              const response = Object.assign({}, res, { subscriptionId });
+              ws.send(JSON.stringify(response));
+            }
           },
           error: (e) => console.log(e)
         });
     });
+
+    ws.on('close', () => requestProcessor.unsubscribeAll());
+    ws.on('error', (e) => console.log(e));
   });
 
   // serve the SPA

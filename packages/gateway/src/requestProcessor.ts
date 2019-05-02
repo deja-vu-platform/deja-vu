@@ -255,6 +255,10 @@ export abstract class RequestProcessor {
     return this.subscriptionCoordinator.forwardRequest(url, request);
   }
 
+  unsubscribeAll() {
+    this.subscriptionCoordinator.unsubscribeAll();
+  }
+
   protected async processTxRequest(
     req: express.Request,
     res: express.Response
