@@ -1,0 +1,67 @@
+/* TODO: Set the nav element's parent class's margin to 0 */
+
+nav {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.navbar-light {
+  background-color: lightgray;
+  color: black;
+}
+
+.navbar-dark {
+  background-color: black;
+  color: lightgray;
+}
+
+.navbar-left {
+  float: left !important;
+}
+
+.navbar-right {
+  float: right !important;
+}
+
+/* Works for ul + li and div elements*/
+.navbar-list-items {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.navbar-list-item {
+  float: left;
+}
+
+.navbar-list-item a {
+  display: inline-block;
+  text-align: center;
+  padding: 1.5em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
+}
+
+.navbar-light .navbar-list-items .navbar-list-item a {
+  color: black;
+}
+
+.navbar-dark .navbar-list-items .navbar-list-item a {
+  color: lightgrey;
+}
+
+.navbar-light .navbar-list-items .navbar-list-item a:hover,
+.navbar-dark .navbar-list-items .navbar-list-item a:hover {
+  color: lightslategray;
+}
+
+.navbar .navbar-list-items .navbar-list-item a.active {
+  color: rgb(9, 189, 78);
+}
+
+.navbar-list-item.navbar-header a {
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
+
