@@ -14,6 +14,7 @@ import {
   Update<%= classify(clicheName) %>Input
 } from './schema';
 
+import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
 
@@ -54,7 +55,7 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const <%= camelize(clicheName) %>s: Collection<<%= classify(clicheName) %>Doc> = db.collection('<%= camelize(clicheName) %>s');
 
   return {
