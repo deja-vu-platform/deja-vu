@@ -31,7 +31,7 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/router": "^5.2.9",
     "@deja-vu/cli": "0.0.1",
-    "@types/graphql": "^14.0.2",
+    "@types/graphql": "^0.12.3",
     "@types/lodash": "^4.14.96",
     "@types/uuid": "^3.4.3",
     "ng-packagr": "^2.0.0",
