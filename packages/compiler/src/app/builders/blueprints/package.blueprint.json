@@ -40,7 +40,7 @@
     "@angular/language-service": "^5.2.0",
     "@deja-vu/cli": "0.0.1",
     "@types/node": "^11.13.4",
-    "@types/lodash": "^4.14.96",
+    "@types/lodash": "^4.14.112",
     "concurrently": "^3.5.1",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",

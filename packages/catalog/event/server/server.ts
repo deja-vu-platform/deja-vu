@@ -18,6 +18,7 @@ import {
   UpdateEventInput
 } from './schema';
 
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -90,7 +91,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const events: Collection<EventDoc> = db.collection('events');
   const series: Collection<SeriesDoc> = db.collection('series');
 

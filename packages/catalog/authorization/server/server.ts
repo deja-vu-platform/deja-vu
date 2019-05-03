@@ -17,7 +17,7 @@ import {
   ResourcesInput
 } from './schema';
 
-
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -114,7 +114,7 @@ function getResourceFilter(input: ResourcesInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const resources: Collection<ResourceDoc> = db.collection('resources');
 
   return {

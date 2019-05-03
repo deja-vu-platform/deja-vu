@@ -8,6 +8,7 @@ import {
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
   DeleteRatingInput,
@@ -87,7 +88,7 @@ function getRatingFilter(input: RatingsInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const ratings: Collection<RatingDoc> = db.collection('ratings');
 
   return {

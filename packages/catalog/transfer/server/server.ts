@@ -11,6 +11,7 @@ import {
   getReturnFields
 } from '@deja-vu/cliche-server';
 import { readFileSync } from 'fs';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
@@ -266,7 +267,7 @@ function getDynamicTypeDefs(config: TransferConfig): string[] {
   }
 }
 
-function resolvers(db: ClicheDb, config: TransferConfig): object {
+function resolvers(db: ClicheDb, config: TransferConfig): IResolvers {
   if (config.balanceType === 'money') {
     const accounts: Collection<AccountDoc<number>> =
       db.collection('accounts');

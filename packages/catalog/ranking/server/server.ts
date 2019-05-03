@@ -8,6 +8,7 @@ import {
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
@@ -64,7 +65,7 @@ function rankingDocsToRanking(rankingDocs: RankingDoc[]): Ranking {
   };
 }
 
-function resolvers(db: ClicheDb, _config: RankingConfig): object {
+function resolvers(db: ClicheDb, _config: RankingConfig): IResolvers {
   const rankings: Collection<RankingDoc> = db.collection('rankings');
 
   return {

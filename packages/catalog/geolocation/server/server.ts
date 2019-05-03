@@ -14,6 +14,7 @@ import {
   MarkersInput
 } from './schema';
 
+import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
 
@@ -56,7 +57,7 @@ function milesToRadian(miles: number) {
   return miles / earthRadiusInMiles;
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const markers: Collection<MarkerDoc> = db.collection('markers');
 
   return {

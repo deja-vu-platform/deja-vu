@@ -8,6 +8,7 @@ import {
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
   CreateMessageInput,
@@ -144,7 +145,7 @@ async function getAggregatedMessages(
     .toArray();
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
   return {
