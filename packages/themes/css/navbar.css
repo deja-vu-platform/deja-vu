@@ -1,17 +1,27 @@
-/* TODO: Set the nav element's parent class's margin to 0 */
+:root {
+  --default-font-style: 'Courier New', Courier, monospace;
+  --default-text-size: 1em;
+  --light-bg-color: lightgray;
+  --light-text-color: black;
+  --dark-bg-color: black;
+  --dark-text-color: lightgray;
+  --hover-text-color: lightslategray;
+  --active-text-color: rgb(9, 189, 78);
+  --sign-out-bg-color: rgb(191, 63, 63);
+}
 
 nav {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--default-font-style);
 }
 
 .navbar-light {
-  background-color: lightgray;
-  color: black;
+  background-color: var(--light-bg-color);
+  color: var(--light-text-color);
 }
 
 .navbar-dark {
-  background-color: black;
-  color: lightgray;
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
 }
 
 .navbar-left {
@@ -23,18 +33,19 @@ nav {
 }
 
 /* Works for ul + li and div elements*/
-.navbar-list-items {
+.navbar-items {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
-.navbar-list-item {
+.navbar-item {
   float: left;
+  font-size: var(--default-text-size);
 }
 
-.navbar-list-item a {
+.navbar-item a {
   display: inline-block;
   text-align: center;
   padding: 1.5em 1em;
@@ -42,26 +53,51 @@ nav {
   vertical-align: text-bottom;
 }
 
-.navbar-light .navbar-list-items .navbar-list-item a {
-  color: black;
+.navbar-item .navbar-hello {
+  display: inline-block;
+  text-align: center;
+  margin: 1.5em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
 }
 
-.navbar-dark .navbar-list-items .navbar-list-item a {
-  color: lightgrey;
+.navbar-item .navbar-sign-out {
+  display: inline-block;
+  text-align: center;
+  margin: 1em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
 }
 
-.navbar-light .navbar-list-items .navbar-list-item a:hover,
-.navbar-dark .navbar-list-items .navbar-list-item a:hover {
-  color: lightslategray;
+.navbar-item .navbar-sign-out .mat-button {
+  font-family: var(--default-font-style);
+  font-size: var(--default-text-size);
+  background-color: var(--sign-out-bg-color);
 }
 
-.navbar .navbar-list-items .navbar-list-item a.active {
-  color: rgb(9, 189, 78);
+.navbar-light .navbar-items .navbar-item a {
+  color: var(--light-text-color);
 }
 
-.navbar-list-item.navbar-header a {
+.navbar-dark .navbar-items .navbar-item a {
+  color: var(--dark-text-color);
+}
+
+.navbar-light .navbar-items .navbar-item a:hover,
+.navbar-dark .navbar-items .navbar-item a:hover {
+  color: var(--hover-text-color);
+}
+
+.navbar .navbar-items .navbar-item a.active {
+  color: var(--active-text-color);
+}
+
+.navbar-item.navbar-header a {
   font-size: 2em;
   font-weight: bold;
   padding: 0.5em 1em;
 }
 
+.inline {
+  display: inline-block;
+}

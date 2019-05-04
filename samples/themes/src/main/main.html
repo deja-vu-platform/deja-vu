@@ -1,0 +1,18 @@
+<dv.action name="main">
+  <themes.navbar />
+
+  <div class="main">
+    <dv.if condition=themes.navbar.loggedInUser>
+      Logged In!
+    </dv.if>
+    <dv.if condition=!themes.navbar.loggedInUser>
+      <dv.tx>
+        <authentication.sign-in />
+      </dv.tx>
+
+      <dv.tx>
+        <authentication.register-user />
+      </dv.tx>
+    </dv.if>
+  </div>
+</dv.action>
