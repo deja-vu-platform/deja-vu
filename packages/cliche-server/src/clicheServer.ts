@@ -115,7 +115,7 @@ export class ClicheServer<C extends Config = Config> {
       setGraphqlQueryAndVariables(req[reqField], req[reqField].inputs,
         req['fullActionName'], req[reqField].extraInfo);
       next();
-    }
+    };
   }
 
   private startApp(schema) {
