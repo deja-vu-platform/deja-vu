@@ -1,0 +1,36 @@
+<dv.action name="navbar" loggedInUser$=authentication.logged-in.user>
+  <authentication.logged-in />
+
+  <nav class="navbar navbar-dark">
+    <div class="navbar-items">
+      <div class="navbar-item navbar-header">
+        <dv.link href="/">Sample App</dv.link>
+      </div>
+
+      <div class="navbar-item">
+        <dv.link href="/">News</dv.link>
+      </div>
+
+      <div class="navbar-item">
+        <dv.link href="/">Contact</dv.link>
+      </div>
+
+      <div class="navbar-item">
+        <dv.link href="/">About</dv.link>
+      </div>
+
+      <dv.if condition=authentication.logged-in.user>
+        <div class="navbar-item navbar-right">
+          <span class="navbar-hello">Hello
+            <authentication.show-user class="inline"
+              user=authentication.logged-in.user />
+          </span>
+
+          <dv.tx>
+            <authentication.sign-out class="navbar-sign-out" />
+          </dv.tx>
+        </div>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>
