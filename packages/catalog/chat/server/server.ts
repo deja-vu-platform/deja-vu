@@ -6,129 +6,145 @@ import {
   Collection,
   Config,
   Context,
-  getReturnFields
+  getReturnFields,
+  isSuccessfulContext
 } from '@deja-vu/cliche-server';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 import { IResolvers } from 'graphql-tools';
 import {
-  ChatDoc,
-  CreateChatInput,
-  UpdateChatInput
+  ChatMessagesInput,
+  CreateMessageInput,
+  MessageDoc,
+  NewChatMessagesInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
 
+
 const pubsub = new PubSub();
-const UPDATED_CHAT_TOPIC = 'updated-chat';
+const NEW_MESSAGE_TOPIC = 'new-message';
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
-  'create-chat': (extraInfo) => `
-    mutation CreateChat($input: CreateChatInput!) {
-      createChat(input: $input) ${getReturnFields(extraInfo)}
+  'create-message': (extraInfo) => `
+    mutation CreateMessage($input: CreateMessageInput!) {
+      createMessage(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
-  'delete-chat': (extraInfo) => `
-    mutation DeleteChat($id: ID!) {
-      deleteChat(id: $id) ${getReturnFields(extraInfo)}
+  'delete-message': (extraInfo) => `
+    mutation DeleteMessage($id: ID!) {
+      deleteMessage(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
   'show-chat': (extraInfo) => {
-    switch (extraInfo.action) {
+    switch (extraInfo) {
       case 'subscribe':
-        return `subscription updatedChat($id: ID!) { updatedChat(id: $id) }`;
+        return `subscription NewChatMessage($chatId: ID!) {
+          newChatMessage(chatId: $chatId) 
+        }`;
+      case 'new':
+        return `
+          query NewChatMessages($input: NewChatMessagesInput!) {
+            newChatMessages(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
       default:
         return `
-          query ShowChat($id: ID!) {
-            chat(id: $id) ${getReturnFields(extraInfo)}
+          query ChatMessages($input: ChatMessagesInput!) {
+            chatMessages(input: $input) ${getReturnFields(extraInfo)}
           }
-        `
+        `;
     }
   },
-  'update-chat': (extraInfo) => {
-    switch (extraInfo.action) {
-      case 'update':
-        return `
-          mutation UpdateChat($input: UpdateChatInput!) {
-            updateChat (input: $input) ${getReturnFields(extraInfo)}
-          }
-        `;
-      case 'load':
-        return `
-          query Chat($id: ID!) {
-            chat(id: $id) ${getReturnFields(extraInfo)}
-          }
-        `;
-      default:
-        throw new Error('Need to specify extraInfo.action');
+  'show-message': (extraInfo) => `
+    query ShowMessage($id: ID!) {
+      message(id: $id) ${getReturnFields(extraInfo)}
     }
-  }
+  `
 };
 
 function resolvers(db: ClicheDb, _config: Config): IResolvers {
-  const chats: Collection<ChatDoc> = db.collection('chats');
+  const messages: Collection<MessageDoc> = db.collection('messages');
 
   return {
     Query: {
-      chat: async (_root, { id }) =>
-        await chats.findOne({ id })
+      message: async (_root, { id }) => await messages.findOne({ id }),
+
+      chatMessages: async (_root, { input }: { input: ChatMessagesInput })
+      : Promise<MessageDoc[]> => 
+        (await messages.findNative({
+          chatId: input.chatId
+        }))
+        .sort({ timestamp: -1 })
+        .limit(input.maxMessageCount)
+        .toArray(),
+
+      newChatMessages: async (_root, { input }: { input: NewChatMessagesInput })
+      : Promise<MessageDoc[]> =>
+        (await messages.findNative({
+          chatId: input.chatId,
+          timestamp: { $gt: input.lastMessageTimestamp }
+        }))
+        .sort({ timestamp: 1 })
+        .toArray(),
     },
 
-    Chat: {
-      id: (chat: ChatDoc) => chat.id,
-      content: (chat: ChatDoc) => chat.content
+    Message: {
+      id: (message: MessageDoc) => message.id,
+      content: (message: MessageDoc) => message.content,
+      timestamp: (message: MessageDoc) => message.timestamp,
+      authorId: (message: MessageDoc) => message.authorId,
+      chatId: (message: MessageDoc) => message.chatId,
     },
 
     Mutation: {
-      createChat: async (
-        _root, { input }: { input: CreateChatInput }, context: Context) => {
-        const chat: ChatDoc = {
+      createMessage: async (
+        _root, { input }: { input: CreateMessageInput }, context: Context) => {
+        const message: MessageDoc = {
           id: input.id ? input.id : uuid(),
-          content: input.content
+          content: input.content,
+          timestamp: Date.now(),
+          authorId: input.authorId,
+          chatId: input.chatId
         };
 
-        return await chats.insertOne(context, chat);
-      },
-
-      updateChat: async (
-        _root, { input }: { input: UpdateChatInput }, context: Context) => {
-        const updateOp = { $set: { content: input.content } };
-
-        return await chats.updateOne(context, { id: input.id }, updateOp)
-          .then((result) => {
-            if (context.reqType == 'commit' || context.reqType == undefined) {
-              pubsub.publish(UPDATED_CHAT_TOPIC, { updatedChat: input.id });
+        return await messages.insertOne(context, message)
+          .then((newMessage) => {
+            if (isSuccessfulContext(context)) {
+              pubsub.publish(NEW_MESSAGE_TOPIC, { newMessage });
             }
-
-            return result;
-          });
+          })
       },
 
-      deleteChat: async (_root, { id }, context: Context) =>
-        await chats.deleteOne(context, { id })
+      deleteMessage: async (_root, { id }, context: Context) =>
+        await messages.deleteOne(context, { id })
     },
 
     Subscription: {
-      updatedChat: {
+      newChatMessage: {
         resolve: (_payload, _args, _context, _info) => {
           // for security, just return true to subscribers and
           // make them do another query to get the new info
           return true;
         },
         subscribe: withFilter(
-          () => pubsub.asyncIterator(UPDATED_CHAT_TOPIC),
-          (payload, variables) => payload.updatedChat === variables.id
+          () => pubsub.asyncIterator(NEW_MESSAGE_TOPIC),
+          (payload, variables) =>
+            variables.chatId === payload.newMessage.chatId 
         ),
-      },
+      }
     }
   };
 }
 
 const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
   .initDb((db: ClicheDb, _config: Config): Promise<any> => {
-    const chats: Collection<ChatDoc> = db.collection('chats');
+    const messages: Collection<MessageDoc> = db.collection('messages');
 
-    return chats.createIndex({ id: 1 }, { unique: true, sparse: true });
+    return Promise.all([
+      messages.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      messages.createIndex({ chatId: 1, timestamp: 1 })
+    ]);
   })
   .actionRequestTable(actionRequestTable)
   .resolvers(resolvers)

@@ -20,32 +20,31 @@ input CreateMessageInput {
   chatId: ID!
 }
 
-input UpdateMessageInput {
-  id: ID!
-  content: String!
+input ChatMessagesInput {
+  chatId: ID!
+  maxMessageCount: Int
 }
 
-input MessagesByChatInput {
+input NewChatMessagesInput {
   chatIds: [ID!]
-  maxMessageCountPerChat: Int
+  maxMessageCount: Int
 }
 
 type Query {
-  # Get all the messages after lastMessageId (in terms of timestamp)
-  # that belong to chatId in descending timestamp order
-  chatMessages(chatId: ID!, lastMessageId: ID): [Message!]
+  message(id: ID!): Message!
 
-  # Get the last input.maxMessageCountPerChat messages that belong
-  # to each of the provided input.chatIds,
-  # with the groups of messages in the same order as the chat ids
-  # and with the messages in each group in descending timestamp order
-  messagesByChat(input: MessagesByChatInput!): [[Message!]]
+  # Get the last input.maxMessageChat messages that belong
+  # to input.chatId, with the messages in descending timestamp order
+  chatMessages(input: ChatMessagesInput!): [Message!]
+
+  # Get all the messages after lastMessageTimestamp
+  # that belong to chatId in ascending timestamp order
+  newChatMessages(input: NewChatMessagesInput!): [Message!]
 }
 
 type Mutation {
   createMessage(input: CreateMessageInput!): Message
   deleteMessage(id: ID!): Boolean
-  updateMessage(input: UpdateMessageInput!): Boolean
 }
 
 type Subscription {
