@@ -7,7 +7,8 @@ import {
   Config,
   Context,
   getReturnFields,
-  isSuccessfulContext
+  isSuccessfulContext,
+  Validation
 } from '@deja-vu/cliche-server';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 import { IResolvers } from 'graphql-tools';
@@ -15,7 +16,8 @@ import {
   ChatMessagesInput,
   CreateMessageInput,
   MessageDoc,
-  NewChatMessagesInput
+  NewChatMessagesInput,
+  UpdateMessageInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
@@ -23,6 +25,18 @@ import { v4 as uuid } from 'uuid';
 
 const pubsub = new PubSub();
 const NEW_MESSAGE_TOPIC = 'new-message';
+
+interface MessageConfig extends Config {
+  /* Whether only authors can edit/delete their own messages or not */
+  onlyAuthorCanEdit?: boolean;
+}
+
+class MessageValidation {
+  static async messageExistsOrFails(
+    messages: Collection<MessageDoc>, id: string): Promise<MessageDoc> {
+    return Validation.existsOrFail(messages, id, 'Message');
+  }
+}
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
@@ -36,6 +50,24 @@ const actionRequestTable: ActionRequestTable = {
       deleteMessage(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'update-message': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'edit':
+        return `
+          mutation UpdateMessage($input: UpdateMessageInput!) {
+            updateMessage(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      case 'load':
+        return `
+          query Message($id: ID!) {
+            message(id: $id) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  },
   'show-chat': (extraInfo) => {
     switch (extraInfo) {
       case 'subscribe':
@@ -63,7 +95,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
   const messages: Collection<MessageDoc> = db.collection('messages');
 
   return {
@@ -114,6 +146,27 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
               pubsub.publish(NEW_MESSAGE_TOPIC, { newMessage });
             }
           })
+      },
+
+      updateMessage: async (
+        _root, { input }: { input: UpdateMessageInput }, context: Context) => {
+          if (config.onlyAuthorCanEdit) {
+            const message = await MessageValidation.messageExistsOrFails(
+              messages, input.id);
+            // IMPORTANT: No explicit transaction logic here to make this atomic
+            // only because Message authorIds CANNOT be changed.
+            // If for some reason editing Message authorIds becomes possible,
+            // this functionality will be broken.
+            // Note that the authorization cliché could also be used
+            // to get the same functionality.
+            if (message.authorId !== input.authorId) {
+              throw new Error('Only the author of the message can edit it.');
+            }
+          }
+
+        const updateOp = { $set: { content: input.content } };
+
+        return await messages.updateOne(context, { id: input.id }, updateOp);
       },
 
       deleteMessage: async (_root, { id }, context: Context) =>

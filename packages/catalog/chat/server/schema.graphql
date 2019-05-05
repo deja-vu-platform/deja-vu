@@ -8,7 +8,7 @@
 type Message {
   id: ID!
   content: String!
-  timestamp: int!
+  timestamp: Int!
   authorId: ID!
   chatId: ID!
 }
@@ -20,14 +20,20 @@ input CreateMessageInput {
   chatId: ID!
 }
 
+input UpdateMessageInput {
+  id: ID!
+  content: String!
+  authorId: String!
+}
+
 input ChatMessagesInput {
   chatId: ID!
-  maxMessageCount: Int
+  maxMessageCount: Int!
 }
 
 input NewChatMessagesInput {
   chatIds: [ID!]
-  maxMessageCount: Int
+  lastMessageTimestamp: Int!
 }
 
 type Query {
@@ -43,7 +49,8 @@ type Query {
 }
 
 type Mutation {
-  createMessage(input: CreateMessageInput!): Message
+  createMessage(input: CreateMessageInput!): Message!
+  updateMessage(input: UpdateMessageInput!): Boolean
   deleteMessage(id: ID!): Boolean
 }
 

@@ -13,6 +13,12 @@ export interface CreateMessageInput {
   chatId: string;
 }
 
+export interface UpdateMessageInput {
+  id: string;
+  content: string;
+  authorId: string;
+}
+
 export interface ChatMessagesInput {
   chatId: string;
   maxMessageCount: number;
