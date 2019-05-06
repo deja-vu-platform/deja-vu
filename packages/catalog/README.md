@@ -14,6 +14,7 @@
 | [Match](match/README.md) | Connect users after attempting to match with each other |
 | [Passkey](passkey/README.md) | Verify the user's identity with a code |
 | [Property](property/README.md) | Describe an object with properties that have values |
+| [Ranking](ranking/README.md) | Rank items |
 | [Rating](rating/README.md) | Crowdsource evaluation of items |
 | [Schedule](schedule/README.md) | Find times to meet |
 | [Scoring](scoring/README.md) | Keep track of scores |
