@@ -14,8 +14,11 @@ source activate dv
 
 To run:
 ```
-python dv.py
+python dv.py path-to-apps
 ```
 
-The script will output a bunch of png files. If you update `data.csv` you need to remove
-`cliche-dev.pickle` to regenerate it.
+The script will print some data and output a bunch of png files.
+The first time you run the simulation, a file `cliche-dev.pickle` is created
+to cache some intermediate results and subsequent runs will use the
+file to speed up execution. If you change the apps being analyzed, you need
+to drop the file.
