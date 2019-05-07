@@ -190,10 +190,10 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
   }
 
   async find(query?: Query<T>): Promise<T[]> {
-    return (await this.findNative(query)).toArray();
+    return (await this.findCursor(query)).toArray();
   }
 
-  async findNative(query?: Query<T>): Promise<mongodb.Cursor<T>> {
+  async findCursor(query?: Query<T>): Promise<mongodb.Cursor<T>> {
     const queryNotPendingCreate: Query<DbDoc<T>> =
       this.getNotPendingCreateFilter(query);
 

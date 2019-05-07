@@ -118,7 +118,7 @@ export interface Collection<T extends Object> {
   find(query?: Query<T>): Promise<T[]>;
 
   /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#find */
-  findNative(query?: Query<T>): Promise<mongodb.Cursor<T>>;
+  findCursor(query?: Query<T>): Promise<mongodb.Cursor<T>>;
 
   /**
    * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOne

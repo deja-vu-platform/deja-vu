@@ -114,7 +114,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
       : Promise<MessageDoc[]> => {
         const limit = input.maxMessageCount ? input.maxMessageCount : 0;
 
-        return (await messages.findNative({
+        return (await messages.findCursor({
           chatId: input.chatId
         }))
         .sort({ timestamp: -1 })
@@ -123,7 +123,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
       },
       newChatMessages: async (_root, { input }: { input: NewChatMessagesInput })
       : Promise<MessageDoc[]> =>
-        (await messages.findNative({
+        (await messages.findCursor({
           chatId: input.chatId,
           timestamp: { $gt: input.lastMessageTimestamp }
         }))
