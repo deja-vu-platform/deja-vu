@@ -28,7 +28,7 @@ input UpdateMessageInput {
 
 input ChatMessagesInput {
   chatId: ID!
-  maxMessageCount: Int! # 0 for no limit
+  maxMessageCount: Int # 0 means no limit
 }
 
 input NewChatMessagesInput {

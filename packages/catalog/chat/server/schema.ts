@@ -21,7 +21,7 @@ export interface UpdateMessageInput {
 
 export interface ChatMessagesInput {
   chatId: string;
-  maxMessageCount: number;
+  maxMessageCount: number | undefined;
 }
 
 export interface NewChatMessagesInput {

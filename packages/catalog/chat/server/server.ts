@@ -111,14 +111,16 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
       message: async (_root, { id }) => await messages.findOne({ id }),
 
       chatMessages: async (_root, { input }: { input: ChatMessagesInput })
-      : Promise<MessageDoc[]> => 
-        (await messages.findNative({
+      : Promise<MessageDoc[]> => {
+        const limit = input.maxMessageCount ? input.maxMessageCount : 0;
+
+        return (await messages.findNative({
           chatId: input.chatId
         }))
         .sort({ timestamp: -1 })
-        .limit(input.maxMessageCount)
-        .toArray(),
-
+        .limit(limit)
+        .toArray()
+      },
       newChatMessages: async (_root, { input }: { input: NewChatMessagesInput })
       : Promise<MessageDoc[]> =>
         (await messages.findNative({
