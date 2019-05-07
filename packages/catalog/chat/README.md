@@ -4,7 +4,8 @@ Description of the cliché
 
 ## Actions
 
-- create-chat
-- delete-chat
+- create-message
+- delete-message
 - show-chat
-- update-chat
+- show-message
+- update-message
