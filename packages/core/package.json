@@ -32,7 +32,7 @@
     "@angular/router": "^5.2.9",
     "@deja-vu/cli": "0.0.1",
     "@types/graphql": "^0.12.3",
-    "@types/lodash": "^4.14.96",
+    "@types/lodash": "ts2.5",
     "@types/uuid": "^3.4.3",
     "ng-packagr": "^2.0.0",
     "rxjs": "5.5.6",
