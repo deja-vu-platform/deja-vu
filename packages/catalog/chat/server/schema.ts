@@ -1,7 +1,7 @@
 export interface MessageDoc {
   id: string;
   content: string;
-  timestamp: number;
+  timestamp: Date;
   authorId: string;
   chatId: string;
 }

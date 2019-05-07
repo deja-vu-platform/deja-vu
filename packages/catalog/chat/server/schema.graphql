@@ -8,7 +8,7 @@
 type Message {
   id: ID!
   content: String!
-  timestamp: Int!
+  timestamp: Float! # unix time accurate to 3 decimal places
   authorId: ID!
   chatId: ID!
 }
@@ -28,12 +28,12 @@ input UpdateMessageInput {
 
 input ChatMessagesInput {
   chatId: ID!
-  maxMessageCount: Int!
+  maxMessageCount: Int! # 0 for no limit
 }
 
 input NewChatMessagesInput {
   chatIds: [ID!]
-  lastMessageTimestamp: Int!
+  lastMessageTimestamp: Float!
 }
 
 type Query {
@@ -55,5 +55,5 @@ type Mutation {
 }
 
 type Subscription {
-  newChatMessage(chatId: ID!): ID!
+  newChatMessage(chatId: ID!): Boolean!
 }

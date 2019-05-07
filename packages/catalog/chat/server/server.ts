@@ -26,6 +26,12 @@ import { v4 as uuid } from 'uuid';
 const pubsub = new PubSub();
 const NEW_MESSAGE_TOPIC = 'new-message';
 
+const MS_IN_S = 1000;
+
+function dateToUnixTime(date: Date): number {
+  return date.valueOf() / MS_IN_S;
+}
+
 interface MessageConfig extends Config {
   /* Whether only authors can edit/delete their own messages or not */
   onlyAuthorCanEdit?: boolean;
@@ -52,7 +58,7 @@ const actionRequestTable: ActionRequestTable = {
   `,
   'update-message': (extraInfo) => {
     switch (extraInfo.action) {
-      case 'edit':
+      case 'update':
         return `
           mutation UpdateMessage($input: UpdateMessageInput!) {
             updateMessage(input: $input) ${getReturnFields(extraInfo)}
@@ -69,7 +75,7 @@ const actionRequestTable: ActionRequestTable = {
     }
   },
   'show-chat': (extraInfo) => {
-    switch (extraInfo) {
+    switch (extraInfo.action) {
       case 'subscribe':
         return `subscription NewChatMessage($chatId: ID!) {
           newChatMessage(chatId: $chatId) 
@@ -124,7 +130,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
     Message: {
       id: (message: MessageDoc) => message.id,
       content: (message: MessageDoc) => message.content,
-      timestamp: (message: MessageDoc) => message.timestamp,
+      timestamp: (message: MessageDoc) => dateToUnixTime(message.timestamp),
       authorId: (message: MessageDoc) => message.authorId,
       chatId: (message: MessageDoc) => message.chatId,
     },
@@ -135,7 +141,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
         const message: MessageDoc = {
           id: input.id ? input.id : uuid(),
           content: input.content,
-          timestamp: Date.now(),
+          timestamp: new Date(),
           authorId: input.authorId,
           chatId: input.chatId
         };
@@ -145,25 +151,28 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
             if (isSuccessfulContext(context)) {
               pubsub.publish(NEW_MESSAGE_TOPIC, { newMessage });
             }
+
+            return newMessage;
           })
       },
 
       updateMessage: async (
         _root, { input }: { input: UpdateMessageInput }, context: Context) => {
-          if (config.onlyAuthorCanEdit) {
-            const message = await MessageValidation.messageExistsOrFails(
-              messages, input.id);
-            // IMPORTANT: No explicit transaction logic here to make this atomic
-            // only because Message authorIds CANNOT be changed.
-            // If for some reason editing Message authorIds becomes possible,
-            // this functionality will be broken.
-            // Note that the authorization cliché could also be used
-            // to get the same functionality.
-            if (message.authorId !== input.authorId) {
-              throw new Error('Only the author of the message can edit it.');
-            }
+        if (config.onlyAuthorCanEdit) {
+          const message = await MessageValidation.messageExistsOrFails(
+            messages, input.id);
+          // IMPORTANT: No explicit transaction logic here to make this atomic
+          // only because Message authorIds CANNOT be changed.
+          // If for some reason editing Message authorIds becomes possible,
+          // this functionality will be broken.
+          // Note that the authorization cliché could also be used
+          // to get the same functionality.
+          if (message.authorId !== input.authorId) {
+            throw new Error('Only the author of the message can edit it.');
           }
+        }
 
+        // TODO: include last updated timestamp?
         const updateOp = { $set: { content: input.content } };
 
         return await messages.updateOne(context, { id: input.id }, updateOp);
