@@ -81,6 +81,8 @@ const actionRequestTable: ActionRequestTable = {
           newChatMessage(chatId: $chatId) 
         }`;
       case 'new':
+        // note that this is unused, but should potentially be used
+        // to avoid overfetching of all past messages
         return `
           query NewChatMessages($input: NewChatMessagesInput!) {
             newChatMessages(input: $input) ${getReturnFields(extraInfo)}
