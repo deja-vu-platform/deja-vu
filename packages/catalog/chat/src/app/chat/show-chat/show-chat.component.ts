@@ -111,6 +111,9 @@ OnInit {
               throw new Error(_.map(res.errors, 'message')
                 .join());
             }
+            // this doesn't work if this action is in a transaction
+            // because those actions might not re-eval anymore due to
+            // the canEval() check that will not know about `shouldUpdate`
             this.shouldUpdate = true;
             this.load();
           });
