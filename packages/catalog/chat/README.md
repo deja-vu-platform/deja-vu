@@ -1,6 +1,6 @@
 # Chat
 
-Send messages within a chat
+Exchange messages in real time with other users
 
 ## Actions
 
