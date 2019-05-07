@@ -40,9 +40,9 @@ export class TopBarComponent {
   @Input() readonly app: App;
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
-  @Output() readonly ioChange = new EventEmitter<void>();
   @Output() readonly preview = new EventEmitter<void>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
+  @ViewChild('directoryInput') readonly directoryInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
   readonly fs: any;
   selectedIndex = 0;
@@ -100,34 +100,16 @@ export class TopBarComponent {
     });
   }
 
-  private makeAppDirectory(callback: (pathToDir: string) => void) {
-    this.fs.mkdir('../designer-apps', (e1) => {
-      if (e1 && e1.code !== 'EEXIST') { throw e1; }
-      const appRoot = `../designer-apps/${this.app.name}`;
-      this.fs.mkdir(appRoot, (e2) => {
-        if (e2 && e2.code !== 'EEXIST') { throw e2; }
-        callback(appRoot);
-      });
-    });
-  }
-
   save() {
     this.saving = true;
     const designerSave = JSON.stringify(this.app);
-    const saveFn = this.fs ? this.saveElectron : this.saveBrowser;
-    saveFn(designerSave, (error) => {
+    this.saveBrowser(designerSave, (error) => {
       this.saving = false;
       this.showSnackBar(error ?
         'Save failed.' :
         'Your work has been saved.'
       );
       if (error) { throw error; }
-    });
-  }
-
-  private saveElectron = (data: string, callback: (error: any) => void) => {
-    this.makeAppDirectory((appRoot) => {
-      this.fs.writeFile(`${appRoot}/designer-save.json`, data, callback);
     });
   }
 
@@ -141,55 +123,58 @@ export class TopBarComponent {
   }
 
   export() {
+    this.directoryInput.nativeElement.click();
+  }
+
+  onSelectExportDir(event) {
+    const { path } = event.target.files[0];
     this.exporting = true;
-    this.makeAppDirectory((appRoot) => {
-      // count callbacks (since fs isn't promise-based)
-      let numFilesToWrite = this.app.actions.length + NUM_CONST_FILES;
-      let numFilesWritten = 0;
-      let exportError = false;
-      const writeCallback = (e) => {
-        numFilesWritten += 1;
-        if (e) {
-          exportError = true;
-          throw e;
-        }
-        if (numFilesWritten === numFilesToWrite) {
-          this.exporting = false;
-          this.showSnackBar(exportError ?
-            'Export failed.' :
-            'Your app has been exported.'
-          );
-        }
-      };
+    // count callbacks (since fs isn't promise-based)
+    let numFilesToWrite = this.app.actions.length + NUM_CONST_FILES;
+    let numFilesWritten = 0;
+    let exportError = false;
+    const writeCallback = (e) => {
+      numFilesWritten += 1;
+      if (e) {
+        exportError = true;
+        throw e;
+      }
+      if (numFilesWritten === numFilesToWrite) {
+        this.exporting = false;
+        this.showSnackBar(exportError ?
+          'Export failed.' :
+          'Your app has been exported.'
+        );
+      }
+    };
 
-      const packageJSON = this.app.toPackageJSON();
-      this.fs.writeFile(`${appRoot}/package.json`, packageJSON, writeCallback);
-      const configJSON = this.app.toDVConfigJSON();
-      this.fs.writeFile(`${appRoot}/dvconfig.json`, configJSON, writeCallback);
+    const packageJSON = this.app.toPackageJSON();
+    this.fs.writeFile(`${path}/package.json`, packageJSON, writeCallback);
+    const configJSON = this.app.toDVConfigJSON();
+    this.fs.writeFile(`${path}/dvconfig.json`, configJSON, writeCallback);
 
-      this.fs.mkdir(`${appRoot}/src`, (e1) => {
-        if (e1 && e1.code !== 'EEXIST') { throw e1; }
-        const css = this.app.toCSS();
-        this.fs.writeFile(`${appRoot}/src/styles.css`, css, writeCallback);
+    this.fs.mkdir(`${path}/src`, (e1) => {
+      if (e1 && e1.code !== 'EEXIST') { throw e1; }
+      const css = this.app.toCSS();
+      this.fs.writeFile(`${path}/src/styles.css`, css, writeCallback);
 
-        this.app.actions.forEach((action) => {
-          const actionRoot = `${appRoot}/src/${action.name}`;
-          this.fs.mkdir(actionRoot, (e2) => {
-            if (e2 && e2.code !== 'EEXIST') { throw e2; }
-            let html = action.toHTML();
-            let imageNum = 0;
-            html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
-              imageNum += 1;
-              numFilesToWrite += 1;
-              const pngFileName = `img-${imageNum}.png`;
-              const pngFilePath = `${actionRoot}/${pngFileName}`;
-              this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
+      this.app.actions.forEach((action) => {
+        const actionRoot = `${path}/src/${action.name}`;
+        this.fs.mkdir(actionRoot, (e2) => {
+          if (e2 && e2.code !== 'EEXIST') { throw e2; }
+          let html = action.toHTML();
+          let imageNum = 0;
+          html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
+            imageNum += 1;
+            numFilesToWrite += 1;
+            const pngFileName = `img-${imageNum}.png`;
+            const pngFilePath = `${actionRoot}/${pngFileName}`;
+            this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
 
-              return `"${pngFileName}"`; // relative reference
-            });
-            const htmlFilePath = `${actionRoot}/${action.name}.html`;
-            this.fs.writeFile(htmlFilePath, html, writeCallback);
+            return `"${pngFileName}"`; // relative reference
           });
+          const htmlFilePath = `${actionRoot}/${action.name}.html`;
+          this.fs.writeFile(htmlFilePath, html, writeCallback);
         });
       });
     });
@@ -202,8 +187,7 @@ export class TopBarComponent {
   onUpload(fileInput) {
     this.opening = true;
     const file: File = fileInput.target.files[0];
-    const openFn = this.fs ? this.openElectron : this.openBrowser;
-    openFn(file, (error, data) => {
+    this.openBrowser(file, (error, data) => {
       this.opening = false;
       if (error) {
         this.showSnackBar('Could not open file.');
@@ -211,13 +195,6 @@ export class TopBarComponent {
       }
       this.load.emit(data);
     });
-  }
-
-  private openElectron = (
-    file: File,
-    callback: (error: any, data: string) => void
-  ) => {
-    this.fs.readFile(file.path, 'utf8', callback);
   }
 
   private openBrowser = (
@@ -231,7 +208,6 @@ export class TopBarComponent {
 
   closeMenu(trigger: MatMenuTrigger) {
     trigger.closeMenu();
-    this.ioChange.emit();
   }
 
   clickFirstTab(mtg: MatTabGroup) {

@@ -1,0 +1,12 @@
+.user-info {
+  display: inline-block;
+  margin: 15px;
+}
+
+.about-me {
+  font-style: italic;
+}
+
+.username {
+  font-weight: bold;
+}

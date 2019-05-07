@@ -1,0 +1,7 @@
+#faq-container {
+  font-family: 'Asap', sans-serif;
+  padding-top: 2em;
+}
+.question {
+	font-weight: bold;
+}

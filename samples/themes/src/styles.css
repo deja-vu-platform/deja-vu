@@ -1,0 +1,6 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/dist/css/navbar.css";
+
+body {
+  margin: 0;
+}

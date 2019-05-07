@@ -1,5 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output
 } from '@angular/core';
 
 import {
@@ -20,6 +21,7 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
   @Input() id: string | undefined;
   @Input() user: User | undefined;
+  @Output() loadedUser = new EventEmitter<User>();
 
   @Input() showId = false;
   @Input() showUsername = true;
@@ -40,9 +42,7 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges() {
-    if (!this.user) {
-      this.load();
-    }
+    this.load();
   }
 
   load() {
@@ -69,6 +69,7 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
           if (userById) {
             this.user = res.data.userById;
           }
+          this.loadedUser.emit(this.user);
         });
     }
   }

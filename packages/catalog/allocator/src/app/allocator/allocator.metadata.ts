@@ -16,6 +16,7 @@ import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
 export { DeleteResourceComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
 export { EditConsumerComponent };
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
@@ -24,7 +25,7 @@ export { ShowConsumerComponent };
 
 const allComponents = [
   CreateAllocationComponent, ShowConsumerComponent, EditConsumerComponent,
-  DeleteResourceComponent
+  DeleteResourceComponent, ConfigWizardComponent
 ];
 
 const metadata = {

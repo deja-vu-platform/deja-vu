@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "fs-extra": "^6.0.1",
-    "rimraf": "^2.6.2",
-    "ohm-js": "^0.14.0"
+    "ohm-js": "^0.14.0",
+    "rimraf": "^2.6.2"
   },
   "peerDepencies": {
     "lodash": "^4.17.4"

@@ -1,6 +1,5 @@
 {
   "name": "morg",
-  "type": "app",
   "usedCliches": {
     "event": {},
     "allocator": {},

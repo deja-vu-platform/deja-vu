@@ -1,0 +1,64 @@
+type Schedule {
+  id: ID!
+  availability: [Slot!]
+}
+
+type Slot {
+  id: ID!
+  startDate: String!
+  endDate: String!
+}
+
+input AddSlotInput {
+  startDate: String!
+  endDate: String!
+}
+
+input SlotsInput {
+  scheduleId: ID!
+  startDate: String
+  endDate: String
+  startTime: String
+  endTime: String
+  sortByStartDate: Int!
+  sortByEndDate: Int!
+}
+
+input NextAvailabilityInput {
+  scheduleIds: [ID!]
+}
+
+input AllAvailabilityInput {
+  scheduleIds: [ID!]
+  startDate: String
+  endDate: String
+  startTime: String
+  endTime: String
+  sortByStartDate: Int!
+  sortByEndDate: Int!
+}
+
+input CreateScheduleInput {
+  id: ID
+  slots: [AddSlotInput!]
+}
+
+input UpdateScheduleInput {
+  id: ID!
+  add: [AddSlotInput!]
+  delete: [ID!]
+}
+
+type Query {
+  schedule(id: ID!): Schedule
+  slot(id: ID!): Slot
+  slots(input: SlotsInput!): [Slot]
+  nextAvailability(input: NextAvailabilityInput!): Slot
+  allAvailability(input: AllAvailabilityInput!): [Slot]
+}
+
+type Mutation {
+  createSchedule(input: CreateScheduleInput!): Schedule
+  updateSchedule(input: UpdateScheduleInput!): Boolean
+  deleteSchedule(id: ID!): Boolean
+}

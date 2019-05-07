@@ -1,0 +1,42 @@
+{
+  "name": "sn",
+  "usedCliches": {
+    "authentication": {},
+    "comment": {},
+    "property": {
+      "config": {
+        "schema": {
+          "title": "Post",
+          "type": "object",
+          "properties": {
+              "author": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "url"
+              }
+          },
+          "required": ["author", "title", "url"]
+        }
+      }
+    },
+    "scoreposts": {
+      "name": "scoring"
+    },
+    "scorecomments": {
+      "name": "scoring"
+    }
+  },
+  "routes": [
+    { "path": "item", "action": "show-post-details" },
+    { "path": "login", "action": "login" },
+    { "path": "news", "action": "home" },
+    { "path": "submit", "action": "submit-post" },
+    { "path": "reply", "action": "reply" },
+    { "path": "", "action": "home" }
+  ]
+}

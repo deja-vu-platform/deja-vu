@@ -1,0 +1,8 @@
+<mat-checkbox
+  [ngModel]="value"
+  (click)="next()"
+  [disabled]="disabled"
+  [indeterminate]="value == null"
+>
+  <ng-content></ng-content>
+</mat-checkbox>

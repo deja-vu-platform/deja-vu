@@ -1,0 +1,17 @@
+<dv.action name="home">
+  <sn.navbar />
+
+  <div class="main">
+    <div class="container">
+      <scoreposts.show-targets-by-score
+        noTargetsText="No posts yet."
+        showAscending=false
+        showScores=false
+        showTarget=<sn.show-post
+          id=$id
+          loggedInUser=sn.navbar.loggedInUser />
+      >
+      </scoreposts.show-targets-by-score>
+    </div>
+  </div>
+</dv.action>

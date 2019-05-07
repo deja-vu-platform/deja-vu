@@ -102,13 +102,6 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     this.user.emit(user);
   }
 
-  setTokens(token: string, user: User) {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-
-    return user;
-  }
-
   dvOnExecSuccess() {
     this.newUserSignedIn = true;
     this.newUserSignedInError = '';

@@ -4,6 +4,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
+  MatDividerModule,
   MatInputModule,
   MatSelectModule
 } from '@angular/material';
@@ -22,6 +23,7 @@ describe('ConfigureClicheComponent', () => {
         BrowserAnimationsModule,
         FormsModule,
         MatDialogModule,
+        MatDividerModule,
         MatInputModule,
         MatSelectModule
       ],

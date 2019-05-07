@@ -1,0 +1,103 @@
+:root {
+  --default-font-style: 'Courier New', Courier, monospace;
+  --default-text-size: 1em;
+  --light-bg-color: lightgray;
+  --light-text-color: black;
+  --dark-bg-color: black;
+  --dark-text-color: lightgray;
+  --hover-text-color: lightslategray;
+  --active-text-color: rgb(9, 189, 78);
+  --sign-out-bg-color: rgb(191, 63, 63);
+}
+
+nav {
+  font-family: var(--default-font-style);
+}
+
+.navbar-light {
+  background-color: var(--light-bg-color);
+  color: var(--light-text-color);
+}
+
+.navbar-dark {
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
+}
+
+.navbar-left {
+  float: left !important;
+}
+
+.navbar-right {
+  float: right !important;
+}
+
+/* Works for ul + li and div elements*/
+.navbar-items {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.navbar-item {
+  float: left;
+  font-size: var(--default-text-size);
+}
+
+.navbar-item a {
+  display: inline-block;
+  text-align: center;
+  padding: 1.5em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
+}
+
+.navbar-item .navbar-hello {
+  display: inline-block;
+  text-align: center;
+  margin: 1.5em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
+}
+
+.navbar-item .navbar-sign-out {
+  display: inline-block;
+  text-align: center;
+  margin: 1em 1em;
+  text-decoration: none;
+  vertical-align: text-bottom;
+}
+
+.navbar-item .navbar-sign-out .mat-button {
+  font-family: var(--default-font-style);
+  font-size: var(--default-text-size);
+  background-color: var(--sign-out-bg-color);
+}
+
+.navbar-light .navbar-items .navbar-item a {
+  color: var(--light-text-color);
+}
+
+.navbar-dark .navbar-items .navbar-item a {
+  color: var(--dark-text-color);
+}
+
+.navbar-light .navbar-items .navbar-item a:hover,
+.navbar-dark .navbar-items .navbar-item a:hover {
+  color: var(--hover-text-color);
+}
+
+.navbar .navbar-items .navbar-item a.active {
+  color: var(--active-text-color);
+}
+
+.navbar-item.navbar-header a {
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
+
+.inline {
+  display: inline-block;
+}

@@ -17,13 +17,13 @@ import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { ClicheActionDirective } from '../cliche-action.directive';
 import {
   ActionInstance,
   AppActionDefinition,
   ClicheActionDefinition
 } from '../datatypes';
-import { ActionIO, ScopeIO} from '../io';
+import { DynamicComponentDirective } from '../dynamic-component.directive';
+import { ChildScopeIO, fullyQualifyName, ScopeIO } from '../io';
 
 
 @Component({
@@ -34,15 +34,20 @@ import { ActionIO, ScopeIO} from '../io';
 export class ActionInstanceComponent
 implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(ClicheActionDirective)
-    private readonly actionHost: ClicheActionDirective;
+  @ViewChild(DynamicComponentDirective)
+    private readonly actionHost: DynamicComponentDirective;
+
   @Input() actionInstance: ActionInstance;
-  @Input() actionIO: ActionIO;
-  private readonly scopeIO: ScopeIO = new ScopeIO();
-  private subscriptions: Subscription[] = [];
+  // default exists because action instance is top-level in preivew mode
+  @Input() parentScopeIO: ScopeIO = new ScopeIO();
+  // not passed to children because their inputs are not editable in this
+  //   context (but it is passed to inputted actions because theirs are)
+  @Input() shouldReLink: EventEmitter<any>;
   // for when rendered in dv-include only
   @Input() extraInputs?: { [ioName: string]: string };
-  @Input() extraInputsScope?: ActionIO;
+
+  scopeIO: ChildScopeIO;
+  private subscriptions: Subscription[] = [];
   hidden = false;
 
   constructor(
@@ -54,7 +59,26 @@ implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.linkScopes();
+    let extraScopeIO: ScopeIO;
+    if (this.extraInputs) {
+      extraScopeIO = new ScopeIO();
+      _.forOwn(this.extraInputs, (thisProp, ioName) => {
+        extraScopeIO.getSubject(ioName)
+          .next(this[thisProp]);
+      });
+    }
+    this.scopeIO = new ChildScopeIO(
+      this.actionInstance,
+      this.parentScopeIO,
+      this.shouldReLink,
+      extraScopeIO
+        ? { scope: extraScopeIO, inputs: Object.keys(this.extraInputs) }
+        : undefined
+    );
+    this.scopeIO.link();
+    if (this.shouldReLink) { // not given for top level
+      this.shouldReLink.subscribe(() => this.scopeIO.link());
+    }
     this.registerRunService();
   }
 
@@ -82,43 +106,21 @@ implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * To be called OnInit
-   * Should only be called once
-   */
-  private linkScopes() {
-    if (this.actionInstance) {
-      if (this.actionInstance) {
-        this.scopeIO.setActionIO(this.actionInstance, this.actionIO);
-      }
-      if (this.extraInputs && this.extraInputsScope) {
-        _.forEach(this.extraInputs, (thisProp, ioName) => {
-          this.extraInputsScope.getSubject(ioName)
-            .next(this[thisProp]);
-        });
-      }
-    }
-  }
-
-  /**
    * To be called AfterViewInit
    * Should only be called once
    */
   private loadContent() {
-    if (this.actionInstance) {
-      if (this.actionInstance.of instanceof AppActionDefinition) {
-        this.scopeIO.link(this.actionInstance);
-      } else {
-        // setTimeout is necessary to avoid angular change detection errors
-        setTimeout(() => this.loadClicheAction());
-      }
-      setTimeout(() => {
-        const sub = this.scopeIO.getSubject(this.actionInstance, 'hidden')
-          .subscribe((value) => {
-            this.hidden = value;
-          });
-        this.subscriptions.push(sub);
-      });
+    if (!(this.actionInstance.of instanceof AppActionDefinition)) {
+      // setTimeout is necessary to avoid angular change detection errors
+      setTimeout(() => this.loadClicheAction());
     }
+    setTimeout(() => {
+      const sub = this.scopeIO.getSubject('hidden')
+        .subscribe((value) => {
+          this.hidden = value;
+        });
+      this.subscriptions.push(sub);
+    });
   }
 
   /**
@@ -139,79 +141,82 @@ implements OnInit, AfterViewInit, OnDestroy {
     );
 
     // subscribe to outputs, storing last outputted value
-    actionDefinition.outputs.forEach((output) => {
-      this.subscriptions.push(
-        (<EventEmitter<any>>componentRef.instance[output]).subscribe((val) => {
-          this.actionIO.getSubject(output)
-            .next(val);
-        })
-      );
-    });
+    if (!this.extraInputs) { // inputted actions don't expose outputs
+      actionDefinition.outputs.forEach((output) => {
+        const sub = (<EventEmitter<any>>componentRef.instance[output])
+          .subscribe((val) => {
+            const fqName = fullyQualifyName(output, this.actionInstance);
+            this.parentScopeIO.getSubject(fqName)
+              .next(val);
+          });
+        this.subscriptions.push(sub);
+      });
+    }
 
     const defaults = {};
     // pass in inputs, and allow the value to be updated
     actionDefinition.inputs.forEach((input) => {
       defaults[input] = componentRef.instance[input];
-      this.subscriptions.push(
-        this.actionIO.getSubject(input)
-          .subscribe((val) => {
-            if (val === undefined) {
-              val = defaults[input];
-            }
-            if (input === '*content') {
-              if (val) {
-                // create the component to put in ng-content
-                let childComponentRef: ComponentRef<ActionInstanceComponent>;
-                const childComponentFactory = this.componentFactoryResolver
-                  .resolveComponentFactory<ActionInstanceComponent>(val.type);
-                childComponentRef = childComponentFactory.create(this.injector);
-                // we need to recreate the cliche action component with content
-                viewContainerRef.clear();
-                componentRef = viewContainerRef.createComponent(
-                  componentFactory,
-                  0,
-                  this.injector,
-                  [[childComponentRef.location.nativeElement]]
-                );
-                // pass inputs
-                childComponentRef.instance.actionInstance =
-                  val.inputs.actionInstance;
-                childComponentRef.instance.actionIO = val.inputs.actionIO;
-                // detect changes since Angular doesn't expect inputs like this
-                childComponentRef.instance.ref.detectChanges();
-                // trigger lifecylce hooks, which would have already fired
-                childComponentRef.instance.ngOnInit();
-                childComponentRef.instance.ngAfterViewInit();
-              } else {
-                // re-render the component with no content
-                viewContainerRef.clear();
-                componentRef = viewContainerRef.createComponent(
-                  componentFactory,
-                  0,
-                  this.injector
-                );
-              }
-            } else {
-              // only pass the new value if it actually changed
-              if (
-                (
-                  // expression input, not equal means changed
-                  !actionDefinition.actionInputs[input]
-                  && componentRef.instance[input] !== val
-                ) || (
-                  // action input, new action means changed
-                  actionDefinition.actionInputs[input]
-                  && _.get(val, ['inputs', 'actionInstance']) !== _.get(
-                    componentRef.instance[input],
-                    ['inputs', 'actionInstance']
-                  )
-                )
-              ) {
-                componentRef.instance[input] = val;
-              }
-            }
-          })
-      );
+      const fromSubject = this.scopeIO.getSubject(input);
+      const sub = fromSubject.subscribe((val) => {
+        if (val === undefined) {
+          val = defaults[input];
+        }
+        if (input === '*content') {
+          if (val) {
+            // create the component to put in ng-content
+            let childComponentRef: ComponentRef<ActionInstanceComponent>;
+            const childComponentFactory = this.componentFactoryResolver
+              .resolveComponentFactory<ActionInstanceComponent>(val.type);
+            childComponentRef = childComponentFactory.create(this.injector);
+            // we need to recreate the cliche action component with content
+            viewContainerRef.clear();
+            componentRef = viewContainerRef.createComponent(
+              componentFactory,
+              0,
+              this.injector,
+              [[childComponentRef.location.nativeElement]]
+            );
+            const instance = childComponentRef.instance;
+            // pass inputs
+            instance.actionInstance =
+              val.inputs.actionInstance;
+            instance.parentScopeIO = val.inputs.parentScopeIO;
+            // detect changes since Angular doesn't expect inputs like this
+            instance.ref.detectChanges();
+            // trigger lifecylce hooks, which would have already fired
+            instance.ngOnInit();
+            instance.ngAfterViewInit();
+          } else {
+            // re-render the component with no content
+            viewContainerRef.clear();
+            componentRef = viewContainerRef.createComponent(
+              componentFactory,
+              0,
+              this.injector
+            );
+          }
+        } else {
+          // only pass the new value if it actually changed
+          if (
+            (
+              // expression input, not equal means changed
+              !actionDefinition.actionInputs[input]
+              && componentRef.instance[input] !== val
+            ) || (
+              // action input, new action means changed
+              actionDefinition.actionInputs[input]
+              && _.get(val, ['inputs', 'actionInstance']) !== _.get(
+                componentRef.instance[input],
+                ['inputs', 'actionInstance']
+              )
+            )
+          ) {
+            componentRef.instance[input] = val;
+          }
+        }
+      });
+      this.subscriptions.push(sub);
     });
 
     // pass the instance for the text action

@@ -1,7 +1,9 @@
 <div
   *ngIf="actionInstance"
+  class="action-instance"
   [attr.data-isaction]="true"
   [attr.dvAlias]="actionInstance.fqtag"
+  [attr.dvOf]="actionInstance.from.name"
   [ngStyle]="actionInstance.of.styles || {}"
   [hidden]="hidden"
 >
@@ -9,7 +11,7 @@
     [attr.data-isaction]="!!actionInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
   >
-    <ng-template *ngIf="actionInstance.of.component" propertyClicheAction>
+    <ng-template *ngIf="actionInstance.of.component" propertyDynamicComponent>
     </ng-template>
 
     <div *ngIf="actionInstance.of.rows">
@@ -24,7 +26,7 @@
         >
           <app-action-instance
             [actionInstance]="action"
-            [actionIO]="scopeIO.getActionIO(action)"
+            [parentScopeIO]="scopeIO"
           >
           </app-action-instance>
         </div>

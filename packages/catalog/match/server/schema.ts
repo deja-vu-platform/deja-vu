@@ -1,6 +1,7 @@
 export interface MatchDoc {
   id: string;
-  userIds: string[];
+  userAId: string;
+  userBId: string;
 }
 
 export interface AttemptDoc {
@@ -12,6 +13,12 @@ export interface AttemptDoc {
 export interface AttemptsInput {
   sourceId?: string;
   targetId?: string;
+}
+
+export interface MatchInput {
+  id?: string;
+  userAId?: string;
+  userBId?: string;
 }
 
 export interface MatchesInput {
@@ -26,5 +33,6 @@ export interface AttemptMatchInput {
 
 export interface CreateMatchInput {
   id?: string;
-  userIds: string[];
+  userAId: string;
+  userBId: string;
 }

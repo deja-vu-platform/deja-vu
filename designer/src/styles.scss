@@ -86,3 +86,7 @@ button.mat-small-y {
   width: fit-content !important;
   transform: translateX(-132px); // side menu size / 2
 }
+
+.designer > .action-instance {
+  min-height: 100%;
+}

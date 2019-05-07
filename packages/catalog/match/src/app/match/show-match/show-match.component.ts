@@ -21,8 +21,10 @@ interface ShowMatchRes {
 })
 export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
   OnInit {
-  // Provide one of the following: id or match
+  // Provide one of the following: id, (userAId and userBId) or match
   @Input() id: string | undefined;
+  @Input() userAId: string | undefined;
+  @Input() userBId: string | undefined;
   @Input() match: Match | undefined;
   @Output() loadedMatch = new EventEmitter();
 
@@ -60,13 +62,18 @@ export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
     if (this.canEval()) {
       this.gs.get<ShowMatchRes>(this.apiPath, {
         params: {
-          inputs: {
-            id: this.id
-          },
+          inputs: JSON.stringify({
+            input: {
+              id: this.id,
+              userAId: this.userAId,
+              userBId: this.userBId
+            }
+          }),
           extraInfo: {
             returnFields: `
               ${this.showId ? 'id' : ''}
-              ${this.showUserIds ? 'userIds' : ''}
+              ${this.showUserIds ? 'userAId' : ''}
+              ${this.showUserIds ? 'userBId' : ''}
             `
           }
         }
@@ -80,6 +87,8 @@ export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
   }
 
   private canEval(): boolean {
-    return !!(!this.match && this.id && this.gs);
+    return !!(!this.match &&
+      (this.id || (this.userAId && this.userBId)) &&
+      this.gs);
   }
 }

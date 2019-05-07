@@ -30,7 +30,7 @@ import { StatusComponent } from './status/status.component';
 import { TxComponent } from './tx/tx.component';
 import { ZipComponent } from './zip/zip.component';
 
-import { ConfigService } from './config.service';
+import { ConfigServiceFactory } from './config.service';
 import { OfDirective } from './of.directive';
 import { StorageService } from './storage.service';
 import { SubscriptionService } from './subscription.service';
@@ -56,7 +56,7 @@ const allComponents = [
   ],
   declarations: [...allComponents, OfDirective],
   providers: [
-    GatewayServiceFactory, RunService, ConfigService, StorageService,
+    GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
     SubscriptionService
   ],
   exports: [...allComponents, OfDirective]

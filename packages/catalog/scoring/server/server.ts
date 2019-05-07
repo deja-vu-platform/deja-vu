@@ -86,10 +86,15 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
+function getOneToOneScoring(config: ScoringConfig): boolean {
+  return config.oneToOneScoring === undefined ? true : config.oneToOneScoring;
+}
+
 function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
   const scores: Collection<ScoreDoc> = db.collection('scores');
   const totalScoreFn = config.totalScoreFn ?
     new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;
+  const oneToOneScoring = getOneToOneScoring(config);
 
   return {
     Query: {
@@ -98,7 +103,7 @@ function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
         // and that there is oneToOneScoring
         if (_.isNil(input.id) &&
           (_.isNil(input.sourceId) || _.isNil(input.targetId) ||
-            !config.oneToOneScoring)) {
+            !oneToOneScoring)) {
           throw new Error('Insufficient inputs to query a score');
         }
 
@@ -220,7 +225,7 @@ function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
             filter['sourceId'] = input.sourceId;
           }
         }
-        
+
         return await scores.deleteMany(context, filter);
       }
     }
@@ -231,7 +236,7 @@ const scoringCliche: ClicheServer<ScoringConfig> =
   new ClicheServerBuilder<ScoringConfig>('scoring')
     .initDb((db: ClicheDb, config: ScoringConfig): Promise<any> => {
       const scores: Collection<ScoreDoc> = db.collection('scores');
-      const sourceTargetIndexOptions = config.oneToOneScoring ?
+      const sourceTargetIndexOptions = getOneToOneScoring(config) ?
         { unique: true, sparse: true } : {};
 
       return Promise.all([

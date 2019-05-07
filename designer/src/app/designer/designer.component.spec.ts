@@ -10,7 +10,8 @@ import {
   MatSelectModule,
   MatSnackBarModule,
   MatTabsModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatTooltipModule
 } from '@angular/material';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ElectronService } from 'ngx-electron';
@@ -57,6 +58,7 @@ describe('DesignerComponent', () => {
         MatSnackBarModule,
         MatTabsModule,
         MatToolbarModule,
+        MatTooltipModule,
         RouterTestingModule
       ],
       providers: [

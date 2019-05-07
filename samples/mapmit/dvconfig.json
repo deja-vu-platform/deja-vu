@@ -1,6 +1,5 @@
 {
   "name": "mapmit",
-  "type": "app",
   "usedCliches": {
     "authentication": {
       "config": {

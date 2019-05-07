@@ -10,6 +10,7 @@ import { DvModule } from '@deja-vu/core';
 // import and export all cliché actions here
 import { CreateMatchComponent } from './create-match/create-match.component';
 export { CreateMatchComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteMatchComponent } from './delete-match/delete-match.component';
 export { DeleteMatchComponent };
 import { ShowMatchComponent } from './show-match/show-match.component';
@@ -32,7 +33,7 @@ export { ShowAttemptsComponent };
 const allComponents = [
   CreateMatchComponent, DeleteMatchComponent, ShowMatchComponent,
   AttemptMatchComponent, WithdrawAttemptComponent, ShowMatchesComponent,
-  ShowAttemptComponent, ShowAttemptsComponent
+  ShowAttemptComponent, ShowAttemptsComponent, ConfigWizardComponent
 ];
 
 const metadata = {

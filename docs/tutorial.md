@@ -1,11 +1,11 @@
 # Tutorial: Building a Hacker News clone
 
 This tutorial covers the fundamentals of Déjà Vu through
-a social news aggregation app *HN*, that is a simple
+a social news aggregation app *SN*, that is a simple
 clone of [Hacker News](https://news.ycombinator.com/).
-The code of the app can be found in [samples/hackernews](../samples/hackernews).
+The code of the app can be found in [samples/sn](../samples/sn).
 
-In *HN*, registered users can submit links,
+In *SN*, registered users can submit links,
 which can then be voted up by other members (posts with
 more upvotes appear towards the top of the home page).
 Registered users can also comment on a post or comment and upvote comments.
@@ -28,7 +28,7 @@ write back-end data.
 They can
 also have inputs and produce outputs.
 
-*HN* uses the [Authentication](../packages/catalog/authentication/README)
+*SN* uses the [Authentication](../packages/catalog/authentication/README)
 cliché to handle user authentication,
 [Comment](../packages/catalog/comment/README) to comment on both posts and other comments,
 [Property](../packages/catalog/property/README) to save a post's author, title, and link, and
@@ -38,8 +38,7 @@ and another one for the upvotes of comments.
 The app's config file (dvconfig.json) is shown below:
 ```json
 {
-  "name": "hackernews",
-  "type": "app",
+  "name": "sn",
   "usedCliches": {
     "authentication": {},
     "comment": {},
@@ -61,11 +60,10 @@ The app's config file (dvconfig.json) is shown below:
       }
     },
     "scoringposts": {
-      "name": "scoring",
-      "config": { "oneToOneScoring": true }
+      "name": "scoring"
     },
     "scoringcomments": {
-      "config": { "oneToOneScoring": true }
+      "name": "scoring"
     }
   },
   "routes": [
@@ -93,7 +91,7 @@ saving.
 (The *Property* cliché essentially gives you a data modeling
 defining facility, albeit with simple CRUD behavior.)
 
-In *HN*, we use `schema` to configure the type of properties we expect our
+In *SN*, we use `schema` to configure the type of properties we expect our
 objects (the posts) to have (an author, a title, and a url). The effect of this is that when we
 use an action from *Property* to, for example, create an object, the action will allow
 the user to input those fields---author, title, and url.
@@ -126,27 +124,27 @@ Actions are included as if they were HTML
 elements, with the tag given by `cliche.action-name` or
 `app.action-name`.
 
-Below is a code excerpt of *HN*'s `submit-post`:
+Below is a code excerpt of *SN*'s `submit-post`:
 ```html
 <dv.action name="submit-post">
-  <hackernews.navbar /> ...
+  <sn.navbar /> ...
   <div class="main">
     <div class="container">
-      <dv.if condition=hackernews.navbar.loggedInUser>
+      <dv.if condition=sn.navbar.loggedInUser>
         <dv.tx>
           <dv.gen-id />
           <authentication.authenticate
-            id=hackernews.navbar.loggedInUser.id hidden=true />
+            id=sn.navbar.loggedInUser.id hidden=true />
           <property.create-object
             buttonLabel="Submit"
             id=dv.gen-id.id
-            initialValue={ author: hackernews.navbar.loggedInUser.username }
+            initialValue={ author: sn.navbar.loggedInUser.username }
             newObjectSavedText="Post submitted"
             showExclude=['author']
-            showOptionToSubmit=hackernews.navbar.loggedInUser />
+            showOptionToSubmit=sn.navbar.loggedInUser />
             
           <scoringposts.create-score
-            sourceId=hackernews.navbar.loggedInUser.username
+            sourceId=sn.navbar.loggedInUser.username
             targetId=dv.gen-id.id
             value=0
             hidden=true />
@@ -233,9 +231,9 @@ to `create-score` and `create-object`. As a result,
 when a user clicks on the "Submit" button of `create-object`,
 `create-score` will create a score
 with the same id as the object `create-object` will create. These two objects can be
-thought of as views of the same *HN* post.
+thought of as views of the same *SN* post.
 
-Similarly, in *HN*'s `show-post` action, we feed
+Similarly, in *SN*'s `show-post` action, we feed
 the `id` input (inputs are preceded with `$`) to `show-object` and
 `show-target`:
 
@@ -250,7 +248,7 @@ the `id` input (inputs are preceded with `$`) to `show-object` and
 
     <dv.if condition=property.show-object.loadedObject class="post-container">
       <div class="inline-block">
-        <hackernews.upvote
+        <sn.upvote
           disabled=!$loggedInUser ||
             property.show-object.loadedObject.author === $loggedInUser.username
           id=$id isPost=true loggedInUser=$loggedInUser />
@@ -289,7 +287,7 @@ the `id` input (inputs are preceded with `$`) to `show-object` and
 
 Each of these actions loads and displays its own
 view of the post entity; the effect when put together is to display a
-*HN* post object. The configuration parameters of an action allow its effect,
+*SN* post object. The configuration parameters of an action allow its effect,
 including its appearance, to be customized; thus the hidden parameter of
 `show-object` marks it as a hidden HTML element, so that it does not appear
 (even though the object data itself is still loaded, emitted as an output,

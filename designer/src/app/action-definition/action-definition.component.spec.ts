@@ -6,7 +6,8 @@ import {
   MatInputModule,
   MatMenuModule,
   MatSelectModule,
-  MatTabsModule
+  MatTabsModule,
+  MatTooltipModule
 } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 
@@ -39,10 +40,11 @@ describe('ActionDefinitionComponent', () => {
         MatIconModule,
         MatInputModule,
         MatSelectModule,
-        MatTabsModule
+        MatTabsModule,
+        MatTooltipModule
       ],
       providers: [
-        { provide: RunService, useValue: {} }
+        { provide: RunService, useValue: { registerAppAction: () => {} } }
       ]
     })
     .compileComponents();

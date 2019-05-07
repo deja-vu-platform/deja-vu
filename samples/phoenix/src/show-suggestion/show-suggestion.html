@@ -1,0 +1,28 @@
+<dv.action name="show-suggestion">
+  <match.show-match userAId=$loggedInUserId userBId=$id hidden=true />
+
+  <!-- Only show other people, not oneself; shouldn't be matched -->
+  <dv.if condition=$loggedInUserId !== $id && !match.show-match.loadedMatch
+    class="suggestion-card">
+    <phoenix.show-user-info userId=$id />
+
+    <div class="interest">
+      <match.show-attempts sourceId=$loggedInUserId targetId=$id hidden=true />
+
+      <!-- The current user already has indicated interest -->
+      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length !== 0>
+        Indicated interest!
+      </dv.if>
+
+      <!-- The current user has not indicated interest -->
+      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length === 0>
+        <dv.tx>
+          <dv.status savedText="Indicated interest!" />
+          <match.attempt-match sourceId=$loggedInUserId targetId=$id
+            hidden=true/>
+          <dv.button class="btn-interested">Interested?</dv.button>
+        </dv.tx>
+      </dv.if>
+    </div>
+  </dv.if>
+</dv.action>
