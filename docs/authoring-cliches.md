@@ -7,7 +7,9 @@
   otherwise
 
 - Show actions should have a `show[Field]` boolean input to determine whether
-  a particular field should be shown or not
+  a particular field should be shown or not. If within `show-foo`, the action
+  shows another entity, say, `bar`, the boolean inputs for `bar`'s fields should
+  have the format `showBar[Field]` to differentiate them from `foo`'s fields.
 
 - Actions that load some entity from the backend (usually `show-*`) should
   produce the object as output. For example, when `show-foo` loads a `Foo` if
