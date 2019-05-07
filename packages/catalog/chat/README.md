@@ -1,6 +1,6 @@
 # Chat
 
-Description of the cliché
+Send messages within a chat
 
 ## Actions
 
