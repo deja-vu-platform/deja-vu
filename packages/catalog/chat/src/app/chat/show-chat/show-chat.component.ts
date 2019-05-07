@@ -29,7 +29,10 @@ OnInit {
   // Provide one of the following: id or chat
   @Input() id: string | undefined;
   @Input() maxMessageCount: number = 0; // 0 for no limit
-  @Input() chat: Message[] | undefined;
+  @Input() set chat(inputChat: Message[]) {
+    this._chat = inputChat;
+    this._loadedChat = inputChat;
+  }
   @Output() loadedChat = new EventEmitter();
 
   @Input() showId = true;
@@ -45,7 +48,8 @@ OnInit {
   @Input() noMessagesToShowText = 'No messages yet';
 
   showChat;
-  private shouldUpdate = false;
+  _loadedChat: Message[] | undefined;
+  private _chat: Message[] | undefined;
   private gs: GatewayService;
 
   constructor(
@@ -78,7 +82,6 @@ OnInit {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.shouldUpdate = false;
       this.gs.get<ShowChatRes>(this.apiPath, {
         params: {
           inputs: {
@@ -100,7 +103,7 @@ OnInit {
       .subscribe((res: ShowChatRes) => {
         if (res.data) {
           const chat: Message[] = res.data.chatMessages;
-          this.chat = chat;
+          this._loadedChat = chat;
           this.loadedChat.emit(chat);
 
           this.gs.subscribe<any>(this.subscriptionsPath, {
@@ -111,10 +114,6 @@ OnInit {
               throw new Error(_.map(res.errors, 'message')
                 .join());
             }
-            // this doesn't work if this action is in a transaction
-            // because those actions might not re-eval anymore due to
-            // the canEval() check that will not know about `shouldUpdate`
-            this.shouldUpdate = true;
             this.load();
           });
         }
@@ -123,6 +122,6 @@ OnInit {
   }
 
   private canEval(): boolean {
-    return !!((!this.chat || this.shouldUpdate) && this.id && this.gs);
+    return !!(!this._chat && this.id && this.gs);
   }
 }
