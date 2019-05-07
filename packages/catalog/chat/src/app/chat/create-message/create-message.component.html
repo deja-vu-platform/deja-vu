@@ -1,14 +1,14 @@
 <form (ngSubmit)="onSubmit()"
-  [formGroup]="createChatForm"
+  [formGroup]="createMessageForm"
   class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <div *ngIf="newChatSaved">
+    <div *ngIf="newMessageSaved">
       <i class="material-icons">done</i>
-        {{newChatSavedText}}
+        {{newMessageSavedText}}
     </div>
-    <mat-error *ngIf="newChatError">
+    <mat-error *ngIf="newMessageError">
       <i class="material-icons">report_problem</i>
-      {{newChatError}}
+      {{newMessageError}}
     </mat-error>
   </div>
   <div class="form-group">
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" [disabled]="!createChatForm.valid">
+    <button mat-button type="submit" [disabled]="!createMessageForm.valid">
       {{buttonLabel}}
     </button>
   </div>

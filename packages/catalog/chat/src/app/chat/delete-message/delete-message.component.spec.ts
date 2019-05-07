@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateChatComponent } from './create-chat.component';
+import { DeleteMessageComponent } from './delete-message.component';
 
 import { config } from '../testing/testbed.config';
 
 
-describe('CreateChatComponent', () => {
-  let component: CreateChatComponent;
-  let fixture: ComponentFixture<CreateChatComponent>;
+describe('DeleteMessageComponent', () => {
+  let component: DeleteMessageComponent;
+  let fixture: ComponentFixture<DeleteMessageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule(config)
@@ -15,12 +15,13 @@ describe('CreateChatComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateChatComponent);
+    fixture = TestBed.createComponent(DeleteMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditChatComponent } from './edit-chat.component';
+import { UpdateMessageComponent } from './update-message.component';
 
 import { config } from '../testing/testbed.config';
 
 
-describe('EditChatComponent', () => {
-  let component: EditChatComponent;
-  let fixture: ComponentFixture<EditChatComponent>;
+describe('UpdateMessageComponent', () => {
+  let component: UpdateMessageComponent;
+  let fixture: ComponentFixture<UpdateMessageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule(config)
@@ -15,7 +15,7 @@ describe('EditChatComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditChatComponent);
+    fixture = TestBed.createComponent(UpdateMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

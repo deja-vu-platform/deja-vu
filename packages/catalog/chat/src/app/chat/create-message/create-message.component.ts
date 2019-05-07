@@ -13,56 +13,58 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../chat.config';
-import { Chat } from '../shared/chat.model';
+import { GraphQlMessage, Message } from '../shared/chat.model';
 
 
-interface CreateChatRes {
-  data: { createChat: Chat };
+interface CreateMessageRes {
+  data: { createMessage: GraphQlMessage };
   errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: 'chat-create-chat',
-  templateUrl: './create-chat.component.html',
-  styleUrls: ['./create-chat.component.css'],
+  selector: 'chat-create-message',
+  templateUrl: './create-message.component.html',
+  styleUrls: ['./create-message.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: CreateChatComponent,
+      useExisting: CreateMessageComponent,
       multi: true
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: CreateChatComponent,
+      useExisting: CreateMessageComponent,
       multi: true
     }
   ]
 })
-export class CreateChatComponent implements OnInit, OnExec, OnExecFailure,
+export class CreateMessageComponent implements OnInit, OnExec, OnExecFailure,
   OnExecSuccess {
   @Input() id: string | undefined;
   @Input() set content(inputContent: string) {
     this.contentControl.setValue(inputContent);
   }
+  @Input() authorId: string;
+  @Input() chatId: string;
   @Input() showOptionToSubmit = true;
 
   // Presentation inputs
-  @Input() buttonLabel = 'Create Chat';
+  @Input() buttonLabel = 'Create Message';
   @Input() inputContentLabel = 'Content';
-  @Input() newChatSavedText = 'New chat saved';
+  @Input() newMessageSavedText = 'New message saved';
 
   @ViewChild(FormGroupDirective) form;
 
   contentControl = new FormControl('', Validators.required);
-  createChatForm: FormGroup = this.builder.group({
+  createMessageForm: FormGroup = this.builder.group({
     contentControl: this.contentControl
   });
 
 
-  newChatSaved = false;
-  newChatError: string;
+  newMessageSaved = false;
+  newMessageError: string;
 
   private gs: GatewayService;
 
@@ -81,11 +83,16 @@ export class CreateChatComponent implements OnInit, OnExec, OnExecFailure,
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<CreateChatRes>(this.apiPath, {
+    if (!this.authorId || !this.chatId) {
+      return;
+    }
+    const res = await this.gs.post<CreateMessageRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
-          content: this.contentControl.value
+          content: this.contentControl.value,
+          authorId: this.authorId,
+          chatId: this.chatId
         }
       },
       extraInfo: { returnFields: 'id' }
@@ -99,9 +106,9 @@ export class CreateChatComponent implements OnInit, OnExec, OnExecFailure,
   }
 
   dvOnExecSuccess() {
-    this.newChatSaved = true;
+    this.newMessageSaved = true;
     window.setTimeout(() => {
-      this.newChatSaved = false;
+      this.newMessageSaved = false;
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -111,6 +118,6 @@ export class CreateChatComponent implements OnInit, OnExec, OnExecFailure,
   }
 
   dvOnExecFailure(reason: Error) {
-    this.newChatError = reason.message;
+    this.newMessageError = reason.message;
   }
 }

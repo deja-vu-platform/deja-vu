@@ -1,18 +1,22 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output
+  OnInit, Output, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH, SUBSCRIPTIONS_PATH } from '../chat.config';
-import { Chat } from '../shared/chat.model';
+import { Message } from '../shared/chat.model';
+import { ShowMessageComponent } from '../show-message/show-message.component';
+
+import * as _ from 'lodash';
+
 
 interface ShowChatRes {
-  data: { chat: Chat };
+  data: { chatMessages: Message[] };
 }
 
 
@@ -24,12 +28,23 @@ export class ShowChatComponent implements AfterViewInit, OnChanges, OnEval,
 OnInit {
   // Provide one of the following: id or chat
   @Input() id: string | undefined;
-  @Input() chat: Chat | undefined;
+  @Input() maxMessageCount: number = 0; // 0 for no limit
+  @Input() chat: Message[] | undefined;
   @Output() loadedChat = new EventEmitter();
 
   @Input() showId = true;
-  @Input() showContent = true;
+  @Input() showMessageId = true;
+  @Input() showMessageContent = true;
+  @Input() showMessageTimestamp = true;
+  @Input() showMessageAuthorId = true;
+  @Input() showMessageChatId = true;
 
+  @Input() showMessage: Action = {
+    type: <Type<Component>> ShowMessageComponent
+  };
+  @Input() noMessagesToShowText = 'No messages yet';
+
+  showChat;
   private shouldUpdate = false;
   private gs: GatewayService;
 
@@ -38,7 +53,9 @@ OnInit {
     private gsf: GatewayServiceFactory,
     private rs: RunService,
     @Inject(API_PATH) private apiPath,
-    @Inject(SUBSCRIPTIONS_PATH) private subscriptionsPath) {}
+    @Inject(SUBSCRIPTIONS_PATH) private subscriptionsPath) {
+    this.showChat = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -65,28 +82,39 @@ OnInit {
       this.gs.get<ShowChatRes>(this.apiPath, {
         params: {
           inputs: {
-            id: this.id
+            input: {
+              chatId: this.id,
+              maxMessageCount: this.maxMessageCount
+            }
           },
           extraInfo: {
             returnFields: `
-              ${this.showId ? 'id' : ''}
-              ${this.showContent ? 'content' : ''}
+              ${this.showMessageId ? 'id' : ''}
+              ${this.showMessageContent ? 'content' : ''}
+              ${this.showMessageTimestamp ? 'timestamp' : ''}
+              ${this.showMessageAuthorId ? 'authorId' : ''}
             `
           }
         },
       })
-      .pipe(map((res: ShowChatRes) => res.data.chat))
-      .subscribe((chat) => {
-        this.chat = chat;
-        this.loadedChat.emit(chat);
+      .subscribe((res: ShowChatRes) => {
+        if (res.data) {
+          const chat: Message[] = res.data.chatMessages;
+          this.chat = chat;
+          this.loadedChat.emit(chat);
 
-        this.gs.subscribe<boolean>(this.subscriptionsPath, {
-          inputs: { id: this.id }
-        })
-        .subscribe(() => {
-          this.shouldUpdate = true;
-          this.load();
-        });
+          this.gs.subscribe<any>(this.subscriptionsPath, {
+            inputs: { chatId: this.id }
+          })
+          .subscribe((res) => {
+            if (res.errors) {
+              throw new Error(_.map(res.errors, 'message')
+                .join());
+            }
+            this.shouldUpdate = true;
+            this.load();
+          });
+        }
       });
     }
   }

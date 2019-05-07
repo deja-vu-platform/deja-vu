@@ -1,9 +1,22 @@
-<span *ngIf="chat">
-  <div *ngIf="showId">
-    {{chat.id}}
-  </div>
+<div *ngIf="showId">{{id}}</div>
 
-  <div *ngIf="showContent">
-    {{chat.content}}
-  </div>
-</span>
+<ul *ngIf="chat && chat.length > 0" class="list-group">
+  <li *ngFor="let message of chat" class="list-group-item">
+    <dv-include 
+      [action]="showMessage" 
+      default-showMessage="{ tag: chat-show-message }"
+      [inputs]="{
+        message: message, showId: showMessageId, 
+        showContent: showMessageContent, showTimestamp: showMessageTimestamp,
+        showAuthorId: showMessageAuthorId, showChatId: showMessageChatId
+      }"
+      [parent]="showChat">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!chat || chat.length === 0">
+  <span>{{noMessagesToShowText}}</span>
+</div>
+
+

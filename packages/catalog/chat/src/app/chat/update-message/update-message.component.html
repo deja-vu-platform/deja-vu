@@ -2,16 +2,16 @@
     <button mat-button (click)="startEditing()" type="submit" *ngIf="!isEditing">
       {{startEditButtonLabel}}
     </button>
-    <form (ngSubmit)="onSubmit()" [formGroup]="updateChatForm"
+    <form (ngSubmit)="onSubmit()" [formGroup]="updateMessageForm"
     class="form-horizontal" *ngIf="isEditing">
       <div class="form-group">
-        <div *ngIf="updateChatSaved" class="edit-comment-success">
+        <div *ngIf="updateMessageSaved" class="edit-comment-success">
           <i class="material-icons">done</i>
-          {{updateChatSavedText}}
+          {{updateMessageSavedText}}
         </div>
-        <mat-error *ngIf="updateChatError">
+        <mat-error *ngIf="updateMessageError">
           <i class="material-icons">report_problem</i>
-          {{updateChatError}}
+          {{updateMessageError}}
         </mat-error>
       </div>
       <div class="form-group">
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="form-group">
-        <button mat-button type="submit" [disabled]="!updateChatForm.valid">
+        <button mat-button type="submit" [disabled]="!updateMessageForm.valid">
           {{buttonLabel}}
         </button>
       </div>

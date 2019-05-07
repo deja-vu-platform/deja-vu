@@ -16,57 +16,58 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../chat.config';
-import { Chat } from '../shared/chat.model';
+import { GraphQlMessage, Message, toMessage } from '../shared/chat.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
-interface ChatRes {
-  data: { chat: Chat };
+interface MessageRes {
+  data: { message: GraphQlMessage };
   errors: { message: string }[];
 }
 
-interface UpdateChatRes {
-  data: { updateChat: boolean };
+interface UpdateMessageRes {
+  data: { updateMessage: boolean };
   errors: { message: string }[];
 }
 
 @Component({
-  selector: 'chat-update-chat',
-  templateUrl: './update-chat.component.html',
-  styleUrls: ['./update-chat.component.css'],
+  selector: 'chat-update-message',
+  templateUrl: './update-message.component.html',
+  styleUrls: ['./update-message.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: UpdateChatComponent,
+      useExisting: UpdateMessageComponent,
       multi: true
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: UpdateChatComponent,
+      useExisting: UpdateMessageComponent,
       multi: true
     }
   ]
 })
-export class UpdateChatComponent implements
+export class UpdateMessageComponent implements
   OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
   @Input() id: string;
+  @Input() authorId: string;
 
   // Presentation text
-  @Input() buttonLabel = 'Update Chat';
+  @Input() buttonLabel = 'Update Message';
   @Input() inputContentLabel = 'Edit Content';
-  @Input() updateChatSavedText = 'Chat updated';
+  @Input() updateMessageSavedText = 'Message updated';
   @Input() startEditButtonLabel = 'Edit';
   @Input() stopEditButtonLabel = 'Cancel';
 
   @ViewChild(FormGroupDirective) form;
   contentControl = new FormControl('', Validators.required);
-  updateChatForm: FormGroup = this.builder.group({
+  updateMessageForm: FormGroup = this.builder.group({
     contentControl: this.contentControl
   });
 
   isEditing = false;
-  updateChatSaved = false;
-  updateChatError: string;
+  updateMessageSaved = false;
+  updateMessageError: string;
 
   private gs: GatewayService;
 
@@ -78,19 +79,19 @@ export class UpdateChatComponent implements
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadChat();
+    this.loadMessage();
   }
 
   ngOnChanges() {
-    this.loadChat();
+    this.loadMessage();
   }
 
-  loadChat() {
+  loadMessage() {
     if (!this.gs || !this.id) {
       return;
     }
 
-    this.gs.get<ChatRes>(this.apiPath, {
+    this.gs.get<MessageRes>(this.apiPath, {
       params: {
         inputs: { id: this.id },
         extraInfo: {
@@ -100,9 +101,9 @@ export class UpdateChatComponent implements
       }
     })
     .subscribe((res) => {
-      const chat = res.data.chat;
-      if (chat) {
-        this.contentControl.setValue(chat.content);
+      if (res.data) {
+        const message = toMessage(res.data.message);
+        this.contentControl.setValue(message.content);
       }
     });
 
@@ -121,10 +122,11 @@ export class UpdateChatComponent implements
   }
 
   async dvOnExec(): Promise<boolean> {
-    const res = await this.gs.post<UpdateChatRes>(this.apiPath, {
+    const res = await this.gs.post<UpdateMessageRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
+          authorId: this.authorId,
           content: this.contentControl.value
         }
       },
@@ -139,14 +141,14 @@ export class UpdateChatComponent implements
         .join());
     }
 
-    return res.data.updateChat;
+    return res.data.updateMessage;
   }
 
   dvOnExecSuccess() {
-    this.updateChatSaved = true;
-    this.updateChatError = '';
+    this.updateMessageSaved = true;
+    this.updateMessageError = '';
     window.setTimeout(() => {
-      this.updateChatSaved = false;
+      this.updateMessageSaved = false;
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.updateTaskForm.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -156,6 +158,6 @@ export class UpdateChatComponent implements
   }
 
   dvOnExecFailure(reason: Error) {
-    this.updateChatError = reason.message;
+    this.updateMessageError = reason.message;
   }
 }

@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeleteChatComponent } from './delete-chat.component';
+import { ShowMessageComponent } from './show-message.component';
 
 import { config } from '../testing/testbed.config';
 
 
-describe('DeleteChatComponent', () => {
-  let component: DeleteChatComponent;
-  let fixture: ComponentFixture<DeleteChatComponent>;
+describe('ShowMessageComponent', () => {
+  let component: ShowMessageComponent;
+  let fixture: ComponentFixture<ShowMessageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule(config)
@@ -15,7 +15,7 @@ describe('DeleteChatComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteChatComponent);
+    fixture = TestBed.createComponent(ShowMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

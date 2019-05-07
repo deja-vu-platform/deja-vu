@@ -9,17 +9,17 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../chat.config';
 
-interface DeleteChatRes {
-  data: { deleteChat: boolean };
+interface DeleteMessageRes {
+  data: { deleteMessage: boolean };
   errors: { message: string }[];
 }
 
 @Component({
-  selector: 'chat-delete-chat',
-  templateUrl: './delete-chat.component.html',
-  styleUrls: ['./delete-chat.component.css']
+  selector: 'chat-delete-message',
+  templateUrl: './delete-message.component.html',
+  styleUrls: ['./delete-message.component.css']
 })
-export class DeleteChatComponent implements OnInit, OnExec {
+export class DeleteMessageComponent implements OnInit, OnExec {
   @Input() id: string;
 
   private gs: GatewayService;
@@ -33,12 +33,12 @@ export class DeleteChatComponent implements OnInit, OnExec {
     this.rs.register(this.elem, this);
   }
 
-  deleteChat() {
+  deleteMessage() {
     this.rs.exec(this.elem);
   }
 
   async dvOnExec() {
-    const res = await this.gs.post<DeleteChatRes>(this.apiPath, {
+    const res = await this.gs.post<DeleteMessageRes>(this.apiPath, {
         inputs: {
           id: this.id
         }
