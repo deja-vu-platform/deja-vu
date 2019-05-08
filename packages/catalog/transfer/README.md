@@ -5,14 +5,14 @@ Transfer money or items between accounts
 ## Actions
 
 - add-to-balance
-- input-amount
-- show-item-count
-- show-transfers
 - create-item-count
-- input-item-counts
-- show-amount
-- show-item-counts
 - create-transfer
+- input-amount
+- input-item-counts
 - input-money
+- show-amount
 - show-balance
+- show-item-count
+- show-item-counts
 - show-transfer
+- show-transfers

@@ -9,6 +9,7 @@ Rank items
 ## Actions
 
 - create-ranking
+- show-fractional-ranking
 - show-ranking
+- show-rankings
 - show-target
-- show-target-rankings
