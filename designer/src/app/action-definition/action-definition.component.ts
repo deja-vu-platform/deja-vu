@@ -35,8 +35,9 @@ interface Reference extends IOReference {
   forActionID: string;
 }
 
+export const MIN_ALPHA_FOR_DARK = 0.25;
+
 const emptyRow = new Row();
-const emptySet = new Set<string>();
 
 // perceptually distinct colors
 // https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
@@ -100,12 +101,14 @@ implements AfterViewInit, OnChanges, OnInit {
 
   ngOnChanges() {
     const action = this.actionInstance.of as AppActionDefinition;
+    const color = tinycolor(action.styles.backgroundColor);
     document
       .querySelector('body').style
       .setProperty(
         '--text-stroke-color',
-        tinycolor(action.styles.backgroundColor)
-          .isDark() ? 'white' : 'black'
+        color.isDark() && color.getAlpha() > MIN_ALPHA_FOR_DARK
+          ? 'white'
+          : 'black'
       );
     this.updateReferences();
   }

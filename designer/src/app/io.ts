@@ -94,7 +94,7 @@ export class ChildScopeIO extends ScopeIO {
           this.emitExpressionValue(inputExpr, toSubject, this.parentScope);
         } else {
           // string inputted
-          toSubject.next(inputValue);
+          toSubject.next(inputValue || undefined);
         }
       } else if (inputValue instanceof ActionInstance) { // action input
         this.emitAction(inputValue, inputName);
