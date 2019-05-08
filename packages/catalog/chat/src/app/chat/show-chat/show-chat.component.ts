@@ -9,14 +9,14 @@ import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH, SUBSCRIPTIONS_PATH } from '../chat.config';
-import { Message } from '../shared/chat.model';
+import { GraphQlMessage, Message, toMessage } from '../shared/chat.model';
 import { ShowMessageComponent } from '../show-message/show-message.component';
 
 import * as _ from 'lodash';
 
 
 interface ShowChatRes {
-  data: { chatMessages: Message[] };
+  data: { chatMessages: GraphQlMessage[] };
 }
 
 
@@ -102,7 +102,7 @@ OnInit {
       })
       .subscribe((res: ShowChatRes) => {
         if (res.data) {
-          const chat: Message[] = res.data.chatMessages;
+          const chat: Message[] = res.data.chatMessages.map(toMessage);
           this._loadedChat = chat;
           this.loadedChat.emit(chat);
 
