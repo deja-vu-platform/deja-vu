@@ -88,14 +88,7 @@ export class ChildScopeIO extends ScopeIO {
       const inputValue = this.actionInstance.inputSettings[inputName];
       if (_.isString(inputValue)) { // expression input
         const toSubject = this.getSubject(inputName);
-        if (inputValue.startsWith('=')) {
-          // expression inputted
-          const inputExpr = inputValue.slice(1); // remove leading =
-          this.emitExpressionValue(inputExpr, toSubject, this.parentScope);
-        } else {
-          // string inputted
-          toSubject.next(inputValue || undefined);
-        }
+        this.emitExpressionValue(inputValue, toSubject, this.parentScope);
       } else if (inputValue instanceof ActionInstance) { // action input
         this.emitAction(inputValue, inputName);
       }
