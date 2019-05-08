@@ -57,3 +57,9 @@ type Mutation {
 type Subscription {
   newChatMessage(chatId: ID!): Boolean!
 }
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

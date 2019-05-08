@@ -2,7 +2,6 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import * as path from 'path';
 
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { readFileSync } from 'fs';
@@ -227,7 +226,6 @@ export class ClicheServer<C extends Config = Config> {
       this._resolvers = this._initResolvers(
         clicheDb, this._config);
       const typeDefs = [
-        readFileSync(path.join(__dirname, 'schema.base.graphql'), 'utf8'),
         readFileSync(this._schemaPath, 'utf8'), ...this._dynamicTypeDefs];
       const schema = makeExecutableSchema(
         { typeDefs, resolvers: this._resolvers });

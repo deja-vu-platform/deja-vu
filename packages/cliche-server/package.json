@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf ./dist",
-    "package": "yarn clean && yarn run build && cp src/schema.base.graphql dist/",
+    "package": "yarn clean && yarn run build",
     "prepare": "yarn run package",
     "lint": "tslint -p . -c tslint.json src/*.ts"
   },
