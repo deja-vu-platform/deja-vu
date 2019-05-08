@@ -27,8 +27,9 @@ By simply adding/ removing/ updating the import statments in the app style sheet
 users can harness any pre-built UI components and styles.
 
 Other popular CSS Frameworks include:
+
 | Framework | Example Import Statement |
-| --------- | ---------------- |
+| --------- | ------------------------ |
 | [Semantic UI](https://semantic-ui.com/) | `@import "~semantic-ui-css/semantic.min.css"` |
 | [Foundation](https://foundation.zurb.com/) | `@import "~foundation-sites/dist/css/foundation.min.css"` |
 | [Materialize](https://materializecss.com/) | `@import "~materialize-css/dist/css/materialize.min.css"` |
