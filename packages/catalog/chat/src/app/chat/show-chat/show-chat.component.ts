@@ -116,6 +116,8 @@ OnInit {
           });
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

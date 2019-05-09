@@ -85,6 +85,8 @@ OnInit {
           this.loadedMessage.emit(message);
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

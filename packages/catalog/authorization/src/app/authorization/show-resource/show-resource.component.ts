@@ -69,6 +69,8 @@ OnChanges {
         this.resource = res.data.resource;
         this.fetchedResource.emit(this.resource);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

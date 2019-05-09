@@ -70,6 +70,8 @@ OnInit {
         this._consumerId = consumerId;
         this.consumerId.emit(consumerId);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

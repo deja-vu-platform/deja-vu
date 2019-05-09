@@ -17,5 +17,9 @@
         { "for": "src/app/app.component.html", "use": "chat-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "chat-show-chat",
+    "chat-show-message"
+  ]
 }

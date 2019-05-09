@@ -19,5 +19,8 @@
         { "for": "src/app/app.component.html", "use": "allocator-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "allocator-show-consumer"
+  ]
 }

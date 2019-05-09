@@ -69,6 +69,8 @@ export class ShowResourceCountComponent implements AfterViewInit, OnChanges,
         .subscribe((resourceCount) => {
           this.resourceCount = resourceCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 
