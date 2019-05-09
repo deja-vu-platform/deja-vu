@@ -172,8 +172,9 @@ export class TxRequest {
    * Send all of the requests.
    */
   private send(): void {
-    // not in transaction: just send it
-    if (this.numActionsTotal === 1) {
+    // not in transaction or tx has just 1 request,
+    // so just send that 1 request directly
+    if (this.requests.length === 1) {
       const { method, body, query: params } = this.requests[0];
       let obs: Observable<any> = null;
       switch (method) {
