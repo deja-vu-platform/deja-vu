@@ -92,6 +92,47 @@
 
 - All form controls should reset themselves on exec success
 
+## Reactive actions
+
+- The `show-chat` action of the chat cliché is a good example of a reactive
+action. It automatically updates whenever a new message for the chat comes in.
+It could be used as an example to follow for the steps below. 
+
+- Actions can be made reactive (i.e. automatically update its contents) by
+  including these things:
+
+  - In the clichés `schema.graphql` file:
+    - a declaration of the desired GraphQL subscriptions inside
+    `type Subscription {}`, similar to queries and mutations
+    - add the following so that the declared subscriptions are recognized:
+
+    ```text
+    schema {
+      query: Query
+      mutation: Mutation
+      subscription: Subscription
+    }
+    ```
+
+  - In the `server.ts` file:
+    - create a `PubSub` object and use it to publish to specific channels every
+    time a relevant event (e.g. a creation or an update) happens
+    - include the GraphQL subscription resolvers. *For security reasons*, the
+    return value of subscriptions should not contain any data. They should
+    just return `true`. When an action receives the reply, it should reload
+    the data so that if it is in a transaction, all the other actions in the
+    transaction would also get re-run. This ensures, for example, that any
+    authentication or authorization checks happen again.
+    - just like other GraphQL requests, add the subscription request(s) to the
+    `ActionRequestTable`. By default, the value of `extraInfo.action` for
+    subscriptions is `'subscribe'`.
+
+  - In the `foo.module.ts` file, include the following provider:
+  `{ provide: SUBSCRIPTIONS_PATH, useValue: '/subscriptions' }`
+
+  - Call `this.gs.subscribe(...)` in the actions themselves. See the note on
+  security under the `server.ts` file.
+
 ## Misc
 
 - Use an `input` object type in the GraphQL schema if there's more than one
