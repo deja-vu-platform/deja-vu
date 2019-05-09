@@ -1,7 +1,7 @@
 <div *ngIf="showId">{{id}}</div>
 
-<ul *ngIf="_loadedChat && _loadedChat.length > 0" class="list-group">
-  <li *ngFor="let message of _loadedChat" class="list-group-item">
+<ul *ngIf="chat && chat.length > 0" class="list-group">
+  <li *ngFor="let message of chat" class="list-group-item">
     <dv-include 
       [action]="showMessage" 
       default-showMessage="{ tag: chat-show-message }"
@@ -15,7 +15,7 @@
   </li>
 </ul>
 
-<div *ngIf="!_loadedChat || _loadedChat.length === 0">
+<div *ngIf="!chat || chat.length === 0">
   <span>{{noMessagesToShowText}}</span>
 </div>
 
