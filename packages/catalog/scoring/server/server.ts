@@ -8,6 +8,7 @@ import {
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
@@ -89,7 +90,7 @@ function getOneToOneScoring(config: ScoringConfig): boolean {
   return config.oneToOneScoring === undefined ? true : config.oneToOneScoring;
 }
 
-function resolvers(db: ClicheDb, config: ScoringConfig): object {
+function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
   const scores: Collection<ScoreDoc> = db.collection('scores');
   const totalScoreFn = config.totalScoreFn ?
     new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;

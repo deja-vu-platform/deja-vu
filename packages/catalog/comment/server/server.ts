@@ -9,6 +9,7 @@ import {
   getReturnFields,
   Validation
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
   CommentDoc,
@@ -93,7 +94,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, config: CommentConfig): object {
+function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
   const comments: Collection<CommentDoc> = db.collection('comments');
 
   return {

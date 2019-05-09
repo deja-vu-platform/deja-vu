@@ -102,7 +102,8 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
             this.loadedComment.emit(this.comment);
           });
       }
-
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

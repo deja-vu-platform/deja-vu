@@ -17,5 +17,13 @@
         { "for": "src/app/app.component.html", "use": "follow-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "follow-show-follower-count",
+    "follow-show-followers",
+    "follow-show-message-count",
+    "follow-show-messages",
+    "follow-show-publisher-count",
+    "follow-show-publishers"
+  ]
 }

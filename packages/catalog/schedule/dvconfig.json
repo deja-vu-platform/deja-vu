@@ -17,5 +17,12 @@
         { "for": "src/app/app.component.html", "use": "schedule-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "schedule-show-all-availability",
+    "schedule-show-next-availability",
+    "schedule-show-schedule",
+    "schedule-show-slot",
+    "schedule-show-slots"
+  ]
 }

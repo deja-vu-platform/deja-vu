@@ -69,6 +69,8 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
         .subscribe((messageCount) => {
           this.messageCount = messageCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

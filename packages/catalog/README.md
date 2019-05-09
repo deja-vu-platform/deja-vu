@@ -5,6 +5,7 @@
 | [Allocator](allocator/README.md) | Distribute resources among consumers |
 | [Authentication](authentication/README.md) | Verify the user's identity with a username and password |
 | [Authorization](authorization/README.md) | Control access to resources |
+| [Chat](chat/README.md) | Exchange messages in real time with other users |
 | [Comment](comment/README.md) | Share reactions to items |
 | [Event](event/README.md) | Schedule events |
 | [Follow](follow/README.md) | Receive updates from sources |

@@ -69,6 +69,8 @@ export class ShowCommentCountComponent implements AfterViewInit, OnChanges,
         .subscribe((commentCount) => {
           this.commentCount = commentCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

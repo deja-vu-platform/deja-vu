@@ -82,6 +82,8 @@ OnInit {
         this.slot = slot;
         this.loadedSlot.emit(slot);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

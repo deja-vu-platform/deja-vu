@@ -62,6 +62,8 @@ OnChanges {
         this._ownerId = ownerId;
         this.ownerId.emit(ownerId);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

@@ -82,6 +82,8 @@ export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
           this.memberIds = res.data.members;
           this.loadedMemberIds.emit(this.memberIds);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

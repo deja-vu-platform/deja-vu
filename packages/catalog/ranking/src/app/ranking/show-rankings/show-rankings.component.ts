@@ -111,6 +111,8 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
           this.loadedRankings.emit(this.rankings);
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

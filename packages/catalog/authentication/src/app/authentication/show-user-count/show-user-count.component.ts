@@ -56,6 +56,8 @@ export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
         .subscribe((userCount) => {
           this.userCount = userCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

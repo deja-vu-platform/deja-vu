@@ -81,6 +81,8 @@ OnChanges {
         this._resourceIds = _.map(res.data.resources, 'id');
         this.resourceIds.emit(this._resourceIds);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

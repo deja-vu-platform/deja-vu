@@ -60,6 +60,7 @@ const INDENT_NUM_SPACES = 2;
 export class ActionHelper {
   private readonly actionTable: ActionTable;
   private readonly actionsNoExecRequest: Set<string>;
+  private readonly actionsRequestOptional: Set<string>;
   private readonly noApp: boolean = false;
 
   /**
@@ -248,6 +249,18 @@ export class ActionHelper {
     return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
   }
 
+  /**
+   * @return the set of actions from the given cliche that only optionally issue
+   * requests
+   */
+  private static GetActionsRequestOptional(cliche: string)
+    : string[] | undefined {
+      const fp = path.join(
+        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8')).actionsRequestOptional;
+  }
+
   private static GetClicheFolder(cliche: string): string {
     // Cliches specify as a main their typings (so that when apps do `import
     // 'cliche'` it works) . To get to their folder we need to go up a dir
@@ -344,6 +357,9 @@ export class ActionHelper {
     this.actionsNoExecRequest = new Set<string>(
       _.flatMap(usedCliches, (cliche: string) => _.get(
         ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+    this.actionsRequestOptional = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string): string[] =>
+        ActionHelper.GetActionsRequestOptional(cliche) || []));
 
     if (!appActionTable) {
       this.noApp = true;
@@ -395,11 +411,15 @@ export class ActionHelper {
   }
 
   /**
-   * @returns true if the action given by `tag` is expected to do an exe
+   * @returns true if the action given by `tag` is expected to do an exec
    * request
    */
   shouldHaveExecRequest(tag: string): boolean {
     return !this.actionsNoExecRequest.has(tag);
+  }
+
+  isRequestOptional(tag: string): boolean {
+    return this.actionsRequestOptional.has(tag);
   }
 
   /**

@@ -18,6 +18,10 @@ export const EMPTY_CONTEXT: Context = {
   reqType: undefined, runId: '', reqId: ''
 };
 
+export function isSuccessfulContext(context: Context): boolean {
+  return context.reqType == undefined || context.reqType == 'commit';
+}
+
 export class ClicheDbError extends Error {
   public readonly errorCode: number;
 
@@ -111,7 +115,10 @@ export interface Collection<T extends Object> {
   deleteOne(context: Context, filter: Query<T>): Promise<boolean>;
 
   /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#find */
-  find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]>;
+  find(query?: Query<T>): Promise<T[]>;
+
+  /** http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#find */
+  findCursor(query?: Query<T>): Promise<mongodb.Cursor<T>>;
 
   /**
    * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOne

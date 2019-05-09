@@ -9,6 +9,7 @@ import {
   getReturnFields
 } from '@deja-vu/cliche-server';
 import * as Ajv from 'ajv';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
@@ -132,7 +133,7 @@ function createObjectFromInput(config: PropertyConfig, input) {
   return newObject;
 }
 
-function resolvers(db: ClicheDb, config: PropertyConfig): object {
+function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
   const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {

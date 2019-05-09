@@ -69,6 +69,8 @@ export class ShowEventCountComponent implements AfterViewInit, OnChanges,
         .subscribe((eventCount) => {
           this.eventCount = eventCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

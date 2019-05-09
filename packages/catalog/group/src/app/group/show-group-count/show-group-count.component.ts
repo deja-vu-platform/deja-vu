@@ -67,6 +67,8 @@ export class ShowGroupCountComponent implements AfterViewInit, OnChanges,
         .subscribe((groupCount) => {
           this.groupCount = groupCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

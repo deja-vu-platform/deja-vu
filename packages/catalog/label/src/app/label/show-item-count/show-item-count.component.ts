@@ -61,6 +61,8 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
         .subscribe((itemCount) => {
           this.itemCount = itemCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

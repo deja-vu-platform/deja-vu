@@ -19,6 +19,7 @@ import {
 } from './schema';
 
 import { getHours, getMinutes } from 'date-fns';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
@@ -231,7 +232,7 @@ function getSlotsPipeline(matchQuery: any, filterCondition: any,
   ];
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const schedules: Collection<ScheduleDoc> = db.collection('schedules');
 
   return {

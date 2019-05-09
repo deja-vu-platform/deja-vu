@@ -22,5 +22,10 @@
     "exec": [
       "authentication-choose-user"
     ]
-  }
+  },
+  "actionsRequestOptional": [
+    "authentication-show-user",
+    "authentication-show-user-count",
+    "authentication-show-users"
+  ]
 }

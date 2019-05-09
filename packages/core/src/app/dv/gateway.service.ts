@@ -12,6 +12,7 @@ import * as _ from 'lodash';
 import { NodeUtils } from './node.utils';
 
 import { RunService } from './run.service';
+import { SubscriptionService } from './subscription.service';
 
 
 export interface Dict {
@@ -31,18 +32,22 @@ export enum Method {
   POST = 'POST'
 }
 
-export interface Params {
+export interface BaseParams {
   from: string;
-  runId: string;
+  fullActionName: string;
   path?: string;
   options?: string;
+}
+
+export interface RunParams extends BaseParams {
+  runId: string;
   [s: string]: string; // won't actually ever have more but typing expects this
 }
 
 export interface ChildRequest {
   method: Method;
   body: string | Object;
-  query: Params;
+  query: RunParams;
 }
 
 interface ChildResponse {
@@ -167,8 +172,9 @@ export class TxRequest {
    * Send all of the requests.
    */
   private send(): void {
-    // not in transaction: just send it
-    if (this.numActionsTotal === 1) {
+    // not in transaction or tx has just 1 request,
+    // so just send that 1 request directly
+    if (this.requests.length === 1) {
       const { method, body, query: params } = this.requests[0];
       let obs: Observable<any> = null;
       switch (method) {
@@ -228,15 +234,18 @@ export class TxRequest {
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
   fromStr: string;
+  private readonly gatewayHttpUrl: string;
 
   constructor(
-    private gatewayUrl: string,
+    gatewayUrl: string,
     private http: HttpClient,
     private renderer: Renderer2,
     private rs: RunService,
+    private ss: SubscriptionService,
     private from: ElementRef
   ) {
     this.fromStr = this.generateFromStr();
+    this.gatewayHttpUrl = `http://${gatewayUrl}`;
   }
 
   /**
@@ -265,6 +274,10 @@ export class GatewayService {
     const runId = NodeUtils.GetRunId(this.from.nativeElement);
     const txRequest = this.getTxReq(runId);
     txRequest.postNoRequest();
+  }
+
+  subscribe<T>(path?: string, request: Object = {}): Observable<T> {
+    return this.ss.subscribe<T>(request, this.buildBaseParams(path));
   }
 
   protected isAction(node: Element): boolean {
@@ -304,7 +317,7 @@ export class GatewayService {
     let txRequest = GatewayService.txBatches[runId];
     if (txRequest === undefined) {
       txRequest = new TxRequest(
-        this.gatewayUrl, this.http, this.from.nativeElement,
+        this.gatewayHttpUrl, this.http, this.from.nativeElement,
         this.renderer, this.rs);
       if (runId) {
         GatewayService.txBatches[runId] = txRequest;
@@ -322,7 +335,7 @@ export class GatewayService {
   ): Observable<T> {
     console.log(`Sending ${method} from ${this.getActionName()}`);
 
-    const params = this.buildParams(path, options);
+    const params = this.buildRunParams(path, options);
 
     const txRequest = this.getTxReq(params.runId);
 
@@ -339,20 +352,26 @@ export class GatewayService {
     return individualResponseObservable;
   }
 
-  private buildParams(path?: string, options?: RequestOptions): Params {
-    const params = {
+  private buildBaseParams(path?: string, options?: RequestOptions): BaseParams {
+    const params: BaseParams = {
       from: this.fromStr,
       fullActionName: this.getActionName(),
-      runId: NodeUtils.GetRunId(this.from.nativeElement)
     };
     if (path) {
-      params['path'] = path;
+      params.path = path;
     }
     if (options) {
-      params['options'] = JSON.stringify(options);
+      params.options = JSON.stringify(options);
     }
 
     return params;
+  }
+
+  private buildRunParams(path?: string, options?: RequestOptions): RunParams {
+    return {
+      ...this.buildBaseParams(path, options),
+      runId: NodeUtils.GetRunId(this.from.nativeElement)
+    };
   }
 
   private getActionName(): string {
@@ -368,9 +387,10 @@ export class DesignerGatewayService extends GatewayService {
     http: HttpClient,
     renderer: Renderer2,
     rs: RunService,
+    ss: SubscriptionService,
     from: ElementRef
   ) {
-    super(gatewayUrl, http, renderer, rs, from);
+    super(gatewayUrl, http, renderer, rs, ss, from);
   }
 
   protected isAction(node: Element): boolean {
@@ -390,9 +410,11 @@ export class DesignerGatewayService extends GatewayService {
 @Injectable()
 export class GatewayServiceFactory {
   private readonly renderer: Renderer2;
+
   constructor(
     @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
-    rendererFactory: RendererFactory2, private rs: RunService) {
+    rendererFactory: RendererFactory2, private rs: RunService,
+    private ss: SubscriptionService) {
     // https://github.com/angular/angular/issues/17824
     // It seems like while you can get Renderer2 injected in components it
     // doesn't work for services. The workaround is to get the factory injected
@@ -410,6 +432,7 @@ export class GatewayServiceFactory {
   for(from: ElementRef): GatewayService {
     const cls = window['dv-designer'] ? DesignerGatewayService : GatewayService;
 
-    return new cls(this.gatewayUrl, this.http, this.renderer, this.rs, from);
+    return new cls(
+      this.gatewayUrl, this.http, this.renderer, this.rs, this.ss, from);
   }
 }

@@ -101,6 +101,8 @@ OnChanges {
         this.transfer = res.data.transfer;
         this.loadedTransfer.emit(this.transfer);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

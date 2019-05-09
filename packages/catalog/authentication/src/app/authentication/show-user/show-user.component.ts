@@ -71,6 +71,8 @@ export class ShowUserComponent implements AfterViewInit, OnEval, OnInit,
           }
           this.loadedUser.emit(this.user);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

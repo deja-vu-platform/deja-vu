@@ -76,6 +76,8 @@ export class ShowTaskCountComponent implements AfterViewInit, OnChanges,
         .subscribe((taskCount) => {
           this.taskCount = taskCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

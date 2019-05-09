@@ -17,5 +17,11 @@
         { "for": "src/app/app.component.html", "use": "match-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "match-show-attempt",
+    "match-show-attempts",
+    "match-show-match",
+    "match-show-matches"
+  ]
 }

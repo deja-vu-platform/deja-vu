@@ -90,6 +90,8 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
           this.events = _.map(res.data.events, (event) => toEvent(event));
           this.fetchedEvents.emit(this.events);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

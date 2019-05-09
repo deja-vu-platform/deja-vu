@@ -125,6 +125,8 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
           this.schedule = schedule;
           this.loadedSchedule.emit(schedule);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

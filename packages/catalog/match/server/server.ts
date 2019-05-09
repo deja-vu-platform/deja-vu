@@ -18,9 +18,10 @@ import {
   MatchInput
 } from './schema';
 
+import { IResolvers } from 'graphql-tools';
+import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import * as _ from 'lodash';
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
@@ -66,7 +67,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const matches: Collection<MatchDoc> = db.collection('matches');
   const attempts: Collection<AttemptDoc> = db.collection('attempts');
 

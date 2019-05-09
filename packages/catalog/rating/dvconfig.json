@@ -17,5 +17,11 @@
         { "for": "src/app/app.component.html", "use": "rating-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "rating-show-average-rating",
+    "rating-show-rating",
+    "rating-show-rating-count",
+    "rating-show-ratings-by-target"
+  ]
 }

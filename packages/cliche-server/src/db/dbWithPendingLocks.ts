@@ -189,13 +189,15 @@ export class CollectionWithPendingLocks<T> implements Collection<T> {
     return undefined;
   }
 
-  async find(query?: Query<T>, options?: mongodb.FindOneOptions): Promise<T[]> {
+  async find(query?: Query<T>): Promise<T[]> {
+    return (await this.findCursor(query)).toArray();
+  }
+
+  async findCursor(query?: Query<T>): Promise<mongodb.Cursor<T>> {
     const queryNotPendingCreate: Query<DbDoc<T>> =
       this.getNotPendingCreateFilter(query);
 
-    return await this._collection
-      .find(queryNotPendingCreate, options)
-      .toArray();
+    return await this._collection.find(queryNotPendingCreate);
   }
 
   async findOne(query: Query<T>, options?: mongodb.FindOneOptions): Promise<T> {

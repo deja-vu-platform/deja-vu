@@ -1,0 +1,25 @@
+{
+  "name": "chat",
+  "config": {
+    "wsPort": 3001
+  },
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/chat/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "chat-root" }
+      ]
+    }
+  },
+  "actionsRequestOptional": [
+    "chat-show-chat",
+    "chat-show-message"
+  ]
+}

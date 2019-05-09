@@ -87,6 +87,8 @@ export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.publishers = res.data.publishers;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

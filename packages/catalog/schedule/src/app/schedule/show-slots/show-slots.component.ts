@@ -126,38 +126,42 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
   }
 
   async dvOnEval(): Promise<void> {
-    const startDate = this.startDateControl.value ?
-      this.startDateControl.value.format('YYYY-MM-DD') : '';
-    const endDate = this.endDateControl.value ?
-      this.endDateControl.value.format('YYYY-MM-DD') : '';
-    this.gs.get<SlotsRes>(this.apiPath, {
-      params: {
-        inputs: JSON.stringify({
-          input: {
-            scheduleId: this.scheduleId,
-            startDate: startDate,
-            endDate: endDate,
-            startTime: this.startTimeControl.value,
-            endTime: this.endTimeControl.value,
-            sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
-            sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
+    if (this.canEval()) {
+      const startDate = this.startDateControl.value ?
+        this.startDateControl.value.format('YYYY-MM-DD') : '';
+      const endDate = this.endDateControl.value ?
+        this.endDateControl.value.format('YYYY-MM-DD') : '';
+      this.gs.get<SlotsRes>(this.apiPath, {
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              scheduleId: this.scheduleId,
+              startDate: startDate,
+              endDate: endDate,
+              startTime: this.startTimeControl.value,
+              endTime: this.endTimeControl.value,
+              sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
+              sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
+            }
+          }),
+          extraInfo: {
+            returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showStartDate ? 'startDate' : ''}
+                ${this.showEndDate ? 'endDate' : ''}
+              `
           }
-        }),
-        extraInfo: {
-          returnFields: `
-              ${this.showId ? 'id' : ''}
-              ${this.showStartDate ? 'startDate' : ''}
-              ${this.showEndDate ? 'endDate' : ''}
-            `
         }
-      }
-    })
-      .pipe(map((res: SlotsRes) => res.data.slots))
-      .subscribe((slots) => {
-        this.slots = slots;
-        this.loadedSlots.emit(slots);
-      });
-    }
+      })
+        .pipe(map((res: SlotsRes) => res.data.slots))
+        .subscribe((slots) => {
+          this.slots = slots;
+          this.loadedSlots.emit(slots);
+        });
+    } else if (this.gs) {
+      this.gs.noRequest();
+    } 
+  }
 
   private canEval(): boolean {
     return !!(!this.slots && this.scheduleId && this.gs);

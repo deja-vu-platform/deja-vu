@@ -10,6 +10,7 @@ import {
   Validation
 } from '@deja-vu/cliche-server';
 import * as bcrypt from 'bcryptjs';
+import { IResolvers } from 'graphql-tools';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -192,7 +193,7 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const users: Collection<UserDoc> = db.collection('users');
 
   return {

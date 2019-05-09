@@ -9,6 +9,7 @@ import {
   EMPTY_CONTEXT,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
   AddLabelsToItemInput,
@@ -134,7 +135,7 @@ function getItemAggregationPipeline(input: ItemsInput, getCount = false) {
   return pipeline;
 }
 
-function resolvers(db: ClicheDb, _config: LabelConfig): object {
+function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
   const labels: Collection<LabelDoc> = db.collection('labels');
 
   return {

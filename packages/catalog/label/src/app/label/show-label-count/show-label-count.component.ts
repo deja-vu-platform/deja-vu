@@ -67,6 +67,8 @@ export class ShowLabelCountComponent implements AfterViewInit, OnChanges,
         .subscribe((labelCount) => {
           this.labelCount = labelCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

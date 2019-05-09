@@ -17,5 +17,11 @@
         { "for": "src/app/app.component.html", "use": "authorization-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "authorization-show-owner",
+    "authorization-show-resource",
+    "authorization-show-resource-count",
+    "authorization-show-resources"
+  ]
 }

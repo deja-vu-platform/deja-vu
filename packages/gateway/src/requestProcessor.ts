@@ -1,4 +1,6 @@
 import * as express from 'express';
+import { ExecutionResult } from 'graphql';
+import { Observable } from 'subscriptions-transport-ws';
 import * as request from 'superagent';
 import { v4 as uuid } from 'uuid';
 
@@ -12,6 +14,7 @@ import {
   ActionTag,
   ActionTagPath
 } from './actionHelper';
+import { SubscriptionCoordinator } from './subscriptionCoordinator';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 import { ActionPath } from './actionPath';
@@ -142,6 +145,7 @@ export abstract class RequestProcessor {
   protected readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch>;
   protected readonly dstTable: { [cliche: string]: port } = {};
+  protected readonly subscriptionCoordinator: SubscriptionCoordinator;
 
   private static ClicheOf(node: ActionTag | undefined): string | undefined {
     if (node === undefined) {
@@ -225,6 +229,7 @@ export abstract class RequestProcessor {
     const txConfig = this.getTxConfig(config);
     this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
       ClicheResponse<string>, ResponseBatch>(txConfig);
+    this.subscriptionCoordinator = new SubscriptionCoordinator();
   }
 
   start(): Promise<void> {
@@ -240,6 +245,20 @@ export abstract class RequestProcessor {
       this.processNonTxRequest(req, res);
   }
 
+  processSubscription(request: Object): Observable<ExecutionResult> {
+    if (!request['from']) {
+      throw new RequestInvalidError('No from specified');
+    }
+    const port = this.getToPort(ActionPath.fromString(request['from']));
+    const url = this.getUrl(port, request['path'], true);
+
+    return this.subscriptionCoordinator.forwardRequest(url, request);
+  }
+
+  unsubscribeAll() {
+    this.subscriptionCoordinator.unsubscribeAll();
+  }
+
   protected async processTxRequest(
     req: express.Request,
     res: express.Response
@@ -249,6 +268,7 @@ export abstract class RequestProcessor {
     const resBatch = new ResponseBatch(res, childRequests.length);
 
     let gatewayToClicheRequests: GatewayToClicheRequest[];
+    let prunedCohortActions: ActionTag[];
     try {
        gatewayToClicheRequests = childRequests
          .map((childRequest) => this.validateRequest(childRequest));
@@ -256,6 +276,11 @@ export abstract class RequestProcessor {
       const actionPath = gatewayToClicheRequests[0].from;
       const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
       const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
+      prunedCohortActions = this.getPrunedCohortActions(cohortActions,
+        childRequests.map(childRequest =>
+          ActionPath.fromString(childRequest.query.from)
+            .last()));
+
       const inputValuesMap: InputValuesMap = {};
       for (const childRequest of childRequests) {
         const actionFqtag = ActionPath.fromString(childRequest.query.from)
@@ -277,7 +302,7 @@ export abstract class RequestProcessor {
       console.log(
         `Checking with context ${JSON.stringify(context)}` +
         `Input values map ${JSON.stringify(inputValuesMap)}`);
-      TxInputsValidator.Validate(inputValuesMap, cohortActions, context);
+      TxInputsValidator.Validate(inputValuesMap, prunedCohortActions, context);
     } catch (e) {
       if (e instanceof RequestInvalidError) {
         resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
@@ -295,6 +320,8 @@ export abstract class RequestProcessor {
           this.txCoordinator.processMessage(
             gatewayToClicheRequest.runId,
             gatewayToClicheRequest.from.serialize(),
+            this.getCohorts(
+              gatewayToClicheRequest.from.serialize(), prunedCohortActions),
             gatewayToClicheRequest, resBatch, index)))
       .then(() => {});
   }
@@ -328,27 +355,21 @@ export abstract class RequestProcessor {
     _dvTxNodeIndex: number
   ): ActionTag[];
 
+  protected abstract getPrunedCohortActions(cohortActions: ActionTag[],
+    receivedRequestFqTags: string[]): ActionTag[];
+
   protected validateRequest(req: express.Request | ChildRequest)
     : GatewayToClicheRequest {
-     if (!req.query.from) {
+    if (!req.query.from) {
       throw new RequestInvalidError('No from specified');
     }
 
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
     const { runId, from: actionPath } = gatewayRequest;
-    const actionTag = this.getActionFromPath(actionPath);
-    const to = RequestProcessor.ClicheOf(actionTag);
-    const toPort: port | undefined = _.get(this.dstTable, to);
+    const toPort: port = this.getToPort(actionPath);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
-    if (!actionTag) {
-      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
-    }
-    if (toPort === undefined) {
-      throw new RequestInvalidError(
-        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
-    }
 
     console.log(
       `Valid request: port: ${toPort}, ` +
@@ -358,11 +379,49 @@ export abstract class RequestProcessor {
     return {
       ...gatewayRequest,
       ...{
-        url: `http://localhost:${toPort}`,
+        url: `${this.getUrl(toPort)}`,
         method: req.method,
         body: req.body
       }
     };
+  }
+
+  protected getCohorts(
+    actionPathId: string, cohortActions: ActionTag[]): string[] {
+    const actionPath: ActionPath = ActionPath.fromString(actionPathId);
+    assert.ok(actionPath.isDvTx(),
+      `Getting cohorts of an action path that is not part of a ` +
+      `dv-tx: ${actionPath}`);
+    const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+
+    return _.map(cohortActions, (action: ActionTag) =>
+      new ActionPath([
+        ..._.take(actionPath.nodes(), dvTxNodeIndex + 1),
+        action.fqtag
+      ]).serialize()
+    );
+  }
+
+  private getToPort(actionPath: ActionPath): port {
+    const actionTag = this.getActionFromPath(actionPath);
+    const to = RequestProcessor.ClicheOf(actionTag);
+    const toPort: port | undefined = _.get(this.dstTable, to);
+
+    if (!actionTag) {
+      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
+    }
+    if (toPort === undefined) {
+      throw new RequestInvalidError(
+        `Invalid to: ${to}, my dstTable is ${stringify(this.dstTable)}`);
+    }
+
+    return toPort;
+  }
+
+  private getUrl(port: port, path: string = '', isSubscription?: boolean) {
+    const protocol = isSubscription ? 'ws' : 'http';
+
+    return `${protocol}://localhost:${port}${path}`;
   }
 
   private getTxConfig(config: GatewayConfig):
@@ -430,22 +489,6 @@ export abstract class RequestProcessor {
         index?: number
       ) => {
         txRes!.add(payload.status, payload.text, index);
-      },
-
-      getCohorts: (actionPathId: string): string[] => {
-        const actionPath: ActionPath = ActionPath.fromString(actionPathId);
-        assert.ok(actionPath.isDvTx(),
-          `Getting cohorts of an action path that is not part of a ` +
-          `dv-tx: ${actionPath}`);
-        const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
-        const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
-
-        return _.map(cohortActions, (action: ActionTag) =>
-          new ActionPath([
-            ..._.take(actionPath.nodes(), dvTxNodeIndex + 1),
-            action.fqtag
-          ]).serialize()
-        );
       },
 
       onError: (
@@ -518,6 +561,50 @@ export class AppRequestProcessor extends RequestProcessor {
     );
   }
 
+  /**
+   * Get the relevant subset of cohort actions based on the action tags
+   * from the received requests for the cohort.
+   *
+   * @param  cohortActions - all the actions in the cohort
+   * @param  receivedRequestFqTags - the action tags received as a batch
+   *                                     for the cohort
+   * @return cohort actions s.t. those not present in receivedRequestFqTags
+   *                        are excluded
+   * @throws RequestInvalidError if there are actions not present in
+   *         receivedRequestFqTags, but those requests are not optional; or
+   *         if there are more requests for an fqtag received than expected; or
+   *         if there are fqtags received that are not part of the cohort at all
+   */
+  protected getPrunedCohortActions(cohortActions: ActionTag[],
+    receivedRequestFqTags: string[]): ActionTag[] {
+    const fqTagsSet: Set<string> = new Set(receivedRequestFqTags);
+    if (fqTagsSet.size < receivedRequestFqTags.length) {
+      throw new RequestInvalidError('Got multiple requests from at least one ' +
+        'fqtag');
+    }
+    const prunedCohortActions: ActionTag[] = [];
+
+    for (const action of cohortActions) {
+      const actionRequestExists = fqTagsSet.has(action.fqtag);
+
+      if (!actionRequestExists &&
+        !this.actionHelper.isRequestOptional(action.tag)) {
+        throw new RequestInvalidError(`Did not get any requests from ` +
+        `${action.fqtag} and ${action.tag}'s request is not optional`);
+      }
+
+      if (actionRequestExists) {
+        prunedCohortActions.push(action);
+      }
+    }
+
+    if (prunedCohortActions.length < receivedRequestFqTags.length) {
+      throw new RequestInvalidError('Received requests include actions that ' +
+        'that are not part of the cohort');
+    }
+
+    return prunedCohortActions;
+  }
 }
 
 export class DesignerRequestProcessor extends RequestProcessor {
@@ -579,6 +666,8 @@ export class DesignerRequestProcessor extends RequestProcessor {
           this.txCoordinator.processMessage(
             gatewayToClicheRequest.runId,
             gatewayToClicheRequest.from.serialize(),
+            this.getCohorts(
+              gatewayToClicheRequest.from.serialize(), this.cohortActions),
             gatewayToClicheRequest, resBatch, index)))
       .then(() => {});
   }
@@ -587,6 +676,11 @@ export class DesignerRequestProcessor extends RequestProcessor {
     _actionPath: ActionPath,
     _dvTxNodeIndex: number
   ): ActionTag[] {
+    return this.cohortActions;
+  }
+
+  protected getPrunedCohortActions(_cohortActions: ActionTag[],
+    _receivedRequestFqTags: string[]): ActionTag[] {
     return this.cohortActions;
   }
 }

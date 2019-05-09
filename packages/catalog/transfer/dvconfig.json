@@ -20,5 +20,10 @@
         {"for": "src/app/app.component.html", "use": "transfer-root"}
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "transfer-show-balance",
+    "transfer-show-transfer",
+    "transfer-show-transfers"
+  ]
 }

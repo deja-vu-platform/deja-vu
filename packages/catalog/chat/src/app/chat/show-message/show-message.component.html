@@ -1,0 +1,21 @@
+<span *ngIf="message">
+  <div *ngIf="showId">
+    {{message.id}}
+  </div>
+
+  <div *ngIf="showContent">
+    {{message.content}}
+  </div>
+
+  <div *ngIf="showTimestamp">
+    {{message.timestamp}}
+  </div>
+
+  <div *ngIf="showAuthorId">
+    {{message.authorId}}
+  </div>
+
+  <div *ngIf="showChatId">
+    {{message.chatId}}
+  </div>
+</span>

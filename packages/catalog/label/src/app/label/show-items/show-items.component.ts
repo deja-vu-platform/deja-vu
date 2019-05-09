@@ -88,6 +88,8 @@ export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
             this.itemIds = res.data.items;
           });
       }
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

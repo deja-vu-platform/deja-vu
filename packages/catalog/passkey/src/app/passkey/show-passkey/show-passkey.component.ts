@@ -79,6 +79,8 @@ OnInit {
         this.passkey = passkey;
         this.loadedPasskey.emit(passkey);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

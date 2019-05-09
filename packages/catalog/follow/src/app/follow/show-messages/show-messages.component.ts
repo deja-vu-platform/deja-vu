@@ -90,6 +90,8 @@ export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.messages = res.data.messages;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

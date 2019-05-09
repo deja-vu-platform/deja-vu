@@ -102,6 +102,8 @@ OnChanges {
           this.loadedRanking.emit(this.ranking);
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

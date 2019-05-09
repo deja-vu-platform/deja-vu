@@ -69,6 +69,8 @@ export class ShowRatingCountComponent implements AfterViewInit, OnChanges,
         .subscribe((ratingCount) => {
           this.ratingCount = ratingCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

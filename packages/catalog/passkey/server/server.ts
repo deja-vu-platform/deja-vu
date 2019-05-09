@@ -10,6 +10,7 @@ import {
   EMPTY_CONTEXT,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import {
@@ -135,7 +136,7 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
   return { id, code };
 }
 
-function resolvers(db: ClicheDb, _config: Config): object {
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
 
   return {

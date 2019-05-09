@@ -106,6 +106,8 @@ OnChanges {
         .subscribe((res) => {
           this.tasks = res.data.tasks;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

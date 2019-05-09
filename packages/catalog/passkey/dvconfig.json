@@ -17,5 +17,8 @@
         { "for": "src/app/app.component.html", "use": "passkey-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "passkey-show-passkey"
+  ]
 }

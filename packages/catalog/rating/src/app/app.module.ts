@@ -16,7 +16,7 @@ import { GATEWAY_URL, DvModule } from '@deja-vu/core';
     RatingModule,
     DvModule
   ],
-  providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
+  providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

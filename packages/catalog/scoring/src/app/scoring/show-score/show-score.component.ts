@@ -84,6 +84,8 @@ export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
           this.score = res.data.score;
           this.loadedScore.emit(this.score);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 
