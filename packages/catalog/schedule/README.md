@@ -13,10 +13,11 @@ Find times to meet
 - show-slots
 - update-schedule
 
-
 ## Notes
+
 To use this cliché in your app you need to add the following
 to `styles.css`:
+
 ```css
 @import "~angular-calendar/css/angular-calendar.css";
 

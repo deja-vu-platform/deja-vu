@@ -13,3 +13,9 @@ Label items so that they can be found later
 - show-label
 - show-label-count
 - show-labels
+
+## Configuration Options
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------  | ----------- |
+| `initialLabelIds` | `string[]` | `[]` | Seeds the label database |

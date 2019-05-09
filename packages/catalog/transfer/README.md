@@ -16,3 +16,9 @@ Transfer money or items between accounts
 - show-item-counts
 - show-transfer
 - show-transfers
+
+## Configuration Options
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------  | ----------- |
+| `balanceType` | `money` or `items` | `items` | Describes the resource being exchanged |
