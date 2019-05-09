@@ -77,6 +77,8 @@ OnInit {
         this.<%= camelize(clicheName) %> = <%= camelize(clicheName) %>;
         this.loaded<%= classify(clicheName) %>.emit(<%= camelize(clicheName) %>);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

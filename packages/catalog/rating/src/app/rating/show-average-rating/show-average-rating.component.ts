@@ -86,6 +86,8 @@ OnInit, OnChanges {
           this.ratingCount.emit(this.ratingCountValue);
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

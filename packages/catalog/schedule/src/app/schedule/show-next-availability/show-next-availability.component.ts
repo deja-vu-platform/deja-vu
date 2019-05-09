@@ -89,6 +89,8 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
           this.nextAvailability = nextAvailability;
           this.loadedNextAvailability.emit(nextAvailability);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

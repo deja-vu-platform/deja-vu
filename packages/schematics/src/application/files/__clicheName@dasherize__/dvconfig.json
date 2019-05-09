@@ -17,5 +17,8 @@
         { "for": "src/app/app.component.html", "use": "<%= dasherize(clicheName) %>-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "<%= dasherize(clicheName) %>-show-<%= dasherize(clicheName) %>"
+  ]
 }

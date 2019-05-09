@@ -152,36 +152,40 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   }
 
   async dvOnEval(): Promise<void> {
-    const startDate = this.startDateControl.value ?
-      this.startDateControl.value.format('YYYY-MM-DD') : '';
-    const endDate = this.endDateControl.value ?
-      this.endDateControl.value.format('YYYY-MM-DD') : '';
+    if (this.canEval()) {
+      const startDate = this.startDateControl.value ?
+        this.startDateControl.value.format('YYYY-MM-DD') : '';
+      const endDate = this.endDateControl.value ?
+        this.endDateControl.value.format('YYYY-MM-DD') : '';
 
-    this.gs.get<AllAvailabilityRes>(this.apiPath, {
-      params: {
-        inputs: JSON.stringify({
-          input: {
-            scheduleIds: this.scheduleIds,
-            startDate: startDate,
-            endDate: endDate,
-            startTime: this.startTimeControl.value,
-            endTime: this.endTimeControl.value,
-            sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
-            sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
-          }
-        }),
-        extraInfo: { returnFields: 'id, startDate, endDate' }
-      }
-    })
-      .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
-      .subscribe((allAvailability) => {
-        this.allAvailability = allAvailability;
-        this.schedule = {
-          id: 'all-availability',
-          availability: this.allAvailability
-        };
-        this.loadedAllAvailability.emit(allAvailability);
-      });
+      this.gs.get<AllAvailabilityRes>(this.apiPath, {
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              scheduleIds: this.scheduleIds,
+              startDate: startDate,
+              endDate: endDate,
+              startTime: this.startTimeControl.value,
+              endTime: this.endTimeControl.value,
+              sortByStartDate: this.sortByStartDate === 'asc' ? 1 : -1,
+              sortByEndDate: this.sortByEndDate === 'asc' ? 1 : -1
+            }
+          }),
+          extraInfo: { returnFields: 'id, startDate, endDate' }
+        }
+      })
+        .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
+        .subscribe((allAvailability) => {
+          this.allAvailability = allAvailability;
+          this.schedule = {
+            id: 'all-availability',
+            availability: this.allAvailability
+          };
+          this.loadedAllAvailability.emit(allAvailability);
+        });
+    } else if (this.gs) {
+      this.gs.noRequest();
+    }
   }
 
   private canEval(): boolean {

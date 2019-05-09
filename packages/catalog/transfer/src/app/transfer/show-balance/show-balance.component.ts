@@ -91,6 +91,8 @@ OnInit, OnChanges {
         this.balance = res.data.balance;
         this.fetchedBalance.emit(this.balance);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

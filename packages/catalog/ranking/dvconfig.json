@@ -17,5 +17,10 @@
         { "for": "src/app/app.component.html", "use": "ranking-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "ranking-show-fractional-ranking",
+    "ranking-show-ranking",
+    "ranking-show-rankings"
+  ]
 }

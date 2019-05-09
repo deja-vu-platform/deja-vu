@@ -109,6 +109,8 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
           this.targets = res.data.targetsByScore;
           this.loadedTargets.emit(this.targets);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

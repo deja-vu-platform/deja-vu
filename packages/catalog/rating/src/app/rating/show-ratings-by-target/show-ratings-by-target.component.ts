@@ -78,6 +78,8 @@ OnInit, OnChanges {
       .subscribe((res) => {
         this.ratings = res.data.ratings;
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

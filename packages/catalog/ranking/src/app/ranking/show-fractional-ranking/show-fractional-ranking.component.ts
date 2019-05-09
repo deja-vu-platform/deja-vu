@@ -79,6 +79,8 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
       .subscribe((res) => {
         this.targets = res.data.fractionalRanking;
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

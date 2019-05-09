@@ -101,6 +101,8 @@ OnChanges {
         .subscribe((res) => {
           this.transfers = res.data.transfers;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

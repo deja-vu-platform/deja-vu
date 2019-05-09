@@ -101,6 +101,8 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
           this.target = res.data.target;
           this.loadedTarget.emit(this.target);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 
