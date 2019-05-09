@@ -250,7 +250,8 @@ export class ActionHelper {
   }
 
   /**
-   * @return the set of actions from the given cliche that TODO
+   * @return the set of actions from the given cliche that only optionally issue
+   * requests
    */
   private static GetActionsRequestOptional(cliche: string)
     : string[] | undefined {
