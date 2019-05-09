@@ -16,6 +16,7 @@ Locate points of interest
 
 To use this cliché in your app you need to add the following
 to `styles.css`:
+
 ```css
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -23,6 +24,8 @@ to `styles.css`:
 ```
 
 ## Configuration Options
-- `mapType` (`string`): If set to `leaflet`, the cliche uses the Leaflet Maps API. If set to `gmap`, it uses the Google Maps API.
-- `apiKey` (`string`): Must be set if `mapType` is `gmap`.
 
+| Option | Type | Default | Description |
+| ------ | ---- | ------  | ----------- |
+| `mapType` | `string` | `leaflet` | Specifies which Maps API to use (Leaflet [`leaflet`] or Google Maps [`gmap`]) |
+| `apiKey` | `string` | `undefined` | Must be set if `mapType` === `gmap` |

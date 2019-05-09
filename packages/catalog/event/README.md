@@ -5,8 +5,10 @@ Schedule events
 ## Actions
 
 - choose-and-show-series
-- create-series
-- delete-event
 - create-event
-- create-weekly-serie
+- create-series
+- create-weekly-series
+- delete-event
 - show-event
+- show-event-count
+- show-events
