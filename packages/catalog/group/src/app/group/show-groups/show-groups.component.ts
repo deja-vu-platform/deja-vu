@@ -84,6 +84,8 @@ OnChanges {
           this._groups = res.data.groups;
           this.groups.emit(this._groups);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

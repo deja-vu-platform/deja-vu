@@ -121,6 +121,8 @@ OnChanges {
           this.objects.emit(this._objects);
           this.objectIds.emit(_.map(this._objects, 'id'));
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

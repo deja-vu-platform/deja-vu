@@ -19,5 +19,11 @@
         { "for": "src/app/app.component.html", "use": "label-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "label-show-item-count",
+    "label-show-items",
+    "label-show-label-count",
+    "label-show-labels",
+  ]
 }

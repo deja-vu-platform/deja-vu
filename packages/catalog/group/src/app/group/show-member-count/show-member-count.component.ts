@@ -67,6 +67,8 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
         .subscribe((memberCount) => {
           this.memberCount = memberCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

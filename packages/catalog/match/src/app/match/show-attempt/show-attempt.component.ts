@@ -78,6 +78,8 @@ OnInit {
         this.attempt = attempt;
         this.loadedAttempt.emit(attempt);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

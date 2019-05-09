@@ -67,6 +67,8 @@ export class ShowPublisherCountComponent implements AfterViewInit, OnChanges,
         .subscribe((publisherCount) => {
           this.publisherCount = publisherCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

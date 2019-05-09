@@ -67,6 +67,8 @@ export class ShowFollowerCountComponent implements AfterViewInit, OnChanges,
         .subscribe((followerCount) => {
           this.followerCount = followerCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

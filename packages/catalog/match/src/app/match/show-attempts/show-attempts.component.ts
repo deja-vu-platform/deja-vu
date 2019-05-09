@@ -92,6 +92,8 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
           this.attempts = attempts;
           this.loadedAttempts.emit(attempts);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

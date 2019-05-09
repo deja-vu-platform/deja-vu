@@ -127,6 +127,8 @@ OnChanges {
           this.object = res.data.object;
           this.loadedObject.emit(this.object);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

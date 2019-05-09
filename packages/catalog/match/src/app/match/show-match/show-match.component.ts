@@ -83,6 +83,8 @@ export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
           this.match = match;
           this.loadedMatch.emit(match);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

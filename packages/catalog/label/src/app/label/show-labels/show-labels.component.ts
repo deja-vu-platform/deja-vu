@@ -82,6 +82,8 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
           this._labels = res.data.labels;
           this.labels.emit(this._labels);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

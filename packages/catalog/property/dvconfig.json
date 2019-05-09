@@ -41,9 +41,11 @@
   },
   "actionsNoRequest": {
     "exec": [
-      "property-choose-object",
-      "property-show-object",
-      "property-show-objects"
+      "property-choose-object"
     ]
-  }
+  },
+  "actionsRequestOptional": [
+    "property-show-object",
+    "property-show-objects"
+  ]
 }

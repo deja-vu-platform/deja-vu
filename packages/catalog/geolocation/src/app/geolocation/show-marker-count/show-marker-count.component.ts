@@ -72,6 +72,8 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
         .subscribe((markerCount) => {
           this.markerCount = markerCount;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 
