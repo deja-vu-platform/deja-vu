@@ -30,12 +30,8 @@ export class SubscriptionCoordinator {
   }
 
   private initializeClient(url: string): SubscriptionClient {
-    return new SubscriptionClient(url,
-    {
-      reconnect: true,
-      connectionParams: {
-        // TODO
-      },
+    return new SubscriptionClient(url, {
+      reconnect: true
     }, WebSocket)
     .use([
       {
@@ -45,8 +41,6 @@ export class SubscriptionCoordinator {
           if (!options.query) {
             options.query = 'to be set';
           }
-          console.log('gateway subscription coord middleware');
-          console.log(options);
           next();
         }
       }
