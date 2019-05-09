@@ -23,6 +23,9 @@ import {
 import { v4 as uuid } from 'uuid';
 
 
+// TODO: update to use a PubSub implementation backed by an external store
+// so that it's fit for production use:
+// https://github.com/apollographql/graphql-subscriptions#pubsub-implementations
 const pubsub = new PubSub();
 const NEW_MESSAGE_TOPIC = 'new-message';
 
