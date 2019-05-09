@@ -15,6 +15,15 @@
   produce the object as output. For example, when `show-foo` loads a `Foo` if
   an `id` is given it should output the object `loadedFoo`.
 
+- Usually, show actions perform a check called `this.canEval()` to avoid
+  unnecessary reloading of the data it had previously loaded. If this is the
+  case, instead of calling `this.gs.get(...)`, the action should call
+  `this.gs.noRequest()` so that the run service knows that the action does not
+  intend to perform a request. If there is a possibility that an action
+  will not perform a request (e.g. because it calls `this.gs.noRequest()` in
+  some cases), the action name (e.g. `clichename-show-foo`) should be included
+  in the `actionsRequestOptional` array field of the cliché's `dvconfig.json`
+  file.
 
 ## Create actions
 
