@@ -21,4 +21,4 @@ Transfer money or items between accounts
 
 | Option | Type | Default | Description |
 | ------ | ---- | ------  | ----------- |
-| `balanceType` | `money | items` | `items` | Describes the resource being exchanged |
+| `balanceType` | `money` or `items` | `items` | Describes the resource being exchanged |
