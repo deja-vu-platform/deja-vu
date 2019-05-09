@@ -27,5 +27,5 @@ to `styles.css`:
 
 | Option | Type | Default | Description |
 | ------ | ---- | ------  | ----------- |
-| `mapType` | `string` | `leaflet` | Specifies which Maps API to use (Leaflet [`leaflet`] or Google Maps [`gmap`]) |
+| `mapType` | `leaflet | gmap` | `leaflet` | Specifies which Maps API to use (Leaflet [`leaflet`] or Google Maps [`gmap`]) |
 | `apiKey` | `string` | `undefined` | Must be set if `mapType` === `gmap` |
