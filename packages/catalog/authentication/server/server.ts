@@ -155,13 +155,6 @@ const actionRequestTable: ActionRequestTable = {
     }
   `
 };
-<<<<<<< HEAD
-
-function isPendingRegister(user: UserDoc | null) {
-  return _.get(user, 'pending.type') === 'register';
-}
-=======
->>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
 
 async function getNewUserDoc(input: RegisterInput): Promise<UserDoc> {
   UserValidation.isUsernameValid(input.username);
@@ -179,38 +172,12 @@ async function getNewUserDoc(input: RegisterInput): Promise<UserDoc> {
 }
 
 async function register(
-<<<<<<< HEAD
-  users: mongodb.Collection<UserDoc>, input: RegisterInput, context: Context) {
-  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-  const newUser: UserDoc = await newUserDocOrFail(users, input);
-
-  switch (context.reqType) {
-    case 'vote':
-      newUser.pending = { reqId: context.reqId, type: 'register' };
-    /* falls through */
-    case undefined:
-      await users.insertOne(newUser);
-
-      return newUser;
-    case 'commit':
-      await users.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-      return undefined;
-    case 'abort':
-      await users.deleteOne(reqIdPendingFilter);
-
-      return undefined;
-  }
-
-  return newUser;
-=======
   users: Collection<UserDoc>, input: RegisterInput, context: Context) {
   const newUser: UserDoc = await getNewUserDoc(input);
   // this will fail for duplicate users because of the unique index
   // on both id and username
 
   return await users.insertOne(context, newUser);
->>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
 }
 
 function sign(userId: string): string {
@@ -226,31 +193,6 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
-<<<<<<< HEAD
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const users: mongodb.Collection<UserDoc> = db.collection('users');
-
-  return {
-    Query: {
-      users: () => users.find({ pending: { $exists: false } })
-        .toArray(),
-      user: async (_root, { username }) => {
-        const user: UserDoc | null = await users
-          .findOne({ username: username });
-
-        return isPendingRegister(user) ? null : user;
-      },
-      userById: async (_root, { id }) => {
-        const user: UserDoc | null = await users.findOne({ id: id });
-
-        if (_.isNil(user) || isPendingRegister(user)) {
-          throw new Error(`User ${id} not found`);
-        }
-
-        return user;
-      },
-
-=======
 function resolvers(db: ClicheDb, _config: Config): IResolvers {
   const users: Collection<UserDoc> = db.collection('users');
 
@@ -259,7 +201,6 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
       users: async () => await users.find(),
       user: async (_root, { username }) => await users.findOne({ username }),
       userById: async (_root, { id }) => await users.findOne({ id: id }),
->>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
       verify: (_root, { input }: { input: VerifyInput }) => verify(
         input.token, input.id)
     },
