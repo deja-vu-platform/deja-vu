@@ -9,14 +9,13 @@ import {
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  OnExecSuccess, RunService, StorageService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
 import { API_PATH } from '../passkey.config';
 import { Passkey, SignInOutput } from '../shared/passkey.model';
-import { PasskeyService } from '../shared/passkey.service';
 import { PasskeyValidator } from '../shared/passkey.validation';
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -50,6 +49,7 @@ interface CreatePasskeyRes {
 })
 export class CreatePasskeyComponent
   implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  @Input() id: string | undefined;
 
   // Presentation options
   @Input() randomPassword = false;
@@ -82,8 +82,7 @@ export class CreatePasskeyComponent
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private passkeyService: PasskeyService,
-    @Inject(API_PATH) private apiPath) { }
+    private ss: StorageService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -95,42 +94,48 @@ export class CreatePasskeyComponent
   }
 
   async dvOnExec(): Promise<void> {
+    const inputs = {
+      input: {
+        id: this.id,
+        code: this.passkeyControl.value
+      }
+    };
     let passkey;
     if (this.signIn) {
       const res = await this.gs
         .post<CreateAndValidatePasskeyRes>(this.apiPath, {
-          query: `mutation {
-          createAndValidatePasskey(code: "${this.passkeyControl.value}") {
-            passkey { code }
-            token
+          inputs: inputs,
+          extraInfo: {
+            action: 'login',
+            returnFields: `
+              passkey { id, code }
+              token
+            `
           }
-        }`
         })
         .toPromise();
 
-      if (res.errors) {
-        throw new Error(_.map(res.errors, 'message')
-          .join());
-      }
+      if (res.errors) { this.throwErrors(res.errors); }
 
       const token = res.data.createAndValidatePasskey.token;
       passkey = res.data.createAndValidatePasskey.passkey;
-      this.passkeyService.setSignedInPasskey(token, passkey);
+      this.ss.setItem(this.elem, 'token', token);
+      this.ss.setItem(this.elem, 'passkey', passkey);
 
     } else {
       const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
-        query: `mutation {
-          createPasskey(code: "${this.passkeyControl.value}") {
+        inputs: inputs,
+        extraInfo: {
+          action: 'register-only',
+          returnFields: `
+            id,
             code
-          }
-        }`
+          `
+        }
       })
         .toPromise();
 
-      if (res.errors) {
-        throw new Error(_.map(res.errors, 'message')
-          .join());
-      }
+      if (res.errors) { this.throwErrors(res.errors); }
 
       passkey = res.data.createPasskey;
     }
@@ -139,9 +144,9 @@ export class CreatePasskeyComponent
 
   dvOnExecSuccess() {
     this.newPasskeyCreated = true;
+    this.newPasskeyError = '';
     window.setTimeout(() => {
       this.newPasskeyCreated = false;
-      this.newPasskeyError = '';
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -152,5 +157,10 @@ export class CreatePasskeyComponent
 
   dvOnExecFailure(reason: Error) {
     this.newPasskeyError = reason.message;
+  }
+
+  private throwErrors(errors: any) {
+    throw new Error(_.map(errors, 'message')
+      .join());
   }
 }

@@ -3,12 +3,6 @@ export interface ScoreDoc {
   value: number;
   sourceId: string;
   targetId: string;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-score';
 }
 
 export interface Target {
@@ -18,7 +12,7 @@ export interface Target {
 }
 
 export interface CreateScoreInput {
-  id: string;
+  id?: string;
   value: number;
   sourceId: string;
   targetId: string;
@@ -26,6 +20,31 @@ export interface CreateScoreInput {
 
 export interface ShowScoreInput {
   id?: string;
+  sourceId?: string;
+  targetId?: string;
+}
+
+export interface ShowTargetInput {
+  id: string;
+  sourceId?: string;
+}
+
+export interface TargetsByScoreInput {
+  asc?: boolean;
+  targetIds?: string[];
+  sourceId?: string;
+}
+
+export interface UpdateScoreInput {
+  id: string;
+  value: number;
+}
+
+export interface DeleteScoreInput {
+  id: string;
+}
+
+export interface DeleteScoresInput {
   sourceId?: string;
   targetId?: string;
 }

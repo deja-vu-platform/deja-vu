@@ -12,10 +12,11 @@
 }
 
 .bigger-text {
-  font-size: 16px;
+  font-size: 20px;
+  text-align: center;
 }
 
-.event-card-row .panel {
+.event-card-row .card {
   margin-top: 10px;
   margin-bottom: 0;
 }
@@ -25,11 +26,11 @@
 }
 
 .edit-cancel-event-btn-container {
-  float: right;
-  display: inline-block;
-  margin-top: -6px;
+  text-align: center;
+  padding-top: 2em;
 }
 
 .edit-event-btn {
   margin-right: 10px;
 }
+

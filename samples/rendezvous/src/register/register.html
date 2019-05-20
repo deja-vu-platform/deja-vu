@@ -6,11 +6,11 @@
     </dv.link>
 
     <div class="registration-pages">
-      <div class="panel panel-default">
-        <div class="panel-heading">
+      <div class="card">
+        <div class="card-header">
           <h3 id="heading">Registration</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           <div id="registrationForm">
             <dv.tx>
               <dv.gen-id />
@@ -20,7 +20,7 @@
                 id=dv.gen-id.id showOptionToSubmit=false />
               <!-- TODO: Allow users to select a major from a list of majors -->
               <!-- labels-choose-labels -->
-              <dv.button class="btn button">
+              <dv.button class="btn button register-button">
                 Finish
               </dv.button>
               <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />

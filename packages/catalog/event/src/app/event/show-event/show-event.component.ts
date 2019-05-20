@@ -79,6 +79,8 @@ OnInit {
           this.sameDayEvent = this.isSameDayEvent(this.event);
         }
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

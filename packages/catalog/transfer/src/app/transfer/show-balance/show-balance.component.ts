@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {
   Action,
-  ConfigService,
+  ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
   OnEval,
@@ -52,14 +52,14 @@ OnInit, OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath,
-    private cs: ConfigService) { }
+    private csf: ConfigServiceFactory) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
 
-    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
-      .balanceType;
+    this.balanceType = this.csf.createConfigService(this.elem)
+      .getConfig().balanceType;
   }
 
   ngAfterViewInit() {
@@ -91,6 +91,8 @@ OnInit, OnChanges {
         this.balance = res.data.balance;
         this.fetchedBalance.emit(this.balance);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

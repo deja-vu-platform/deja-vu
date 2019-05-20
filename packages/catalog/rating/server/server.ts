@@ -1,14 +1,18 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
+  Collection,
   Config,
   Context,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import {
+  DeleteRatingInput,
+  DeleteRatingsInput,
   RatingDoc,
   RatingInput,
   RatingsInput,
@@ -44,54 +48,65 @@ const actionRequestTable: ActionRequestTable = {
       rating(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-rating-count': (extraInfo) => `
+    query ShowRatingCount($input: RatingsInput!) {
+      ratingCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-ratings-by-target': (extraInfo) => `
     query ShowRatingsByTarget($input: RatingsInput!) {
       ratings(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'delete-rating': (extraInfo) => `
+    mutation DeleteRating($input: DeleteRatingInput!) {
+      deleteRating(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'delete-ratings': (extraInfo) => `
+    mutation DeleteRatings($input: DeleteRatingsInput!) {
+      deleteRatings(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
+
 };
 
-function isPendingUpdate(doc: RatingDoc | null) {
-  return _.get(doc, 'pending.type') === 'update-rating';
+function getRatingFilter(input: RatingsInput) {
+  const filter = {};
+  if (!_.isNil(input)) {
+    if (input.bySourceId) {
+      // All ratings by a source
+      filter['sourceId'] = input.bySourceId;
+    }
+
+    if (input.ofTargetId) {
+      // All ratings of a target
+      filter['targetId'] = input.ofTargetId;
+    }
+  }
+
+  return filter;
 }
 
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
+  const ratings: Collection<RatingDoc> = db.collection('ratings');
 
   return {
     Query: {
-      rating: async (_root, { input }: { input: RatingInput }) => {
-        const rating = await ratings
-          .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
+      rating: async (_root, { input }: { input: RatingInput }) => await ratings
+        .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
-        if (_.isNil(rating) || isPendingUpdate(rating)) {
-          throw new Error(`Rating by ${input.bySourceId} for target
-           ${input.ofTargetId} does not exist`);
-        }
-
-        return rating;
+      ratings: async (_root, { input }: { input: RatingsInput }) => {
+        return await ratings.find(getRatingFilter(input));
       },
 
-      ratings: (_root, { input }: { input: RatingsInput }) => {
-        const filter = { pending: { $exists: false } };
-        if (input.bySourceId) {
-          // All ratings by a source
-          filter['sourceId'] = input.bySourceId;
-        }
-
-        if (input.ofTargetId) {
-          // All ratings of a target
-          filter['targetId'] = input.ofTargetId;
-        }
-
-        return ratings.find(filter)
-          .toArray();
+      ratingCount: async (_root, { input }: { input: RatingsInput }) => {
+        return await ratings.countDocuments(getRatingFilter(input));
       },
 
       averageRatingForTarget: async (_root, { targetId }) => {
         const results = await ratings.aggregate([
-          // Ignore ratings that are currently being updated
-          { $match: { targetId: targetId, pending: { $exists: false } } },
+          { $match: { targetId: targetId } },
           {
             $group:
             {
@@ -121,75 +136,37 @@ function resolvers(db: mongodb.Db, _config: Config): object {
     Mutation: {
       setRating: async (
         _root, { input }: { input: SetRatingInput }, context: Context) => {
-        const notPendingRatingFilter = {
+        const filter = {
           sourceId: input.sourceId,
-          targetId: input.targetId,
-          pending: { $exists: false }
+          targetId: input.targetId
         };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            await ratings.updateOne(
-              notPendingRatingFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'set-rating'
-                  }
-                }
-              },
-              { upsert: true }
-            );
+        return await ratings.updateOne(
+          context,
+          filter,
+          { $set: { rating: input.newRating } },
+          { upsert: true });
 
-            // If there's a concurrent update then the upsert will fail because
-            // of the (sourceId, targetId) index
+        // If there's a concurrent update then the upsert will fail because
+        // of the (sourceId, targetId) index
+      },
 
-            return true;
+      deleteRating: async (
+        _root, { input }: { input: DeleteRatingInput }, context: Context) => {
+        return await ratings.deleteOne(context, getRatingFilter(input));
+      },
 
-          case undefined:
-            await ratings.updateOne(
-              notPendingRatingFilter,
-              { $set: { rating: input.newRating } },
-              { upsert: true });
-
-            // If there's a concurrent update then the upsert will fail because
-            // of the (sourceId, targetId) index
-
-            return true;
-
-          case 'commit':
-            await ratings.updateMany(
-              reqIdPendingFilter,
-              {
-                $set: { rating: input.newRating },
-                $unset: { pending: '' }
-              },
-              { upsert: true }
-            );
-
-            return false;
-
-          case 'abort':
-            await ratings.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } },
-              { upsert: true }
-            );
-
-            return false;
-        }
-
-        return false;
+      deleteRatings: async (
+        _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
+        return await ratings.deleteMany(context, getRatingFilter(input))
       }
     }
   };
 }
 
 const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const ratings: mongodb.Collection<RatingDoc> = db.collection('ratings');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const ratings: Collection<RatingDoc> = db.collection('ratings');
 
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });

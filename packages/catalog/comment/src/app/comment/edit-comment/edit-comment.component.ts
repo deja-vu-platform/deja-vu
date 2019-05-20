@@ -96,16 +96,16 @@ export class EditCommentComponent implements
         inputs: { id: this.id },
         extraInfo: {
           action: 'load',
-          returnFields: 'id'
+          returnFields: 'id, content'
         }
       }
     })
-      .subscribe((res) => {
-        const comment = res.data.comment;
-        if (comment) {
-          this.contentControl.setValue(comment.content);
-        }
-      });
+    .subscribe((res) => {
+      const comment = res.data.comment;
+      if (comment) {
+        this.contentControl.setValue(comment.content);
+      }
+    });
 
   }
 

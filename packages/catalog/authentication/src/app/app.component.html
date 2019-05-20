@@ -6,7 +6,11 @@
   <h1>Sign in</h1>
   <authentication-sign-in></authentication-sign-in>
   <h1>Show user of id ben</h1>
-  <authentication-show-user id="ben"></authentication-show-user>
+  <authentication-show-user id="ben" (loadedUser)="result=$event">
+  </authentication-show-user>
+  <h1>Show loaded user</h1>
+  <authentication-show-user [user]="result">
+  </authentication-show-user>
   <h1>Change password of the logged in user</h1>
   <authentication-logged-in (user)="user=$event">
   </authentication-logged-in>
@@ -17,7 +21,10 @@
   <h1>Is the user of id ben authenticated?</h1>
   <authentication-authenticate id="ben"></authentication-authenticate>
   <h1>Users</h1>
-  <authentication-show-users></authentication-show-users>
+  <authentication-show-users (fetchedUsers)="users=$event">
+  </authentication-show-users>
   <h1>Choose User</h1>
   <authentication-choose-user></authentication-choose-user>
+  <h1>Show User Count</h1>
+  <authentication-show-user-count></authentication-show-user-count>
 </div>

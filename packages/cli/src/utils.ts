@@ -1,4 +1,4 @@
-import { spawnSync } from 'child_process';
+import { spawnSync, SpawnSyncOptions } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import * as _ from 'lodash';
 import * as path from 'path';
@@ -33,25 +33,34 @@ const PKGS_FOLDER = 'packages';
  * Executes `ng` synchronously
  */
 export function ng(args: string[], cwd?: string): void {
-  cmd('ng', args, cwd);
+  cmd('ng', args, { cwd });
 }
 
 /**
  * Executes `yarn` synchronously
  */
 export function yarn(args: string[], cwd?: string): void {
-  cmd('yarn', args, cwd);
+  cmd('yarn', args, { cwd });
 }
 
-export function cmd(cmdS: string, args: string[], cwd?: string): void {
+/**
+ * Wrapper for child_process.spawnSync which adds error handling
+ * and support for Windows
+ */
+export function cmd(
+  command: string,
+  args?: string[],
+  options?: SpawnSyncOptions
+): void {
   // Windows users must include `shell: true` for the cli to work
   // TODO: Remove `shell: true` in the future
-  const c = spawnSync(cmdS, args, { stdio: 'inherit', cwd: cwd, shell: true });
+  options = { stdio: 'inherit', shell: true, ...options };
+  const c = spawnSync(command, args, options);
   if (c.error) {
-    throw new Error(`Failed to run "${cmdS}": ${c.error}`);
+    throw new Error(`Failed to run "${command}": ${c.error}`);
   }
   if (c.status !== 0) {
-    throw new Error(`${cmdS} exited with code ${c.status}`);
+    throw new Error(`${command} exited with code ${c.status}`);
   }
 }
 
@@ -153,7 +162,6 @@ export function concurrentlyCmd(...cmds: string[]): string {
 
 export interface DvConfig {
   name?: string;
-  type?: 'cliche' | 'app';
   startServer?: boolean;
   watch?: boolean;
   config?: any;

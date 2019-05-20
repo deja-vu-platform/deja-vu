@@ -131,6 +131,8 @@ export class ActionCompiler {
         <ActionStEntry[]> ActionCompiler
           .FilterKind('action', clicheEntry.symbolTable))
       .flatten()
+      // Include aliased actions
+      .concat(ActionCompiler.FilterKind('action', thisActionSymbolTable))
       .map((clicheEntry: ActionStEntry): string[] =>
         ActionCompiler.GetNgFields('output', clicheEntry.symbolTable))
       .flatten()

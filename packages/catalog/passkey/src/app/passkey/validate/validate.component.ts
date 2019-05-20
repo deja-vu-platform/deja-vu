@@ -2,13 +2,12 @@ import {
   Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService, StorageService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
 import { API_PATH } from '../passkey.config';
-import { PasskeyService } from '../shared/passkey.service';
 
 interface VerifyRes {
   data: { verify: boolean };
@@ -21,13 +20,15 @@ interface VerifyRes {
   styleUrls: ['./validate.component.css']
 })
 export class ValidateComponent implements OnExec, OnInit, OnChanges {
+  @Input() code: string;
+
   isValidated = false;
 
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private passkeyService: PasskeyService,
+    private rs: RunService, private ss: StorageService,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
@@ -41,37 +42,32 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs) {
+    this.doRequest();
+  }
+
+  dvOnExec() {
+    this.doRequest();
+  }
+
+  doRequest() {
+    if (!this.gs || _.isEmpty(this.code)) {
       return;
     }
 
-    const code = this.passkeyService.getSignedInPasskey();
-    const token = this.passkeyService.getToken();
-
-    if (!code || !token) {
-      return;
-    }
+    const token = this.ss.getItem(this.elem, 'token');
 
     this.gs.get<VerifyRes>(this.apiPath, {
       params: {
-        query: `
-          query Verify($input: VerifyInput!) {
-            verify(input: $input)
-          }`,
-        variables: JSON.stringify({
+        inputs: JSON.stringify({
           input: {
-            code: code,
+            code: this.code,
             token: token
           }
         })
       }
     })
-      .subscribe((res) => {
-        this.isValidated = res.data.verify;
-      });
-  }
-
-  dvOnExec() {
-    this.load();
+    .subscribe((res) => {
+      this.isValidated = res.data.verify;
+    });
   }
 }

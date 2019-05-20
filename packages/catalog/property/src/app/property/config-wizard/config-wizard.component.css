@@ -1,0 +1,43 @@
+/* 16px is an arbitrarily chosen value for consistent spacing */
+
+.config-wizard {
+  text-align: left;
+}
+
+h2 {
+  font-size: 100%;
+  font-weight: bold;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.cfg-wiz-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cfg-wiz-row > *:not(:last-child) {
+  margin-right: 16px;
+}
+
+button.right {
+  display: block;
+  margin-left: auto;
+}
+
+mat-table {
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+mat-header-cell, mat-cell {
+  min-width: 116px; /* a reasonable minimum input width */
+  padding-right: 16px;
+}
+
+mat-header-cell.sm-col, mat-cell.sm-col {
+  min-width: 69px; /* chosen emperically to fit text */
+}

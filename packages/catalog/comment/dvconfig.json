@@ -17,5 +17,9 @@
         { "for": "src/app/app.component.html", "use": "comment-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "comment-show-comment",
+    "comment-show-comment-count"
+  ]
 }

@@ -1,0 +1,12 @@
+mat-label {
+  display: block;
+}
+
+mat-radio-group {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+mat-radio-button {
+  margin: 5px;
+}

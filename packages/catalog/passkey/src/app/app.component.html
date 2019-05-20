@@ -1,13 +1,26 @@
 <div class="container">
   <h1>Create Custom Passkey + Sign In</h1>
-  <passkey-create-passkey >
-  </passkey-create-passkey>
+  <passkey-create-passkey></passkey-create-passkey>
+
+  <passkey-logged-in></passkey-logged-in>
+
   <h1>Sign Out First User</h1>
   <passkey-sign-out></passkey-sign-out>
 
   <h1>Create Random Passkey + Sign In</h1>
-  <passkey-create-passkey randomPassword="true">
+  <passkey-create-passkey [randomPassword]="true" (passkey)="p=$event">
   </passkey-create-passkey>
+
+  <h1>Show Random Passkey</h1>
+  <passkey-show-passkey [passkey]="p"></passkey-show-passkey>
+
+  <h1>Create Random Passkey with id 'passkeyId' (Not Signed In)</h1>
+  <passkey-create-passkey id="passkeyId" [randomPassword]="true" [signIn]="false">
+  </passkey-create-passkey>
+
+  <h1>Show Passkey of id 'passkeyId'</h1>
+  <passkey-show-passkey id="passkeyId"></passkey-show-passkey>
+
   <h1>Sign Out Random Passkey</h1>
   <passkey-sign-out></passkey-sign-out>
 </div>

@@ -42,6 +42,10 @@ function startServerCmdOfUsedCliche(
   return startServerCmd(serverDistFolder, configKey, asFlagValue);
 }
 
+function calledFromCatalog(): boolean {
+  return path.basename(path.dirname(process.cwd())) === 'catalog';
+}
+
 // tslint:disable no-unused-expression
 yargs.commandDir('commands')
   .completion('completion', 'generate the bash completion script')
@@ -51,7 +55,7 @@ yargs.commandDir('commands')
     console.log('Serving');
 
     const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-    if (config.type === 'app') {
+    if (!calledFromCatalog()) {
       console.log('Serving app');
       AppCompiler.Compile('.', CACHE_DIR);
       process.chdir(CACHE_DIR);

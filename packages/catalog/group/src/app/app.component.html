@@ -24,7 +24,7 @@
       <group-show-members></group-show-members>
 
       <h1>Show Number of Members</h1>
-      <group-show-members [showMembersList]="true"></group-show-members>
+      <group-show-members></group-show-members>
 
       <h1>Show Members in <em>bens</em></h1>
       <group-show-members inGroupId="bens"></group-show-members>
@@ -37,8 +37,7 @@
       <group-delete-group id="bobs"></group-delete-group>
 
       <h1><em>ben</em> join/leave <em>bens</em></h1>
-      <group-join-leave
-        groupId="bens"
+      <group-join-leave groupId="bens"
         memberId="ben">
       </group-join-leave>
 
@@ -49,4 +48,8 @@
       <group-choose-group [loadMembers]="false"></group-choose-group>
     </div>
   </div>
+  <h1>Show Group Count</h1>
+  <group-show-group-count></group-show-group-count>
+  <h1>Show Member Count</h1>
+  <group-show-member-count></group-show-member-count>
 </div>

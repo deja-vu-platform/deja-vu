@@ -1,11 +1,12 @@
 export interface PasskeyDoc {
+  id: string;
   code: string;
-  pending?: PendingDoc;
+  used?: boolean;
 }
 
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-passkey';
+export interface CreatePasskeyInput {
+  id?: string;
+  code?: string;
 }
 
 export interface VerifyInput {

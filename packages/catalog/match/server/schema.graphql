@@ -1,0 +1,53 @@
+type Match {
+  id: ID!
+  userAId: ID!
+  userBId: ID!
+}
+
+type Attempt {
+  id: ID!
+  sourceId: ID!
+  targetId: ID!
+}
+
+input AttemptsInput {
+  sourceId: ID
+  targetId: ID
+}
+
+input MatchInput {
+  id: ID
+  userAId: ID
+  userBId: ID
+}
+
+input MatchesInput {
+  userId: ID
+}
+
+input AttemptMatchInput {
+  id: ID
+  sourceId: ID!
+  targetId: ID!
+}
+
+input CreateMatchInput {
+  id: ID
+  userAId: ID!
+  userBId: ID!
+}
+
+type Query {
+  attempt(id: ID!): Attempt
+  attempts(input: AttemptsInput!): [Attempt]
+  match(input: MatchInput!): Match
+  matches(input: MatchesInput!): [Match]
+}
+
+type Mutation {
+  # true if a match was made, false otherwise
+  attemptMatch(input: AttemptMatchInput!): Boolean
+  withdrawAttempt(id: ID!): Boolean
+  createMatch(input: CreateMatchInput!): Match
+  deleteMatch(id: ID!): Boolean
+}

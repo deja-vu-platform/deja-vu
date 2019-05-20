@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RunService } from '@deja-vu/core';
+import { App } from '../datatypes';
 import { ActionInstanceComponent } from './action-instance.component';
 
 describe('ActionInstanceComponent', () => {
@@ -8,7 +9,10 @@ describe('ActionInstanceComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ActionInstanceComponent]
+      declarations: [ActionInstanceComponent],
+      providers: [
+        { provide: RunService, useValue: {} }
+      ]
     })
     .compileComponents();
   }));
@@ -16,6 +20,8 @@ describe('ActionInstanceComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ActionInstanceComponent);
     component = fixture.componentInstance;
+    component.actionInstance = (new App('text'))
+      .newActionInstanceByName('button', 'dv');
     fixture.detectChanges();
   });
 

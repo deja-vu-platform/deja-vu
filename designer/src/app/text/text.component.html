@@ -1,7 +1,8 @@
 <quill-editor #editor
   *ngIf="actionInstance && modules"
-  theme="bubble"
+  [theme]="readOnly ? 'bubble' : 'snow'"
   [ngModel]="actionInstance.data"
   [modules]="modules"
   (onContentChanged)="onContentChanged($event)"
+  [readOnly]="readOnly"
 ></quill-editor>

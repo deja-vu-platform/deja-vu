@@ -1,4 +1,4 @@
-#configure-cliche {
+h1 {
   text-align: center;
 }
 
@@ -15,4 +15,10 @@ mat-dialog-actions {
 textarea {
   font-family: monospace;
   max-height: 320px; /* prevent scrolling on dialog */
+}
+
+mat-divider {
+  $m: 32px;
+  margin-top: $m;
+  margin-bottom: $m;
 }

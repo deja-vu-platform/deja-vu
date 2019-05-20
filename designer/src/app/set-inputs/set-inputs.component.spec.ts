@@ -1,7 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatInputModule } from '@angular/material';
+import {
+  MatCheckboxModule,
+  MatDialogModule,
+  MatIconModule,
+  MatInputModule,
+  MatMenuModule,
+  MatTooltipModule
+} from '@angular/material';
 
+import {
+  FloatingMenuComponent
+} from '../floating-menu/floating-menu.component';
 import { SetInputsComponent } from './set-inputs.component';
 
 describe('SetInputsComponent', () => {
@@ -10,11 +20,18 @@ describe('SetInputsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SetInputsComponent ],
+      declarations: [
+        SetInputsComponent,
+        FloatingMenuComponent
+      ],
       imports: [
         FormsModule,
+        MatCheckboxModule,
         MatDialogModule,
-        MatInputModule
+        MatMenuModule,
+        MatIconModule,
+        MatInputModule,
+        MatTooltipModule
       ]
     })
     .compileComponents();

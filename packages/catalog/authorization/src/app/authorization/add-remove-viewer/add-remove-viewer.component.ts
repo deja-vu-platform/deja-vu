@@ -1,5 +1,7 @@
 import { Component, ElementRef, Inject, Input, OnInit } from '@angular/core';
-import { GatewayService, GatewayServiceFactory, RunService } from '@deja-vu/core';
+import {
+  GatewayService, GatewayServiceFactory, RunService
+} from '@deja-vu/core';
 
 import { API_PATH } from '../authorization.config';
 import { Resource } from '../shared/authorization.model';

@@ -1,10 +1,12 @@
 # Comment
 
-Express an opinion or reaction in writing
+Share reactions to items
 
 ## Actions
 
 - create-comment
-- show-comments
+- delete-comment
 - edit-comment
 - show-comment
+- show-comment-count
+- show-comments

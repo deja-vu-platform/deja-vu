@@ -1,0 +1,19 @@
+<dv.action name="show-climbs">
+  <livescorecard.host-navbar />
+
+  <div class="container below-navbar">
+    <div class="row">
+      <div class="col-2 center white">name</div>
+      <div class="col-3 center white">points</div>
+      <div class="col-5 center white">category</div>
+    </div>
+
+    <livescorecard.create-climb
+      competitionId=$competitionId
+      loggedInUserId=livescorecard.host-navbar.loggedInUserId />
+
+    <competitionclimbs.show-members inGroupId=$competitionId
+      noMembersText=""
+      showMember=<livescorecard.show-climb climbId=$id /> />
+  </div>
+</dv.action>

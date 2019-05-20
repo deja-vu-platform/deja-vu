@@ -3,7 +3,6 @@
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-
 md-icon {
   font-family: 'Material Icons' !important;
 }
@@ -26,7 +25,8 @@ body {
   margin-bottom: 10px;
 }
 
-.btn-blue, .btn-blue:hover {
+.btn-blue,
+.btn-blue:hover {
   background-color: #1FB8CC;
   color: white;
   border-color: white;
@@ -34,13 +34,6 @@ body {
 
 .login-signup-container {
   text-align: center;
-}
-
-.username-password-container {
-  width: 80%;
-  margin-bottom: 5px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .blue-background {
@@ -68,12 +61,8 @@ h2 {
   margin-top: 0;
 }
 
-.panel-default > .panel-heading {
+.card>.card-heading {
   background-color: #f5f8fa;
-}
-
-.panel-group {
-  margin-bottom: 0;
 }
 
 .events-panel {
@@ -91,30 +80,56 @@ h2 {
   float: right;
 }
 
-.event-btn-container > .btn {
+.event-btn-container>.btn {
   margin-left: 10px;
 }
 
-input.checkbox-btn, input.radio-btn {
-  margin-right: 5px;
+authentication-register-user button.mat-button,
+authentication-register-user button.mat-button:hover {
+  background-color: #1FB8CC;
+  border-color: white;
+  width: 80%;
+  margin-bottom: 5px;
+  margin-top: 10px;
 }
 
-input.checkbox-btn {
-  margin-left: 20px;
+authentication-register-user button.mat-button:disabled {
+  background-color: lightgrey;
 }
 
-.float-right {
-  float: right;
+authentication-register-user span.mat-button-wrapper {
+  color: white;
 }
 
-.normal-weight {
-  font-weight: normal;
+authentication-register-user .mat-input-container,
+authentication-sign-in .mat-input-container {
+  width: 80%;
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.filtering-datetimepicker {
-  margin-left: 20px;
+.inline-block {
+  display: inline-block;
 }
 
-#filter-header {
-  margin-bottom: 13px;
+authorization-show-resources li {
+  margin-left: auto;
+  margin-right: auto;
+  background: none;
+  padding: 0% 0%
+}
+
+.authorization-show-resources-resource-item {
+  border: none;
+}
+
+.cancel-event-btn-container button.mat-button {
+  background-color: red;
+  color: white;
+}
+
+.cancel-event-btn button.mat-button {
+  background-color: #ff392e;
+  color: white;
 }

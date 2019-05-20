@@ -141,13 +141,13 @@ export class NgComponentBuilder {
         ${fields.join('\n  ')}
 
         constructor(
-           ${noInputs ? '' : 'private route: ActivatedRoute,'}
-           private elem: ElementRef, private rs: RunService) {}
+           ${noInputs ? '' : 'private __dv__route: ActivatedRoute,'}
+           private __dv__elem: ElementRef, private __dv__rs: RunService) {}
 
         ngOnInit() {
-          this.rs.registerAppAction(this.elem, this);
+          this.__dv__rs.registerAppAction(this.__dv__elem, this);
           ${noInputs ? '' :
-          `this.route.paramMap.subscribe(params => {
+          `this.__dv__route.paramMap.subscribe(params => {
             ${inputParams.join('\n  ')}
           });`}
         }

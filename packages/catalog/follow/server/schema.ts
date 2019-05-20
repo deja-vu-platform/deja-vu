@@ -2,13 +2,6 @@ export interface PublisherDoc {
   id: string;
   messages?: Message[];
   followerIds?: string[];
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-publisher' | 'create-message' | 'edit-message' |
-  'follow' | 'unfollow';
 }
 
 export interface Message {

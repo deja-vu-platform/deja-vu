@@ -4,6 +4,7 @@
     id="edit-action"
     class="mat-small"
     (click)="editAction()"
+    matTooltip="Configure Action"
   >
     <mat-icon>more_vert</mat-icon>
   </button>
@@ -29,6 +30,14 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
+  <button mat-button
+    #menuTrigger="matMenuTrigger"
+    [matMenuTriggerFor]="menu.matMenu"
+    class="mat-small"
+    matTooltip="Inputs & Outputs"
+  >
+    <mat-icon>input</mat-icon>
+  </button>
 
   <div class="right">
     <mat-form-field>
@@ -55,6 +64,14 @@
     <button
       mat-button
       class="mat-small"
+      (click)="showPreview()"
+      matTooltip="Preview"
+    >
+      <mat-icon>devices</mat-icon>
+    </button>
+    <button
+      mat-button
+      class="mat-small"
       (click)="export()"
       [disabled]="!this.fs || exporting"
       matTooltip="Export"
@@ -62,10 +79,82 @@
       <mat-icon>publish</mat-icon>
     </button>
   </div>
+
+  <app-floating-menu
+    #menu
+    [title]="app.name + '-' + openAction.name"
+    (opened)="clickFirstTab(menuContent)"
+    (shouldClose)="closeMenu(menuTrigger)"
+  >
+    <mat-tab-group #menuContent class="popup-menu action-menu">
+      <mat-tab label="Outputs">
+        <div class="io-container">
+          <div
+            *ngFor="let output of openAction.outputSettings"
+            class="io-and-button"
+          >
+            <mat-form-field>
+              <input
+                matInput
+                class="input-value"
+                [placeholder]="output.name"
+                [name]="output.name"
+                [(ngModel)]="output.value"
+                dragula="expression-io"
+                (addOutput)="addOutput(output, $event)"
+              >
+            </mat-form-field>
+            <button
+              mat-button
+              color="warn"
+              (click)="removeIO(output)"
+              class="mat-small hide-on-drag"
+            >
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="openAction.outputSettings.length === 0">
+            This action has no outputs.
+          </div>
+        </div>
+        <button mat-button color="primary" (click)="addIO('output')" class="add-io">
+          <mat-icon>add_circle</mat-icon> Add Output 
+        </button>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div dragula="expression-io" class="inputtables io-container">
+          <div
+            class="io-and-button"
+            *ngFor="let input of openAction.inputSettings"
+            [attr.data-output]="'$' + input.name"
+          >
+            <div>
+                {{input.name}}
+            </div>
+            <button
+              mat-button
+              color="warn"
+              (click)="removeIO(input)"
+              class="mat-small hide-on-drag"
+            >
+              <mat-icon>remove_circle</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="openAction.inputSettings.length === 0" class="no-drag">
+            This action has no inputs.
+          </div>
+        </div>
+        <button mat-button color="primary" (click)="addIO('input')" class="add-io">
+          <mat-icon>add_circle</mat-icon> Add Input 
+        </button>
+      </mat-tab>
+    </mat-tab-group>
+  </app-floating-menu>
 </mat-toolbar>
 
 <!-- invisible elements needed for rather hacky reasons -->
 <div style="display:none">
-  <input #fileInput type="file"(change)="onUpload($event)">
+  <input #fileInput type="file" (change)="onUpload($event)">
+  <input #directoryInput type="file" webkitdirectory (change)="onSelectExportDir($event)">
   <a #downloadAnchor></a>
 </div>

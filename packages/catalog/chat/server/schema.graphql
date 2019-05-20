@@ -1,0 +1,65 @@
+# While this is the chat cliché,
+# it only keeps track of the messages within chats
+# and not as chat objects.
+# Chats are referenced through the field chatId and
+# typically, the participants of a chat
+# can be represented by the group cliché,
+# so chatId points to the id of the group that contains the participants
+type Message {
+  id: ID!
+  content: String!
+  timestamp: Float! # unix time accurate to 3 decimal places
+  authorId: ID!
+  chatId: ID!
+}
+
+input CreateMessageInput {
+  id: ID
+  content: String!
+  authorId: ID!
+  chatId: ID!
+}
+
+input UpdateMessageInput {
+  id: ID!
+  content: String!
+  authorId: String!
+}
+
+input ChatMessagesInput {
+  chatId: ID!
+  maxMessageCount: Int # 0 means no limit
+}
+
+input NewChatMessagesInput {
+  chatIds: [ID!]
+  lastMessageTimestamp: Float!
+}
+
+type Query {
+  message(id: ID!): Message!
+
+  # Get the last input.maxMessageChat messages that belong
+  # to input.chatId, with the messages in descending timestamp order
+  chatMessages(input: ChatMessagesInput!): [Message!]
+
+  # Get all the messages after lastMessageTimestamp
+  # that belong to chatId in ascending timestamp order
+  newChatMessages(input: NewChatMessagesInput!): [Message!]
+}
+
+type Mutation {
+  createMessage(input: CreateMessageInput!): Message!
+  updateMessage(input: UpdateMessageInput!): Boolean
+  deleteMessage(id: ID!): Boolean
+}
+
+type Subscription {
+  newChatMessage(chatId: ID!): Boolean!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

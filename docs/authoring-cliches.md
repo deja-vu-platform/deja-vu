@@ -7,12 +7,23 @@
   otherwise
 
 - Show actions should have a `show[Field]` boolean input to determine whether
-  a particular field should be shown or not
+  a particular field should be shown or not. If within `show-foo`, the action
+  shows another entity, say, `bar`, the boolean inputs for `bar`'s fields should
+  have the format `showBar[Field]` to differentiate them from `foo`'s fields.
 
 - Actions that load some entity from the backend (usually `show-*`) should
   produce the object as output. For example, when `show-foo` loads a `Foo` if
   an `id` is given it should output the object `loadedFoo`.
 
+- Usually, show actions perform a check called `this.canEval()` to avoid
+  unnecessary reloading of the data it had previously loaded. If this is the
+  case, instead of calling `this.gs.get(...)`, the action should call
+  `this.gs.noRequest()` so that the run service knows that the action does not
+  intend to perform a request. If there is a possibility that an action
+  will not perform a request (e.g. because it calls `this.gs.noRequest()` in
+  some cases), the action name (e.g. `clichename-show-foo`) should be included
+  in the `actionsRequestOptional` array field of the cliché's `dvconfig.json`
+  file.
 
 ## Create actions
 
@@ -89,6 +100,47 @@
   control as `fooControl = new FormControl()`.
 
 - All form controls should reset themselves on exec success
+
+## Reactive actions
+
+- The `show-chat` action of the chat cliché is a good example of a reactive
+action. It automatically updates whenever a new message for the chat comes in.
+It could be used as an example to follow for the steps below. 
+
+- Actions can be made reactive (i.e. automatically update its contents) by
+  including these things:
+
+  - In the clichés `schema.graphql` file:
+    - a declaration of the desired GraphQL subscriptions inside
+    `type Subscription {}`, similar to queries and mutations
+    - add the following so that the declared subscriptions are recognized:
+
+    ```text
+    schema {
+      query: Query
+      mutation: Mutation
+      subscription: Subscription
+    }
+    ```
+
+  - In the `server.ts` file:
+    - create a `PubSub` object and use it to publish to specific channels every
+    time a relevant event (e.g. a creation or an update) happens
+    - include the GraphQL subscription resolvers. *For security reasons*, the
+    return value of subscriptions should not contain any data. They should
+    just return `true`. When an action receives the reply, it should reload
+    the data so that if it is in a transaction, all the other actions in the
+    transaction would also get re-run. This ensures, for example, that any
+    authentication or authorization checks happen again.
+    - just like other GraphQL requests, add the subscription request(s) to the
+    `ActionRequestTable`. By default, the value of `extraInfo.action` for
+    subscriptions is `'subscribe'`.
+
+  - In the `foo.module.ts` file, include the following provider:
+  `{ provide: SUBSCRIPTIONS_PATH, useValue: '/subscriptions' }`
+
+  - Call `this.gs.subscribe(...)` in the actions themselves. See the note on
+  security under the `server.ts` file.
 
 ## Misc
 

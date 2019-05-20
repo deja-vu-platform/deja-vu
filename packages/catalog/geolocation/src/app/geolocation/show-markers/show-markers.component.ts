@@ -89,6 +89,8 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.markers = res.data.markers;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

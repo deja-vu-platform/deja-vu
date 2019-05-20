@@ -5,13 +5,6 @@ export interface TaskDoc {
   dueDate: string;
   completed: boolean;
   approved: boolean;
-  pending?: PendingDoc;
-}
-
-export interface PendingDoc {
-  reqId: string;
-  type: 'create-task' | 'update-task' | 'claim-task' | 'complete-task' |
-    'approve-task';
 }
 
 export interface TasksInput {
@@ -26,6 +19,12 @@ export interface CreateTaskInput {
   id: string;
   assignerId: string;
   assigneeId: string;
+  dueDate: string;
+}
+
+export interface CreateTasksForAssigneesInput {
+  assignerId: string;
+  assigneeIds: string[];
   dueDate: string;
 }
 

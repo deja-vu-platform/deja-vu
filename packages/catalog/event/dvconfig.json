@@ -17,5 +17,10 @@
         { "for": "src/app/app.component.html", "use": "event-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "event-show-event",
+    "event-show-event-count",
+    "event-show-events"
+  ]
 }

@@ -1,0 +1,10 @@
+{
+  "name": "themes",
+  "usedCliches": {
+    "authentication": {}
+  },
+  "routes": [
+    { "path": "main", "action": "main" },
+    { "path": "", "action": "main" }
+  ]
+}

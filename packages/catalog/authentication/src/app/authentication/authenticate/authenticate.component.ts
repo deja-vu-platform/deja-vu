@@ -1,17 +1,18 @@
 import {
-  Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnInit, Output
+  Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService,
+  StorageService
 } from '@deja-vu/core';
 
-import { AuthenticationService } from '../shared/authentication.service';
 
 import * as _ from 'lodash';
 
 import { API_PATH } from '../authentication.config';
+
+import { User } from '../shared/authentication.model';
 
 
 @Component({
@@ -20,7 +21,8 @@ import { API_PATH } from '../authentication.config';
   styleUrls: ['./authenticate.component.css']
 })
 export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
-  @Input() id: string;
+  @Input() id: string | undefined;
+  @Input() user: User | undefined;
   isAuthenticated = false;
 
   private gs: GatewayService;
@@ -28,7 +30,7 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath,
-    private authenticationService: AuthenticationService) { }
+    private ss: StorageService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -49,22 +51,22 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
   }
 
   doRequest() {
-    if (!this.gs || _.isEmpty(this.id)) {
+    if (!this.gs || (_.isEmpty(this.id) && _.isEmpty(this.user))) {
       return;
     }
-    const token = this.authenticationService.getToken();
+    const token = this.ss.getItem(this.elem, 'token');
     this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
       params: {
         inputs: {
           input: {
-            id: this.id,
+            id: this.id ? this.id : this.user.id,
             token: token
           }
         }
       }
     })
-    .subscribe((res) => {
-      this.isAuthenticated = res.data.verify;
-    });
+      .subscribe((res) => {
+        this.isAuthenticated = res.data.verify;
+      });
   }
 }

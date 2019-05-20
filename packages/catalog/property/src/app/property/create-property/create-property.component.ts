@@ -28,6 +28,10 @@ export class CamelToTitleCasePipe implements PipeTransform {
   }
 }
 
+/**
+ * Create a single property
+ * You probably don't want to use this on its own and instead want Create Object
+ */
 @Component({
   selector: 'property-create-property',
   templateUrl: './create-property.component.html',
@@ -48,9 +52,18 @@ export class CamelToTitleCasePipe implements PipeTransform {
 export class CreatePropertyComponent
 implements OnInit, OnChanges, ControlValueAccessor, Validator,
 OnExecSuccess {
+  /**
+   * The name of the property to create
+   * (should match a name in the schama the cliche is configured with)
+   */
   @Input() name: string;
+  /**
+   * (Optional) default value to populate the input with
+   */
   @Input() initialValue;
-
+  /**
+   * The value of the property created
+   */
   @Output() value = new EventEmitter();
 
   propertyControl: FormControl;

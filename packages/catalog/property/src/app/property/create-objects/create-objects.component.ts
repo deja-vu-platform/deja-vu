@@ -18,12 +18,21 @@ import { API_PATH } from '../property.config';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
+/**
+ * Create objects in bulk
+ * This action does not display anything.
+ * The data for the objects must come from another action.
+ * The action's execution must be triggered by another action (in a transaction)
+ */
 @Component({
   selector: 'property-create-objects',
   templateUrl: './create-objects.component.html',
   styleUrls: ['./create-objects.component.css']
 })
 export class CreateObjectsComponent implements OnInit, OnExec {
+  /**
+   * List of objects to save to the database as new entities
+   */
   @Input() objects: any[];
 
   private gs: GatewayService;

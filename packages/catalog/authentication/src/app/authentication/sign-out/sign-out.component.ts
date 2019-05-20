@@ -1,12 +1,7 @@
-import {
-  Component, ElementRef, EventEmitter,
-  Input, OnInit
-} from '@angular/core';
-import { OnExec, RunService } from '@deja-vu/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { OnExec, RunService, StorageService } from '@deja-vu/core';
 
 import * as _ from 'lodash';
-
-import { AuthenticationService } from '../shared/authentication.service';
 
 
 @Component({
@@ -19,7 +14,7 @@ export class SignOutComponent implements OnInit, OnExec {
 
   constructor(
     private elem: ElementRef, private rs: RunService,
-    private authenticationService: AuthenticationService) {}
+    private ss: StorageService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -30,6 +25,7 @@ export class SignOutComponent implements OnInit, OnExec {
   }
 
   dvOnExec() {
-    this.authenticationService.signOut();
+    this.ss.removeItem(this.elem, 'token');
+    this.ss.removeItem(this.elem, 'user');
   }
 }

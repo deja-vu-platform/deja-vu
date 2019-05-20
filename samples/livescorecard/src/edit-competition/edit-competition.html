@@ -1,0 +1,15 @@
+<dv.action name="edit-competition">
+  Edit competition coming soon!
+  <!-- TODO: edit name, date -->
+
+  <!-- Delete Competition -->
+  <dv.tx>
+    <!-- competition.delete-object -->
+    <!-- competitioncode.delete-passkey -->
+    <event.delete-event id=$id />
+    <competitionhosts.delete-group id=$id hidden=true />
+    <competitionclimbers.delete-group id=$id hidden=true />
+    <authorization.delete-resource id=$id />
+  </dv.tx>
+
+</dv.action>

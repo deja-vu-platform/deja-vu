@@ -1,0 +1,51 @@
+#sidebar-container {
+  height: 100vh;
+  position: fixed;
+  left: 0px;
+  font-family: 'Asap', sans-serif;
+  font-size: 3vmin;
+  background-color: #029f5b;
+  color: #e6e6e6;
+  box-shadow: 3px 0px 3px 3px #e6e6e6;
+  float: left;
+}
+
+#sidebar-container ul {
+  margin-top: 40vh;
+  list-style: none;
+  position: relative;
+  text-align: right;
+  padding-right: 10px;
+  margin-right: 1vh;
+
+}
+
+#sidebar-container img {
+  max-width: 80%;
+  position: absolute;
+  left: 3vh;
+  top: 8vh;
+}
+
+#sidebar-container li {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
+#sidebar-container .row,
+#sidebar-container .col-6 {
+  margin: 0;
+}
+
+.sidebar-username {
+  padding-right: 0.5em;
+  padding-top: 0.1em;
+}
+
+#sidebar-username-and-signout {
+  position: absolute;
+  bottom: 2vh;
+  right: 2vh;
+  font-size: 2.5vmin;
+  max-width: 100%;
+}

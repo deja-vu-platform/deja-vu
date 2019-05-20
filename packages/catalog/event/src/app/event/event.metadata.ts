@@ -21,18 +21,23 @@ import {
   CreateWeeklySeriesComponent
 } from './create-weekly-series/create-weekly-series.component';
 export { CreateWeeklySeriesComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteEventComponent } from './delete-event/delete-event.component';
 export { DeleteEventComponent };
 import { ShowEventComponent } from './show-event/show-event.component';
 export { ShowEventComponent };
 import { ShowEventsComponent } from './show-events/show-events.component';
 export { ShowEventsComponent };
+import {
+  ShowEventCountComponent
+} from './show-event-count/show-event-count.component';
+export { ShowEventCountComponent };
 
 
 const allComponents = [
   ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
   CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent,
-  ShowEventsComponent
+  ShowEventsComponent, ShowEventCountComponent, ConfigWizardComponent
 ];
 
 const metadata = {

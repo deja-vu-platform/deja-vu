@@ -1,9 +1,7 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output
 } from '@angular/core';
-import { RunService } from '@deja-vu/core';
-
-import { AuthenticationService } from '../shared/authentication.service';
+import { RunService, StorageService } from '@deja-vu/core';
 
 
 @Component({
@@ -15,7 +13,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
 
   constructor(
     private elem: ElementRef, private rs: RunService,
-    private authenticationService: AuthenticationService) {}
+    private ss: StorageService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -28,7 +26,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
   }
 
   async dvOnEval(): Promise<void> {
-    const user = this.authenticationService.getSignedInUser();
+    const user = this.ss.getItem(this.elem, 'user');
     if (user) {
       this.user.emit(user);
     } else {

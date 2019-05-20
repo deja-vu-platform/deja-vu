@@ -8,6 +8,7 @@ out-tsc
 pkg
 .ng_pkg_build
 pkg.tgz
+documentation.json
 
 # dependencies
 node_modules
@@ -48,6 +49,3 @@ e2e/*.map
 # System Files
 .DS_Store
 Thumbs.db
-
-# apps created with the designer
-designer-apps

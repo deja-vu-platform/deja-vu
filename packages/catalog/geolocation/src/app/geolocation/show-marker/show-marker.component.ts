@@ -79,6 +79,8 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
             this.loadedMarker.emit(this.marker);
           }
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

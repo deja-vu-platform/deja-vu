@@ -7,12 +7,13 @@ import { DragulaModule } from 'ng2-dragula';
 import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
-import { DvModule, GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
 
+import { AppRoutingModule } from './app-routing.module';
 import { ClicheModule, dvCoreActions } from './cliche.module';
 import { MatModule } from './mat.module';
 
-import { ClicheActionDirective } from './cliche-action.directive';
+import { DynamicComponentDirective } from './dynamic-component.directive';
 
 import {
   ActionDefinitionComponent
@@ -20,16 +21,18 @@ import {
 import {
   ActionInstanceComponent
 } from './action-instance/action-instance.component';
+import {
+  AddAppActionIoComponent
+} from './add-app-action-io/add-app-action-io.component';
 import { AppComponent } from './app.component';
 import {
   ConfigureActionComponent
 } from './configure-action/configure-action.component';
 import {
-  ConfigureClicheComponent
+  ConfigureClicheComponent, usedClichesConfig
 } from './configure-cliche/configure-cliche.component';
-import {
-  InputActionComponent
-} from './input-action/input-action.component';
+import { DesignerComponent } from './designer/designer.component';
+import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
@@ -37,23 +40,29 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
-import { ScopeIO } from './io';
+import { ChildScopeIO } from './io';
 
-ScopeIO.actionInstanceComponent = ActionInstanceComponent;
+export function getUsedClichesConfig() {
+  return usedClichesConfig;
+}
+
+ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
 
 @NgModule({
   declarations: [
-    ClicheActionDirective,
+    DynamicComponentDirective,
     ActionDefinitionComponent,
     ActionInstanceComponent,
     AppComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
+    DesignerComponent,
+    FloatingMenuComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    TopBarComponent
+    TopBarComponent,
+    AddAppActionIoComponent
   ],
   imports: [
     BrowserModule,
@@ -64,7 +73,8 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
     NgxElectronModule,
     QuillModule,
     DvModule,
-    ClicheModule
+    ClicheModule,
+    AppRoutingModule
   ],
   providers: [
     {
@@ -72,14 +82,18 @@ ScopeIO.actionInstanceComponent = ActionInstanceComponent;
       // the designer is served at 4200
       // requests are proxied to the gateway running at 3000
       useValue: 'http://localhost:4200/api'
+    },
+    {
+      provide: USED_CLICHES_CONFIG,
+      useFactory: getUsedClichesConfig
     }
   ],
   bootstrap: [AppComponent],
   entryComponents: [
     ActionInstanceComponent,
+    AddAppActionIoComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
-    InputActionComponent,
     TextComponent
   ].concat(dvCoreActions)
 })

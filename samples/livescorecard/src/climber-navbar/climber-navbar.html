@@ -1,0 +1,69 @@
+<dv.action name="climber-navbar"
+  climber$=climbercode.logged-in.passkey
+  competitionId$=competitioncode.logged-in.passkey.id>
+
+  <dv.tx>
+    <climbercode.logged-in hidden=true />
+    <competitioncode.logged-in hidden=true />
+    <dv.redirect href="/login/climber" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <div class="navbar-brand">
+        <dv.link href="/climber">Climber</dv.link> |
+        <userprofile.show-object class="inline-block"
+          id=climbercode.logged-in.passkey?.id
+          showOnly=['firstName'] />
+
+        (<climberscore.show-target
+          class="inline-block"
+          id=climbercode.logged-in.passkey?.id
+          showIndex=false
+          showId=false
+          showScores=false
+          totalLabel="" />)
+      </div>
+
+      <div class="navbar-nav navbar-right inline-block">
+        <div class="nav-item popuptext">
+          <climbercode.show-passkey
+            passkey=climbercode.logged-in.passkey
+            showId=false class="inline-block" />
+        </div>
+
+        <div class="nav-item">
+          <dv.link class="nav-link" href="/climber">Scorecard</dv.link>
+        </div>
+
+        <div class="nav-item">
+          <dv.link class="nav-link" href="/climber/leaderboard"
+            params={
+              isClimber: true,
+              competitionId: competitioncode.logged-in.passkey?.id
+            }>
+           Leaderboard
+          </dv.link>
+        </div>
+
+        <div class="nav-item">
+          <dv.link class="nav-link" href="/climber/rules"
+            params={
+              isClimber: true,
+              competitionId: competitioncode.logged-in.passkey?.id
+             }>
+            Rules
+          </dv.link>
+        </div>
+
+        <div class="nav-item">
+          <dv.tx>
+            <climbercode.sign-out hidden=true />
+            <competitioncode.sign-out hidden=true />
+            <dv.link class="nav-link" href="/login/climber">Log Out</dv.link>
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+  </nav>
+</dv.action>

@@ -22,6 +22,7 @@
           [attr.data-source]="collection.name"
           [attr.data-action]="action.name"
           [attr.data-disabled]="disable(action)"
+          [matTooltip]="action.description"
         >
           {{action.name}}
         </mat-list-item>

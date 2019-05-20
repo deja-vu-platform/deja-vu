@@ -1,0 +1,37 @@
+.custom-event a {
+  color: #fff !important;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.cal-day-view .cal-event {
+  white-space: normal;
+}
+
+.cal-day-view .cal-event-container {
+  width: 100% !important;
+}
+
+.cal-day-view .cal-time {
+  width: 40px !important;
+  font-size: smaller !important;
+}
+
+.cal-week-hours-view .cal-day-container:first-child {
+  width: 40px !important;
+  flex: none;
+}
+
+.cal-week-hours-view .cal-header:first-child {
+  width: 40px !important;
+  flex: none;
+  border: none;
+}
+
+.cal-header {
+  border-left: solid 1px #e1e1e1;
+}
+
+.cal-today {
+  color: pink;
+}

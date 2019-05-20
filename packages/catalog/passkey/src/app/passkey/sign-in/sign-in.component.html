@@ -1,4 +1,4 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="validatePasskeyForm" 
+<form (ngSubmit)="onSubmit()" [formGroup]="validatePasskeyForm"
   class="form-horizontal">
 
   <div class="form-group">
@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!validatePasskeyForm.valid">
       {{buttonLabel}}
     </button>

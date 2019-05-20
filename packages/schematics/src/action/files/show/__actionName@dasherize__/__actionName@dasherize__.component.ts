@@ -77,6 +77,8 @@ OnInit {
         this.<%= camelize(entityName) %> = <%= camelize(entityName) %>;
         this.loaded<%= classify(entityName) %>.emit(<%= camelize(entityName) %>);
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

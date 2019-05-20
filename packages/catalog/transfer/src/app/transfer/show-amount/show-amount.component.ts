@@ -2,9 +2,7 @@ import {
   Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
 
-import { ConfigService } from '@deja-vu/core';
-
-import { TransferConfig } from '../transfer.config';
+import { ConfigServiceFactory } from '@deja-vu/core';
 
 
 @Component({
@@ -18,10 +16,10 @@ export class ShowAmountComponent implements OnInit {
   balanceType: 'money' | 'items';
 
   constructor(
-    private elem: ElementRef, private cs: ConfigService) { }
+    private elem: ElementRef, private csf: ConfigServiceFactory) { }
 
   ngOnInit() {
-    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
-      .balanceType;
+    this.balanceType = this.csf.createConfigService(this.elem)
+      .getConfig().balanceType;
   }
 }

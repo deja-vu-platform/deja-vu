@@ -81,6 +81,8 @@ OnChanges {
         .subscribe((res) => {
           this.followers = res.data.followers;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

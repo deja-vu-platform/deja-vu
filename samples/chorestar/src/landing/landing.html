@@ -1,0 +1,37 @@
+<dv.action name="landing">
+  <div class="body">
+    <h1 id="welcome">Welcome to <span class="logo">ChoreStar</span></h1>
+    <div class="container-fluid">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="white-box offset-md-1 col-md-5">
+            <dv.tx>
+              <h2>Parent Login</h2>
+              <parentauthentication.sign-in />
+              <dv.link href="/parent" hidden=true />
+            </dv.tx>
+          </div>
+          <div class="white-box right-box col-md-5">
+            <dv.tx>
+              <h2>Child Login</h2>
+              <childauthentication.sign-in />
+              <dv.link href="/child" hidden=true />
+            </dv.tx>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="white-box offset-md-1 col-md-5">
+            <dv.tx>
+              <h2>Parent Registration</h2>
+              <dv.gen-id />
+              <parentauthentication.register-user id=dv.gen-id.id  />
+              <group.create-group id=dv.gen-id.id hidden=true />
+              <dv.link href="/parent" hidden=true />
+            </dv.tx>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

@@ -34,7 +34,6 @@ export interface TxConfig<Message, Payload, State = any> {
   sendToClient: (payload: Payload, state?: State, index?: number) => void;
 
   onError: (error: Error, msg: Message, state?: State) => void;
-  getCohorts: (cohortId: string) => string[];
 }
 
 export interface Vote<Payload> {
@@ -110,23 +109,23 @@ export class TxCoordinator<Message, Payload, State = any> {
     setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * MS_IN_S);
   }
 
-  async processMessage(
-    txId: string, cohortId: string, msg: Message, state?: State, index?: number)
+  async processMessage(txId: string, cohortId: string, cohorts: string[],
+    msg: Message, state?: State, index?: number)
     : Promise<void> {
-    return this.doProcessMessage(txId, cohortId, msg, state, index)
+    return this.doProcessMessage(txId, cohortId, cohorts, msg, state, index)
       .catch((e) => {
         this.config.onError(e, msg, state);
       });
   }
 
-  private async doProcessMessage(
-    txId: string, cohortId: string, msg: Message, state?: State, index?: number)
+  private async doProcessMessage(txId: string, cohortId: string,
+    cohorts: string[], msg: Message, state?: State, index?: number)
     : Promise<void> {
     if (!this.txs) {
       throw new Error('TxCoordinator hasn\'t been started yet: call start()');
     }
     log(`Processing msg ${JSON.stringify(msg)}`, txId, cohortId);
-    const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohortId);
+    const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohorts);
 
     // No race condition here because the set of cohorts doesn't change after
     // initialization
@@ -237,15 +236,9 @@ export class TxCoordinator<Message, Payload, State = any> {
     return ret;
   }
 
-  private async getTx(txId: string, cohortId: string)
+  private async getTx(txId: string, cohorts: string[])
     : Promise<TxDoc<Message, Payload>> {
-    // We are going to be recomputing the expected cohorts for each tx we fetch
-    // but this lets us do `$setOnInsert`. We could check if the tx has been
-    // initialized and if not compute the expected cohorts but we would have to
-    // acquire the tx lock to do `find`, get the expected cohorts, and `update`
-    // atomically.
-    const cohorts = _.map(
-      this.config.getCohorts(cohortId), (id: string) => ({ id }));
+    const cohortObjects = _.map(cohorts, (id: string) => ({ id }));
     try { // https://jira.mongodb.org/browse/SERVER-14322
       // Look at the tx table and create one if there's no active tx for txId
       return (await this.txs!.findOneAndUpdate(
@@ -253,7 +246,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         { $setOnInsert: {
           state: 'voting',
           startedOn: new Date(),
-          cohorts: cohorts
+          cohorts: cohortObjects
         } },
         { returnOriginal: false, upsert: true }))
         .value!;

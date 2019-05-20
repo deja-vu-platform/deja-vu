@@ -17,5 +17,10 @@
         { "for": "src/app/app.component.html", "use": "scoring-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "scoring-show-score",
+    "scoring-show-target",
+    "scoring-show-targets-by-score"
+  ]
 }

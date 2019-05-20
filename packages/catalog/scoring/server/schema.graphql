@@ -1,8 +1,8 @@
 type Score {
   id: ID!
-  value: Float
-  sourceId: ID
-  targetId: ID
+  value: Float!
+  sourceId: ID!
+  targetId: ID!
 }
 
 type Target {
@@ -13,9 +13,9 @@ type Target {
 
 input CreateScoreInput {
   id: ID
-  value: Float
-  sourceId: ID
-  targetId: ID
+  value: Float!
+  sourceId: ID!
+  targetId: ID!
 }
 
 input ShowScoreInput {
@@ -24,12 +24,47 @@ input ShowScoreInput {
   targetId: ID
 }
 
+input ShowTargetInput {
+  id: ID!
+  sourceId: ID
+}
+
+# If both targetIds and sourceId are provided, it will only list the targets
+#   in `targetIds` that have scores made by `sourceId`.
+# If `targetIds` is provided alone, it will load the list of targets (and all
+#   of its associated scores regardless of which source gave it to them).
+# If sourceId is provided alone, it would load all targets that have scores
+#   made by `sourceId`.
+input TargetsByScoreInput {
+  asc: Boolean
+  targetIds: [ID]
+  sourceId: ID
+}
+
+input UpdateScoreInput {
+  id: ID!
+  value: Float!
+}
+
+input DeleteScoreInput {
+  id: ID!
+}
+
+# delete all scores created by a source or for a target
+input DeleteScoresInput {
+  sourceId: ID
+  targetId: ID
+}
+
 type Query {
   score(input: ShowScoreInput!): Score
-  target(id: ID!): Target
-  targetsByScore(asc: Boolean): [Target!]
+  target(input: ShowTargetInput!): Target
+  targetsByScore(input: TargetsByScoreInput!): [Target!]
 }
 
 type Mutation {
   createScore(input: CreateScoreInput!): Score
+  updateScore(input: UpdateScoreInput!): Boolean
+  deleteScore(input: DeleteScoreInput!): Boolean
+  deleteScores(input: DeleteScoresInput!): Boolean
 }

@@ -25,6 +25,7 @@ import {
   CreateTaskComponent
 } from './create-task/create-task.component';
 export { CreateTaskComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   ShowAssigneeComponent
 } from './show-assignee/show-assignee.component';
@@ -39,13 +40,28 @@ import {
 export { ShowTasksComponent };
 import { UpdateTaskComponent } from './update-task/update-task.component';
 export { UpdateTaskComponent };
+import {
+  ShowTaskCountComponent
+} from './show-task-count/show-task-count.component';
+export { ShowTaskCountComponent };
+import {
+  CreateTasksForAssigneesComponent
+} from './create-tasks-for-assignees/create-tasks-for-assignees.component';
+export { CreateTasksForAssigneesComponent };
+import { StageComponent } from './stage/stage.component';
+export { StageComponent };
+import {
+  InputAssigneeComponent
+} from './input-assignee/input-assignee.component';
+export { InputAssigneeComponent };
 
 
 const allComponents = [
   ApproveTaskComponent, ClaimTaskComponent,
   CompleteTaskComponent, CreateDueDateComponent, CreateTaskComponent,
   ShowAssigneeComponent, ShowTaskComponent, ShowTasksComponent,
-  UpdateTaskComponent
+  UpdateTaskComponent, ShowTaskCountComponent, CreateTasksForAssigneesComponent,
+  StageComponent, InputAssigneeComponent, ConfigWizardComponent
 ];
 
 const metadata = {

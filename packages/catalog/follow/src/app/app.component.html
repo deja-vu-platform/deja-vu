@@ -2,6 +2,8 @@
   <h1>Create Publisher <i>alice</i></h1>
   <follow-create-publisher id="alice" (publisher)="alicePublisher=$event">
   </follow-create-publisher>
+  <h1>Create Publisher <i>roger</i></h1>
+  <follow-create-publisher id="roger"></follow-create-publisher>
   <h1>Show Publisher <i>alice</i></h1>
   <follow-show-publisher [publisher]="alicePublisher">
   </follow-show-publisher>
@@ -11,6 +13,8 @@
   </follow-create-message>
   <h1>Show Message <i>herMessage</i></h1>
   <follow-show-message [message]="aliceMessage"></follow-show-message>
+  <h1>Create Message by <i>roger</i></h1>
+  <follow-create-message publisherId="roger"></follow-create-message>
   <h1>Show All Followers</h1>
   <follow-show-followers></follow-show-followers>
   <h1>Show All Messages</h1>
@@ -34,4 +38,12 @@
   <h1>Edit Message <i>herMessage</i> by Publisher <i>alice</i></h1>
   <follow-edit-message id="herMessage" publisherId="alice">
   </follow-edit-message>
+  <h1>Show Follower Count</h1>
+  <follow-show-follower-count></follow-show-follower-count>
+  <h1>Show Follower Count of Publisher <i>alice</i></h1>
+  <follow-show-follower-count ofPublisher="alice"></follow-show-follower-count>
+  <h1>Show Message Count</h1>
+  <follow-show-message-count></follow-show-message-count>
+  <h1>Show Publisher Count</h1>
+  <follow-show-publisher-count></follow-show-publisher-count>
 </div>

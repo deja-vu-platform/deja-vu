@@ -128,6 +128,108 @@ describe('ActionCompiler', () => {
       .toMatch(/dv-if/);
   });
 
+  it('should compile action with dv.if with action', () => {
+    const st: SymbolTable = {
+      foo: {
+        kind: 'cliche',
+        clicheName: 'foo'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <dv.if condition=2 lt 3>
+          <foo.action />
+        </dv.if>
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch('foo-action');
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\*ngIf="2 < 3"/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv\.if/);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch(/dv-if/);
+  });
+
+  it('should compile action with input action with dv.if', () => {
+    const st: SymbolTable = {
+      event: {
+        kind: 'cliche'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <event.choose-and-show-series
+          showEvent=<dv.if condition=2 lt 3>
+            <${appName}.action />
+          </dv.if>
+        />
+      </dv.action>
+    `;
+
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`${appName}-action`);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .not
+      .toMatch(`lt`);
+  });
+
+  it('should compile action with input action with dv.if', () => {
+    const st: SymbolTable = {
+      transfer: {
+        kind: 'cliche',
+        clicheName: 'transfer'
+      }
+    };
+    const actionName = 'action-with-if';
+    const action = `
+      <dv.action name="${actionName}">
+        <transfer.show-balance />
+        <dv.for elems=[1, 2, 3]
+        showElem= <dv.if
+          condition=$elem gt= transfer.show-balance.fetchedBalance>
+          <${appName}.action reward=$elem />
+        </dv.if>
+        />
+      </dv.action>
+    `;
+
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showEvent]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngComponent)
+      .toMatch(/@Input\(\) elem/);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`${appName}-action`);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .not
+      .toMatch(`gt`);
+  });
+
   it('should compile action with actions', () => {
     const heading = 'Group meeting organizer';
     const st: SymbolTable = {
@@ -207,6 +309,64 @@ describe('ActionCompiler', () => {
     `;
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+    const outputField = compiledAction.ngTemplate
+      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
+  });
+
+  it('should compile action accessing member of output of aliased action', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      allocator: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="show-group-meeting">
+        <property.choose-object
+          chooseObjectSelectPlaceholder="Champion"
+          initialObjectId=ec.currentConsumer.id />
+        <allocator.edit-consumer as ec hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+    const outputField = compiledAction.ngTemplate
+      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+    expect(compiledAction.ngComponent)
+      .toMatch(outputField);
+  });
+
+  it('should compile action accessing member of output of aliased action ' +
+    'with elvis', () => {
+    const st: SymbolTable = {
+      property: {
+        kind: 'cliche'
+      },
+      allocator: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="show-group-meeting">
+        <property.choose-object
+          chooseObjectSelectPlaceholder="Champion"
+          initialObjectId=ec.currentConsumer?.id />
+        <allocator.edit-consumer as ec hidden=true />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(
+        /\[initialObjectId\]=".*currentConsumer__ec\?\.id"/);
     expect(compiledAction.ngTemplate)
       .toMatch(/\(currentConsumer\)=".+=\$event"/);
     const outputField = compiledAction.ngTemplate
@@ -333,6 +493,39 @@ describe('ActionCompiler', () => {
     expect(compiledAction.actionInputs[0].ngTemplate)
       .toMatch(`show-event`);
   });
+
+  /* TODO: fix the parsing bug exposed by this test.
+      The action fails to parse when `assigneeId=...` appears first
+  it('should compile action with action input with inputs', () => {
+    const st: SymbolTable = {
+      task: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="home">
+        <${appName}.child-navbar />
+        <task.show-tasks
+          assigneeId=chorestar.child-navbar.user?.id
+          noTasksToShowText="No uncompleted chores"
+          completed=false
+          showOptionToComplete=true
+          showTask=<${appName}.show-chore chore=$task view="hello" /> />
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`[showTask]`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`tag`);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`type`);
+    expect(compiledAction.actionInputs.length)
+      .toBe(1);
+    expect(compiledAction.actionInputs[0].ngTemplate)
+      .toMatch(`show-task`);
+  }); */
 
   it('should compile action with html action input', () => {
     const st: SymbolTable = {

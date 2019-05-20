@@ -1,0 +1,26 @@
+<dv.action name="host-navbar"
+  loggedInUserId$=hostauthentication.logged-in.user.id>
+  <dv.tx>
+    <hostauthentication.logged-in />
+    <dv.redirect href="/login/host" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <div class="navbar-brand">
+        <dv.link href="/host" class="navbar-brand">Host</dv.link>
+      </div>
+
+      <div class="navbar-nav navbar-right inline-block">
+        <dv.link href="/host">Competitions</dv.link>
+
+        <span class="space-filler"></span>
+
+        <dv.tx>
+          <hostauthentication.sign-out hidden=true />
+          <dv.link href="/login/host">Log Out</dv.link>
+        </dv.tx>
+      </div>
+    </div>
+  </nav>
+</dv.action>

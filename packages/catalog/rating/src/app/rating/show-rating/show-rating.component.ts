@@ -91,6 +91,8 @@ export class ShowRatingComponent implements
             this.loadedRating.emit(res.data.rating);
           }
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

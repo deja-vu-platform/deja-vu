@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, ConfigService, GatewayService, GatewayServiceFactory, OnEval,
+  Action, ConfigServiceFactory, GatewayService, GatewayServiceFactory, OnEval,
   RunService
 } from '@deja-vu/core';
 
@@ -10,7 +10,7 @@ import { Transfer } from '../shared/transfer.model';
 import {
   ShowTransferComponent
 } from '../show-transfer/show-transfer.component';
-import { API_PATH, TransferConfig } from '../transfer.config';
+import { API_PATH } from '../transfer.config';
 
 
 @Component({
@@ -46,7 +46,7 @@ OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private cs: ConfigService,
+    private rs: RunService, private csf: ConfigServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.showTransfers = this;
   }
@@ -55,8 +55,8 @@ OnChanges {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
 
-    this.balanceType = this.cs.getConfig<TransferConfig>(this.elem)
-      .balanceType;
+    this.balanceType = this.csf.createConfigService(this.elem)
+      .getConfig().balanceType;
   }
 
   ngAfterViewInit() {
@@ -101,6 +101,8 @@ OnChanges {
         .subscribe((res) => {
           this.transfers = res.data.transfers;
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

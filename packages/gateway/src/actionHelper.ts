@@ -60,6 +60,7 @@ const INDENT_NUM_SPACES = 2;
 export class ActionHelper {
   private readonly actionTable: ActionTable;
   private readonly actionsNoExecRequest: Set<string>;
+  private readonly actionsRequestOptional: Set<string>;
   private readonly noApp: boolean = false;
 
   /**
@@ -248,6 +249,18 @@ export class ActionHelper {
     return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
   }
 
+  /**
+   * @return the set of actions from the given cliche that only optionally issue
+   * requests
+   */
+  private static GetActionsRequestOptional(cliche: string)
+    : string[] | undefined {
+      const fp = path.join(
+        ActionHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8')).actionsRequestOptional;
+  }
+
   private static GetClicheFolder(cliche: string): string {
     // Cliches specify as a main their typings (so that when apps do `import
     // 'cliche'` it works) . To get to their folder we need to go up a dir
@@ -344,6 +357,9 @@ export class ActionHelper {
     this.actionsNoExecRequest = new Set<string>(
       _.flatMap(usedCliches, (cliche: string) => _.get(
         ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+    this.actionsRequestOptional = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string): string[] =>
+        ActionHelper.GetActionsRequestOptional(cliche) || []));
 
     if (!appActionTable) {
       this.noApp = true;
@@ -354,13 +370,19 @@ export class ActionHelper {
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
     const usedActions = new Set<string>(_.keys(appActionTable));
+    // The iteration order of Set is the insertion order
     const saveUsedActions = (
       actionAst: ActionAst | undefined,
-      debugPath: string[]
+      debugPath: Set<string>
     ): void => {
       _.each(actionAst, (action: ActionTag) => {
-        const thisDebugPath = debugPath.slice();
-        thisDebugPath.push(action.fqtag);
+        const thisDebugPath = new Set(debugPath);
+        // If this debugPath has action.fqtag already, we have a loop and we
+        // need to stop (because we already added all the used actions)
+        if (thisDebugPath.has(action.fqtag)) {
+          return;
+        }
+        thisDebugPath.add(action.fqtag);
         usedActions.add(action.tag);
 
         try {
@@ -368,7 +390,7 @@ export class ActionHelper {
           saveUsedActions(actionContent, thisDebugPath);
         } catch (e) {
           if (!_.has(e, 'actionPath')) {
-            e.actionPath = thisDebugPath;
+            e.actionPath = [ ...thisDebugPath ];
           }
           throw e;
         }
@@ -378,7 +400,7 @@ export class ActionHelper {
     try {
       _.each(_.keys(appActionTable), (tag: string) => {
         const content = this.getContent({ fqtag: tag, tag: tag });
-        saveUsedActions(content, [ tag ]);
+        saveUsedActions(content, new Set([ tag ]));
       });
     } catch (e) {
       e.message = `Error at path: ${e.actionPath}\n${e.message}`;
@@ -389,11 +411,15 @@ export class ActionHelper {
   }
 
   /**
-   * @returns true if the action given by `tag` is expected to do an exe
+   * @returns true if the action given by `tag` is expected to do an exec
    * request
    */
   shouldHaveExecRequest(tag: string): boolean {
     return !this.actionsNoExecRequest.has(tag);
+  }
+
+  isRequestOptional(tag: string): boolean {
+    return this.actionsRequestOptional.has(tag);
   }
 
   /**

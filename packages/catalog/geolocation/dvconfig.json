@@ -17,5 +17,10 @@
         { "for": "src/app/app.component.html", "use": "geolocation-root" }
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "geolocation-show-marker",
+    "geolocation-show-marker-count",
+    "geolocation-show-markers"
+  ]
 }

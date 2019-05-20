@@ -19,5 +19,9 @@
         {"for": "src/app/app.component.html", "use": "task-root"}
       ]
     }
-  }
+  },
+  "actionsRequestOptional": [
+    "task-show-task-count",
+    "task-show-tasks"
+  ]
 }

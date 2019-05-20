@@ -29,8 +29,8 @@
     "@angular/router": "^5.2.0",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
-    "@types/lodash": "^4.14.96",
-    "@types/mongodb": "~3.0.7",
+    "@types/lodash": "^4.14.112",
+    "@types/mongodb": "^3.1.8",
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
@@ -59,23 +59,8 @@
   "workspaces": [
     "packages/*",
     "packages/catalog/*",
-    "samples/chorestar",
-    "samples/hackernews",
-    "samples/hackernews/.dv",
-    "samples/listify",
-    "samples/listify/.dv",
-    "samples/morg",
-    "samples/morg/.dv",
-    "samples/potluck",
-    "samples/potluck/.dv",
-    "samples/mapmit",
-    "samples/mapmit/.dv",
-    "samples/rendezvous",
-    "samples/rendezvous/.dv",
-    "samples/sweetspots",
-    "samples/sweetspots/.dv",
-    "designer",
-    "designer-apps/*",
-    "designer-apps/*/.dv"
+    "samples/*",
+    "samples/*/.dv",
+    "designer"
   ]
 }

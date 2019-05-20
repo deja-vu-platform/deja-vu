@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  GatewayService, GatewayServiceFactory, OnExec,
+  OnExecFailure, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
 
@@ -110,6 +110,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   dvOnExecSuccess() {
     this.newPasswordSaved = true;
+    this.newPasswordSavedError = '';
     window.setTimeout(() => {
       this.newPasswordSaved = false;
     }, SAVED_MSG_TIMEOUT);

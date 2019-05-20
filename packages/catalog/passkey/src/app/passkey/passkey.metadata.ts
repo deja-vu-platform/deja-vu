@@ -15,6 +15,7 @@ import {
   CreatePasskeyComponent
 } from './create-passkey/create-passkey.component';
 export { CreatePasskeyComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { LoggedInComponent } from './logged-in/logged-in.component';
 export { LoggedInComponent };
 import { SignInComponent } from './sign-in/sign-in.component';
@@ -23,10 +24,13 @@ import { SignOutComponent } from './sign-out/sign-out.component';
 export { SignOutComponent };
 import { ValidateComponent } from './validate/validate.component';
 export { ValidateComponent };
+import { ShowPasskeyComponent } from './show-passkey/show-passkey.component';
+export { ShowPasskeyComponent };
 
 const allComponents = [
   CreatePasskeyComponent, SignInComponent, SignOutComponent,
-  LoggedInComponent, ValidateComponent
+  LoggedInComponent, ValidateComponent, ShowPasskeyComponent,
+  ConfigWizardComponent
 ];
 
 const metadata = {

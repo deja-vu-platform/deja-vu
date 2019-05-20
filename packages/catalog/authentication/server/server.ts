@@ -1,17 +1,18 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
   getReturnFields,
   Validation
 } from '@deja-vu/cliche-server';
 import * as bcrypt from 'bcryptjs';
+import { IResolvers } from 'graphql-tools';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 import {
   ChangePasswordInput,
@@ -47,31 +48,13 @@ const SALT_ROUNDS = 10;
 
 class UserValidation {
   static async userExistsById(
-    users: mongodb.Collection<UserDoc>, userId: string): Promise<UserDoc> {
+    users: Collection<UserDoc>, userId: string): Promise<UserDoc> {
     return Validation.existsOrFail(users, userId, 'User');
   }
 
   static async userExistsByUsername(
-    users: mongodb.Collection<UserDoc>, username: string): Promise<UserDoc> {
-    const user: UserDoc | null = await users.findOne({ username: username });
-    if (!user) {
-      throw new Error(`User ${username} not found.`);
-    }
-
-    return user;
-  }
-
-  static async userIsNew(users: mongodb.Collection<UserDoc>, id: string,
-    username: string): Promise<void> {
-    const user: UserDoc | null = await users
-      .findOne({
-        $or: [
-          { id: id }, { username: username }
-        ]
-      });
-    if (user) {
-      throw new Error(`User already exists.`);
-    }
+    users: Collection<UserDoc>, username: string): Promise<UserDoc> {
+    return await users.findOne({ username: username });
   }
 
   static async verifyPassword(inputPassword: string, savedPassword: string)
@@ -123,7 +106,7 @@ class UserValidation {
 }
 
 const actionRequestTable: ActionRequestTable = {
-  'authenticate': (extraInfo) => `
+  authenticate: (extraInfo) => `
     query Authenticate($input: VerifyInput!) {
       verify(input: $input) ${getReturnFields(extraInfo)}
     }
@@ -156,6 +139,11 @@ const actionRequestTable: ActionRequestTable = {
       userById(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
+  'show-user-count': (extraInfo) => `
+    query ShowUserCount {
+      userCount ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-users': (extraInfo) => `
     query ShowUsers($input: UsersInput!) {
       users(input: $input) ${getReturnFields(extraInfo)}
@@ -167,19 +155,19 @@ const actionRequestTable: ActionRequestTable = {
     }
   `
 };
+<<<<<<< HEAD
 
 function isPendingRegister(user: UserDoc | null) {
   return _.get(user, 'pending.type') === 'register';
 }
+=======
+>>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
 
-async function newUserDocOrFail(
-  users: mongodb.Collection<UserDoc>, input: RegisterInput): Promise<UserDoc> {
+async function getNewUserDoc(input: RegisterInput): Promise<UserDoc> {
   UserValidation.isUsernameValid(input.username);
   UserValidation.isPasswordValid(input.password);
 
   const id = input.id ? input.id : uuid();
-
-  await UserValidation.userIsNew(users, id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
 
@@ -191,6 +179,7 @@ async function newUserDocOrFail(
 }
 
 async function register(
+<<<<<<< HEAD
   users: mongodb.Collection<UserDoc>, input: RegisterInput, context: Context) {
   const reqIdPendingFilter = { 'pending.reqId': context.reqId };
   const newUser: UserDoc = await newUserDocOrFail(users, input);
@@ -214,6 +203,14 @@ async function register(
   }
 
   return newUser;
+=======
+  users: Collection<UserDoc>, input: RegisterInput, context: Context) {
+  const newUser: UserDoc = await getNewUserDoc(input);
+  // this will fail for duplicate users because of the unique index
+  // on both id and username
+
+  return await users.insertOne(context, newUser);
+>>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
 }
 
 function sign(userId: string): string {
@@ -229,6 +226,7 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
+<<<<<<< HEAD
 function resolvers(db: mongodb.Db, _config: Config): object {
   const users: mongodb.Collection<UserDoc> = db.collection('users');
 
@@ -252,6 +250,16 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         return user;
       },
 
+=======
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
+  const users: Collection<UserDoc> = db.collection('users');
+
+  return {
+    Query: {
+      users: async () => await users.find(),
+      user: async (_root, { username }) => await users.findOne({ username }),
+      userById: async (_root, { id }) => await users.findOne({ id: id }),
+>>>>>>> 8ddbc6db4573a2290566ff1e24840deb54c22097
       verify: (_root, { input }: { input: VerifyInput }) => verify(
         input.token, input.id)
     },
@@ -276,16 +284,12 @@ function resolvers(db: mongodb.Db, _config: Config): object {
         _root, { input }: { input: RegisterInput }, context: Context) => {
         const user = await register(users, input, context);
 
-        if (!_.isNil(user)) {
-          const token: string = sign(user!.id);
+        const token: string = sign(user!.id);
 
-          return {
-            token: token,
-            user: user
-          };
-        }
-
-        return undefined;
+        return {
+          token: token,
+          user: user
+        };
       },
 
       signIn: async (_root, { input }: { input: SignInInput }) => {
@@ -311,55 +315,7 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
         const updateOp = { $set: { password: newPasswordHash } };
 
-        const notPendingUserFilter = {
-          id: input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            const pendingUpdateObj = await users.updateOne(
-              notPendingUserFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'change-password'
-                  }
-                }
-              });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-
-          case undefined:
-            await UserValidation.userExistsById(users, input.id);
-            const updateObj = await users
-              .updateOne(notPendingUserFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-
-          case 'commit':
-            await users.updateOne(
-              reqIdPendingFilter,
-              { ...updateOp, $unset: { pending: '' } });
-
-            return false;
-
-          case 'abort':
-            await users
-              .updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return false;
-        }
-
-        return false;
+        return await users.updateOne(context, { id: input.id }, updateOp);
       }
     }
   };
@@ -367,8 +323,8 @@ function resolvers(db: mongodb.Db, _config: Config): object {
 
 const authenticationCliche: ClicheServer =
   new ClicheServerBuilder('authentication')
-    .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-      const users: mongodb.Collection<UserDoc> = db.collection('users');
+    .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+      const users: Collection<UserDoc> = db.collection('users');
 
       return Promise.all([
         users.createIndex({ id: 1 }, { unique: true, sparse: true }),

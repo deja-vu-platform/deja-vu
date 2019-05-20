@@ -1,6 +1,7 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "./dragula.scss";
+@import "./app/dvd-app-styles.css";
 @import "~quill/dist/quill.bubble.css";
 @import "~quill/dist/quill.snow.css";
 
@@ -15,26 +16,12 @@ body {
   margin: 0;
 }
 
-/* Ensure text boxes do not get squished */
-.ql-container {
-  min-width: 300px;
-}
-
 /* add class mat-small to mat button to make it fit content */
-.mat-button.mat-small {
+button.mat-small {
   min-width: 1%;
 }
-.mat-button.mat-small-y {
+button.mat-small-y {
   line-height: 100%;
-}
-
-/* prevent interaction with dynamically-rendered components */
-.action-instance * {
-  pointer-events: none;
-}
-/* don't prevent interaction with quill editor */
-.action-instance quill-editor * {
-  pointer-events: auto;
 }
 
 /* styles for custom quill buttons (don't have component) */
@@ -46,4 +33,60 @@ body {
 }
 .text-button-text {
   white-space: nowrap;
+}
+
+.floating-menu {
+  .mat-tab-label, .mat-tab-label-active{
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 1;
+    height: 32px !important;
+  }
+}
+
+.mat-menu-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.mat-tab-body-wrapper {
+  flex: 1;
+}
+
+.cdk-global-overlay-wrapper {
+  z-index: 1000;
+}
+
+.gu-mirror, .gu-transit {
+  .hide-on-drag {
+    display: none !important;
+  }
+}
+
+.mat-form-field-wrapper {
+  width: 100%;
+}
+
+.compound-input .mat-form-field-infix {
+  width: unset;
+}
+
+.mat-menu-panel {
+  max-width: none !important; // override
+}
+
+.inputtables > * {
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.mat-snack-bar-handset {
+  width: fit-content !important;
+  transform: translateX(-132px); // side menu size / 2
+}
+
+.designer > .action-instance {
+  min-height: 100%;
 }

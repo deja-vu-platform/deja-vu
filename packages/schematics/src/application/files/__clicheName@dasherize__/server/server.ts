@@ -1,12 +1,12 @@
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  CONCURRENT_UPDATE_ERROR,
+  Collection,
   Config,
   Context,
-  getReturnFields,
-  Validation
+  getReturnFields
 } from '@deja-vu/cliche-server';
 import {
   <%= classify(clicheName) %>Doc,
@@ -14,17 +14,9 @@ import {
   Update<%= classify(clicheName) %>Input
 } from './schema';
 
-import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
+import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
-
-class <%= classify(clicheName) %>Validation {
-  static async <%= camelize(clicheName) %>ExistsOrFails(
-    <%= camelize(clicheName) %>s: mongodb.Collection<<%= classify(clicheName) %>Doc>, id: string): Promise<<%= classify(clicheName) %>Doc> {
-    return Validation.existsOrFail(<%= camelize(clicheName) %>s, id, '<%= classify(clicheName) %>');
-  }
-}
 
 // each action should be mapped to its corresponding GraphQl request here
 const actionRequestTable: ActionRequestTable = {
@@ -63,24 +55,13 @@ const actionRequestTable: ActionRequestTable = {
   }
 };
 
-function isPendingCreate(doc: <%= classify(clicheName) %>Doc | null) {
-  return _.get(doc, 'pending.type') === 'create-<%= dasherize(clicheName) %>';
-}
-
-function resolvers(db: mongodb.Db, _config: Config): object {
-  const <%= camelize(clicheName) %>s: mongodb.Collection<<%= classify(clicheName) %>Doc> = db.collection('<%= camelize(clicheName) %>s');
+function resolvers(db: ClicheDb, _config: Config): IResolvers {
+  const <%= camelize(clicheName) %>s: Collection<<%= classify(clicheName) %>Doc> = db.collection('<%= camelize(clicheName) %>s');
 
   return {
     Query: {
-      <%= camelize(clicheName) %>: async (_root, { id }) => {
-        const <%= camelize(clicheName) %> = await <%= camelize(clicheName) %>s.findOne({ id });
-
-        if (_.isNil(<%= camelize(clicheName) %>) || isPendingCreate(<%= camelize(clicheName) %>)) {
-          throw new Error(`<%= capitalize(clicheName) %> ${id} not found`);
-        }
-
-        return <%= camelize(clicheName) %>;
-      }
+      <%= camelize(clicheName) %>: async (_root, { id }) =>
+        await <%= camelize(clicheName) %>s.findOne({ id })
     },
 
     <%= classify(clicheName) %>: {
@@ -96,139 +77,25 @@ function resolvers(db: mongodb.Db, _config: Config): object {
           content: input.content
         };
 
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            <%= camelize(clicheName) %>.pending = { reqId: context.reqId, type: 'create-<%= dasherize(clicheName) %>' };
-            /* falls through */
-          case undefined:
-            await <%= camelize(clicheName) %>s.insertOne(<%= camelize(clicheName) %>);
-
-            return <%= camelize(clicheName) %>;
-          case 'commit':
-            await <%= camelize(clicheName) %>s.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await <%= camelize(clicheName) %>s.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-        }
-
-        return <%= camelize(clicheName) %>;
+        return await <%= camelize(clicheName) %>s.insertOne(context, <%= camelize(clicheName) %>);
       },
 
       update<%= classify(clicheName) %>: async (
         _root, { input }: { input: Update<%= classify(clicheName) %>Input }, context: Context) => {
         const updateOp = { $set: { content: input.content } };
-        const notPending<%= classify(clicheName) %>IdFilter = {
-          id: input.id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-        switch (context.reqType) {
-          case 'vote':
-            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, input.id);
-            const pendingUpdateObj = await <%= camelize(clicheName) %>s
-              .updateOne(
-                notPending<%= classify(clicheName) %>IdFilter,
-                {
-                  $set: {
-                    pending: {
-                      reqId: context.reqId,
-                      type: 'update-<%= dasherize(clicheName) %>'
-                    }
-                  }
-                });
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, input.id);
-            const updateObj = await <%= camelize(clicheName) %>s
-              .updateOne(notPending<%= classify(clicheName) %>IdFilter, updateOp);
-            if (updateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return updateObj.modifiedCount === 1;
-          case 'commit':
-            await <%= camelize(clicheName) %>s.updateOne(
-              reqIdPendingFilter,
-              { ...updateOp, $unset: { pending: '' } });
-
-            return undefined;
-          case 'abort':
-            await <%= camelize(clicheName) %>s.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
+        return await <%= camelize(clicheName) %>s.updateOne(context, { id: input.id }, updateOp);
       },
 
-      delete<%= classify(clicheName) %>: async (_root, { id }, context: Context) => {
-        const notPending<%= classify(clicheName) %>IdFilter = {
-          id: id,
-          pending: { $exists: false }
-        };
-        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-        switch (context.reqType) {
-          case 'vote':
-            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, id);
-            const pendingUpdateObj = await <%= camelize(clicheName) %>s.updateOne(
-              notPending<%= classify(clicheName) %>IdFilter,
-              {
-                $set: {
-                  pending: {
-                    reqId: context.reqId,
-                    type: 'delete-<%= dasherize(clicheName) %>'
-                  }
-                }
-              });
-
-            if (pendingUpdateObj.matchedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case undefined:
-            await <%= classify(clicheName) %>Validation.<%= camelize(clicheName) %>ExistsOrFails(<%= camelize(clicheName) %>s, id);
-            const res = await <%= camelize(clicheName) %>s
-              .deleteOne(notPending<%= classify(clicheName) %>IdFilter);
-
-            if (res.deletedCount === 0) {
-              throw new Error(CONCURRENT_UPDATE_ERROR);
-            }
-
-            return true;
-          case 'commit':
-            await <%= camelize(clicheName) %>s.deleteOne(reqIdPendingFilter);
-
-            return undefined;
-          case 'abort':
-            await <%= camelize(clicheName) %>s.updateOne(
-              reqIdPendingFilter, { $unset: { pending: '' } });
-
-            return undefined;
-        }
-
-        return undefined;
-      }
+      delete<%= classify(clicheName) %>: async (_root, { id }, context: Context) =>
+        await <%= camelize(clicheName) %>s.deleteOne(context, { id })
     }
   };
 }
 
 const <%= camelize(clicheName) %>Cliche: ClicheServer = new ClicheServerBuilder('<%= camelize(clicheName) %>')
-  .initDb((db: mongodb.Db, _config: Config): Promise<any> => {
-    const <%= camelize(clicheName) %>s: mongodb.Collection<<%= classify(clicheName) %>Doc> = db.collection('<%= camelize(clicheName) %>s');
+  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+    const <%= camelize(clicheName) %>s: Collection<<%= classify(clicheName) %>Doc> = db.collection('<%= camelize(clicheName) %>s');
 
     return <%= camelize(clicheName) %>s.createIndex({ id: 1 }, { unique: true, sparse: true });
   })

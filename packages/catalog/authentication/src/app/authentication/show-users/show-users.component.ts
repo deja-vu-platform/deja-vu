@@ -83,6 +83,8 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
           this.fetchedUsers.emit(this.users);
           this.fetchedUserIds.emit(_.map(this.users, 'id'));
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

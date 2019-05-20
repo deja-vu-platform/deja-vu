@@ -1,0 +1,22 @@
+<dv.action name="climber-login">
+  <div class="white-back">
+    <livescorecard.banner climberLogin=true />
+    <div class="container text-center">
+      <div class="row">
+        <div class="offset-lg-4 col-lg-4 offset-lg-4">
+          <hr class="user-form" />
+          <dv.tx>
+            <competitioncode.sign-in class="full"
+              showOptionToSubmit=false
+              inputLabel="enter the competition code here"/>
+            <climbercode.sign-in class="full"
+              showOptionToSubmit=false
+              inputLabel="enter your climber code here"/>
+            <dv.button class="btn btn-success full">CLIMB!</dv.button>
+            <dv.callback defaultHref="/climber" onExecSuccess=true hidden=true />
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.action>

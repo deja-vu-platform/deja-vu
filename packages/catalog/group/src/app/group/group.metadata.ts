@@ -13,6 +13,7 @@ import { ChooseGroupComponent } from './choose-group/choose-group.component';
 export { ChooseGroupComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
 export { CreateGroupComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteGroupComponent } from './delete-group/delete-group.component';
 export { DeleteGroupComponent };
 import { InputMemberComponent } from './input-member/input-member.component';
@@ -29,13 +30,22 @@ import { ShowMembersComponent } from './show-members/show-members.component';
 export { ShowMembersComponent };
 import { StageComponent } from './stage/stage.component';
 export { StageComponent };
+import {
+  ShowGroupCountComponent
+} from './show-group-count/show-group-count.component';
+export { ShowGroupCountComponent };
+import {
+  ShowMemberCountComponent
+} from './show-member-count/show-member-count.component';
+export { ShowMemberCountComponent };
 
 
 const allComponents = [
   AddToGroupComponent, ChooseGroupComponent, CreateGroupComponent,
   DeleteGroupComponent, InputMemberComponent, JoinLeaveComponent,
   ShowGroupComponent, ShowGroupsComponent, ShowMemberComponent,
-  ShowMembersComponent, StageComponent
+  ShowMembersComponent, StageComponent, ShowGroupCountComponent,
+  ShowMemberCountComponent, ConfigWizardComponent
 ];
 
 

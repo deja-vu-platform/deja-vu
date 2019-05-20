@@ -1,8 +1,8 @@
-import { InjectionToken, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { InjectionToken, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule
+  MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,6 +14,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { CreateMarkerComponent } from './create-marker/create-marker.component';
 export { CreateMarkerComponent };
+import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
 export { DeleteMarkerComponent };
 import { DisplayMapComponent } from './display-map/display-map.component';
@@ -26,9 +27,12 @@ import { ShowMarkerComponent } from './show-marker/show-marker.component';
 export { ShowMarkerComponent };
 import { ShowMarkersComponent } from './show-markers/show-markers.component';
 export { ShowMarkersComponent };
+import {
+  ShowMarkerCountComponent
+} from './show-marker-count/show-marker-count.component';
+export { ShowMarkerCountComponent };
 
 import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
-
 
 const allComponents = [
   CreateMarkerComponent,
@@ -36,7 +40,9 @@ const allComponents = [
   DisplayMapComponent,
   GetCurrentLocationComponent,
   ShowMarkerComponent,
-  ShowMarkersComponent
+  ShowMarkersComponent,
+  ShowMarkerCountComponent,
+  ConfigWizardComponent
 ];
 
 const metadata = {

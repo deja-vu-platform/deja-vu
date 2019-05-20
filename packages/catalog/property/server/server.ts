@@ -1,40 +1,22 @@
-import * as Ajv from 'ajv';
 import {
   ActionRequestTable,
+  ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
-  Config,
+  Collection,
   Context,
+  EMPTY_CONTEXT,
   getReturnFields
 } from '@deja-vu/cliche-server';
+import * as Ajv from 'ajv';
+import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
-import * as mongodb from 'mongodb';
-import { ObjectDoc } from './schema';
 import { v4 as uuid } from 'uuid';
-
-const jsonSchemaTypeToGraphQlType = {
-  integer: 'Int',
-  number: 'Float',
-  string: 'String',
-  boolean: 'Boolean'
-  /* Not supported yet: object, array, null */
-};
-
-interface Property {
-  type: keyof typeof jsonSchemaTypeToGraphQlType;
-}
-
-interface Schema {
-  properties: { [name: string]: Property };
-  required?: string[];
-  title: string;
-  type: 'object';
-}
-
-interface PropertyConfig extends Config {
-  initialObjects: Object[];
-  schema: Schema;
-}
+import {
+  jsonSchemaTypeToGraphQlType,
+  PropertyConfig
+} from './config-types';
+import { ObjectDoc } from './schema';
 
 const loadSchemaQuery = (extraInfo) => `
   query Properties {
@@ -54,7 +36,7 @@ const loadSchemaAndObjectsQueries = (extraInfo) => {
     default:
       throw new Error('Need to specify extraInfo.action');
   }
-}
+};
 
 
 const actionRequestTable: ActionRequestTable = {
@@ -107,8 +89,8 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'show-objects': (extraInfo) =>loadSchemaAndObjectsQueries(extraInfo)
-}
+  'show-objects': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo)
+};
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
   const requiredProperties: Set<string> = new Set(config.schema.required);
@@ -144,14 +126,15 @@ function createObjectFromInput(config: PropertyConfig, input) {
   const validate = ajv.compile(config.schema);
   const valid = validate(_.omit(newObject, 'id'));
   if (!valid) {
-    throw new Error(_.map(validate.errors, 'message').join('\n'));
+    throw new Error(_.map(validate.errors, 'message')
+      .join('\n'));
   }
 
   return newObject;
 }
 
-function resolvers(db: mongodb.Db, config: PropertyConfig): object {
-  const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
+function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
+  const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {
       property: (_root, { name }) => {
@@ -168,8 +151,7 @@ function resolvers(db: mongodb.Db, config: PropertyConfig): object {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: (_root) => objects.find({ _pending: { $exists: false } })
-        .toArray(),
+      objects: (_root) => objects.find(),
       properties: (_root) => _
         .chain(config['schema'].properties)
         .toPairs()
@@ -188,55 +170,18 @@ function resolvers(db: mongodb.Db, config: PropertyConfig): object {
     Mutation: {
       createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-        const reqIdPendingFilter = { '_pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            newObject._pending = { reqId: context.reqId };
-            /* falls through */
-          case undefined:
-            await objects.insertOne(newObject);
 
-            return newObject;
-          case 'commit':
-            await objects.updateOne(
-              reqIdPendingFilter, { $unset: { _pending: '' } });
-
-            return newObject;
-          case 'abort':
-            await objects.deleteOne(reqIdPendingFilter);
-
-            return newObject;
-        }
-
-        return newObject;
+        return await objects.insertOne(context, newObject);
       },
 
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
-        const reqIdPendingFilter = { '_pending.reqId': context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            _.each(objDocs, (objDoc: ObjectDoc) => {
-              objDoc._pending = { reqId: context.reqId };
-            });
-            /* falls through */
-          case undefined:
-            await objects.insertMany(objDocs);
+        _.each(objDocs, (objDoc: ObjectDoc) => {
+          objDoc._pending = { reqId: context.reqId };
+        });
 
-            return objDocs;
-          case 'commit':
-            await objects.updateMany(
-              reqIdPendingFilter, { $unset: { _pending: '' } });
-
-            return objDocs;
-          case 'abort':
-            await objects.deleteMany(reqIdPendingFilter);
-
-            return objDocs;
-        }
-
-        return objDocs;
+        return await objects.insertMany(context, objDocs);
       }
     }
   };
@@ -253,15 +198,17 @@ function resolvers(db: mongodb.Db, config: PropertyConfig): object {
 
 const propertyCliche: ClicheServer<PropertyConfig> =
   new ClicheServerBuilder<PropertyConfig>('property')
-    .initDb(async (db: mongodb.Db, config: PropertyConfig): Promise<any> => {
-      const objects: mongodb.Collection<ObjectDoc> = db.collection('objects');
+    .initDb(async (db: ClicheDb, config: PropertyConfig): Promise<any> => {
+      const objects: Collection<ObjectDoc> = db.collection('objects');
       await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
       if (!_.isEmpty(config.initialObjects)) {
-        return objects.insertMany(_.map(config.initialObjects, (obj) => {
-          obj['id'] = obj['id'] ? obj['id'] : uuid();
+        return objects.insertMany(EMPTY_CONTEXT,
+          _.map(config.initialObjects, (obj) => {
+            obj['id'] = obj['id'] ? obj['id'] : uuid();
 
-          return obj;
-        }));
+            return obj;
+          })
+        );
       }
 
       return Promise.resolve();

@@ -24,6 +24,7 @@ interface RatingsRes {
 export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
   @Input() targetId: string;
+
   @Input() showRating: Action = { type: <Type<Component>>ShowRatingComponent };
 
   @Input() noRatingsToShowText = 'No ratings to show';
@@ -77,6 +78,8 @@ OnInit, OnChanges {
       .subscribe((res) => {
         this.ratings = res.data.ratings;
       });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
   }
 

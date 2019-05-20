@@ -21,7 +21,7 @@ const components = [ AppComponent, @@components ];
   ],
   entryComponents: components,
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
+    { provide: GATEWAY_URL, useValue: 'localhost:3000/api' },
     { provide: USED_CLICHES_CONFIG, useValue: @@usedClichesConfig }
   ],
   bootstrap: [AppComponent]

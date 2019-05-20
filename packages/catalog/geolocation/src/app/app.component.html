@@ -1,7 +1,6 @@
 <div class="container">
   <h1>Display Map <i>markerMapId</i></h1>
-  <geolocation-display-map
-    id="markerMapId"
+  <geolocation-display-map id="markerMapId"
     (newMarker)="selectedMarker=$event">
   </geolocation-display-map>
   <h1>Create Marker on Map <i>markerMapId</i></h1>
@@ -18,7 +17,7 @@
   <h1>Show Markers for Map <i>markerMapId</i></h1>
   <geolocation-show-markers ofMapId="markerMapId"></geolocation-show-markers>
 
-  <!-- Current Location -->
+
   <h1>Display current location</h1>
   <geolocation-get-current-location (location)="l=$event">
   </geolocation-get-current-location>
@@ -26,15 +25,17 @@
   <h1>Show Markers within 5 miles</h1>
   <geolocation-show-markers [center]="l" radius="5"></geolocation-show-markers>
 
-  <!-- Create marker to delete -->
+
   <h1>Create Marker <i>markerId</i> on Map <i>markerMapId</i>
     (<i>Stata Center</i>)</h1>
-  <geolocation-create-marker
-    id="markerId" mapId="markerMapId" title="Stata Center"
+  <geolocation-create-marker id="markerId" mapId="markerMapId" title="Stata Center"
     latitude="42.361635760915846" longitude="-71.0906195640564">
   </geolocation-create-marker>
   <h1>Show Marker <i>markerId</i></h1>
   <geolocation-show-marker id="markerId"></geolocation-show-marker>
   <h1>Delete Marker <i>markerId</i></h1>
   <geolocation-delete-marker id="markerId"></geolocation-delete-marker>
+
+  <h1>Show Marker Count</h1>
+  <geolocation-show-marker-count></geolocation-show-marker-count>
 </div>

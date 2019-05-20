@@ -8,3 +8,7 @@ export interface Message {
   id: string;
   content: string;
 }
+
+export interface Follower {
+  id: string;
+}

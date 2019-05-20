@@ -1,0 +1,28 @@
+{
+  "name": "schedule",
+  "config": {
+    "wsPort": 3001
+  },
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/schedule/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "schedule-root" }
+      ]
+    }
+  },
+  "actionsRequestOptional": [
+    "schedule-show-all-availability",
+    "schedule-show-next-availability",
+    "schedule-show-schedule",
+    "schedule-show-slot",
+    "schedule-show-slots"
+  ]
+}
