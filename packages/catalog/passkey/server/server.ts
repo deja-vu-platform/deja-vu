@@ -115,8 +115,9 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
   let code;
   if (_.isEmpty(input.code)) {
     code = await getRandomPasscode(passkeys);
-    await passkeys.updateOne(
-      context, { code }, { $set: { used: true } });
+    const updateOp = { $set: { used: true } };
+    if (!_.isEmpty(input.id)) { _.set(updateOp, '$set.id', input.id); }
+    await passkeys.updateOne(context, { code: code }, updateOp);
   } else {
     PasskeyValidation.isCodeValid(input.code);
     code = input.code;
