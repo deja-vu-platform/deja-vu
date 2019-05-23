@@ -81,7 +81,7 @@ ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
       provide: GATEWAY_URL,
       // the designer is served at 4200
       // requests are proxied to the gateway running at 3000
-      useValue: 'http://localhost:4200/api'
+      useValue: 'localhost:4200/api'
     },
     {
       provide: USED_CLICHES_CONFIG,
