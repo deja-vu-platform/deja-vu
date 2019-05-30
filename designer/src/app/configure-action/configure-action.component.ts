@@ -7,6 +7,9 @@ import * as _ from 'lodash';
 import * as tinycolor from 'tinycolor2';
 
 import {
+  MIN_ALPHA_FOR_DARK
+} from '../action-definition/action-definition.component';
+import {
   App,
   AppActionDefinition,
   AppActionStyles,
@@ -109,12 +112,14 @@ export class ConfigureActionComponent implements OnInit {
     action.transaction = this.transaction;
 
     Object.assign(action.styles, this.styles);
+    const color = tinycolor(this.styles.backgroundColor);
     document
       .querySelector('body').style
       .setProperty(
         '--text-stroke-color',
-        tinycolor(this.styles.backgroundColor)
-          .isDark() ? 'white' : 'black'
+        color.isDark() && color.getAlpha() > MIN_ALPHA_FOR_DARK
+          ? 'white'
+          : 'black'
       );
 
     this.dialogRef.close();

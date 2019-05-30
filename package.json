@@ -29,7 +29,7 @@
     "@angular/router": "^5.2.0",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
-    "@types/lodash": "^4.14.112",
+    "@types/lodash": "ts2.5",
     "@types/mongodb": "^3.1.8",
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
