@@ -113,8 +113,7 @@ export class NgAppBuilder {
   }
 
   private static InstallDependencies(cacheDir: string) {
-    // Windows users must include `shell: true` for the command to work
-    // TODO: Remove `shell: true` in the future
+    // TODO: Remove `shell: true` hack
     const c = spawnSync(
       'yarn', [], { stdio: 'inherit', cwd: cacheDir, shell: true });
     if (c.error) {

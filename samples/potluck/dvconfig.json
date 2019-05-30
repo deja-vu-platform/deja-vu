@@ -1,6 +1,5 @@
 {
   "name": "potluck",
-  "type": "app",
   "usedCliches": {
     "authentication": {
       "config": {
