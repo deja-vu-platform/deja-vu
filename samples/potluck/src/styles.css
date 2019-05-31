@@ -1,6 +1,11 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
+/* Fonts */
+@import url("https://fonts.googleapis.com/css?family=Pacifico");
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+
 md-icon {
   font-family: 'Material Icons' !important;
 }
