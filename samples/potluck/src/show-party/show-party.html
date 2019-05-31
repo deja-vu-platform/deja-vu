@@ -1,7 +1,7 @@
 <dv.action name="show-party">
-  <party.show-object id=$id hidden=true />
-  <authorization.show-resource id=$id hidden=true />
-  <transfer.show-balance accountId=$id hidden=true />
+  <party.show-object id=$partyId hidden=true />
+  <authorization.show-resource id=$partyId hidden=true />
+  <transfer.show-balance accountId=$partyId hidden=true />
 
   <div class="panel panel-default">
     <div class="panel-body">
@@ -14,7 +14,7 @@
           <div class="top-space">
             <p>
               <i class="material-icons icon">event</i> Date:
-              <event.show-event id=$id class="inline-block" />
+              <event.show-event id=$partyId class="inline-block" />
             </p>
             <p>
               <i class="material-icons icon">person</i> Host:
@@ -42,8 +42,8 @@
           <div class="row">
             <div class="col-md-12">
               <h4>Invited List</h4>
-              <group.show-members inGroupId=$id
-                showMember=<authentication.show-user id=$memberId showId=false /> />
+              <group.show-members inGroupId=$partyId
+                showMember=<authentication.show-user id=$id showId=false /> />
             </div>
           </div>
           <div class="row top-space">
@@ -54,12 +54,12 @@
               <dv.tx class="col-md-12">
                 <h4>Add Guest</h4>
                 <dv.status savedText="Guest added to list" />
-                <group.add-to-group id=$id
+                <group.add-to-group id=$partyId
                   member=authentication.choose-user.selectedUser
                   hidden=true />
                 <authorization.can-view principalId=$loggedInUserId
-                  resourceId =$id hidden=true />
-                <authorization.add-viewer id=$id
+                  resourceId=$partyId hidden=true />
+                <authorization.add-viewer id=$partyId
                   viewer=authentication.choose-user.selectedUser
                   hidden=true />
                 <authentication.authenticate id=$loggedInUserId hidden=true />
@@ -92,7 +92,7 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <transfer.show-transfers fromId=$id
+                    <transfer.show-transfers fromId=$partyId
                       noTransfersToShowText="No claims"
                       showTransfer=<potluck.show-claim id=$transfer.id /> />
                   </div>
@@ -104,7 +104,7 @@
           <div class="row top-space">
             <div class="col-md-12">
               <h4>Add Supplies</h4>
-              <potluck.create-supply id=$id save=true
+              <potluck.create-supply id=$partyId save=true
                 loggedInUserId=$loggedInUserId />
             </div>
           </div>
