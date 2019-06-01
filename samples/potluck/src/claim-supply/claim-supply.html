@@ -1,8 +1,4 @@
 <dv.action name="claim-supply">
-  <authentication.logged-in />
-  <authorization.show-resource id=$id hidden=true />
-
-
   <div class="row">
     <div class="col-md-12">
       <potluck.show-supply supplyObj=$supplyObj useIdForObject=true />
@@ -13,7 +9,7 @@
       <dv.tx>
         <transfer.create-transfer id=$partyId
           fromId=$partyId
-          toId=authentication.logged-in.user?.id
+          toId=$loggedInUserId
           showOptionToInputFromId=false
           showOptionToInputToId=false
           buttonLabel="Claim"
@@ -21,7 +17,7 @@
           inputAmount=
             <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
               <transfer.create-item-count
-                id=authorization.show-resource.fetchedResource?.id
+                id=$supplyObj?.id
                 showOptionToCreate=false
                 showOptionToInputItemId=false
                 emitOnRunOnly=false />

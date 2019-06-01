@@ -87,6 +87,7 @@
                       itemCounts=transfer.show-balance.fetchedBalance
                       showItemCount=<potluck.claim-supply
                         supplyObj=$itemCount
+                        loggedInUserId=$loggedInUserId
                         partyId=authorization.show-resource.fetchedResource?.id /> />
                   </div>
                 </div>
@@ -94,7 +95,7 @@
                   <div class="col-md-12">
                     <transfer.show-transfers fromId=$partyId
                       noTransfersToShowText="No claims"
-                      showTransfer=<potluck.show-claim id=$transfer.id /> />
+                      showTransfer=<potluck.show-claim claim=$transfer /> />
                   </div>
                 </div>
               </div>

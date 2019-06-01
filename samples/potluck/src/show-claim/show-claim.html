@@ -1,24 +1,22 @@
 <dv.action name="show-claim">
-  <transfer.show-transfer id=$id hidden=true />
-
   <div class="row">
     <div class="col-md-4">
-      <supply.show-object id=transfer.show-transfer.loadedTransfer.good.id
+      <supply.show-object id=$transfer.amount[0].id
         showOnly=['item'] />
     </div>
     <div class="col-md-4">
-      <transfer.show-transfer transfer=transfer.show-transfer.loadedTransfer
+      <transfer.show-transfer transfer=$transfer
         showId=false
         showFromId=false
         showToId=false />
     </div>
     <div class="col-md-4">
-      <supply.show-object id=transfer.show-transfer.loadedTransfer.good.id
+      <supply.show-object id=$transfer.amount[0].id
         showOnly=['unit'] />
     </div>
   </div>
 
   Claimed by
-  <authentication.show-user id=transfer.show-transfer.loadedTransfer.id
+  <authentication.show-user id=$transfer.toId
     showId=false />
 </dv.action>

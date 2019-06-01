@@ -334,10 +334,9 @@ export abstract class RequestProcessor {
     try {
       const gatewayToClicheRequest = this.validateRequest(req);
       /**
-       * Currently, if a tx has only one request, the client sends a
-       * non-tx request (treats the tx as a no-op). But we can't trust
-       * the client so we need to check that no other req is indeed
-       * expected
+       * We need to check that no other req is expected (another req could
+       * be expected if this req is supposed to be part of a tx with more
+       * than one cohort)
        */
       const actionPath = gatewayToClicheRequest.from;
       const dvTxNodeIndex: number | null  = actionPath.indexOfClosestTxNode();
