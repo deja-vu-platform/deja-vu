@@ -551,8 +551,8 @@ describe('ActionCompiler', () => {
       .toMatch(`type`);
   });
 
-  it('should compile action with action input ' +
-    'that uses context inputs', () => {
+  it('should compile app action with action input ' +
+    'that uses context outputs', () => {
       const st: SymbolTable = {
         event: {
           kind: 'cliche'
@@ -613,8 +613,8 @@ describe('ActionCompiler', () => {
         .toMatch('capture__');
     });
 
-  it('should compile action with action input ' +
-    'that uses context', () => {
+  it('should compile cliche action with action input ' +
+    'that uses context outputs', () => {
       const st: SymbolTable = {
         scoring: {
           kind: 'cliche'
@@ -822,6 +822,61 @@ describe('ActionCompiler', () => {
 
       expect(compiledAction.ngTemplate)
         .toMatch(inputsObjRegex(`capture__myId`));
+
+      expect(compiledAction.ngTemplate)
+        .toMatch(/capture__myId:\s*myId\s*/);
+      expect(compiledAction.ngComponent)
+        .toMatch(/@Input\(\) myId/);
+
+      expect(compiledAction.actionInputs.length)
+        .toBe(1);
+      const actionInput = compiledAction.actionInputs[0];
+      expect(actionInput.ngTemplate)
+        .toMatch(`create-post`);
+      expect(actionInput.ngTemplate)
+        .toMatch(/\[id\]="capture__myId"/);
+      expect(actionInput.ngComponent)
+        .toMatch(/@Input\(\) capture__myId;/);
+  });
+
+  it('should compile action with action input ' +
+    'that captures context inputs', () => {
+      const st: SymbolTable = {
+        scoring: {
+          kind: 'cliche'
+        },
+        foo: {
+          kind: 'cliche'
+        }
+      };
+      const action = `
+      <dv.action name="home">
+        <foo.navbar id=$myId />
+        <div>
+          <scoring.show-targets-by-score
+            showTarget=<${appName}.create-post id=$myId />
+          />
+        </div>
+      </dv.action>`;
+      const compiledAction: CompiledAction = actionCompiler
+        .compile(appName, action, st);
+      expect(compiledAction.ngTemplate)
+        .toMatch(/\[showTarget\]/);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`tag`);
+      expect(compiledAction.ngTemplate)
+        .toMatch(`type`);
+
+      const inputsObjRegex = (inputField) => new RegExp(
+        `${inputField}:\\s*([^}\\s]*)`);
+
+      expect(compiledAction.ngTemplate)
+        .toMatch(inputsObjRegex(`capture__myId`));
+
+      expect(compiledAction.ngTemplate)
+        .toMatch(/capture__myId:\s*myId\s*/);
+      expect(compiledAction.ngComponent)
+        .toMatch(/@Input\(\) myId/);
 
       expect(compiledAction.actionInputs.length)
         .toBe(1);

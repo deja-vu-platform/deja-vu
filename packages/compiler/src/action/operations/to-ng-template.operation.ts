@@ -352,7 +352,7 @@ function transformActionInput(
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
         `${k}: ${isInput(inputsObj[k]) ?
-          inputsObj[k] :
+          inputToNgField(inputsObj[k]) :
           nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 
