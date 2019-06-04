@@ -42,7 +42,7 @@ export function capturesToInputs(
     Attribute: (attributeName, eq, expr) =>
       attributeName.sourceString + eq.sourceString + expr.capturesToInputs(),
     Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
-    Expr_member: recurse, Expr_literal: recurse,
+    Expr_prop: recurse, Expr_literal: recurse,
 
     Expr_input: (inputNode) => {
       const input = inputNode.sourceString;
@@ -75,7 +75,7 @@ export function capturesToInputs(
       `${cond.capturesToInputs()} ? ${ifTrue.capturesToInputs()} : ` +
       ifFalse.capturesToInputs(),
 
-    MemberExpr: (nameOrInputNode, restNode, _rest) => {
+    PropExpr_io: (nameOrInputNode, restNode, _rest) => {
       const nameOrInput = nameOrInputNode.sourceString;
       const rest = restNode.sourceString;
       if (isInput(nameOrInput)) {
@@ -123,6 +123,11 @@ export function capturesToInputs(
           `symbol table ${pretty(symbolTable)} or context ${pretty(context)}`);
       }
     },
+    PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) =>
+      `${e1.captursToInputs()}[${e2.captursToInputs()}]`,
+    PropExpr_static: (e, nav, name) =>
+      e.capturesToInputs() + nav.capturesToInputs() +
+      name.capturesToInputs(),
     Literal_number: (num) => num.sourceString,
     Literal_text: (stringLiteral) => stringLiteral.sourceString,
     Literal_true: (trueNode) => trueNode.sourceString,

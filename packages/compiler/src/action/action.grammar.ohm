@@ -36,7 +36,7 @@ Action {
     = UnExpr       -- un
     | BinExpr      -- bin
     | TerExpr      -- ter
-    | MemberExpr   -- member
+    | PropExpr     -- prop
     | Literal      -- literal
     | input        -- input
     | Element      -- element
@@ -65,7 +65,11 @@ Action {
 
   TerExpr = Expr "?" Expr ":" Expr
 
-  MemberExpr = (name | input) (nav name)+
+  PropExpr
+    // in an expression, a `name` can only appear as a reference to an output
+    = Expr "[" Expr "]"          -- dynamic
+    | Expr nav name              -- static
+    | (name | input) (nav name)+ -- io
 
   Literal
     = decimalLiteral            -- number

@@ -37,7 +37,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Attribute: (_attributeName, _eq, expr) => expr.saveUsedOutputs(),
 
     Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
-    Expr_member: recurse, Expr_literal: recurse,
+    Expr_prop: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => {
       // We need to figure out if the action input is using an output from this
@@ -67,7 +67,7 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       ifTrue.saveUsedOutputs();
       ifFalse.saveUsedOutputs();
     },
-    MemberExpr: (nameOrInputNode, _dot, namesNode) =>  {
+    PropExpr_io: (nameOrInputNode, _dot, namesNode) =>  {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
       const fullMemberAccess = nameOrInput + names;
@@ -111,7 +111,11 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
           break;
       }
     },
-
+    PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) => {
+      e1.saveUsedOutputs();
+      e2.saveUsedOutputs();
+    },
+    PropExpr_static: (e, _nav, _name) => e.saveUsedOutputs(),
     Literal_number: (_number) => {},
     Literal_text: (_stringLiteral) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},

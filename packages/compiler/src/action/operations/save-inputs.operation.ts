@@ -21,7 +21,7 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
     Attribute: (_attributeName, _eq, expr) => expr.saveInputs(),
 
     Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
-    Expr_member: recurse, Expr_literal: recurse,
+    Expr_prop: recurse, Expr_literal: recurse,
     Expr_input: (inputNode) => inputNode.saveInputs(),
     Expr_element: (_element) => {}, // TODO
     Expr_parens: (_op, expr, _cp) => expr.saveInputs(),
@@ -42,8 +42,12 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
       ifFalse.saveInputs();
     },
 
-    MemberExpr: binOpRecurse,
-
+    PropExpr_io: binOpRecurse,
+    PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) => {
+      e1.saveInputs();
+      e2.saveInputs();
+    },
+    PropExpr_static: (e, _nav, _name) => e.saveInputs(),
     Literal_number: (_number) => {},
     Literal_text: (_stringLiteral) => {},
     Literal_true: (_true) => {}, Literal_false: (_false) => {},

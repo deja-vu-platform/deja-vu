@@ -48,12 +48,23 @@ describe('ActionCompiler', () => {
     };
     const action = `
       <dv.action name="${actionName}">
+        <foo.aliased-action as aa />
+        <foo.other-actiom />
         <foo.action
           obj={a: "hi", b: 3 + 2, c: 'hello'}
           numberArray=[1, -2.5]
           objArray=[{a: 1}, {b: 2}]
           conditional=!((2 + 2e-10) === 5) ? "b" : "c"
-          otherConditional=2 lt 5 ? 3/2 : 1*2.3 />
+          otherConditional=[2, 1, 3][2] lt 5 ? 3/2 : 1*2.3
+          propAccess={a: 1}.a
+          otherPropAccess=[{a: 1}][0].a
+          propAccessOutput=foo.action.out[0]
+          otherPropAccessOutput=foo.action.out[0].baz
+          propAccessOutput=aa.out[1]
+          otherPropAccessOutput=aa.out[1].bar
+          inputPropAccess=$in.a
+          otherInputPropAccess=$in.a[0]
+          otherOtherInputPropAccess=$in.a[0].bar />
       </dv.action>
     `;
     const compiledAction: CompiledAction = actionCompiler
