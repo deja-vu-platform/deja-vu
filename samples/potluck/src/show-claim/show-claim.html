@@ -1,20 +1,5 @@
 <dv.action name="show-claim">
-  <div class="row">
-    <div class="col-md-4">
-      <supply.show-object id=$transfer.amount[0].id
-        showOnly=['item'] />
-    </div>
-    <div class="col-md-4">
-      <transfer.show-transfer transfer=$transfer
-        showId=false
-        showFromId=false
-        showToId=false />
-    </div>
-    <div class="col-md-4">
-      <supply.show-object id=$transfer.amount[0].id
-        showOnly=['unit'] />
-    </div>
-  </div>
+  <potluck.show-supply supplyObj=$transfer.amount[0] useIdForObject=true />
 
   Claimed by
   <authentication.show-user id=$transfer.toId
