@@ -1,9 +1,9 @@
 <ul *ngIf="_resourceIds && _resourceIds.length > 0" class="list-group">
   <li *ngFor="let resourceId of _resourceIds"
     class="list-group-item authorization-show-resources-resource-item">
-    <dv-include [action]="showResource" default-showResource="{ tag: authorization-show-resource }" [inputs]="{
-        id: resourceId
-      }"
+    <dv-include [action]="showResource"
+      default-showResource="{ tag: authorization-show-resource }"
+      [inputs]="{ id: resourceId }"
       [parent]="showResources">
     </dv-include>
   </li>

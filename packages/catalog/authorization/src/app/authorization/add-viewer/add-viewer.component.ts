@@ -1,6 +1,4 @@
-import {
-  Component, ElementRef, Inject, Input, OnInit
-} from '@angular/core';
+import { Component, ElementRef, Inject, Input, OnInit } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
@@ -21,8 +19,7 @@ export class AddViewerComponent implements
   OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
   @Input() viewerId: string;
-  @Input()
-  set viewer(value: { id: string }) {
+  @Input() set viewer(value: { id: string }) {
     this.viewerId = _.get(value, 'id');
   }
 

@@ -236,7 +236,7 @@ export function toNgTemplate(
     },
     Alias: (_as, alias) => alias.sourceString,
     Expr_un: recurse, Expr_bin: recurse, Expr_ter: recurse,
-    Expr_member: recurse, Expr_literal: recurse,
+    Expr_prop: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.toNgTemplate(),
     Expr_element: transformActionInput(
       appName, symbolTable, actionInputs, context),
@@ -256,8 +256,8 @@ export function toNgTemplate(
 
     TerExpr: (cond, _q, ifTrue, _c, ifFalse) =>
       `${cond.toNgTemplate()} ? ${ifTrue.toNgTemplate()} : ` +
-      ifFalse.toNgTemplate(),
-    MemberExpr: (nameOrInputNode, _dot, namesNode) => {
+    ifFalse.toNgTemplate(),
+    PropExpr_io: (nameOrInputNode, _dot, namesNode) => {
       const nameOrInput = nameOrInputNode.sourceString;
       const names = namesNode.sourceString;
       const fullMemberAccess = nameOrInput + names;
@@ -267,7 +267,10 @@ export function toNgTemplate(
 
       return nonInputMemberAccessToField(fullMemberAccess, symbolTable);
     },
-
+    PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) =>
+      `${e1.toNgTemplate()}[${e2.toNgTemplate()}]`,
+    PropExpr_static: (e, nav, name) =>
+      e.toNgTemplate() + nav.toNgTemplate() + name.toNgTemplate(),
     Literal_number: (numberNode) => numberNode.sourceString,
     Literal_text: (stringLiteral) => stringLiteral.toNgTemplate(),
     stringLiteral_doubleQuote: (_oq, text, _cq) =>
@@ -321,7 +324,9 @@ export function toNgTemplate(
       return ngInputField;
     },
     PropAssignment: (name, _c, expr) =>
-      `${name.sourceString}: ${expr.toNgTemplate()}`
+      `${name.sourceString}: ${expr.toNgTemplate()}`,
+    nav: (nav) => nav.sourceString,
+    name: (l, rest) => l.sourceString + rest.sourceString
   };
 }
 
@@ -352,7 +357,7 @@ function transformActionInput(
     const inputsStr = '{ ' + _
       .map(_.keys(inputsObj), (k: string) =>
         `${k}: ${isInput(inputsObj[k]) ?
-          inputsObj[k] :
+          inputToNgField(inputsObj[k]) :
           nonInputMemberAccessToField(inputsObj[k], symbolTable)}`)
       .join(', ') + ' }';
 

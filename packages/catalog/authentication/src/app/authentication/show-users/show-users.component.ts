@@ -12,6 +12,8 @@ import { ShowUserComponent } from '../show-user/show-user.component';
 
 import { API_PATH } from '../authentication.config';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'authentication-show-users',
@@ -30,6 +32,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
   users: User[] = [];
 
   @Output() fetchedUsers = new EventEmitter<User[]>();
+  @Output() fetchedUserIds = new EventEmitter<string[]>();
 
   showUsers;
   private gs: GatewayService;
@@ -65,8 +68,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
         .get<{ data: { users: User[] } }>(this.apiPath, {
           params: {
             inputs: JSON.stringify({
-              input: {
-              }
+              input: {}
             }),
             extraInfo: {
               returnFields: `
@@ -79,6 +81,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.users = res.data.users;
           this.fetchedUsers.emit(this.users);
+          this.fetchedUserIds.emit(_.map(this.users, 'id'));
         });
     } else if (this.gs) {
       this.gs.noRequest();

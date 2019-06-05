@@ -1,0 +1,35 @@
+<dv.action name="show-supply">
+  <dv.if condition=$id class="row">
+    <div class="col-md-4">
+      <supply.show-object id=$id showOnly=['item'] />
+    </div>
+    <div class="col-md-4">
+      <transfer.show-transfer id=$id showId=false showToId=false />
+    </div>
+    <div class="col-md-4">
+      <supply.show-object id=$id showOnly=['unit'] />
+    </div>
+  </dv.if>
+
+  <dv.if condition=$supplyObj class="row">
+    <div class="col-md-4">
+      <dv.if condition=!$useIdForObject>
+        <supply.show-object object=$supplyObj showOnly=['item'] />
+      </dv.if>
+      <dv.if condition=$useIdForObject>
+        <supply.show-object id=$supplyObj.id showOnly=['item'] />
+      </dv.if>
+    </div>
+    <div class="col-md-4">
+      <transfer.show-item-count itemCount=$supplyObj showItemId=false />
+    </div>
+    <div class="col-md-4">
+      <dv.if condition=!$useIdForObject>
+        <supply.show-object object=$supplyObj showOnly=['unit'] />
+      </dv.if>
+      <dv.if condition=$useIdForObject>
+        <supply.show-object id=$supplyObj.id showOnly=['unit'] />
+      </dv.if>
+    </div>
+  </dv.if>
+</dv.action>

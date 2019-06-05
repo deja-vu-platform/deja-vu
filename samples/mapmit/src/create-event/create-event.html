@@ -5,6 +5,8 @@
     <div class="events-panel card">
       <div class="events-panel-body card-body">
         <h2 class="create-event-header">Create an Event!</h2>
+        <geolocation.display-map id="homeMapId"
+           showLoadedMarkers=false showDirectionsControl=false />
 
         <dv.tx>
           <dv.gen-id />
@@ -17,6 +19,9 @@
           <!-- Location -->
           <div class="create-event-input">
             <geolocation.create-marker id=dv.gen-id.id
+              title=geolocation.display-map.newMarker?.title
+              latitude=geolocation.display-map.newMarker?.latitude
+              longitude=geolocation.display-map.newMarker?.longitude
               mapId="homeMapId"
               showOptionToSubmit=false />
           </div>

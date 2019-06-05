@@ -41,7 +41,11 @@
   },
   "actionsNoRequest": {
     "exec": [
-      "property-choose-object"
+      "property-choose-object",
+      "property-create-property"
+    ],
+    "eval": [
+      "property-create-property"
     ]
   },
   "actionsRequestOptional": [

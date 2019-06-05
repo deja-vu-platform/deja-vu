@@ -15,7 +15,6 @@ import {
 
 import * as _ from 'lodash';
 
-
 import {
   PasswordValidator, RetypePasswordValidator
 } from '../shared/authentication.validation';

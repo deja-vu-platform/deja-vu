@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService,
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
   StorageService
 } from '@deja-vu/core';
 
@@ -20,7 +20,7 @@ import { User } from '../shared/authentication.model';
   templateUrl: './authenticate.component.html',
   styleUrls: ['./authenticate.component.css']
 })
-export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
+export class AuthenticateComponent implements OnExec, OnEval, OnInit {
   @Input() id: string | undefined;
   @Input() user: User | undefined;
   isAuthenticated = false;
@@ -35,24 +35,20 @@ export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.load();
   }
 
-  ngOnChanges() {
-    this.load();
-  }
-
-  load() {
-    this.doRequest();
+  dvOnEval() {
+    return this.doAuthenticate();
   }
 
   dvOnExec() {
-    this.doRequest();
+    return this.doAuthenticate();
   }
 
-  doRequest() {
+  doAuthenticate() {
     if (!this.gs || (_.isEmpty(this.id) && _.isEmpty(this.user))) {
-      return;
+      // this is essentialy failing the tx if there is one
+      return this.gs.noRequest();
     }
     const token = this.ss.getItem(this.elem, 'token');
     this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {

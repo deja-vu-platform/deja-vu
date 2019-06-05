@@ -1,0 +1,31 @@
+<dv.action name="claim-supply">
+  <div class="row">
+    <div class="col-md-12">
+      <potluck.show-supply supplyObj=$supplyObj useIdForObject=true />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <dv.tx>
+        <transfer.create-transfer id=$partyId
+          fromId=$partyId
+          toId=$loggedInUserId
+          showOptionToInputFromId=false
+          showOptionToInputToId=false
+          buttonLabel="Claim"
+          newTransferSavedText="Supplies claimed"
+          inputAmount=
+            <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
+              <transfer.create-item-count
+                id=$supplyObj?.id
+                showOptionToCreate=false
+                showOptionToInputItemId=false
+                emitOnRunOnly=false />
+            </dv.action>
+          />
+
+        <authentication.authenticate id=$loggedInUserId hidden=true />
+      </dv.tx>
+    </div>
+  </div>
+</dv.action>

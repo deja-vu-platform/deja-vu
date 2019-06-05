@@ -1,0 +1,26 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.redirect href="/login" onEvalFailure=true />
+  </dv.tx>
+
+  <nav class="navbar navbar-expand-lg fixed-top bg-light">
+    <div class="container">
+      <dv.link class="navbar-brand" href="/">Potluck</dv.link>
+      <dv.if condition=authentication.logged-in.user>
+        <ul class="navbar-nav">
+          <li class="username">
+            <authentication.show-user user=authentication.logged-in.user
+              showId=false />
+          </li>
+          <li>
+            <dv.tx>
+              <authentication.sign-out />
+              <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+            </dv.tx>
+          </li>
+        </ul>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

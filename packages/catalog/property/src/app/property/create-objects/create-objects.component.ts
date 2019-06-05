@@ -3,15 +3,16 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  ConfigService, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
+  OnExec, RunService
 } from '@deja-vu/core';
 
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { PropertiesRes, Property } from '../shared/property.model';
-
 import * as _ from 'lodash';
+
+import { getPropertyNames } from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
 
@@ -40,32 +41,16 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private rs: RunService, private csf: ConfigServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadSchema();
-  }
 
-  loadSchema() {
-    if (!this.gs) {
-      return;
-    }
-    this.gs
-      .get<PropertiesRes>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'schema',
-            returnFields: 'name'
-          }
-        }
-      })
-      .pipe(map((res: PropertiesRes) => res.data.properties))
-      .subscribe((properties: Property[]) => {
-        this.properties = _.map(properties, 'name');
-      });
+
+    const cs = this.csf.createConfigService(this.elem);
+    this.properties = getPropertyNames(cs);
   }
 
   async dvOnExec(): Promise<void> {

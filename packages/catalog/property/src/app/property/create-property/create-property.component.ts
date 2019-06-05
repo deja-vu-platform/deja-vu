@@ -9,10 +9,9 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExecSuccess, RunService
+  ConfigService, ConfigServiceFactory, GatewayService,
+  GatewayServiceFactory, OnExecSuccess, RunService
 } from '@deja-vu/core';
-
-import { PropertyRes, Property } from '../shared/property.model';
 
 import { map, startWith } from 'rxjs/operators';
 
@@ -20,6 +19,9 @@ import * as Ajv from 'ajv';
 
 import * as _ from 'lodash';
 
+import {
+  getProperties, getPropertiesFromConfig, Property
+} from '../shared/property.model';
 
 @Pipe({ name: 'camelToTitleCase'})
 export class CamelToTitleCasePipe implements PipeTransform {
@@ -65,6 +67,10 @@ OnExecSuccess {
    * The value of the property created
    */
   @Output() value = new EventEmitter();
+  /**
+   * Used internally by the cliche for passing the configuration
+   */
+  @Input() _config;
 
   propertyControl: FormControl;
   schemaErrors: string[];
@@ -72,16 +78,18 @@ OnExecSuccess {
   type;
 
   private gs: GatewayService;
+  private cs: ConfigService;
   private schemaValidate;
   private ajv = new Ajv();
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, private csf: ConfigServiceFactory) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.cs = this.csf.createConfigService(this.elem);
     this.loadSchema();
   }
 
@@ -98,46 +106,38 @@ OnExecSuccess {
    * validators.
    */
   loadSchema() {
-    if (!this.gs || !this.name) {
+    if ((!this.cs && !this._config) || !this.name) {
       return;
     }
-    this.gs
-      .get<PropertyRes>('/graphql', {
-        params: {
-          inputs: { name: this.name },
-          extraInfo: {
-            returnFields: `
-              schema
-              required
-            `
-          }
-        }
-      })
-      .pipe(map((res: PropertyRes) => res.data.property))
-      .subscribe((property: Property) => {
-        const schema = JSON.parse(property.schema);
-        this.schemaValidate = this.ajv.compile(schema);
-        if (schema.type === 'integer' ||
-            schema.type === 'number') {
-          this.type = Number;
-        } else if (schema.type === 'string') {
-          this.type = String;
-        } else {
-          this.type = Boolean;
-        }
-        const validators = [this.schemaValidator.bind(this)];
-        if (property.required) {
-          this.required = true;
-          validators.push(Validators.required);
-        }
-        this.propertyControl = new FormControl('', validators);
-        this.propertyControl.setValue(this.initialValue);
-        this.propertyControl.valueChanges.subscribe((newValue) => {
-          this.value.emit(newValue);
-        });
-        this.propertyControl.valueChanges
-          .pipe(startWith(this.propertyControl.value));
-      });
+    const properties = this._config ?
+      getPropertiesFromConfig(this._config) : getProperties(this.cs);
+    const property: Property | undefined = _
+      .find(properties, ['name', this.name]);
+    if (!property) {
+      throw new Error(`Property ${this.name} not in schema`);
+    }
+    const schema = property.schema;
+    this.schemaValidate = this.ajv.compile(schema);
+    if (schema.type === 'integer' ||
+        schema.type === 'number') {
+      this.type = Number;
+    } else if (schema.type === 'string') {
+      this.type = String;
+    } else {
+      this.type = Boolean;
+    }
+    const validators = [this.schemaValidator.bind(this)];
+    if (property.required) {
+      this.required = true;
+      validators.push(Validators.required);
+    }
+    this.propertyControl = new FormControl('', validators);
+    this.propertyControl.setValue(this.initialValue);
+    this.propertyControl.valueChanges.subscribe((newValue) => {
+      this.value.emit(newValue);
+    });
+    this.propertyControl.valueChanges
+      .pipe(startWith(this.propertyControl.value));
   }
 
   schemaValidator(control: AbstractControl): {[key: string]: any} {

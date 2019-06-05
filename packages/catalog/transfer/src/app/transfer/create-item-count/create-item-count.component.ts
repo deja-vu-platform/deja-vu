@@ -5,7 +5,9 @@ import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective, Validators
 } from '@angular/forms';
 
-import { OnExec, OnExecSuccess, RunService } from '@deja-vu/core';
+import {
+  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
+} from '@deja-vu/core';
 
 import { ItemCount } from '../shared/transfer.model';
 
@@ -33,21 +35,25 @@ export class CreateItemCountComponent
   @Input() showOptionToInputItemId = true;
   @Input() showOptionToCreate = true;
 
-  @Input()
-  set id(value: string) {
+  @Input() set id(value: string) {
     this.idControl.setValue(value);
+  }
+  @Input() set count(value: number) {
+    this.countControl.setValue(value);
   }
 
   @ViewChild(FormGroupDirective) form;
-  createItemCountForm = this.builder.group({
+  createItemCountForm: FormGroup = this.builder.group({
     idControl: this.idControl,
     countControl: this.countControl
   });
 
   thisItemCount: ItemCount | undefined;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
+    private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder) {
     this.idControl.valueChanges.subscribe((value: string) => {
       if (this.thisItemCount === undefined) {
@@ -70,6 +76,7 @@ export class CreateItemCountComponent
   }
 
   ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }
 
@@ -80,11 +87,12 @@ export class CreateItemCountComponent
   emit() {
     const itemCountToEmit = _.cloneDeep(this.thisItemCount);
     this.itemCount.emit(itemCountToEmit);
-    this.itemCountAsAmount.emit([ itemCountToEmit ]);
+    this.itemCountAsAmount.emit([itemCountToEmit]);
   }
 
   dvOnExec() {
     this.emit();
+    this.gs.noRequest();
   }
 
   dvOnExecSuccess() {

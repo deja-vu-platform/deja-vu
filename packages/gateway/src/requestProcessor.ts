@@ -277,7 +277,7 @@ export abstract class RequestProcessor {
       const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
       const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
       prunedCohortActions = this.getPrunedCohortActions(cohortActions,
-        childRequests.map(childRequest =>
+        childRequests.map((childRequest) =>
           ActionPath.fromString(childRequest.query.from)
             .last()));
 
@@ -333,6 +333,22 @@ export abstract class RequestProcessor {
     const resBatch = new ResponseBatch(res, 1);
     try {
       const gatewayToClicheRequest = this.validateRequest(req);
+      /**
+       * We need to check that no other req is expected (another req could
+       * be expected if this req is supposed to be part of a tx with more
+       * than one cohort)
+       */
+      const actionPath = gatewayToClicheRequest.from;
+      const dvTxNodeIndex: number | null  = actionPath.indexOfClosestTxNode();
+      if (dvTxNodeIndex) {
+        console.log('Validating request of no-op tx');
+        console.log(dvTxNodeIndex + ' ' + actionPath.length());
+        const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
+        // throws error if invalid
+        this.getPrunedCohortActions(cohortActions,
+          [actionPath.last()]);
+      }
+
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
       resBatch.add(clicheRes.status, clicheRes.text, 1);

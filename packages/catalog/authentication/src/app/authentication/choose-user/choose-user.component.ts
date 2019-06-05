@@ -13,7 +13,7 @@ import { User } from '../shared/authentication.model';
   styleUrls: ['./choose-user.component.css']
 })
 export class ChooseUserComponent {
-  users: User[];
+  @Input() users: User[];
   @Input() showUser: Action = {
     type: <Type<Component>>ShowUserComponent,
     inputMap: { entity: 'user' }

@@ -1,0 +1,33 @@
+<dv.action name="landing">
+  <potluck.navbar />
+
+  <div id="background-signin">
+    <div class="container" id="signin-container">
+      <div class="row">
+        <div class="offset-md-2 col-md">
+          <h1 class="white-text">Sign In</h1>
+          <dv.tx>
+            <authentication.sign-in />
+            <dv.callback defaultHref="/parties"
+              onExecSuccess=true hidden=true />
+          </dv.tx>
+        </div>
+        <div class="col-md">
+          <h1 class="white-text">Register</h1>
+          <dv.tx>
+            <authentication.register-user buttonLabel="Register" />
+            <dv.callback defaultHref="/parties"
+              onExecSuccess=true hidden=true />
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+    <div id="description">
+      Potluck is an application for all of your party planning needs.
+      Create a party, invite guests, and coordinate who's bringing
+      what with a shared supplies list. Use Potluck to plan your next
+      party, event, or gathering!
+    </div>
+    <div id="food-pic"></div>
+  </div>
+</dv.action>

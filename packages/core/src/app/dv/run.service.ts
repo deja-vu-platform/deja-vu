@@ -144,6 +144,8 @@ export class RunService {
 
   private async run(runType: RunType, elem: ElementRef) {
     const targetAction = this.getTargetAction(elem.nativeElement);
+    const targetActionFqTag = NodeUtils.GetFqTagOfNode(targetAction);
+    console.log(`Target action is ${targetActionFqTag}`);
     if (NodeUtils.HasRunId(targetAction)) {
       console.log(
         `Skipping ${runType} since the same one is already in progress`);
@@ -158,7 +160,7 @@ export class RunService {
     } catch (error) {
       console.error(
         `Got error on ${runType} ${id} ` +
-        `(${NodeUtils.GetFqTagOfNode(targetAction)}): ${error.message}`);
+        `(${targetActionFqTag}): ${error.message}`);
       this.callDvOnRunFailure(runType, targetAction, error);
       NodeUtils.RemoveRunId(targetAction);
     }

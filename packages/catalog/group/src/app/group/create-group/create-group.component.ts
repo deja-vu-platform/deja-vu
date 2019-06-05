@@ -26,7 +26,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateGroupComponent
 implements OnInit, OnExecSuccess, OnExecFailure {
-  @Input() id;
+  @Input() id: string | undefined;
 
   @Input()
   set memberIds(value: string[] | undefined) {

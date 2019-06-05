@@ -21,6 +21,11 @@
       ]
     }
   },
+  "actionsNoRequest": {
+    "exec": [
+      "transfer-create-item-count"
+    ]
+  },
   "actionsRequestOptional": [
     "transfer-show-balance",
     "transfer-show-transfer",

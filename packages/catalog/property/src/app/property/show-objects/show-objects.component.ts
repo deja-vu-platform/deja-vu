@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import {
   Action,
+  ConfigService, ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
   OnEval,
@@ -11,7 +12,7 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { properties, Property } from '../shared/property.model';
+import { getFilteredPropertyNames } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
 
@@ -69,16 +70,19 @@ OnChanges {
   properties: string[];
   showObjects;
   private gs: GatewayService;
+  private cs: ConfigService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private rs: RunService, private csf: ConfigServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showObjects = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.cs = this.csf.createConfigService(this.elem);
   }
 
   ngAfterViewInit() {
@@ -90,13 +94,6 @@ OnChanges {
   }
 
   async load() {
-    if (!this.gs) {
-      return;
-    }
-    if (!this.properties) {
-      this.properties = properties(
-        this.showOnly, this.showExclude, await this.fetchProperties());
-    }
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -104,6 +101,8 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      this.properties = getFilteredPropertyNames(
+        this.showOnly, this.showExclude, this.cs);
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
@@ -126,22 +125,7 @@ OnChanges {
     }
   }
 
-  async fetchProperties(): Promise<string[]> {
-    const res = await this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'properties',
-            returnFields: 'name'
-          }
-        }
-      })
-      .toPromise();
-
-    return _.map(res.data.properties, 'name');
-  }
-
   private canEval(): boolean {
-    return !!(this.properties && this.gs);
+    return !!(this.gs);
   }
 }

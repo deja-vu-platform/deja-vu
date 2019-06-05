@@ -1,5 +1,6 @@
-<authentication-show-users (fetchedUsers)="users=$event" [hidden]="true">
-</authentication-show-users>
+<authentication-show-users *ngIf="!users"
+  (fetchedUsers)="users=$event" [hidden]="true">
+  </authentication-show-users>
 <dv-choose [showEntity]="showUser" default-showUser="{ tag: 'authentication-show-user' }"
            [entities]="users" [chooseSelectPlaceholder]="chooseSelectPlaceholder"
            [addButtonLabel]="addButtonLabel"

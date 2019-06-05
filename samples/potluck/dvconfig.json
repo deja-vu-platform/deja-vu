@@ -1,46 +1,35 @@
 {
   "name": "potluck",
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "authentication": {
       "config": {
-        "wsPort": 3002,
         "reinitDbOnStartup": true
       }
     },
     "authorization": {
       "config": {
-        "wsPort": 3003,
         "reinitDbOnStartup": true
       }
     },
     "transfer": {
       "config": {
-        "wsPort": 3004,
         "reinitDbOnStartup": true,
         "balanceType": "items"
       }
     },
     "event": {
       "config": {
-        "wsPort": 3005,
         "reinitDbOnStartup": true
       }
     },
     "group": {
       "config": {
-        "wsPort": 3006,
         "reinitDbOnStartup": true
       }
     },
     "party": {
       "name": "property",
       "config": {
-        "wsPort": 3007,
         "reinitDbOnStartup": true,
         "schema": {
           "title": "Party",
@@ -63,7 +52,6 @@
     "supply": {
       "name": "property",
       "config": {
-        "wsPort": 3008,
         "reinitDbOnStartup": true,
         "schema": {
           "title": "Good",
@@ -81,16 +69,10 @@
       }
     }
   },
-  "actions": {
-    "app": {
-      "names": [
-        {"for": "src/app/app.component.html", "use": "potluck-root"}
-      ]
-    }
-  },
   "routes": [
-    { "path": "parties", "action": "potluck-show-parties" },
-    { "path": "create-party", "action": "potluck-create-party" },
-    { "path": "", "action": "potluck-landing" }
+    { "path": "parties", "action": "show-parties" },
+    { "path": "create-party", "action": "create-party" },
+    { "path": "login", "action": "landing" },
+    { "path": "", "action": "landing" }
   ]
 }

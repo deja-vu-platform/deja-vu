@@ -3,23 +3,25 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  AbstractControl, FormBuilder, FormControl,
+  FormGroup, FormGroupDirective,
   Validators
 } from '@angular/forms';
 
 import {
+  ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
+  OnExec,
   OnExecFailure,
   OnExecSuccess,
-  OnExec,
   RunService
 } from '@deja-vu/core';
 
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { PropertiesRes, Property } from '../shared/property.model';
+import { getProperties, Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -98,44 +100,30 @@ export class CreateObjectComponent
   newObjectError: string;
   formInitialized = false;
 
+  config;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
+    private rs: RunService, private csf: ConfigServiceFactory,
+    private builder: FormBuilder,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadSchema();
-  }
 
-  loadSchema() {
-    if (!this.gs) {
-      return;
+    const cs = this.csf.createConfigService(this.elem);
+    this.config = cs.getConfig();
+    this.properties = getProperties(cs);
+    const formControls = {};
+    for (const property of this.properties) {
+      this[property.name] = new FormControl('');
+      formControls[property.name] = this[property.name];
     }
-    this.gs
-      .get<PropertiesRes>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'schema',
-            returnFields: 'name'
-          }
-        }
-      })
-      .pipe(map((res: PropertiesRes) => res.data.properties))
-      .subscribe((properties: Property[]) => {
-        this.properties = properties;
-        const formControls = {};
-        for (const property of properties) {
-          this[property.name] = new FormControl('');
-          formControls[property.name] = this[property.name];
-        }
-        this.createObjectForm = this.builder.group(formControls);
-        this.formInitialized = true;
-        this.initialValue = this.savedInitialValue;
-      });
+    this.createObjectForm = this.builder.group(formControls);
+    this.formInitialized = true;
+    this.initialValue = this.savedInitialValue;
   }
 
   onSubmit() {
@@ -147,6 +135,7 @@ export class CreateObjectComponent
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
     }
+
     if (this.save) {
       const res = await this.gs
         .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
