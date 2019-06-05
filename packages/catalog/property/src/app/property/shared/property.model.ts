@@ -28,8 +28,8 @@ export function getFilteredPropertyNames(only: string[], exclude: string[],
    return filterPropertyNames(only, exclude, getPropertyNames(cs));
 }
 
-export function getProperties(cs: ConfigService): Property[] {
-  const schema = cs.getConfig()['schema'];
+export function getPropertiesFromConfig(c): Property[] {
+  const schema = c['schema'];
 
   return _
     .chain(schema.properties)
@@ -40,4 +40,8 @@ export function getProperties(cs: ConfigService): Property[] {
       required: _.includes(schema.required, name)
     }))
     .value();
+}
+
+export function getProperties(cs: ConfigService): Property[] {
+  return getPropertiesFromConfig(cs.getConfig());
 }

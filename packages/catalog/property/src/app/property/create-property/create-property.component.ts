@@ -19,7 +19,9 @@ import * as Ajv from 'ajv';
 
 import * as _ from 'lodash';
 
-import { getProperties, Property } from '../shared/property.model';
+import {
+  getProperties, getPropertiesFromConfig, Property
+} from '../shared/property.model';
 
 @Pipe({ name: 'camelToTitleCase'})
 export class CamelToTitleCasePipe implements PipeTransform {
@@ -65,6 +67,10 @@ OnExecSuccess {
    * The value of the property created
    */
   @Output() value = new EventEmitter();
+  /**
+   * Used internally by the cliche for passing the configuration
+   */
+  @Input() _config;
 
   propertyControl: FormControl;
   schemaErrors: string[];
@@ -100,11 +106,16 @@ OnExecSuccess {
    * validators.
    */
   loadSchema() {
-    if (!this.cs || !this.name) {
+    if ((!this.cs && !this._config) || !this.name) {
       return;
     }
-    const property: Property = _.find(
-      getProperties(this.cs), ['name', this.name]);
+    const properties = this._config ?
+      getPropertiesFromConfig(this._config) : getProperties(this.cs);
+    const property: Property | undefined = _
+      .find(properties, ['name', this.name]);
+    if (!property) {
+      throw new Error(`Property ${this.name} not in schema`);
+    }
     const schema = property.schema;
     this.schemaValidate = this.ajv.compile(schema);
     if (schema.type === 'integer' ||

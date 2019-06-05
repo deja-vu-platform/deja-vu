@@ -100,6 +100,7 @@ export class CreateObjectComponent
   newObjectError: string;
   formInitialized = false;
 
+  config;
   private gs: GatewayService;
 
   constructor(
@@ -113,6 +114,7 @@ export class CreateObjectComponent
     this.rs.register(this.elem, this);
 
     const cs = this.csf.createConfigService(this.elem);
+    this.config = cs.getConfig();
     this.properties = getProperties(cs);
     const formControls = {};
     for (const property of this.properties) {
