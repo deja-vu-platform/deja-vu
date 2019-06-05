@@ -3,15 +3,12 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService
+  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { properties, Property } from '../shared/property.model';
+import { getFilteredPropertyNames } from '../shared/property.model';
 
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
@@ -71,23 +68,34 @@ OnChanges {
    * App creators probably want showOnly.
    */
   @Input() properties: string[];
-  propertySchemas: { [propName: string]: {
-    type: string,
-    format?: string
-  }} = {};
+  private urlProps: Set<string> = new Set();
 
   showObject;
   private gs: GatewayService;
+  private cs: ConfigService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private rs: RunService, private csf: ConfigServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showObject = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.cs = this.csf.createConfigService(this.elem);
+
+    this.properties = getFilteredPropertyNames(
+      this.showOnly, this.showExclude, this.cs);
+
+    const schema = this.cs.getConfig()['schema'];
+    this.urlProps = new Set([ ..._
+      .chain(schema.properties)
+      .pickBy((p) => p.type === 'string' && p.format === 'url')
+      .keys()
+      .value()
+    ]);
   }
 
   ngAfterViewInit() {
@@ -101,10 +109,6 @@ OnChanges {
   async load() {
     if (!this.gs) {
       return;
-    }
-    if (!this.properties) {
-      this.properties = properties(
-        this.showOnly, this.showExclude, await this.fetchProperties());
     }
     if (this.canEval()) {
       this.rs.eval(this.elem);
@@ -135,35 +139,11 @@ OnChanges {
     }
   }
 
-  async fetchProperties(): Promise<string[]> {
-    const res = await this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'properties',
-            returnFields: `
-              name
-              schema
-            `
-          }
-        }
-      })
-      .toPromise();
-
-    const properties = res.data.properties;
-    _.forEach(properties, (prop) => {
-      this.propertySchemas[prop.name] = JSON.parse(prop.schema);
-    });
-    return _.map(properties, 'name');
-  }
-
   isUrl(propName: string): boolean {
-    return this.propertySchemas[propName] &&
-      this.propertySchemas[propName].type === 'string' &&
-      this.propertySchemas[propName].format === 'url';
+    return this.urlProps.has(propName);
   }
 
   private canEval(): boolean {
-    return !!(!this.object && this.id && this.properties && this.gs);
+    return !!(!this.object && this.id && this.gs);
   }
 }

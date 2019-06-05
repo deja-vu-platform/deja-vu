@@ -1,27 +1,43 @@
 import * as _ from 'lodash';
 
+import { ConfigService } from '@deja-vu/core';
+
 export interface Property {
   name: string;
   required: boolean;
   schema: any;
 }
 
-export interface PropertiesRes {
-  data: { properties: Property[] };
-}
-
-export interface PropertyRes {
-  data: { property: Property };
-}
-
-export function properties(showOnly: string[], showExclude: string[],
+export function filterPropertyNames(only: string[], exclude: string[],
   propertyNames: string[]): string[] {
-
-  if (!_.isEmpty(showOnly)) {
-    return showOnly;
-  } else if (!_.isEmpty(showExclude)) {
-    return _.difference(propertyNames, showExclude);
+  if (!_.isEmpty(only)) {
+    return only;
+  } else if (!_.isEmpty(exclude)) {
+    return _.difference(propertyNames, exclude);
   }
 
   return propertyNames;
+}
+
+export function getPropertyNames(cs: ConfigService): string[] {
+  return _.keys(cs.getConfig()['schema'].properties);
+}
+
+export function getFilteredPropertyNames(only: string[], exclude: string[],
+  cs: ConfigService): string[] {
+   return filterPropertyNames(only, exclude, getPropertyNames(cs));
+}
+
+export function getProperties(cs: ConfigService): Property[] {
+  const schema = cs.getConfig()['schema'];
+
+  return _
+    .chain(schema.properties)
+    .toPairs()
+    .map(([ name, propertyInfo ]) => ({
+      name: name,
+      schema: propertyInfo,
+      required: _.includes(schema.required, name)
+    }))
+    .value();
 }

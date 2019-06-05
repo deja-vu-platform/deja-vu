@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Type,
-  ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit,
+  Output, Type, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -10,17 +10,18 @@ import {
 
 import { MatAutocompleteSelectedEvent } from '@angular/material';
 
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators/map';
 import { startWith } from 'rxjs/operators/startWith';
 
 import * as _ from 'lodash';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, RunService
+  Action, ConfigService, ConfigServiceFactory,
+  GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
-import { properties, Property } from '../shared/property.model';
+import { getFilteredPropertyNames } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
 
@@ -37,7 +38,7 @@ import { API_PATH } from '../property.config';
   styleUrls: ['./object-autocomplete.component.css']
 })
 export class ObjectAutocompleteComponent
-implements OnInit, ControlValueAccessor, Validator {
+implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
   /**
    * Text to show to prompt the user to choose an object.
    */
@@ -133,15 +134,20 @@ implements OnInit, ControlValueAccessor, Validator {
 
   private properties: string[];
   private gs: GatewayService;
+  private cs: ConfigService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private rs: RunService, private csf: ConfigServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.cs = this.csf.createConfigService(this.elem);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -149,30 +155,13 @@ implements OnInit, ControlValueAccessor, Validator {
     if (!this.gs) {
       return;
     }
-    if (!this.properties) {
-      this.properties = properties(
-        this.showOnly, this.showExclude, await this.fetchProperties());
-    }
-    this.fetchObjects();
+    this.rs.eval(this.elem);
   }
 
-  async fetchProperties(): Promise<string[]> {
-    const res = await this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'properties',
-            returnFields: 'name'
-          }
-        }
-      })
-      .toPromise();
-
-    return _.map(res.data.properties, 'name');
-  }
-
-  fetchObjects() {
+  async dvOnEval(): Promise<void> {
     if (this.gs) {
+      this.properties = getFilteredPropertyNames(
+        this.showOnly, this.showExclude, this.cs);
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {

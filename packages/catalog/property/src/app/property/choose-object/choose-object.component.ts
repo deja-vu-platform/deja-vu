@@ -1,14 +1,15 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
-  Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnInit, Output, Type
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExecSuccess, RunService
+  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  GatewayServiceFactory, OnExecSuccess, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { properties, Property } from '../shared/property.model';
+import { getFilteredPropertyNames } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
 
@@ -23,7 +24,8 @@ import { API_PATH } from '../property.config';
   templateUrl: './choose-object.component.html',
   styleUrls: ['./choose-object.component.css']
 })
-export class ChooseObjectComponent implements OnInit, OnExecSuccess {
+export class ChooseObjectComponent implements
+  OnInit, AfterViewInit, OnExecSuccess {
   /**
    * Text to show to prompt the user to choose an object.
    */
@@ -82,10 +84,11 @@ export class ChooseObjectComponent implements OnInit, OnExecSuccess {
   _selectedObjectId;
   private properties: string[];
   private gs: GatewayService;
+  private cs: ConfigService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private rs: RunService, private csf: ConfigServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.chooseObject = this;
   }
@@ -93,37 +96,18 @@ export class ChooseObjectComponent implements OnInit, OnExecSuccess {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.load();
+    this.cs = this.csf.createConfigService(this.elem);
   }
 
-  async load() {
-    if (!this.gs) {
-      return;
-    }
-    if (!this.properties) {
-      this.properties = properties(
-        this.showOnly, this.showExclude, await this.fetchProperties());
-    }
-    this.fetchObjects();
+  ngAfterViewInit() {
+    this.rs.eval(this.elem);
   }
 
-  async fetchProperties(): Promise<string[]> {
-    const res = await this.gs
-      .get<{data: {properties: Property[]}}>(this.apiPath, {
-        params: {
-          extraInfo: {
-            action: 'properties',
-            returnFields: 'name'
-          }
-        }
-      })
-      .toPromise();
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      this.properties = getFilteredPropertyNames(
+        this.showOnly, this.showExclude, this.cs);
 
-    return _.map(res.data.properties, 'name');
-  }
-
-  fetchObjects() {
-    if (this.gs) {
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
@@ -140,7 +124,13 @@ export class ChooseObjectComponent implements OnInit, OnExecSuccess {
           this._objects = res.data.objects;
           this.objects.emit(this._objects);
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 
   updateSelected(id: string) {
