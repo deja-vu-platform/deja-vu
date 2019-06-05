@@ -1,8 +1,6 @@
-<dv.action name="create-supply">
+<dv.action name="stage-supply" stagedSupply$=dv.merge.object>
   <dv.tx>
-    <dv.status savedText="Supply added to party!" />
     <dv.gen-id />
-
     <div class="row">
       <div class="col-md-12">
         <supply.create-property as potluck-create-supply-item
@@ -15,7 +13,7 @@
         <transfer.create-item-count id=dv.gen-id.id
           showOptionToInputItemId=false
           showOptionToCreate=false
-          emitOnRunOnly=false />
+          emitOnRunOnly=true />
       </div>
     </div>
 
@@ -26,24 +24,19 @@
       </div>
     </div>
 
-    <supply.create-object id=dv.gen-id.id
+    <supply.create-object id=dv.gen-id.id save=$save
       initialValue={
         item: potluck-create-supply-item.value,
         unit: potluck-create-supply-unit.value
       }
       hidden=true />
 
-    <transfer.add-to-balance accountId=$id
-      amount=transfer.create-item-count.itemCountAsAmount
-      hidden=true />
-
-    <authentication.authenticate id=$loggedInUserId hidden=true />
+    <dv.merge sources=[supply.create-object.object,
+      transfer.create-item-count.itemCount] />
 
     <div class="row">
       <div class="col-md-12">
         <dv.button>Add Supply</dv.button>
-        <dv.callback defaultHref="/parties" onExecSuccess=true
-          hidden=true />
       </div>
     </div>
   </dv.tx>
