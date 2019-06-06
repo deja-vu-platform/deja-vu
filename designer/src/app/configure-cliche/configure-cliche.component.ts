@@ -20,7 +20,9 @@ import { Subscribable } from 'rxjs/Observable';
 import { AnonymousSubscription } from 'rxjs/Subscription';
 
 import { clicheDefinitions } from '../cliche.module';
-import { App, ClicheDefinition, ClicheInstance } from '../datatypes';
+import {
+  App, ClicheDefinition, ClicheInstance, usedClichesConfig
+} from '../datatypes';
 import { DynamicComponentDirective } from '../dynamic-component.directive';
 
 
@@ -37,9 +39,6 @@ export interface AfterClosedData {
 interface ControlGroup {
   form: { valid: boolean };
 }
-
-
-export const usedClichesConfig = {};
 
 
 class JSONValidator extends ErrorStateMatcher {

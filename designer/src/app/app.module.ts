@@ -15,6 +15,8 @@ import { MatModule } from './mat.module';
 
 import { DynamicComponentDirective } from './dynamic-component.directive';
 
+import { usedClichesConfig } from './datatypes';
+
 import {
   ActionDefinitionComponent
 } from './action-definition/action-definition.component';
@@ -29,7 +31,7 @@ import {
   ConfigureActionComponent
 } from './configure-action/configure-action.component';
 import {
-  ConfigureClicheComponent, usedClichesConfig
+  ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';

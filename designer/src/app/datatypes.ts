@@ -7,6 +7,7 @@ import * as uuidv4 from 'uuid/v4';
 import dvdAppStyles from './dvd-app-styles';
 import { exportDvExpr } from './expression.compiler';
 
+
 /**
  * A named collection of actions
  * Could be App, ClicheDefinition, ClicheInstance, etc.
@@ -33,6 +34,8 @@ export interface ActionInputs {
 export const OMNIPRESENT_INPUTS = [
   'hidden'
 ];
+
+export const usedClichesConfig = {};
 
 /**
  * Action Definition
@@ -484,6 +487,7 @@ export class App {
       const ofCliche = App.clicheDefinitions.find((cd) => cd.name === ci.of);
       const clicheInstance = new ClicheInstance(ci.name, ofCliche);
       Object.assign(clicheInstance.config, ci.config);
+      usedClichesConfig[ci.name] = { config: clicheInstance.config };
       app.cliches.push(clicheInstance);
     });
 
