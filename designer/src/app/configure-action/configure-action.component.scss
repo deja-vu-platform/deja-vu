@@ -20,6 +20,10 @@ mat-dialog-actions {
   justify-content: space-between;
 }
 
+.save {
+  justify-content: flex-end;
+}
+
 mat-checkbox {
   margin-right: 8px;
 }

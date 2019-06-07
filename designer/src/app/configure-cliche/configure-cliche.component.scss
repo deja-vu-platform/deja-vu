@@ -12,6 +12,10 @@ mat-dialog-actions {
   justify-content: space-between;
 }
 
+.save {
+  justify-content: flex-end;
+}
+
 textarea {
   font-family: monospace;
   max-height: 320px; /* prevent scrolling on dialog */
