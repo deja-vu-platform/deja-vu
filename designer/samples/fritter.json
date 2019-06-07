@@ -353,7 +353,7 @@
               "inputSettings": {
                 "showExclude": "[\"author\"]",
                 "initialValue": "{author:authentication.logged-in.user.id}",
-                "newObjectSavedText": "\"\"",
+                "newObjectSavedText": "\"Freet posted!\"",
                 "buttonLabel": "\"Post Freet\""
               },
               "styles": {

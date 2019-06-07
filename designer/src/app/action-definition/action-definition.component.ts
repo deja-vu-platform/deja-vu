@@ -127,7 +127,10 @@ implements AfterViewInit, OnChanges, OnInit {
       this.lastNumActions = instanceContainersArr.length;
       // show the name of any action on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
-      setTimeout(() => this.calcShowHint(instanceContainersArr));
+      setTimeout(() => {
+        this.calcShowNoContentHint(instanceContainersArr);
+        this.calcShowHiddenHint(instanceContainersArr);
+      });
     });
   }
 
@@ -159,7 +162,12 @@ implements AfterViewInit, OnChanges, OnInit {
     forAction.shouldReLink.emit();
     this.updateReferences();
     // need to wait for values to propogate
-    setTimeout(() => this.calcShowHint(this.instanceContainers.toArray()));
+    setTimeout(() => {
+      this.calcShowNoContentHint(
+        this.instanceContainers.toArray());
+      this.calcShowHiddenHint(
+        this.instanceContainers.toArray());
+    });
   }
 
   stopPropIfShift(event: Event) {
@@ -310,12 +318,12 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Set the showHint property on each child action
-   * This property is set to true if the action is not rednering anything
+   * Set the showNoContentHint property on each child action
+   * This property is set to true if the action is not rendering anything
    * Since actions are broken up into rows but the ViewChildren gives us
    *   one array it makes the most sense to do this all at once in a loop
    */
-  private calcShowHint(instanceContainersArr: ElementRef[]) {
+  private calcShowNoContentHint(instanceContainersArr: ElementRef[]) {
     let rowActions = 0;
     this.rows.forEach((row) => {
       row.actions.forEach((action, actionNum) => {
@@ -323,16 +331,24 @@ implements AfterViewInit, OnChanges, OnInit {
         const actionContainer = instanceContainersArr[index];
         const firstChild = actionContainer
           && actionContainer.nativeElement.firstElementChild.firstElementChild;
-        const showHint = (
+        const showNoContentHint = (
           firstChild
           && (
             firstChild.offsetHeight === 0
             || firstChild.offsetWidth === 0
           )
         );
-        action['showHint'] = showHint;
+        action['showNoContentHint'] = showNoContentHint;
       });
       rowActions += row.actions.length;
+    });
+  }
+
+  private calcShowHiddenHint(instanceContainersArr: ElementRef[]) {
+    this.rows.forEach((row) => {
+      row.actions.forEach((action: ActionInstance, actionNum) => {
+        action['showHiddenHint'] = action.inputSettings['hidden'];
+      });
     });
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "morgdvd",
+  "name": "morg",
   "actions": [
     {
       "name": "create-group-meeting-series",
@@ -258,7 +258,8 @@
               "from": "event",
               "inputSettings": {
                 "event": "$groupMeeting",
-                "showId": "false"
+                "showId": "false",
+                "hidden": ""
               },
               "styles": {
                 "stretch": false
@@ -272,7 +273,7 @@
           "actions": [
             {
               "of": "choose-champion",
-              "from": "morgdvd",
+              "from": "morg",
               "inputSettings": {
                 "groupMeeting": "$groupMeeting"
               },
@@ -282,7 +283,7 @@
             },
             {
               "of": "cancel-meeting",
-              "from": "morgdvd",
+              "from": "morg",
               "inputSettings": {
                 "groupMeeting": "$groupMeeting",
                 "groupMeetings": "$groupMeetings"
@@ -328,7 +329,7 @@
           "actions": [
             {
               "of": "create-group-meeting-series",
-              "from": "morgdvd",
+              "from": "morg",
               "inputSettings": {
                 "objectIds": "property.show-objects.objectIds"
               },
@@ -350,7 +351,7 @@
                 "chooseSeriesSelectPlaceholder": "\"Choose Meeting Series\"",
                 "showEvent": {
                   "of": "show-group-meeting",
-                  "from": "morgdvd",
+                  "from": "morg",
                   "inputSettings": {
                     "groupMeeting": "$event",
                     "groupMeetings": "$events"

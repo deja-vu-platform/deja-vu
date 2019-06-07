@@ -58,7 +58,11 @@
               [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
             >
             </app-action-instance>
-            <div *ngIf="action.showHint" class="hint">
+            <div *ngIf="!action.showHiddenHint && action.showNoContentHint"
+              class="hint">
+              {{action.fqtag}}
+            </div>
+            <div *ngIf="action.showHiddenHint" class="hint">
               Hidden: {{action.fqtag}}
             </div>
             <app-floating-menu
