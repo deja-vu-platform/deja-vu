@@ -102,7 +102,7 @@ export class TopBarComponent {
 
   save() {
     this.saving = true;
-    const designerSave = JSON.stringify(this.app);
+    const designerSave = JSON.stringify(this.app, null, 2);
     this.saveBrowser(designerSave, (error) => {
       this.saving = false;
       this.showSnackBar(error ?
@@ -113,7 +113,7 @@ export class TopBarComponent {
     });
   }
 
-  private saveBrowser = (data: string, callback: (error: any) => void) => {
+  private saveBrowser(data: string, callback: (error: any) => void): void {
     data = `data:text/json;charset=utf-8,${encodeURIComponent(data)}`;
     const dlAnchorElm = this.downloadAnchor.nativeElement;
     dlAnchorElm.setAttribute('href', data);
