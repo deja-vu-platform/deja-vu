@@ -3,7 +3,9 @@
   #configureClicheForm="ngForm"
   (ngSubmit)="save(configureClicheForm)"
 >
-  <h1 mat-dialog-title>Configure Cliché</h1>
+  <h1 mat-dialog-title>
+    {{ data.cliche ? 'Configure' : 'Import' }} Cliché
+  </h1>
 
   <mat-dialog-content>
     <mat-form-field>
@@ -54,7 +56,7 @@
     </mat-form-field>
   </mat-dialog-content>
 
-  <mat-dialog-actions>
+  <mat-dialog-actions [ngClass]="data.cliche ? 'delete-save' : 'save-only'">
     <button
       mat-button
       *ngIf="data.cliche"

@@ -96,7 +96,7 @@
     </mat-form-field>
   </mat-dialog-content>
 
-  <mat-dialog-actions>
+  <mat-dialog-actions [ngClass]="data.action ? 'delete-save' : 'save-only'">
     <button
       mat-button
       *ngIf="data.action"

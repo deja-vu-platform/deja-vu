@@ -15,9 +15,14 @@ mat-dialog-content {
   flex-direction: column;
 }
 
-mat-dialog-actions {
+.delete-save {
   display: flex;
   justify-content: space-between;
+}
+
+.save-only {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .save {
