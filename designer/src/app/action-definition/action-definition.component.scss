@@ -50,11 +50,18 @@ $main-view-padding: 24px;
 .row-control {
   width: $row-control-width;
   button {
-    cursor: grab;
     padding: 0 4px;
-    height: 100%;
     width: 100%;
   }
+}
+
+.grab {
+  cursor: grab;
+}
+
+.hide-row {
+  visibility: hidden;
+  cursor: pointer;
 }
 
 // the content on the page

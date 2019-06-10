@@ -31,6 +31,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
   app = new App('newapp');
   openActionInstance: ActionInstance;
   previewMode = false;
+  dragging = false;
 
   private _openAction: AppActionDefinition;
   private nextPort = 3002;
@@ -50,6 +51,14 @@ export class DesignerComponent implements OnInit, OnDestroy {
     this.openAction = this.app.homepage;
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
+    this.dragulaService.drag()
+      .subscribe(() => {
+        this.dragging = true;
+      });
+    this.dragulaService.dragend()
+      .subscribe(() => {
+        this.dragging = false;
+      });
 
     // imports for addCliche
     if (this.electronService.remote) {
@@ -143,7 +152,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
       this.app = App.fromJSON(appJSON);
       this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
-      this.snackBar.open('Save has been loaded.', 'dismiss', {
+      this.snackBar.open('App has been loaded.', 'dismiss', {
         duration: 2500
       });
     });

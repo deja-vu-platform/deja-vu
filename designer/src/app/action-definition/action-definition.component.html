@@ -15,14 +15,31 @@
       class="row-container"
       [ngClass]="{ 'no-drag': rowNum == rows.length - 1 }"
       [attr.data-index]="rowNum"
+      (mouseenter)="row.hover = true"
+      (mouseleave)="row.hover = false"
     >
-      <div class="row-control handle">
+      <div class="row-control"
+        [ngClass]="(row.hover && !dragging) ? '' : 'hide-row'">
         <button
           mat-button
-          class="mat-small handle"
+          class="mat-small"
           #rowMenuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="rowMenu.matMenu"
           (contextmenu)="openMenu(rowMenuTrigger)"
+        >
+          <mat-icon>palette</mat-icon>
+        </button>
+        <button
+          mat-button
+          class="mat-small"
+          (click)="deleteRow(rowNum)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button
+          mat-button
+          class="mat-small handle"
+          [ngClass]="(row.hover && !dragging) ? 'grab' : ''"
         >
           <mat-icon class="handle">drag_handle</mat-icon>
         </button>

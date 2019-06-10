@@ -80,6 +80,7 @@ export class ActionDefinitionComponent
 implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
   @Input() actionInstance: ActionInstance;
+  @Input() dragging = false;
 
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
@@ -268,6 +269,12 @@ implements AfterViewInit, OnChanges, OnInit {
    */
   max(...numbers: number[]): number {
     return Math.max(...numbers);
+  }
+
+  deleteRow(rowNum: number): void {
+    console.log(rowNum);
+    (<AppActionDefinition> this.actionInstance.of).rows
+      .splice(rowNum, 1);
   }
 
   /**
