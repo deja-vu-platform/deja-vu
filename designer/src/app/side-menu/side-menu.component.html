@@ -5,12 +5,12 @@
         <mat-panel-title>
           <button
             mat-button
-            class="mat-small more"
+            class="mat-small settings"
             *ngIf="collection.config"
             (click)="$event.stopPropagation(); editCliche(collection);"
             matTooltip="Configure Cliché"
           >
-            <mat-icon>more_vert</mat-icon>
+            <mat-icon>settings</mat-icon>
           </button>
           <span class="spacer" *ngIf="!collection.config"></span>
           {{collection.name}}
