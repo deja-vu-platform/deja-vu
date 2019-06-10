@@ -43,24 +43,7 @@
     <mat-form-field>
       <input matInput name="appName" [(ngModel)]="app.name">
     </mat-form-field>
-    <button
-      mat-button
-      class="mat-small"
-      (click)="open()"
-      [disabled]="opening"
-      matTooltip="Open"
-    >
-      <mat-icon>folder_open</mat-icon>
-    </button>
-    <button
-      mat-button
-      class="mat-small"
-      (click)="save()"
-      [disabled]="saving"
-      matTooltip="Save"
-    >
-      <mat-icon>save</mat-icon>
-    </button>
+
     <button
       mat-button
       class="mat-small"
@@ -69,15 +52,45 @@
     >
       <mat-icon>devices</mat-icon>
     </button>
+
     <button
       mat-button
       class="mat-small"
-      (click)="export()"
-      [disabled]="!this.fs || exporting"
-      matTooltip="Export"
-    >
-      <mat-icon>publish</mat-icon>
+      matTooltip="More"
+      [matMenuTriggerFor]="moreMenu">
+      <mat-icon>more_vert</mat-icon>
     </button>
+
+    <mat-menu #moreMenu="matMenu">
+      <button
+        mat-menu-item
+        class="mat-small"
+        (click)="open()"
+        [disabled]="opening"
+      >
+        <mat-icon>folder_open</mat-icon>
+        <span>Open...</span>
+      </button>
+      <button
+        mat-menu-item
+        class="mat-small"
+        (click)="save()"
+        [disabled]="saving"
+      >
+        <mat-icon>save</mat-icon>
+        <span>Save...</span>
+      </button>
+
+      <button
+        mat-menu-item
+        class="mat-small"
+        (click)="export()"
+        [disabled]="!this.fs || exporting"
+      >
+        <mat-icon>publish</mat-icon>
+        <span>Export...</span>
+      </button>
+    </mat-menu>
   </div>
 
   <app-floating-menu
