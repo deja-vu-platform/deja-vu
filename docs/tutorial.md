@@ -94,7 +94,7 @@ defining facility, albeit with simple CRUD behavior.)
 In *SN*, we use `schema` to configure the type of properties we expect our
 objects (the posts) to have (an author, a title, and a url). The effect of this is that when we
 use an action from *Property* to, for example, create an object, the action will allow
-the user to input those fields---author, title, and url.
+the user to input those fields&mdash;author, title, and url.
 Moreover, since we specified they are all required fields, the action
 will expect the user to provide a value for each one (and show an
 error if she doesn't).
@@ -102,7 +102,7 @@ error if she doesn't).
 In the app's configuration file, we also define the routes of
 our app, given as
 a list of path and action name pairs.
-Each page is an app action, and app actions---as we'll see later---can contain other actions.
+Each page is an app action, and app actions&mdash;as we'll see later&mdash;can contain other actions.
 Our homepage
 is the action `home` because `path` is empty.
 If the user navigates to `/login`, the `login` action
@@ -193,7 +193,7 @@ Cliché actions have two phases: an *evaluation* phase (eval) and an
 Both phases can take inputs and produce outputs.
 When a cliché action execs or evals, it expects all its
 required inputs
-to be available---blocking the evaluation or
+to be available&mdash;blocking the evaluation or
 execution until inputs are given.
 After the phase runs, it will produce its outputs.
 
@@ -295,7 +295,7 @@ including its appearance, to be customized; thus the hidden parameter of
 (even though the object data itself is still loaded, emitted as an output,
 and used in several parts of the view). (Any action can be hidden with `hidden=true`,
 but the action still runs as if it wasn't hidden, the only difference
-is that it won't be shown to the user---and as a result, the user won't be able
+is that it won't be shown to the user&mdash;and as a result, the user won't be able
 to interact with it.) All `show-*` actions of clichés follow
 this pattern: when loaded, the action evaluates and if an id was given
 it fetches the entity (e.g., the object, score) with the given id
