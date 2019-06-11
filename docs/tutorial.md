@@ -124,7 +124,7 @@ Actions are included as if they were HTML
 elements, with the tag given by `cliche.action-name` or
 `app.action-name`.
 
-Below is a code excerpt of *SN*'s `submit-post`:
+Below is a code excerpt of *SN*'s `submit-post` definition:
 ```html
 <dv.action name="submit-post">
   <sn.navbar /> ...
