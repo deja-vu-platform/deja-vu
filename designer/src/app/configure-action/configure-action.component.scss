@@ -69,3 +69,13 @@ div.compound-input {
 .presentation-panel {
   margin-bottom: 5px !important;
 }
+
+.presentation-panel mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+.page-container {
+  display: flex;
+  justify-content: space-between;
+}

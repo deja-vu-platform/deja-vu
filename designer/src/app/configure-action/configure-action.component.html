@@ -16,14 +16,16 @@
       >
     </mat-form-field>
 
-    <div class="mat-form-field">
-      <mat-checkbox *ngIf="!home" name="page" [(ngModel)]="page">
-        Page
-      </mat-checkbox>
-      <div *ngIf="!home"
-        class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
-        <div class="mat-hint">
-          Check this box if you want this action to be accessible via a URL
+    <div class="mat-form-field page-container">
+      <div>
+        <mat-checkbox [disabled]="home" name="page" [(ngModel)]="page">
+          Page
+        </mat-checkbox>
+        <div
+          class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
+          <div class="mat-hint">
+            Check this box if you want this action to be accessible via a URL
+          </div>
         </div>
       </div>
       <button
