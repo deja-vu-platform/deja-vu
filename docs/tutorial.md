@@ -28,11 +28,11 @@ write back-end data.
 They can
 also have inputs and produce outputs.
 
-*SN* uses the [Authentication](../packages/catalog/authentication/README)
+*SN* uses the [Authentication](../packages/catalog/authentication/README.md)
 cliché to handle user authentication,
-[Comment](../packages/catalog/comment/README) to comment on both posts and other comments,
-[Property](../packages/catalog/property/README) to save a post's author, title, and link, and
-[Scoring](../packages/catalog/scoring/README) twice: once for keeping track of each post's upvotes;
+[Comment](../packages/catalog/comment/README.md) to comment on both posts and other comments,
+[Property](../packages/catalog/property/README.md) to save a post's author, title, and link, and
+[Scoring](../packages/catalog/scoring/README.md) twice: once for keeping track of each post's upvotes;
 and another one for the upvotes of comments.
 
 The app's config file (dvconfig.json) is shown below:
