@@ -27,8 +27,14 @@ import {
   ActionInstanceComponent
 } from '../action-instance/action-instance.component';
 import {
+  ClicheInstancesComponent
+} from '../cliche-instances/cliche-instances.component';
+import {
   FloatingMenuComponent
 } from '../floating-menu/floating-menu.component';
+import {
+  InsertActionComponent
+} from '../insert-action/insert-action.component';
 import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 import { SideMenuComponent } from '../side-menu/side-menu.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
@@ -39,8 +45,10 @@ describe('DesignerComponent', () => {
       declarations: [
         ActionDefinitionComponent,
         ActionInstanceComponent,
+        ClicheInstancesComponent,
         DesignerComponent,
         FloatingMenuComponent,
+        InsertActionComponent,
         SetInputsComponent,
         SideMenuComponent,
         TopBarComponent

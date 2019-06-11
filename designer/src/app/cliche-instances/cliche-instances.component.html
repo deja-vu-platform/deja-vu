@@ -1,0 +1,22 @@
+<button
+  mat-raised-button
+  id="import-cliche"
+  color="primary"
+  (click)="importCliche()"
+>Import Cliché</button>
+<mat-list *ngIf="app">
+  <mat-list-item
+    *ngFor="let collection of app.actionCollections">
+    <span class="spacer" *ngIf="!collection.config"></span>
+    {{collection.name}}
+    <button
+      mat-button
+      class="mat-small settings"
+      *ngIf="collection.config"
+      (click)="$event.stopPropagation(); editCliche(collection);"
+      matTooltip="Configure Cliché"
+    >
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-list-item>
+</mat-list>

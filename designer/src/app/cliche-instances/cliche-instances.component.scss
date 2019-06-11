@@ -1,0 +1,13 @@
+#import-cliche {
+  margin-top: 16px;
+}
+
+button.settings {
+  padding: 0;
+  margin-right: 8px;
+}
+
+mat-list-item[data-disabled="true"] {
+  color: gray;
+  cursor: not-allowed;
+}

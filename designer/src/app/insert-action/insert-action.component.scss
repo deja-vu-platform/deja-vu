@@ -1,0 +1,17 @@
+mat-panel-title {
+  align-items: center;
+}
+
+mat-expansion-panel-header {
+  padding-left: 16px;
+}
+
+.spacer {
+  display: inline-block;
+  width: 32px;
+}
+
+mat-list-item[data-disabled="true"] {
+  color: gray;
+  cursor: not-allowed;
+}
