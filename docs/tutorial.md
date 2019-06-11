@@ -166,8 +166,9 @@ three cliché actions,
 `create-score` of the `scoringposts` instance of *Scoring*; 
 and three built-in actions (which can be regarded as free-standing cliché actions): `dv.if`, which
 shows the enclosed content if the given condition is true, `dv.gen-id`,
-which generates a unique ID, `dv.link` which navigates to the action matching
-the `/item` route (and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
+which generates a unique ID, `dv.link` which redirects the user to
+another page (in this case, it navigates to the action matching
+the `/item` route and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
 which synchronizes the actions it wraps (explained in more detail later).
 
 App actions, like cliché actions, can have input and
