@@ -20,6 +20,12 @@
       <mat-checkbox *ngIf="!home" name="page" [(ngModel)]="page">
         Page
       </mat-checkbox>
+      <div *ngIf="!home"
+        class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
+        <div class="mat-hint">
+          Check this box if you want this action to be accessible via a URL
+        </div>
+      </div>
       <button
         mat-button
         *ngIf="!home && page && data.action"
@@ -35,6 +41,11 @@
       <mat-checkbox name="transaction" [(ngModel)]="transaction">
         Transaction
       </mat-checkbox>
+      <div class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
+        <div class="mat-hint">
+          Check this box if you want child cliché actions to run together
+        </div>
+      </div>
     </div>
 
     <mat-form-field>
