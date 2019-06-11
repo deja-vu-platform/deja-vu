@@ -158,7 +158,9 @@ Below is a code excerpt of *SN*'s `submit-post`:
 ```
 
 
-`submit-post` includes one app action, `navbar` (defined elsewhere); three cliché actions,
+`submit-post` includes one app action, `navbar`
+([defined elsewhere](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/navbar/navbar.html));
+three cliché actions,
 `authenticate` of `authentication`, `create-object` of
 `property`, and
 `create-score` of the `scoringposts` instance of *Scoring*; 
