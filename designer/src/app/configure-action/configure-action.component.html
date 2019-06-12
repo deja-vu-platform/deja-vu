@@ -2,7 +2,9 @@
   #configureActionForm="ngForm"
   (ngSubmit)="save(configureActionForm)"
 >
-  <h1 mat-dialog-title>Configure Action</h1>
+  <h1 mat-dialog-title>
+    {{ data.action ? 'Configure': 'New' }} Action
+  </h1>
 
   <mat-dialog-content>
     <mat-form-field>
@@ -144,7 +146,9 @@
         color="primary"
         type="submit"
         [disabled]="!validate(configureActionForm)"
-      >Save</button>
+      >
+        {{ data.action ? 'Save' : 'Create' }}
+      </button>
     </div>
   </mat-dialog-actions>
 </form>

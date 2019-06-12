@@ -4,7 +4,7 @@
   (ngSubmit)="save(configureClicheForm)"
 >
   <h1 mat-dialog-title>
-    {{ data.cliche ? 'Configure' : 'Import' }} Cliché
+    {{ data.cliche ? 'Configure' : 'New' }} Cliché Instance
   </h1>
 
   <mat-dialog-content>
@@ -75,7 +75,7 @@
         color="primary"
         type="submit"
         [disabled]="!validate(configureClicheForm)"
-      >{{ data.cliche ? 'Save' : 'Import' }}</button>
+      >{{ data.cliche ? 'Save' : 'Create' }}</button>
     </div>
   </mat-dialog-actions>
 
