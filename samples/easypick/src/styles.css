@@ -217,7 +217,11 @@ sweetspots-add-a-spot-form .mat-input-container {
 }
 
 .mat-option {
-    font-size: inherit;
-    line-height: 2em !important; 
-    height: 4.5em !important;
+  font-size: inherit;
+  line-height: 2em !important; 
+  height: 4.5em !important;
+}
+
+.rating {
+  justify-content: left;
 }
