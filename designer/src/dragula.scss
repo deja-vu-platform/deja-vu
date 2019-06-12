@@ -38,3 +38,9 @@ but you may wish to make your own modifications.
   box-shadow: inset 0 0 100px 100px rgba(0,0,0,.15);
   cursor: grab;
 }
+
+
+*[dragula] > *:not(*[data-disabled="true"]):not(.no-drag):active {
+  box-shadow: inset 0 0 100px 100px rgba(0,0,0,.15);
+  cursor: grabbing;
+}

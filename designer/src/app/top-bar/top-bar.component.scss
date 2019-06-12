@@ -1,26 +1,11 @@
 #top-bar {
   border-bottom: 1px solid black;
-}
-
-#edit-action {
-  margin-right: 8px;
-}
-
-#create-action {
-  width: 100%;
-  font-size: inherit;
-  /* consistent with other items in select */
-  line-height: 3em;
-  height: 3em;
-  text-align: left;
-}
-
-#create-action * {
-  font-size: inherit;
-}
-
-.right {
-  margin-left: auto;
+  font-size: 16px;
+  padding-top: 20px;
+  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 0px;
 }
 
 .io-container {
@@ -37,7 +22,7 @@
     }
     button {
       padding: 0;
-      // largest that works, emperically
+      // largest that works, empirically
       width: 44px;
       height: 44px;
     }
@@ -56,5 +41,5 @@ mat-tab-group {
 
 .popup-menu {
   height: 250px;
-  width: 256px; // chosen emperically
+  width: 256px; // chosen empirically
 }

@@ -1,9 +1,9 @@
 <button
-  mat-raised-button
+  mat-button color="primary"
   id="import-cliche"
-  color="primary"
-  (click)="newClicheInstance()"
->New Cliché Instance</button>
+  (click)="newClicheInstance()">
+  <mat-icon>add_circle</mat-icon> New Cliché Instance
+</button>
 <div *ngIf="app">
   <div class="help" *ngIf="app.cliches?.length === 0">
     Create a new cliché instance to add behavior
@@ -32,6 +32,7 @@
       </button>
       <button
         mat-button
+        color="warn"
         class="mat-small"
         *ngIf="ci.config"
         matTooltip="Delete"

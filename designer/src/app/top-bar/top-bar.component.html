@@ -1,47 +1,54 @@
 <mat-toolbar class="mat-toolbar" id="top-bar" *ngIf="app">
-  <button
-    mat-button
-    id="edit-action"
-    class="mat-small"
-    (click)="editAction()"
-    matTooltip="Configure Action"
-  >
-    <mat-icon>settings</mat-icon>
-  </button>
-  <mat-form-field>
-    <mat-select
-      name="action"
-      [(ngModel)]="openAction"
-      (selectionChange)="onSelectAction($event)"
+  <div>
+    DV Designer
+  </div>
+  <div>
+    <button
+      mat-button
+      class="mat-small"
+      matTooltip="Create Action"
+      (click)="createAction()"
     >
-      <button
-        mat-raised-button
-        id="create-action"
-        color="primary"
-        (click)="createAction()"
-      >
-        <mat-icon>add_circle</mat-icon> Create Action
-      </button>
-      <mat-option
-        *ngFor="let action of app.actions"
-        [value]="action"
-      >
-        {{action.name}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <button mat-button
-    #menuTrigger="matMenuTrigger"
-    [matMenuTriggerFor]="menu.matMenu"
-    class="mat-small"
-    matTooltip="Inputs & Outputs"
-  >
-    <mat-icon>input</mat-icon>
-  </button>
-
-  <div class="right">
+      <mat-icon>add_circle</mat-icon>
+    </button>
     <mat-form-field>
-      <input matInput name="appName" [(ngModel)]="app.name">
+      <mat-select
+        name="action"
+        placeholder="App Action"
+        [(ngModel)]="openAction"
+        (selectionChange)="onSelectAction($event)"
+      >
+        <mat-option
+          *ngFor="let action of app.actions"
+          [value]="action"
+        >
+          {{action.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button
+      mat-button
+      class="mat-small"
+      (click)="editAction()"
+      matTooltip="Configure Action"
+    >
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button mat-button
+      #menuTrigger="matMenuTrigger"
+      [matMenuTriggerFor]="menu.matMenu"
+      class="mat-small"
+      matTooltip="Inputs & Outputs"
+    >
+      <mat-icon>input</mat-icon>
+    </button>
+  </div>
+
+  <div>
+    <mat-form-field>
+      <input matInput
+        placeholder="App Name"
+        name="appName" [(ngModel)]="app.name">
     </mat-form-field>
 
     <button
@@ -123,7 +130,7 @@
               (click)="removeIO(output)"
               class="mat-small hide-on-drag"
             >
-              <mat-icon>remove_circle</mat-icon>
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
           <div *ngIf="openAction.outputSettings.length === 0">
@@ -131,7 +138,7 @@
           </div>
         </div>
         <button mat-button color="primary" (click)="addIO('output')" class="add-io">
-          <mat-icon>add_circle</mat-icon> Add Output
+          <mat-icon>add_circle</mat-icon> New Output
         </button>
       </mat-tab>
       <mat-tab label="Inputs">
@@ -150,7 +157,7 @@
               (click)="removeIO(input)"
               class="mat-small hide-on-drag"
             >
-              <mat-icon>remove_circle</mat-icon>
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
           <div *ngIf="openAction.inputSettings.length === 0" class="no-drag">
@@ -158,7 +165,7 @@
           </div>
         </div>
         <button mat-button color="primary" (click)="addIO('input')" class="add-io">
-          <mat-icon>add_circle</mat-icon> Add Input
+          <mat-icon>add_circle</mat-icon> New Input
         </button>
       </mat-tab>
     </mat-tab-group>

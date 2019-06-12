@@ -36,13 +36,11 @@
         >
           <mat-icon>delete</mat-icon>
         </button>
-        <button
-          mat-button
-          class="mat-small handle"
+        <mat-icon
           [ngClass]="(row.hover && !dragging) ? 'grab' : ''"
-        >
-          <mat-icon class="handle">drag_handle</mat-icon>
-        </button>
+          class="handle">
+          drag_handle
+        </mat-icon>
       </div>
       <div
         class="dvd-row no-drag"

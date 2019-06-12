@@ -64,6 +64,14 @@ $main-view-padding: 24px;
   cursor: pointer;
 }
 
+.handle {
+  margin-left: 4px;
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
 // the content on the page
 .dvd-row {
   flex: 1;
