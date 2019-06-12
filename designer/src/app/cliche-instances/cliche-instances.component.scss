@@ -32,9 +32,17 @@
 }
 
 .info-icon {
-  font-size: 75%;
+  font-size: 100%;
   color: rgba(0,0,0,.54);
   width: 10px;
   height: 10px;
   cursor: pointer;
+  vertical-align: text-top;
+}
+
+.help {
+  width: 75%;
+  margin: auto;
+  text-align: left;
+  color: rgba(0,0,0,.54);
 }

@@ -5,13 +5,19 @@
   (click)="newClicheInstance()"
 >New Cliché Instance</button>
 <div *ngIf="app">
+  <div class="help" *ngIf="app.cliches?.length === 0">
+    Create a new cliché instance to add behavior
+    to your app
+  </div>
   <div class="cliche-instance"
     *ngFor="let ci of app.cliches">
     <div class="cliche-instance-info">
       <div class="alias">{{ci.name}}</div>
       <div class="of">
         {{ci.of.name}}
-        <mat-icon class="info-icon" (click)="docs(ci.of)">info</mat-icon>
+        <mat-icon
+          matTooltip="Info"
+          class="info-icon" (click)="docs(ci.of)">info</mat-icon>
       </div>
     </div>
     <div class="cliche-instance-buttons">

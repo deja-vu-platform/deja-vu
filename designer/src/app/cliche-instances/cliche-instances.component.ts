@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { map } from 'rxjs/operators';
 
+import { ElectronService } from 'ngx-electron';
+
 import {
   AfterClosedData,
   ConfigureClicheComponent,
@@ -27,7 +29,9 @@ export class ClicheInstancesComponent {
   @Output() readonly clicheAdded = new EventEmitter<ClicheInstance>();
   @Output() readonly clicheRemoved = new EventEmitter<string>();
 
-  constructor(private readonly dialog: MatDialog) {}
+  constructor(
+    private readonly dialog: MatDialog,
+    private readonly electronService: ElectronService) {}
 
   private openConfigureDialog(
     then: (data: AfterClosedData) => void,
@@ -81,7 +85,12 @@ export class ClicheInstancesComponent {
     }
   }
 
-  docs(alias: string) {
-    console.log(alias);
+  docs(ci: ClicheInstance) {
+    if (this.electronService.remote) {
+      this.electronService.shell
+        .openExternal(
+          'https://github.com/spderosso/deja-vu/blob/master/packages/' +
+          `catalog/${ci.name}/README.md`);
+    }
   }
 }
