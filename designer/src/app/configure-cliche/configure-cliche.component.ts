@@ -149,15 +149,11 @@ export class ConfigureClicheComponent implements OnInit {
 
   delete() {
     if (window.confirm(
-      'Are you sure you want to remove this Cliché? ' +
-      'Any of its actions that you are using will be removed as well.'
+      'Are you sure you want to remove this cliché instance? ' +
+      'All of the actions of this cliché instance ' +
+      'that you are using will be removed as well.'
     )) {
-      this.data.app.actions.forEach((ad) => {
-        ad.rows.forEach((r) => {
-          _.remove(r.actions, (ai) => ai.from === this.data.cliche);
-        });
-      });
-      _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
+      this.data.app.deleteClicheInstance(this.data.cliche);
       this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
     }
   }

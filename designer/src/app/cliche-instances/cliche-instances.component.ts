@@ -14,6 +14,8 @@ import {
   ClicheInstance
 } from '../datatypes';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'app-cliche-instances',
@@ -49,7 +51,7 @@ export class ClicheInstancesComponent {
       .subscribe(then);
   }
 
-  importCliche() {
+  newClicheInstance() {
     this.openConfigureDialog(({ event, cliche }) => {
       if (event === 'create') {
         this.clicheAdded.emit(cliche);
@@ -57,7 +59,7 @@ export class ClicheInstancesComponent {
     });
   }
 
-  editCliche(cliche: ClicheInstance) {
+  editClicheInstance(cliche: ClicheInstance) {
     const origName = cliche.name;
     this.openConfigureDialog(({ event, cliche: newCliche }) => {
       if (event === 'update') {
@@ -67,5 +69,19 @@ export class ClicheInstancesComponent {
         this.clicheRemoved.emit(origName);
       }
     }, cliche);
+  }
+
+  deleteClicheInstance(ci: ClicheInstance) {
+    if (window.confirm(
+      'Are you sure you want to remove this cliché instance? ' +
+      'All of the actions of this cliché instance ' +
+      'that you are using will be removed as well.'
+    )) {
+      this.app.deleteClicheInstance(ci);
+    }
+  }
+
+  docs(alias: string) {
+    console.log(alias);
   }
 }

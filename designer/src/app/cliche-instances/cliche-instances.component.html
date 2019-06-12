@@ -2,21 +2,37 @@
   mat-raised-button
   id="import-cliche"
   color="primary"
-  (click)="importCliche()"
->Import Cliché</button>
-<mat-list *ngIf="app">
-  <mat-list-item
-    *ngFor="let collection of app.actionCollections">
-    <span class="spacer" *ngIf="!collection.config"></span>
-    {{collection.name}}
-    <button
-      mat-button
-      class="mat-small settings"
-      *ngIf="collection.config"
-      (click)="$event.stopPropagation(); editCliche(collection);"
-      matTooltip="Configure Cliché"
-    >
-      <mat-icon>settings</mat-icon>
-    </button>
-  </mat-list-item>
-</mat-list>
+  (click)="newClicheInstance()"
+>New Cliché Instance</button>
+<div *ngIf="app">
+  <div class="cliche-instance"
+    *ngFor="let ci of app.cliches">
+    <div class="cliche-instance-info">
+      <div class="alias">{{ci.name}}</div>
+      <div class="of">
+        {{ci.of.name}}
+        <mat-icon class="info-icon" (click)="docs(ci.of)">info</mat-icon>
+      </div>
+    </div>
+    <div class="cliche-instance-buttons">
+      <button
+        mat-button
+        class="mat-small"
+        *ngIf="ci.config"
+        (click)="$event.stopPropagation(); editClicheInstance(ci);"
+        matTooltip="Configure"
+      >
+        <mat-icon>settings</mat-icon>
+      </button>
+      <button
+        mat-button
+        class="mat-small"
+        *ngIf="ci.config"
+        matTooltip="Delete"
+        (click)="deleteClicheInstance(ci)"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

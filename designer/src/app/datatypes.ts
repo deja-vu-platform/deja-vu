@@ -658,6 +658,15 @@ export class App {
       : undefined;
   }
 
+  deleteClicheInstance(ci: ClicheInstance) {
+    this.actions.forEach((ad) => {
+      ad.rows.forEach((r) => {
+        _.remove(r.actions, (ai) => ai.from === ci);
+      });
+    });
+    _.remove(this.cliches, (c) => c === ci);
+  }
+
   /**
    * @param actionInstance the action instance to mutate
    * @param inputSettings JSON form of ActionInstance

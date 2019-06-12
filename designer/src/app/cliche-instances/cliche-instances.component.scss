@@ -1,13 +1,40 @@
 #import-cliche {
   margin-top: 16px;
+  height: 48px;
+  margin-bottom: 26px;
 }
 
-button.settings {
-  padding: 0;
-  margin-right: 8px;
+.cliche-instance {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 16px;
 }
 
-mat-list-item[data-disabled="true"] {
-  color: gray;
-  cursor: not-allowed;
+.cliche-instance-info {
+  display: flex;
+  flex-direction: column;
+}
+
+// match mat-hints
+.of {
+  font-size: 75%;
+  color: rgba(0,0,0,.54);
+  margin-right: auto;
+}
+
+.alias {
+  margin-right: auto;
+}
+
+.cliche-instance-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-icon {
+  font-size: 75%;
+  color: rgba(0,0,0,.54);
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
 }

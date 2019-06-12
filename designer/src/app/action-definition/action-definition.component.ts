@@ -121,14 +121,15 @@ implements AfterViewInit, OnChanges, OnInit {
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
       const instanceContainersArr = this.instanceContainers.toArray();
-      // if an action was removed we need to re-do the data layer
-      if (this.lastNumActions > instanceContainersArr.length) {
-        this.updateReferences();
-      }
-      this.lastNumActions = instanceContainersArr.length;
+
       // show the name of any action on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
+        // if an action was removed we need to re-do the data layer
+        if (this.lastNumActions > instanceContainersArr.length) {
+          this.updateReferences();
+        }
+        this.lastNumActions = instanceContainersArr.length;
         this.calcShowNoContentHint(instanceContainersArr);
         this.calcShowHiddenHint(instanceContainersArr);
       });
