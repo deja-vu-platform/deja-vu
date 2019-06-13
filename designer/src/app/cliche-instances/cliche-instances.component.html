@@ -9,36 +9,38 @@
     Create a new cliché instance to add behavior
     to your app
   </div>
-  <div class="cliche-instance"
-    *ngFor="let ci of app.cliches">
-    <div class="cliche-instance-info">
-      <div class="alias">{{ci.name}}</div>
-      <div class="of">
-        {{ci.of.name}}
-        <mat-icon
-          matTooltip="Info"
-          class="info-icon" (click)="docs(ci.of)">info</mat-icon>
+  <div *ngFor="let ci of app.cliches">
+    <div class="cliche-instance">
+      <div class="cliche-instance-info">
+        <div class="alias">{{ci.name}}</div>
+        <div class="of">
+          {{ci.of.name}}
+          <mat-icon
+            matTooltip="Info"
+            class="info-icon" (click)="docs(ci.of)">info</mat-icon>
+        </div>
+      </div>
+      <div class="cliche-instance-buttons">
+        <button
+          mat-icon-button
+          class="mat-small"
+          *ngIf="ci.config"
+          (click)="$event.stopPropagation(); editClicheInstance(ci);"
+          matTooltip="Configure"
+        >
+          <mat-icon>settings</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="mat-small"
+          *ngIf="ci.config"
+          matTooltip="Delete"
+          (click)="deleteClicheInstance(ci)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
     </div>
-    <div class="cliche-instance-buttons">
-      <button
-        mat-icon-button
-        class="mat-small"
-        *ngIf="ci.config"
-        (click)="$event.stopPropagation(); editClicheInstance(ci);"
-        matTooltip="Configure"
-      >
-        <mat-icon>settings</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        class="mat-small"
-        *ngIf="ci.config"
-        matTooltip="Delete"
-        (click)="deleteClicheInstance(ci)"
-      >
-        <mat-icon>delete</mat-icon>
-      </button>
-    </div>
+    <mat-divider></mat-divider>
   </div>
 </div>
