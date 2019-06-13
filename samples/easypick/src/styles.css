@@ -32,15 +32,24 @@ md-icon {
 }
 
 .btn-primary {
-  background-color: #A52C4B !important;
-  border-color: #A52C4B !important;
+  background-color: #44a6f2;
   color: #FFFFFF !important;
+  border: 2px solid white;
+  font-size: 20px;
+  line-height: 20px;
+  transition: all 250ms ease;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
 }
 
 .btn-primary:hover {
-  background-color: #721129 !important;
-  border-color: #721129 !important;
-  color: #FFFFFF !important;
+  color: #44a6f2 !important;
+  background-color: white;
+  border: 2px solid #44a6f2;
 }
 
 .btn-default {
@@ -58,21 +67,31 @@ md-icon {
 .btn-danger,
 authentication-sign-out button.mat-button,
 comment-delete-comment button.mat-button {
-  background-color: #A52C4B !important;
-  border-color: #A52C4B !important;
-  color: #FFFFFF !important;
+  background-color: #44a6f2 ;
+  border-color: #FFFFFF ;
+  border-width: 2px;
+  border-radius: 25px;
+  color: #FFFFFF ;
 }
 
-.btn-danger:hover {
-  background-color: #721129 !important;
-  border-color: #721129 !important;
-  color: #FFFFFF !important;
+
+.btn-danger:hover,
+authentication-sign-out button.mat-button:hover,
+comment-delete-comment button.mat-button:hover  {
+  background-color: #FFFFFF;
+  border-color: #44a6f2;
+  color: #44a6f2;
 }
 
 .btn-info {
-  background-color: #00D9C0 !important;
-  border-color: #00D9C0 !important;
-  color: #FFFFFF !important;
+  background-color: transparent; 
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.btn-info:hover {
+  background-color: transparent; 
+  color: #1b3177;
 }
 
 html,
@@ -107,8 +126,8 @@ body {
 }
 
 .form-signin-heading {
-  font-family: 'Mogra', cursive !important;
-  color: #f62459;
+  font-family: 'Arial', cursive !important;
+  color: #44a6f2;
 }
 
 .navbar-btn {
@@ -131,32 +150,42 @@ ul {
 
 authentication-register-user button.mat-button,
 authentication-sign-in button.mat-button {
+  background-color: #44a6f2;
+  color: #FFFFFF !important;
+  border: 2px solid white;
+  font-size: 20px;
+  line-height: 20px;
+  transition: all 250ms ease;
   padding: 10px 16px;
   font-size: 18px;
   line-height: 1.3333333;
   border-radius: 6px;
   display: block;
   width: 100%;
-  background-color: #A52C4B !important;
-  border-color: #A52C4B !important;
-  color: #FFFFFF !important;
 }
 
 authentication-register-user button.mat-button:hover,
 authentication-sign-in button.mat-button:hover {
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 6px;
-  display: block;
-  width: 100%;
-  background-color: #721129 !important;
-  border-color: #721129 !important;
-  color: #FFFFFF !important;
+  color: #44a6f2 !important;
+  background-color: white;
+  border: 2px solid #44a6f2;
 }
 
-.sweet-spots-heading a {
-  font-family: 'Mogra', cursive !important;
+.navbar a {
+    color: white;
+    text-shadow: 2px 2px black;
+    background-color: transparent;
+}
+
+.navbar li a:hover, .navbar li a:focus, .navbar-brand:hover, .navbar-brand:focus {
+    color: #22547a;
+    text-shadow: 0px 0px;
+    background-color: transparent;
+}
+
+
+.easypick-heading a {
+  font-family: 'Arial' !important;
   font-size: 32px !important;
   color: #FFFFFF !important;
 }
