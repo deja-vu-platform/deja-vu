@@ -12,6 +12,8 @@
     cursor: grab;
     display: flex;
     justify-content: center;
+    // account for the icon
+    margin-right: 24px;
     align-items: center;
     font-size: 90%;
   }
