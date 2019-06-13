@@ -28,7 +28,7 @@ import {
   viewProviders: [DragulaService]
 })
 export class DesignerComponent implements OnInit, OnDestroy {
-  app = new App('newapp');
+  app = new App('myapp');
   openActionInstance: ActionInstance;
   previewMode = false;
   dragging = false;

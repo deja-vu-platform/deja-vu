@@ -1,16 +1,22 @@
 #top-bar {
   border-bottom: 1px solid black;
   font-size: 16px;
-  padding-top: 20px;
   height: 65px;
   display: flex;
   justify-content: space-between;
-  padding-right: 0px;
+  padding: 0px;
 }
 
 .logo {
   line-height: 1.2em;
-  margin-bottom: 20px;
+  background: black;
+  height: 65px;
+  color: white;
+  padding: 0;
+  margin: 0;
+  width: 100px;
+  padding-top: 10px;
+  padding-left: 16px;
 }
 
 .logo-dv {
@@ -18,6 +24,14 @@
 }
 
 .logo-designer {
+}
+
+.toolbar-app-action {
+  padding-top: 20px;
+}
+
+.toolbar-app-name {
+  padding-top: 20px;
 }
 
 .io-container {

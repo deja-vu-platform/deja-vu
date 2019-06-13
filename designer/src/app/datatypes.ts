@@ -527,7 +527,7 @@ export class App {
 
   constructor(name: string) {
     this.name = name;
-    this.actions = [new AppActionDefinition('new-action-1')];
+    this.actions = [new AppActionDefinition('home')];
     this.pages = [...this.actions];
     this.homepage = this.pages[0];
     this._actionCollections.push(this);
