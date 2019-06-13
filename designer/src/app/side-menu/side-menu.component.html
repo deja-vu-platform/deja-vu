@@ -1,10 +1,10 @@
 <div id="side-menu">
   <mat-tab-group>
-    <mat-tab label="Insert Action">
+    <mat-tab label="Actions">
       <app-insert-action [app]="app" [openAction]="openAction">
       </app-insert-action>
     </mat-tab>
-    <mat-tab label="Cliché Instances">
+    <mat-tab label="Clichés">
       <app-cliche-instances
         [app]="app"
         (clicheAdded)="clicheAdded.emit($event)"

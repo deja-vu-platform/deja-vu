@@ -15,3 +15,9 @@ mat-list-item[data-disabled="true"] {
   color: gray;
   cursor: not-allowed;
 }
+
+.collection-hint {
+  font-size: 75%;
+  color: rgba(0,0,0,.54);
+  padding-left: 5px;
+}

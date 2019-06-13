@@ -3,6 +3,10 @@
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{collection.name}}
+        <span class="collection-hint">
+          {{(collection.name === 'dv') ? '(built-in actions)' : ''}}
+          {{(collection.name === app.name) ? '(app actions)' : ''}}
+        </span>
       </mat-panel-title>
     </mat-expansion-panel-header>
     <mat-list class="action-list" dragula="action">
