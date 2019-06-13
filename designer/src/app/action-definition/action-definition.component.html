@@ -21,7 +21,7 @@
       <div class="row-control"
         [ngClass]="(row.hover && !dragging) ? '' : 'hide-row'">
         <button
-          mat-button
+          mat-icon-button
           class="mat-small"
           #rowMenuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="rowMenu.matMenu"
@@ -30,7 +30,7 @@
           <mat-icon>palette</mat-icon>
         </button>
         <button
-          mat-button
+          mat-icon-button
           class="mat-small"
           (click)="deleteRow(rowNum)"
         >

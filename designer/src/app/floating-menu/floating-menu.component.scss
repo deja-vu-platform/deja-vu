@@ -6,15 +6,9 @@
 .top-bar {
   display: flex;
   border-bottom: 1px solid black;
-  button {
-    padding: 0;
-    font-size: 16px;
-    height: 24px;
-    width: 24px;
-  }
+  background: rgb(245, 245, 245);
   .handle {
     flex: 1;
-    background: lightgray;
     cursor: grab;
     display: flex;
     justify-content: center;
