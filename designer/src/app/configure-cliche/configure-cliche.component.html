@@ -25,6 +25,7 @@
           {{clicheDefinition.name}}
         </mat-option>
       </mat-select>
+      <mat-hint>The type of this cliché instance</mat-hint>
     </mat-form-field>
 
     <mat-form-field>
@@ -36,24 +37,37 @@
         placeholder="Alias"
         [(ngModel)]="name"
       >
+      <mat-hint>The name to use to refer to this cliché instance</mat-hint>
     </mat-form-field>
 
-    <mat-divider></mat-divider>
+    <div class="mat-form-field">
+      <mat-accordion class="options-headers-align">
+        <mat-expansion-panel hideToggle class="options-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Options</mat-panel-title>
+            <mat-panel-description>
+              Set cliché instance options
+              <mat-icon>build</mat-icon>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
 
-    <ng-template propertyDynamicComponent>
-    </ng-template>
+          <ng-template propertyDynamicComponent>
+          </ng-template>
 
-    <mat-form-field [hidden]="!of || !!of.configWizardComponent">
-      <textarea
-        matInput
-        name="config"
-        #ngFormConfig="ngModel"
-        placeholder="Config (JSON)"
-        [(ngModel)]="configString"
-        [errorStateMatcher]="jsonValidator"
-      >
-      </textarea>
-    </mat-form-field>
+          <mat-form-field [hidden]="!of || !!of.configWizardComponent">
+            <textarea
+              matInput
+              name="config"
+              #ngFormConfig="ngModel"
+              placeholder="Config (JSON)"
+              [(ngModel)]="configString"
+              [errorStateMatcher]="jsonValidator"
+            >
+            </textarea>
+          </mat-form-field>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
   </mat-dialog-content>
 
   <mat-dialog-actions [ngClass]="data.cliche ? 'delete-save' : 'save-only'">

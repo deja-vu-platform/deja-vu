@@ -35,3 +35,26 @@ mat-divider {
   margin-top: $m;
   margin-bottom: $m;
 }
+
+.options-headers-align .mat-expansion-panel-header-title,
+.options-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.options-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.options-panel {
+  margin-bottom: 5px !important;
+}
+
+.options-panel mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+mat-form-field {
+  margin-bottom: 15px;
+}
