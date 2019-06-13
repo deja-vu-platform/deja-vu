@@ -44,7 +44,9 @@
       </div>
       <div
         class="dvd-row no-drag"
-        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign,
+        (row.hover && !dragging && rowNum < rows.length - 1) ?
+          'hover-row' : '-row']"
         dragula="action"
         [attr.data-index]="rowNum"
         [ngStyle]="actionInstance.of.styles"
