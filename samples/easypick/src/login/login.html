@@ -1,0 +1,10 @@
+<dv.action name="login">
+  <div id="content" class="center text-font form-signin">
+    <h2 class="form-signin-heading">Welcome to EasyPick!</h2>
+    <dv.tx>
+      <authentication.sign-in />
+      <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+    </dv.tx>
+    Don't have an account? <dv.link href="/signup"> Sign up here!</dv.link>
+  </div>
+</dv.action>

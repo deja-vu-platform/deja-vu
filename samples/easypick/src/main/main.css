@@ -1,0 +1,11 @@
+#left-main-div {
+  /*width: 400px;*/
+  float: left;
+  padding: 1em 2em;
+}
+
+property-choose-object select-panel.mat-option {
+    font-size: inherit;
+    line-height: 2em !important; 
+    height: 4.5em !important;
+}
