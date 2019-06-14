@@ -41,13 +41,19 @@ OnChanges {
   };
   _objects: Object[] = [];
   /**
-   * List of property names to pass to showObject actoin
+   * input object type: fieldName: fieldValue
+   * will return only the objects with its fieldName matching fieldValue
+   * currently, number of fields is restricted to one
+   */
+  @Input() fieldMatching: object=null;
+  /**
+   * List of property names to pass to showObject action
    * (For the default showObject, this will cause only
    * these properties to be shown)
    */
   @Input() showOnly: string[];
   /**
-   * List of property names to pass to showObject actoin
+   * List of property names to pass to showObject action
    * (For the default showObject, this will cause
    * these properties to not be shown)
    */
@@ -106,6 +112,7 @@ OnChanges {
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
+            inputs: this.fieldMatching,
             extraInfo: {
               action: 'objects',
               returnFields: `

@@ -89,7 +89,20 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'show-objects': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo)
+  'show-objects': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'properties':
+        return loadSchemaQuery(extraInfo);
+      case 'object':
+        return `
+          query ShowObjects($input: FieldMatchingInput) {
+            objects(fields: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  }
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -151,7 +164,10 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: (_root) => objects.find(),
+      objects: (_root, { fields }) => { 
+        console.log(fields);
+        objects.find( fields );
+      },
       properties: (_root) => _
         .chain(config['schema'].properties)
         .toPairs()
