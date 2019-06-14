@@ -93,10 +93,10 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'properties':
         return loadSchemaQuery(extraInfo);
-      case 'object':
+      case 'objects':
         return `
-          query ShowObjects($input: FieldMatchingInput) {
-            objects(fields: $input) ${getReturnFields(extraInfo)}
+          query ShowObjects($fields: FieldMatchingInput) {
+            objects(fields: $fields) ${getReturnFields(extraInfo)}
           }
         `;
       default:
@@ -116,8 +116,19 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
         (requiredProperties.has(propertyName) ? '!' : '');
     })
     .value();
+    const joinedProperties = properties.join('\n');
 
-  const joinedProperties = properties.join('\n');
+    // Similar as properties, but it doesn't mark any field as required
+    // this is used as a filter mechanism where not all fields must present
+    const nonRequiredProperties = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .map(([propertyName, schemaPropertyObject]) => {
+      return `${propertyName}: ` +
+        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type]
+    })
+    .value();
+    const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
   return [`
     type Object {
@@ -128,6 +139,11 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     input CreateObjectInput {
       id: ID
       ${joinedProperties}
+    }
+
+    input FieldMatchingInput {
+      id: ID
+      ${joinedNonRequiredProperties}
     }
   `];
 }
@@ -164,9 +180,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: (_root, { fields }) => { 
+      objects: async (_root, { fields }) => { 
         console.log(fields);
-        objects.find( fields );
+        return objects.find(fields);
       },
       properties: (_root) => _
         .chain(config['schema'].properties)

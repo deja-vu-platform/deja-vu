@@ -11,7 +11,7 @@ type Query {
   property(name: String): Property
   object(id: ID!): Object
   properties: [Property]
-  objects: [Object]
+  objects(fields: FieldMatchingInput): [Object]
 }
 
 type Mutation {
