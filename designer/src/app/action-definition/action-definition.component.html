@@ -59,7 +59,6 @@
         >
           <div
             #instanceContainer
-            (contextmenu)="openMenu(actionMenuTrigger)"
             [ngStyle]="{
               'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
             }"

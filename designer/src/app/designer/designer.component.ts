@@ -183,9 +183,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         || (
           target.classList.contains('action-input')
           && source.classList.contains('action-list')
-        ),
-      // if you drag outside of a row the action gets removed
-      removeOnSpill: true
+        )
     });
 
     // this function is unfortunately kind of complicated
@@ -271,16 +269,6 @@ export class DesignerComponent implements OnInit, OnDestroy {
         }
         if (shouldRemoveCopy) {
           el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        }
-      });
-
-    // handle dropping an action outside the page (remove it)
-    this.dragulaService.remove('action')
-      .subscribe(({ el, source }) => {
-        if (source.classList.contains('dvd-row')) {
-          const fromRowIdx = parseInt(source['dataset'].index, 10);
-          const actionIdx = parseInt(el['dataset'].index, 10);
-          this.openAction.rows[fromRowIdx].actions.splice(actionIdx, 1);
         }
       });
 

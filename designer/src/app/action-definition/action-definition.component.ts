@@ -274,14 +274,17 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   deleteRow(rowNum: number): void {
-    console.log(rowNum);
-    (<AppActionDefinition> this.actionInstance.of).rows
-      .splice(rowNum, 1);
+    if (window.confirm('Are you sure you want to remove this row?')) {
+      (<AppActionDefinition> this.actionInstance.of).rows
+        .splice(rowNum, 1);
+    }
   }
 
   deleteAction(rowNum: number, actionNum: number) {
-    (<AppActionDefinition> this.actionInstance.of).rows[rowNum]
-      .actions.splice(actionNum, 1);
+    if (window.confirm('Are you sure you want to remove this action?')) {
+      (<AppActionDefinition> this.actionInstance.of).rows[rowNum]
+        .actions.splice(actionNum, 1);
+    }
   }
 
   /**
