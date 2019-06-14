@@ -15,7 +15,7 @@
   padding: 0;
   margin: 0;
   width: 100px;
-  padding-top: 10px;
+  padding-top: 12px;
   padding-left: 16px;
 }
 
@@ -76,5 +76,8 @@ mat-tab-group {
 
 .popup-menu {
   height: 250px;
-  width: 256px; // chosen empirically
+}
+
+.no-inputs-hint {
+  height: inherit;
 }

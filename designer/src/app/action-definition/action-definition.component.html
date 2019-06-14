@@ -59,9 +59,6 @@
         >
           <div
             #instanceContainer
-            class="instance-container"
-            #actionMenuTrigger="matMenuTrigger"
-            [matMenuTriggerFor]="actionMenu.matMenu"
             (contextmenu)="openMenu(actionMenuTrigger)"
             [ngStyle]="{
               'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
@@ -81,6 +78,25 @@
             </div>
             <div *ngIf="action.showHiddenHint" class="hint">
               Hidden: {{action.fqtag}}
+            </div>
+            <div class="instance-container-buttons">
+              <button
+                mat-icon-button
+                class="mat-small"
+                #actionMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="actionMenu.matMenu"
+                matTooltip="Set Inputs/Outputs of Action"
+              >
+                <mat-icon>compare_arrows</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="mat-small"
+                (click)="deleteAction(rowNum, actionNum)"
+                matTooltip="Delete Action"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
             <app-floating-menu
               #actionMenu

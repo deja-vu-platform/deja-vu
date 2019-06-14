@@ -114,6 +114,9 @@
   >
     <mat-tab-group #menuContent class="popup-menu action-menu">
       <mat-tab label="Outputs">
+        <button mat-button color="primary" (click)="addIO('output')" class="add-io">
+          <mat-icon>add_circle</mat-icon> New Output
+        </button>
         <div class="io-container">
           <div
             *ngFor="let output of openAction.outputSettings"
@@ -142,11 +145,11 @@
             This action has no outputs.
           </div>
         </div>
-        <button mat-button color="primary" (click)="addIO('output')" class="add-io">
-          <mat-icon>add_circle</mat-icon> New Output
-        </button>
       </mat-tab>
       <mat-tab label="Inputs">
+        <button mat-button color="primary" (click)="addIO('input')" class="add-io">
+          <mat-icon>add_circle</mat-icon> New Input
+        </button>
         <div dragula="expression-io" class="inputtables io-container">
           <div
             class="io-and-button"
@@ -164,13 +167,11 @@
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <div *ngIf="openAction.inputSettings.length === 0" class="no-drag">
+          <div *ngIf="openAction.inputSettings.length === 0"
+            class="no-drag" class="no-inputs-hint">
             This action has no inputs.
           </div>
         </div>
-        <button mat-button color="primary" (click)="addIO('input')" class="add-io">
-          <mat-icon>add_circle</mat-icon> New Input
-        </button>
       </mat-tab>
     </mat-tab-group>
   </app-floating-menu>

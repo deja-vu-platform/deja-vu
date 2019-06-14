@@ -1,6 +1,7 @@
 .floating-menu {
   display: flex;
   flex-direction: column;
+  min-width: 256px;
 }
 
 .top-bar {

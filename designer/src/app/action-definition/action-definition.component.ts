@@ -279,6 +279,11 @@ implements AfterViewInit, OnChanges, OnInit {
       .splice(rowNum, 1);
   }
 
+  deleteAction(rowNum: number, actionNum: number) {
+    (<AppActionDefinition> this.actionInstance.of).rows[rowNum]
+      .actions.splice(actionNum, 1);
+  }
+
   /**
    * Update references to show in the UI
    * Allocate colors to referenced parent inputs / sibling outputs
