@@ -195,13 +195,15 @@ export class TopBarComponent {
         throw error;
       }
       this.load.emit(data);
+      // reset file input so that the user can reload the same project
+      this.fileInput.nativeElement.value = '';
     });
   }
 
-  private openBrowser = (
+  private openBrowser(
     file: File,
     callback: (error: any, data: string) => void
-  ) => {
+  ) {
     const reader = new FileReader();
     reader.onloadend = () => callback(null, <string>reader.result);
     reader.readAsText(file);
