@@ -39,7 +39,7 @@ $action-input-padding: 4px;
     height: 100%;
   }
 
-  // center content 
+  // center content
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,17 +62,6 @@ $action-input-padding: 4px;
     &:focus {
       outline: 0;
     }
-  }
-}
-
-.edit-text {
-  width: 100%;
-  padding-left: 0;
-  text-align: left;
-  font-weight: normal;
-  font-size: 16px;
-  .name {
-    color: #757575;
   }
 }
 
