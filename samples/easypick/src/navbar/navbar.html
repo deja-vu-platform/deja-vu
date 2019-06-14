@@ -10,7 +10,7 @@
     <div class="container-fluid">
 
       <div class="navbar-header">
-        <dv.link class="sweet-spots-heading navbar-brand" href="/">
+        <dv.link class="easypick-heading navbar-brand" href="/">
           EasyPick
         </dv.link>
       </div>
@@ -29,27 +29,22 @@
             </dv.link>
             &nbsp;
             <dv.tx>
-              <authentication.sign-out class="btn btn-danger"
+              <authentication.sign-out id="navbar-logout" class="btn btn-danger"
                 buttonLabel="Logout"/>
               <dv.link href="/login" hidden=true />
             </dv.tx>
           </div>
         </div>
-        <p class="navbar-text navbar-right inline-block">
-          Hello, <authentication.show-user class="inline-block"
-            user=authentication.logged-in.user
-            showId=false />! &nbsp;
-        </p>
       </dv.if>
 
       <dv.if condition=!authentication.logged-in.user>
         <div class="form-inline navbar-right">
           <div class="btn-toolbar toolbar">
-            <dv.link href="/login" class="mat-button btn btn-primary login-btn">
+            <dv.link href="/login" class="mat-button btn btn-info login-btn">
               Login
             </dv.link>
             &nbsp;
-            <dv.link href="/register" class="mat-button btn btn-info register-btn">
+            <dv.link href="/signup" class="mat-button btn btn-info register-btn">
               Register
             </dv.link>
           </div>

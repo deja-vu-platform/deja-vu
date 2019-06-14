@@ -6,26 +6,11 @@
     </dv.if>
 
     <dv.if condition= easypick.navbar.loggedInUserId>
-    	<div> 
-    		Input Your Feedback!
-    	</div>
-    	<div>
-    		<property.choose-object showOnly=["classNumber","className"]/>
-    		<dv.tx>
-    			<dv.status savedText="New feedback saved!"/>
-    			<rating.rate-target 
-    				sourceId=easypick.navbar.loggedInUserId 
-    				targetId=property.choose-object.selectedObjectId  
-    				execOnClick=false 
-    			/>
-    			<comment.create-comment 
-    				authorId=easypick.navbar.loggedInUserId 
-    				targetId=property.choose-object.selectedObjectId
-    				showOptionToSubmit=false
-    			/>
-    			<dv.button class="btn btn-primary">Submit Feedback</dv.button>
-    		</dv.tx>
-    	</div>
+      <userProfile.show-object id=easypick.navbar.loggedInUserId />
+    	<dv.link href="/feedback" class="btn btn-primary" params={ userId:easypick.navbar.loggedInUserId } >
+              Write Your Review!
+      </dv.link>
+      <easypick.show-reviews />
 		</dv.if>
 
   </div>

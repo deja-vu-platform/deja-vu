@@ -4,5 +4,47 @@ p.navbar-text {
 }
 
 #nav-bar {
-  background-color: #f62459 !important;
+  background-color: #44a6f2 !important;
+}
+
+
+.navbar, .navbar-brand {
+    font-size: 24px;
+    font-weight: bolder;
+    line-height: 28px;
+}
+
+.navbar-brand {
+    background-image: url("/resources/logo_white.png");
+    background-size: 40px 40px;
+    background-position: 35px 7px;
+    background-repeat: no-repeat;
+    padding-left: 80px;
+    height: 60px;
+}
+
+.navbar-brand:hover {
+    background-image: url("/resources/logo_dark.png");
+}
+
+.navbar-nav li {
+    margin: auto 20px;
+}
+
+#navbar-logout {
+    height: 50px;
+    background-color: #44a6f2;
+    font-size: 18px;
+    line-height: 18px;
+    border-radius: 24px;
+    border: 2px solid white;
+    margin-top: 8px;
+    color: white;
+    transition: all 250ms ease;
+}
+
+#navbar-logout:hover {
+    background-color: white;
+    border: 2px solid #44a6f2;
+    color: #44a6f2;
 }
