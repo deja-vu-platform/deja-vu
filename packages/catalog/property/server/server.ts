@@ -181,7 +181,6 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return _.get(obj, '_pending') ? null : obj;
       },
       objects: async (_root, { fields }) => { 
-        console.log(fields);
         return objects.find(fields);
       },
       properties: (_root) => _
