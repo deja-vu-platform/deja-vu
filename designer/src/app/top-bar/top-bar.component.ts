@@ -41,6 +41,7 @@ export class TopBarComponent {
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
   @Output() readonly preview = new EventEmitter<void>();
+  @Output() readonly showIoHintChange = new EventEmitter<boolean>();
   @ViewChild('fileInput') readonly fileInput: ElementRef;
   @ViewChild('directoryInput') readonly directoryInput: ElementRef;
   @ViewChild('downloadAnchor') readonly downloadAnchor: ElementRef;
@@ -242,5 +243,9 @@ export class TopBarComponent {
   addOutput(output: IO, event: CustomEvent) {
     output.value = event.detail.output;
     // TODO: append once that is actually supported
+  }
+
+  ioHintChange(checkedEvt) {
+    this.showIoHintChange.emit(checkedEvt.checked);
   }
 }

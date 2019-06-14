@@ -32,6 +32,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
   openActionInstance: ActionInstance;
   previewMode = false;
   dragging = false;
+  showIoHints = false;
 
   private _openAction: AppActionDefinition;
   private nextPort = 3002;

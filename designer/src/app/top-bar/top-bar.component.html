@@ -44,6 +44,11 @@
       <mat-icon>compare_arrows</mat-icon>
     </button>
   </div>
+  <div class="toolbar-io-hints">
+    <mat-checkbox (change)="ioHintChange($event)">
+      Show I/O Hints
+    </mat-checkbox>
+  </div>
 
   <div class="toolbar-app-name">
     <mat-form-field>

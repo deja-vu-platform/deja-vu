@@ -118,6 +118,7 @@
           <div
             class="ref-indicator input-ref-indicator hide-on-drag"
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
+            [hidden]="!showIoHints"
             [ngStyle]="{
               'grid-row': 1 + refNum,
               color: color(ioRef.action, ioRef.ioName)
@@ -134,7 +135,9 @@
               color: color(action, ioRef.ioName)
             }"
           >
-            <div class="ref-io-name">{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
+          <div class="ref-io-name"
+            [hidden]="!showIoHints"
+            >{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
           </div>
         </div>
       </div>
@@ -168,7 +171,7 @@
       </app-floating-menu>
     </div>
   </div>
-  <div class="parent-refs">
+  <div *ngIf="showIoHints" class="parent-refs">
     <div
       class="ref-indicator input-ref-indicator hide-on-drag"
       *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"

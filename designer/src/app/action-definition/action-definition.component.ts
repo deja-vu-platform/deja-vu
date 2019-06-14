@@ -81,6 +81,7 @@ implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
   @Input() actionInstance: ActionInstance;
   @Input() dragging = false;
+  @Input() showIoHints = false;
 
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
