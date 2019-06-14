@@ -84,7 +84,26 @@
         "reinitDbOnStartup": true
       }
     },
-    "rating": {
+    "paceReasonable": {
+      "name": "rating",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "gradingFair": {
+      "name": "rating",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "contentsManageable": {
+      "name": "rating",
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "overallRating": {
+      "name": "rating",
       "config": {
         "reinitDbOnStartup": true
       }
@@ -92,9 +111,10 @@
   },
   "routes": [
     { "path": "", "action": "main" },
-    { "path": "login", "action": "login"},
-    { "path": "signup", "action": "signup"},
-    { "path": "search", "action": "search"},
-    { "path": "add-user-profile", "action": "add-user-profile"}
+    { "path": "login", "action": "login" },
+    { "path": "signup", "action": "signup" },
+    { "path": "search", "action": "search" },
+    { "path": "add-user-profile", "action": "add-user-profile" },
+    { "path": "feedback", "action": "feedback" }
   ]
 }

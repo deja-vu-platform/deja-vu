@@ -1,0 +1,52 @@
+<dv.action name="feedback">
+	<easypick.navbar accessRequired=true/>
+	<div> 
+		Input Your Review!
+	</div>
+	<div>
+		<class.choose-object showOnly=["classNumber","className"]/>
+		<dv.tx>
+			<dv.gen-id />
+			<dv.status savedText="New feedback saved!"/>
+			<p> Pace is reasonable </p>
+			<paceReasonable.rate-target 
+				id=dv.gen-id.id
+				sourceId=$userId
+				targetId=class.choose-object.selectedObjectId  
+				execOnClick=false 
+			/>
+
+			<p> Grading is fair </p>
+			<gradingFair.rate-target 
+				id=dv.gen-id.id
+				sourceId=$userId
+				targetId=class.choose-object.selectedObjectId  
+				execOnClick=false 
+			/>
+
+			<p> Contents are interesting </p>
+			<contentsManageable.rate-target 
+				id=dv.gen-id.id
+				sourceId=$userId
+				targetId=class.choose-object.selectedObjectId  
+				execOnClick=false 
+			/>
+
+			<p> Overall, it is a good class </p>
+			<overallRating.rate-target
+				id=dv.gen-id.id 
+				sourceId=$userId
+				targetId=class.choose-object.selectedObjectId  
+				execOnClick=false 
+			/>
+			<comment.create-comment 
+				id=dv.gen-id.id
+				authorId=$userId 
+				targetId=class.choose-object.selectedObjectId
+				showOptionToSubmit=false
+			/>
+			<dv.button class="btn btn-primary">Submit Feedback</dv.button>
+		</dv.tx>
+	</div>
+
+</dv.action>

@@ -1,6 +1,14 @@
 <dv.action name="show-class">
 	<div id="left-main-div">
 		<class.show-object id=$class.id/>
+		<a> Pace </a>
+		<paceReasonable.show-average-rating targetId=$class.id  />
+		<a> Grading </a>
+		<gradingFair.show-average-rating targetId=$class.id  />
+		<a> Contents </a>
+		<contentsManageable.show-average-rating targetId=$class.id  />
+		<a> Overall </a>
+		<overallRating.show-average-rating targetId=$class.id  />
 		<comment.show-comments 
 			ofTargetId=$class.id 
 			showId=false 
@@ -8,6 +16,5 @@
 			showTargetId=false 
 			noCommentsToShowText=""
 			/>
-		<rating.show-average-rating targetId=$class.id  />
 	</div>
 </dv.action>
