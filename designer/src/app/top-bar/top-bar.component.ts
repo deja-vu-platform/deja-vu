@@ -271,4 +271,13 @@ export class TopBarComponent {
       return 'note';
     }
   }
+
+  help() {
+    if (this.electronService.remote) {
+      this.electronService.shell
+        .openExternal(
+          'https://github.com/spderosso/deja-vu/blob/master/' +
+          'designer/tutorial.md');
+    }
+  }
 }
