@@ -26,6 +26,12 @@
 .logo-designer {
 }
 
+.create-action-button {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 12px;
+}
+
 .toolbar-app-action {
   padding-top: 20px;
 }
@@ -95,4 +101,5 @@ mat-tab-group {
   vertical-align: sub;
   font-size: 12px;
   margin-right: 10px;
+  margin-left: -5px;
 }

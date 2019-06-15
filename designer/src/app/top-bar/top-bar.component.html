@@ -3,15 +3,14 @@
     <div class="logo-dv">Déjà Vu</div>
     <div class="logo-designer">Designer</div>
   </div>
+  <button
+    class="create-action-button"
+    mat-button color="primary"
+    (click)="createAction()"
+   >
+    <mat-icon>add_circle</mat-icon> New Action
+   </button>
   <div class="toolbar-app-action">
-    <button
-      mat-icon-button
-      class="mat-small"
-      matTooltip="New Action"
-      (click)="createAction()"
-    >
-      <mat-icon>add_circle</mat-icon>
-    </button>
     <mat-form-field>
       <mat-select
         name="action"
