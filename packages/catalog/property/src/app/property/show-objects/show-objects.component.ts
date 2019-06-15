@@ -47,9 +47,8 @@ OnChanges {
    */
   @Input() showOnly: string[];
   /**
-   * input object type: fieldName: fieldValue
-   * will return only the objects with its fieldName matching fieldValue
-   * currently, number of fields is restricted to one
+   * input object type:{ fieldName: fieldValue }
+   * will return only the objects with its fieldNames matching the fieldValues
    */
   @Input() fieldMatching: Object;
   /**

@@ -116,11 +116,11 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
         (requiredProperties.has(propertyName) ? '!' : '');
     })
     .value();
-    const joinedProperties = properties.join('\n');
+  const joinedProperties = properties.join('\n');
 
-    // Similar as properties, but it doesn't mark any field as required
-    // this is used as a filter mechanism where not all fields must present
-    const nonRequiredProperties = _
+  // Similar as properties, but it doesn't mark any field as required
+  // this is used as a filter mechanism where not all fields must present
+  const nonRequiredProperties = _
     .chain(config.schema.properties)
     .toPairs()
     .map(([propertyName, schemaPropertyObject]) => {
@@ -128,7 +128,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
         jsonSchemaTypeToGraphQlType[schemaPropertyObject.type]
     })
     .value();
-    const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
+  const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
   return [`
     type Object {
