@@ -85,4 +85,12 @@ mat-tab-group {
 .action-icon {
   margin-bottom: 5px;
   color: rgba(0, 0, 0, 0.54);
+  margin-right: 0px !important;
+}
+
+.tx-hint {
+  color: rgba(0, 0, 0, 0.54);
+  vertical-align: sub;
+  font-size: 12px;
+  margin-right: 10px;
 }

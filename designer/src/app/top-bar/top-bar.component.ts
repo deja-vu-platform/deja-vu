@@ -261,6 +261,10 @@ export class TopBarComponent {
     this.showIoHintChange.emit(checkedEvt.checked);
   }
 
+  isTx(action: AppActionDefinition): boolean {
+    return action.transaction;
+  }
+
   getActionIcon(action: AppActionDefinition):
   'home' | 'insert_drive_file' | 'note' {
     if (action.name === this.app.homepage.name) {

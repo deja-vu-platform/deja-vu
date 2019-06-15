@@ -26,8 +26,12 @@
           *ngFor="let action of app.actions"
           [value]="action"
         >
-        <mat-icon class="action-icon">{{getActionIcon(action)}}</mat-icon>
-        {{action.name}}
+          <mat-icon class="action-icon">{{getActionIcon(action)}}</mat-icon>
+          <span class="tx-hint"
+            [style.visibility]="isTx(action) ? 'visible' : 'hidden'">
+            tx
+          </span>
+          {{action.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
