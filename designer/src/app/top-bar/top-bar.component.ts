@@ -37,7 +37,16 @@ const SNACKBAR_DURATION = 2500;
   styleUrls: ['./top-bar.component.scss']
 })
 export class TopBarComponent {
-  @Input() readonly app: App;
+  private _app: App;
+  private appPages;
+  @Input()
+  set app(app: App) {
+    this._app = app;
+    this.appPages = new Set<string>(_.map(this.app.pages, 'name'));
+  }
+  get app(): App {
+    return this._app;
+  }
   @Input() readonly openAction: AppActionDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
   @Output() readonly preview = new EventEmitter<void>();
@@ -51,6 +60,7 @@ export class TopBarComponent {
   saving = false;
   exporting = false;
   opening = false;
+
 
   constructor(
     private readonly electronService: ElectronService,
@@ -249,5 +259,16 @@ export class TopBarComponent {
 
   ioHintChange(checkedEvt) {
     this.showIoHintChange.emit(checkedEvt.checked);
+  }
+
+  getActionIcon(action: AppActionDefinition):
+  'home' | 'insert_drive_file' | 'note' {
+    if (action.name === this.app.homepage.name) {
+      return 'home';
+    } else if (this.appPages.has(action.name)) {
+      return 'insert_drive_file';
+    } else {
+      return 'note';
+    }
   }
 }

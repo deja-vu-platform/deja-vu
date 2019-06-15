@@ -19,11 +19,15 @@
         [(ngModel)]="openAction"
         (selectionChange)="onSelectAction($event)"
       >
+        <mat-select-trigger>
+          {{openAction.name}}
+        </mat-select-trigger>
         <mat-option
           *ngFor="let action of app.actions"
           [value]="action"
         >
-          {{action.name}}
+        <mat-icon class="action-icon">{{getActionIcon(action)}}</mat-icon>
+        {{action.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
