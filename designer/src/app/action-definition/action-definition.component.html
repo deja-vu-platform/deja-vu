@@ -59,6 +59,7 @@
         >
           <div
             #instanceContainer
+            class="instance-container"
             [ngStyle]="{
               'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
             }"
@@ -79,6 +80,15 @@
               Hidden: {{action.fqtag}}
             </div>
             <div class="instance-container-buttons">
+              <button
+                *ngIf="action.isAppAction"
+                mat-icon-button
+                class="mat-small"
+                (click)="editAction(action)"
+                matTooltip="Edit Action"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
               <button
                 mat-icon-button
                 class="mat-small"

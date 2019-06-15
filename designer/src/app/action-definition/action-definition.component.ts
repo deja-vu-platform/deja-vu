@@ -11,6 +11,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { MatMenuTrigger, MatTabGroup } from '@angular/material';
+import { Router } from '@angular/router';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 import * as tinycolor from 'tinycolor2';
@@ -99,7 +100,9 @@ implements AfterViewInit, OnChanges, OnInit {
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
 
-  constructor(private elem: ElementRef, private rs: RunService) { }
+  constructor(
+    private elem: ElementRef, private rs: RunService,
+    private readonly router: Router) { }
 
   ngOnChanges() {
     const action = this.actionInstance.of as AppActionDefinition;
@@ -278,6 +281,10 @@ implements AfterViewInit, OnChanges, OnInit {
       (<AppActionDefinition> this.actionInstance.of).rows
         .splice(rowNum, 1);
     }
+  }
+
+  editAction(action: ActionInstance) {
+    this.router.navigateByUrl('/' + action.of.name);
   }
 
   deleteAction(rowNum: number, actionNum: number) {
