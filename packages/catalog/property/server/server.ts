@@ -89,7 +89,20 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'show-objects': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo)
+  'show-objects': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'properties':
+        return loadSchemaQuery(extraInfo);
+      case 'objects':
+        return `
+          query ShowObjects($fields: FieldMatchingInput) {
+            objects(fields: $fields) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('Need to specify extraInfo.action');
+    }
+  }
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -103,8 +116,19 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
         (requiredProperties.has(propertyName) ? '!' : '');
     })
     .value();
-
   const joinedProperties = properties.join('\n');
+
+  // Similar as properties, but it doesn't mark any field as required
+  // this is used as a filter mechanism where not all fields must present
+  const nonRequiredProperties = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .map(([propertyName, schemaPropertyObject]) => {
+      return `${propertyName}: ` +
+        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type]
+    })
+    .value();
+  const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
   return [`
     type Object {
@@ -115,6 +139,11 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     input CreateObjectInput {
       id: ID
       ${joinedProperties}
+    }
+
+    input FieldMatchingInput {
+      id: ID
+      ${joinedNonRequiredProperties}
     }
   `];
 }
@@ -151,7 +180,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: (_root) => objects.find(),
+      objects: async (_root, { fields }) => { 
+        return objects.find(fields);
+      },
       properties: (_root) => _
         .chain(config['schema'].properties)
         .toPairs()
