@@ -124,6 +124,10 @@
                   </app-set-inputs>
                 </mat-tab>
                 <mat-tab label="Outputs">
+                  <div *ngIf="action.of.outputs.length > 0"
+                    class="use-outputs-hint">
+                    Drag an output into an input textbox to use it
+                  </div>
                   <div dragula="expression-io" class="inputtables">
                     <div
                       *ngFor="let output of action.of.outputs"

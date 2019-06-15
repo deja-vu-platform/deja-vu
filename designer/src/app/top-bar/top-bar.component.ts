@@ -116,10 +116,14 @@ export class TopBarComponent {
     const designerSave = JSON.stringify(this.app, null, 2);
     this.saveBrowser(designerSave, (error) => {
       this.saving = false;
-      this.showSnackBar(error ?
-        'Save failed.' :
-        'Your work has been saved.'
-      );
+      if (!this.electronService.remote) {
+        // tmp hack: not show the snackbar on electron because it appears before
+        // the file is actually saved
+        this.showSnackBar(error ?
+          'Save failed.' :
+          'Your work has been saved.'
+        );
+      }
       if (error) { throw error; }
     });
   }
