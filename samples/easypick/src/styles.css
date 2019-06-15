@@ -8,6 +8,13 @@
 md-icon {
   font-family: 'Material Icons' !important;
 }
+.center-column {
+  margin: 30px 70px;
+}
+
+.individual-card {
+  margin: 10px 0;
+}
 
 .inline-block {
   display: inline-block;

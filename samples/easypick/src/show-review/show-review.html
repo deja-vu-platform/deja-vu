@@ -1,9 +1,36 @@
-<dv.action name="show-review">
+<dv.action name="show-review" >
+	<class.show-object id=$review.targetId />
 	<reviewHeader.show-object 
 		id=$review.id 
 		showOnly=["year","term"]
 	/>
+	<a> Pace: </a>
+	<paceReasonable.show-rating 
+		sourceId=$review.sourceId
+		targetId=$review.targetId
+	/>
+	<a> Grading: </a>
+	<gradingFair.show-rating 
+		sourceId=$review.sourceId
+		targetId=$review.targetId
+	/>
+	<a> Contents: </a>
+	<contentsManageable.show-rating 
+		sourceId=$review.sourceId
+		targetId=$review.targetId
+	/>
+	<a> Overall: </a>
 	<overallRating.show-rating 
-		ratingIn=$review.id
+		sourceId=$review.sourceId
+		targetId=$review.targetId
+	/>
+	<a> Your Comments: </a>
+	<comment.show-comments 
+		byAuthorId=$review.sourceId
+		ofTargetId=$review.targetId
+		showId=false
+		showAuthorId=false
+		showTargetId=false
+		showContent=true
 	/>
 </dv.action>
