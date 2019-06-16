@@ -16,6 +16,7 @@ import {
   MatSelectChange
 } from '@angular/material';
 import * as _ from 'lodash';
+import { ElectronService } from 'ngx-electron';
 import { Subscribable } from 'rxjs/Observable';
 import { AnonymousSubscription } from 'rxjs/Subscription';
 
@@ -82,6 +83,7 @@ export class ConfigureClicheComponent implements OnInit {
   sub: AnonymousSubscription;
 
   constructor(
+    private readonly electronService: ElectronService,
     private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData,
     private readonly componentFactoryResolver: ComponentFactoryResolver,
@@ -155,6 +157,15 @@ export class ConfigureClicheComponent implements OnInit {
     )) {
       this.data.app.deleteClicheInstance(this.data.cliche);
       this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
+    }
+  }
+
+  help() {
+    if (this.electronService.remote) {
+      this.electronService.shell
+        .openExternal(
+          'https://github.com/spderosso/deja-vu/blob/master/packages/' +
+          'catalog/README.md');
     }
   }
 

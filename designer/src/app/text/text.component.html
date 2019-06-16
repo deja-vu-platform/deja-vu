@@ -3,6 +3,7 @@
   [theme]="readOnly ? 'bubble' : 'snow'"
   [ngModel]="actionInstance.data"
   [modules]="modules"
+  [placeholder]="'Set the content from the I/O menu'"
   (onContentChanged)="onContentChanged($event)"
   [readOnly]="readOnly"
 ></quill-editor>

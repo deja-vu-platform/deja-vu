@@ -25,7 +25,15 @@
           {{clicheDefinition.name}}
         </mat-option>
       </mat-select>
-      <mat-hint>The type of this cliché instance</mat-hint>
+      <button
+        mat-icon-button
+        matSuffix
+        class="mat-small"
+        matTooltip="Help"
+        (click)="help()">
+        <mat-icon>help</mat-icon>
+      </button>
+      <mat-hint>The cliché to instantiate</mat-hint>
     </mat-form-field>
 
     <mat-form-field>
