@@ -107,6 +107,30 @@
       "config": {
         "reinitDbOnStartup": true
       }
+    },
+    "reviewInfo": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Review",
+          "type": "object",
+          "properties": {
+            "sourceId": {
+              "type": "string"
+            },
+            "targetId": {
+              "type": "string"
+            },
+            "term": {
+              "type": "string"
+            },
+            "year": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "routes": [
