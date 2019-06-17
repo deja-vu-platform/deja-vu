@@ -15,21 +15,38 @@
       class="row-container"
       [ngClass]="{ 'no-drag': rowNum == rows.length - 1 }"
       [attr.data-index]="rowNum"
+      (mouseenter)="row.hover = true"
+      (mouseleave)="row.hover = false"
     >
-      <div class="row-control handle">
+      <div class="row-control"
+        [ngClass]="(row.hover && !dragging) ? '' : 'hide-row'">
         <button
-          mat-button
-          class="mat-small handle"
+          mat-icon-button
+          class="mat-small"
           #rowMenuTrigger="matMenuTrigger"
           [matMenuTriggerFor]="rowMenu.matMenu"
           (contextmenu)="openMenu(rowMenuTrigger)"
         >
-          <mat-icon class="handle">drag_handle</mat-icon>
+          <mat-icon>palette</mat-icon>
         </button>
+        <button
+          mat-icon-button
+          class="mat-small"
+          (click)="deleteRow(rowNum)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-icon
+          [ngClass]="(row.hover && !dragging) ? 'grab' : ''"
+          class="handle">
+          drag_handle
+        </mat-icon>
       </div>
       <div
         class="dvd-row no-drag"
-        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign,
+        (row.hover && !dragging && rowNum < rows.length - 1) ?
+          'hover-row' : '-row']"
         dragula="action"
         [attr.data-index]="rowNum"
         [ngStyle]="actionInstance.of.styles"
@@ -43,9 +60,6 @@
           <div
             #instanceContainer
             class="instance-container"
-            #actionMenuTrigger="matMenuTrigger"
-            [matMenuTriggerFor]="actionMenu.matMenu"
-            (contextmenu)="openMenu(actionMenuTrigger)"
             [ngStyle]="{
               'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
             }"
@@ -65,6 +79,34 @@
             <div *ngIf="action.showHiddenHint" class="hint">
               Hidden: {{action.fqtag}}
             </div>
+            <div class="instance-container-buttons">
+              <button
+                *ngIf="action.isAppAction"
+                mat-icon-button
+                class="mat-small"
+                (click)="editAction(action)"
+                matTooltip="Edit Action"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="mat-small"
+                #actionMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="actionMenu.matMenu"
+                matTooltip="Set Inputs/Outputs of Action"
+              >
+                <mat-icon>swap_horiz</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="mat-small"
+                (click)="deleteAction(rowNum, actionNum)"
+                matTooltip="Delete Action"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
             <app-floating-menu
               #actionMenu
               [title]="action.fqtag"
@@ -82,6 +124,10 @@
                   </app-set-inputs>
                 </mat-tab>
                 <mat-tab label="Outputs">
+                  <div *ngIf="action.of.outputs.length > 0"
+                    class="use-outputs-hint">
+                    Drag an output into an input textbox to use it
+                  </div>
                   <div dragula="expression-io" class="inputtables">
                     <div
                       *ngFor="let output of action.of.outputs"
@@ -101,6 +147,7 @@
           <div
             class="ref-indicator input-ref-indicator hide-on-drag"
             *ngFor="let ioRef of ioReferences(action); let refNum = index"
+            [hidden]="!showIoHints"
             [ngStyle]="{
               'grid-row': 1 + refNum,
               color: color(ioRef.action, ioRef.ioName)
@@ -117,7 +164,9 @@
               color: color(action, ioRef.ioName)
             }"
           >
-            <div class="ref-io-name">{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
+          <div class="ref-io-name"
+            [hidden]="!showIoHints"
+            >{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
           </div>
         </div>
       </div>
@@ -151,7 +200,7 @@
       </app-floating-menu>
     </div>
   </div>
-  <div class="parent-refs">
+  <div *ngIf="showIoHints" class="parent-refs">
     <div
       class="ref-indicator input-ref-indicator hide-on-drag"
       *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"

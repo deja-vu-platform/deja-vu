@@ -5,12 +5,15 @@
       [openAction]="openAction"
       (load)="load($event)"
       (preview)="showPreview()"
-    ></app-top-bar>
+      (showIoHintChange)="showIoHints=$event"
+      ></app-top-bar>
     <div class="grow scroll">
       <app-action-definition
         class="grow"
         [actionInstance]="openActionInstance"
         [app]="app"
+        [dragging]="dragging"
+        [showIoHints]="showIoHints"
       >
       </app-action-definition>
     </div>

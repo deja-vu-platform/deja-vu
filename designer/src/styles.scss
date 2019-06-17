@@ -24,6 +24,11 @@ button.mat-small-y {
   line-height: 100%;
 }
 
+// add hover for mat-icon butttons
+.mat-icon-button:hover {
+  background-color: silver;
+}
+
 /* styles for custom quill buttons (don't have component) */
 .ql-bubble .ql-toolbar button:hover .text-button-text {
   color: white;
@@ -36,7 +41,7 @@ button.mat-small-y {
 }
 
 .floating-menu {
-  .mat-tab-label, .mat-tab-label-active{
+  .mat-tab-label, .mat-tab-label-active {
     min-width: 0 !important;
     padding: 0 !important;
     margin: 0 !important;

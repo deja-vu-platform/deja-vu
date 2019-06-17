@@ -28,9 +28,11 @@ import {
   viewProviders: [DragulaService]
 })
 export class DesignerComponent implements OnInit, OnDestroy {
-  app = new App('newapp');
+  app = new App('myapp');
   openActionInstance: ActionInstance;
   previewMode = false;
+  dragging = false;
+  showIoHints = false;
 
   private _openAction: AppActionDefinition;
   private nextPort = 3002;
@@ -50,6 +52,14 @@ export class DesignerComponent implements OnInit, OnDestroy {
     this.openAction = this.app.homepage;
     window['dv-designer'] = true; // alters how cliche server finds actions
     this.configureDragula(); // dragula needs to be configured at the top level
+    this.dragulaService.drag()
+      .subscribe(() => {
+        this.dragging = true;
+      });
+    this.dragulaService.dragend()
+      .subscribe(() => {
+        this.dragging = false;
+      });
 
     // imports for addCliche
     if (this.electronService.remote) {
@@ -143,7 +153,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
       this.app = App.fromJSON(appJSON);
       this.app.cliches.forEach((cliche) => this.addCliche(cliche));
       this.openAction = this.app.homepage;
-      this.snackBar.open('Save has been loaded.', 'dismiss', {
+      this.snackBar.open('App has been loaded.', 'dismiss', {
         duration: 2500
       });
     });
@@ -173,9 +183,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         || (
           target.classList.contains('action-input')
           && source.classList.contains('action-list')
-        ),
-      // if you drag outside of a row the action gets removed
-      removeOnSpill: true
+        )
     });
 
     // this function is unfortunately kind of complicated
@@ -261,16 +269,6 @@ export class DesignerComponent implements OnInit, OnDestroy {
         }
         if (shouldRemoveCopy) {
           el.parentNode.removeChild(el); // delete copy that Dragula leaves
-        }
-      });
-
-    // handle dropping an action outside the page (remove it)
-    this.dragulaService.remove('action')
-      .subscribe(({ el, source }) => {
-        if (source.classList.contains('dvd-row')) {
-          const fromRowIdx = parseInt(source['dataset'].index, 10);
-          const actionIdx = parseInt(el['dataset'].index, 10);
-          this.openAction.rows[fromRowIdx].actions.splice(actionIdx, 1);
         }
       });
 

@@ -46,7 +46,7 @@
     "graphlib": "^2.1.7",
     "jquery": "^1.9.1",
     "lodash": "^4.17.5",
-    "moment": "^2.22.2",
+    "moment": "^2.22.1",
     "ng2-dragula": "^2.1.0",
     "ngx-electron": "^2.1.1",
     "ngx-quill": "^3.6.0",

@@ -1,26 +1,54 @@
 #top-bar {
   border-bottom: 1px solid black;
+  font-size: 16px;
+  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px;
 }
 
-#edit-action {
-  margin-right: 8px;
+.logo {
+  line-height: 1.2em;
+  background: black;
+  height: 65px;
+  color: white;
+  padding: 0;
+  margin: 0;
+  width: 100px;
+  padding-top: 12px;
+  padding-left: 16px;
 }
 
-#create-action {
-  width: 100%;
-  font-size: inherit;
-  /* consistent with other items in select */
-  line-height: 3em;
-  height: 3em;
-  text-align: left;
+.logo-dv {
+  font-weight: 200;
 }
 
-#create-action * {
-  font-size: inherit;
+.logo-designer {
 }
 
-.right {
-  margin-left: auto;
+.create-action-button {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 12px;
+}
+
+.toolbar-app-action {
+  padding-top: 20px;
+}
+
+.toolbar-app-name {
+  padding-top: 20px;
+}
+
+.toolbar-io-hints {
+  padding-top: 20px;
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
+.toolbar-io-hints mat-checkbox {
+  font-size: 16px;
+  font-weight: 400;
 }
 
 .io-container {
@@ -37,7 +65,7 @@
     }
     button {
       padding: 0;
-      // largest that works, emperically
+      // largest that works, empirically
       width: 44px;
       height: 44px;
     }
@@ -56,5 +84,22 @@ mat-tab-group {
 
 .popup-menu {
   height: 250px;
-  width: 256px; // chosen emperically
+}
+
+.no-inputs-hint {
+  height: inherit;
+}
+
+.action-icon {
+  margin-bottom: 5px;
+  color: rgba(0, 0, 0, 0.54);
+  margin-right: 0px !important;
+}
+
+.tx-hint {
+  color: rgba(0, 0, 0, 0.54);
+  vertical-align: sub;
+  font-size: 12px;
+  margin-right: 10px;
+  margin-left: -5px;
 }

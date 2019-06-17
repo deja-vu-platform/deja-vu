@@ -28,6 +28,9 @@ import {
 } from './add-app-action-io/add-app-action-io.component';
 import { AppComponent } from './app.component';
 import {
+  ClicheInstancesComponent
+} from './cliche-instances/cliche-instances.component';
+import {
   ConfigureActionComponent
 } from './configure-action/configure-action.component';
 import {
@@ -35,6 +38,7 @@ import {
 } from './configure-cliche/configure-cliche.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
+import { InsertActionComponent } from './insert-action/insert-action.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
@@ -56,10 +60,12 @@ ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
     ActionDefinitionComponent,
     ActionInstanceComponent,
     AppComponent,
+    ClicheInstancesComponent,
     ConfigureActionComponent,
     ConfigureClicheComponent,
     DesignerComponent,
     FloatingMenuComponent,
+    InsertActionComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,

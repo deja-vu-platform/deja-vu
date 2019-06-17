@@ -16,6 +16,7 @@ import {
   MatSelectChange
 } from '@angular/material';
 import * as _ from 'lodash';
+import { ElectronService } from 'ngx-electron';
 import { Subscribable } from 'rxjs/Observable';
 import { AnonymousSubscription } from 'rxjs/Subscription';
 
@@ -82,6 +83,7 @@ export class ConfigureClicheComponent implements OnInit {
   sub: AnonymousSubscription;
 
   constructor(
+    private readonly electronService: ElectronService,
     private readonly dialogRef: MatDialogRef<ConfigureClicheComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData,
     private readonly componentFactoryResolver: ComponentFactoryResolver,
@@ -149,16 +151,21 @@ export class ConfigureClicheComponent implements OnInit {
 
   delete() {
     if (window.confirm(
-      'Are you sure you want to remove this Cliché? ' +
-      'Any of its actions that you are using will be removed as well.'
+      'Are you sure you want to remove this cliché instance? ' +
+      'All of the actions of this cliché instance ' +
+      'that you are using will be removed as well.'
     )) {
-      this.data.app.actions.forEach((ad) => {
-        ad.rows.forEach((r) => {
-          _.remove(r.actions, (ai) => ai.from === this.data.cliche);
-        });
-      });
-      _.remove(this.data.app.cliches, (c) => c === this.data.cliche);
+      this.data.app.deleteClicheInstance(this.data.cliche);
       this.dialogRef.close({ event: 'delete', cliche: this.data.cliche });
+    }
+  }
+
+  help() {
+    if (this.electronService.remote) {
+      this.electronService.shell
+        .openExternal(
+          'https://github.com/spderosso/deja-vu/blob/master/packages/' +
+          'catalog/README.md');
     }
   }
 

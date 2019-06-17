@@ -1,23 +1,20 @@
 .floating-menu {
   display: flex;
   flex-direction: column;
+  min-width: 256px;
 }
 
 .top-bar {
   display: flex;
   border-bottom: 1px solid black;
-  button {
-    padding: 0;
-    font-size: 16px;
-    height: 24px;
-    width: 24px;
-  }
+  background: rgb(245, 245, 245);
   .handle {
     flex: 1;
-    background: lightgray;
     cursor: grab;
     display: flex;
     justify-content: center;
+    // account for the icon
+    margin-right: 24px;
     align-items: center;
     font-size: 90%;
   }

@@ -1,38 +1,15 @@
 <div id="side-menu">
-  <mat-accordion id="cliche-list" *ngIf="app">
-    <mat-expansion-panel *ngFor="let collection of app.actionCollections">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <button
-            mat-button
-            class="mat-small more"
-            *ngIf="collection.config"
-            (click)="$event.stopPropagation(); editCliche(collection);"
-            matTooltip="Configure Cliché"
-          >
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <span class="spacer" *ngIf="!collection.config"></span>
-          {{collection.name}}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <mat-list class="action-list" dragula="action">
-        <mat-list-item
-          *ngFor="let action of collection.actions"
-          [attr.data-source]="collection.name"
-          [attr.data-action]="action.name"
-          [attr.data-disabled]="disable(action)"
-          [matTooltip]="action.description"
-        >
-          {{action.name}}
-        </mat-list-item>
-      </mat-list>
-    </mat-expansion-panel>
-  </mat-accordion>
-  <button
-    mat-raised-button
-    id="import-cliche"
-    color="primary"
-    (click)="importCliche()"
-  >Import Cliché</button>
+  <mat-tab-group>
+    <mat-tab label="Actions">
+      <app-insert-action [app]="app" [openAction]="openAction">
+      </app-insert-action>
+    </mat-tab>
+    <mat-tab label="Clichés">
+      <app-cliche-instances
+        [app]="app"
+        (clicheAdded)="clicheAdded.emit($event)"
+        (clicheRemoved)="clicheRemoved.emit($event)">
+      </app-cliche-instances>
+    </mat-tab>
+  </mat-tab-group>
 </div>

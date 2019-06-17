@@ -11,6 +11,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { MatMenuTrigger, MatTabGroup } from '@angular/material';
+import { Router } from '@angular/router';
 import { RunService } from '@deja-vu/core';
 import * as _ from 'lodash';
 import * as tinycolor from 'tinycolor2';
@@ -80,6 +81,8 @@ export class ActionDefinitionComponent
 implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
   @Input() actionInstance: ActionInstance;
+  @Input() dragging = false;
+  @Input() showIoHints = false;
 
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
@@ -97,7 +100,9 @@ implements AfterViewInit, OnChanges, OnInit {
   private availableColors: Set<string> = new Set(COLORS);
   private colorAssignments: ColorAssignments = {};
 
-  constructor(private elem: ElementRef, private rs: RunService) { }
+  constructor(
+    private elem: ElementRef, private rs: RunService,
+    private readonly router: Router) { }
 
   ngOnChanges() {
     const action = this.actionInstance.of as AppActionDefinition;
@@ -120,14 +125,15 @@ implements AfterViewInit, OnChanges, OnInit {
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
       const instanceContainersArr = this.instanceContainers.toArray();
-      // if an action was removed we need to re-do the data layer
-      if (this.lastNumActions > instanceContainersArr.length) {
-        this.updateReferences();
-      }
-      this.lastNumActions = instanceContainersArr.length;
+
       // show the name of any action on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
+        // if an action was removed we need to re-do the data layer
+        if (this.lastNumActions > instanceContainersArr.length) {
+          this.updateReferences();
+        }
+        this.lastNumActions = instanceContainersArr.length;
         this.calcShowNoContentHint(instanceContainersArr);
         this.calcShowHiddenHint(instanceContainersArr);
       });
@@ -268,6 +274,24 @@ implements AfterViewInit, OnChanges, OnInit {
    */
   max(...numbers: number[]): number {
     return Math.max(...numbers);
+  }
+
+  deleteRow(rowNum: number): void {
+    if (window.confirm('Are you sure you want to remove this row?')) {
+      (<AppActionDefinition> this.actionInstance.of).rows
+        .splice(rowNum, 1);
+    }
+  }
+
+  editAction(action: ActionInstance) {
+    this.router.navigateByUrl('/' + action.of.name);
+  }
+
+  deleteAction(rowNum: number, actionNum: number) {
+    if (window.confirm('Are you sure you want to remove this action?')) {
+      (<AppActionDefinition> this.actionInstance.of).rows[rowNum]
+        .actions.splice(actionNum, 1);
+    }
   }
 
   /**

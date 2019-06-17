@@ -115,7 +115,7 @@
       ],
       "transaction": true,
       "styles": {
-        "backgroundColor": "white",
+        "backgroundColor": "transparent",
         "borderWidth": "0",
         "borderColor": "black",
         "borderStyle": "solid",

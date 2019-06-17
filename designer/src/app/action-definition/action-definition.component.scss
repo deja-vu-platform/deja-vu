@@ -50,11 +50,30 @@ $main-view-padding: 24px;
 .row-control {
   width: $row-control-width;
   button {
-    cursor: grab;
     padding: 0 4px;
-    height: 100%;
     width: 100%;
   }
+}
+
+.grab {
+  cursor: grab;
+}
+
+.hide-row {
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.hover-row {
+  box-shadow: 9px 0px 0px;
+}
+
+.handle {
+  margin-left: 4px;
+}
+
+.handle:active {
+  cursor: grabbing;
 }
 
 // the content on the page
@@ -91,6 +110,11 @@ $main-view-padding: 24px;
     border: 3px solid rgba(255,255,255,0);
     border-radius: 5px;
   }
+  .instance-container-buttons {
+    visibility: hidden;
+    display: flex;
+    justify-content: flex-end;
+  }
   .input-ref-indicator {
     grid-column: 1;
     justify-self: end;
@@ -108,12 +132,14 @@ $main-view-padding: 24px;
       // show bounds of action
       border-color:rgba(16, 219, 255, .5);
     }
+    .instance-container-buttons {
+      visibility: visible;
+    }
   }
 }
 
 .popup-menu {
   height: 250px;
-  width: 256px; // chosen emperically
   mat-form-field {
     width: 100%;
   }
@@ -160,4 +186,12 @@ mat-checkbox {
 .ref-io-name {
   -webkit-text-stroke-width: 0.4px;
   -webkit-text-stroke-color: var(--text-stroke-color);
+}
+
+.use-outputs-hint {
+  color: rgba(0, 0, 0, 0.54);
+  width: 200px;
+  margin: auto;
+  margin-top: 20px;
+  font-size: 75%;
 }

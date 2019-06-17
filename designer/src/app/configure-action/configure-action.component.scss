@@ -46,6 +46,36 @@ mat-checkbox {
     padding-right: 0;
   }
 }
+
 div.compound-input {
   display: flex;
+}
+
+.checkbox-hint {
+  font-size: 75%;
+  padding-bottom: 10px;
+}
+
+.presentation-headers-align .mat-expansion-panel-header-title,
+.presentation-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.presentation-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.presentation-panel {
+  margin-bottom: 5px !important;
+}
+
+.presentation-panel mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+.page-container {
+  display: flex;
+  justify-content: space-between;
 }

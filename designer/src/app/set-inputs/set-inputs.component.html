@@ -8,13 +8,9 @@
 
   <div *ngIf="actionInstance.isText" class="text-input mat-form-field">
     <button
-      mat-button
-      class="edit-text"
-      (click)="openTextEditor()"
-    >
-      <span class="value">
+      mat-button color="primary"
+      (click)="openTextEditor()">
         Edit Content
-      </span>
     </button>
   </div>
 

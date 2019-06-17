@@ -230,7 +230,7 @@ export const flexAlign = {
  */
 export class Row {
   readonly actions: ActionInstance[] = [];
-  hJust: keyof typeof flexJustify = 'fs';
+  hJust: keyof typeof flexJustify = 'c';
   vAlign: keyof typeof flexAlign = 's';
 
   constructor() {}
@@ -527,7 +527,7 @@ export class App {
 
   constructor(name: string) {
     this.name = name;
-    this.actions = [new AppActionDefinition('new-action-1')];
+    this.actions = [new AppActionDefinition('home')];
     this.pages = [...this.actions];
     this.homepage = this.pages[0];
     this._actionCollections.push(this);
@@ -656,6 +656,15 @@ export class App {
     return ofAction
       ? new ActionInstance(ofAction, fromSource)
       : undefined;
+  }
+
+  deleteClicheInstance(ci: ClicheInstance) {
+    this.actions.forEach((ad) => {
+      ad.rows.forEach((r) => {
+        _.remove(r.actions, (ai) => ai.from === ci);
+      });
+    });
+    _.remove(this.cliches, (c) => c === ci);
   }
 
   /**

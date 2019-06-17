@@ -1,0 +1,24 @@
+<mat-accordion *ngIf="app">
+  <mat-expansion-panel *ngFor="let collection of app.actionCollections">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{collection.name}}
+        <span class="collection-hint">
+          {{(collection.name === 'dv') ? '(built-in actions)' : ''}}
+          {{(collection.name === app.name) ? '(app actions)' : ''}}
+        </span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-list class="action-list" dragula="action">
+      <mat-list-item
+        *ngFor="let action of collection.actions"
+        [attr.data-source]="collection.name"
+        [attr.data-action]="action.name"
+        [attr.data-disabled]="disable(action)"
+        [matTooltip]="action.description"
+      >
+        {{action.name}}
+      </mat-list-item>
+    </mat-list>
+  </mat-expansion-panel>
+</mat-accordion>
