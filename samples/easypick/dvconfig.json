@@ -108,7 +108,7 @@
         "reinitDbOnStartup": true
       }
     },
-    "reviewHeader": {
+    "reviewInfo": {
       "name": "property",
       "config": {
         "reinitDbOnStartup": true,
