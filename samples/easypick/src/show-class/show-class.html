@@ -1,6 +1,6 @@
 <dv.action name="show-class">
 	<div class="individual-card">
-		<class.show-object id=$class.id/>
+		<class.show-object id=$class.id showOnly=["classNumber", "className"] />
 		<a> Pace </a>
 		<paceReasonable.show-average-rating targetId=$class.id  />
 		<a> Grading </a>
@@ -9,12 +9,12 @@
 		<contentsManageable.show-average-rating targetId=$class.id  />
 		<a> Overall </a>
 		<overallRating.show-average-rating targetId=$class.id  />
-		<comment.show-comments 
-			ofTargetId=$class.id 
-			showId=false 
-			showAuthorId=false 
-			showTargetId=false 
+		<comment.show-comments
+			ofTargetId=$class.id
+			showId=false
+			showAuthorId=false
+			showTargetId=false
 			noCommentsToShowText=""
-			/>
+			></comment.show-comments>
 	</div>
 </dv.action>

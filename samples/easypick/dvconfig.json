@@ -24,30 +24,62 @@
             },
             "className": {
               "type": "string"
+            },
+            "HASS": {
+              "type": "boolean"
+            },
+            "REST": {
+              "type": "boolean"
+            },
+            "CIH": {
+              "type": "boolean"
+            },
+            "CIHW": {
+              "type": "boolean"
             }
           },
-          "required": ["classNumber", "className"]
+          "required": ["classNumber", "className", "HASS", "REST", "CI-H", "CI-M"]
         },
       "initialObjects": [
           {
-            "classNumber": "6.046", 
-            "className": "Intermediate Algorithms"
+            "classNumber": "6.046",
+            "className": "Intermediate Algorithms",
+            "HASS": false,
+            "REST": false,
+            "CIH": false,
+            "CIHW": false
           },
           {
             "classNumber": "6.009",
-            "className": "Fundamentals In Programming"
+            "className": "Fundamentals In Programming",
+            "HASS": false,
+            "REST": false,
+            "CIH": false,
+            "CIHW": false
           },
           {
-            "classNumber": "6.036",
-            "className": "Intro to Machine Learning"
+            "classNumber": "6.172",
+            "className": "Performance Engineering",
+            "HASS": false,
+            "REST": true,
+            "CIH": false,
+            "CIHW": false
           },
           {
-            "classNumber": "6.858",
-            "className": "Computer System Security"
+            "classNumber": "24.900",
+            "className": "Intro to Linguistics",
+            "HASS": true,
+            "REST": false,
+            "CIH": true,
+            "CIHW": true
           },
           {
-            "classNumber": "6.828",
-            "className": "Operating System"
+            "classNumber": "6.01",
+            "className": "Intro to EECS",
+            "HASS": false,
+            "REST": true,
+            "CIH": false,
+            "CIHW": false
           }
         ]
       }
