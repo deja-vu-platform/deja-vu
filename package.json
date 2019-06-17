@@ -8,7 +8,7 @@
     "prepare": "yarn run package",
     "package": "lerna run package",
     "test": "lerna run test",
-    "clean": "lerna clean && rm -rf node_modules && lerna run clean",
+    "clean": "lerna clean && lerna run clean && rm -rf node_modules",
     "release": "lerna publish"
   },
   "devDependencies": {
