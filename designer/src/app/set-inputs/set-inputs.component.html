@@ -72,17 +72,26 @@
     </div>
   </div>
 
-  <mat-form-field *ngFor="let input of expressionInputs" class="expression-input">
-    <input
-      matInput
-      class="input-value"
-      [placeholder]="input"
-      [name]="input"
-      [(ngModel)]="actionInstance.inputSettings[input]"
-      dragula="expression-io"
-      (addOutput)="addOutput(input, $event)"
-      [attr.data-context]="context"
-      [matTooltip]="actionInstance.of.ioDescriptions[input]"
-    >
-  </mat-form-field>
+  <div *ngFor="let input of expressionInputs">
+    <mat-form-field  class="expression-input"
+      [ngClass]="errors[input] ? 'mat-form-field-invalid' : ''">
+      <input
+        matInput
+        class="input-value"
+        [placeholder]="input"
+        [name]="input"
+        [(ngModel)]="actionInstance.inputSettings[input]"
+        dragula="expression-io"
+        (addOutput)="addOutput(input, $event)"
+        (blur)="checkExpr(input, $event)"
+        [attr.data-context]="context"
+        [matTooltip]="actionInstance.of.ioDescriptions[input]"
+      >
+    </mat-form-field>
+    <div *ngIf="errors[input]" class="mat-error error-msg">
+      Invalid expression:
+      {{errors[input]}}
+    </div>
+  </div>
+
 </div>

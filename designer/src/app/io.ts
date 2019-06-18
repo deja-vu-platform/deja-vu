@@ -123,7 +123,16 @@ export class ChildScopeIO extends ScopeIO {
     toSubject: BehaviorSubject<any>,
     fromScope: ScopeIO
   ) {
-    const { names, evaluate } = compileDvExpr(dvExpression);
+    let compiledDvExpr;
+    try {
+      compiledDvExpr = compileDvExpr(dvExpression);
+    } catch (e) {
+      console.error(`Failed to compile ${dvExpression}`);
+      console.error(e);
+
+      return;
+    }
+    const { names, evaluate } = compiledDvExpr;
     const ngScope = {};
     const send = () => toSubject.next(evaluate(ngScope));
     names.forEach((refdName) => {

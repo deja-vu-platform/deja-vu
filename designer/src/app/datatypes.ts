@@ -62,7 +62,7 @@ export interface ClicheActionDefinition extends ActionDefinition {
 // tslint:disable-next-line interface-name
 export interface IO {
   name: string;
-  value: string; // default constant for input, epression for output
+  value: string; // default constant for input, expression for output
 }
 
 export interface InInput {

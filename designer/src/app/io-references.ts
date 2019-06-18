@@ -73,10 +73,21 @@ export default function findReferences(appActionInstance: ActionInstance) {
   const outReferences: OutReferences = {};
   appActionDefinition
     .getChildren(true)
-    .forEach((action) => {
+    .forEach((action: ActionInstance) => {
       action.walkInputs(true, (inputName, inputValue, ofAction, inInput) => {
         if (!_.isString(inputValue)) { return; }
-        const { names } = compileDvExpr(inputValue);
+          let compiledDvExpr;
+          try {
+            compiledDvExpr = compileDvExpr(inputValue);
+          } catch (e) {
+            console.error(
+              `Coulnd't find references for expression "${inputValue}",` +
+              `used in action "${action.of.name}" for input "${inputName}"`);
+            console.error(e);
+
+            return;
+          }
+        const { names } = compiledDvExpr;
         names.forEach((name) => {
           const { fromAction, ioName } = resolveName(
             name,

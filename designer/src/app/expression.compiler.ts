@@ -80,7 +80,11 @@ export default function compileDvExpr(dvExpr: string): {
   parsedExpr?: ohm.Dict
 } {
   if (!dvExpr) { return { names: [], evaluate: () => undefined }; }
-  const parsedExpr = semantics(grammar.match(dvExpr));
+  const match = grammar.match(dvExpr);
+  if (match.failed()) {
+    throw new Error(match.message);
+  }
+  const parsedExpr = semantics(match);
   const names: string[] = (parsedExpr.getNames() as string[])
     .map((name) => name
         .replace(/\?/g, '') // ignore elvis operator
