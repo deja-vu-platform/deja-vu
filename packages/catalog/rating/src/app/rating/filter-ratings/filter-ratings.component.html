@@ -1,0 +1,8 @@
+<div>
+  <div *ngFor="let minimumRating of minimumRatings">
+    <star-rating-comp [showHalfStars]="true" [rating]="minimumRating"
+                      [readOnly]="true" [starType]="'svg'">
+    </star-rating-comp>
+    <a> {{ minimumRating }} & up </a>
+  </div>
+</div>

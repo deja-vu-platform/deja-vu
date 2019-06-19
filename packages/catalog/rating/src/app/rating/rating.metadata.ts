@@ -33,6 +33,8 @@ import {
 export { DeleteRatingsComponent };
 import { DeleteRatingComponent } from './delete-rating/delete-rating.component';
 export { DeleteRatingComponent };
+import { FilterRatingsComponent } from './filter-ratings/filter-ratings.component';
+export { FilterRatingsComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 
@@ -43,7 +45,8 @@ import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
   ShowRatingsByTargetComponent, ShowRatingCountComponent,
-  DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent
+  DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent,
+  FilterRatingsComponent
 ];
 
 
