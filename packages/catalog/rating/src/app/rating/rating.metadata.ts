@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ModuleWithProviders } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule
+  MatButtonModule, MatFormFieldModule, MatInputModule, MatRadioModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -56,7 +56,7 @@ const metadata = {
     DvModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatButtonModule, MatInputModule, MatFormFieldModule, MatRadioModule,
     StarRatingModule.forRoot()
   ],
   declarations: allComponents,

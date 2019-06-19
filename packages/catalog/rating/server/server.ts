@@ -130,9 +130,9 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
         };
       },
 
-      findRatingsHigher: async (_root, { minimumRating: minimumRating }) => (
-        minimumRating ? ratings.find() : ratings.find( { rating: { $gte: minimumRating} } )
-      )
+      findRatingsHigher: async (_root, { input }) => ( !!input.minimumRating && input.minimumRating > 0 ?
+          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() )
+
     },
 
     Rating: {

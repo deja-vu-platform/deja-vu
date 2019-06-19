@@ -1,8 +1,14 @@
-<div>
-  <div *ngFor="let minimumRating of minimumRatings">
+<mat-radio-group aria-label="Filter Ratings"
+                 [(ngModel)]="selectedMinimumRating"
+                  (change)="updateSelected($event.value)">
+  <mat-radio-button *ngFor="let minimumRating of minimumRatings"
+                    [value]="minimumRating">
     <star-rating-comp [showHalfStars]="true" [rating]="minimumRating"
                       [readOnly]="true" [starType]="'svg'">
     </star-rating-comp>
     <a> {{ minimumRating }} & up </a>
-  </div>
-</div>
+    <br />
+  </mat-radio-button>
+
+  <div> {{selectedMinimumRating}} </div>
+</mat-radio-group>

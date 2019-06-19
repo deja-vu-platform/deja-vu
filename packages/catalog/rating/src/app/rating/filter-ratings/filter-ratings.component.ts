@@ -23,8 +23,8 @@ const RATING_VALUE_FOUR = 4;
   templateUrl: './filter-ratings.component.html',
   styleUrls: ['./filter-ratings.component.css']
 })
-export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
+  {
   /**
    * A list of minimumRatings that the user can filter with
    * Example:
@@ -32,6 +32,8 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit,
    */
   @Input() minimumRatings = [ RATING_VALUE_ONE, RATING_VALUE_TWO,
                               RATING_VALUE_THREE, RATING_VALUE_FOUR];
+  selectedMinimumRating: number;
+
   /**
    * The objects left after filtering
    */
@@ -57,10 +59,6 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit,
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
-  }
-
   async load() {
     if (!this.gs) {
       return;
@@ -75,6 +73,11 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit,
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
+            inputs: {
+              input: {
+                minimumRating: this.selectedMinimumRating
+              }
+            },
             extraInfo: {
               action: 'objects',
               returnFields: `
@@ -92,6 +95,11 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  updateSelected(newSelectedMinimumRating) {
+    this.selectedMinimumRating = newSelectedMinimumRating;
+    this.load();
   }
 
   private canEval(): boolean {
