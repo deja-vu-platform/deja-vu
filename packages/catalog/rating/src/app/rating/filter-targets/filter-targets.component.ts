@@ -16,8 +16,8 @@ const RATING_VALUE_THREE = 3;
 const RATING_VALUE_FOUR = 4;
 
 /**
- * Filter out ratings in a list of ratings that are
- * larger than (or equal to) certain number
+ * Filter rating targets so that only targets with average rating
+ * higher than certain number are left
  */
 @Component({
   selector: 'rating-filter-targets',
@@ -27,9 +27,9 @@ const RATING_VALUE_FOUR = 4;
 export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
 {
   /**
-   * A list of choices of minimumRatings that the user can filter with
+   * A list of choices of minimumAverageRatings that the user can filter with
    * Example:
-   *  if minimumRatings = [ 2, 3, 4.5 ]
+   *  if minimumAvgRatings = [ 2, 3, 4.5 ]
    *  then the html displayed will be:
    *    [ ] 2 & up
    *    [x] 3 & up
@@ -40,7 +40,7 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
   selectedMinimumAvgRating: number;
 
   /**
-   * The ratings left after filtering
+   * The targets left after filtering
    */
   @Output() loadedTargets = new EventEmitter<any>();
   _loadedTargets: Object[] = [];
