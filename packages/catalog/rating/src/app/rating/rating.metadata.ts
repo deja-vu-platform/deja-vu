@@ -35,6 +35,8 @@ import { DeleteRatingComponent } from './delete-rating/delete-rating.component';
 export { DeleteRatingComponent };
 import { FilterRatingsComponent } from './filter-ratings/filter-ratings.component';
 export { FilterRatingsComponent };
+import { FilterTargetsComponent } from './filter-targets/filter-targets.component';
+export { FilterTargetsComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 
@@ -46,7 +48,7 @@ const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
   ShowRatingsByTargetComponent, ShowRatingCountComponent,
   DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent,
-  FilterRatingsComponent
+  FilterRatingsComponent, FilterTargetsComponent
 ];
 
 

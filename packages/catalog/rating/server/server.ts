@@ -69,10 +69,15 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'filter-ratings': (extraInfo) => `
-    query FilterRatings($input: FilterRatingInput ) {
-      findRatingsHigher( input: $input ) ${getReturnFields(extraInfo)}
+    query FilterRatings($input: FilterRatingInput) {
+      findRatingsHigher(input: $input) ${getReturnFields(extraInfo)}
     }
-   `
+   `,
+  'filter-targets': (extraInfo) => `
+    query FilterTargets($input: FilterTargetInput) {
+      targetsRatedHigherThan(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `
 };
 
 function getRatingFilter(input: RatingsInput) {
@@ -131,8 +136,30 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
       },
 
       findRatingsHigher: async (_root, { input }) => ( !!input.minimumRating && input.minimumRating > 0 ?
-          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() )
+          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() ),
 
+      targetsRatedHigherThan: async (_root, { input }) => (!!input && !!input.minimumAvgRating ?
+          ratings.aggregate([
+            {
+              $group: {
+                _id: "$targetId",
+                targetId: { $first: "$targetId"},
+                avgRating: {$avg: "$rating"}
+              }
+            },
+            {
+              $match: {"avgRating": {$gte: input.minimumAvgRating}}
+            }
+          ]) :
+          ratings.aggregate([
+            {
+              $group: {
+                _id: "$targetId",
+                targetId: { $first: "$targetId"},
+                avgRating: {$avg: "$rating"}
+              }
+            }
+          ])).toArray()
     },
 
     Rating: {
