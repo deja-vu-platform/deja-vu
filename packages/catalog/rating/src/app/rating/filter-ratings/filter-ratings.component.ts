@@ -16,7 +16,8 @@ const RATING_VALUE_THREE = 3;
 const RATING_VALUE_FOUR = 4;
 
 /**
- * Displays an object
+ * Filter out ratings in a list of ratings that are
+ * larger than (or equal to) certain number
  */
 @Component({
   selector: 'rating-filter-ratings',
@@ -26,19 +27,23 @@ const RATING_VALUE_FOUR = 4;
 export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
   {
   /**
-   * A list of minimumRatings that the user can filter with
+   * A list of choices of minimumRatings that the user can filter with
    * Example:
-   *  if minimumRatings
+   *  if minimumRatings = [ 2, 3, 4.5 ]
+   *  then the html displayed will be:
+   *    [ ] 2 & up
+   *    [x] 3 & up
+   *    [ ] 4.5 & up
    */
   @Input() minimumRatings = [ RATING_VALUE_ONE, RATING_VALUE_TWO,
                               RATING_VALUE_THREE, RATING_VALUE_FOUR];
   selectedMinimumRating: number;
 
   /**
-   * The objects left after filtering
+   * The ratings left after filtering
    */
-  @Output() loadedObjects = new EventEmitter<any>();
-  _loadedObjects: Object[] = [];
+  @Output() loadedRatings = new EventEmitter<any>();
+  _loadedRatings: Object[] = [];
 
   private gs: GatewayService;
   private cs: ConfigService;
@@ -89,8 +94,8 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
           }
         })
         .subscribe((res) => {
-          this._loadedObjects = res.data.objects;
-          this.loadedObjects.emit(this._loadedObjects);
+          this._loadedRatings = res.data.objects;
+          this.loadedRatings.emit(this._loadedRatings);
         });
     } else if (this.gs) {
       this.gs.noRequest();
