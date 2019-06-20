@@ -11,7 +11,7 @@ import { API_PATH } from '../rating.config';
 import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
 
 
-/**yarn
+/**
  * Filter out ratings in a list of ratings that are
  * larger than (or equal to) certain number
  */
