@@ -8,12 +8,7 @@ import {
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
-
-
-const RATING_VALUE_ONE = 1;
-const RATING_VALUE_TWO = 2;
-const RATING_VALUE_THREE = 3;
-const RATING_VALUE_FOUR = 4;
+import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
 
 /**
  * Filter rating targets so that only targets with average rating
@@ -35,8 +30,7 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
    *    [x] 3 & up
    *    [ ] 4.5 & up
    */
-  @Input() minimumAvgRatings = [ RATING_VALUE_ONE, RATING_VALUE_TWO,
-    RATING_VALUE_THREE, RATING_VALUE_FOUR];
+  @Input() minimumAvgRatings = DEFAULT_RATING_FILTER;
   selectedMinimumAvgRating: number;
 
   /**

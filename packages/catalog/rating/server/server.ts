@@ -69,13 +69,13 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'filter-ratings': (extraInfo) => `
-    query FilterRatings($input: FilterRatingInput ) {
-      findRatingsHigher( input: $input ) ${getReturnFields(extraInfo)}
+    query FilterRatings($input: FilterRatingInput) {
+      findRatingsHigher(input: $input) ${getReturnFields(extraInfo)}
     }
    `,
   'filter-targets': (extraInfo) => `
-    query FilterTargets ($input: FilterTargetInput ) {
-      targetsRatedHigherThan ( input: $input ) ${getReturnFields(extraInfo)}
+    query FilterTargets($input: FilterTargetInput) {
+      targetsRatedHigherThan(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };

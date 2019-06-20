@@ -8,14 +8,10 @@ import {
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
+import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
 
 
-const RATING_VALUE_ONE = 1;
-const RATING_VALUE_TWO = 2;
-const RATING_VALUE_THREE = 3;
-const RATING_VALUE_FOUR = 4;
-
-/**
+/**yarn
  * Filter out ratings in a list of ratings that are
  * larger than (or equal to) certain number
  */
@@ -35,8 +31,7 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
    *    [x] 3 & up
    *    [ ] 4.5 & up
    */
-  @Input() minimumRatings = [ RATING_VALUE_ONE, RATING_VALUE_TWO,
-                              RATING_VALUE_THREE, RATING_VALUE_FOUR];
+  @Input() minimumRatings = DEFAULT_RATING_FILTER;
   selectedMinimumRating: number;
 
   /**
