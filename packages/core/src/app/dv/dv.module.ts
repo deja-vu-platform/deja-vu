@@ -25,6 +25,7 @@ import { MergeComponent } from './merge/merge.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
+import { ShowEntitiesComponent } from './show-entities/show-entities.component';
 import { StageComponent } from './stage/stage.component';
 import { StatusComponent } from './status/status.component';
 import { TxComponent } from './tx/tx.component';
@@ -42,7 +43,7 @@ const allComponents = [
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
-  ForComponent
+  ForComponent, ShowEntitiesComponent
 ];
 
 @NgModule({
