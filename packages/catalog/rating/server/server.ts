@@ -67,8 +67,12 @@ const actionRequestTable: ActionRequestTable = {
     mutation DeleteRatings($input: DeleteRatingsInput!) {
       deleteRatings(input: $input) ${getReturnFields(extraInfo)}
     }
-  `
-
+  `,
+  'filter-ratings': (extraInfo) => `
+    query FilterRatings($input: FilterRatingInput ) {
+      findRatingsHigher( input: $input ) ${getReturnFields(extraInfo)}
+    }
+   `
 };
 
 function getRatingFilter(input: RatingsInput) {
@@ -124,7 +128,11 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
           rating: results[0]['average'],
           count: results[0]['count']
         };
-      }
+      },
+
+      findRatingsHigher: async (_root, { input }) => ( !!input.minimumRating && input.minimumRating > 0 ?
+          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() )
+
     },
 
     Rating: {

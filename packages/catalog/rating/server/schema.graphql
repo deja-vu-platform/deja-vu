@@ -36,11 +36,16 @@ input DeleteRatingsInput {
   ofTargetId: ID
 }
 
+input FilterRatingInput {
+  minimumRating: Float
+}
+
 type Query {
   rating(input: RatingInput!): Rating
   ratings(input: RatingsInput!): [Rating]
   ratingCount(input: RatingsInput!): Int
   averageRatingForTarget(targetId: ID!): AverageRatingForTargetOutput
+  findRatingsHigher( input: FilterRatingInput ): [Rating]
 }
 
 type Mutation {
