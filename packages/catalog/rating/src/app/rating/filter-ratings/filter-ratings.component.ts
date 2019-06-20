@@ -84,7 +84,7 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
               }
             },
             extraInfo: {
-              action: 'objects',
+              action: 'filter-ratings',
               returnFields: `
                 sourceId
                 targetId
