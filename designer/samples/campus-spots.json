@@ -1,0 +1,308 @@
+{
+  "name": "spots",
+  "actions": [
+    {
+      "name": "navbar",
+      "inputSettings": [],
+      "outputSettings": [],
+      "rows": [
+        {
+          "actions": [
+            {
+              "of": "text",
+              "from": "dv",
+              "inputSettings": {},
+              "styles": {
+                "stretch": false
+              },
+              "data": "<p><strong class=\"ql-size-huge\">Campus Spots</strong></p><p><em style=\"color: rgb(68, 68, 68);\" class=\"ql-size-large\">Find points of interest﻿ in campus</em></p>"
+            },
+            {
+              "of": "text",
+              "from": "dv",
+              "inputSettings": {},
+              "styles": {
+                "stretch": false
+              },
+              "data": "<p><img src=\"data:image/png;base64,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\"></p>"
+            }
+          ],
+          "hJust": "fs",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "link",
+              "from": "dv",
+              "inputSettings": {
+                "*content": {
+                  "of": "text",
+                  "from": "dv",
+                  "inputSettings": {},
+                  "styles": {
+                    "stretch": false
+                  },
+                  "data": "<p>Show Spots</p>"
+                }
+              },
+              "styles": {
+                "stretch": false
+              }
+            },
+            {
+              "of": "link",
+              "from": "dv",
+              "inputSettings": {
+                "*content": {
+                  "of": "text",
+                  "from": "dv",
+                  "inputSettings": {},
+                  "styles": {
+                    "stretch": false
+                  },
+                  "data": "<p>Add a Spot</p>"
+                },
+                "href": "\"create-spot\""
+              },
+              "styles": {
+                "stretch": false
+              }
+            }
+          ],
+          "hJust": "fs",
+          "vAlign": "s"
+        }
+      ],
+      "styles": {
+        "backgroundColor": "rgb(255, 165, 153)",
+        "borderWidth": "1px",
+        "borderColor": "black",
+        "borderStyle": "solid",
+        "padding": "8px"
+      }
+    },
+    {
+      "name": "home",
+      "inputSettings": [],
+      "outputSettings": [],
+      "rows": [
+        {
+          "actions": [
+            {
+              "of": "navbar",
+              "from": "spots",
+              "inputSettings": {},
+              "styles": {
+                "stretch": true
+              }
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "text",
+              "from": "dv",
+              "inputSettings": {},
+              "styles": {
+                "stretch": false
+              },
+              "data": "<h1>Spots</h1>"
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "show-markers",
+              "from": "geolocation",
+              "inputSettings": {
+                "noMarkersToShowText": "\"No spots to show. Create one!\""
+              },
+              "styles": {
+                "stretch": false
+              }
+            },
+            {
+              "of": "display-map",
+              "from": "geolocation",
+              "inputSettings": {
+                "id": "\"mapId\""
+              },
+              "styles": {
+                "stretch": false
+              }
+            }
+          ],
+          "hJust": "sa",
+          "vAlign": "s"
+        }
+      ],
+      "transaction": false,
+      "styles": {
+        "backgroundColor": "transparent",
+        "borderWidth": "0",
+        "borderColor": "black",
+        "borderStyle": "solid",
+        "padding": "8px"
+      }
+    },
+    {
+      "name": "create-spot",
+      "inputSettings": [],
+      "outputSettings": [],
+      "rows": [
+        {
+          "actions": [
+            {
+              "of": "navbar",
+              "from": "spots",
+              "inputSettings": {},
+              "styles": {
+                "stretch": true
+              }
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "text",
+              "from": "dv",
+              "inputSettings": {},
+              "styles": {
+                "stretch": false
+              },
+              "data": "<h1>Add a Spot</h1>"
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "create-marker",
+              "from": "geolocation",
+              "inputSettings": {
+                "mapId": "\"mapId\"",
+                "longitude": "geolocation.display-map.newMarker.longitude",
+                "latitude": "geolocation.display-map.newMarker.latitude",
+                "showOptionToSubmit": "false",
+                "title": "\"\"",
+                "titleLabel": "\"Spot Name\""
+              },
+              "styles": {
+                "stretch": false
+              }
+            },
+            {
+              "of": "display-map",
+              "from": "geolocation",
+              "inputSettings": {
+                "id": "\"mapId\""
+              },
+              "styles": {
+                "stretch": false
+              }
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "create-object",
+              "from": "review",
+              "inputSettings": {
+                "showOptionToSubmit": "false"
+              },
+              "styles": {
+                "stretch": false
+              }
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        },
+        {
+          "actions": [
+            {
+              "of": "button",
+              "from": "dv",
+              "inputSettings": {
+                "*content": {
+                  "of": "text",
+                  "from": "dv",
+                  "inputSettings": {},
+                  "styles": {
+                    "stretch": false
+                  },
+                  "data": "<p>Create Spot</p>"
+                }
+              },
+              "styles": {
+                "stretch": false
+              }
+            }
+          ],
+          "hJust": "c",
+          "vAlign": "s"
+        }
+      ],
+      "transaction": true,
+      "styles": {
+        "backgroundColor": "transparent",
+        "borderWidth": "0",
+        "borderColor": "black",
+        "borderStyle": "solid",
+        "padding": "8px"
+      }
+    }
+  ],
+  "pages": [
+    "home",
+    "create-spot",
+    "create-spot"
+  ],
+  "homepage": "home",
+  "cliches": [
+    {
+      "name": "geolocation",
+      "of": "geolocation",
+      "config": {}
+    },
+    {
+      "name": "rating",
+      "of": "rating",
+      "config": {}
+    },
+    {
+      "name": "review",
+      "of": "property",
+      "config": {
+        "schema": {
+          "properties": {
+            "review": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "review"
+          ],
+          "title": "Review",
+          "type": "object"
+        },
+        "initialObjects": []
+      }
+    }
+  ]
+}

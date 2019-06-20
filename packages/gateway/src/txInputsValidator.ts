@@ -29,8 +29,9 @@ export class TxInputsValidator {
       //  have assignments, use `new`, etc
       `(${unparsedExpr})`, { plugins: [elvis] }) // polyfills `?.`
       .code;
-    console.log(`Running code ${polyfilledCode} with ` +
-        `context ${JSON.stringify(context)}`);
+    console.log(
+      `Running code "${polyfilledCode}" (pollyfilled from "${unparsedExpr}") ` +
+      `with context ${JSON.stringify(context)}`);
 
     // This is safer than `eval`. It runs the code in a sandbox.
     const vm = new VM();

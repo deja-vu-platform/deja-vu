@@ -97,7 +97,7 @@ export function startGateway(
         .processSubscription(subscriptionObj)
         .subscribe({
           next: (res) => {
-            if (ws.readyState == WebSocket.OPEN) {
+            if (ws.readyState === WebSocket.OPEN) {
               const response = Object.assign({}, res, { subscriptionId });
               ws.send(JSON.stringify(response));
             }
