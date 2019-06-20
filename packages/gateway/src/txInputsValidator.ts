@@ -35,9 +35,10 @@ export class TxInputsValidator {
 
     // This is safer than `eval`. It runs the code in a sandbox.
     const vm = new VM();
-    // for some reason doing forEach(context, vm.freeze) doesn't work sometimes
+    // `freeze` prevents template exprs from modifying the context
+    // for some reason, doing `forEach(context, vm.freeze)` doesn't work
+    // sometimes
     _.forEach(context, (value: any, key: string) => vm.freeze(value, key));
-    // don't let template exprs modify context
 
     return vm.run(polyfilledCode);
   }
@@ -56,7 +57,7 @@ export class TxInputsValidator {
     }
 
     // We do the checking by inputs. For each input value we receive, we
-    // evaluate the expr that appears in the html source code and check that
+    // evaluate the expr that appears in the HTML source code and check that
     // we get the same value.
     _.forEach(inputValues, (input, actionFqTag: string) => {
       _.forEach(input, (inputValue: any, inputName: string) => {
@@ -71,9 +72,9 @@ export class TxInputsValidator {
     context: {[name: string]: any}, actions)
     : void {
     const unparsedExpr = _.get(actions, [fqtag, inputName]);
-    if (unparsedExpr  === undefined) {
+    if (unparsedExpr === undefined) {
       console.log(
-        `Not checking ${fqtag}.${inputName} since it's internal input`);
+        `Not checking ${fqtag}.${inputName} since it's an internal input`);
 
       return;
     }

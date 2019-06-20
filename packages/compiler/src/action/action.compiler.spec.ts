@@ -24,7 +24,7 @@ describe('ActionCompiler', () => {
           <p class="para">
             Lorem ipsum
           </p>
-          <input type="button" class="button">Click</button>
+          <button type="button" class="button">Click</button>
         </div>
       </dv.action>
     `;
@@ -321,14 +321,16 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
 
-  it('should compile action accessing member of output of aliased action', () => {
+  it('should compile action accessing member of output of ' +
+    'aliased action', () => {
     const st: SymbolTable = {
       property: {
         kind: 'cliche'
