@@ -11,6 +11,7 @@ import * as _ from 'lodash';
   templateUrl: './union.component.html'
 })
 export class UnionComponent implements OnInit, OnChanges {
+  private static readonly MINIMUM_UNION_LISTS = 2;
   /**
    * A list of lists that is going to be unioned
    */
@@ -39,12 +40,9 @@ export class UnionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    // left the const here because it will not be used elsewhere
-    const MINIMUM_UNION_LISTS = 2;
-
     // this.lists[0] added to avoid tslint error
     // issue thread: https://github.com/microsoft/TypeScript/issues/4130
-    if ( !!this.lists && this.lists.length >= MINIMUM_UNION_LISTS ) {
+    if ( !!this.lists && this.lists.length >= UnionComponent.MINIMUM_UNION_LISTS ) {
       this.unionList.emit(_.unionBy(this.lists[0], ...this.lists, this.key));
     } else {
       throw new Error('pass in at least two lists for union');

@@ -6,11 +6,13 @@ import { RunService, OnExecSuccess } from '../run.service';
 import * as _ from 'lodash';
 
 
+
 @Component({
   selector: 'dv-intersect',
   templateUrl: './intersect.component.html'
 })
 export class IntersectComponent implements OnInit, OnChanges {
+  private static readonly MINIMUM_INTERSECTION_LISTS = 2;
   /**
    * A list of lists that is going to be intersected
    */
@@ -30,6 +32,7 @@ export class IntersectComponent implements OnInit, OnChanges {
    */
   @Output() intersectList = new EventEmitter<any[]>();
 
+
   constructor(
     private elem: ElementRef, private rs: RunService) {}
 
@@ -38,11 +41,10 @@ export class IntersectComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    const MINIMUM_INTERSECTION_LISTS = 2;
-
     // this.lists[0] added to avoid tslint error
     // issue thread: https://github.com/microsoft/TypeScript/issues/4130
-    if (!!this.lists && this.lists.length >= MINIMUM_INTERSECTION_LISTS) {
+    if (!!this.lists && this.lists.length >=
+      IntersectComponent.MINIMUM_INTERSECTION_LISTS) {
       this.intersectList.emit(this.key ?
         _.intersectionBy(this.lists[0], ...this.lists, this.key)
         : _.intersection(this.lists[0], ...this.lists));
