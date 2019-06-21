@@ -321,9 +321,9 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event"/)[1]
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
       .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
@@ -350,9 +350,10 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
@@ -379,11 +380,12 @@ describe('ActionCompiler', () => {
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(
-        /\[initialObjectId\]=".*currentConsumer__ec\?\.id"/);
+        /\[initialObjectId\]="[\s\S]*currentConsumer__ec\?\.id\s*"/);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
@@ -618,7 +620,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 
@@ -680,7 +682,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 
@@ -742,7 +744,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 
