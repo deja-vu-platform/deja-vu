@@ -35,12 +35,27 @@ export class TxInputsValidator {
 
     // This is safer than `eval`. It runs the code in a sandbox.
     const vm = new VM();
-    // `freeze` prevents template exprs from modifying the context
-    // for some reason, doing `forEach(context, vm.freeze)` doesn't work
+    // `freeze` prevents template exprs from modifying the context.
+    // For some reason, doing `forEach(context, vm.freeze)` doesn't work
     // sometimes
     _.forEach(context, (value: any, key: string) => vm.freeze(value, key));
 
-    return vm.run(polyfilledCode);
+    // I couldn't find a flag for returning `undefined` to the sandboxed script
+    // if a reference doesn't exist in the context, so we have to do this hack
+    // TODO: find a better alternative
+    while (true) {
+      try {
+        return vm.run(polyfilledCode);
+      } catch (e) {
+        const m = e.message.match(/(.*) is not defined/);
+        if (m) {
+          console.log(`Adding ${m[1]} to context with value undefined`);
+          vm.freeze(undefined, m[1]);
+          continue;
+        }
+        throw e;
+      }
+    }
   }
 
   public static Validate(
@@ -81,6 +96,10 @@ export class TxInputsValidator {
     console.log(`Checking ${fqtag}.${inputName}: ${inputValue}`);
     const expectedValue = TxInputsValidator.Eval(unparsedExpr, context);
     console.log(`Expected value for ${fqtag}.${inputName} is ${expectedValue}`);
+    // TODO: handle the case in which the expected value is `undefined` and
+    // the input value is something other than `undefined` and it's ok
+    // because the behavior of the action is to use a default value for an
+    // input if none is given
     if (!_.isEqual(expectedValue, inputValue)) {
       throw new RequestInvalidError(
         `The value obtained for ${fqtag}.${inputName} is not the expected ` +
