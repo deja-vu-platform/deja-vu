@@ -144,11 +144,12 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
               $group: {
                 _id: "$targetId",
                 targetId: { $first: "$targetId"},
-                avgRating: {$avg: "$rating"}
+                rating: {$avg: "$rating"},
+                count: {$sum: 1}
               }
             },
             {
-              $match: {"avgRating": {$gte: input.minimumAvgRating}}
+              $match: {"rating": {$gte: input.minimumAvgRating}}
             }
           ]) :
           ratings.aggregate([
@@ -156,7 +157,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
               $group: {
                 _id: "$targetId",
                 targetId: { $first: "$targetId"},
-                avgRating: {$avg: "$rating"}
+                rating: {$avg: "$rating"},
+                count: {$sum: 1}
               }
             }
           ])).toArray()

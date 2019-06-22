@@ -8,7 +8,7 @@ import {
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
-import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
+import { AverageRatingForInputRes, DEFAULT_RATING_FILTER } from '../shared/rating.model';
 
 /**
  * Filter rating targets so that only targets with average rating
@@ -70,24 +70,25 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.gs
-        .get<{data: {objects: Object[]}}>(this.apiPath, {
-          params: {
-            inputs: {
-              input: {
-                minimumAvgRating: this.selectedMinimumAvgRating
+        .get<{data: {targetsRatedHigherThan: AverageRatingForInputRes[]}}>(
+          this.apiPath, {
+            params: {
+              inputs: {
+                input: {
+                  minimumAvgRating: this.selectedMinimumAvgRating
+                }
+              },
+              extraInfo: {
+                action: 'filter-targets',
+                returnFields: `
+                  targetId
+                  rating
+                `
               }
-            },
-            extraInfo: {
-              action: 'filter-targets',
-              returnFields: `
-                targetId
-                avgRating
-              `
             }
-          }
         })
         .subscribe((res) => {
-          this._loadedTargets = res.data.objects;
+          this._loadedTargets = res.data.targetsRatedHigherThan;
           this.loadedTargets.emit(this._loadedTargets);
         });
     } else if (this.gs) {

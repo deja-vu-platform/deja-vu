@@ -4,6 +4,12 @@ export interface Rating {
   rating: number;
 }
 
+export interface AverageRatingForInputRes {
+  data: { averageRatingForTarget:
+      { targetId: string, rating: number; count: number } };
+  errors: { message: string }[];
+}
+
 const RATING_VALUE_ONE = 1;
 const RATING_VALUE_TWO = 2;
 const RATING_VALUE_THREE = 3;
