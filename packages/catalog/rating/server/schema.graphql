@@ -10,6 +10,7 @@ type RatingTarget {
 }
 
 type AverageRatingForTargetOutput {
+  targetId: ID
   rating: Float
   count: Float
 }
@@ -55,7 +56,7 @@ type Query {
   ratingCount(input: RatingsInput!): Int
   averageRatingForTarget(targetId: ID!): AverageRatingForTargetOutput
   findRatingsHigher(input: FilterRatingInput): [Rating]
-  targetsRatedHigherThan(input: FilterTargetInput): [RatingTarget]
+  targetsRatedHigherThan(input: FilterTargetInput): [AverageRatingForTargetOutput]
 }
 
 type Mutation {
