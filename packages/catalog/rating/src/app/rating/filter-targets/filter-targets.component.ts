@@ -88,9 +88,6 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
             }
         })
         .subscribe((res) => {
-          console.log(res);
-          console.log(res.data);
-          console.log(res.data.targetsRatedHigherThan);
           this._loadedTargets = res.data.targetsRatedHigherThan;
           this.loadedTargets.emit(this._loadedTargets);
         });
