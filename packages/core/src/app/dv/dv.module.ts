@@ -64,6 +64,7 @@ const allComponents = [
     GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
     SubscriptionService
   ],
+  entryComponents: [ShowEntityComponent],
   exports: [...allComponents, OfDirective]
 })
 export class DvModule { }
