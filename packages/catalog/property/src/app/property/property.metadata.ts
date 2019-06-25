@@ -27,6 +27,8 @@ import {
    CamelToTitleCasePipe, CreatePropertyComponent
 } from './create-property/create-property.component';
 export { CreatePropertyComponent };
+import { FilterObjectsComponent} from "./filter-objects/filter-objects.component";
+export { FilterObjectsComponent };
 import {
   ObjectAutocompleteComponent
 } from './object-autocomplete/object-autocomplete.component';
@@ -48,6 +50,7 @@ const publicComponents = [
   CreateObjectComponent,
   CreateObjectsComponent,
   CreatePropertyComponent,
+  FilterObjectsComponent,
   ObjectAutocompleteComponent,
   ShowObjectComponent,
   ShowObjectsComponent,
