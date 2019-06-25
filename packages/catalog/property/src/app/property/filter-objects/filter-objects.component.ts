@@ -14,6 +14,7 @@ import { API_PATH } from '../property.config';
 
 /**
  * Displays the filters of a property
+ * Currently only supports filter for boolean properties
  */
 @Component({
   selector: 'property-filter-objects',
@@ -46,6 +47,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
    */
   @Input() properties: Property[];
   filterObjects;
+  propertyValues;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -62,7 +64,14 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     this.cs = this.csf.createConfigService(this.elem);
 
     this.properties = getProperties(this.cs);
-    console.log(this.properties);
+    this.propertyValues = _.reduce(this.properties,
+      (object, property, index) => {
+        if (property.schema.type === 'boolean') {
+          object[property.name] = false;
+        }
+
+        return object;
+      }, {});
   }
 
   ngAfterViewInit() {
@@ -70,6 +79,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges() {
+    console.log("CHNAGE");
     this.load();
   }
 
@@ -104,6 +114,13 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  updateFieldFilter(fieldName, fieldValue) {
+    this.propertyValues[fieldName] = fieldValue;
+    console.log("UPDATE");
+    console.log(this.propertyValues);
+    this.load();
   }
 
   private canEval(): boolean {
