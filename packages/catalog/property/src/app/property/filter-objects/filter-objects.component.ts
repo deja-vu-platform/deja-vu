@@ -36,10 +36,16 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
    */
   @Input() showExclude: string[];
   /**
-   * The object left after filter
+   * The objects left after filter
    */
-  @Output() loadedObject = new EventEmitter<any>();
+  @Output() loadedObjects = new EventEmitter<Object[]>();
   _loadedObjects;
+
+  /**
+   * The id of the objects left after filter
+   */
+  @Output() loadedObjectIds = new EventEmitter<string[]>();
+
   /**
    * List of properties.
    * If given, causes exactly these properties to be shown.
@@ -96,7 +102,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.gs
-        .get<{data: {objects: Object[]}}>(this.apiPath, {
+        .get<{data: {filteredObjects: Object[]}}>(this.apiPath, {
           params: {
             inputs: { filters: this.propertyValues },
             extraInfo: {
@@ -110,8 +116,9 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
           }
         })
         .subscribe((res) => {
-          this._loadedObjects = res.data.objects;
-          this.loadedObject.emit(this._loadedObjects);
+          this._loadedObjects = res.data.filteredObjects;
+          this.loadedObjects.emit(this._loadedObjects);
+          this.loadedObjectIds.emit(_.map(this._loadedObjects, 'id'));
         });
     } else if (this.gs) {
       this.gs.noRequest();

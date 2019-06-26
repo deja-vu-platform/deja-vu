@@ -166,6 +166,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     }
 
     input FilterInput {
+      id: ID
       ${joinedPropertyFilters}
     }
   `];

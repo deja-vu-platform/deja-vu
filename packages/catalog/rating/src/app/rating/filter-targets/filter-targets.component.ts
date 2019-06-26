@@ -9,6 +9,7 @@ import {
 
 import { API_PATH } from '../rating.config';
 import { AverageRatingForInputRes, DEFAULT_RATING_FILTER } from '../shared/rating.model';
+import * as _ from 'lodash';
 
 /**
  * Filter rating targets so that only targets with average rating
@@ -38,6 +39,11 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
    */
   @Output() loadedTargets = new EventEmitter<any>();
   _loadedTargets: Object[] = [];
+
+  /**
+   * The targetIds of the targets left after filtering
+   */
+  @Output() loadedTargetIds = new EventEmitter<string[]>();
 
   private gs: GatewayService;
   private cs: ConfigService;
@@ -90,6 +96,7 @@ export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
         .subscribe((res) => {
           this._loadedTargets = res.data.targetsRatedHigherThan;
           this.loadedTargets.emit(this._loadedTargets);
+          this.loadedTargetIds.emit(_.map(this._loadedTargets, 'targetId'));
         });
     } else if (this.gs) {
       this.gs.noRequest();
