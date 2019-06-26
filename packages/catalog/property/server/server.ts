@@ -133,6 +133,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       return `${propertyName}: ` +
         jsonSchemaTypeToGraphQlType[schemaPropertyObject.type];
     })
+
     .value();
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
@@ -206,10 +207,10 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return objects.find(fields);
       },
       filteredObjects: async (_root, { filters } ) => {
-        console.log(filters);
+        // only supports Boolean
+        const modifiedFilters = _.pickBy(filters, (value) => (value));
 
-
-        return objects.find(filters);
+        return objects.find(modifiedFilters);
       },
       properties: (_root) => _
         .chain(config['schema'].properties)

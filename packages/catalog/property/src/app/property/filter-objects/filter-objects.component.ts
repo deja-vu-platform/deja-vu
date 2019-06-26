@@ -67,7 +67,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     this.propertyValues = _.reduce(this.properties,
       (object, property, index) => {
         if (property.schema.type === 'boolean') {
-          object[property.name] = false;
+          object[property.name] = null;
         }
 
         return object;
@@ -118,8 +118,11 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     }
   }
 
+  /*
+  Only supporting boolean inputs right now
+   */
   updateFieldFilter(fieldName, fieldValue) {
-    this.propertyValues[fieldName] = fieldValue;
+    this.propertyValues[fieldName] = fieldValue ? true : null;
     this.load();
   }
 
