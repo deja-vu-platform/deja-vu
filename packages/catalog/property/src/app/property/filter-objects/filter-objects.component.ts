@@ -26,11 +26,13 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   /**
    * List of property names.
    * If given, causes only these properties to be shown.
+   * TODO: [Not Implemented]
    */
   @Input() showOnly: string[];
   /**
    * List of property names.
    * If given, causes these properties to not be shown.
+   * TODO: [Not Implemented]
    */
   @Input() showExclude: string[];
   /**
@@ -108,8 +110,6 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
           }
         })
         .subscribe((res) => {
-          console.log("RESULTS");
-          console.log(res);
           this._loadedObjects = res.data.objects;
           this.loadedObject.emit(this._loadedObjects);
         });
@@ -122,6 +122,8 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   Only supporting boolean inputs right now
    */
   updateFieldFilter(fieldName, fieldValue) {
+    /* TODO: `null` is used to represent `false`
+      to work around graphql turning everything into `true` */
     this.propertyValues[fieldName] = fieldValue ? true : null;
     this.load();
   }
