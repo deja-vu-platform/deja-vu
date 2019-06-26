@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
+  jsonSchemaTypeToGraphQlFilterType,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -74,6 +75,11 @@ const actionRequestTable: ActionRequestTable = {
       property(name: $name) ${getReturnFields(extraInfo)}
     }
   `,
+  'filter-objects': (extraInfo) => `
+    query FilteredObjects($filters: FilterInput) {
+      filteredObjects(filters: $filters) ${getReturnFields(extraInfo)},
+    }
+  `,
   'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
   'show-object': (extraInfo) => {
     switch (extraInfo.action) {
@@ -125,10 +131,22 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .toPairs()
     .map(([propertyName, schemaPropertyObject]) => {
       return `${propertyName}: ` +
-        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type]
+        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type];
     })
     .value();
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
+
+  const propertyFilters = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .filter(([_propertyName, schemaPropertyObject]) => (
+      schemaPropertyObject.type === 'boolean'))
+    .map(([propertyName, schemaPropertyObject]) => {
+      return `${propertyName}: ` +
+        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type];
+    })
+    .value();
+  const joinedPropertyFilters = propertyFilters.join('\n');
 
   return [`
     type Object {
@@ -144,6 +162,10 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     input FieldMatchingInput {
       id: ID
       ${joinedNonRequiredProperties}
+    }
+
+    input FilterInput {
+      ${joinedPropertyFilters}
     }
   `];
 }
@@ -180,8 +202,14 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: async (_root, { fields }) => { 
+      objects: async (_root, { fields }) => {
         return objects.find(fields);
+      },
+      filteredObjects: async (_root, { filters } ) => {
+        console.log(filters);
+
+
+        return objects.find(filters);
       },
       properties: (_root) => _
         .chain(config['schema'].properties)

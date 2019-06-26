@@ -79,7 +79,6 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges() {
-    console.log("CHNAGE");
     this.load();
   }
 
@@ -94,23 +93,26 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      // this.gs
-      //   .get<{data: {objects: Object[]}}>(this.apiPath, {
-      //     params: {
-      //       inputs: {},
-      //       extraInfo: {
-      //         action: 'objects',
-      //         returnFields: `
-      //           id
-      //           ${this.properties.join('\n')}
-      //         `
-      //       }
-      //     }
-      //   })
-      //   .subscribe((res) => {
-      //     this._loadedObjects = res.data.objects;
-      //     this.loadedObject.emit(this._loadedObjects);
-      //   });
+      this.gs
+        .get<{data: {objects: Object[]}}>(this.apiPath, {
+          params: {
+            inputs: { filters: this.propertyValues },
+            extraInfo: {
+              action: 'objects',
+              returnFields: `
+                id
+                ${_.map(this.properties, (property) => (property.name))
+                .join('\n')}
+              `
+            }
+          }
+        })
+        .subscribe((res) => {
+          console.log("RESULTS");
+          console.log(res);
+          this._loadedObjects = res.data.objects;
+          this.loadedObject.emit(this._loadedObjects);
+        });
     } else if (this.gs) {
       this.gs.noRequest();
     }
@@ -118,8 +120,6 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
 
   updateFieldFilter(fieldName, fieldValue) {
     this.propertyValues[fieldName] = fieldValue;
-    console.log("UPDATE");
-    console.log(this.propertyValues);
     this.load();
   }
 
