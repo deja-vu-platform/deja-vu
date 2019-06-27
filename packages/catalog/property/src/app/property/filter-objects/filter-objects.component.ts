@@ -23,21 +23,6 @@ import { API_PATH } from '../property.config';
 })
 export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
-  /**
-   * List of property names.
-   * If given, causes only these properties to be shown.
-   * TODO: [Not Implemented]
-   */
-  @Input() showOnly: string[];
-  /**
-   * List of property names.
-   * If given, causes these properties to not be shown.
-   * TODO: [Not Implemented]
-   */
-  @Input() showExclude: string[];
-  /**
-   * The objects left after filter
-   */
   @Output() loadedObjects = new EventEmitter<Object[]>();
   _loadedObjects;
 
