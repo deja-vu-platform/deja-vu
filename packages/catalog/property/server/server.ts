@@ -166,6 +166,8 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     }
 
     input FilterInput {
+      // filtering by id is not implemented currently
+      // the id field is included to prevent having and empty type
       id: ID
       ${joinedPropertyFilters}
     }
