@@ -208,7 +208,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return objects.find(fields);
       },
       filteredObjects: async (_root, { filters } ) => {
-        // only supports Boolean
+        // removes all fields that has `false` as its value
+        // this includes objects where the non-selected fields are true
+        // i.e. it turns the yes/no logic into a yes/don't care logic
         const modifiedFilters = _.pickBy(filters, (value) => (value));
 
         return objects.find(modifiedFilters);
