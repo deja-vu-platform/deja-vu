@@ -1,6 +1,8 @@
 <dv.action name="search">
   <easypick.navbar accessRequired=false />
+
   <div class="center-column">
+    <class.filter-objects />
     <div>Grading</div>
     <gradingFair.filter-targets />
     <div>Pace</div>
@@ -10,16 +12,16 @@
     <div>Overall</div>
     <overallRating.filter-targets />
 
-    <dv.intersect lists=[gradingFair.filter-targets.loadedTargets,
-                  paceReasonable.filter-targets.loadedTargets,
-                  contentsManageable.filter-targets.loadedTargets,
-                  overallRating.filter-targets.loadedTargets]
-                  key="targetId"
+    <dv.intersect lists=[gradingFair.filter-targets.loadedTargetIds,
+                  paceReasonable.filter-targets.loadedTargetIds,
+                  contentsManageable.filter-targets.loadedTargetIds,
+                  overallRating.filter-targets.loadedTargetIds,
+                  class.filter-objects.loadedObjectIds]
     />
 
     <dv.show-entities
       entities=dv.intersect.intersectList
-      showEntity=<easypick.show-class classId=$entity.targetId />
+      showEntity=<easypick.show-class classId=$entity />
     />
 
   </div>

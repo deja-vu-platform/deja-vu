@@ -12,6 +12,7 @@ type Query {
   object(id: ID!): Object
   properties: [Property]
   objects(fields: FieldMatchingInput): [Object]
+  filteredObjects(filters: FilterInput): [Object]
 }
 
 type Mutation {

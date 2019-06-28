@@ -24,30 +24,62 @@
             },
             "className": {
               "type": "string"
+            },
+            "HASS": {
+              "type": "boolean"
+            },
+            "REST": {
+              "type": "boolean"
+            },
+            "CIH": {
+              "type": "boolean"
+            },
+            "CIHW": {
+              "type": "boolean"
             }
           },
-          "required": ["classNumber", "className"]
+          "required": ["classNumber", "className", "HASS", "REST", "CIH", "CIHW"]
         },
       "initialObjects": [
           {
-            "classNumber": "6.046", 
-            "className": "Intermediate Algorithms"
+            "classNumber": "6.004",
+            "className": "Computer Structures",
+            "HASS": false,
+            "REST": true,
+            "CIH": false,
+            "CIHW": false
           },
           {
-            "classNumber": "6.009",
-            "className": "Fundamentals In Programming"
+            "classNumber": "6.033",
+            "className": "Computer System Engineering",
+            "HASS": false,
+            "REST": false,
+            "CIH": true,
+            "CIHW": true
           },
           {
-            "classNumber": "6.036",
-            "className": "Intro to Machine Learning"
+            "classNumber": "24.900",
+            "className": "Intro to Linguistics",
+            "HASS": true,
+            "REST": false,
+            "CIH": true,
+            "CIHW": true
           },
           {
-            "classNumber": "6.858",
-            "className": "Computer System Security"
+            "classNumber": "6.046",
+            "className": "Intermediate Algorithms",
+            "HASS": false,
+            "REST": false,
+            "CIH": false,
+            "CIHW": false
           },
           {
-            "classNumber": "6.828",
-            "className": "Operating System"
+            "classNumber": "21M.301",
+            "className": "Music Theory",
+            "HASS": true,
+            "REST": false,
+            "CIH": false,
+            "CIHW": false
           }
         ]
       }
