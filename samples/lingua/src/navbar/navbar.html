@@ -1,0 +1,55 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.if condition=$accessRequired>
+      <dv.redirect href="/login" onEvalFailure=true />
+    </dv.if>
+  </dv.tx>
+
+  <nav id="nav-bar" class="navbar navbar-light">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <dv.link class=" navbar-brand" href="/">
+          Lingua
+        </dv.link>
+      </div>
+
+      <dv.if condition=authentication.logged-in.user>
+        <div class="form-inline navbar-right inline-block">
+          <div class="btn-toolbar toolbar">
+            <dv.link href="/"
+                     class="mat-button btn btn-info profile-btn">
+              PlaceHolder
+            </dv.link>
+            &nbsp;
+            <dv.link href="/profile"
+                     class="mat-button btn btn-info profile-btn">
+              My Profile
+            </dv.link>
+            &nbsp;
+            <dv.tx>
+              <authentication.sign-out id="navbar-logout" class="btn btn-danger"
+                                       buttonLabel="Logout"/>
+              <dv.link href="/login" hidden=true />
+            </dv.tx>
+          </div>
+        </div>
+      </dv.if>
+
+      <dv.if condition=!authentication.logged-in.user>
+        <div class="form-inline navbar-right">
+          <div class="btn-toolbar toolbar">
+            <dv.link href="/login" class="mat-button btn btn-info login-btn">
+              Login
+            </dv.link>
+
+            <dv.link href="/signup" class="mat-button btn btn-info register-btn">
+              Register
+            </dv.link>
+          </div>
+        </div>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

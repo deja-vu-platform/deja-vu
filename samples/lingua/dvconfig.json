@@ -1,0 +1,21 @@
+{
+  "name": "lingua",
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    }
+  },
+  "routes": [
+    { "path": "", "action": "conversations" },
+    { "path": "login", "action": "login" },
+    { "path": "signup", "action": "signup" },
+    { "path": "profile", "action": "profile" }
+  ]
+}

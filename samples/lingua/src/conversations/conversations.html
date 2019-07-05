@@ -1,0 +1,12 @@
+<dv.action name="conversations">
+  <lingua.navbar accessRequired=false />
+    <div class="center-column">
+      <dv.if condition=!lingua.navbar.loggedInUserId>
+        You need to log in first :)
+      </dv.if>
+
+      <dv.if condition= lingua.navbar.loggedInUserId>
+        Yes, you logged in
+      </dv.if>
+    </div>
+</dv.action>
