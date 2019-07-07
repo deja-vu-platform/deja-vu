@@ -29,6 +29,11 @@ const actionRequestTable: ActionRequestTable = {
       createMarker (input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'create-marker-from-map': (extraInfo) => `
+    mutation CreateMarker($input: CreateMarkerInput!) {
+      createMarker (input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'delete-marker': (extraInfo) => `
     mutation DeleteMarker($id: ID!) {
       deleteMarker (id: $id) ${getReturnFields(extraInfo)}
