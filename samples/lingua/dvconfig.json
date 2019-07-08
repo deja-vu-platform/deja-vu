@@ -3,18 +3,18 @@
   "usedCliches": {
     "authentication": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "authorization": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
+        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
@@ -37,13 +37,13 @@
     },
     "chat": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "chatGroup": {
       "name": "group",
       "config": {
-        "reinitDbOnStartUp": true
+        "reinitDbOnStartUp": false
       }
     }
   },

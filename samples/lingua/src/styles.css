@@ -238,3 +238,31 @@ label-search-items-by-labels button.mat-button {
   margin: 50px 70px;
   padding: 50px;
 }
+
+.massage-info {
+  margin: 2px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.span {
+  display: inline-block !important;
+}
+
+.pull-right {
+  float: right;
+}
+
+.massage-info {
+  margin: 2px;
+  font-weight: 400;
+  font-size:18px;
+}
+
+.property-show-object-property {
+  display:inline-block;
+}
+
+.property-show-object {
+  display:inline-block;
+}

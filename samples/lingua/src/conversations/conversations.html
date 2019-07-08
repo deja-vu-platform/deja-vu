@@ -1,14 +1,18 @@
 <dv.action name="conversations">
   <lingua.navbar accessRequired=false />
     <div class="center-column">
-      <dv.if condition=!lingua.navbar.loggedInUserId>
+      <dv.if condition=!lingua.navbar.loggedInUserId >
         You need to log in first :)
       </dv.if>
 
-      <dv.if condition= lingua.navbar.loggedInUserId>
-        Yes, you logged in
-        <chatGroup.show-groups withMemberId=lingua.navbar.loggedInUserId
-                               showGroup=<chat.show-chat id=$group.id /> />
+      <dv.if condition=lingua.navbar.loggedInUserId >
+        <chatGroup.choose-group withMemberId=lingua.navbar.loggedInUserId
+                                showChooseButton=false
+                                chooseSelectPlaceholder="Choose Chat" />
+        <dv.if condition=chatGroup.choose-group.selectedGroup >
+          <lingua.display-chat chatId=chatGroup.choose-group.selectedGroup.id
+                              userId=lingua.navbar.loggedInUserId />
+        </dv.if>
       </dv.if>
     </div>
 </dv.action>
