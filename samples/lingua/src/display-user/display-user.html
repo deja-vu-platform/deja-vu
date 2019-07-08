@@ -1,5 +1,6 @@
 <dv.action name="display-user">
   <div class="panel">
     <userProfile.show-object id=$user.id />
+    <chat.create-message authorId=$loggedInUserId />
   </div>
 </dv.action>
