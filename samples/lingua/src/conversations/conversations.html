@@ -8,7 +8,8 @@
       <dv.if condition=lingua.navbar.loggedInUserId >
         <chatGroup.choose-group withMemberId=lingua.navbar.loggedInUserId
                                 showChooseButton=false
-                                chooseSelectPlaceholder="Choose Chat" />
+                                chooseSelectPlaceholder="Choose Chat"
+        />
         <dv.if condition=chatGroup.choose-group.selectedGroup >
           <lingua.display-chat chatId=chatGroup.choose-group.selectedGroup.id
                               userId=lingua.navbar.loggedInUserId />
