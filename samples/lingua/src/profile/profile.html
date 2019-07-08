@@ -1,4 +1,9 @@
 <dv.action name="profile">
-  <div id="content" class="center text-font form-signin">
+  <lingua.navbar accessRequired=true />
+  <div class="panel">
+    <userProfile.create-object id=lingua.navbar.loggedInUserId />
+  </div>
+  <div class="panel">
+    <authentication.change-password id=lingua.navbar.loggedInUserId />
   </div>
 </dv.action>
