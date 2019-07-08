@@ -1,6 +1,7 @@
 <dv.action name="display-user">
   <div class="panel">
     <userProfile.show-object id=$user.id />
-    <chat.create-message authorId=$loggedInUserId />
+    <chatGroup.create-group memberIds=[$user.id, $loggedInUserId]
+                            showOptionToAddMembers=false />
   </div>
 </dv.action>
