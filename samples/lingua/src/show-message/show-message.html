@@ -1,4 +1,4 @@
-<dv.action name="display-message">
+<dv.action name="show-message">
   <div>
     <div class="message-info">
       <span>
@@ -13,6 +13,14 @@
       <dv.show-entity entity=$message.content />
     </div>
 
+    <!--<mat-expansion-panel>-->
+      <!--<mat-panel-title>Correct</mat-panel-title>-->
+      <!--<mat-panel-description>-->
+        <correction.create-object showExclude=["authorId","chatId"]
+                                  initialValue={ authorId: $userId, chatId: $chatId }
+        />
+      <!--</mat-panel-description>-->
+    <!--</mat-expansion-panel>-->
 
   </div>
 </dv.action>
