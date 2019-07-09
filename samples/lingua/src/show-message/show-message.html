@@ -1,0 +1,18 @@
+<dv.action name="display-message">
+  <div>
+    <div class="message-info">
+      <span>
+        <userProfile.show-object id=$message.authorId showOnly=["name"] /> :
+      </span>
+      <span class="pull-right">
+        <dv.show-entity entity=$message.timestamp />
+      </span>
+    </div>
+
+    <div class="message-content">
+      <dv.show-entity entity=$message.content />
+    </div>
+
+
+  </div>
+</dv.action>

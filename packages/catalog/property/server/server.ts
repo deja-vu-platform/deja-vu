@@ -149,6 +149,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
 
+
   return [`
     type Object {
       id: ID!
@@ -166,8 +167,8 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     }
 
     input FilterInput {
-      // filtering by id is not implemented currently
-      // the id field is included to prevent having and empty type
+      # filtering by id is not implemented currently
+      # the id field is included to prevent having and empty type
       id: ID
       ${joinedPropertyFilters}
     }
@@ -235,7 +236,6 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
     Mutation: {
       createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-
         return await objects.insertOne(context, newObject);
       },
 

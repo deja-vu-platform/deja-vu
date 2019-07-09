@@ -1,0 +1,11 @@
+<dv.action name="signup">
+  <lingua.navbar accessRequired=false />
+  <div id="content" class="center form-signin">
+    <h2 class="form-signin-heading">Welcome to EasyPick!</h2>
+    <dv.tx>
+      <authentication.register-user />
+      <dv.callback defaultHref="/profile" onExecSuccess=true hidden=true />
+    </dv.tx>
+    <dv.link href="/login" id='back-to-login'>Back to Login page</dv.link>
+  </div>
+</dv.action>
