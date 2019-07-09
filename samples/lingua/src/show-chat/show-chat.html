@@ -1,4 +1,4 @@
-<dv.action name="display-chat">
+<dv.action name="show-chat">
   <lingua.navbar accessRequired=true />
   <div class="center-column">
     <span class="bold">
@@ -9,8 +9,13 @@
     </span>
     <chat.show-chat id=$chatId
                     showId = false
-                    showMessage=<lingua.display-message message=$message />
+                    showMessage=<lingua.show-message message=$message chatId=$chatId userId=lingua.navbar.loggedInUserId />
     />
     <chat.create-message authorId=lingua.navbar.loggedInUserId chatId=$chatId />
+  </div>
+  <div class="pull-right">
+    <correction.show-objects fieldMatching={chatId: $chatId}
+                             showObject=<lingua.show-correction correction=$object />
+    />
   </div>
 </dv.action>
