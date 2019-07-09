@@ -52,6 +52,7 @@
     { "path": "login", "action": "login" },
     { "path": "signup", "action": "signup" },
     { "path": "profile", "action": "profile" },
-    { "path": "users", "action": "users"}
+    { "path": "users", "action": "users"},
+    { "path": "chat", "action": "display-chat"}
   ]
 }

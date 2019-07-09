@@ -1,7 +1,16 @@
 <dv.action name="display-chat">
-  <div >
+  <lingua.navbar accessRequired=true />
+  <div class="center-column">
+    <span class="bold">
+      Chat between
+      <userProfile.show-object id=$firstMemberId showOnly=["name"] />
+      and
+      <userProfile.show-object id=$secondMemberId showOnly=["name"] />
+    </span>
     <chat.show-chat id=$chatId
-                    showMessage=<lingua.display-message message=$message /> />
-    <chat.create-message authorId=$userId chatId=$chatId />
+                    showId = false
+                    showMessage=<lingua.display-message message=$message />
+    />
+    <chat.create-message authorId=lingua.navbar.loggedInUserId chatId=$chatId />
   </div>
 </dv.action>

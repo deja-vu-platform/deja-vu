@@ -245,8 +245,9 @@ label-search-items-by-labels button.mat-button {
   font-size: 14px;
 }
 
-.span {
+.bold {
   display: inline-block !important;
+  font-weight: 600 !important;
 }
 
 .pull-right {
