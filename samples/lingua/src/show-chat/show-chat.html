@@ -2,10 +2,16 @@
   <lingua.navbar accessRequired=true />
   <div class="center-column">
     <span class="bold">
-      Chat between
-      <userProfile.show-object id=$firstMemberId showOnly=["name"] />
-      and
-      <userProfile.show-object id=$secondMemberId showOnly=["name"] />
+      Conversation:
+      <br />
+      <userProfile.show-object id=$firstMemberId showOnly=["name"] />:
+      <rating.show-average-rating targetId=$firstMemberId showNumRatings=false />
+      <userProfile.show-object id=$secondMemberId showOnly=["name"] />:
+      <rating.show-average-rating targetId=$secondMemberId showNumRatings=false />
+      Rate Your Conversation:
+      <rating.rate-target sourceId=lingua.navbar.loggedInUserId
+                          targetId=$firstMemberId===lingua.navbar.loggedInUserId ? $secondMemberId : $firstMemberId
+      />
     </span>
     <chat.show-chat id=$chatId
                     showId = false
