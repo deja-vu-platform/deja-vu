@@ -74,6 +74,7 @@ export class UpdateObjectComponent
 
   updateObjectForm: FormGroup = this.builder.group({});
   properties: Property[];
+  initialValue;
 
   objectUpdated = false;
   updateObjectError: string;
@@ -102,7 +103,7 @@ export class UpdateObjectComponent
     }
     this.updateObjectForm = this.builder.group(formControls);
     this.formInitialized = true;
-    // this.initialValue = this.savedInitialValue;
+    this.initialValue = this.savedInitialValue;
   }
 
   onSubmit() {
