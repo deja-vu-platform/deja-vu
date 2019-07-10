@@ -1,0 +1,24 @@
+{
+  "name": "newapp",
+  "type": "app",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {},
+  "routes": [
+    {
+      "path": "",
+      "action": "new-action-1"
+    },
+    {
+      "path": "new-action-1",
+      "action": "new-action-1"
+    },
+    {
+      "path": "MEOW",
+      "action": "MEOW"
+    }
+  ]
+}

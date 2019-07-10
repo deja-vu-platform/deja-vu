@@ -1,0 +1,17 @@
+{
+  "name": "newapp",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "dv serve"
+  },
+  "private": true,
+  "devDependencies": {
+    "@deja-vu/cli": "0.0.1"
+  },
+  "repository": "github:spderosso/dejavu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme"
+}
