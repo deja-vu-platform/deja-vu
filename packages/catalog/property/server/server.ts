@@ -70,6 +70,18 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
+  'update-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObject($input: UpdateObjectInput!) {
+            updateObject(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
+    }
+  },
   'create-property': (extraInfo) => `
     query Property($name: String!) {
       property(name: $name) ${getReturnFields(extraInfo)}
@@ -160,6 +172,11 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       id: ID
       ${joinedProperties}
     }
+    
+    input UpdateObjectInput {
+      id: ID!
+      ${joinedProperties}
+    }
 
     input FieldMatchingInput {
       id: ID
@@ -247,6 +264,12 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         });
 
         return await objects.insertMany(context, objDocs);
+      },
+
+      updateObject: async (_root, { input }, context: Context) => {
+        const newObject: ObjectDoc = createObjectFromInput(config, input);
+
+        return await objects.updateOne(context, {id: input.id}, {$set: newObject}, {upsert:true});
       }
     }
   };

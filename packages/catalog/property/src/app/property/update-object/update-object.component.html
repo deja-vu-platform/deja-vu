@@ -1,0 +1,24 @@
+<form (ngSubmit)="onSubmit()"
+      [formGroup]="updateObjectForm"
+      class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="objectUpdated">
+      <i class="material-icons">done</i>
+      {{updateObjectSavedText}}
+    </div>
+    <mat-error *ngIf="newObjectError">
+      <i class="material-icons">report_problem</i>
+      {{updateObjectError}}
+    </mat-error>
+  </div>
+  <div class="form-group" *ngFor="let property of properties">
+    <property-create-property [_config]="config" [name]="property.name" [formControlName]="property.name" [hidden]="showExclude.includes(property.name)">
+    </property-create-property>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit"
+            [disabled]="!updateObjectForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
