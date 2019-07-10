@@ -20,8 +20,8 @@ export function attributeNameToInput(attributeName: string) {
   return attributeName;
 }
 
-export function isNgComponent(name: string): boolean {
-  return _.includes(name, '-');
+export function isAction(name: string): boolean {
+  return _.includes(name, '-') && !name.startsWith('mat-');
 }
 
 export function classNameToNgField(name: string): string {
