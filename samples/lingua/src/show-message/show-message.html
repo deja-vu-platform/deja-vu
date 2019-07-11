@@ -15,14 +15,14 @@
 
     <!--material component is commented out -->
     <!--because otherwise results in invalid path-->
-    <!--<mat-expansion-panel>-->
-      <!--<mat-expansion-panel-header>-->
-        <!--<mat-panel-title>Correct Words</mat-panel-title>-->
-      <!--</mat-expansion-panel-header>-->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Correct Words</mat-panel-title>
+      </mat-expansion-panel-header>
       <correction.create-object showExclude=["authorId","chatId"]
                                 initialValue={ authorId: $userId, chatId: $chatId }
       />
-    <!--</mat-expansion-panel>-->
+    </mat-expansion-panel>
 
   </div>
 </dv.action>
