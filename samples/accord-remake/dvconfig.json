@@ -24,9 +24,6 @@
             },
             "lastName": {
               "type": "string"
-            },
-            "email": {
-              "type": "string"
             }
           }
         }
