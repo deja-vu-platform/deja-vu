@@ -476,6 +476,9 @@ export class App {
    */
   static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
+    if (_.isEmpty(appJSON)) {
+      return new App('myapp');
+    }
 
     const app = new App(appJSON.name);
 

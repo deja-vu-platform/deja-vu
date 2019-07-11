@@ -85,6 +85,14 @@
       <button
         mat-menu-item
         class="mat-small"
+        (click)="newApp()"
+      >
+        <mat-icon>add</mat-icon>
+        <span>New</span>
+      </button>
+      <button
+        mat-menu-item
+        class="mat-small"
         (click)="open()"
         [disabled]="opening"
       >
