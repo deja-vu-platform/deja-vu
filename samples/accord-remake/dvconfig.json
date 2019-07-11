@@ -1,0 +1,127 @@
+{
+  "name": "accord",
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "userProfile": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Profile",
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "group": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "groupInfo": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "GroupInfo",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "setList": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "SetList",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "publicRating": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "proposal": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Proposal",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "author": {
+              "type": "string"
+            },
+            "lyrics": {
+              "type": "string"
+            },
+            "mediaLink": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "rating": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "comment": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    }
+  },
+  "routes": [
+    { "path": "", "action": "groups" },
+    { "path": "sign-in", "action": "sign-in" },
+    { "path": "sign-up", "action": "sign-up" },
+    { "path": "user-profile", "action": "user-profile" },
+    { "path": "about", "action": "about" },
+    { "path": "group", "action": "show-group" },
+    { "path": "create-group", "action": "create-group" },
+    { "path": "set-list", "action": "show-set-list" },
+    { "path": "create-set-list", "action": "create-set-list" },
+    { "path": "proposal", "action": "show-proposal" },
+    { "path": "create-proposal", "action": "create-proposal" }
+  ]
+}
