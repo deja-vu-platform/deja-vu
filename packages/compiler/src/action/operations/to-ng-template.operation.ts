@@ -13,7 +13,7 @@ import {
   getStEntryForNgComponent,
   inputToNgField,
   isInput,
-  isNgComponent,
+  isAction,
   outputToNgField
 } from './shared';
 
@@ -85,7 +85,7 @@ export function toNgTemplate(
   const tagTransform = (open, elementName, attrs, close): string => {
     let transformedElementName = elementName.toNgTemplate();
     let transformedActionName = _.split(transformedElementName, ' ', 1)[0];
-    const tagIsNgComponent = isNgComponent(transformedActionName);
+    const tagIsNgComponent = isAction(transformedActionName);
     let outputs = [];
     if (tagIsNgComponent && transformedActionName !== 'dv-action') {
       const maybeAlias: string[] | null = transformedElementName
@@ -187,7 +187,7 @@ export function toNgTemplate(
     StartTag: tagTransform,
     EndTag: (open, elementNameNode, close): string => {
       let elementName = elementNameNode.toNgTemplate();
-      if (isNgComponent(elementName)) {
+      if (isAction(elementName)) {
         const clicheAlias = _.split(elementName, '-', 1)[0];
         if (clicheAlias !== 'dv' && clicheAlias !== appName) {
           const clicheContextEntry = context[clicheAlias];

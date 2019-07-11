@@ -45,6 +45,37 @@
       "config": {
         "reinitDbOnStartUp": false
       }
+    },
+    "correction": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "Correction",
+          "type": "object",
+          "properties": {
+            "originalText": {
+              "type": "string"
+            },
+            "revisedText": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "authorId": {
+              "type": "string"
+            },
+            "chatId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "rating": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
     }
   },
   "routes": [
@@ -53,6 +84,6 @@
     { "path": "signup", "action": "signup" },
     { "path": "profile", "action": "profile" },
     { "path": "users", "action": "users"},
-    { "path": "chat", "action": "display-chat"}
+    { "path": "chat", "action": "show-chat"}
   ]
 }

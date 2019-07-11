@@ -39,6 +39,7 @@ import { ShowObjectsComponent } from './show-objects/show-objects.component';
 export { ShowObjectsComponent };
 import { ShowUrlComponent } from './show-url/show-url.component';
 export { ShowUrlComponent };
+import { UpdateObjectComponent} from "./update-object/update-object.component";
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   TriStateCheckboxComponent
@@ -55,6 +56,7 @@ const publicComponents = [
   ShowObjectComponent,
   ShowObjectsComponent,
   ShowUrlComponent,
+  UpdateObjectComponent,
   ConfigWizardComponent
 ];
 

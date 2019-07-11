@@ -69,7 +69,7 @@ export class NodeUtils {
 
   static IsAction(node): boolean {
     // No HTML tag has a hyphen
-    return _.includes(NodeUtils.GetTag(node), '-');
+    return _.includes(NodeUtils.GetTag(node), '-') && !NodeUtils.GetTag(node).startsWith('mat-');
   }
 
   static IsAppAction(node): boolean {

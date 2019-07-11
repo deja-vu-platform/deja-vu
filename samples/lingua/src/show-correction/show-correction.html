@@ -1,0 +1,17 @@
+<dv.action name="show-correction">
+  <div>
+    <span class="massage-info">
+      <userProfile.show-object id=$correction.authorId
+                             showOnly=["name"] /> says:
+    </span>
+    <span class="message-content">
+      <dv.show-entity entity=$correction.originalText />
+      should be
+      <dv.show-entity entity=$correction.revisedText />
+      <br />
+      Comments:
+      <dv.show-entity entity=$correction.comment />
+    </span>
+
+  </div>
+</dv.action>
