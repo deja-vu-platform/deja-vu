@@ -189,25 +189,10 @@
         {
           "actions": [
             {
-              "of": "create-marker",
+              "of": "create-marker-from-map",
               "from": "geolocation",
               "inputSettings": {
-                "mapId": "\"mapId\"",
-                "longitude": "geolocation.display-map.newMarker.longitude",
-                "latitude": "geolocation.display-map.newMarker.latitude",
-                "showOptionToSubmit": "false",
-                "title": "\"\"",
-                "titleLabel": "\"Spot Name\""
-              },
-              "styles": {
-                "stretch": false
-              }
-            },
-            {
-              "of": "display-map",
-              "from": "geolocation",
-              "inputSettings": {
-                "id": "\"mapId\""
+                "showOptionToSubmit": "false"
               },
               "styles": {
                 "stretch": false
