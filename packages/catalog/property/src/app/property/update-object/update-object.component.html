@@ -5,7 +5,7 @@
     <property-show-object [id]="id"
                           [hidden]="true"
                           [_config]="config"
-                          (loadedObject)="initialValue"></property-show-object>
+                          (loadedObject)="setInitialValues($event)"></property-show-object>
     <div *ngIf="objectUpdated">
       <i class="material-icons">done</i>
       {{updateObjectSavedText}}

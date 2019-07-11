@@ -1,7 +1,32 @@
 <dv.action name="show-user">
   <div class="panel">
-    <userProfile.show-object id=$user.id />
-    <chatGroup.create-group memberIds=[$user.id, $loggedInUserId]
-                            showOptionToAddMembers=false />
+    <div>
+      <userProfile.show-object object=$user showOnly=["name"] class="title" />
+    </div>
+    <span class="bold">
+      Rating:
+      <rating.show-average-rating targetId=$user.id />
+      <br />
+
+      Learning Language:
+      <userProfile.show-object object=$user showOnly=["learningLanguage"] />
+    </span>
+
+    <dv.tx>
+      <dv.gen-id />
+      <chatGroup.create-group memberIds=[$user.id, $loggedInUserId]
+                              showOptionToAddMembers=false
+                              showOptionToSubmit=false
+                              id=dv.gen-id.id
+      />
+      <dv.button>Chat</dv.button>
+      <dv.redirect href="/chat"
+                   params={ firstMemberId: $user.id,
+                            secondMemberId: $loggedInUserId,
+                            chatId: dv.gen-id.id }
+                   onExecSuccess=true
+      />
+    </dv.tx>
+
   </div>
 </dv.action>

@@ -113,7 +113,8 @@ export class UpdateObjectComponent
   async dvOnExec(): Promise<void> {
     const input = { id: this.id };
     for (const property of this.properties) {
-      input[property.name] = this[property.name].value;
+      input[property.name] = this[property.name].value ?
+        this[property.name].value : '';
     }
 
     const res = await this.gs
@@ -121,7 +122,7 @@ export class UpdateObjectComponent
         inputs: { input: input },
         extraInfo: {
           action: 'update',
-          returnFields: 'id'
+          returnFields: ''
         }
       })
       .toPromise();
@@ -141,16 +142,15 @@ export class UpdateObjectComponent
         this.objectUpdated = false;
       }, SAVED_MSG_TIMEOUT);
     }
-    // Can't do `this.form.reset();`
-    // See https://github.com/angular/material2/issues/4190
-    if (this.form) {
-      this.form.resetForm();
-    }
   }
 
   dvOnExecFailure(reason: Error) {
     if (this.showOptionToSubmit) {
       this.updateObjectError = reason.message;
     }
+  }
+
+  setInitialValues(value) {
+    this.updateObjectForm.patchValue(value);
   }
 }

@@ -268,8 +268,8 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
       updateObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-
-        return await objects.updateOne(context, {id: input.id}, {$set: newObject}, {upsert:true});
+        return await objects.updateOne(context, {id: input.id},
+          {$set: newObject}, {upsert: true});
       }
     }
   };
