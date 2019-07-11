@@ -9,22 +9,26 @@
 
   <mat-dialog-content>
     <mat-form-field>
-      <mat-select
+      <input type="text"
         required
-        name="cliche"
-        #ngFormCliche="ngModel"
         placeholder="Cliché"
-        [(ngModel)]="of"
-        (selectionChange)="onSelectCliche($event)"
+        matInput
+        [matAutocomplete]="auto"
+        [formControl]="ofControl"
+        (blur)="onSelectCliche()"
         [disabled]="data.cliche"
-      >
-        <mat-option
-          *ngFor="let clicheDefinition of clicheDefinitions"
-          [value]="clicheDefinition"
         >
-          {{clicheDefinition.name}}
+      <mat-error *ngIf="ofControl.errors?.invalidName">
+        You must choose an existing cliché
+      </mat-error>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          *ngFor="let clicheDefinitionName of filteredClicheDefinitionNames | async"
+          [value]="clicheDefinitionName"
+        >
+          {{clicheDefinitionName}}
         </mat-option>
-      </mat-select>
+      </mat-autocomplete>
       <button
         mat-icon-button
         matSuffix
