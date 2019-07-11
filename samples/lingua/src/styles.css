@@ -267,3 +267,7 @@ label-search-items-by-labels button.mat-button {
 .property-show-object {
   display:inline-block;
 }
+
+.title {
+  font-size: 28px;
+}
