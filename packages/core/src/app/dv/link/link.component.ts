@@ -10,6 +10,7 @@ import { OnExecSuccess, RunService } from '../run.service';
 })
 export class LinkComponent implements OnInit, OnExecSuccess {
   @Input() href: string;
+  @Input() value: string | undefined;
   @Input() params;
 
   constructor(

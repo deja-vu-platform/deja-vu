@@ -1,4 +1,5 @@
 <button mat-button type="button"
-        [disabled]="!valid" (click)="onClick()" class="mat-button">
+  [disabled]="!valid" (click)="onClick()" class="mat-button">
+  <span *ngIf="value">{{value}}</span>
   <ng-content></ng-content>
 </button>
