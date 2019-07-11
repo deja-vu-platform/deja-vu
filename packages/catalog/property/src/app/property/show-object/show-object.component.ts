@@ -8,7 +8,7 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getFilteredPropertyNames } from '../shared/property.model';
+import { getFilteredPropertyNames, getFilteredPropertyNamesFromConfig } from '../shared/property.model';
 
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
@@ -59,6 +59,10 @@ OnChanges {
    * The object being shown
    */
   @Output() loadedObject = new EventEmitter<any>();
+  /**
+   * Used internally by the cliche for passing the configuration
+   */
+  @Input() _config;
 
   /**
    * List of property names.
@@ -86,10 +90,15 @@ OnChanges {
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
 
-    this.properties = getFilteredPropertyNames(
+    this.properties = this._config ?
+      getFilteredPropertyNamesFromConfig(
+        this.showOnly, this.showExclude, this._config) :
+      getFilteredPropertyNames(
       this.showOnly, this.showExclude, this.cs);
 
-    const schema = this.cs.getConfig()['schema'];
+    const schema = this._config ?
+      this._config['schema'] :
+      this.cs.getConfig()['schema'];
     this.urlProps = new Set([ ..._
       .chain(schema.properties)
       .pickBy((p) => p.type === 'string' && p.format === 'url')

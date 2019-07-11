@@ -4,6 +4,7 @@
   <div *ngIf="showOptionToSubmit" class="form-group">
     <property-show-object [id]="id"
                           [hidden]="true"
+                          [_config]="config"
                           (loadedObject)="initialValue"></property-show-object>
     <div *ngIf="objectUpdated">
       <i class="material-icons">done</i>
