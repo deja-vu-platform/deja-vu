@@ -1,3 +1,13 @@
 <dv.action name="create-proposal">
   <accord.navbar accessRequired=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+  <div class="right-column">
+    <h1>Create Proposal</h1>
+    <proposal.create-object initialValue={ setListId:$setListId, addedBy:accord.navbar.loggedInUserId }
+                           showExclude=["setListId","addedBy"]
+                           buttonLabel="Create Proposal"
+    />
+  </div>
 </dv.action>

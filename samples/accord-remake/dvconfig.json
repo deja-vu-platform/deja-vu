@@ -84,10 +84,10 @@
           "title": "Proposal",
           "type": "object",
           "properties": {
-            "name": {
+            "songTitle": {
               "type": "string"
             },
-            "author": {
+            "songArtist": {
               "type": "string"
             },
             "lyrics": {
@@ -97,6 +97,9 @@
               "type": "string"
             },
             "setListId": {
+              "type": "string"
+            },
+            "addedBy": {
               "type": "string"
             }
           }

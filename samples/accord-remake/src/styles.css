@@ -75,6 +75,18 @@ div {
   padding: 30px 50px;
 }
 
+.left-column-2 {
+  float: left;
+  width: 75%;
+  padding: 10px 30px;
+}
+
+.right-column-2 {
+  float: right;
+  width: 25%;
+  padding: 10px 30px;
+}
+
 .individual-card {
   margin: 10px 0;
 }

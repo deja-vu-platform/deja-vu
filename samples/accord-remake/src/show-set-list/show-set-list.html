@@ -10,6 +10,9 @@
     <div>
       <setList.show-object id=$setListId showOnly=["description"] />
     </div>
-    <dv.link href="create-proposal">Add Proposal</dv.link>
+    <dv.link href="/create-proposal" params={ groupId:$groupId, setListId:$setListId }>Add Proposal</dv.link>
+    <proposal.show-objects fieldMatching={ setListId:$setListId }
+                           showObject=<accord.show-proposal-preview proposal=$object />
+    />
   </div>
 </dv.action>

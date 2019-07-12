@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<dv.action name="show-proposal-preview">
+  <div class="left-column-2">
+    <h3><dv.show-entity entity=$proposal.songTitle /></h3>
+    <div>By <dv.show-entity entity=$proposal.songArtist /></div>
+    <dv.link href="/proposal">View</dv.link>
+  </div>
+  <div class="right-column-2">
+  Added By <userProfile.show-object id=$proposal.addedBy
+                                    showOnly=["firstName"] />
+  </div>
+
+</dv.action>
