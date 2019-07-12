@@ -1,3 +1,13 @@
 <dv.action name="create-set-list">
   <accord.navbar accessRequired=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+  <div class="right-column">
+    <h1>Create Setlist</h1>
+    <setList.create-object initialValue={groupId:$groupId}
+                           showExclude=["groupId"]
+                           buttonLabel="Create Setlist"
+    />
+  </div>
 </dv.action>

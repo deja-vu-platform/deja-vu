@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<dv.action name="set-list-catalog">
+  <h2>
+    <groupInfo.show-object id=$groupId showOnly=["name"] />
+  </h2>
+  <dv.link href="group" params={groupId:$groupId}>View Group</dv.link>
+  <div>
+    <dv.link href="/create-set-list" params={groupId:$groupId}>Add Setlist</dv.link>
+    <setList.show-objects fieldMatching={groupId: $groupId}
+                          showOnly=["name"]
+                          showObject=<accord.show-set-list-info setList=$object groupId=$groupId />
+    />
+  </div>
+</dv.action>
