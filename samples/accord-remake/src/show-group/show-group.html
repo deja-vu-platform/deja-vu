@@ -1,7 +1,8 @@
 <dv.action name="show-group">
   <accord.navbar accessRequired=true />
+  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId />
+    <accord.set-list-catalog groupId=$groupId currentUserId=accord.navbar.loggedInUserId />
   </div>
   <div class="right-column">
     <h1>
@@ -9,7 +10,9 @@
     </h1>
     <div>
       <groupInfo.show-object id=$groupId showOnly=["description"] />
-      <dv.link href="/edit-group" params={ groupId:$groupId }>Edit Group Info</dv.link>
+      <dv.if condition=authorization.can-view.canView>
+        <dv.link href="/edit-group" params={ groupId:$groupId }>Edit Group Info</dv.link>
+      </dv.if>
     </div>
     <h2>Members</h2>
     <group.show-group id=$groupId
