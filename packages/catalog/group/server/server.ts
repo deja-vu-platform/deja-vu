@@ -61,6 +61,11 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
+  'show-group': (extraInfo) => `
+    query ShowGroup($id: ID!) {
+      group(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-groups': (extraInfo) => `
     query ShowGroups($input: GroupsInput!) {
       groups(input: $input) ${getReturnFields(extraInfo)}
