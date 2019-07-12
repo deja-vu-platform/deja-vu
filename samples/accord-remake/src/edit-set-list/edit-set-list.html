@@ -1,0 +1,10 @@
+<dv.action name="edit-set-list">
+  <accord.navbar accessRequired=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+  <div class="right-column">
+    <h2>Edit Setlist</h2>
+    <setList.update-object id=$setListId showExclude=["groupId"] buttonLabel="Update Setlist"/>
+  </div>
+</dv.action>

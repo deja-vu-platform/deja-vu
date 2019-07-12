@@ -127,6 +127,7 @@
     { "path": "group", "action": "show-group" },
     { "path": "create-group", "action": "create-group" },
     { "path": "set-list", "action": "show-set-list" },
+    { "path": "edit-set-list", "action": "edit-set-list" },
     { "path": "create-set-list", "action": "create-set-list" },
     { "path": "proposal", "action": "show-proposal" },
     { "path": "create-proposal", "action": "create-proposal" }

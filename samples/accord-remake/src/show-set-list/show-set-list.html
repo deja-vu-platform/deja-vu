@@ -9,6 +9,7 @@
     </h1>
     <div>
       <setList.show-object id=$setListId showOnly=["description"] />
+      <dv.link href="/edit-set-list" params={ groupId:$groupId, setListId:$setListId }>Edit</dv.link>
     </div>
     <dv.link href="/create-proposal" params={ groupId:$groupId, setListId:$setListId }>Add Proposal</dv.link>
     <proposal.show-objects fieldMatching={ setListId:$setListId }
