@@ -27,11 +27,18 @@
               About
             </dv.link>
             &nbsp;
-            <dv.tx>
-              <authentication.sign-out id="navbar-logout" class="btn btn-danger"
-                                       buttonLabel="Logout"/>
-              <dv.link href="/sign-in" hidden=true />
-            </dv.tx>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                Logged In: <userProfile.show-object id=authentication.logged-in.user.id showOnly=["firstName"] />
+              </mat-expansion-panel-header>
+              <dv.link href="/user-profile" class="mat-button btn btn-info profile-btn">Account Setting</dv.link>
+              <br />
+              <dv.tx>
+                <authentication.sign-out class="mat-button btn btn-info profile-btn"
+                                         buttonLabel="Logout"/>
+                <dv.link href="/sign-in" hidden=true />
+              </dv.tx>
+            </mat-expansion-panel>
           </div>
         </div>
       </dv.if>
