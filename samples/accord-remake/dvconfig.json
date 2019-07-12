@@ -123,6 +123,7 @@
     { "path": "sign-up", "action": "sign-up" },
     { "path": "user-profile", "action": "user-profile" },
     { "path": "about", "action": "about" },
+    { "path": "edit-group", "action": "edit-group" },
     { "path": "group", "action": "show-group" },
     { "path": "create-group", "action": "create-group" },
     { "path": "set-list", "action": "show-set-list" },

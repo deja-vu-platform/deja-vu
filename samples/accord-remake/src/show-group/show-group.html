@@ -9,7 +9,7 @@
     </h1>
     <div>
       <groupInfo.show-object id=$groupId showOnly=["description"] />
-      <dv.link href="/sign-in">Edit Group Info</dv.link>
+      <dv.link href="/edit-group" params={ groupId:$groupId }>Edit Group Info</dv.link>
     </div>
     <h2>Members</h2>
     <group.show-group id=$groupId

@@ -1,0 +1,21 @@
+<dv.action name="edit-group">
+  <accord.navbar accessRequired=true />
+  <div class="center-column">
+    <h2>Edit Group</h2>
+    <groupInfo.update-object id=$groupId />
+    <h2>Members</h2>
+    <userProfile.choose-object chooseObjectSelectPlaceholder="Select user to invite"
+                               showOnly=["firstName","lastName"] />
+    <dv.if condition=!!userProfile.choose-object.selectedObjectId>
+      <group.add-to-group showInput=false
+                          memberId=userProfile.choose-object.selectedObjectId
+                          id=$groupId />
+    </dv.if>
+    <h3>Current Members</h3>
+    <group.show-group id=$groupId
+                      showMembers=true
+                      showGroupId=false
+                      showMember=<accord.show-user-info userId=$id />
+    />
+  </div>
+</dv.action>
