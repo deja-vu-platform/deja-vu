@@ -5,9 +5,14 @@
   </div>
   <div class="right-column">
     <h1>Create Proposal</h1>
-    <proposal.create-object initialValue={ setListId:$setListId, addedBy:accord.navbar.loggedInUserId }
-                           showExclude=["setListId","addedBy"]
-                           buttonLabel="Create Proposal"
-    />
+    <dv.tx>
+      <dv.gen-id />
+      <proposal.create-object initialValue={ setListId:$setListId, addedBy:accord.navbar.loggedInUserId }
+                              showExclude=["setListId","addedBy"]
+                              buttonLabel="Create Proposal"
+                              id=dv.gen-id.id
+      />
+      <dv.redirect href="/proposal" params={ proposalId:dv.gen-id.id, groupId:$groupId } onExecSuccess=true />
+    </dv.tx>
   </div>
 </dv.action>

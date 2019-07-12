@@ -5,10 +5,13 @@
   </div>
   <proposal.show-object id=$proposalId hidden=true />
 
-  <div class="mid-column">cr
+  <div class="mid-column">
     <dv.if condition=!!proposal.show-object.loadedObject>
       <h1>
         <dv.show-entity entity=proposal.show-object.loadedObject.songTitle />
+        <dv.if condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
+          <dv.link class="plain" href="/edit-proposal" params={ groupId:$groupId, proposalId:$proposalId }> ✏️️</dv.link>
+        </dv.if>
       </h1>
       by <dv.show-entity entity=proposal.show-object.loadedObject.songArtist />
       <h3>Lyrics</h3>

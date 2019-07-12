@@ -130,6 +130,7 @@
     { "path": "edit-set-list", "action": "edit-set-list" },
     { "path": "create-set-list", "action": "create-set-list" },
     { "path": "proposal", "action": "show-proposal" },
+    { "path": "edit-proposal", "action": "edit-proposal" },
     { "path": "create-proposal", "action": "create-proposal" }
   ]
 }

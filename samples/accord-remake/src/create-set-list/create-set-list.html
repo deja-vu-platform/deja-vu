@@ -7,10 +7,16 @@
   <dv.if condition=authorization.can-view.canView>
     <div class="right-column">
       <h1>Create Setlist</h1>
-      <setList.create-object initialValue={groupId:$groupId}
-                             showExclude=["groupId"]
-                             buttonLabel="Create Setlist"
-      />
+      <dv.tx>
+        <dv.gen-id />
+        <setList.create-object initialValue={groupId:$groupId}
+                               showExclude=["groupId"]
+                               buttonLabel="Create Setlist"
+                               id=dv.gen-id.id
+        />
+        <dv.redirect href="/set-list" params={ groupId:$groupId, setListId:dv.gen-id.id } onExecSuccess=true />
+      </dv.tx>
+
     </div>
   </dv.if>
   <dv.if condition=!authorization.can-view.canView>
