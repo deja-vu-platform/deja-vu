@@ -78,13 +78,13 @@ div {
 .left-column-2 {
   float: left;
   width: 75%;
-  padding: 10px 30px;
+  padding: 10px 10px;
 }
 
 .right-column-2 {
   float: right;
   width: 25%;
-  padding: 10px 30px;
+  padding: 10px 10px;
 }
 
 .individual-card {

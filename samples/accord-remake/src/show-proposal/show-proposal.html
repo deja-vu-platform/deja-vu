@@ -1,3 +1,24 @@
 <dv.action name="show-proposal">
   <accord.navbar accessRequired=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+  <div class="right-column">
+    <h1>
+      <proposal.show-object id=$proposalId showOnly=["songTitle"] />
+    </h1>
+    by <proposal.show-object id=$proposalId showOnly=["songArtist"] />
+    <h3>Lyrics</h3>
+    <proposal.show-object id=$proposalId showOnly=["lyrics"] />
+    <h3>Media</h3>
+    <proposal.show-object id=$proposalId showOnly=["mediaLink"] />
+    <h3>Comments</h3>
+    <comment.show-comments ofTargetId=$proposalId
+                           showId=false
+                           showAuthorId=false
+                           showTargetId=false
+                           showContent=true
+    />
+    <comment.create-comment authorId=accord.navbar.loggedInUserId targetId=$proposalId />
+  </div>
 </dv.action>
