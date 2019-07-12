@@ -326,7 +326,10 @@ label-search-items-by-labels button.mat-button {
   font-weight: 600 !important;
 }
 
+.plain {
+  display: inline-block !important;
+}
+
 .pull-right {
   float: right;
 }
-

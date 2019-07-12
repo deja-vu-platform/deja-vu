@@ -31,6 +31,8 @@ export class RemoveViewerComponent implements
   @Input() viewerInputLabel = 'Viewer Id';
   @Input() buttonLabel = 'Remove Viewer from Resource';
   @Input() viewerRemovedSuccessText = 'Viewer removed from resource';
+  @Input() showResourceInputField = true;
+  @Input() showViewerInputField = true;
 
   viewerRemovedSuccess = false;
   viewerRemovedErrorText: string;

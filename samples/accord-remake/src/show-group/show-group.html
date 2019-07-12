@@ -15,7 +15,10 @@
     <group.show-group id=$groupId
                       showMembers=true
                       showGroupId=false
-                      showMember=<accord.show-user-info userId=$id />
+                      showMember=<accord.show-user-info userId=$id
+                                                        groupId=$groupId
+                                                        allowEdit=false
+                                                        currentUserId=accord.navbar.loggedInUserId />
     />
   </div>
 </dv.action>

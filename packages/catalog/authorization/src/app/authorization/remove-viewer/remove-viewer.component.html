@@ -9,13 +9,13 @@
       {{viewerRemovedErrorText}}
     </mat-error>
   </div>
-  <div class="form-group remove-viewer-form-group">
+  <div *ngIf="showResourceInputField" class="form-group remove-viewer-form-group">
     <mat-form-field>
       <mat-label>{{resourceInputLabel}}</mat-label>
       <input matInput [(ngModel)]="id" name="id">
     </mat-form-field>
   </div>
-  <div class="form-group remove-viewer-form-group">
+  <div *ngIf="showViewerInputField" class="form-group remove-viewer-form-group">
     <mat-form-field>
       <mat-label>{{viewerInputLabel}}</mat-label>
       <input matInput [(ngModel)]="viewerId" name="viewerId">
