@@ -63,6 +63,18 @@ div {
   margin: 30px 70px;
 }
 
+.left-column {
+  float: left;
+  width: 25%;
+  padding: 30px 50px;
+}
+
+.right-column {
+  float: right;
+  width: 75%;
+  padding: 30px 50px;
+}
+
 .individual-card {
   margin: 10px 0;
 }

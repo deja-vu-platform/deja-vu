@@ -1,4 +1,23 @@
 <dv.action name="show-group">
   <accord.navbar accessRequired=true />
-
+  <div class="divide-column"></div>
+  <div class="left-column">
+    Setlists
+  </div>
+  <div class="right-column">
+    <h1>
+      <groupInfo.show-object id=$groupId showOnly=["name"] />
+    </h1>
+    <div>
+      <groupInfo.show-object id=$groupId showOnly=["description"] />
+      <dv.link href="/sign-in">Edit Group Info</dv.link>
+    </div>
+    <h2>Members</h2>
+    <group.show-group id=$groupId
+                      showMembers=true
+                      showGroupId=false
+                      showMember=<accord.show-user-info userId=$id />
+    />
+  </div>
 </dv.action>
+

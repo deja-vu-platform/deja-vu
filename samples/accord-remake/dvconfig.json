@@ -68,6 +68,9 @@
             },
             "publicRating": {
               "type": "boolean"
+            },
+            "groupId": {
+              "type": "string"
             }
           }
         }
@@ -91,6 +94,9 @@
               "type": "string"
             },
             "mediaLink": {
+              "type": "string"
+            },
+            "setListId": {
               "type": "string"
             }
           }
