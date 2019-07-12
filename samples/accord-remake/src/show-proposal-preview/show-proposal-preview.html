@@ -5,7 +5,12 @@
     <dv.link href="/proposal" params={ proposalId:$proposal.id, groupId:$groupId }>View</dv.link>
   </div>
   <div class="right-column-2">
-  Added By <userProfile.show-object id=$proposal.addedBy
-                                    showOnly=["firstName"] />
+    Added By <userProfile.show-object id=$proposal.addedBy
+                                      showOnly=["firstName"] />
+    Your Rating: <rating.show-rating targetId=$proposal.id
+                                     sourceId=$loggedInUserId />
+    Rate: <rating.rate-target sourceId=$loggedInUserId
+                              targetId=$proposal.id />
+    Average Rating: <rating.show-average-rating targetId=$proposal.id />
   </div>
 </dv.action>

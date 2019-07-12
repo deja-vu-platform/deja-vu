@@ -69,6 +69,18 @@ div {
   padding: 30px 50px;
 }
 
+.mid-column {
+  float: left;
+  width: 50%;
+  padding: 30px 50px;
+}
+
+.right-column-thin {
+  float: left;
+  width: 25%;
+  padding: 30px 50px;
+}
+
 .right-column {
   float: right;
   width: 75%;

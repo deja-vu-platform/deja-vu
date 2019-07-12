@@ -7,6 +7,7 @@
     <dv.link href="/create-set-list" params={groupId:$groupId}>Add Setlist</dv.link>
     <setList.show-objects fieldMatching={groupId: $groupId}
                           showOnly=["name"]
+                          noObjectsToShowText="No setlists yet"
                           showObject=<accord.show-set-list-info setList=$object groupId=$groupId />
     />
   </div>

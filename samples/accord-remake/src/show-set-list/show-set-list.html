@@ -12,7 +12,8 @@
     </div>
     <dv.link href="/create-proposal" params={ groupId:$groupId, setListId:$setListId }>Add Proposal</dv.link>
     <proposal.show-objects fieldMatching={ setListId:$setListId }
-                           showObject=<accord.show-proposal-preview proposal=$object groupId=$groupId />
+                           noObjectsToShowText="No proposals yet"
+                           showObject=<accord.show-proposal-preview proposal=$object groupId=$groupId loggedInUserId=accord.navbar.loggedInUserId />
     />
   </div>
 </dv.action>
