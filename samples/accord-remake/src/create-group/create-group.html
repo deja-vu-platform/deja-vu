@@ -1,3 +1,18 @@
 <dv.action name="create-group">
   <accord.navbar accessRequired=true />
+  <div class="center-column">
+    <h1>Create Group</h1>
+    <dv.tx>
+      <dv.gen-id />
+      <group.create-group id=dv.gen-id.id
+                          memberIds=[accord.navbar.loggedInUserId]
+                          showOptionToSubmit=false
+                          showOptionToAddMembers=false
+      />
+      <groupInfo.create-object id=dv.gen-id.id
+                               showOptionToSubmit=false
+      />
+      <dv.button class="mat-button btn-default">Create Group</dv.button>
+    </dv.tx>
+  </div>
 </dv.action>
