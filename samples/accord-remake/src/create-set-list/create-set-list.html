@@ -1,0 +1,26 @@
+<dv.action name="create-set-list">
+  <accord.navbar accessRequired=true />
+  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+  <dv.if condition=authorization.can-view.canView>
+    <div class="right-column">
+      <h1>Create Setlist</h1>
+      <dv.tx>
+        <dv.gen-id />
+        <setList.create-object initialValue={groupId:$groupId}
+                               showExclude=["groupId"]
+                               buttonLabel="Create Setlist"
+                               id=dv.gen-id.id
+        />
+        <dv.redirect href="/set-list" params={ groupId:$groupId, setListId:dv.gen-id.id } onExecSuccess=true />
+      </dv.tx>
+
+    </div>
+  </dv.if>
+  <dv.if condition=!authorization.can-view.canView>
+    Only admins of the group can create new setlists.
+  </dv.if>
+
+</dv.action>

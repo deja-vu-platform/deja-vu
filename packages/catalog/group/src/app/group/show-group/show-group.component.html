@@ -1,7 +1,7 @@
-<div *ngIf="id">
+<div *ngIf="showGroupId && id">
   {{ id }}
 </div>
-<div *ngIf="group">
+<div *ngIf="showGroupId && group && !id">
   {{ group.id }}
 </div>
 <ul *ngIf="showMembers && group?.memberIds?.length > 0" class="list-group">

@@ -1,0 +1,10 @@
+<dv.action name="groups">
+  <accord.navbar accessRequired=true />
+  <div class="center-column">
+    <h1>My Groups</h1>
+    <dv.link href="/create-group">Create Group</dv.link>
+    <group.show-groups withMemberId=accord.navbar.loggedInUserId
+                       showGroup=<accord.show-group-info group=$group />
+    />
+  </div>
+</dv.action>
