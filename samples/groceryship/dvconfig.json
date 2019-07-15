@@ -1,0 +1,113 @@
+{
+  "name": "groceryship",
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "userProfile": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "User",
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "dorm": {
+              "type": "string"
+            },
+            "phoneNumber": {
+              "type": "string"
+            }
+          },
+          "required": ["username"]
+        }
+      }
+    },
+    "request": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Request",
+          "type": "object",
+          "properties": {
+            "itemName": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "integer"
+            },
+            "priceEstimate": {
+              "type": "float"
+            },
+            "price": {
+              "type": "float"
+            },
+            "tips": {
+              "type": "float"
+            },
+            "due": {
+              "type": "string"
+            },
+            "pickupLocation": {
+              "type": "string"
+            },
+            "requesterId": {
+              "type": "string"
+            },
+            "claimed": {
+              "type": "boolean"
+            },
+            "deliveryId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "delivery": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Delivery",
+          "type": "object",
+          "properties": {
+            "requesterId": {
+              "type": "string"
+            },
+            "delivererId": {
+              "type": "string"
+            },
+            "pickupTime": {
+              "type": "string"
+            },
+            "delivered": {
+              "type": "boolean"
+            },
+            "confirmed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "routes": [
+    { "path": "", "action": "main" },
+    { "path": "sign-in", "action": "sign-in" },
+    { "path": "sign-up", "action": "sign-up" },
+    { "path": "requests", "action": "show-requests" },
+    { "path": "make-request", "action": "create-request" }
+  ]
+}
