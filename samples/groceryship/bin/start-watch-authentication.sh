@@ -1,1 +1,0 @@
-if [ -f node_modules/authentication/server/server.js ]; then nodemon -w node_modules/authentication/server node_modules/authentication/server/server.js -- --config `dv get usedCliches.authentication.config`; else echo 'No file'; fi;
