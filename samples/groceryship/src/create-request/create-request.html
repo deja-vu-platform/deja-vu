@@ -1,6 +1,7 @@
 <dv.action name="create-request">
   <groceryship.navbar accessRequired=true />
   <div class="center-column">
-    <request.create-object />
+    <request.create-object initialValue={ requesterId:groceryship.navbar.loggedInUserId }
+                           showExclude=["requesterId","claimed","deliveryId"] />
   </div>
 </dv.action>

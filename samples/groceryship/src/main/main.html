@@ -1,6 +1,10 @@
 <dv.action name="main">
   <groceryship.navbar accessRequired=true />
     <div class="center-column">
-      Main Page
+      <h1>Your Requests</h1>
+      <div>
+        <request.show-objects showExclude=["requesterId","claimed","deliveryId"] />
+      </div>
+      <h1>To Deliver</h1>
     </div>
 </dv.action>

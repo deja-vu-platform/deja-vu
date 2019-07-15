@@ -19,17 +19,13 @@
           "title": "User",
           "type": "object",
           "properties": {
-            "username": {
-              "type": "string"
-            },
             "dorm": {
               "type": "string"
             },
             "phoneNumber": {
               "type": "string"
             }
-          },
-          "required": ["username"]
+          }
         }
       }
     },
@@ -45,16 +41,16 @@
               "type": "string"
             },
             "quantity": {
-              "type": "integer"
+              "type": "string"
             },
             "priceEstimate": {
-              "type": "float"
+              "type": "string"
             },
             "price": {
-              "type": "float"
+              "type": "string"
             },
             "tips": {
-              "type": "float"
+              "type": "string"
             },
             "due": {
               "type": "string"
