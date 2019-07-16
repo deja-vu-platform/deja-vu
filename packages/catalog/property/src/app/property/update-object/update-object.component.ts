@@ -46,8 +46,13 @@ export class UpdateObjectComponent
    * The ID which should be used by the created object.
    * If not given, a random ID is generated.
    */
-  @Input() id: string ;
-  savedInitialValue: ValueMap;
+  @Input() id: string;
+
+  /**
+   * The preset initialValues that overwrites
+   * the return value from showObject
+   */
+  @Input() initialValue: ValueMap = {};
 
   /**
    * List of property names to not show input fields for
@@ -74,7 +79,6 @@ export class UpdateObjectComponent
 
   updateObjectForm: FormGroup = this.builder.group({});
   properties: Property[];
-  initialValue;
 
   objectUpdated = false;
   updateObjectError: string;
@@ -103,7 +107,6 @@ export class UpdateObjectComponent
     }
     this.updateObjectForm = this.builder.group(formControls);
     this.formInitialized = true;
-    this.initialValue = this.savedInitialValue;
   }
 
   onSubmit() {
@@ -151,6 +154,8 @@ export class UpdateObjectComponent
   }
 
   setInitialValues(value) {
+    console.log("SET INITIAL VALUES");
     this.updateObjectForm.patchValue(value);
+    this.updateObjectForm.patchValue(this.initialValue);
   }
 }
