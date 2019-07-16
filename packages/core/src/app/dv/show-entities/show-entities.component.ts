@@ -9,7 +9,7 @@ import { RunService } from '../run.service';
 
 @Component({
   selector: 'dv-show-entities',
-  templateUrl: './show-entities.component.html',
+  templateUrl: './show-entities.component.html'
 })
 export class ShowEntitiesComponent {
   /**

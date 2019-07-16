@@ -1,0 +1,14 @@
+<mat-table *ngIf="data && data.length > 0" [dataSource]="data" class="mat-elevation-z8">
+
+  <ng-container *ngFor="let column of columnInfo" matColumnDef="{{column.fieldName}}">
+    <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element[column.fieldName]}}</mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+
+<div *ngIf="!data || data.length === 0">
+  {{ noDataToShowText }}
+</div>

@@ -1,6 +1,10 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
+  <request.show-objects hidden=true />
     <div class="center-column">
-      <request.show-objects showExclude=["requesterId","claimed","deliveryId"] />
+      <dv.if condition=!!request.show-objects.objects>
+        <dv.table data=request.show-objects.objects
+                  columnInfo=[{label:"Item",fieldName:"itemName"},{label:"Quant",fieldName:"quantity"}] />
+      </dv.if>
     </div>
 </dv.action>
