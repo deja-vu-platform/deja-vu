@@ -1,6 +1,6 @@
 <div *ngIf="id">
   <!-- Leaflet Maps -->
-  <div *ngIf="mapType === 'leaflet'">
+  <div *ngIf="mapType !== 'gmap'">
     <div class="map"
       leaflet
       (leafletMapReady)="onMapReady($event)"

@@ -102,7 +102,10 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
     this.mapType = this.csf.createConfigService(this.elem)
       .getConfig().mapType;
-    if (this.mapType === 'leaflet') { this.setUpLeafletMap(); }
+    if (this.mapType !== 'gmap') {
+      console.log('Setting up leaflet');
+      this.setUpLeafletMap();
+    }
   }
 
   ngAfterViewInit() {
