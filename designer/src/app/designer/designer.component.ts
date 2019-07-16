@@ -38,9 +38,11 @@ export class DesignerComponent implements OnInit, OnDestroy {
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
   private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
+  private readonly assetsDir: string;
   private readonly path: any; // path module
   private readonly cp: any; // child_process module
   private readonly cli: any; // dv-cli module
+  private readonly fsExtra: any; // fsExtra module
 
   constructor(
     private readonly dragulaService: DragulaService,
@@ -65,9 +67,12 @@ export class DesignerComponent implements OnInit, OnDestroy {
     if (this.electronService.remote) {
       this.requestProcessor = this.electronService.remote
         .require('./electron.js').requestProcessor;
+      this.assetsDir = this.electronService.remote
+        .require('./electron.js').assetsDir;
       this.path = this.electronService.remote.require('path');
       this.cp = this.electronService.remote.require('child_process');
       this.cli = this.electronService.remote.require('@deja-vu/cli/dist/utils');
+      this.fsExtra = this.electronService.remote.require('fs-extra');
     }
   }
 
@@ -116,10 +121,10 @@ export class DesignerComponent implements OnInit, OnDestroy {
     if (this.electronService.remote) {
       this.requestProcessor
         .addCliche(cliche.of.name, this.nextPort, cliche.name);
-      const serverPath = this.path.join(this.path.dirname(
-        this.cli.locateClichePackage(cliche.of.name)),
-        '..', 'server', 'server.js');
-      const configObj = Object.assign({wsPort: this.nextPort}, cliche.config);
+      const clichePkg = this.path.join(this.path.dirname(
+        this.cli.locateClichePackage(cliche.of.name)), '..');
+      const serverPath = this.path.join(clichePkg, 'server', 'server.js');
+      const configObj = Object.assign({ wsPort: this.nextPort }, cliche.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;
       if (cliche.name !== cliche.of.name) {
@@ -127,6 +132,15 @@ export class DesignerComponent implements OnInit, OnDestroy {
       }
       this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
       this.nextPort += 1;
+
+      // We also need to copy assets to the assets folder
+      const clicheAssetsPath = this.path.join(clichePkg, 'assets');
+      // rating hack: see ng-ap-builder.ts in the compiler package
+      const appAssetsDir = cliche.of.name === 'rating' ? this.assetsDir :
+        this.path.join(this.assetsDir, cliche.of.name);
+      if (this.fsExtra.existsSync(clicheAssetsPath)) {
+        this.fsExtra.copySync(clicheAssetsPath, appAssetsDir);
+      }
     }
   }
 

@@ -4,7 +4,11 @@ const isDev = require('electron-is-dev');
 
 const gateway = require('@deja-vu/gateway');
 
-const requestProcessor = gateway.startGateway(); // port 3000 default
+const serveDir = __dirname + '/.serve-assets';
+const assetsDir = serveDir + '/assets';
+const requestProcessor = gateway.startGateway(
+  undefined, undefined, serveDir); // port 3000 default
+
 
 function startElectron(url, serveDelay = 0) {
   let win;
@@ -52,5 +56,6 @@ function startElectron(url, serveDelay = 0) {
 
 module.exports = {
   startElectron,
+  assetsDir,
   requestProcessor, // designer imports this to manage cliches dynamically
 };
