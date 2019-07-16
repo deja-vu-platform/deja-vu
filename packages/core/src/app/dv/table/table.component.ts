@@ -4,7 +4,7 @@ import {
 import { MatTableDataSource } from '@angular/material';
 
 import { RunService } from '../run.service';
-import * as _ from 'lodash';
+import { Action } from '../include/include.component';
 
 export interface ColumnConfiguration {
   label: string;
@@ -27,6 +27,11 @@ export class TableComponent {
   @Input() columnInfo: ColumnConfiguration[] = [];
 
   /**
+   * Action that can be performed on each row
+   */
+  @Input() rowAction: Action | undefined;
+
+  /**
    * Text to display when empty list or undefined entities are passed in
    */
   @Input() noDataToShowText = 'No Data';
@@ -39,6 +44,9 @@ export class TableComponent {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
-    this.displayedColumns = _.map(this.columnInfo, 'fieldName');
+    this.displayedColumns = this.rowAction ? this.columnInfo
+      .map((column) => column.fieldName)
+      .concat('rowAction') :
+      this.columnInfo.map((column) => column.fieldName);
   }
 }
