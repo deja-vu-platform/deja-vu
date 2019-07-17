@@ -14,9 +14,11 @@ Action {
   Attribute = AttributeName "=" Expr
 
   Content
-    = Text    -- text
-    | Element -- element
-  Text = (~"<" ~">" any)+
+    = Interpolation -- interpolation
+    | Text          -- text
+    | Element       -- element
+  Text = (~"<" ~">" ~"{{" ~"}}" any)+
+  Interpolation = "{{" Expr "}}"
   ElementName
    = ActionNameMaybeAlias -- action
    | name                 -- html

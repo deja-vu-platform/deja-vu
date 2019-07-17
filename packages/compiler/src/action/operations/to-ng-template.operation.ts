@@ -12,8 +12,8 @@ import {
   classNameToNgField,
   getStEntryForNgComponent,
   inputToNgField,
-  isInput,
   isAction,
+  isInput,
   outputToNgField
 } from './shared';
 
@@ -222,6 +222,8 @@ export function toNgTemplate(
     },
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),
+    Content_interpolation: (interpolation) => interpolation.toNgTemplate(),
+    Interpolation: (_cb1, expr, _cb2) => `{{ ${expr.toNgTemplate()} }}`,
     ElementName_action: (actionNameMaybeAlias) =>
       actionNameMaybeAlias.toNgTemplate(),
     ElementName_html: (name) => name.sourceString,
