@@ -340,7 +340,7 @@ export abstract class RequestProcessor {
        */
       const actionPath = gatewayToClicheRequest.from;
       const dvTxNodeIndex: number | null  = actionPath.indexOfClosestTxNode();
-      if (dvTxNodeIndex) {
+      if (dvTxNodeIndex === actionPath.length() - 1) {
         console.log('Validating request of no-op tx');
         console.log(dvTxNodeIndex + ' ' + actionPath.length());
         const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);

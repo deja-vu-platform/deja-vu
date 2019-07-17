@@ -66,6 +66,9 @@
             },
             "deliveryId": {
               "type": "string"
+            },
+            "delivererId": {
+              "type": "string"
             }
           }
         }

@@ -1,5 +1,6 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
+  <userProfile.update-object id=groceryship.navbar.loggedInUserId />
   <request.show-objects hidden=true />
     <div class="center-column">
       <dv.if condition=!!request.show-objects.objects>
@@ -10,7 +11,7 @@
                               {label:"Due",fieldName:"due"},
                               {label:"Pickup Location",fieldName:"pickupLocation"},
                               {label:"Tips",fieldName:"tips"}]
-                  rowAction=<groceryship.claim-request />
+                  rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
         />
       </dv.if>
     </div>
