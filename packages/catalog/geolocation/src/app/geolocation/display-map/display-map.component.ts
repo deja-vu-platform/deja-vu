@@ -35,7 +35,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   public options: L.MapOptions;
   public bounds: L.LatLngBounds;
   public layers: L.Layer[];
-  public mapType: 'gmap' | 'leaflet';
+  public mapType: 'gmap' | 'leaflet' | undefined;
 
   private _markers: Marker[];
   private _map: L.Map;
@@ -103,7 +103,6 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     this.mapType = this.csf.createConfigService(this.elem)
       .getConfig().mapType;
     if (this.mapType !== 'gmap') {
-      console.log('Setting up leaflet');
       this.setUpLeafletMap();
     }
   }
@@ -220,7 +219,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   onMapClick(e) {
 
-    if (this.mapType === 'leaflet') {
+    if (this.mapType !== 'gmap') {
       const event: L.LeafletMouseEvent = e;
       const coords = event.latlng;
 
@@ -280,7 +279,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
         })
         .subscribe((res) => {
           this.markers = res.data.markers;
-          if (this.mapType === 'leaflet') {
+          if (this.mapType !== 'gmap') {
             this.setLeafletMarkers();
           }
         });

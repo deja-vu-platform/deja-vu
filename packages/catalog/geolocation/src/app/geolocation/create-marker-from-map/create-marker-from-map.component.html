@@ -1,6 +1,6 @@
 <div class="form-group">
   <geolocation-display-map id="default"
-    showDirectionsControl=false
+    [showDirectionsControl]="false"
     (newMarker)="updateMarker($event)">
   </geolocation-display-map>
 </div>
