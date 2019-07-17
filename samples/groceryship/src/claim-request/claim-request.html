@@ -1,10 +1,12 @@
 <dv.action name="claim-request">
-  <dv.tx>
+  <dv.if condition=!$request.claimed&&$userId!==$request.requesterId >
+    <dv.tx>
     <request.update-object id=$request.id
                            initialValue={claimed:"true",delivererId:$userId}
                            showOptionToSubmit=false
-                           hidden=false
+                           hidden=true
     />
     <dv.button>Claim</dv.button>
-  </dv.tx>
+    </dv.tx>
+  </dv.if>
 </dv.action>

@@ -120,7 +120,12 @@ const actionRequestTable: ActionRequestTable = {
       default:
         throw new Error('Need to specify extraInfo.action');
     }
-  }
+  },
+  'remove-object': (extraInfo) => `
+    mutation RemoveObject($id: ID!) {
+      removeObject(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -270,6 +275,12 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
         return await objects.updateOne(context, {id: input.id},
           {$set: newObject}, {upsert: true});
+      },
+
+      removeObject: async (_root, { id }, context: Context) => {
+        console.log("in db function");
+        console.log("id is: " + id);
+        return await objects.deleteOne(context, {id: id});
       }
     }
   };

@@ -1,11 +1,9 @@
 <dv.action name="main">
   <groceryship.navbar accessRequired=true />
-    <div class="center-column">
-      <h1>Your Requests</h1>
-      <request.show-objects showExclude=["requesterId","claimed","deliveryId","delivererId"]
-                            fieldMatching={ requesterId:groceryship.navbar.loggedInUserId } />
-      <h1>To Deliver</h1>
-      <request.show-objects showExclude=["requesterId","claimed","deliveryId","delivererId"]
-                            fieldMatching={ delivererId:groceryship.navbar.loggedInUserId } />
-    </div>
+  <div class="center-column">
+    <h1>Your Requests</h1>
+    <groceryship.show-requests-from-user userId=groceryship.navbar.loggedInUserId />
+    <h1>To Deliver</h1>
+    <groceryship.show-requests-to-deliver userId=groceryship.navbar.loggedInUserId />
+  </div>
 </dv.action>
