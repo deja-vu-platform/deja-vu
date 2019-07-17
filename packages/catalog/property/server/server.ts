@@ -278,8 +278,6 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       },
 
       removeObject: async (_root, { id }, context: Context) => {
-        console.log("in db function");
-        console.log("id is: " + id);
         return await objects.deleteOne(context, {id: id});
       }
     }
