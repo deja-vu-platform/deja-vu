@@ -1,5 +1,25 @@
 <mat-table *ngIf="data && data.length > 0" [dataSource]="data" class="mat-elevation-z8">
 
+  <ng-container *ngIf="enableSelection" matColumnDef="select">
+    <mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                    [aria-label]="checkboxLabel()">
+      </mat-checkbox>
+    </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                    [aria-label]="checkboxLabel(row)">
+      </mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+
+
+
   <ng-container *ngFor="let column of columnInfo" matColumnDef="{{column.fieldName}}">
     <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element[column.fieldName]}}</mat-cell>

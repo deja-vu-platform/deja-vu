@@ -4,6 +4,7 @@
                         hidden=true
   />
   <dv.table data=request.show-objects.objects
+            enableSelection=true
             columnInfo=[{label:"Item Name",fieldName:"itemName"},
             {label:"Quantity",fieldName:"quantity"},
             {label:"Price Estimate",fieldName:"priceEstimate"},
@@ -11,4 +12,6 @@
             {label:"Pickup Location",fieldName:"pickupLocation"},
             {label:"Tips",fieldName:"tips"}]
   />
+  <dv.show-entities entities=dv.table.selectedRowObjects />
 </dv.action>
+

@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTableModule
+  MatButtonModule, MatCheckboxModule, MatFormFieldModule,
+  MatInputModule, MatSelectModule, MatTableModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -59,7 +60,7 @@ const allComponents = [
     BrowserAnimationsModule,
     // Material
     MatButtonModule, MatInputModule, MatFormFieldModule,
-    MatSelectModule, MatTableModule
+    MatSelectModule, MatTableModule, MatCheckboxModule
   ],
   declarations: [...allComponents, OfDirective],
   providers: [
