@@ -55,16 +55,12 @@ export class CreateObjectComponent
    * (Optional) default values to populate each property input with
    */
   @Input() set initialValue(value: ValueMap) {
-    if (!this.formInitialized) {
-      this.savedInitialValue = value;
-
-      return;
-    }
     for (const fieldName of _.keys(value)) {
       if (this[fieldName]) {
         this[fieldName].setValue(value[fieldName]);
       }
     }
+    this.savedInitialValue = value;
   }
   /**
    * List of property names to not show input fields for
@@ -98,7 +94,6 @@ export class CreateObjectComponent
 
   newObjectSaved = false;
   newObjectError: string;
-  formInitialized = false;
 
   config;
   private gs: GatewayService;
@@ -122,7 +117,6 @@ export class CreateObjectComponent
       formControls[property.name] = this[property.name];
     }
     this.createObjectForm = this.builder.group(formControls);
-    this.formInitialized = true;
     this.initialValue = this.savedInitialValue;
   }
 
@@ -133,7 +127,7 @@ export class CreateObjectComponent
   async dvOnExec(): Promise<void> {
     const input = { id: this.id };
     for (const property of this.properties) {
-      input[property.name] = this[property.name].value;
+      input[property.name] = this[property.name].value ? this[property.name].value : '';
     }
 
     if (this.save) {
@@ -168,12 +162,19 @@ export class CreateObjectComponent
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();
+      this.setInitialValues();
     }
   }
 
   dvOnExecFailure(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newObjectError = reason.message;
+    }
+  }
+
+  setInitialValues() {
+    if (this.savedInitialValue) {
+      this.createObjectForm.patchValue(this.savedInitialValue);
     }
   }
 }

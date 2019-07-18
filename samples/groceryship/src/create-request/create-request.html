@@ -1,7 +1,14 @@
 <dv.action name="create-request">
   <groceryship.navbar accessRequired=true />
   <div class="center-column">
-    <request.create-object initialValue={ requesterId:groceryship.navbar.loggedInUserId }
-                           showExclude=["requesterId","claimed","deliveryId"] />
+    <dv.stage
+      stageEntity=<dv.action stage$=groceryship.stage-request.stagedRequest>
+                    <groceryship.stage-request userId=groceryship.navbar.loggedInUserId />
+                  </dv.action>
+    />
+    <dv.tx>
+      <request.create-objects objects=dv.stage.stagedEntities />
+      <dv.button>Save Requests</dv.button>
+    </dv.tx>
   </div>
 </dv.action>

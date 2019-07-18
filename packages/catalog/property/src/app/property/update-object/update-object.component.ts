@@ -154,8 +154,12 @@ export class UpdateObjectComponent
   }
 
   setInitialValues(value) {
-    console.log("SET INITIAL VALUES");
-    this.updateObjectForm.patchValue(value);
-    this.updateObjectForm.patchValue(this.initialValue);
+    if (value) {
+      this.updateObjectForm.patchValue(value);
+    }
+
+    if (this.initialValue) {
+      this.updateObjectForm.patchValue(this.initialValue);
+    }
   }
 }

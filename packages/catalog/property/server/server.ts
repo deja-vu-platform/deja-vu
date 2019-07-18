@@ -264,10 +264,6 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
-        _.each(objDocs, (objDoc: ObjectDoc) => {
-          objDoc._pending = { reqId: context.reqId };
-        });
-
         return await objects.insertMany(context, objDocs);
       },
 
