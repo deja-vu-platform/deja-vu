@@ -165,7 +165,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     })
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
-
+  console.log(joinedProperties);
 
   return [`
     type Object {
@@ -198,7 +198,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 }
 
 function createObjectFromInput(config: PropertyConfig, input) {
-  const newObject = input;
+  const newObject = _.omitBy(_.cloneDeep(input), _.isNil);
   newObject.id = input.id ? input.id : uuid();
   const ajv = new Ajv();
   const validate = ajv.compile(config.schema);

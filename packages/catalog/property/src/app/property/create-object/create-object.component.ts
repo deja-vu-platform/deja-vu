@@ -127,7 +127,7 @@ export class CreateObjectComponent
   async dvOnExec(): Promise<void> {
     const input = { id: this.id };
     for (const property of this.properties) {
-      input[property.name] = this[property.name].value ? this[property.name].value : '';
+      input[property.name] = this[property.name].value;
     }
 
     if (this.save) {
