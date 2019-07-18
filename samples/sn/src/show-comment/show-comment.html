@@ -5,9 +5,9 @@
     <dv.if condition=$snComment>
       <div class="inline-block">
         <sn.upvote
-          disabled=!$loggedInUser ||
-            $snComment.authorId === $loggedInUser.username
-          id=$snComment.id loggedInUser=$loggedInUser isPost=false />
+          disabled=!$user ||
+            $snComment.authorId === $user.username
+          id=$snComment.id user=$user isPost=false />
       </div>
 
       <div class="inline-block">
@@ -33,7 +33,7 @@
             ofTargetId=$snComment.id
             noCommentsToShowText=''
             showComment=<sn.show-comment
-              snComment=$comment loggedInUser=$loggedInUser /> />
+              snComment=$comment user=$user /> />
         </div>
       </div>
     </dv.if>

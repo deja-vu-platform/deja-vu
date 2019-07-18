@@ -3,7 +3,8 @@
   "usedCliches": {
     "authentication": {},
     "comment": {},
-    "property": {
+    "post": {
+      "name": "property",
       "config": {
         "schema": {
           "title": "Post",
