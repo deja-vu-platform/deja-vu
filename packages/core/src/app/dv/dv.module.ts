@@ -68,6 +68,6 @@ const allComponents = [
     SubscriptionService
   ],
   entryComponents: [ShowEntityComponent],
-  exports: [...allComponents, OfDirective, MatTableModule]
+  exports: [...allComponents, OfDirective]
 })
 export class DvModule { }
