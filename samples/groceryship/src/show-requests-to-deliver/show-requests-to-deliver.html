@@ -12,6 +12,6 @@
             {label:"Pickup Location",fieldName:"pickupLocation"},
             {label:"Tips",fieldName:"tips"}]
   />
-  <dv.show-entities entities=dv.table.selectedRowObjects />
+  <dv.link href="/make-delivery" params={ requests:dv.table.selectedRowObjects } >Deliver Now</dv.link>
 </dv.action>
 

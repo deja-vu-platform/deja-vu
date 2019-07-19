@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OnExecSuccess, RunService } from '../run.service';
+import * as _ from 'lodash';
 
 
 @Component({
@@ -26,6 +27,8 @@ export class LinkComponent implements OnInit, OnExecSuccess {
 
   dvOnExecSuccess() {
     console.log(this.href);
+    this.params = this.params ?
+      _.mapValues(this.params, (value) => JSON.stringify(value)) : null;
     this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
   }
 }

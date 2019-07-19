@@ -107,7 +107,8 @@ export class NgComponentBuilder {
     const inputFields = _.map(this.inputs, (input: string) =>
       `@Input() ${input};`);
     const inputParams = _.map(this.inputs, (input: string) =>
-      `this.${input} = this.${input} || params.get('${input}');`);
+      `this.${input} = this.${input} || JSON.parse(params.get('${input}'));`);
+
     const fields = _.map(this.fields, (field: NgField) =>
       ((allUsedFields.has(field.name) ?
         `private _${field.name}` :
