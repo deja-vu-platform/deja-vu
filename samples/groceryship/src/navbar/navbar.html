@@ -1,0 +1,67 @@
+<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+  <dv.tx>
+    <authentication.logged-in />
+    <dv.if condition=$accessRequired>
+      <dv.redirect href="/sign-in" onEvalFailure=true />
+    </dv.if>
+  </dv.tx>
+
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-header">
+        <dv.link class="navbar-brand" href="/">
+          GroceryShip
+        </dv.link>
+      </div>
+
+      <dv.if condition=authentication.logged-in.user>
+        <div class="form-inline navbar-right inline-block">
+          <div class="btn-toolbar toolbar">
+            <dv.link href="/"
+                     class="mat-button btn btn-info profile-btn">
+              Dashboard
+            </dv.link>
+            &nbsp;
+            <dv.link href="/make-request"
+                     class="mat-button btn btn-info profile-btn">
+              Request
+            </dv.link>
+            &nbsp;
+            <dv.link href="/requests"
+                     class="mat-button btn btn-info profile-btn">
+              Deliver
+            </dv.link>
+            &nbsp;
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                Logged In:
+                <dv.show-entity entity=authentication.logged-in.user.username />
+              </mat-expansion-panel-header>
+              <dv.link href="/profile" class="mat-button btn btn-info profile-btn">Account Setting</dv.link>
+              <br />
+              <dv.tx>
+                <authentication.sign-out class="mat-button btn btn-info profile-btn"
+                                         buttonLabel="Logout"/>
+                <dv.link href="/sign-in" hidden=true />
+              </dv.tx>
+            </mat-expansion-panel>
+          </div>
+        </div>
+      </dv.if>
+
+      <dv.if condition=!authentication.logged-in.user>
+        <div class="form-inline navbar-right">
+          <div class="btn-toolbar toolbar">
+            <dv.link href="/sign-in" class="mat-button btn btn-info profile-btn">
+              Login
+            </dv.link>
+
+            <dv.link href="/sign-up" class="mat-button btn btn-info profile-btn">
+              Register
+            </dv.link>
+          </div>
+        </div>
+      </dv.if>
+    </div>
+  </nav>
+</dv.action>

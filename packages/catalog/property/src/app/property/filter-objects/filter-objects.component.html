@@ -1,0 +1,11 @@
+<div class="property-filter-objects">
+  <div *ngFor="let property of properties" class="property-filter-objects-property">
+    <div *ngIf="property.schema.type ==='boolean' " >
+      <mat-checkbox [value]="propertyValues[property.name]"
+                    (change)="updateFieldFilter(property.name, $event.checked)"
+      >
+        {{property.name}}
+      </mat-checkbox>
+    </div>
+  </div>
+</div>

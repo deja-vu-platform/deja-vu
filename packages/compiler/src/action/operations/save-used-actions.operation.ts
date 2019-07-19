@@ -19,6 +19,7 @@ export function saveUsedActions(symbolTable: ActionSymbolTable) {
       actionNameMaybeAlias.saveUsedActions(),
     ElementName_html: (_name) => { }, Content_text: (_text) => { },
     Content_element: (element) => element.saveUsedActions(),
+    Content_interpolation: (_interpolation) => {},
     ActionNameMaybeAlias: (actionNameNode, maybeAliasNode) => {
       const maybeAlias = maybeAliasNode.saveUsedActions();
       if (!_.isEmpty(maybeAlias)) {

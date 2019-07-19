@@ -1,0 +1,19 @@
+<dv.action name="edit-set-list">
+  <accord.navbar accessRequired=true />
+  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+
+  <div class="right-column">
+    <dv.if condition=authorization.can-view.canView>
+      <h2>Edit Setlist</h2>
+      <setList.update-object id=$setListId showExclude=["groupId"] buttonLabel="Update Setlist"/>
+    </dv.if>
+
+    <dv.if condition=!authorization.can-view.canView>
+      Only admins can edit the setlist.
+    </dv.if>
+  </div>
+
+</dv.action>

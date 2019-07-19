@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
+  jsonSchemaTypeToGraphQlFilterType,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -69,9 +70,26 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
+  'update-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObject($input: UpdateObjectInput!) {
+            updateObject(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
+    }
+  },
   'create-property': (extraInfo) => `
     query Property($name: String!) {
       property(name: $name) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'filter-objects': (extraInfo) => `
+    query FilteredObjects($filters: FilterInput) {
+      filteredObjects(filters: $filters) ${getReturnFields(extraInfo)},
     }
   `,
   'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
@@ -102,7 +120,12 @@ const actionRequestTable: ActionRequestTable = {
       default:
         throw new Error('Need to specify extraInfo.action');
     }
-  }
+  },
+  'remove-object': (extraInfo) => `
+    mutation RemoveObject($id: ID!) {
+      removeObject(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -125,10 +148,23 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .toPairs()
     .map(([propertyName, schemaPropertyObject]) => {
       return `${propertyName}: ` +
-        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type]
+        jsonSchemaTypeToGraphQlType[schemaPropertyObject.type];
     })
+
     .value();
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
+
+  const propertyFilters = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .filter(([_propertyName, schemaPropertyObject]) => (
+      schemaPropertyObject.type === 'boolean'))
+    .map(([propertyName, schemaPropertyObject]) => {
+      return `${propertyName}: ` +
+        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type];
+    })
+    .value();
+  const joinedPropertyFilters = propertyFilters.join('\n');
 
   return [`
     type Object {
@@ -140,16 +176,28 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       id: ID
       ${joinedProperties}
     }
+    
+    input UpdateObjectInput {
+      id: ID!
+      ${joinedProperties}
+    }
 
     input FieldMatchingInput {
       id: ID
       ${joinedNonRequiredProperties}
     }
+
+    input FilterInput {
+      # filtering by id is not implemented currently
+      # the id field is included to prevent having and empty type
+      id: ID
+      ${joinedPropertyFilters}
+    }
   `];
 }
 
 function createObjectFromInput(config: PropertyConfig, input) {
-  const newObject = input;
+  const newObject = _.omitBy(_.cloneDeep(input), _.isNil);
   newObject.id = input.id ? input.id : uuid();
   const ajv = new Ajv();
   const validate = ajv.compile(config.schema);
@@ -180,8 +228,16 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         return _.get(obj, '_pending') ? null : obj;
       },
-      objects: async (_root, { fields }) => { 
+      objects: async (_root, { fields }) => {
         return objects.find(fields);
+      },
+      filteredObjects: async (_root, { filters } ) => {
+        // removes all fields that has `false` as its value
+        // this includes objects where the non-selected fields are true
+        // i.e. it turns the yes/no logic into a yes/don't care logic
+        const modifiedFilters = _.pickBy(filters, (value) => (value));
+
+        return objects.find(modifiedFilters);
       },
       properties: (_root) => _
         .chain(config['schema'].properties)
@@ -201,18 +257,23 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
     Mutation: {
       createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-
         return await objects.insertOne(context, newObject);
       },
 
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
-        _.each(objDocs, (objDoc: ObjectDoc) => {
-          objDoc._pending = { reqId: context.reqId };
-        });
-
         return await objects.insertMany(context, objDocs);
+      },
+
+      updateObject: async (_root, { input }, context: Context) => {
+        const newObject: ObjectDoc = createObjectFromInput(config, input);
+        return await objects.updateOne(context, {id: input.id},
+          {$set: newObject}, {upsert: true});
+      },
+
+      removeObject: async (_root, { id }, context: Context) => {
+        return await objects.deleteOne(context, {id: id});
       }
     }
   };

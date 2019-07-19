@@ -12,8 +12,8 @@ import {
   classNameToNgField,
   getStEntryForNgComponent,
   inputToNgField,
+  isAction,
   isInput,
-  isNgComponent,
   outputToNgField
 } from './shared';
 
@@ -85,7 +85,7 @@ export function toNgTemplate(
   const tagTransform = (open, elementName, attrs, close): string => {
     let transformedElementName = elementName.toNgTemplate();
     let transformedActionName = _.split(transformedElementName, ' ', 1)[0];
-    const tagIsNgComponent = isNgComponent(transformedActionName);
+    const tagIsNgComponent = isAction(transformedActionName);
     let outputs = [];
     if (tagIsNgComponent && transformedActionName !== 'dv-action') {
       const maybeAlias: string[] | null = transformedElementName
@@ -187,7 +187,7 @@ export function toNgTemplate(
     StartTag: tagTransform,
     EndTag: (open, elementNameNode, close): string => {
       let elementName = elementNameNode.toNgTemplate();
-      if (isNgComponent(elementName)) {
+      if (isAction(elementName)) {
         const clicheAlias = _.split(elementName, '-', 1)[0];
         if (clicheAlias !== 'dv' && clicheAlias !== appName) {
           const clicheContextEntry = context[clicheAlias];
@@ -222,6 +222,8 @@ export function toNgTemplate(
     },
     Content_text: (text) => text.sourceString,
     Content_element: (element) => element.toNgTemplate(),
+    Content_interpolation: (interpolation) => interpolation.toNgTemplate(),
+    Interpolation: (_cb1, expr, _cb2) => `{{ ${expr.toNgTemplate()} }}`,
     ElementName_action: (actionNameMaybeAlias) =>
       actionNameMaybeAlias.toNgTemplate(),
     ElementName_html: (name) => name.sourceString,
@@ -323,8 +325,12 @@ export function toNgTemplate(
 
       return ngInputField;
     },
-    PropAssignment: (name, _c, expr) =>
-      `${name.sourceString}: ${expr.toNgTemplate()}`,
+    PropAssignment: (prop, _c, expr) =>
+    `${prop.toNgTemplate()}: ${expr.toNgTemplate()}`,
+    Prop_noQuote: (name) => name.sourceString,
+    Prop_withQuotes: (stringLiteral) => `'${stringLiteral
+        .sourceString
+        .slice(1, -1)}'`,
     nav: (nav) => nav.sourceString,
     name: (l, rest) => l.sourceString + rest.sourceString
   };

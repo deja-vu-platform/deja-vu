@@ -27,16 +27,21 @@ import {
    CamelToTitleCasePipe, CreatePropertyComponent
 } from './create-property/create-property.component';
 export { CreatePropertyComponent };
+import { FilterObjectsComponent} from "./filter-objects/filter-objects.component";
+export { FilterObjectsComponent };
 import {
   ObjectAutocompleteComponent
 } from './object-autocomplete/object-autocomplete.component';
 export { ObjectAutocompleteComponent };
+import { RemoveObjectComponent } from './remove-object/remove-object.component';
+export { RemoveObjectComponent };
 import { ShowObjectComponent } from './show-object/show-object.component';
 export { ShowObjectComponent };
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
 export { ShowObjectsComponent };
 import { ShowUrlComponent } from './show-url/show-url.component';
 export { ShowUrlComponent };
+import { UpdateObjectComponent} from "./update-object/update-object.component";
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   TriStateCheckboxComponent
@@ -48,10 +53,13 @@ const publicComponents = [
   CreateObjectComponent,
   CreateObjectsComponent,
   CreatePropertyComponent,
+  FilterObjectsComponent,
   ObjectAutocompleteComponent,
+  RemoveObjectComponent,
   ShowObjectComponent,
   ShowObjectsComponent,
   ShowUrlComponent,
+  UpdateObjectComponent,
   ConfigWizardComponent
 ];
 

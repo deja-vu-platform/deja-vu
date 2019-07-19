@@ -1,0 +1,20 @@
+<dv.action name="edit-proposal">
+  <accord.navbar accessRequired=true />
+  <proposal.show-object id=$proposalId hidden=true />
+  <div class="left-column">
+    <accord.set-list-catalog groupId=$groupId />
+  </div>
+
+  <div class="right-column">
+    <dv.if condition=proposal.show-object.loadedObject>
+      <dv.if condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
+        <h2>Edit Proposal</h2>
+        <proposal.update-object id=$proposalId showExclude=["addedBy","setListId"] buttonLabel="Update Proposal"/>
+      </dv.if>
+      <dv.if condition=proposal.show-object.loadedObject.addedBy!==accord.navbar.loggedInUserId>
+        Only the creator can edit the proposal.
+      </dv.if>
+    </dv.if>
+  </div>
+
+</dv.action>

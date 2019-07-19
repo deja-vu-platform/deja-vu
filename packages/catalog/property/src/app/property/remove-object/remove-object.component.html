@@ -1,0 +1,10 @@
+<div *ngIf="showOptionToDelete">
+  <div *ngIf="objectDeleted">
+    {{objectDeletedText}}
+  </div>
+  <mat-error *ngIf="deleteObjectError">
+    {{deleteObjectError}}
+  </mat-error>
+  <button mat-button (click)="removeObject()">{{buttonLabel}}</button>
+</div>
+

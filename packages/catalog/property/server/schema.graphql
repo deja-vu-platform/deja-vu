@@ -12,9 +12,12 @@ type Query {
   object(id: ID!): Object
   properties: [Property]
   objects(fields: FieldMatchingInput): [Object]
+  filteredObjects(filters: FilterInput): [Object]
 }
 
 type Mutation {
   createObject(input: CreateObjectInput!): Object
   createObjects(input: [CreateObjectInput!]!): [Object]
+  updateObject(input: UpdateObjectInput!): Boolean
+  removeObject(id: ID!): Boolean
 }

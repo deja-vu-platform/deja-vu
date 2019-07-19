@@ -7,12 +7,7 @@ import {
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
-import { Rating } from '../shared/rating.model';
-
-interface AverageRatingForInputRes {
-  data: { averageRatingForTarget: { rating: number; count: number } };
-  errors: { message: string }[];
-}
+import { AverageRatingForInputRes } from '../shared/rating.model';
 
 @Component({
   selector: 'rating-show-average-rating',

@@ -1,31 +1,28 @@
-<dv.action name="show-post" loadedPost$=property.show-object.loadedObject>
+<dv.action name="show-post" loadedPost$=post.show-object.loadedObject>
   <div>
-    <property.show-object id=$id hidden=true />
+    <post.show-object id=$id hidden=true />
 
-    <dv.if condition=!property.show-object.loadedObject>
+    <dv.if condition=!post.show-object.loadedObject>
       Post not found
     </dv.if>
 
-    <dv.if condition=property.show-object.loadedObject class="post-container">
+    <dv.if condition=post.show-object.loadedObject class="post-container">
       <div class="inline-block">
         <sn.upvote
-          disabled=!$loggedInUser ||
-            property.show-object.loadedObject.author === $loggedInUser.username
-          id=$id isPost=true loggedInUser=$loggedInUser />
+          disabled=!$user ||
+            post.show-object.loadedObject.author === $user.username
+          id=$id isPost=true user=$user />
       </div>
       <div class="inline-block">
         <div>
           <span class="post-title">
-            <a href=property.show-object.loadedObject.url>
-              <property.show-object class="inline-block"
-                object=property.show-object.loadedObject
-                showOnly=['title'] />
+            <a href=post.show-object.loadedObject.url>
+              {{ post.show-object.loadedObject.title }}
             </a>
           </span>
-          <!-- TODO: below should link to list of all posts with that base url -->
-          <span class="subtext">(<property.show-url class="inline-block"
+          <span class="subtext">(<post.show-url class="inline-block"
             showBaseUrlOnly=true
-            url=property.show-object.loadedObject.url />)</span>
+            url=post.show-object.loadedObject.url />)</span>
         </div>
         <div class="subtext">
           <scoreposts.show-target
@@ -34,13 +31,8 @@
             showId=false
             showScores=false
             totalLabel="" />
-          points by
-          <property.show-object class="inline-block"
-            object=property.show-object.loadedObject
-            showOnly=['author'] /> |
+          points by {{ post.show-object.loadedObject.author }} |
           <dv.link href="/item" params={ id: $id }>comments</dv.link>
-          <!-- TODO: show number of comments -->
-          <!-- TODO: save timestamp and show how long ago this was posted -->
         </div>
       </div>
     </dv.if>

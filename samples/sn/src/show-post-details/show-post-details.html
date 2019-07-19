@@ -3,19 +3,19 @@
 
   <div class="main">
     <div class="container">
-      <sn.show-post id=$id loggedInUser=sn.navbar.loggedInUser />
+      <sn.show-post id=$id user=sn.navbar.user />
 
       <dv.if condition=sn.show-post.loadedPost>
         <div class="write-comment-container">
           <hr class="post-separator" />
 
           <comment.create-comment
-            authorId=sn.navbar.loggedInUser?.username
+            authorId=sn.navbar.user?.username
             buttonLabel="Add comment"
-            showOptionToSubmit=!!sn.navbar.loggedInUser
+            showOptionToSubmit=!!sn.navbar.user
             targetId=$id />
 
-          <dv.if condition=!sn.navbar.loggedInUser>
+          <dv.if condition=!sn.navbar.user>
             <dv.callback-link class="black-link" href="/login">
               Add comment
             </dv.callback-link>
@@ -26,7 +26,7 @@
           <comment.show-comments
             ofTargetId=$id
             showComment=<sn.show-comment
-            snComment=$comment loggedInUser=sn.navbar.loggedInUser /> />
+            snComment=$comment user=sn.navbar.user /> />
         </div>
       </dv.if>
     </div>

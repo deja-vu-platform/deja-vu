@@ -1,3 +1,5 @@
+The following app/cliché names are reserved: `mat`, `ng`
+
 Fonts
 -----
 

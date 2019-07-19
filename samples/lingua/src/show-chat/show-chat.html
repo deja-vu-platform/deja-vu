@@ -1,0 +1,27 @@
+<dv.action name="show-chat">
+  <lingua.navbar accessRequired=true />
+  <div class="center-column">
+    <span class="bold">
+      Conversation:
+      <br />
+      <userProfile.show-object id=$firstMemberId showOnly=["name"] />:
+      <rating.show-average-rating targetId=$firstMemberId showNumRatings=false />
+      <userProfile.show-object id=$secondMemberId showOnly=["name"] />:
+      <rating.show-average-rating targetId=$secondMemberId showNumRatings=false />
+      Rate Your Conversation:
+      <rating.rate-target sourceId=lingua.navbar.loggedInUserId
+                          targetId=$firstMemberId===lingua.navbar.loggedInUserId ? $secondMemberId : $firstMemberId
+      />
+    </span>
+    <chat.show-chat id=$chatId
+                    showId = false
+                    showMessage=<lingua.show-message message=$message chatId=$chatId userId=lingua.navbar.loggedInUserId />
+    />
+    <chat.create-message authorId=lingua.navbar.loggedInUserId chatId=$chatId />
+  </div>
+  <div class="pull-right">
+    <correction.show-objects fieldMatching={chatId: $chatId}
+                             showObject=<lingua.show-correction correction=$object />
+    />
+  </div>
+</dv.action>

@@ -1,0 +1,12 @@
+<mat-radio-group aria-label="Filter Rating Targets"
+                 [(ngModel)]="selectedMinimumAvgRating"
+                 (change)="updateSelected($event.value)">
+  <mat-radio-button *ngFor="let minimumAvgRating of minimumAvgRatings"
+                    [value]="minimumAvgRating">
+    <star-rating-comp [showHalfStars]="true" [rating]="minimumAvgRating"
+                      [readOnly]="true" [starType]="'svg'">
+    </star-rating-comp>
+    <a> {{ minimumAvgRating }} & up </a>
+    <br />
+  </mat-radio-button>
+</mat-radio-group>

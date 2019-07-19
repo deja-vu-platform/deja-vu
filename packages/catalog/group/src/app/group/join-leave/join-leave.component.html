@@ -1,4 +1,4 @@
 <div *ngIf="group || groupId">
-  <button mat-button *ngIf="!inGroup" (click)="joinGroup()">Join Group</button>
-  <button mat-button *ngIf="inGroup" (click)="leaveGroup()">Leave Group</button>
+  <button mat-button *ngIf="!inGroup" (click)="joinGroup()">{{joinGroupText}}</button>
+  <button mat-button *ngIf="inGroup" (click)="leaveGroup()">{{leaveGroupText}}</button>
 </div>

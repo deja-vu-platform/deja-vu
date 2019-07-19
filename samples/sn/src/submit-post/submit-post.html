@@ -9,22 +9,21 @@
 
   <div class="main">
     <div class="container">
-      <dv.if condition=sn.navbar.loggedInUser>
+      <dv.if condition=sn.navbar.user>
         <dv.tx>
           <dv.gen-id />
           <authentication.authenticate
-            id=sn.navbar.loggedInUser.id hidden=true />
-          <property.create-object
-            buttonLabel="Submit"
+            id=sn.navbar.user.id hidden=true />
+          <post.create-object
             id=dv.gen-id.id
-            initialValue={ author: sn.navbar.loggedInUser.username }
-            newObjectSavedText="Post submitted"
+            initialValue={ author: sn.navbar.user.username }
             showExclude=['author']
-            showOptionToSubmit=sn.navbar.loggedInUser />
+            buttonLabel="Submit"
+            newObjectSavedText="Post submitted" />
           <!-- use author as sourceId of initial score -->
           <!-- also allows database to prevent author from upvoting own post -->
           <scoreposts.create-score
-            sourceId=sn.navbar.loggedInUser.username
+            sourceId=sn.navbar.user.username
             targetId=dv.gen-id.id
             value=0
             hidden=true />

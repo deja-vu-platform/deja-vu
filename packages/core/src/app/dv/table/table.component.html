@@ -1,0 +1,45 @@
+<mat-table *ngIf="data && data.length > 0" [dataSource]="data" class="mat-elevation-z8">
+
+  <ng-container *ngIf="enableSelection" matColumnDef="select">
+    <mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                    [aria-label]="checkboxLabel()">
+      </mat-checkbox>
+    </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                    [aria-label]="checkboxLabel(row)">
+      </mat-checkbox>
+    </mat-cell>
+  </ng-container>
+
+
+
+
+  <ng-container *ngFor="let column of columnInfo" matColumnDef="{{column.fieldName}}">
+    <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element[column.fieldName]}}</mat-cell>
+  </ng-container>
+
+  <ng-container *ngIf="!!rowAction" matColumnDef="rowAction">
+    <mat-header-cell *matHeaderCellDef>Row Action</mat-header-cell>
+    <mat-cell *matCellDef="let element">
+      <dv-include [action]="rowAction"
+                  [inputs]="{ rowObject: element }"
+                  [parent]="table" no-default-rowAction>
+      </dv-include>
+
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+
+<div *ngIf="!data || data.length === 0">
+  {{ noDataToShowText }}
+</div>

@@ -3,13 +3,13 @@
     <dv.if condition=$isPost>
       <dv.tx>
         <authentication.authenticate as upvote-post-authenticate
-          id=$loggedInUser?.id hidden=true />
+          id=$user?.id hidden=true />
         <scoreposts.create-score as upvote-post-create-score
-          buttonDisabled=$disabled || !$loggedInUser
+          buttonDisabled=$disabled || !$user
           class="upvote-button"
           newScoreSavedText=""
           showOptionToInputValue=false
-          sourceId=$loggedInUser?.username
+          sourceId=$user?.username
           submitMatIconName="arrow_drop_up"
           targetId=$id
           value=1 />
@@ -19,13 +19,13 @@
     <dv.if condition=!$isPost>
       <dv.tx>
         <authentication.authenticate
-          id=$loggedInUser?.id hidden=true />
+          id=$user?.id hidden=true />
         <scorecomments.create-score
-          buttonDisabled=$disabled || !$loggedInUser
+          buttonDisabled=$disabled || !$user
           class="upvote-button"
           newScoreSavedText=""
           showOptionToInputValue=false
-          sourceId=$loggedInUser?.username
+          sourceId=$user?.username
           submitMatIconName="arrow_drop_up"
           targetId=$id
           value="1" />

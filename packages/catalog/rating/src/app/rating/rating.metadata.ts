@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ModuleWithProviders } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule
+  MatButtonModule, MatFormFieldModule, MatInputModule, MatRadioModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -33,6 +33,10 @@ import {
 export { DeleteRatingsComponent };
 import { DeleteRatingComponent } from './delete-rating/delete-rating.component';
 export { DeleteRatingComponent };
+import { FilterRatingsComponent } from './filter-ratings/filter-ratings.component';
+export { FilterRatingsComponent };
+import { FilterTargetsComponent } from './filter-targets/filter-targets.component';
+export { FilterTargetsComponent };
 
 import { StarRatingModule } from 'angular-star-rating';
 
@@ -43,7 +47,8 @@ import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent,
   ShowRatingsByTargetComponent, ShowRatingCountComponent,
-  DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent
+  DeleteRatingsComponent, DeleteRatingComponent, ConfigWizardComponent,
+  FilterRatingsComponent, FilterTargetsComponent
 ];
 
 
@@ -53,7 +58,7 @@ const metadata = {
     DvModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatButtonModule, MatInputModule, MatFormFieldModule, MatRadioModule,
     StarRatingModule.forRoot()
   ],
   declarations: allComponents,

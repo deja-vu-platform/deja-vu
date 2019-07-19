@@ -1,6 +1,32 @@
 import { SymbolTable } from '../symbolTable';
 import { ActionCompiler, CompiledAction } from './action.compiler';
 
+
+function expectInputMatch(action: CompiledAction): string {
+  const inputRegex = /@Input\(\)\s+(.*);/;
+  expect(action.ngComponent)
+    .toMatch(inputRegex);
+
+  const inputField = action.ngComponent
+    .match(inputRegex)[1];
+  expect(action.ngTemplate)
+    .toMatch(inputField);
+
+  return inputField;
+}
+
+function expectOutputMatch(output: string, action: CompiledAction): string {
+  expect(action.ngTemplate)
+    .toMatch(`\\(${output}\\)=".+=\\$event"`);
+  const outputField = action.ngTemplate
+    .match(`\\(${output}\\)="(.+)=\\$event"`)[1];
+  expect(action.ngComponent)
+    .toMatch(outputField);
+
+  return outputField;
+}
+
+
 describe('ActionCompiler', () => {
   let actionCompiler: ActionCompiler;
   const appName = 'app';
@@ -51,7 +77,7 @@ describe('ActionCompiler', () => {
         <foo.aliased-action as aa />
         <foo.other-actiom />
         <foo.action
-          obj={a: "hi", b: 3 + 2, c: 'hello'}
+          obj={a: "hi", b: 3 + 2, c: 'hello', 'h e': 'llo'}
           numberArray=[1, -2.5]
           objArray=[{a: 1}, {b: 2}]
           conditional=!((2 + 2e-10) === 5) ? "b" : "c"
@@ -78,6 +104,39 @@ describe('ActionCompiler', () => {
       .toMatch('-2.5');
     expect(compiledAction.ngTemplate)
       .toMatch('2e-10');
+  });
+
+  it('should compile action with interpolation', () => {
+    const actionName = 'action-with-interpolation';
+    const st: SymbolTable = {
+      foo: {
+        kind: 'cliche'
+      }
+    };
+    const action = `
+      <dv.action name="${actionName}">
+        <foo.aliased-action as aa />
+        <foo.other-action />
+        String: {{ "hi" }}
+        Output: {{ aa.out[0] }}
+        Input: {{ $in.a }}
+      </dv.action>
+    `;
+    const compiledAction: CompiledAction = actionCompiler
+      .compile(appName, action, st);
+    expect(compiledAction.ngTemplate)
+      .not
+      .toMatch('dv.action');
+    expect(compiledAction.ngTemplate)
+      .toMatch(`{{ 'hi' }}`);
+
+    const inputField = expectInputMatch(compiledAction);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`{{ ${inputField}.a }}`);
+
+    const outputField = expectOutputMatch('out', compiledAction);
+    expect(compiledAction.ngTemplate)
+      .toMatch(`{{ ${outputField}\\[0\\] }}`);
   });
 
   it('should handle strings correctly', () => {

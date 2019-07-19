@@ -187,3 +187,8 @@ It could be used as an example to follow for the steps below.
       .toPromise())
     .value());
   ```
+
+
+# Other Stuff
+
+- if you don't have a default action for an action input use `no-default-foo`. See [stage-header](https://github.com/spderosso/deja-vu/tree/master/packages/core/src/app/dv/stage) for an example.

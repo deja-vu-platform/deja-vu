@@ -6,10 +6,10 @@
       <div class="comment-container">
         <div class="inline-block">
           <sn.upvote
-            disabled=!sn.navbar.loggedInUser ||
+            disabled=!sn.navbar.user ||
               comment.show-comment.loadedComment?.authorId ===
-              sn.navbar.loggedInUser?.username
-            id=$id loggedInUser=sn.navbar.loggedInUser isPost=false />
+              sn.navbar.user?.username
+            id=$id user=sn.navbar.user isPost=false />
         </div>
 
         <div class="inline-block">
@@ -25,11 +25,11 @@
 
           <dv.tx>
             <authentication.authenticate
-              user=sn.navbar.loggedInUser hidden=true />
+              user=sn.navbar.user hidden=true />
             <comment.create-comment
-              authorId=sn.navbar.loggedInUser?.username
+              authorId=sn.navbar.user?.username
               buttonLabel="Reply"
-              showOptionToSubmit=!!sn.navbar.loggedInUser
+              showOptionToSubmit=!!sn.navbar.user
               targetId=$id />
           </dv.tx>
         </div>

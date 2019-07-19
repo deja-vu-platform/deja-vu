@@ -1,0 +1,26 @@
+<dv.action name="show-message">
+  <div>
+    <div class="message-info">
+      <span>
+        <userProfile.show-object id=$message.authorId showOnly=["name"] /> :
+      </span>
+      <span class="pull-right">
+        <dv.show-entity entity=$message.timestamp />
+      </span>
+    </div>
+
+    <div class="message-content">
+      <dv.show-entity entity=$message.content />
+    </div>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Correct Words</mat-panel-title>
+      </mat-expansion-panel-header>
+      <correction.create-object showExclude=["authorId","chatId"]
+                                initialValue={ authorId: $userId, chatId: $chatId }
+      />
+    </mat-expansion-panel>
+
+  </div>
+</dv.action>

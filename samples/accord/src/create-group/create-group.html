@@ -1,0 +1,24 @@
+<dv.action name="create-group">
+  <accord.navbar accessRequired=true />
+  <div class="center-column">
+    <h1>Create Group</h1>
+    <dv.tx>
+      <dv.gen-id />
+      <group.create-group id=dv.gen-id.id
+                          memberIds=[accord.navbar.loggedInUserId]
+                          showOptionToSubmit=false
+                          showOptionToAddMembers=false
+      />
+      <authorization.create-resource id=dv.gen-id.id
+                                     ownerId=accord.navbar.loggedInUserId
+                                     viewerIds=[accord.navbar.loggedInUserId]
+                                     hidden=true
+      />
+      <groupInfo.create-object id=dv.gen-id.id
+                               showOptionToSubmit=false
+      />
+      <dv.button class="mat-button btn-default">Create Group</dv.button>
+      <dv.redirect href="/group" params={ groupId:dv.gen-id.id } onExecSuccess=true />
+    </dv.tx>
+  </div>
+</dv.action>

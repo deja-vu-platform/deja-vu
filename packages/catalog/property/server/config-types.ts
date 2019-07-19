@@ -8,6 +8,11 @@ export const jsonSchemaTypeToGraphQlType = {
   /* Not supported yet: object, array, null */
 };
 
+export const jsonSchemaTypeToGraphQlFilterType = {
+  boolean: 'Boolean'
+  /* only supports boolean for now */
+};
+
 export interface Property {
   type: keyof typeof jsonSchemaTypeToGraphQlType;
 }

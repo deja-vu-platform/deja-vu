@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule
+  MatButtonModule, MatCheckboxModule, MatFormFieldModule,
+  MatInputModule, MatSelectModule, MatTableModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -20,14 +21,19 @@ import {
   IncludeComponent, IncludeDirective
 } from './include/include.component';
 import { InputIdComponent } from './input-id/input-id.component';
+import { IntersectComponent } from './intersect/intersect.component';
 import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
+import { ShowEntitiesComponent } from './show-entities/show-entities.component';
+import { ShowEntityComponent } from './show-entity/show-entity.component';
 import { StageComponent } from './stage/stage.component';
 import { StatusComponent } from './status/status.component';
+import { TableComponent } from './table/table.component';
 import { TxComponent } from './tx/tx.component';
+import { UnionComponent } from './union/union.component';
 import { ZipComponent } from './zip/zip.component';
 
 import { ConfigServiceFactory } from './config.service';
@@ -42,7 +48,8 @@ const allComponents = [
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
-  ForComponent
+  ForComponent, ShowEntitiesComponent, UnionComponent,
+  IntersectComponent, ShowEntityComponent, TableComponent
 ];
 
 @NgModule({
@@ -52,13 +59,15 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
+    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatSelectModule, MatTableModule, MatCheckboxModule
   ],
   declarations: [...allComponents, OfDirective],
   providers: [
     GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
     SubscriptionService
   ],
+  entryComponents: [ShowEntityComponent],
   exports: [...allComponents, OfDirective]
 })
 export class DvModule { }

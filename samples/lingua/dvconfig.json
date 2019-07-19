@@ -1,0 +1,89 @@
+{
+  "name": "lingua",
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "authorization": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "userProfile": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Profile",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "aboutMe": {
+              "type": "string"
+            },
+            "learningLanguage": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "chat": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
+    },
+    "chatGroup": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartUp": false
+      }
+    },
+    "correction": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "Correction",
+          "type": "object",
+          "properties": {
+            "originalText": {
+              "type": "string"
+            },
+            "revisedText": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "authorId": {
+              "type": "string"
+            },
+            "chatId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "rating": {
+      "config": {
+        "reinitDbOnStartup": true
+      }
+    }
+  },
+  "routes": [
+    { "path": "", "action": "conversations" },
+    { "path": "login", "action": "login" },
+    { "path": "signup", "action": "signup" },
+    { "path": "profile", "action": "profile" },
+    { "path": "users", "action": "users"},
+    { "path": "chat", "action": "show-chat"}
+  ]
+}

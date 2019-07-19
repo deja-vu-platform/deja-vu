@@ -1,0 +1,31 @@
+<dv.action name="edit-group">
+  <accord.navbar accessRequired=true />
+  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <div class="center-column">
+    <dv.if condition=authorization.can-view.canView>
+      <h2>Edit Group</h2>
+      <groupInfo.update-object id=$groupId />
+      <h2>Members</h2>
+      <userProfile.choose-object chooseObjectSelectPlaceholder="Select user to invite"
+                                 showOnly=["firstName","lastName"] />
+      <dv.if condition=!!userProfile.choose-object.selectedObjectId>
+        <group.add-to-group showInput=false
+                            memberId=userProfile.choose-object.selectedObjectId
+                            id=$groupId />
+      </dv.if>
+      <h3>Current Members</h3>
+      <group.show-group id=$groupId
+                        showMembers=true
+                        showGroupId=false
+                        showMember=<accord.show-user-info userId=$id
+                        groupId=$groupId
+                        allowEdit=true
+                        currentUserId=accord.navbar.loggedInUserId />
+      />
+    </dv.if>
+
+    <dv.if condition=!authorization.can-view.canView>
+      Only admins are allowed to edit the group info.
+    </dv.if>
+  </div>
+</dv.action>

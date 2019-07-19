@@ -63,9 +63,13 @@ export function saveInputs(symbolTable: ActionSymbolTable) {
       .saveInputs(),
     Content_element: (element) => element.saveInputs(),
     Content_text: (_text) => {},
+    Content_interpolation: (interpolation) => interpolation.saveInputs(),
+    Interpolation: (_cb1, expr, _cb2) => expr.saveInputs(),
     name: (_letter, _rest)  => {},
     input: (ds, inputName) => {
-      symbolTable[ds.sourceString + inputName.sourceString] = { kind: 'input' };
+      symbolTable[ds.sourceString + inputName.sourceString] = {
+        kind: 'input'
+      };
     },
     PropAssignment: (_name, _c, expr) => expr.saveInputs()
   };
