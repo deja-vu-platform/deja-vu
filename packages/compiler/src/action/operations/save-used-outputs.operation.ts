@@ -131,6 +131,8 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
         .saveUsedOutputs(),
     Content_element: (element) => element.saveUsedOutputs(),
     Content_text: (_text) => {},
+    Content_interpolation: (interpolation) => interpolation.saveUsedOutputs(),
+    Interpolation: (_cb1, expr, _cb2) => expr.saveUsedOutputs(),
     PropAssignment: (_name, _c, expr) => expr.saveUsedOutputs()
   };
 }
