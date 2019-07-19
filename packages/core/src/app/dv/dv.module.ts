@@ -18,6 +18,7 @@ import { ForComponent } from './for/for.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
 import { GenIdsComponent } from './gen-ids/gen-ids.component';
+import { GroupByComponent } from './group-by/group-by.component';
 import {
   IncludeComponent, IncludeDirective
 } from './include/include.component';
@@ -50,7 +51,8 @@ const allComponents = [
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
-  IntersectComponent, ShowEntityComponent, TableComponent, DifferenceComponent
+  IntersectComponent, ShowEntityComponent, TableComponent,
+  DifferenceComponent, GroupByComponent
 ];
 
 @NgModule({

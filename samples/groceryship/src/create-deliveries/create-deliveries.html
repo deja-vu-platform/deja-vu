@@ -1,4 +1,10 @@
 <dv.action name="create-deliveries">
+  <dv.group-by items=$requests key="itemName" />
+  <dv.for
+    elems=dv.group-by.groupedItems
+    showElem=<dv.show-entities entities=$elem.items />
+  />
+
   <dv.table data=$requests
             enableSelection=true
             columnInfo=[{label:"Item Name",fieldName:"itemName"},
