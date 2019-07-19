@@ -33,6 +33,8 @@ import {
   ObjectAutocompleteComponent
 } from './object-autocomplete/object-autocomplete.component';
 export { ObjectAutocompleteComponent };
+import { RemoveObjectComponent } from './remove-object/remove-object.component';
+export { RemoveObjectComponent };
 import { ShowObjectComponent } from './show-object/show-object.component';
 export { ShowObjectComponent };
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
@@ -53,6 +55,7 @@ const publicComponents = [
   CreatePropertyComponent,
   FilterObjectsComponent,
   ObjectAutocompleteComponent,
+  RemoveObjectComponent,
   ShowObjectComponent,
   ShowObjectsComponent,
   ShowUrlComponent,

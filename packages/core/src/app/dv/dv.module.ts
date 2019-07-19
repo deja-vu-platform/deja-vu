@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule
+  MatButtonModule, MatCheckboxModule, MatFormFieldModule,
+  MatInputModule, MatSelectModule, MatTableModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -30,6 +31,7 @@ import { ShowEntitiesComponent } from './show-entities/show-entities.component';
 import { ShowEntityComponent } from './show-entity/show-entity.component';
 import { StageComponent } from './stage/stage.component';
 import { StatusComponent } from './status/status.component';
+import { TableComponent } from './table/table.component';
 import { TxComponent } from './tx/tx.component';
 import { UnionComponent } from './union/union.component';
 import { ZipComponent } from './zip/zip.component';
@@ -47,7 +49,7 @@ const allComponents = [
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
-  IntersectComponent, ShowEntityComponent
+  IntersectComponent, ShowEntityComponent, TableComponent
 ];
 
 @NgModule({
@@ -57,7 +59,8 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
+    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatSelectModule, MatTableModule, MatCheckboxModule
   ],
   declarations: [...allComponents, OfDirective],
   providers: [

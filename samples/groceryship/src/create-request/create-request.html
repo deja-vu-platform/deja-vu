@@ -1,0 +1,17 @@
+<dv.action name="create-request">
+  <groceryship.navbar accessRequired=true />
+  <div class="center-column">
+    <dv.stage
+      stageEntity=<dv.action stage$=groceryship.stage-request.stagedRequest>
+                    <groceryship.stage-request userId=groceryship.navbar.loggedInUserId />
+                  </dv.action>
+      stageHeader=<h2>Requests in List</h2>
+      showEntity=<groceryship.show-request request=$entity />
+    />
+    <dv.tx>
+      <request.create-objects objects=dv.stage.stagedEntities />
+      <dv.button>Confirm Requests</dv.button>
+      <dv.redirect href="/" onExecSuccess=true />
+    </dv.tx>
+  </div>
+</dv.action>

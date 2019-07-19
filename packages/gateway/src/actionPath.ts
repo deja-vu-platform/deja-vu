@@ -56,7 +56,7 @@ export class ActionPath {
    * @returns true if this action path is inside a dv transaction
    */
   isDvTx(): boolean {
-    return this.indexOfClosestTxNode() !== null;
+    return this.indexOfClosestTxNode() === this.length() - 2;
   }
 
   /**

@@ -74,6 +74,8 @@ OnChanges {
 
   properties: string[];
   showObjects;
+
+  config;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -88,6 +90,7 @@ OnChanges {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
+    this.config = this.cs.getConfig();
   }
 
   ngAfterViewInit() {

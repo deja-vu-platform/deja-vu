@@ -1,118 +1,112 @@
 {
   "name": "groceryship",
-  "watch": true,
-  "gateway": {
-    "config": {
-      "wsPort": 3000
-    }
-  },
   "usedCliches": {
     "authentication": {
       "config": {
-        "wsPort": 3002,
         "reinitDbOnStartup": false
       }
     },
     "authorization": {
       "config": {
-        "wsPort": 3003,
         "reinitDbOnStartup": false
       }
     },
-    "market": {
+    "userProfile": {
+      "name": "property",
       "config": {
-        "wsPort": 3004,
-        "reinitDbOnStartup": false,
-        "enforceBalance": false
-      }
-    },
-    "event": {
-      "config": {
-        "wsPort": 3005,
-        "reinitDbOnStartup": false
-      }
-    },
-    "rating": {
-      "config": {
-        "wsPort": 3006,
-        "reinitDbOnStartup": false
-      }
-    },
-    "task": {
-      "config": {
-        "wsPort": 3007,
-        "reinitDbOnStartup": false
-      }
-    },
-    "profile": {
-      "config": {
-        "wsPort": 3008,
         "reinitDbOnStartup": false,
         "schema": {
-          "title": "Profile",
+          "title": "User",
           "type": "object",
           "properties": {
-            "firstName": {
-              "type": "string"
-            },
-            "lastName": {
-              "type": "string"
-            },
-            "email": {
+            "dorm": {
               "type": "string"
             },
             "phoneNumber": {
               "type": "string"
-            },
-            "birthday": {
-              "type": "string"
-            },
-            "dorm": {
-              "type": "string"
             }
-          },
-          "required": [
-            "firstName", "lastName", "email", "phoneNumber", "birthday", "dorm"
-          ]
+          }
         }
       }
     },
     "request": {
+      "name": "property",
       "config": {
-        "wsPort": 3009,
         "reinitDbOnStartup": false,
         "schema": {
           "title": "Request",
           "type": "object",
           "properties": {
-              "itemName": {
-                "type": "string"
-              },
-              "quantity": {
-                "type": "string"
-              },
-              "estimatedPrice": {
-                "type": "number",
-                "minimum": 0
-              },
-              "stores": {
-                "type": "string"
-              },
-              "pickupLocation": {
-                "type": "string"
-              },
-              "moreInfo": {
-                "type": "string"
-              },
-              "rejectionReason": {
-                "type": "string"
-              }
-          },
-          "required": [
-            "itemName", "quantity", "estimatedPrice", "stores", "pickupLocation"
-          ]
+            "itemName": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "string"
+            },
+            "priceEstimate": {
+              "type": "string"
+            },
+            "price": {
+              "type": "string"
+            },
+            "tips": {
+              "type": "string"
+            },
+            "due": {
+              "type": "string"
+            },
+            "pickupLocation": {
+              "type": "string"
+            },
+            "requesterId": {
+              "type": "string"
+            },
+            "claimed": {
+              "type": "boolean"
+            },
+            "deliveryId": {
+              "type": "string"
+            },
+            "delivererId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "delivery": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Delivery",
+          "type": "object",
+          "properties": {
+            "requesterId": {
+              "type": "string"
+            },
+            "delivererId": {
+              "type": "string"
+            },
+            "pickupTime": {
+              "type": "string"
+            },
+            "delivered": {
+              "type": "boolean"
+            },
+            "confirmed": {
+              "type": "boolean"
+            }
+          }
         }
       }
     }
-  }
+  },
+  "routes": [
+    { "path": "", "action": "main" },
+    { "path": "sign-in", "action": "sign-in" },
+    { "path": "sign-up", "action": "sign-up" },
+    { "path": "requests", "action": "show-requests" },
+    { "path": "make-request", "action": "create-request" }
+  ]
 }

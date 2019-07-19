@@ -120,7 +120,12 @@ const actionRequestTable: ActionRequestTable = {
       default:
         throw new Error('Need to specify extraInfo.action');
     }
-  }
+  },
+  'remove-object': (extraInfo) => `
+    mutation RemoveObject($id: ID!) {
+      removeObject(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -161,7 +166,6 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
 
-
   return [`
     type Object {
       id: ID!
@@ -193,7 +197,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 }
 
 function createObjectFromInput(config: PropertyConfig, input) {
-  const newObject = input;
+  const newObject = _.omitBy(_.cloneDeep(input), _.isNil);
   newObject.id = input.id ? input.id : uuid();
   const ajv = new Ajv();
   const validate = ajv.compile(config.schema);
@@ -259,10 +263,6 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
-        _.each(objDocs, (objDoc: ObjectDoc) => {
-          objDoc._pending = { reqId: context.reqId };
-        });
-
         return await objects.insertMany(context, objDocs);
       },
 
@@ -270,6 +270,10 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
         return await objects.updateOne(context, {id: input.id},
           {$set: newObject}, {upsert: true});
+      },
+
+      removeObject: async (_root, { id }, context: Context) => {
+        return await objects.deleteOne(context, {id: id});
       }
     }
   };

@@ -1,11 +1,12 @@
+<property-show-object [id]="id"
+                      [hidden]="true"
+                      [_config]="config"
+                      (loadedObject)="setInitialValues($event)"></property-show-object>
+
 <form (ngSubmit)="onSubmit()"
       [formGroup]="updateObjectForm"
       class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <property-show-object [id]="id"
-                          [hidden]="true"
-                          [_config]="config"
-                          (loadedObject)="setInitialValues($event)"></property-show-object>
     <div *ngIf="objectUpdated">
       <i class="material-icons">done</i>
       {{updateObjectSavedText}}

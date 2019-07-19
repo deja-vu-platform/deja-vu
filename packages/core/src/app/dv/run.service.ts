@@ -127,19 +127,13 @@ export class RunService {
   }
 
   private getTargetAction(initialNode) {
-    let node = initialNode;
-    let targetAction = node;
+    let parentAction = initialNode;
+    do {
+      parentAction = this.renderer.parentNode(parentAction);
+    } while (parentAction && parentAction.getAttribute &&
+    !NodeUtils.IsAction(parentAction));
 
-    // 'document' doesn't have `getAttribute`
-    while (node && node.getAttribute) {
-      if (RunService.IsDvTx(node)) {
-        targetAction = node;
-        break;
-      }
-      node = this.renderer.parentNode(node);
-    }
-
-    return targetAction;
+    return RunService.IsDvTx(parentAction) ? parentAction : initialNode;
   }
 
   private async run(runType: RunType, elem: ElementRef) {
