@@ -63,7 +63,7 @@ div {
   margin: 30px 70px;
 }
 
-.left-column {
+.left-column, .dv-stage-stage-entity {
   float: left;
   width: 25%;
   padding: 30px 50px;
@@ -81,7 +81,8 @@ div {
   padding: 30px 50px;
 }
 
-.right-column {
+.right-column, .dv-stage-stage-header,
+.dv-stage-staged-entities {
   float: right;
   width: 75%;
   padding: 30px 50px;
@@ -191,11 +192,6 @@ main {
   margin: 0;
   padding: 0;
   background-color: #FFFCF9 !important;
-}
-
-sweetspots-add-a-spot,
-#add-a-spot {
-  text-align: center;
 }
 
 body {
@@ -332,4 +328,9 @@ label-search-items-by-labels button.mat-button {
 
 .pull-right {
   float: right;
+}
+
+.disabled {
+  float: none;
+  color: #959ca6;
 }

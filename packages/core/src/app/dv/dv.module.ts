@@ -13,6 +13,7 @@ import { ButtonComponent } from './button/button.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
+import { DifferenceComponent } from './difference/difference.component';
 import { ForComponent } from './for/for.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
@@ -49,7 +50,7 @@ const allComponents = [
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
-  IntersectComponent, ShowEntityComponent, TableComponent
+  IntersectComponent, ShowEntityComponent, TableComponent, DifferenceComponent
 ];
 
 @NgModule({
