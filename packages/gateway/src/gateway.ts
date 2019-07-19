@@ -55,12 +55,13 @@ function stringify(json: any) {
   return JSON.stringify(json, undefined, JSON_INDENTATION);
 }
 
+
 /**
  * Start the gateway server.
  */
 export function startGateway(
   gatewayConfigOptions?: GatewayConfigOptions,
-  info?: AppInfo
+  info?: AppInfo, designerServePath?: string
 ): RequestProcessor {
   const gatewayConfig: GatewayConfig = Object
     .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
@@ -97,7 +98,7 @@ export function startGateway(
         .processSubscription(subscriptionObj)
         .subscribe({
           next: (res) => {
-            if (ws.readyState == WebSocket.OPEN) {
+            if (ws.readyState === WebSocket.OPEN) {
               const response = Object.assign({}, res, { subscriptionId });
               ws.send(JSON.stringify(response));
             }
@@ -116,6 +117,9 @@ export function startGateway(
     app.get('*', ({}, res) => {
       res.sendFile(path.join(info.distFolder, 'app', 'index.html'));
     });
+  } else if (designerServePath) {
+    console.log(`Serving ${designerServePath}`);
+    app.use(express.static(designerServePath));
   }
 
   // Listen

@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import { spawnSync } from 'child_process';
 import * as rimraf from 'rimraf';
 
+import * as prettier from 'prettier';
 
 interface Dependency {
   name: string;
@@ -62,22 +63,32 @@ export class NgAppBuilder {
   private appAssetsDir: string | undefined;
 
   private static Replace(
-    srcFile: string, srcExt: string, dstDir: string,
+    srcFile: string,
+    srcExt: 'ts' | 'd.ts' | 'html' | 'json',
+    dstDir: string,
     replaceMap?: { [pattern: string]: string }) {
     const dst = path.join(dstDir, `${srcFile}.${srcExt}`);
     const src = path.join(
       this.blueprintsPath, `${srcFile}.blueprint.${srcExt}`);
+    let contents;
     if (replaceMap === undefined) {
-      writeFileSync(dst, readFileSync(src, 'utf8'));
+      contents = readFileSync(src, 'utf8');
     } else {
       const regex = new RegExp(Object.keys(replaceMap)
         .map((key) => `@@${key}`)
         .join('|'), 'gi');
-      writeFileSync(
-        dst,
-        readFileSync(src, 'utf8')
-          .replace(regex, (matched) => replaceMap[matched.substring(2)]));
+      contents = readFileSync(src, 'utf8')
+        .replace(regex, (matched) => replaceMap[matched.substring(2)]);
     }
+    const extensionToParser: { [ext: string]: prettier.BuiltInParserName } = {
+      ts: 'typescript',
+      'd.ts': 'typescript',
+      html: 'angular',
+      json: 'json'
+    };
+    writeFileSync(
+      dst,
+      prettier.format(contents, { parser: extensionToParser[srcExt] }));
   }
 
   private static DepToModule(dep: string) {
@@ -285,7 +296,8 @@ export class NgAppBuilder {
       .mapValues(newDvConfigContents['usedCliches'], (uc) => _
         .merge({ config: { wsPort: clichePort++ } }, uc));
 
-    const newDvConfigContentsStr = JSON.stringify(newDvConfigContents, null, 2);
+    const newDvConfigContentsStr = prettier
+      .format(JSON.stringify(newDvConfigContents), { parser: 'json' });
     writeFileSync(path.join(cacheDir, 'dvconfig.json'), newDvConfigContentsStr);
 
     // | src/
@@ -327,7 +339,9 @@ export class NgAppBuilder {
 
     // | styles.css
     if (diff.globalStyleChanged || _.has(diff, 'prev.globalStyle')) {
-      writeFileSync(path.join(srcDir, 'styles.css'), this.globalStyle);
+      writeFileSync(
+        path.join(srcDir, 'styles.css'),
+        prettier.format(this.globalStyle, { parser: 'css' }));
     }
 
     // | favicon.ico
@@ -341,11 +355,12 @@ export class NgAppBuilder {
       const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
 
       /**
-       * Desired behaviour: Image assets for a cliche are found in
-       *    `assets/<cliche-name>/<img-file>`
-       * Problem: The library used to display stars in the rating cliche looks
-       *    for the image in `assets/images/<img-name>`
-       * Hack: Put rating's assets in `assets/` not `assets/rating/`
+       * Image assets for a cliche are in `assets/<cliche-name>/<img-file>`,
+       * but the library used to display stars in the rating cliche looks
+       * for the image in `assets/images/<img-name>`. As a temporary hack,
+       * we detect if we are dealing with rating and put the assets where the
+       * library expects them. TODO: check to see if there's a way to change
+       * the location where the library expects to find the assets.
        */
       const appAssetsDir = d.name === 'rating' ? assetsDir :
         path.join(assetsDir, d.name);

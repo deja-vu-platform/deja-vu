@@ -18,7 +18,9 @@ import 'leaflet-routing-machine';
 declare let L;
 
 import { API_PATH } from '../geolocation.config';
-import { Location, Marker } from '../shared/geolocation.model';
+import {
+  DEFAULT_MAP_ID, Location, Marker
+} from '../shared/geolocation.model';
 
 import * as _ from 'lodash';
 
@@ -33,7 +35,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   public options: L.MapOptions;
   public bounds: L.LatLngBounds;
   public layers: L.Layer[];
-  public mapType: 'gmap' | 'leaflet';
+  public mapType: 'gmap' | 'leaflet' | undefined;
 
   private _markers: Marker[];
   private _map: L.Map;
@@ -46,8 +48,8 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     shadowUrl: 'assets/geolocation/marker-shadow.png'
   });
 
-  // Required
-  @Input() id: string;
+  @Input() id = DEFAULT_MAP_ID;
+  @Input() waitOnId = false;
 
   // If not provided, all markers associated with `id` will be loaded
   get markers() { return this._markers; }
@@ -100,7 +102,9 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
     this.mapType = this.csf.createConfigService(this.elem)
       .getConfig().mapType;
-    if (this.mapType === 'leaflet') { this.setUpLeafletMap(); }
+    if (this.mapType !== 'gmap') {
+      this.setUpLeafletMap();
+    }
   }
 
   ngAfterViewInit() {
@@ -215,7 +219,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   onMapClick(e) {
 
-    if (this.mapType === 'leaflet') {
+    if (this.mapType !== 'gmap') {
       const event: L.LeafletMouseEvent = e;
       const coords = event.latlng;
 
@@ -275,7 +279,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
         })
         .subscribe((res) => {
           this.markers = res.data.markers;
-          if (this.mapType === 'leaflet') {
+          if (this.mapType !== 'gmap') {
             this.setLeafletMarkers();
           }
         });
@@ -288,5 +292,10 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     } else {
       return !!(this.id && this.gs);
     }
+  }
+
+  private idIsReady(): boolean {
+    return this.id !== DEFAULT_MAP_ID ||
+      (this.id === DEFAULT_MAP_ID && this.waitOnId === false);
   }
 }

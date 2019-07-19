@@ -29,16 +29,33 @@ export class TxInputsValidator {
       //  have assignments, use `new`, etc
       `(${unparsedExpr})`, { plugins: [elvis] }) // polyfills `?.`
       .code;
-    console.log(`Running code ${polyfilledCode} with ` +
-        `context ${JSON.stringify(context)}`);
+    console.log(
+      `Running code "${polyfilledCode}" (pollyfilled from "${unparsedExpr}") ` +
+      `with context ${JSON.stringify(context)}`);
 
     // This is safer than `eval`. It runs the code in a sandbox.
     const vm = new VM();
-    // for some reason doing forEach(context, vm.freeze) doesn't work sometimes
+    // `freeze` prevents template exprs from modifying the context.
+    // For some reason, doing `forEach(context, vm.freeze)` doesn't work
+    // sometimes
     _.forEach(context, (value: any, key: string) => vm.freeze(value, key));
-    // don't let template exprs modify context
 
-    return vm.run(polyfilledCode);
+    // I couldn't find a flag for returning `undefined` to the sandboxed script
+    // if a reference doesn't exist in the context, so we have to do this hack
+    // TODO: find a better alternative
+    while (true) {
+      try {
+        return vm.run(polyfilledCode);
+      } catch (e) {
+        const m = e.message.match(/(.*) is not defined/);
+        if (m) {
+          console.log(`Adding ${m[1]} to context with value undefined`);
+          vm.freeze(undefined, m[1]);
+          continue;
+        }
+        throw e;
+      }
+    }
   }
 
   public static Validate(
@@ -55,7 +72,7 @@ export class TxInputsValidator {
     }
 
     // We do the checking by inputs. For each input value we receive, we
-    // evaluate the expr that appears in the html source code and check that
+    // evaluate the expr that appears in the HTML source code and check that
     // we get the same value.
     _.forEach(inputValues, (input, actionFqTag: string) => {
       _.forEach(input, (inputValue: any, inputName: string) => {
@@ -70,15 +87,19 @@ export class TxInputsValidator {
     context: {[name: string]: any}, actions)
     : void {
     const unparsedExpr = _.get(actions, [fqtag, inputName]);
-    if (unparsedExpr  === undefined) {
+    if (unparsedExpr === undefined) {
       console.log(
-        `Not checking ${fqtag}.${inputName} since it's internal input`);
+        `Not checking ${fqtag}.${inputName} since it's an internal input`);
 
       return;
     }
     console.log(`Checking ${fqtag}.${inputName}: ${inputValue}`);
     const expectedValue = TxInputsValidator.Eval(unparsedExpr, context);
     console.log(`Expected value for ${fqtag}.${inputName} is ${expectedValue}`);
+    // TODO: handle the case in which the expected value is `undefined` and
+    // the input value is something other than `undefined` and it's ok
+    // because the behavior of the action is to use a default value for an
+    // input if none is given
     if (!_.isEqual(expectedValue, inputValue)) {
       throw new RequestInvalidError(
         `The value obtained for ${fqtag}.${inputName} is not the expected ` +

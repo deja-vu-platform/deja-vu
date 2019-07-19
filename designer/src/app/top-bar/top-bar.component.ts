@@ -199,6 +199,14 @@ export class TopBarComponent {
     this.fileInput.nativeElement.click();
   }
 
+  newApp() {
+    if (window.confirm(
+      'Any unsaved changes in your current app will be lost. ' +
+      'Do you wish to continue?')) {
+      this.load.emit('{}');
+    }
+  }
+
   onUpload(fileInput) {
     this.opening = true;
     const file: File = fileInput.target.files[0];

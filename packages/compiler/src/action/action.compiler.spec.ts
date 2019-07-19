@@ -50,7 +50,7 @@ describe('ActionCompiler', () => {
           <p class="para">
             Lorem ipsum
           </p>
-          <input type="button" class="button">Click</button>
+          <button type="button" class="button">Click</button>
         </div>
       </dv.action>
     `;
@@ -380,15 +380,16 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
 
-  it('should compile action accessing member of output of aliased ' +
-    'action', () => {
+  it('should compile action accessing member of output of ' +
+    'aliased action', () => {
     const st: SymbolTable = {
       property: {
         kind: 'cliche'
@@ -408,9 +409,10 @@ describe('ActionCompiler', () => {
     const compiledAction: CompiledAction = actionCompiler
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
@@ -437,11 +439,12 @@ describe('ActionCompiler', () => {
       .compile(appName, action, st);
     expect(compiledAction.ngTemplate)
       .toMatch(
-        /\[initialObjectId\]=".*currentConsumer__ec\?\.id"/);
+        /\[initialObjectId\]="[\s\S]*currentConsumer__ec\?\.id\s*"/);
     expect(compiledAction.ngTemplate)
-      .toMatch(/\(currentConsumer\)=".+=\$event"/);
+      .toMatch(/\(currentConsumer\)="[\s\S]+=\s*\$event\s*"/);
     const outputField = compiledAction.ngTemplate
-      .match(/\(currentConsumer\)="(.+)=\$event"/)[1];
+      .match(/\(currentConsumer\)="([\s\S]+)=\s*\$event\s*"/)[1]
+      .trim();
     expect(compiledAction.ngComponent)
       .toMatch(outputField);
   });
@@ -676,7 +679,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 
@@ -738,7 +741,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 
@@ -800,7 +803,7 @@ describe('ActionCompiler', () => {
       const outputField = compiledAction.ngTemplate
         .match(inputsObjRegex)[1];
       expect(compiledAction.ngTemplate)
-        .toMatch(`${outputField}=`);
+        .toMatch(new RegExp(`${outputField}\\s*=`));
       expect(compiledAction.ngComponent)
         .toMatch(outputField);
 

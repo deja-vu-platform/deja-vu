@@ -371,7 +371,7 @@ implements AfterViewInit, OnChanges, OnInit {
   private calcShowHiddenHint(instanceContainersArr: ElementRef[]) {
     this.rows.forEach((row) => {
       row.actions.forEach((action: ActionInstance, actionNum) => {
-        action['showHiddenHint'] = action.inputSettings['hidden'];
+        action['showHiddenHint'] = (action.inputSettings['hidden'] === 'true');
       });
     });
   }

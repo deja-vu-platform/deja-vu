@@ -369,7 +369,7 @@ function transformActionInput(
 
     return `{
       type: ${classNameToNgField(compiledAction.className)},
-      tag: ${compiledAction.selector},
+      tag: '${compiledAction.selector}',
       inputs: ${inputsStr}
     }`;
   };

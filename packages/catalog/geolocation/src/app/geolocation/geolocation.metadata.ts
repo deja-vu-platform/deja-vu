@@ -14,6 +14,10 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { CreateMarkerComponent } from './create-marker/create-marker.component';
 export { CreateMarkerComponent };
+import {
+  CreateMarkerFromMapComponent
+} from './create-marker-from-map/create-marker-from-map.component';
+export { CreateMarkerFromMapComponent };
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
 export { DeleteMarkerComponent };
@@ -36,6 +40,7 @@ import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
 
 const allComponents = [
   CreateMarkerComponent,
+  CreateMarkerFromMapComponent,
   DeleteMarkerComponent,
   DisplayMapComponent,
   GetCurrentLocationComponent,

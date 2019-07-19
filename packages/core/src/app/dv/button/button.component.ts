@@ -8,6 +8,7 @@ import { RunService } from '../run.service';
 })
 export class ButtonComponent implements OnInit {
   @Input() valid = true;
+  @Input() value: string | undefined;
 
   constructor(private elem: ElementRef, private rs: RunService) {}
 

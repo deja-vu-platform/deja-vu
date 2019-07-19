@@ -12,12 +12,16 @@ import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import {
   ErrorStateMatcher,
   MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatSelectChange
+  MatDialogRef
 } from '@angular/material';
+
 import * as _ from 'lodash';
 import { ElectronService } from 'ngx-electron';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+
 import { Subscribable } from 'rxjs/Observable';
+
 import { AnonymousSubscription } from 'rxjs/Subscription';
 
 import { clicheDefinitions } from '../cliche.module';
@@ -76,11 +80,13 @@ class JSONValidator extends ErrorStateMatcher {
 export class ConfigureClicheComponent implements OnInit {
   @ViewChild(DynamicComponentDirective)
     private readonly configWizardComponentHost: DynamicComponentDirective;
-  of: ClicheDefinition;
   name: string;
   configString: string;
   readonly jsonValidator: JSONValidator;
   sub: AnonymousSubscription;
+  ofControl = new FormControl();
+  filteredClicheDefinitionNames: Observable<string[]>;
+  clicheDefinitionsMap: {[name: string]: ClicheDefinition};
 
   constructor(
     private readonly electronService: ElectronService,
@@ -90,34 +96,72 @@ export class ConfigureClicheComponent implements OnInit {
     private readonly injector: Injector
   ) {
     this.jsonValidator = new JSONValidator(this);
+    this.clicheDefinitionsMap = _.keyBy(this.clicheDefinitions, 'name');
   }
 
   ngOnInit() {
+    this.filteredClicheDefinitionNames = this.ofControl.valueChanges
+      .pipe(
+        startWith(''),
+        map((v: string) => this.filterClicheDefinitionNames(v))
+      );
     if (this.data.cliche) {
-      this.of = this.data.cliche.of;
+      this.ofControl.setValue(this.data.cliche.of.name);
+      this.ofControl.disable();
       this.name = this.data.cliche.name;
       this.configString = JSON.stringify(this.data.cliche.config);
-      if (this.of.configWizardComponent) {
+      if (this.getConfigWizard()) {
         this.loadConfigWizard();
       }
     }
+  }
+
+  private filterClicheDefinitionNames(value: string): string[] {
+    return _.filter(
+      _.keys(this.clicheDefinitionsMap),
+      (cdn: string) => cdn.toLowerCase()
+        .includes(value));
   }
 
   get clicheDefinitions() {
     return clicheDefinitions;
   }
 
-  validate(form: ControlGroup) {
-    return form.form.valid && !this.jsonValidator.isErrorState();
+  get clicheDefinitionNames() {
+    return _.keys(this.clicheDefinitionsMap);
   }
 
-  onSelectCliche(event: MatSelectChange) {
-    this.name = event.value.name;
-    this.configString = '';
-    if (this.of.configWizardComponent) {
-      this.loadConfigWizard();
+  validate(form: ControlGroup) {
+    return form.form.valid && !this.jsonValidator.isErrorState() &&
+      (this.ofControl.disabled || this.ofControl.valid);
+  }
+
+  getConfigWizard() {
+    return this.getClicheDefinition().configWizardComponent;
+  }
+
+  getClicheDefinition() {
+    return this.clicheDefinitionsMap[this.ofControl.value.toLowerCase()];
+  }
+
+  onSelectCliche() {
+    if (_.isEmpty(this.ofControl.value)) {
+      return;
+    }
+    const validNames = _.map(
+      this.clicheDefinitionNames, (cd) => cd.toLowerCase());
+    if (!_.includes(validNames, this.ofControl.value.toLowerCase())) {
+      this.ofControl.setErrors({ invalidName: true });
     } else {
-      this.clearConfigWizard();
+      this.ofControl.setErrors(null);
+      this.ofControl.updateValueAndValidity();
+      this.name = this.ofControl.value.toLowerCase();
+      this.configString = '';
+      if (this.getConfigWizard()) {
+        this.loadConfigWizard();
+      } else {
+        this.clearConfigWizard();
+      }
     }
   }
 
@@ -135,7 +179,8 @@ export class ConfigureClicheComponent implements OnInit {
           delete clicheInstance.config[key];
         });
       } else {
-        clicheInstance = new ClicheInstance(this.name, this.of);
+        clicheInstance = new ClicheInstance(
+          this.name, this.getClicheDefinition());
         usedClichesConfig[this.name] = { config: clicheInstance.config };
         this.data.app.cliches.push(clicheInstance);
       }
@@ -183,7 +228,7 @@ export class ConfigureClicheComponent implements OnInit {
   private loadConfigWizard() {
     const viewContainerRef = this.clearConfigWizard();
     const componentFactory = this.componentFactoryResolver
-      .resolveComponentFactory(<Type<{}>>this.of.configWizardComponent);
+      .resolveComponentFactory(<Type<{}>> this.getConfigWizard());
     const componentRef = viewContainerRef.createComponent(
       componentFactory,
       0,

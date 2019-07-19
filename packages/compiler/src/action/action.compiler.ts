@@ -20,6 +20,8 @@ import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { classNameToNgField } from './operations/shared';
 import { toNgTemplate } from './operations/to-ng-template.operation';
 
+import * as prettier from 'prettier';
+
 const ohm = require('ohm-js');
 
 
@@ -167,10 +169,9 @@ export class ActionCompiler {
       name: thisActionName,
       className: className,
       selector: selector,
-      ngComponent: ngComponent,
-      ngTemplate: ngTemplate,
+      ngComponent: prettier.format(ngComponent, { parser: 'typescript' }),
+      ngTemplate: prettier.format(ngTemplate, { parser: 'angular' }),
       actionInputs: actionInputs
     };
   }
 }
-

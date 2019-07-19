@@ -62,7 +62,7 @@ export interface ClicheActionDefinition extends ActionDefinition {
 // tslint:disable-next-line interface-name
 export interface IO {
   name: string;
-  value: string; // default constant for input, epression for output
+  value: string; // default constant for input, expression for output
 }
 
 export interface InInput {
@@ -476,6 +476,9 @@ export class App {
    */
   static fromJSON(jsonString: string): App {
     const appJSON = JSON.parse(jsonString);
+    if (_.isEmpty(appJSON)) {
+      return new App('myapp');
+    }
 
     const app = new App(appJSON.name);
 

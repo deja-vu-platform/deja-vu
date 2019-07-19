@@ -8,6 +8,8 @@ import {
   TextComponent
 } from '../text/text.component';
 
+import compileDvExpr from '../expression.compiler';
+
 @Component({
   selector: 'app-set-inputs',
   templateUrl: './set-inputs.component.html',
@@ -24,6 +26,8 @@ export class SetInputsComponent implements OnChanges {
   actionInputsIODescriptions: {
     [actionInputName: string]: { [ioName: string]: string }
   };
+
+  errors = {};
 
   constructor(private readonly dialog: MatDialog) { }
 
@@ -84,5 +88,16 @@ export class SetInputsComponent implements OnChanges {
 
   actionInput(name: string) {
     return Object.keys(this.actionInstance.of.actionInputs[name]);
+  }
+
+  checkExpr(input, evt) {
+    try {
+      compileDvExpr(evt.target.value);
+      if (this.errors[input] !== undefined) {
+        delete this.errors[input];
+      }
+    } catch (e) {
+      this.errors[input] = e.message;
+    }
   }
 }
