@@ -77,7 +77,7 @@ describe('ActionCompiler', () => {
         <foo.aliased-action as aa />
         <foo.other-actiom />
         <foo.action
-          obj={a: "hi", b: 3 + 2, c: 'hello'}
+          obj={a: "hi", b: 3 + 2, c: 'hello', 'h e': 'llo'}
           numberArray=[1, -2.5]
           objArray=[{a: 1}, {b: 2}]
           conditional=!((2 + 2e-10) === 5) ? "b" : "c"

@@ -325,8 +325,12 @@ export function toNgTemplate(
 
       return ngInputField;
     },
-    PropAssignment: (name, _c, expr) =>
-      `${name.sourceString}: ${expr.toNgTemplate()}`,
+    PropAssignment: (prop, _c, expr) =>
+    `${prop.toNgTemplate()}: ${expr.toNgTemplate()}`,
+    Prop_noQuote: (name) => name.sourceString,
+    Prop_withQuotes: (stringLiteral) => `'${stringLiteral
+        .sourceString
+        .slice(1, -1)}'`,
     nav: (nav) => nav.sourceString,
     name: (l, rest) => l.sourceString + rest.sourceString
   };

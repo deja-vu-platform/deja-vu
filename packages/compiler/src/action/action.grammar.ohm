@@ -20,8 +20,8 @@ Action {
   Text = (~"<" ~">" ~"{{" ~"}}" any)+
   Interpolation = "{{" Expr "}}"
   ElementName
-   = ActionNameMaybeAlias -- action
-   | name                 -- html
+    = ActionNameMaybeAlias -- action
+    | name                 -- html
   AttributeName
     = output -- output
     | name   -- name
@@ -48,22 +48,24 @@ Action {
     = "!" Expr -- not
 
   BinExpr
-    = Expr "+" Expr   -- plus
-    | Expr "-" Expr   -- minus
-    | Expr "*" Expr   -- mul
-    | Expr "/" Expr   -- div
-    | Expr "%" Expr   -- mod
+    = Expr "+" Expr    -- plus
+    | Expr "-" Expr    -- minus
+    | Expr "*" Expr    -- mul
+    // Angular's template syntax doesn't support exp
+    // | Expr "**" Expr   -- exp
+    | Expr "/" Expr    -- div
+    | Expr "%" Expr    -- mod
     // Relational Expr
     | Expr "lt" Expr   -- lt
     | Expr "gt" Expr   -- gt
     | Expr "lt=" Expr  -- le
     | Expr "gt=" Expr  -- ge
     // Equality Expr
-    | Expr "===" Expr -- eq
-    | Expr "!==" Expr -- neq
+    | Expr "===" Expr  -- eq
+    | Expr "!==" Expr  -- neq
     // Logical Expr
-    | Expr "&&" Expr  -- and
-    | Expr "||" Expr  -- or
+    | Expr "&&" Expr   -- and
+    | Expr "||" Expr   -- or
 
   TerExpr = Expr "?" Expr ":" Expr
 
@@ -111,7 +113,11 @@ Action {
   doubleStringChar = ~("\"") any
   singleStringChar = ~("'") any
 
-  PropAssignment = name ":" Expr
+  PropAssignment = Prop ":" Expr
+
+  Prop
+    = name            -- noQuote
+    | stringLiteral   -- withQuotes
 
   number = "-"? digit+
   name = letter (alnum | "-" | "_")*
@@ -120,13 +126,14 @@ Action {
 
   nav = "." | "?."
   space := whitespace | lineTerminator | comment
-  whitespace = "\t"
-             | "\x0B"    -- verticalTab
-             | "\x0C"    -- formFeed
-             | " "
-             | "\u00A0"  -- noBreakSpace
-             | "\uFEFF"  -- byteOrderMark
-             | unicodeSpaceSeparator
+  whitespace
+    = "\t"
+    | "\x0B"    -- verticalTab
+    | "\x0C"    -- formFeed
+    | " "
+    | "\u00A0"  -- noBreakSpace
+    | "\uFEFF"  -- byteOrderMark
+    | unicodeSpaceSeparator
   unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
 
   lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
