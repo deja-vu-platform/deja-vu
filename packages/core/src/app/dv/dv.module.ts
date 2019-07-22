@@ -26,6 +26,7 @@ import { InputIdComponent } from './input-id/input-id.component';
 import { IntersectComponent } from './intersect/intersect.component';
 import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
+import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
@@ -52,7 +53,7 @@ const allComponents = [
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
-  DifferenceComponent, GroupByComponent
+  DifferenceComponent, GroupByComponent, PickComponent
 ];
 
 @NgModule({

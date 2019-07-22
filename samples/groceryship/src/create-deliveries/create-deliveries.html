@@ -1,9 +1,10 @@
 <dv.action name="create-deliveries">
-  <dv.group-by items=$requests key="itemName" />
-  <dv.for
-    elems=dv.group-by.groupedItems
-    showElem=<dv.show-entities entities=$elem.items />
-  />
+  <div class="center-column">
+    <dv.group-by items=$requests key="itemName" />
+    <dv.pick entities=dv.group-by.groupedItems keys=["groupById"] flatten=true />
+    <dv.show-entities entities=dv.pick.pickedEntities />
+  </div>
+
 
   <dv.table data=$requests
             enableSelection=true
