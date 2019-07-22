@@ -24,12 +24,17 @@ export class PickComponent implements OnInit, OnChanges {
   @Input() keys: string[];
 
   /**
+   * If exist, must be the same length as keys
+   * Maps a new fieldName onto the picked key
+   */
+  @Input() newKeyNames: string[];
+
+  /**
    * If set to true, the function will flatten the object
    * and make the value stand on its own
    * When flatten is set to true, keys.length() must be 1.
    */
   @Input() flatten: false;
-
 
   /**
    * The list of entities with the picked fields
@@ -53,8 +58,35 @@ export class PickComponent implements OnInit, OnChanges {
         this.pickedEntities.emit(_.map(this.entities, this.keys[0]));
       }
     } else {
-      this.pickedEntities.emit(_.map(this.entities,
-        (value) => _.pick(value, this.keys)));
+      if (!this.newKeyNames) {
+        this.pickedEntities.emit(_.map(this.entities,
+          (value) => _.pick(value, this.keys)));
+      } else if (this.newKeyNames.length === this.keys.length) {
+        console.log(_.map(this.entities,
+          (value) => {
+            const constructObject = {};
+            for (const i of Object.keys(this.keys)) {
+              constructObject[this.newKeyNames[i]] = value[this.keys[i]];
+            }
+
+            return constructObject;
+          }
+        ));
+
+        this.pickedEntities.emit(_.map(this.entities,
+          (value) => {
+          const constructObject = {};
+          for (const i of Object.keys(this.keys)) {
+            constructObject[this.newKeyNames[i]] = value[this.keys[i]];
+          }
+
+          return constructObject;
+          }
+        ));
+      } else {
+        throw new Error('newKeyNames must have the same length as keys');
+      }
+
     }
   }
 }

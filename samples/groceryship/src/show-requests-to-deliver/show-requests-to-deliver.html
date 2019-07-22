@@ -1,6 +1,5 @@
 <dv.action name="show-requests-to-deliver">
-  <request.show-objects showExclude=["requesterId","claimed","deliveryId","delivererId"]
-                        fieldMatching={ delivererId:$userId }
+  <request.show-objects fieldMatching={ delivererId:$userId }
                         hidden=true
   />
   <dv.table data=request.show-objects.objects

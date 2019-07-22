@@ -8,12 +8,6 @@ import {
   OnExec, RunService
 } from '@deja-vu/core';
 
-import {
-  AbstractControl, FormBuilder, FormControl,
-  FormGroup, FormGroupDirective,
-  Validators
-} from '@angular/forms';
-
 import { CreateObjectComponent } from '../create-object/create-object.component';
 
 import * as _ from 'lodash';
@@ -21,9 +15,6 @@ import * as _ from 'lodash';
 import { getPropertyNames } from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
-
-
-const SAVED_MSG_TIMEOUT = 3000;
 
 /**
  * Create objects in bulk
@@ -62,6 +53,11 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   @Input() initialValue: any;
 
   /**
+   * List of property names to no show input fields for
+   */
+  @Input() showExclude: string[] = [];
+
+  /**
    * The label that shows on the button that triggers
    * the object creation
    */
@@ -72,13 +68,13 @@ export class CreateObjectsComponent implements OnInit, OnExec {
    */
   @Input() showOptionToSubmit = true;
 
-  @ViewChildren(CreateObjectComponent) createObjectComponents: QueryList<CreateObjectComponent>;
-
+  @ViewChildren(CreateObjectComponent) createObjectComponents:
+    QueryList<CreateObjectComponent>;
 
   private gs: GatewayService;
   private properties: string[];
   config;
-  createObjectsForm;
+  mergedInitialValues = [];
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -95,6 +91,14 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
     if (this.objects) {
       return;
+    }
+
+    for (const index of Object.keys(this.ids)) {
+      if (this.initialValues && this.initialValues[index] && this.initialValue) {
+        this.mergedInitialValues[index] = {...this.initialValues[index], ...this.initialValue};
+      } else {
+        this.mergedInitialValues[index] = this.initialValue;
+      }
     }
   }
 
