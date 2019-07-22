@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit
+  Component, ElementRef, EventEmitter, Inject, Input,
+  OnInit, ViewChildren, QueryList
 } from '@angular/core';
 
 import {
@@ -7,8 +8,13 @@ import {
   OnExec, RunService
 } from '@deja-vu/core';
 
-import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
+import {
+  AbstractControl, FormBuilder, FormControl,
+  FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+
+import { CreateObjectComponent } from '../create-object/create-object.component';
 
 import * as _ from 'lodash';
 
@@ -36,8 +42,43 @@ export class CreateObjectsComponent implements OnInit, OnExec {
    */
   @Input() objects: any[];
 
+  /**
+   * List of Id of the new objects to create
+   * Note that currently it is NOT wired to the objects input
+   */
+  @Input() ids: string[];
+
+  /**
+   * A list of initialValue that will be mapped to each of
+   * the ids separately. They can be seen as partial objects
+   * that serve as templates for the newly created objects.
+   */
+  @Input() initialValues: any[];
+
+  /**
+   * The initialValue that fits for all of the objects that
+   * are created.
+   */
+  @Input() initialValue: any;
+
+  /**
+   * The label that shows on the button that triggers
+   * the object creation
+   */
+  @Input() buttonLabel = 'Create Objects';
+
+  /**
+   * Only used when there is no objects
+   */
+  @Input() showOptionToSubmit = true;
+
+  @ViewChildren(CreateObjectComponent) createObjectComponents: QueryList<CreateObjectComponent>;
+
+
   private gs: GatewayService;
   private properties: string[];
+  config;
+  createObjectsForm;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -48,9 +89,13 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
 
-
     const cs = this.csf.createConfigService(this.elem);
+    this.config = cs.getConfig();
     this.properties = getPropertyNames(cs);
+
+    if (this.objects) {
+      return;
+    }
   }
 
   async dvOnExec(): Promise<void> {
@@ -76,5 +121,11 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
   objectToCreateObjectInput(obj: any) {
     return _.pick(obj, ['id', ...this.properties]);
+  }
+
+  submitChildren() {
+    this.createObjectComponents.forEach((child) => {
+      child.onSubmit();
+    });
   }
 }

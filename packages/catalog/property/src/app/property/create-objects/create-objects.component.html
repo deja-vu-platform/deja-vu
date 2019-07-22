@@ -1,0 +1,11 @@
+<div *ngIf="!objects">
+  <div *ngFor="let id of ids">
+    <property-create-object [_config]="config" [id]="id" [showOptionToSubmit]=false>
+    </property-create-object>
+  </div>
+  <div *ngIf="showOptionToSubmit">
+    <button mat-button (click)="submitChildren()">
+      {{buttonLabel}}
+    </button>
+  </div>
+</div>

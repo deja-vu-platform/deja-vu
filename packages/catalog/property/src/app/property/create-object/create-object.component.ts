@@ -18,10 +18,7 @@ import {
   RunService
 } from '@deja-vu/core';
 
-import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
-
-import { getProperties, Property } from '../shared/property.model';
+import { getPropertiesFromConfig, Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -82,6 +79,8 @@ export class CreateObjectComponent
    * Whether or not the created object should be saved to the database
    */
   @Input() save = true;
+
+  @Input() _config;
   /**
    * The created object
    */
@@ -109,8 +108,8 @@ export class CreateObjectComponent
     this.rs.register(this.elem, this);
 
     const cs = this.csf.createConfigService(this.elem);
-    this.config = cs.getConfig();
-    this.properties = getProperties(cs);
+    this.config = this._config ? this._config : cs.getConfig();
+    this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};
     for (const property of this.properties) {
       this[property.name] = new FormControl('');
