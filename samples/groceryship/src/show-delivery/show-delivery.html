@@ -1,10 +1,34 @@
 <dv.action name="show-delivery">
-  <dv.table data=[$request]
-            columnInfo=[{label:"Item Name",fieldName:"itemName"},
-  {label:"Quantity",fieldName:"quantity"},
-  {label:"Price Estimate",fieldName:"priceEstimate"},
-  {label:"Due",fieldName:"due"},
-  {label:"Pickup Location",fieldName:"pickupLocation"},
-  {label:"Tips",fieldName:"tips"}]
-  />
+  <h4 class="inline-card">
+    <dv.if condition=$showRequester>
+      Delivering to:
+      <authentication.show-user id=$delivery.requesterId />
+    </dv.if>
+    <dv.if condition=$showDeliverer>
+      Delivering by:
+      <authentication.show-user id=$delivery.delivererId />
+    </dv.if>
+    Pick Up Time:
+    <dv.show-entity entity=$delivery.pickupTime />
+    <br />
+    Pick Up Location:
+    <dv.show-entity entity=$delivery.pickupLocation />
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Items
+      </mat-expansion-panel-header>
+      <request.show-objects fieldMatching={ deliveryId:$delivery.id }
+      hidden=true
+      />
+      <dv.table data=request.show-objects.objects
+                columnInfo=[{label:"Item Name",fieldName:"itemName"},
+                            {label:"Quantity",fieldName:"quantity"},
+                            {label:"Price Estimate",fieldName:"priceEstimate"},
+                            {label:"Tips",fieldName:"tips"}]
+      />
+    </mat-expansion-panel>
+  </h4>
+
+
+
 </dv.action>

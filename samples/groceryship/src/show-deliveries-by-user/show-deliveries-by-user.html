@@ -1,4 +1,7 @@
 <dv.action name="show-deliveries-by-user">
   <h1>You are delivering</h1>
-  <delivery.show-objects fieldMatching={delivererId: $userId} />
+  <delivery.show-objects fieldMatching={delivererId: $userId}
+                         showObject=<groceryship.show-delivery delivery=$object
+                                      showRequester=true showDeliverer=false />
+  />
 </dv.action>

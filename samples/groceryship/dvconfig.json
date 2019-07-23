@@ -91,6 +91,9 @@
             "pickupTime": {
               "type": "string"
             },
+            "pickupLocation": {
+              "type": "string"
+            },
             "delivered": {
               "type": "boolean"
             },

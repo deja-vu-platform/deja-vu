@@ -334,3 +334,9 @@ label-search-items-by-labels button.mat-button {
   float: none;
   color: #959ca6;
 }
+
+.inline-cards {
+  display: inline-block;
+  float: left;
+  width: 200px;
+}
