@@ -1,16 +1,15 @@
-<div *ngIf="!objects">
+<div *ngIf="showInputForms">
   <div *ngFor="let id of ids; let i = index">
-    <!--<div *ngIf="mergedInitialValues">-->
-      <property-create-object [_config]="config"
-                              [id]="id"
-                              [showExclude]="showExclude"
-                              [initialValue]="mergedInitialValues[i]"
-                              [showOptionToSubmit]=false>
-      </property-create-object>
-    <!--</div>-->
+    <property-create-object [_config]="config"
+                            [id]="id"
+                            [showExclude]="showExclude"
+                            [initialValue]="mergedInitialValues[i]"
+                            [showOptionToSubmit]=false
+                            (objectOnDisplay)="updateIndexedObject($event, i)">
+    </property-create-object>
   </div>
   <div *ngIf="showOptionToSubmit">
-    <button mat-button (click)="submitChildren()">
+    <button mat-button (click)="submit()">
       {{buttonLabel}}
     </button>
   </div>

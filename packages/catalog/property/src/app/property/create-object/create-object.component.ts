@@ -86,6 +86,13 @@ export class CreateObjectComponent
    */
   @Output() object = new EventEmitter<any>();
 
+  /**
+   * Updates on change
+   * Used to let it's parent object (create-objects) to get the
+   * information of what is on display
+   */
+  @Output() objectOnDisplay = new EventEmitter<any>();
+
   @ViewChild(FormGroupDirective) form;
 
   createObjectForm: FormGroup = this.builder.group({});
@@ -117,6 +124,16 @@ export class CreateObjectComponent
     }
     this.createObjectForm = this.builder.group(formControls);
     this.initialValue = this.savedInitialValue;
+
+    this.createObjectForm.valueChanges.subscribe(
+      () => {
+        const input = { id: this.id };
+        for (const property of this.properties) {
+          input[property.name] = this[property.name].value;
+        }
+        this.objectOnDisplay.emit(input);
+      }
+    );
   }
 
   onSubmit() {
@@ -160,9 +177,13 @@ export class CreateObjectComponent
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
-      this.form.resetForm();
-      this.setInitialValues();
+      this.reset();
     }
+  }
+
+  reset() {
+    this.form.resetForm();
+    this.setInitialValues();
   }
 
   dvOnExecFailure(reason: Error) {

@@ -75,6 +75,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   private properties: string[];
   config;
   mergedInitialValues = [];
+  showInputForms = false;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -93,12 +94,16 @@ export class CreateObjectsComponent implements OnInit, OnExec {
       return;
     }
 
+    this.showInputForms = true;
+    this.objects = [];
+
     for (const index of Object.keys(this.ids)) {
       if (this.initialValues && this.initialValues[index] && this.initialValue) {
         this.mergedInitialValues[index] = {...this.initialValues[index], ...this.initialValue};
       } else {
         this.mergedInitialValues[index] = this.initialValue;
       }
+      this.objects.push({});
     }
   }
 
@@ -127,9 +132,14 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     return _.pick(obj, ['id', ...this.properties]);
   }
 
-  submitChildren() {
+  submit() {
+    this.rs.exec(this.elem);
     this.createObjectComponents.forEach((child) => {
-      child.onSubmit();
+      child.reset();
     });
+  }
+
+  updateIndexedObject(object, index) {
+    this.objects[index] = object;
   }
 }
