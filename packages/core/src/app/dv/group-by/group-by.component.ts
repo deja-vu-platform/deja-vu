@@ -42,7 +42,6 @@ export class GroupByComponent implements OnInit, OnChanges {
       .groupBy(this.key)
       .map((val, key) => ({groupById: key, items: val}))
       .value();
-    console.log(groupedItems);
     this.groupedItems.emit(groupedItems);
   }
 }

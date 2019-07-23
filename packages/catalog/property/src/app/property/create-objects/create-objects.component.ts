@@ -126,6 +126,9 @@ export class CreateObjectsComponent implements OnInit, OnExec {
       throw new Error(_.map(res.errors, 'message')
         .join());
     }
+    this.createObjectComponents.forEach((child) => {
+      child.reset();
+    });
   }
 
   objectToCreateObjectInput(obj: any) {
@@ -134,9 +137,6 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
   submit() {
     this.rs.exec(this.elem);
-    this.createObjectComponents.forEach((child) => {
-      child.reset();
-    });
   }
 
   updateIndexedObject(object, index) {

@@ -2,23 +2,24 @@
   <groceryship.navbar accessRequired=true />
   <div class="center-column">
     <dv.group-by items=$requests key="requesterId" hidden=true />
-    <dv.pick entities=dv.group-by.groupedItems keys=["groupById"]
+    <dv.pick as pick-keys
+             entities=dv.group-by.groupedItems keys=["groupById"]
              newKeyNames=["requesterId"] flatten=false hidden=true />
+    <dv.pick as pick-items
+             entities=dv.group-by.groupedItems keys=["items"]
+             flatten=true hidden=true />
+    <dv.tx>
+      <dv.gen-ids for=pick-keys.pickedEntities hidden=true />
+      <delivery.create-objects initialValue={ delivererId:$requests[0].delivererId }
+                               showExclude=["requesterId","delivererId","delivered","confirmed"]
+                               ids=dv.gen-ids.ids
+                               initialValues=pick-keys.pickedEntities
+                               showOptionToSubmit=false
+      />
+      <request.update-objects objectsToUpdate=pick-items.pickedEntities
+                               initialValues={ deliveryId: dv.gen-ids.ids } />
+      <dv.button>Confirm</dv.button>
+    </dv.tx>
 
-    <dv.gen-ids for=dv.pick.pickedEntities hidden=true />
-    <delivery.create-objects initialValue={ delivererId:$requests[0].delivererId }
-                             ids=dv.gen-ids.ids
-                             initialValues=dv.pick.pickedEntities />
   </div>
-
-
-  <dv.table data=$requests
-            enableSelection=true
-            columnInfo=[{label:"Item Name",fieldName:"itemName"},
-                        {label:"Quantity",fieldName:"quantity"},
-                        {label:"Price Estimate",fieldName:"priceEstimate"},
-                        {label:"Due",fieldName:"due"},
-                        {label:"Pickup Location",fieldName:"pickupLocation"},
-                        {label:"Tips",fieldName:"tips"}]
-  />
 </dv.action>
