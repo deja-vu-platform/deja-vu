@@ -1,9 +1,6 @@
 <dv.action name="show-requests-from-user">
-  <h1>Your Requests</h1>
-  <request.show-objects showExclude=["requesterId","claimed","deliveryId","delivererId"]
-                        fieldMatching={ requesterId:$userId }
-                        hidden=true
-  />
+  <h3>Your Requests</h3>
+  <request.show-objects fieldMatching={ requesterId:$userId, deliveryId:"" } hidden=true />
   <dv.table data=request.show-objects.objects
             columnInfo=[{label:"Item Name",fieldName:"itemName"},
             {label:"Quantity",fieldName:"quantity"},
@@ -11,6 +8,6 @@
             {label:"Due",fieldName:"due"},
             {label:"Pickup Location",fieldName:"pickupLocation"},
             {label:"Tips",fieldName:"tips"}]
-            rowAction=<request.remove-object id=$rowObject.id buttonLabel="Cancel" />
+            rowAction=<groceryship.cancel-request request=$rowObject />
   />
 </dv.action>

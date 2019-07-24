@@ -1,7 +1,10 @@
 <dv.action name="show-deliveries-by-user">
-  <h1>You are delivering</h1>
-  <delivery.show-objects fieldMatching={delivererId: $userId}
+  <dv.if condition=delivery.show-objects.objects && delivery.show-objects.objects.length !== 0 >
+    <h3>You are delivering</h3>
+  </dv.if>
+  <delivery.show-objects fieldMatching={ delivererId: $userId, confirmed:false }
+                         noObjectsToShowText=""
                          showObject=<groceryship.show-delivery delivery=$object
-                                      showRequester=true showDeliverer=false />
+                                      isDeliverer=true/>
   />
 </dv.action>

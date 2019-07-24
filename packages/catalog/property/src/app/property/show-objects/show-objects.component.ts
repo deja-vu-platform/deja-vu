@@ -12,7 +12,7 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getFilteredPropertyNames } from '../shared/property.model';
+import { getFilteredPropertyNames, getPropertiesFromConfig } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
 
@@ -50,7 +50,7 @@ OnChanges {
    * input object type:{ fieldName: fieldValue }
    * will return only the objects with its fieldNames matching the fieldValues
    */
-  @Input() fieldMatching: Object;
+  @Input() fieldMatching = {};
   /**
    * List of property names to pass to showObject action
    * (For the default showObject, this will cause
@@ -76,6 +76,7 @@ OnChanges {
   showObjects;
 
   config;
+  schemas;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -91,6 +92,7 @@ OnChanges {
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
     this.config = this.cs.getConfig();
+    this.schemas = getPropertiesFromConfig(this.config);
   }
 
   ngAfterViewInit() {
@@ -111,10 +113,11 @@ OnChanges {
     if (this.canEval()) {
       this.properties = getFilteredPropertyNames(
         this.showOnly, this.showExclude, this.cs);
+      const adjustedFields = this.adjustFieldMatching();
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
-            inputs: { fields: this.fieldMatching },
+            inputs: { fields: adjustedFields },
             extraInfo: {
               action: 'objects',
               returnFields: `
@@ -136,5 +139,34 @@ OnChanges {
 
   private canEval(): boolean {
     return !!(this.gs);
+  }
+
+  /**
+   * When a boolean field gets input "false",
+   * it becomes "true" in the server.
+   * It will only be false if the input is null.
+   * This method changes all false boolean fields to null
+   */
+  private adjustFieldMatching() {
+    if (this.fieldMatching && this.schemas) {
+      const adjustedFields = _.mapValues(this.fieldMatching,
+        (value, key) => {
+        const schemaObjects = _.filter(this.schemas, _.matches({name: key}));
+        if (!schemaObjects || schemaObjects.length === 0) {
+          throw new Error ('field ' + key + ' in fieldMatching ' +
+            'does not match any field name the property');
+        }
+        const schemaObject = schemaObjects[0].schema;
+        if (schemaObject.type === 'boolean' && !value) {
+          return null;
+        } else {
+          return value;
+        }
+      });
+
+      return adjustedFields;
+    } else {
+      return this.fieldMatching;
+    }
   }
 }

@@ -1,18 +1,52 @@
 <dv.action name="show-delivery">
-  <h4 class="inline-card">
-    <dv.if condition=$showRequester>
+  <div class="inline-card">
+    <dv.if condition=$isDeliverer >
       Delivering to:
       <authentication.show-user id=$delivery.requesterId />
     </dv.if>
-    <dv.if condition=$showDeliverer>
+    <dv.if condition=!$isDeliverer >
       Delivering by:
-      <authentication.show-user id=$delivery.delivererId />
+      <authentication.show-user id=$delivery.delivererId/>
     </dv.if>
     Pick Up Time:
     <dv.show-entity entity=$delivery.pickupTime />
     <br />
     Pick Up Location:
     <dv.show-entity entity=$delivery.pickupLocation />
+
+    <dv.if condition=$isDeliverer && !$delivery.delivered >
+      <dv.tx>
+        <delivery.update-object as set-delivered
+                                id=$delivery.id
+                                initialValue={delivered: true}
+                                hidden=true />
+        <dv.button>Delivered</dv.button>
+      </dv.tx>
+
+    <!--Status-->
+    </dv.if>
+    <dv.if condition=$isDeliverer && $delivery.delivered && !$delivery.confirmed >
+      Status: Waiting for the requester to confirm
+    </dv.if>
+
+    <dv.if condition=!$isDeliverer && !$delivery.delivered >
+      Status: the deliverer is on their way
+    </dv.if>
+    <dv.if condition=!$isDeliverer && $delivery.delivered && !$delivery.confirmed >
+      <dv.tx>
+        <delivery.update-object as confirm-delivery
+                                id=$delivery.id
+                                initialValue={confirmed: true}
+                                hidden=true />
+        <dv.button>Confirm Delivered</dv.button>
+      </dv.tx>
+
+    </dv.if>
+    <dv.if condition=$delivery.delivered && $delivery.confirmed >
+      shouldn't appear
+    </dv.if>
+    <!--Status Ends-->
+
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         Items
@@ -27,8 +61,5 @@
                             {label:"Tips",fieldName:"tips"}]
       />
     </mat-expansion-panel>
-  </h4>
-
-
-
+  </div>
 </dv.action>
