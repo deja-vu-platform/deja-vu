@@ -41,16 +41,16 @@
               "type": "string"
             },
             "quantity": {
-              "type": "string"
+              "type": "integer"
             },
             "priceEstimate": {
-              "type": "integer"
+              "type": "number"
             },
             "price": {
-              "type": "string"
+              "type": "number"
             },
             "tips": {
-              "type": "integer"
+              "type": "number"
             },
             "due": {
               "type": "string"
