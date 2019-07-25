@@ -119,7 +119,7 @@ export class CreateObjectComponent
     this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};
     for (const property of this.properties) {
-      this[property.name] = new FormControl('');
+      this[property.name] = new FormControl();
       formControls[property.name] = this[property.name];
     }
     this.createObjectForm = this.builder.group(formControls);
