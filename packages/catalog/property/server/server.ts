@@ -295,12 +295,12 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
 
         // TODO: use bulkWrite
         // instead of updating one by one, we should use BulkWrite
-        for (const object of newObjects) {
-          await objects.updateOne(context, {id: object.id},
-          {$set: object}, {upsert: false});
-        }
-
-        return true;
+        return await Promise.all(newObjects.map(
+          async (object) => (
+            await objects.updateOne(context, {id: object.id},
+          {$set: object}, {upsert: false})
+          ))
+        );
       }
     }
   };

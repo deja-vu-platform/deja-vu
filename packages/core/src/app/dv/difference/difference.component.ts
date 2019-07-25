@@ -15,10 +15,10 @@ import * as _ from 'lodash';
 })
 export class DifferenceComponent implements OnInit, OnChanges {
   /** A list of entities to be subtracted by */
-  @Input() original: any[];
+  @Input() array: any[];
 
-  /** A list of entities to subtract with */
-  @Input() subtractor: any[];
+  /** Lists of entities to subtract with */
+  @Input() values: any[][];
 
   /** compare only one field when the original and subtractor are objects */
   @Input() key: string;
@@ -40,10 +40,10 @@ export class DifferenceComponent implements OnInit, OnChanges {
    */
   ngOnChanges() {
     if (!this.key) {
-      this._difference = _.difference(this.original, this.subtractor);
+      this._difference = _.difference(this.array, ...this.values);
       this.difference.emit(this._difference);
     } else {
-      this._difference = _.differenceBy(this.original, this.subtractor, this.key);
+      this._difference = _.differenceBy(this.array, ...this.values, this.key);
       this.difference.emit(this._difference);
     }
   }

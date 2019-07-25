@@ -1,10 +1,10 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
   <request.show-objects hidden=true />
-  <dv.difference original=request.show-objects.objects
+  <dv.difference array=request.show-objects.objects
                  key="claimed"
                  hidden=true
-                 subtractor=[{claimed:true}] />
+                 values=[[{claimed:true}]] />
   <div class="center-column">
     <dv.table data=dv.difference.difference
               columnInfo=[{label:"Item Name",fieldName:"itemName"},

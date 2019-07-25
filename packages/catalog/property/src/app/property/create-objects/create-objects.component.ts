@@ -35,7 +35,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
   /**
    * List of Id of the new objects to create
-   * Note that currently it is NOT wired to the objects input
+   * Note that it is NOT wired to the objects input
    */
   @Input() ids: string[];
 
@@ -47,8 +47,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   @Input() initialValues: any[];
 
   /**
-   * The initialValue that fits for all of the objects that
-   * are created.
+   * A key-value pair that overrides the initial values of all objects
    */
   @Input() initialValue: any;
 
