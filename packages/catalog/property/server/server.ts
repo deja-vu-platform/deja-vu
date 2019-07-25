@@ -70,18 +70,6 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'update-object': (extraInfo) => {
-    switch (extraInfo.action) {
-      case 'update':
-        return `
-          mutation UpdateObject($input: UpdateObjectInput!) {
-            updateObject(input: $input) ${getReturnFields(extraInfo)}
-          }
-        `;
-      default:
-        throw new Error('extraInfo.action can only be update');
-    }
-  },
   'create-property': (extraInfo) => `
     query Property($name: String!) {
       property(name: $name) ${getReturnFields(extraInfo)}
@@ -93,6 +81,11 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
+  'remove-object': (extraInfo) => `
+    mutation RemoveObject($id: ID!) {
+      removeObject(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-object': (extraInfo) => {
     switch (extraInfo.action) {
       case 'properties':
@@ -121,11 +114,31 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'remove-object': (extraInfo) => `
-    mutation RemoveObject($id: ID!) {
-      removeObject(id: $id) ${getReturnFields(extraInfo)}
+  'update-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObject($input: UpdateObjectInput!) {
+            updateObject(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
     }
-  `
+  },
+  'update-objects': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObjects($input: [UpdateObjectInput!]) {
+            updateObjects(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
+    }
+  }
+
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -179,7 +192,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     
     input UpdateObjectInput {
       id: ID!
-      ${joinedProperties}
+      ${joinedNonRequiredProperties}
     }
 
     input FieldMatchingInput {
@@ -266,14 +279,27 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return await objects.insertMany(context, objDocs);
       },
 
+      removeObject: async (_root, { id }, context: Context) => {
+        return await objects.deleteOne(context, {id: id});
+      },
+
       updateObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
         return await objects.updateOne(context, {id: input.id},
           {$set: newObject}, {upsert: true});
       },
 
-      removeObject: async (_root, { id }, context: Context) => {
-        return await objects.deleteOne(context, {id: id});
+      updateObjects: async (_root, { input }, context: Context) => {
+        const newObjects: ObjectDoc[] = _.map(input,
+          (value) => createObjectFromInput(config, value));
+
+        // TODO: use bulkWrite
+        // instead of updating one by one, we should use BulkWrite
+        return await Promise.all(newObjects.map(
+          (object) => objects.updateOne(context, {id: object.id},
+          {$set: object}, {upsert: false})
+          )
+        );
       }
     }
   };

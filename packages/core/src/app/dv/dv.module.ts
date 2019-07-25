@@ -13,10 +13,12 @@ import { ButtonComponent } from './button/button.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
+import { DifferenceComponent } from './difference/difference.component';
 import { ForComponent } from './for/for.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
 import { GenIdsComponent } from './gen-ids/gen-ids.component';
+import { GroupByComponent } from './group-by/group-by.component';
 import {
   IncludeComponent, IncludeDirective
 } from './include/include.component';
@@ -24,6 +26,7 @@ import { InputIdComponent } from './input-id/input-id.component';
 import { IntersectComponent } from './intersect/intersect.component';
 import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
+import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
@@ -49,7 +52,8 @@ const allComponents = [
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
-  IntersectComponent, ShowEntityComponent, TableComponent
+  IntersectComponent, ShowEntityComponent, TableComponent,
+  DifferenceComponent, GroupByComponent, PickComponent
 ];
 
 @NgModule({

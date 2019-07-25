@@ -9,4 +9,7 @@
     <dv.button>Claim</dv.button>
     </dv.tx>
   </dv.if>
+  <dv.if condition=$userId === $request.requesterId >
+    <div class="disabled">Yours</div>
+  </dv.if>
 </dv.action>

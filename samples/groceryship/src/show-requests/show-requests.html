@@ -1,17 +1,19 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
   <request.show-objects hidden=true />
-    <div class="center-column">
-      <dv.if condition=!!request.show-objects.objects>
-        <dv.table data=request.show-objects.objects
-                  columnInfo=[{label:"Item Name",fieldName:"itemName"},
-                              {label:"Quantity",fieldName:"quantity"},
-                              {label:"Price Estimate",fieldName:"priceEstimate"},
-                              {label:"Due",fieldName:"due"},
-                              {label:"Pickup Location",fieldName:"pickupLocation"},
-                              {label:"Tips",fieldName:"tips"}]
-                  rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
-        />
-      </dv.if>
-    </div>
+  <dv.difference array=request.show-objects.objects
+                 key="claimed"
+                 hidden=true
+                 values=[[{claimed:true}]] />
+  <div class="center-column">
+    <dv.table data=dv.difference.difference
+              columnInfo=[{label:"Item Name",fieldName:"itemName"},
+                          {label:"Quantity",fieldName:"quantity"},
+                          {label:"Price Estimate",fieldName:"priceEstimate"},
+                          {label:"Due",fieldName:"due"},
+                          {label:"Pickup Location",fieldName:"pickupLocation"},
+                          {label:"Tips",fieldName:"tips"}]
+              rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
+    />
+  </div>
 </dv.action>
