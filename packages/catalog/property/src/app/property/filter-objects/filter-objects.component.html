@@ -7,5 +7,10 @@
         {{property.name}}
       </mat-checkbox>
     </div>
+    <div *ngIf="property.schema.type ==='integer' || property.schema.type ==='number' " >
+      <mat-form-field>
+        <input matInput placeholder="title">
+      </mat-form-field>
+    </div>
   </div>
 </div>

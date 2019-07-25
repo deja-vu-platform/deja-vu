@@ -102,7 +102,7 @@ export class UpdateObjectComponent
     this.properties = getProperties(cs);
     const formControls = {};
     for (const property of this.properties) {
-      this[property.name] = new FormControl('');
+      this[property.name] = new FormControl();
       formControls[property.name] = this[property.name];
     }
     this.updateObjectForm = this.builder.group(formControls);
@@ -116,8 +116,7 @@ export class UpdateObjectComponent
   async dvOnExec(): Promise<void> {
     const input = { id: this.id };
     for (const property of this.properties) {
-      input[property.name] = this[property.name].value ?
-        this[property.name].value : '';
+      input[property.name] = this[property.name].value;
     }
 
     const res = await this.gs
