@@ -25,7 +25,6 @@ export class DifferenceComponent implements OnInit, OnChanges {
 
   /** The output list */
   @Output() difference = new EventEmitter<any[]>();
-  _difference;
 
   constructor(
     private elem: ElementRef, private rs: RunService) {}
@@ -40,11 +39,9 @@ export class DifferenceComponent implements OnInit, OnChanges {
    */
   ngOnChanges() {
     if (!this.key) {
-      this._difference = _.difference(this.array, ...this.values);
-      this.difference.emit(this._difference);
+      this.difference.emit(_.difference(this.array, ...this.values));
     } else {
-      this._difference = _.differenceBy(this.array, ...this.values, this.key);
-      this.difference.emit(this._difference);
+      this.difference.emit(_.differenceBy(this.array, ...this.values, this.key));
     }
   }
 }
