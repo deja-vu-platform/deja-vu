@@ -88,7 +88,7 @@ export class CreateObjectComponent
 
   /**
    * Updates on change
-   * Used to let it's parent object (create-objects) to get the
+   * Used to let its parent object to get the
    * information of what is on display
    */
   @Output() objectOnDisplay = new EventEmitter<any>();
