@@ -14,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "dependencies": {
+    "ng5-slider": "^1.2.4"
+  }
 }
