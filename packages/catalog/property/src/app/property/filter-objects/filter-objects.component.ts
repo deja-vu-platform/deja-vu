@@ -8,9 +8,22 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { Property, getProperties } from '../shared/property.model';
+import { getProperties } from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
+import { Options } from 'ng5-slider';
+
+export const DEFAULT_INTEGER_OPTIONS: Options = {
+  floor: 0,
+  ceil: 10,
+  step: 1,
+  showTicks: true
+};
+
+export const DEFAULT_NUMBER_OPTIONS: Options = {
+  floor: 0,
+  ceil: 10
+};
 
 /**
  * Displays the filters of a property
@@ -23,6 +36,19 @@ import { API_PATH } from '../property.config';
 })
 export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
+
+  /**
+   * The configueration options of the filters
+   * for numbers:
+   *    the floor, ceil and step size of the selection range
+   */
+  @Input() propertyOptions: Object = {};
+
+  /**
+   * The initialValues of some or all fields of the filter
+   */
+  @Input() initialValue: Object = {};
+
   @Output() loadedObjects = new EventEmitter<Object[]>();
   _loadedObjects;
 
@@ -31,16 +57,9 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
    */
   @Output() loadedObjectIds = new EventEmitter<string[]>();
 
-  /**
-   * List of properties.
-   * If given, causes exactly these properties to be shown.
-   * Takes precedence over showOnly and showExclude.
-   * Primarily intended for use within the cliché.
-   * App creators probably want showOnly.
-   */
-  @Input() properties: Property[];
   filterObjects;
   propertyValues;
+  properties;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -57,14 +76,8 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     this.cs = this.csf.createConfigService(this.elem);
 
     this.properties = getProperties(this.cs);
-    this.propertyValues = _.reduce(this.properties,
-      (object, property, index) => {
-        if (property.schema.type === 'boolean') {
-          object[property.name] = null;
-        }
-
-        return object;
-      }, {});
+    this.initializePropertyOptions();
+    this.initializePropertyValues();
   }
 
   ngAfterViewInit() {
@@ -110,15 +123,84 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     }
   }
 
-  /*
-  Only supporting boolean inputs right now
-   */
-  updateFieldFilter(fieldName, fieldValue) {
+  initializePropertyOptions() {
+    for (const property of this.properties) {
+      switch (property.schema.type) {
+        case 'integer': {
+          this.propertyOptions[property.name] =
+            this.propertyOptions[property.name] ? _
+                .extend(DEFAULT_INTEGER_OPTIONS,
+                  ...this.propertyOptions[property.name]) :
+              DEFAULT_INTEGER_OPTIONS;
+          break;
+        }
+        case 'number': {
+          this.propertyOptions[property.name] =
+            this.propertyOptions[property.name] ? _
+                .extend(DEFAULT_NUMBER_OPTIONS,
+                  ...this.propertyOptions[property.name]) :
+              DEFAULT_INTEGER_OPTIONS;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+  }
+
+  initializePropertyValues() {
+    this.propertyValues = _.reduce(this.properties,
+      (object, property, index) => {
+        switch (property.schema.type) {
+          case 'boolean': {
+            object[property.name] = this.initialValue[property.name] ?
+              this.initialValue[property.name] : null;
+            break;
+          }
+          case 'integer': {
+          } // intentional fallthrough
+          case 'number': {
+            object[property.name] = {
+              minValue: this.initialValue[property.name]
+              && this.initialValue[property.name].minValue ?
+                this.initialValue[property.name].minValue :
+                this.propertyOptions[property.name].floor,
+              maxValue: this.initialValue[property.name]
+              && this.initialValue[property.name].maxValue ?
+                this.initialValue[property.name].maxValue :
+                this.propertyOptions[property.name].ceil
+            };
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+
+        return object;
+      }, {});
+  }
+
+  updateBooleanFilter(fieldName, fieldValue) {
     /* TODO: `null` is used to represent `false`
       to work around graphql turning everything into `true` */
     this.propertyValues[fieldName] = fieldValue ? true : null;
     this.load();
   }
+
+  // updateNumberFilter(fieldName, maxMin, fieldValue) {
+  //   console.log(fieldValue);
+  //   if (!this.propertyValues[fieldName]) {
+  //     this.propertyValues[fieldName] = {};
+  //   }
+  //   if (maxMin === 'max') {
+  //     this.propertyValues[fieldName].max = fieldValue;
+  //   } else if (maxMin === 'min') {
+  //     this.propertyValues[fieldName].min = fieldValue;
+  //   }
+  //   this.load();
+  // }
 
   private canEval(): boolean {
     return true;
