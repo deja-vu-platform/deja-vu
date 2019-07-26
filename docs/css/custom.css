@@ -8,6 +8,10 @@
   list-style: none;
   background: white;
   border: 1px solid black;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .tiles li p {
@@ -15,10 +19,13 @@
   margin-bottom: 10px;
 }
 
+.tiles li > :nth-child(2) {
+  height: 75px;
+}
+
 .tiles a {
   display: inline-block;
   height: 30px;
-  padding: 0 30px;
   color: #555;
   text-align: center;
   white-space: nowrap;
@@ -27,6 +34,7 @@
   cursor: pointer;
   box-sizing: border-box;
   font-weight: 300;
+  width: 70px;
 }
 
 .tiles a:hover {
