@@ -85,7 +85,8 @@ languages and tools.
 Re#'s sweet spot is limited-variability apps.
 A limited-variability app is an amalgamation of common
 functionality, with only small variations between the app and other apps
-in its category.
+in its category. (Hence the name of our tool! using re# you
+are, for the most part, rehashing concepts.)
 
 For example, if you want to build a social news aggregator,
 you'd most likely want functionality that allows users to submit news and rate

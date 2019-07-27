@@ -10,98 +10,98 @@ contribute a new concept, see the
 
 
 {: .tiles}
-- **Allocator**
+- Allocator
 
-  *Distribute resources among consumers*
+  Distribute resources among consumers
 
   {% include concept-btns.html name="property" %}
-- **Authentication**
+- Authentication
 
-  *Verify the user's identity with a username and password*
+  Verify the user's identity with a username and password
 
   {% include concept-btns.html name="authentication" %}
-- **Authorization**
+- Authorization
 
-  *Control access to resources*
+  Control access to resources
 
   {% include concept-btns.html name="authorization" %}
-- **Chat**
+- Chat
 
-  *Exchange messages in real time with other users*
+  Exchange messages in real time with other users
 
   {% include concept-btns.html name="chat" %}
-- **Comment**
+- Comment
  
-  *Share reactions to items*
+  Share reactions to items
 
   {% include concept-btns.html name="comment" %}
-- **Event**
+- Event
 
-  *Schedule events*
+  Schedule events
 
   {% include concept-btns.html name="event" %}
-- **Follow**
+- Follow
 
-  *Receive updates from sources*
+  Receive updates from sources
 
   {% include concept-btns.html name="follow" %}
-- **Geolocation**
+- Geolocation
 
-  *Locate points of interest*
+  Locate points of interest
 
   {% include concept-btns.html name="geolocation" %}
-- **Group**
+- Group
 
-  *Organize members into groups so that they can be handled in aggregate*
+  Organize members into groups so that they can be handled in aggregate
 
   {% include concept-btns.html name="group" %}
-- **Label**
+- Label
 
-  *Label items so that they can be found later*
+  Label items so that they can be found later
 
   {% include concept-btns.html name="label" %}
-- **Match**
+- Match
 
-  *Connect users after attempting to match with each other*
+  Connect users after attempting to match with each other
 
   {% include concept-btns.html name="match" %}
-- **Passkey**
+- Passkey
 
-  *Verify the user's identity with a code*
+  Verify the user's identity with a code
 
   {% include concept-btns.html name="passkey" %}
-- **Property**
+- Property
 
-  *Describe an object with properties that have values*
+  Describe an object with properties that have values
 
   {% include concept-btns.html name="property" %}
-- **Ranking**
+- Ranking
 
-  *Rank items*
+  Rank items
 
   {% include concept-btns.html name="ranking" %}
-- **Rating**
+- Rating
 
-  *Crowdsource evaluation of items*
+  Crowdsource evaluation of items
 
   {% include concept-btns.html name="rating" %}
-- **Schedule**
+- Schedule
  
-  *Find times to meet*
+  Find times to meet
 
   {% include concept-btns.html name="schedule" %}
-- **Scoring**
+- Scoring
  
-  *Keep track of scores*
+  Keep track of scores
 
   {% include concept-btns.html name="scoring" %}
-- **Task**
+- Task
  
-  *Keep track of pieces of work to be done*
+  Keep track of pieces of work to be done
 
   {% include concept-btns.html name="task" %}
-- **Transfer**
+- Transfer
  
-  *Transfer money or items between accounts*
+  Transfer money or items between accounts
 
   {% include concept-btns.html name="transfer" %}
