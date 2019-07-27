@@ -1,6 +1,9 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
-  <request.filter-objects />
+  <request.filter-objects showOnly=["priceEstimate","tips"]
+                          initialValue={ claimed:false }
+                          propertyOptions={ tips:{ceil:50,step:0.5}, priceEstimate:{ceil:100,step:1} }
+  />
   <div class="center-column">
     <dv.table data=request.filter-objects.loadedObjects
               columnInfo=[{label:"Item Name",fieldName:"itemName"},
