@@ -8,7 +8,7 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getProperties } from '../shared/property.model';
+import { getProperties, getPropertyNames } from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
 import { Options } from 'ng5-slider';
@@ -22,7 +22,8 @@ export const DEFAULT_INTEGER_OPTIONS: Options = {
 
 export const DEFAULT_NUMBER_OPTIONS: Options = {
   floor: 0,
-  ceil: 10
+  ceil: 10,
+  step: 0.1
 };
 
 /**
@@ -42,12 +43,25 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
    * for numbers:
    *    the floor, ceil and step size of the selection range
    */
-  @Input() propertyOptions: Object = {};
+  @Input() propertyOptions = {};
 
   /**
    * The initialValues of some or all fields of the filter
    */
   @Input() initialValue: Object = {};
+
+  /**
+   * List of property names to show the filters
+   * A field will be filtered if
+   *  (1) it is shown OR
+   *  (2) it has input initialValue
+   */
+  @Input() showOnly: string[];
+
+  /**
+   * List of property names to not show the filters
+   */
+  @Input() showExclude: string[];
 
   @Output() loadedObjects = new EventEmitter<Object[]>();
   _loadedObjects;
@@ -60,6 +74,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   filterObjects;
   propertyValues;
   properties;
+  propertiesToShow;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -71,11 +86,11 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnInit() {
+    console.log(this.propertyOptions);
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
-
-    this.properties = getProperties(this.cs);
+    this.initializePropertiesToInclude();
     this.initializePropertyOptions();
     this.initializePropertyValues();
   }
@@ -123,7 +138,21 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     }
   }
 
+  initializePropertiesToInclude() {
+    const propertiesInfo = getProperties(this.cs);
+    const propertyNames = getPropertyNames(this.cs);
+    this.propertiesToShow = this.showOnly ?
+      _.difference(this.showOnly, this.showExclude) :
+      _.difference(propertyNames, this.showExclude);
+    this.properties = _.filter(propertiesInfo,
+      (property) => _.includes(
+        _.union(this.propertiesToShow, Object.keys(this.initialValue)),
+        property.name)
+      );
+  }
+
   initializePropertyOptions() {
+    console.log(this.propertyOptions);
     for (const property of this.properties) {
       switch (property.schema.type) {
         case 'integer': {
@@ -135,11 +164,12 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
           break;
         }
         case 'number': {
+          console.log(property);
           this.propertyOptions[property.name] =
             this.propertyOptions[property.name] ? _
                 .extend(DEFAULT_NUMBER_OPTIONS,
                   ...this.propertyOptions[property.name]) :
-              DEFAULT_INTEGER_OPTIONS;
+              DEFAULT_NUMBER_OPTIONS;
           break;
         }
         default: {
@@ -147,6 +177,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
         }
       }
     }
+    console.log(this.propertyOptions);
   }
 
   initializePropertyValues() {
@@ -188,19 +219,6 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
     this.propertyValues[fieldName] = fieldValue ? true : null;
     this.load();
   }
-
-  // updateNumberFilter(fieldName, maxMin, fieldValue) {
-  //   console.log(fieldValue);
-  //   if (!this.propertyValues[fieldName]) {
-  //     this.propertyValues[fieldName] = {};
-  //   }
-  //   if (maxMin === 'max') {
-  //     this.propertyValues[fieldName].max = fieldValue;
-  //   } else if (maxMin === 'min') {
-  //     this.propertyValues[fieldName].min = fieldValue;
-  //   }
-  //   this.load();
-  // }
 
   private canEval(): boolean {
     return true;
