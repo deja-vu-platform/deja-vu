@@ -26,6 +26,11 @@ export const DEFAULT_NUMBER_OPTIONS: Options = {
   step: 0.1
 };
 
+export interface PropertyOptions {
+  tips?: number;
+  priceEstimate?: number;
+}
+
 /**
  * Displays the filters of a property
  * Currently only supports filter for boolean properties
@@ -43,7 +48,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
    * for numbers:
    *    the floor, ceil and step size of the selection range
    */
-  @Input() propertyOptions = {};
+  @Input() propertyOptions: PropertyOptions = {};
 
   /**
    * The initialValues of some or all fields of the filter
@@ -86,10 +91,11 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnInit() {
-    console.log(this.propertyOptions);
+    console.log(JSON.stringify(this.propertyOptions));
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
+    console.log(JSON.stringify(this.propertyOptions));
     this.initializePropertiesToInclude();
     this.initializePropertyOptions();
     this.initializePropertyValues();
@@ -152,23 +158,19 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   initializePropertyOptions() {
-    console.log(this.propertyOptions);
     for (const property of this.properties) {
       switch (property.schema.type) {
         case 'integer': {
           this.propertyOptions[property.name] =
-            this.propertyOptions[property.name] ? _
-                .extend(DEFAULT_INTEGER_OPTIONS,
-                  ...this.propertyOptions[property.name]) :
+            this.propertyOptions[property.name] ?
+              { ...DEFAULT_INTEGER_OPTIONS, ...this.propertyOptions[property.name]} :
               DEFAULT_INTEGER_OPTIONS;
           break;
         }
         case 'number': {
-          console.log(property);
-          this.propertyOptions[property.name] =
-            this.propertyOptions[property.name] ? _
-                .extend(DEFAULT_NUMBER_OPTIONS,
-                  ...this.propertyOptions[property.name]) :
+            this.propertyOptions[property.name] =
+            this.propertyOptions[property.name] ?
+              { ...DEFAULT_NUMBER_OPTIONS, ...this.propertyOptions[property.name]} :
               DEFAULT_NUMBER_OPTIONS;
           break;
         }
@@ -177,7 +179,6 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
         }
       }
     }
-    console.log(this.propertyOptions);
   }
 
   initializePropertyValues() {
