@@ -9,8 +9,10 @@ export const jsonSchemaTypeToGraphQlType = {
 };
 
 export const jsonSchemaTypeToGraphQlFilterType = {
-  boolean: 'Boolean'
-  /* only supports boolean for now */
+  boolean: 'Boolean',
+  integer: 'RangeFilterInput',
+  number: 'RangeFilterInput'
+  /* string is not supported */
 };
 
 export interface Property {
