@@ -22,3 +22,8 @@ type Mutation {
   updateObjects(input: [UpdateObjectInput!]): Boolean
   removeObject(id: ID!): Boolean
 }
+
+input RangeFilterInput {
+  maxValue: Float
+  minValue: Float
+}

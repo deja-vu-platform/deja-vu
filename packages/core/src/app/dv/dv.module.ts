@@ -14,6 +14,7 @@ import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
 import { DifferenceComponent } from './difference/difference.component';
+import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
@@ -53,7 +54,7 @@ const allComponents = [
   RedirectComponent, ZipComponent, ShowCountComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
-  DifferenceComponent, GroupByComponent, PickComponent
+  DifferenceComponent, GroupByComponent, PickComponent, FilterComponent
 ];
 
 @NgModule({
