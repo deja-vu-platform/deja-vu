@@ -76,6 +76,7 @@ OnExecSuccess {
   schemaErrors: string[];
   required = false;
   type;
+  enumList = null;
 
   private gs: GatewayService;
   private cs: ConfigService;
@@ -117,6 +118,9 @@ OnExecSuccess {
       throw new Error(`Property ${this.name} not in schema`);
     }
     const schema = property.schema;
+    if (schema.enum) {
+      this.enumList = schema.enum;
+    }
     this.schemaValidate = this.ajv.compile(schema);
     if (schema.type === 'integer' ||
         schema.type === 'number') {
