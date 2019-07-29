@@ -1,13 +1,11 @@
 <mat-form-field *ngIf="propertyControl">
   <mat-label>{{name | camelToTitleCase}}</mat-label>
-    <mat-select *ngIf="enumList" [formControl]="propertyControl" [required]="required">
-      <mat-option *ngFor="let value of enumList" [value]="value">
-        {{value}}
-      </mat-option>
-    </mat-select>
-  <div *ngIf="!enumList">
-    <input matInput [formControl]="propertyControl" [required]="required">
-  </div>
+  <mat-select *ngIf="enumList" [formControl]="propertyControl" [required]="required">
+    <mat-option *ngFor="let value of enumList" [value]="value">
+      {{value}}
+    </mat-option>
+  </mat-select>
+  <input *ngIf="!enumList" matInput [formControl]="propertyControl" [required]="required">
   <mat-error *ngIf="propertyControl.hasError('required')">
     {{name | camelToTitleCase}} is <strong>required</strong>
   </mat-error>

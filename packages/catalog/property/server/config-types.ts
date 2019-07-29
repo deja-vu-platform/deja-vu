@@ -15,8 +15,16 @@ export const jsonSchemaTypeToGraphQlFilterType = {
   /* string is not supported */
 };
 
+export const jsonSchemaTypedEnumFilterToGraphQlFilter = {
+  boolean: 'BooleanEnumFilterInput',
+  integer: 'IntegerEnumFilterInput',
+  number: 'NumberEnumFilterInput',
+  string: 'StringEnumFilterInput'
+};
+
 export interface Property {
   type: keyof typeof jsonSchemaTypeToGraphQlType;
+  enum?: any[];
 }
 
 export interface Schema {
