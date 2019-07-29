@@ -72,7 +72,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   @Output() loadedObjectIds = new EventEmitter<string[]>();
 
   filterObjects;
-  propertyValues;
+  propertyValues = {};
   properties;
   propertiesToShow;
   private gs: GatewayService;
@@ -160,7 +160,7 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
           break;
         }
         case 'number': {
-            this.propertyOptions[property.name] =
+          this.propertyOptions[property.name] =
             this.propertyOptions[property.name] ?
               { ...DEFAULT_NUMBER_OPTIONS, ...this.propertyOptions[property.name]} :
               DEFAULT_NUMBER_OPTIONS;
@@ -174,18 +174,21 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   initializePropertyValues() {
-    this.propertyValues = _.reduce(this.properties,
-      (object, property, index) => {
+    for (const property of this.properties) {
+      if (property.schema.enum) {
+        this.propertyValues[property.name] = this.initialValue[property.name] ?
+          this.initialValue[property.name] : { matchValues: [] };
+      } else {
         switch (property.schema.type) {
           case 'boolean': {
-            object[property.name] = this.initialValue[property.name] ?
+            this.propertyValues[property.name] = this.initialValue[property.name] ?
               this.initialValue[property.name] : null;
             break;
           }
           case 'integer': {
           } // intentional fallthrough
           case 'number': {
-            object[property.name] = {
+            this.propertyValues[property.name] = {
               minValue: this.initialValue[property.name]
               && this.initialValue[property.name].minValue ?
                 this.initialValue[property.name].minValue :
@@ -201,15 +204,23 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
             break;
           }
         }
-
-        return object;
-      }, {});
+      }
+    }
   }
 
-  updateBooleanFilter(fieldName, fieldValue) {
+  updateBooleanFilter(fieldName, checked) {
     /* TODO: `null` is used to represent `false`
       to work around graphql turning everything into `true` */
-    this.propertyValues[fieldName] = fieldValue ? true : null;
+    this.propertyValues[fieldName] = checked ? true : null;
+    this.load();
+  }
+
+  updateEnumFilter(fieldName, valueName, checked) {
+    if (checked) {
+      this.propertyValues[fieldName].matchValues.push(valueName);
+    } else {
+      _.pull(this.propertyValues[fieldName].matchValues, valueName);
+    }
     this.load();
   }
 

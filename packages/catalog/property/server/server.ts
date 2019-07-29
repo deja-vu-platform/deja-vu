@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
   jsonSchemaTypeToGraphQlFilterType,
+  jsonSchemaTypedEnumFilterToGraphQlFilter,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -173,15 +174,17 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .filter(([_propertyName, schemaPropertyObject]) => (
       schemaPropertyObject.type === 'boolean' ||
       schemaPropertyObject.type === 'integer' ||
-      schemaPropertyObject.type === 'number'
+      schemaPropertyObject.type === 'number' ||
+      !!schemaPropertyObject.enum
     ))
-    .map(([propertyName, schemaPropertyObject]) => {
-      return `${propertyName}: ` +
-        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type];
-    })
+    .map(([propertyName, schemaPropertyObject]) => (
+      `${propertyName}: ` +
+        (schemaPropertyObject.enum ?
+        jsonSchemaTypedEnumFilterToGraphQlFilter[schemaPropertyObject.type] :
+        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type])
+    ))
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
-  console.log(joinedPropertyFilters);
 
   return [`
     type Object {
@@ -258,6 +261,8 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
           (filter) => {
           if (typeof filter === 'boolean') {
             return filter;
+          } else if (filter.matchValues) {
+            return { $in: filter.matchValues };
           } else {
             return {
               $gte: filter.minValue,
