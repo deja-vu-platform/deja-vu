@@ -56,7 +56,9 @@
               "type": "string"
             },
             "pickupLocation": {
-              "type": "string"
+              "type": "string",
+              "enum": ["EC", "Senior House", "New House", "Next House",
+                "Maseeh", "McCormick", "Baker", "MacGregor", "Random", "Burton Connor"]
             },
             "requesterId": {
               "type": "string"

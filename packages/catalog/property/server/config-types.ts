@@ -9,12 +9,22 @@ export const jsonSchemaTypeToGraphQlType = {
 };
 
 export const jsonSchemaTypeToGraphQlFilterType = {
-  boolean: 'Boolean'
-  /* only supports boolean for now */
+  boolean: 'Boolean',
+  integer: 'RangeFilterInput',
+  number: 'RangeFilterInput'
+  /* string is not supported */
+};
+
+export const jsonSchemaTypedEnumFilterToGraphQlFilter = {
+  boolean: 'BooleanEnumFilterInput',
+  integer: 'IntegerEnumFilterInput',
+  number: 'NumberEnumFilterInput',
+  string: 'StringEnumFilterInput'
 };
 
 export interface Property {
   type: keyof typeof jsonSchemaTypeToGraphQlType;
+  enum?: any[];
 }
 
 export interface Schema {

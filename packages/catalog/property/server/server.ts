@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
   jsonSchemaTypeToGraphQlFilterType,
+  jsonSchemaTypedEnumFilterToGraphQlFilter,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -171,11 +172,17 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .chain(config.schema.properties)
     .toPairs()
     .filter(([_propertyName, schemaPropertyObject]) => (
-      schemaPropertyObject.type === 'boolean'))
-    .map(([propertyName, schemaPropertyObject]) => {
-      return `${propertyName}: ` +
-        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type];
-    })
+      schemaPropertyObject.type === 'boolean' ||
+      schemaPropertyObject.type === 'integer' ||
+      schemaPropertyObject.type === 'number' ||
+      !!schemaPropertyObject.enum
+    ))
+    .map(([propertyName, schemaPropertyObject]) => (
+      `${propertyName}: ` +
+        (schemaPropertyObject.enum ?
+        jsonSchemaTypedEnumFilterToGraphQlFilter[schemaPropertyObject.type] :
+        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type])
+    ))
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
 
@@ -245,10 +252,24 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return objects.find(fields);
       },
       filteredObjects: async (_root, { filters } ) => {
-        // removes all fields that has `false` as its value
-        // this includes objects where the non-selected fields are true
-        // i.e. it turns the yes/no logic into a yes/don't care logic
-        const modifiedFilters = _.pickBy(filters, (value) => (value));
+        // it servers two purposes :
+        // (1) get rid of null fields
+        // (2) turn yes/no logic into yes/don't care logic for booleans
+        const filteredFilters = _.pickBy(filters, (value) => (!!value));
+
+        const modifiedFilters = _.mapValues(filteredFilters,
+          (filter) => {
+          if (typeof filter === 'boolean') {
+            return filter;
+          } else if (filter.matchValues) {
+            return { $in: filter.matchValues };
+          } else {
+            return {
+              $gte: filter.minValue,
+              $lte: filter.maxValue
+            };
+          }
+        });
 
         return objects.find(modifiedFilters);
       },

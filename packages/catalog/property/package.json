@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "ajv": "^6.2.1",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "ng5-slider": "^1.2.4"
   },
   "peerDependencies": {
     "@angular/animations": "^5.2.0",

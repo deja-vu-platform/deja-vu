@@ -11,6 +11,7 @@ import {
   MatTableModule,
   MatTooltipModule
 } from '@angular/material';
+import { Ng5SliderModule }  from "ng5-slider";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from '@deja-vu/core';
@@ -76,6 +77,7 @@ const metadata = {
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    Ng5SliderModule,
     // Material
     MatAutocompleteModule,
     MatButtonModule,
