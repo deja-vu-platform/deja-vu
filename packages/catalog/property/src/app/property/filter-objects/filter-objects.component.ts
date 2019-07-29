@@ -8,7 +8,7 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getProperties, getPropertyNames } from '../shared/property.model';
+import { getProperties, getPropertyNames, getFilteredPropertyNames } from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
 import { Options } from 'ng5-slider';
@@ -138,10 +138,8 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
 
   initializePropertiesToInclude() {
     const propertiesInfo = getProperties(this.cs);
-    const propertyNames = getPropertyNames(this.cs);
-    this.propertiesToShow = this.showOnly ?
-      _.difference(this.showOnly, this.showExclude) :
-      _.difference(propertyNames, this.showExclude);
+    this.propertiesToShow = getFilteredPropertyNames(
+      this.showOnly, this.showExclude, this.cs);
     this.properties = _.filter(propertiesInfo,
       (property) => _.includes(
         _.union(this.propertiesToShow, Object.keys(this.initialValue)),
