@@ -1,19 +1,23 @@
 <dv.action name="show-requests">
   <groceryship.navbar accessRequired=true />
-  <div class="center-column">
+  <div class="left-column">
+    <h3>Filters</h3>
     <request.filter-objects showOnly=["priceEstimate","tips","quantity","pickupLocation"]
                             propertyOptions={ tips:{ceil:10,step:0.5}, priceEstimate:{ceil:100,step:1} }
     />
     <dv.filter entitiesToFilter=request.filter-objects.loadedObjects
                filter={claimed:false} />
+  </div>
+  <div class="right-column">
+    <h3>Requests</h3>
     <dv.table data=dv.filter.filteredEntities
               columnInfo=[{label:"Item Name",fieldName:"itemName"},
-                          {label:"Quantity",fieldName:"quantity"},
-                          {label:"Price Estimate",fieldName:"priceEstimate"},
-                          {label:"Due",fieldName:"due"},
-                          {label:"Pickup Location",fieldName:"pickupLocation"},
-                          {label:"Tips",fieldName:"tips"}]
-              rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
+    {label:"Quantity",fieldName:"quantity"},
+    {label:"Price Estimate",fieldName:"priceEstimate"},
+    {label:"Due",fieldName:"due"},
+    {label:"Pickup Location",fieldName:"pickupLocation"},
+    {label:"Tips",fieldName:"tips"}]
+    rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
     />
   </div>
 </dv.action>
