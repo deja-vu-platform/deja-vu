@@ -10,14 +10,14 @@
              flatten=true hidden=true />
     <dv.tx>
       <dv.gen-ids for=pick-keys.pickedEntities hidden=true />
-      <delivery.create-objects initialValue={ delivererId:$requests[0].delivererId }
+      <delivery.create-objects initialValue={ delivererId:$requests[0].delivererId, confirmed:false, delivered:false }
                                showExclude=["requesterId","delivererId","delivered","confirmed"]
                                ids=dv.gen-ids.ids
                                initialValues=pick-keys.pickedEntities
                                showOptionToSubmit=false
       />
       <request.update-objects objectsToUpdate=pick-items.pickedEntities
-                               initialValues={ deliveryId: dv.gen-ids.ids } />
+                              initialValues={ deliveryId: dv.gen-ids.ids } />
       <dv.button>Confirm</dv.button>
     </dv.tx>
 
