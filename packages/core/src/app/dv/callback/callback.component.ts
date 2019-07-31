@@ -29,10 +29,11 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
-    this.route.paramMap.subscribe(params => {
-      if (params.has('callback'))
-        this.loadedCallback = params.get('callback');
+    this.route.paramMap.subscribe((params) => {
+      if (params.has('callback')) {
+        this.loadedCallback = JSON.parse(params.get('callback'));
         this.callback.emit(this.loadedCallback);
+      }
     });
   }
 
