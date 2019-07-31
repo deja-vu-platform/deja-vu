@@ -2,7 +2,7 @@
   <div>
     <post.show-object id=$id hidden=true />
 
-    <dv.if condition=!post.show-object.loadedObject>
+    <dv.if condition=post.show-object.errors>
       Post not found
     </dv.if>
 
