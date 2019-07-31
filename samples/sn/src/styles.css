@@ -17,7 +17,8 @@
   font-size: 9pt; /* hacker news subtext font size */
 }
 
-.black-link a {
+.black-link a,
+.black-link a:hover {
   color: black;
 }
 
@@ -37,6 +38,14 @@
 
 .authentication-show-user-username {
   display: inline;
+}
+
+.create-comment-success {
+  width: 200px;
+}
+
+.dvlink, .dvlink:hover {
+  color: gray;
 }
 
 h1 {
