@@ -14,6 +14,21 @@
     Pick Up Location:
     <dv.show-entity entity=$delivery.pickupLocation />
 
+    <mat-expansion-panel class="mat-elevation-z0">
+      <mat-expansion-panel-header>
+        Items
+      </mat-expansion-panel-header>
+      <request.show-objects fieldMatching={ deliveryId:$delivery.id }
+                            hidden=true
+      />
+      <dv.table data=request.show-objects.objects
+                columnInfo=[{label:"Item Name",fieldName:"itemName"},
+      {label:"Quantity",fieldName:"quantity"},
+      {label:"Price Estimate",fieldName:"priceEstimate"},
+      {label:"Tips",fieldName:"tips"}]
+      />
+    </mat-expansion-panel>
+
     <dv.if condition=$isDeliverer && !$delivery.delivered >
       <dv.tx>
         <delivery.update-object as set-delivered
@@ -47,19 +62,6 @@
     </dv.if>
     <!--Status Ends-->
 
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        Items
-      </mat-expansion-panel-header>
-      <request.show-objects fieldMatching={ deliveryId:$delivery.id }
-      hidden=true
-      />
-      <dv.table data=request.show-objects.objects
-                columnInfo=[{label:"Item Name",fieldName:"itemName"},
-                            {label:"Quantity",fieldName:"quantity"},
-                            {label:"Price Estimate",fieldName:"priceEstimate"},
-                            {label:"Tips",fieldName:"tips"}]
-      />
-    </mat-expansion-panel>
+
   </div>
 </dv.action>
