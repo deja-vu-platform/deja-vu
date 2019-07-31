@@ -86,15 +86,19 @@ main {
 }
 
 .individual-card {
-  margin: 10px 0;
+  margin: 30px 0;
 }
 
 .inline-block {
   display: inline-block;
 }
 
+.small-vertical-margin {
+  margin: 10px 0;
+}
+
 /* Auth Related */
-.sign-up-btn button.mat-button,
+.theme-button button.mat-button,
 authentication-sign-in button.mat-button {
   background-color: #4bad42;
   color: #FFFFFF !important;
