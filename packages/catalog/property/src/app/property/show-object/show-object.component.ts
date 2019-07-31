@@ -59,6 +59,7 @@ OnChanges {
    * The object being shown
    */
   @Output() loadedObject = new EventEmitter<any>();
+  @Output() errors = new EventEmitter<any>();
   /**
    * Used internally by the cliche for passing the configuration
    */
@@ -127,7 +128,7 @@ OnChanges {
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.gs
-        .get<{data: {object: Object}}>(this.apiPath, {
+        .get<{data: {object: Object}, errors: any}>(this.apiPath, {
           params: {
             inputs: { id: this.id },
             extraInfo: {
@@ -140,8 +141,12 @@ OnChanges {
           }
         })
         .subscribe((res) => {
-          this.object = res.data.object;
-          this.loadedObject.emit(this.object);
+          if (!_.isEmpty(res.errors)) {
+            this.errors.emit(res.errors);
+          } else {
+            this.object = res.data.object;
+            this.loadedObject.emit(this.object);
+          }
         });
     } else if (this.gs) {
       this.gs.noRequest();
