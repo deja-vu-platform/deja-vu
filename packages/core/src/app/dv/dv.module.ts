@@ -44,6 +44,7 @@ import { ConfigServiceFactory } from './config.service';
 import { OfDirective } from './of.directive';
 import { StorageService } from './storage.service';
 import { SubscriptionService } from './subscription.service';
+import { CamelToTitleCasePipe } from './stage/stage.component';
 
 
 const allComponents = [
@@ -67,7 +68,11 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule, MatTableModule, MatCheckboxModule
   ],
-  declarations: [...allComponents, OfDirective],
+  declarations: [
+    ...allComponents,
+    OfDirective,
+    CamelToTitleCasePipe
+  ],
   providers: [
     GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
     SubscriptionService

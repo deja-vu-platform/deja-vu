@@ -17,9 +17,6 @@
     </mat-cell>
   </ng-container>
 
-
-
-
   <ng-container *ngFor="let column of columnInfo" matColumnDef="{{column.fieldName}}">
     <mat-header-cell *matHeaderCellDef> {{column.label}} </mat-header-cell>
     <mat-cell *matCellDef="let element"> {{element[column.fieldName]}}</mat-cell>
@@ -32,7 +29,6 @@
                   [inputs]="{ rowObject: element }"
                   [parent]="table" no-default-rowAction>
       </dv-include>
-
     </mat-cell>
   </ng-container>
 

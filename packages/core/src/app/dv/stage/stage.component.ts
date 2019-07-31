@@ -1,17 +1,25 @@
 import {
   AfterViewChecked, ChangeDetectorRef, Component, ElementRef, EventEmitter,
-  Input, OnInit, Output, ViewChild
+  Input, OnInit, Output, Pipe, PipeTransform, ViewChild
 } from '@angular/core';
 import {
   ControlValueAccessor, FormBuilder, FormControl, FormGroup, FormGroupDirective,
   NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator
 } from '@angular/forms';
+import { MatTable } from '@angular/material';
 
 import * as _ from 'lodash';
 
 import { Action } from '../include/include.component';
 import { OnExecSuccess, RunService } from '../run.service';
 
+// TODO: is it better to import it from property cliche
+@Pipe({ name: 'camelToTitleCase'})
+export class CamelToTitleCasePipe implements PipeTransform {
+  transform(camelCase: string): string {
+    return _.startCase(_.camelCase(camelCase));
+  }
+}
 
 @Component({
   selector: 'dv-stage',
@@ -44,11 +52,13 @@ export class StageComponent
   @Output() filteredStagedEntities = new EventEmitter<any[]>();
 
   // Presentation inputs
+  @Input() tableView = false;
   @Input() entityName = 'Entity';
   @Input() stageButtonLabel = 'Add';
 
   stageComponent = this;
   staged: any[] = [];
+  Object = Object;
 
   entityControl = new FormControl();
 
@@ -56,6 +66,7 @@ export class StageComponent
   stageForm: FormGroup = this.builder.group({
     entityControl: this.entityControl
   });
+  @ViewChild(MatTable) table: MatTable<any>;
 
   constructor(
     private builder: FormBuilder, private elem: ElementRef,
@@ -86,6 +97,9 @@ export class StageComponent
       this.staged.push(value);
       this.stagedEntities.emit(_.cloneDeep(this.staged));
       this.filteredStagedEntities.emit(_.cloneDeep(this.filterEntities()));
+      if (this.tableView && this.table) {
+        this.table.renderRows();
+      }
     }
   }
 
@@ -93,6 +107,9 @@ export class StageComponent
     _.pullAt(this.staged, index);
     this.stagedEntities.emit(_.cloneDeep(this.staged));
     this.filteredStagedEntities.emit(_.cloneDeep(this.filterEntities()));
+    if (this.tableView && this.table) {
+      this.table.renderRows();
+    }
   }
 
   writeValue(value: any[]) {
