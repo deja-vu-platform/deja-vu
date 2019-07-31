@@ -178,10 +178,10 @@ authentication-sign-in button.mat-button:hover {
   color: #959ca6;
 }
 
-.inline-cards {
+.inline-card {
   display: inline-block;
   float: left;
-  width: 200px;
+  width: 350px;
 }
 
 .property-filter-objects-property {
@@ -190,3 +190,19 @@ authentication-sign-in button.mat-button:hover {
 .property-filter-objects-property-title {
   font-weight:bold;
 }
+.authentication-show-user-username {
+  display: inline-block;
+}
+.list-group {
+  display:inline-block;
+}
+.list-group-item {
+  margin: 10px !important;
+  width: 400px !important;
+  vertical-align: top;
+  display:inline-block
+}
+.list-group-item:first-child {
+  border-radius: .25rem;
+}
+
