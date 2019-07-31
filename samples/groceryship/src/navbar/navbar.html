@@ -48,16 +48,14 @@
       </dv.if>
 
       <dv.if condition=!authentication.logged-in.user>
-        <div class="form-inline navbar-right">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/sign-in" class="mat-button btn btn-info profile-btn">
-              Login
-            </dv.link>
+        <div class="navbar-right inline-block">
+          <dv.link href="/sign-in">
+            Login
+          </dv.link>
 
-            <dv.link href="/sign-up" class="mat-button btn btn-info profile-btn">
-              Register
-            </dv.link>
-          </div>
+          <dv.link href="/sign-up">
+            Register
+          </dv.link>
         </div>
       </dv.if>
     </div>
