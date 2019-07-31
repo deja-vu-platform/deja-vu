@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, RunService
 } from '../run.service';
+import * as _ from 'lodash';
 
 
 @Component({
@@ -61,6 +62,8 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
 
   private redirectToCallback() {
     const href = this.loadedCallback ? this.loadedCallback : this.defaultHref;
+    this.params = this.params ?
+      _.mapValues(this.params, (value) => JSON.stringify(value)) : null;
     this.router.navigate([href, ...(this.params ? [this.params] : []) ]);
   }
 }

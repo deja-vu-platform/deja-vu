@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid';
 import {
   jsonSchemaTypeToGraphQlType,
   jsonSchemaTypeToGraphQlFilterType,
+  jsonSchemaTypedEnumFilterToGraphQlFilter,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -70,18 +71,6 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'update-object': (extraInfo) => {
-    switch (extraInfo.action) {
-      case 'update':
-        return `
-          mutation UpdateObject($input: UpdateObjectInput!) {
-            updateObject(input: $input) ${getReturnFields(extraInfo)}
-          }
-        `;
-      default:
-        throw new Error('extraInfo.action can only be update');
-    }
-  },
   'create-property': (extraInfo) => `
     query Property($name: String!) {
       property(name: $name) ${getReturnFields(extraInfo)}
@@ -93,6 +82,11 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
+  'remove-object': (extraInfo) => `
+    mutation RemoveObject($id: ID!) {
+      removeObject(id: $id) ${getReturnFields(extraInfo)}
+    }
+  `,
   'show-object': (extraInfo) => {
     switch (extraInfo.action) {
       case 'properties':
@@ -121,11 +115,31 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('Need to specify extraInfo.action');
     }
   },
-  'remove-object': (extraInfo) => `
-    mutation RemoveObject($id: ID!) {
-      removeObject(id: $id) ${getReturnFields(extraInfo)}
+  'update-object': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObject($input: UpdateObjectInput!) {
+            updateObject(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
     }
-  `
+  },
+  'update-objects': (extraInfo) => {
+    switch (extraInfo.action) {
+      case 'update':
+        return `
+          mutation UpdateObjects($input: [UpdateObjectInput!]) {
+            updateObjects(input: $input) ${getReturnFields(extraInfo)}
+          }
+        `;
+      default:
+        throw new Error('extraInfo.action can only be update');
+    }
+  }
+
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -158,11 +172,17 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     .chain(config.schema.properties)
     .toPairs()
     .filter(([_propertyName, schemaPropertyObject]) => (
-      schemaPropertyObject.type === 'boolean'))
-    .map(([propertyName, schemaPropertyObject]) => {
-      return `${propertyName}: ` +
-        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type];
-    })
+      schemaPropertyObject.type === 'boolean' ||
+      schemaPropertyObject.type === 'integer' ||
+      schemaPropertyObject.type === 'number' ||
+      !!schemaPropertyObject.enum
+    ))
+    .map(([propertyName, schemaPropertyObject]) => (
+      `${propertyName}: ` +
+        (schemaPropertyObject.enum ?
+        jsonSchemaTypedEnumFilterToGraphQlFilter[schemaPropertyObject.type] :
+        jsonSchemaTypeToGraphQlFilterType[schemaPropertyObject.type])
+    ))
     .value();
   const joinedPropertyFilters = propertyFilters.join('\n');
 
@@ -179,7 +199,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     
     input UpdateObjectInput {
       id: ID!
-      ${joinedProperties}
+      ${joinedNonRequiredProperties}
     }
 
     input FieldMatchingInput {
@@ -232,10 +252,24 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return objects.find(fields);
       },
       filteredObjects: async (_root, { filters } ) => {
-        // removes all fields that has `false` as its value
-        // this includes objects where the non-selected fields are true
-        // i.e. it turns the yes/no logic into a yes/don't care logic
-        const modifiedFilters = _.pickBy(filters, (value) => (value));
+        // it servers two purposes :
+        // (1) get rid of null fields
+        // (2) turn yes/no logic into yes/don't care logic for booleans
+        const filteredFilters = _.pickBy(filters, (value) => (!!value));
+
+        const modifiedFilters = _.mapValues(filteredFilters,
+          (filter) => {
+          if (typeof filter === 'boolean') {
+            return filter;
+          } else if (filter.matchValues) {
+            return { $in: filter.matchValues };
+          } else {
+            return {
+              $gte: filter.minValue,
+              $lte: filter.maxValue
+            };
+          }
+        });
 
         return objects.find(modifiedFilters);
       },
@@ -266,14 +300,27 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return await objects.insertMany(context, objDocs);
       },
 
+      removeObject: async (_root, { id }, context: Context) => {
+        return await objects.deleteOne(context, {id: id});
+      },
+
       updateObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
         return await objects.updateOne(context, {id: input.id},
           {$set: newObject}, {upsert: true});
       },
 
-      removeObject: async (_root, { id }, context: Context) => {
-        return await objects.deleteOne(context, {id: id});
+      updateObjects: async (_root, { input }, context: Context) => {
+        const newObjects: ObjectDoc[] = _.map(input,
+          (value) => createObjectFromInput(config, value));
+
+        // TODO: use bulkWrite
+        // instead of updating one by one, we should use BulkWrite
+        return await Promise.all(newObjects.map(
+          (object) => objects.updateOne(context, {id: object.id},
+          {$set: object}, {upsert: false})
+          )
+        );
       }
     }
   };

@@ -2,7 +2,7 @@ import {
   Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
 } from '@angular/core';
 
-import { RunService, OnExecSuccess } from '../run.service';
+import { RunService } from '../run.service';
 import * as _ from 'lodash';
 
 

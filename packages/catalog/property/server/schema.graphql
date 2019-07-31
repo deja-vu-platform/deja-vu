@@ -19,5 +19,28 @@ type Mutation {
   createObject(input: CreateObjectInput!): Object
   createObjects(input: [CreateObjectInput!]!): [Object]
   updateObject(input: UpdateObjectInput!): Boolean
+  updateObjects(input: [UpdateObjectInput!]): Boolean
   removeObject(id: ID!): Boolean
 }
+
+input RangeFilterInput {
+  maxValue: Float
+  minValue: Float
+}
+
+input BooleanEnumFilterInput {
+  matchValues: [Boolean!]
+}
+
+input IntegerEnumFilterInput {
+  matchValues: [Int!]
+}
+
+input NumberEnumFilterInput {
+  matchValues: [Float!]
+}
+
+input StringEnumFilterInput {
+  matchValues: [String!]
+}
+

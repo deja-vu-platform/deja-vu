@@ -41,22 +41,24 @@
               "type": "string"
             },
             "quantity": {
-              "type": "string"
+              "type": "integer"
             },
             "priceEstimate": {
-              "type": "string"
+              "type": "number"
             },
             "price": {
-              "type": "string"
+              "type": "number"
             },
             "tips": {
-              "type": "string"
+              "type": "number"
             },
             "due": {
               "type": "string"
             },
             "pickupLocation": {
-              "type": "string"
+              "type": "string",
+              "enum": ["EC", "Senior House", "New House", "Next House",
+                "Maseeh", "McCormick", "Baker", "MacGregor", "Random", "Burton Connor"]
             },
             "requesterId": {
               "type": "string"
@@ -77,7 +79,7 @@
     "delivery": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
+        "reinitDbOnStartup": false,
         "schema": {
           "title": "Delivery",
           "type": "object",
@@ -89,6 +91,9 @@
               "type": "string"
             },
             "pickupTime": {
+              "type": "string"
+            },
+            "pickupLocation": {
               "type": "string"
             },
             "delivered": {
@@ -107,6 +112,8 @@
     { "path": "sign-in", "action": "sign-in" },
     { "path": "sign-up", "action": "sign-up" },
     { "path": "requests", "action": "show-requests" },
-    { "path": "make-request", "action": "create-request" }
+    { "path": "make-request", "action": "create-request" },
+    { "path": "make-delivery", "action": "create-deliveries" },
+    { "path": "profile", "action": "update-profile" }
   ]
 }

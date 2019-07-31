@@ -1,11 +1,36 @@
 <div class="property-filter-objects">
   <div *ngFor="let property of properties" class="property-filter-objects-property">
-    <div *ngIf="property.schema.type ==='boolean' " >
-      <mat-checkbox [value]="propertyValues[property.name]"
-                    (change)="updateFieldFilter(property.name, $event.checked)"
-      >
+    <div *ngIf="propertiesToShow.includes(property.name)">
+      <div *ngIf="property.schema.enum">
         {{property.name}}
-      </mat-checkbox>
+        <div *ngFor="let value of property.schema.enum">
+          <mat-checkbox
+            [value]="value"
+            (change)="updateEnumFilter(property.name, value, $event.checked)"
+          >
+            {{value}}
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <div *ngIf="!property.schema.enum">
+        <div *ngIf="property.schema.type === 'boolean' " >
+          <mat-checkbox [value]="propertyValues[property.name]"
+                        (change)="updateBooleanFilter(property.name, $event.checked)"
+          >
+            {{property.name}}
+          </mat-checkbox>
+        </div>
+        <div *ngIf="property.schema.type === 'integer' || property.schema.type ==='number' " >
+          {{property.name}}
+          <ng5-slider [(value)]="propertyValues[property.name].minValue"
+                      [(highValue)]="propertyValues[property.name].maxValue"
+                      [options]="propertyOptions[property.name]"
+                      (userChangeEnd)="load()"
+          >
+          </ng5-slider>
+        </div>
+      </div>
     </div>
   </div>
 </div>

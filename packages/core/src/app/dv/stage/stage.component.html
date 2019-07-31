@@ -1,11 +1,11 @@
-<div *ngIf="stageEntity">
+<div *ngIf="stageEntity" class="dv-stage-stage-entity">
   <dv-include [action]="stageEntity"
               [outputs]="{ stage: 'stage' }"
               [parent]="stageComponent"
               no-default-stageEntity >
   </dv-include>
 </div>
-<div *ngIf="!stageEntity" class="row">
+<div *ngIf="!stageEntity" class="row dv-stage-stage-entity">
   <div class="col-md-12">
     <form (ngSubmit)="onSubmit()"
           [formGroup]="stageForm"
@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<div *ngIf="stageHeader" class="row">
+<div *ngIf="stageHeader" class="row dv-stage-stage-header">
   <div class="col-md-12">
     <dv-include [action]="stageHeader" no-default-stageHeader
                 [parent]="stageComponent">
@@ -32,7 +32,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row dv-stage-staged-entities">
   <div class="col-md-12">
     <ul *ngIf="staged && staged.length > 0" class="list-group">
       <li *ngFor="let entity of staged; index as i" class="list-group-item">
