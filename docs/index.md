@@ -34,10 +34,10 @@ are used, and how they are placed on the page. Concepts
 are configured in JSON and you can style your app with CSS.
 
 - **conventional output** A compiled re# app is a standard MEAN
-(MongoDB-Express-Angular-Node.js) app, which you can deploy
-with very little effort using popular cloud providers.
+(MongoDB-Express-Angular-Node.js) app, which can be
+easily deployed with popular cloud providers.
 If you don't have a preferred cloud provider, you can 
-follow our guide to [easily deploy]() to Heroku.
+follow our guide to [deploy]() to Heroku.
 
 
 **Re# is a research prototype and you shouldn't rely on it for anything

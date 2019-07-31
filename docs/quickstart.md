@@ -13,7 +13,8 @@ You are going to need [Node.js](https://nodejs.org/en/) v9+ and
 you don't need to register or pay any money to Mongo Inc.
 
 You can install the CLI globally or you
-can create a local project and install it locally.
+can create an npm project and install it locally
+as a dependency.
 
 
 ## global install

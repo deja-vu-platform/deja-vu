@@ -4,7 +4,14 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-.tiles li {
+.tiles-sample {
+  display: grid;
+  grid-column-gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+.tiles li,
+.tiles-sample li {
   list-style: none;
   background: white;
   border: 1px solid black;
@@ -14,21 +21,24 @@
   margin-bottom: 5px;
 }
 
-.tiles li p {
+.tiles li p,
+.tiles-sample li p {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.tiles li > :nth-child(1) {
+.tiles li > :nth-child(1),
+.tiles-sample li > :nth-child(1) {
   font-weight: bold;
 }
 
-.tiles li > :nth-child(2) {
+.tiles li > :nth-child(2),
+.tiles-sample li > :nth-child(2) {
   font-style: italic;
   height: 75px;
 }
 
-.tiles .btn {
+.btn {
   display: inline-block;
   height: 30px;
   color: #555;
@@ -42,7 +52,7 @@
   width: 70px;
 }
 
-.tiles .btn:hover {
+.btn:hover {
   color: #333;
   border-color: #888;
   outline: 0;
