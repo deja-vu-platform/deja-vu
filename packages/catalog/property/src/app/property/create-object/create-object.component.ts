@@ -187,6 +187,7 @@ export class CreateObjectComponent
   }
 
   dvOnExecFailure(reason: Error) {
+    this.setInitialValues();
     if (this.showOptionToSubmit && this.save) {
       this.newObjectError = reason.message;
     }
