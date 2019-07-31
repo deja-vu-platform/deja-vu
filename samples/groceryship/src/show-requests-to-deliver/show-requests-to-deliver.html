@@ -1,20 +1,30 @@
 <dv.action name="show-requests-to-deliver">
-  <h3>To Deliver</h3>
-  <request.show-objects fieldMatching={ delivererId:$userId }
-                        hidden=true
-  />
-  <dv.filter entitiesToFilter=request.show-objects.objects filter='deliveryId' />
-  <dv.difference array=request.show-objects.objects values=[dv.filter.filteredEntities] />
-  <dv.table data=dv.difference.difference
-            enableSelection=true
-            columnInfo=[{label:"Item Name",fieldName:"itemName"},
-            {label:"Quantity",fieldName:"quantity"},
-            {label:"Price Estimate",fieldName:"priceEstimate"},
-            {label:"Due",fieldName:"due"},
-            {label:"Pickup Location",fieldName:"pickupLocation"},
-            {label:"Tips",fieldName:"tips"}]
-            noDataToShowText="You have not claimed requests yet."
-  />
-  <dv.link href="/make-delivery" params={ requests:dv.table.selectedRowObjects } >Deliver Now</dv.link>
+  <div class="individual-card">
+    <h3>To Deliver</h3>
+    <request.show-objects fieldMatching={ delivererId:$userId }
+                          hidden=true
+    />
+    <dv.filter entitiesToFilter=request.show-objects.objects filter='deliveryId' />
+    <dv.difference array=request.show-objects.objects values=[dv.filter.filteredEntities] />
+    <dv.table data=dv.difference.difference
+              enableSelection=true
+              columnInfo=[{label:"Item Name",fieldName:"itemName"},
+              {label:"Quantity",fieldName:"quantity"},
+              {label:"Price Estimate",fieldName:"priceEstimate"},
+              {label:"Due",fieldName:"due"},
+              {label:"Pickup Location",fieldName:"pickupLocation"},
+              {label:"Tips",fieldName:"tips"}]
+              noDataToShowText="You have not claimed requests yet."
+    />
+
+    <dv.if condition=dv.table.selectedRowObjects >
+      <dv.tx>
+        <dv.button class="theme-button pull-right small-vertical-margin">
+          Deliver Now
+        </dv.button>
+        <dv.link href="/make-delivery" params={ requests:dv.table.selectedRowObjects } hidden=true />
+      </dv.tx>
+    </dv.if>
+  </div>
 </dv.action>
 
