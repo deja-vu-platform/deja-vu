@@ -62,6 +62,10 @@ main {
   margin: 30px 70px;
 }
 
+.center-column-thin {
+  margin: 50px 300px;
+}
+
 .left-column, .dv-stage-stage-entity {
   float: left;
   width: 35%;
@@ -89,36 +93,10 @@ main {
   display: inline-block;
 }
 
-
-
-/*.form-signin {*/
-  /*max-width: 330px;*/
-  /*padding: 15px;*/
-  /*margin: 0 auto;*/
-  /*text-align: center;*/
-/*}*/
-
-/*.form-signin .form-signin-heading,*/
-/*.form-signin .checkbox {*/
-  /*margin-bottom: 10px;*/
-/*}*/
-
-/*.form-signin-heading {*/
-  /*font-family: 'Arial', cursive !important;*/
-  /*color: #44a6f2;*/
-/*}*/
-
-/*.form-horizontal .form-group {*/
-  /*margin-right: 0;*/
-  /*margin-left: 0;*/
-/*}*/
-
-
-
 /* Auth Related */
-authentication-register-user button.mat-button,
+.sign-up-btn button.mat-button,
 authentication-sign-in button.mat-button {
-  background-color: #44a6f2;
+  background-color: #4bad42;
   color: #FFFFFF !important;
   border: 2px solid white;
   font-size: 20px;
@@ -129,21 +107,22 @@ authentication-sign-in button.mat-button {
   line-height: 1.3333333;
   border-radius: 6px;
   display: block;
-  width: 100%;
+  width: 200px;
 }
 
-authentication-register-user button.mat-button:hover,
+.sign-up-btn button.mat-button:hover,
 authentication-sign-in button.mat-button:hover {
-  color: #44a6f2 !important;
+  color: #4bad42 !important;
   background-color: white;
-  border: 2px solid #44a6f2;
+  border: 2px solid #4bad42;
 }
 
 /* Navbar */
 .navbar a{
   color: #FFFFFF;
   text-decoration: none;
-  text-align:center
+  text-align:center;
+  margin:5px;
 }
 
 .navbar a:hover {
@@ -162,17 +141,12 @@ authentication-sign-in button.mat-button:hover {
   background-color: #4bad42;
 }
 
-/*.login-btn a,*/
-/*.register-btn a {*/
-  /*color: #262626;*/
-/*}*/
+.login-btn a,
+.register-btn a {
+  color: #4bad42;
+}
 
-/*label-search-items-by-labels button.mat-button {*/
-  /*display: inline-block;*/
-  /*margin-left: 1em;*/
-  /*background-color: floralwhite;*/
-/*}*/
-
+/* Other */
 .mat-option {
   font-size: inherit;
   line-height: 2em !important;

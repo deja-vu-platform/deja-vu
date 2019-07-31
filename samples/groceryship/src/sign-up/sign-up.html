@@ -1,12 +1,12 @@
 <dv.action name="sign-up">
   <groceryship.navbar accessRequired=false />
-  <div class="center text-font form-signin">
+  <div class="center-column-thin">
     <h1>Sign Up</h1>
     <dv.tx>
       <dv.gen-id />
       <userProfile.create-object showOptionToSubmit=false id=dv.gen-id.id />
       <authentication.register-user showOptionToSubmit=false id=dv.gen-id.id/>
-      <dv.button class=".btn-default">Sign Up</dv.button>
+      <dv.button class="sign-up-btn">Sign Up</dv.button>
       <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
     </dv.tx>
     <div>

@@ -8,7 +8,7 @@
       />
       <dv.difference array=request.filter-objects.loadedObjects
                      key="claimed"
-                     values=[{claimed:true}]
+                     values=[[{claimed:true}]]
       />
     </div>
     <div class="right-column">
@@ -20,6 +20,7 @@
       {label:"Due",fieldName:"due"},
       {label:"Pickup Location",fieldName:"pickupLocation"},
       {label:"Tips",fieldName:"tips"}]
+      noDataToShowText="No request has been made."
       rowAction=<groceryship.claim-request request=$rowObject userId=groceryship.navbar.loggedInUserId />
       />
     </div>
