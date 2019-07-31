@@ -212,7 +212,3 @@ authentication-sign-in button.mat-button:hover {
 .property-filter-objects-property {
   margin: 30px 0;
 }
-
-/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-selection {
-  background:#4bad42
-}

@@ -23,12 +23,14 @@
         </div>
         <div *ngIf="property.schema.type === 'integer' || property.schema.type ==='number' " >
           {{property.name | camelToTitleCase}}
-          <ng5-slider [(value)]="propertyValues[property.name].minValue"
-                      [(highValue)]="propertyValues[property.name].maxValue"
-                      [options]="propertyOptions[property.name]"
-                      (userChangeEnd)="load()"
-          >
-          </ng5-slider>
+          <div class="property-filter-objects-slider">
+            <ng5-slider [(value)]="propertyValues[property.name].minValue"
+                        [(highValue)]="propertyValues[property.name].maxValue"
+                        [options]="propertyOptions[property.name]"
+                        (userChangeEnd)="load()"
+            >
+            </ng5-slider>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,15 @@
+/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-selection {
+  background: #4bad42;
+}
+
+/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-pointer {
+  background: #4bad42;
+}
+
+/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: #255720;
+}
+
+/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: #4bad42;
+}
