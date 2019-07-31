@@ -15,36 +15,34 @@
       </div>
 
       <dv.if condition=authentication.logged-in.user>
-        <div class="form-inline navbar-right inline-block">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/"
-                     class="mat-button btn btn-info profile-btn">
+        <div class="navbar-right inline-block">
+          <div>
+            <dv.link href="/">
               Dashboard
             </dv.link>
             &nbsp;
-            <dv.link href="/make-request"
-                     class="mat-button btn btn-info profile-btn">
+            <dv.link href="/make-request">
               Request
             </dv.link>
             &nbsp;
-            <dv.link href="/requests"
-                     class="mat-button btn btn-info profile-btn">
+            <dv.link href="/requests">
               Deliver
             </dv.link>
             &nbsp;
-            <mat-expansion-panel class="mat-elevation-z0" >
-              <mat-expansion-panel-header>
-                Logged In:
-                <dv.show-entity entity=authentication.logged-in.user.username />
-              </mat-expansion-panel-header>
-              <dv.link href="/profile" class="mat-button btn btn-info profile-btn">Account Setting</dv.link>
-              <br />
-              <dv.tx>
-                <authentication.sign-out class="mat-button btn btn-info profile-btn"
-                                         buttonLabel="Logout"/>
-                <dv.link href="/sign-in" hidden=true />
-              </dv.tx>
-            </mat-expansion-panel>
+            <div class="navbar-right-elem">
+              <mat-expansion-panel class="mat-elevation-z0" >
+                <mat-expansion-panel-header>
+                  <span class="inline-block">Logged In: </span>
+                  <dv.show-entity entity=authentication.logged-in.user.username />
+                </mat-expansion-panel-header>
+                <dv.link href="/profile">Account Setting</dv.link>
+                <br />
+                <dv.tx>
+                  <authentication.sign-out buttonLabel="Logout"/>
+                  <dv.link href="/sign-in" hidden=true />
+                </dv.tx>
+              </mat-expansion-panel>
+            </div>
           </div>
         </div>
       </dv.if>
