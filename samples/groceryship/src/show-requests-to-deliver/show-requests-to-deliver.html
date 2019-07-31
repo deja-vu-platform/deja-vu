@@ -1,9 +1,11 @@
 <dv.action name="show-requests-to-deliver">
   <h3>To Deliver</h3>
-  <request.show-objects fieldMatching={ delivererId:$userId, deliveryId:"" }
+  <request.show-objects fieldMatching={ delivererId:$userId }
                         hidden=true
   />
-  <dv.table data=request.show-objects.objects
+  <dv.filter entitiesToFilter=request.show-objects.objects filter='deliveryId' />
+  <dv.difference array=request.show-objects.objects values=[dv.filter.filteredEntities] />
+  <dv.table data=dv.difference.difference
             enableSelection=true
             columnInfo=[{label:"Item Name",fieldName:"itemName"},
             {label:"Quantity",fieldName:"quantity"},
@@ -11,6 +13,7 @@
             {label:"Due",fieldName:"due"},
             {label:"Pickup Location",fieldName:"pickupLocation"},
             {label:"Tips",fieldName:"tips"}]
+            noDataToShowText="You have not claimed requests yet."
   />
   <dv.link href="/make-delivery" params={ requests:dv.table.selectedRowObjects } >Deliver Now</dv.link>
 </dv.action>
