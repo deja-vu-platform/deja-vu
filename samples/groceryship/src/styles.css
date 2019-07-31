@@ -9,28 +9,14 @@ md-icon {
   font-family: 'Material Icons' !important;
 }
 
-
-/* Author: Barry */
-.page-content {
-  margin-top: 56px !important;
-}
-
-.proposal {
-  margin-bottom: 20px;
-}
-
-.col-centered {
-  float: none;
-  margin: 0 auto;
-}
-
+/* Basics */
 p {
   white-space: pre-wrap;
   font-family: 'Raleway', sans-serif;
 }
 
 a {
-  color: #28bdb1;
+  color: #4bad42;
 }
 
 a:hover {
@@ -40,13 +26,13 @@ a:hover {
 h1 {
   font-family: 'Raleway', sans-serif;
   font-weight: bold;
-  color: #28bdb1;
+  color: #4bad42;
 }
 
 h2 {
   font-family: 'Raleway', sans-serif;
   font-weight: bold;
-  color: #28bdb1;
+  color: #4bad42;
 }
 
 h3 {
@@ -57,8 +43,20 @@ div {
   font-family: 'Raleway', sans-serif;
 }
 
+ul {
+  list-style: none;
+}
 
+html,
+body,
+main {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #fffff7 !important;
+}
 
+/* Layouts */
 .center-column {
   margin: 30px 70px;
 }
@@ -82,18 +80,6 @@ div {
   padding: 30px 50px;
 }
 
-.left-column-2 {
-  float: left;
-  width: 75%;
-  padding: 10px 10px;
-}
-
-.right-column-2 {
-  float: right;
-  width: 25%;
-  padding: 10px 10px;
-}
-
 .individual-card {
   margin: 10px 0;
 }
@@ -102,132 +88,33 @@ div {
   display: inline-block;
 }
 
-.loader {
-  border: 16px solid #f3f3f3;
-  border-top: 16px solid #3498db;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.btn-primary {
-  background-color: #44a6f2;
-  color: #FFFFFF !important;
-  border: 2px solid white;
-  font-size: 20px;
-  line-height: 20px;
-  transition: all 250ms ease;
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 6px;
-  display: block;
-  width: 100%;
-}
-
-.btn-primary:hover {
-  color: #44a6f2 !important;
-  background-color: white;
-  border: 2px solid #44a6f2;
-}
-
-.btn-default {
-  background-color: #28bdb1 !important;
-  border-color: #28bdb1 !important;
-  color: #FFFFFF !important;
-}
-
-.btn-default:hover {
-  background-color: #37dbce !important;
-  border-color: #37dbce !important;
-  color: #FFFFFF !important;
-}
-
-.btn-danger {
-  background-color: #44a6f2 ;
-  border-color: #FFFFFF ;
-  border-width: 2px;
-  border-radius: 25px;
-  color: #FFFFFF ;
-}
 
 
-.btn-danger:hover {
-  background-color: #FFFFFF;
-  border-color: #44a6f2;
-  color: #44a6f2;
-}
+/*.form-signin {*/
+  /*max-width: 330px;*/
+  /*padding: 15px;*/
+  /*margin: 0 auto;*/
+  /*text-align: center;*/
+/*}*/
 
-.btn-info {
-  background-color: transparent;
-  color: #FFFFFF;
-  border-color: #FFFFFF;
-}
+/*.form-signin .form-signin-heading,*/
+/*.form-signin .checkbox {*/
+  /*margin-bottom: 10px;*/
+/*}*/
 
-.btn-info:hover {
-  background-color: transparent;
-  color: #1b3177;
-}
+/*.form-signin-heading {*/
+  /*font-family: 'Arial', cursive !important;*/
+  /*color: #44a6f2;*/
+/*}*/
 
-html,
-body,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #FFFCF9 !important;
-}
+/*.form-horizontal .form-group {*/
+  /*margin-right: 0;*/
+  /*margin-left: 0;*/
+/*}*/
 
-body {
-  padding-bottom: 40px;
-  background-color: #FFFFFF;
-}
 
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
-  text-align: center;
-}
 
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-
-.form-signin-heading {
-  font-family: 'Arial', cursive !important;
-  color: #44a6f2;
-}
-
-.navbar-btn {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.form-horizontal .form-group {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-#map-div {
-  height: calc(100vh - 105px);
-}
-
-ul {
-  list-style: none;
-}
-
+/* Auth Related */
 authentication-register-user button.mat-button,
 authentication-sign-in button.mat-button {
   background-color: #44a6f2;
@@ -251,31 +138,39 @@ authentication-sign-in button.mat-button:hover {
   border: 2px solid #44a6f2;
 }
 
-.navbar a {
-  background-color: transparent;
+/* Navbar */
+.navbar a{
+  color: #FFFFFF;
+  text-decoration: none;
+  text-align:center
 }
 
-.navbar li a:hover, .navbar li a:focus, .navbar-brand:hover, .navbar-brand:focus {
-  color: #22547a;
-  text-shadow: 0px 0px;
-  background-color: transparent;
+.navbar a:hover {
+  text-decoration: none;
+  font-weight: 700;
 }
 
-dv-link.profile-btn {
-  padding-top: 5px;
-}
-
-.profile-btn a,
-.login-btn a,
-.register-btn a {
-  color: #262626;
-}
-
-label-search-items-by-labels button.mat-button {
+.navbar-right a, .navbar-right-elem {
+  vertical-align: middle;
+  text-align: center;
   display: inline-block;
-  margin-left: 1em;
-  background-color: floralwhite;
+  color: white;
 }
+
+.navbar {
+  background-color: #4bad42;
+}
+
+/*.login-btn a,*/
+/*.register-btn a {*/
+  /*color: #262626;*/
+/*}*/
+
+/*label-search-items-by-labels button.mat-button {*/
+  /*display: inline-block;*/
+  /*margin-left: 1em;*/
+  /*background-color: floralwhite;*/
+/*}*/
 
 .mat-option {
   font-size: inherit;
@@ -316,4 +211,8 @@ label-search-items-by-labels button.mat-button {
 
 .property-filter-objects-property {
   margin: 30px 0;
+}
+
+/deep/ .property-filter-objects-slider .ng5-slider .ng5-slider-selection {
+  background:#4bad42
 }
