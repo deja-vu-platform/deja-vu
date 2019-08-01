@@ -210,3 +210,9 @@ authentication-sign-in button.mat-button:hover {
   border-radius: .25rem;
 }
 
+.property-create-objects-each-object, .dv-show-entities-entity-item {
+  margin: 20px 0;
+  height: 150px;
+  width: 120px;
+}
+

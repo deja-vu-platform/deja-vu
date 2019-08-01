@@ -1,5 +1,5 @@
 <div *ngIf="showInputForms">
-  <div *ngFor="let id of ids; let i = index">
+  <div *ngFor="let id of ids; let i = index" class="property-create-objects-each-object">
     <property-create-object [_config]="config"
                             [id]="id"
                             [showExclude]="showExclude"
