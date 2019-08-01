@@ -1,0 +1,16 @@
+<div *ngIf="showInputForms">
+  <div *ngFor="let id of ids; let i = index" class="property-create-objects-each-object">
+    <property-update-object [_config]="config"
+                            [id]="id"
+                            [showExclude]="showExclude"
+                            [showOptionToSubmit]=false
+                            [emitOnChange]=true
+                            (objectOnDisplay)="updateIndexedObject($event, i)">
+    </property-update-object>
+  </div>
+  <div *ngIf="showOptionToSubmit">
+    <button mat-button (click)="submit()">
+      {{buttonLabel}}
+    </button>
+  </div>
+</div>

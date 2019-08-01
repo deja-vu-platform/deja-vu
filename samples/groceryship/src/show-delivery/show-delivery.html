@@ -31,11 +31,8 @@
 
     <dv.if condition=$isDeliverer && !$delivery.delivered >
       <dv.tx>
-        <delivery.update-object as set-delivered
-                                id=$delivery.id
-                                initialValue={delivered: true}
-                                hidden=true />
         <dv.button>Delivered</dv.button>
+        <dv.link href="/input-price" params={ deliveryId:$delivery.id } />
       </dv.tx>
 
     <!--Status-->

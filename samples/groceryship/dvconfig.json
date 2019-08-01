@@ -114,6 +114,7 @@
     { "path": "requests", "action": "show-requests" },
     { "path": "make-request", "action": "create-request" },
     { "path": "make-delivery", "action": "create-deliveries" },
-    { "path": "profile", "action": "update-profile" }
+    { "path": "profile", "action": "update-profile" },
+    { "path": "input-price", "action": "input-price" }
   ]
 }
