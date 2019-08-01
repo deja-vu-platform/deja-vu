@@ -36,6 +36,7 @@ import { ShowEntitiesComponent } from './show-entities/show-entities.component';
 import { ShowEntityComponent } from './show-entity/show-entity.component';
 import { StageComponent } from './stage/stage.component';
 import { StatusComponent } from './status/status.component';
+import { SumComponent } from './sum/sum.component';
 import { TableComponent } from './table/table.component';
 import { TxComponent } from './tx/tx.component';
 import { UnionComponent } from './union/union.component';
@@ -57,7 +58,7 @@ const allComponents = [
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
   DifferenceComponent, GroupByComponent, PickComponent, FilterComponent,
-  LogComponent
+  LogComponent, SumComponent
 ];
 
 @NgModule({
