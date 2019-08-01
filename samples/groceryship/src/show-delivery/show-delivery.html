@@ -29,13 +29,14 @@
       />
     </mat-expansion-panel>
 
+    <hr width="80%"/>
+
     <dv.if condition=$isDeliverer && !$delivery.delivered >
       <dv.tx>
         <dv.button>Delivered</dv.button>
         <dv.link href="/input-price" params={ deliveryId:$delivery.id } />
       </dv.tx>
 
-      <hr width="80%"/>
     <!--Status-->
     </dv.if>
     <dv.if condition=$isDeliverer && $delivery.delivered && !$delivery.confirmed >
@@ -43,7 +44,7 @@
     </dv.if>
 
     <dv.if condition=!$isDeliverer && !$delivery.delivered >
-      Status: The deliverer is being delivered by <authentication.show-user id=$delivery.delivererId />
+      Status: Your request is being delivered by <authentication.show-user id=$delivery.delivererId />
       <mat-expansion-panel class="mat-elevation-z0">
         <mat-expansion-panel-header>
           Show Profile
