@@ -88,7 +88,7 @@ export class UpdateObjectComponent
 
   /**
    * Updates on change
-   * Used to let its parent object to get the information
+   * Used to let its parent object get the information
    * of what is on display
    */
   @Output() objectOnDisplay = new EventEmitter<any>();

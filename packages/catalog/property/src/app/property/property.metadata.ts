@@ -24,11 +24,9 @@ import {
   CreateObjectsComponent
 } from './create-objects/create-objects.component';
 export { CreateObjectsComponent };
-import {
-   CamelToTitleCasePipe, CreatePropertyComponent
-} from './create-property/create-property.component';
+import { CreatePropertyComponent } from './create-property/create-property.component';
 export { CreatePropertyComponent };
-import { FilterObjectsComponent} from "./filter-objects/filter-objects.component";
+import { FilterObjectsComponent} from './filter-objects/filter-objects.component';
 export { FilterObjectsComponent };
 import {
   ObjectAutocompleteComponent
@@ -48,7 +46,6 @@ import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   TriStateCheckboxComponent
 } from './tri-state-checkbox/tri-state-checkbox.component';
-
 
 const publicComponents = [
   ChooseObjectComponent,
@@ -91,11 +88,10 @@ const metadata = {
   ],
   declarations: [
     ...publicComponents,
-    ...privateComponents,
-    CamelToTitleCasePipe
+    ...privateComponents
   ],
   entryComponents: [...publicComponents, ...privateComponents],
-  exports: [...publicComponents, CamelToTitleCasePipe]
+  exports: [...publicComponents]
 };
 
 export { metadata };

@@ -13,7 +13,6 @@ import * as _ from 'lodash';
 import { Action } from '../include/include.component';
 import { OnExecSuccess, RunService } from '../run.service';
 
-// TODO: is it better to import it from property cliche
 @Pipe({ name: 'camelToTitleCase'})
 export class CamelToTitleCasePipe implements PipeTransform {
   transform(camelCase: string): string {

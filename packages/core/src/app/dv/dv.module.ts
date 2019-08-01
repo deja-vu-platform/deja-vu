@@ -13,6 +13,7 @@ import { ButtonComponent } from './button/button.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ChooseComponent } from './choose/choose.component';
+import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
 import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
@@ -26,7 +27,6 @@ import {
 import { InputIdComponent } from './input-id/input-id.component';
 import { IntersectComponent } from './intersect/intersect.component';
 import { LinkComponent } from './link/link.component';
-import { LogComponent } from './log/log.component';
 import { MergeComponent } from './merge/merge.component';
 import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
@@ -58,7 +58,7 @@ const allComponents = [
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
   DifferenceComponent, GroupByComponent, PickComponent, FilterComponent,
-  LogComponent, SumComponent
+  DebugLogComponent, SumComponent
 ];
 
 @NgModule({
@@ -81,6 +81,6 @@ const allComponents = [
     SubscriptionService
   ],
   entryComponents: [ShowEntityComponent],
-  exports: [...allComponents, OfDirective]
+  exports: [...allComponents, OfDirective, CamelToTitleCasePipe]
 })
 export class DvModule { }

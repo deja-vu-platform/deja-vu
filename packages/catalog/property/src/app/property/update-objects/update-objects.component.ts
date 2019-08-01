@@ -78,7 +78,6 @@ export class UpdateObjectsComponent
     const cs = this.csf.createConfigService(this.elem);
     this.config = cs.getConfig();
     if (!this.objectsToUpdate && this.ids) {
-      console.log("in init if");
       this.showInputForms = true;
       this.updateObjectsList = _.map(this.ids,
         (id) => ( { id: id } ));
@@ -88,6 +87,7 @@ export class UpdateObjectsComponent
   async dvOnExec(): Promise<void> {
     if (_.isEmpty(this.objectsToUpdate)
       && (_.isEmpty(this.updateObjectsList))) {
+      this.gs.noRequest();
       return;
     }
 

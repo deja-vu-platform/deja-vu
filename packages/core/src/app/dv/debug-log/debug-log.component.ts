@@ -1,10 +1,10 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
 @Component({
-  selector: 'dv-log',
-  templateUrl: './log.component.html'
+  selector: 'dv-debug-log',
+  templateUrl: './debug-log.component.html'
 })
-export class LogComponent implements OnChanges {
+export class DebugLogComponent implements OnChanges {
   @Input() entity: any;
 
   ngOnChanges() {
