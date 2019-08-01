@@ -105,6 +105,11 @@
           }
         }
       }
+    },
+    "rating": {
+      "config": {
+        "reinitDbOnStartup": false
+      }
     }
   },
   "routes": [
