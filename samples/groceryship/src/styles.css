@@ -74,7 +74,7 @@ main {
 
 .mid-column {
   float: left;
-  width: 50%;
+  width: 35%;
   padding: 30px 50px;
 }
 
@@ -82,6 +82,12 @@ main {
 .dv-stage-staged-entities {
   float: right;
   width: 65%;
+  padding: 30px 50px;
+}
+
+.right-column-thin {
+  float: right;
+  width: 30%;
   padding: 30px 50px;
 }
 
