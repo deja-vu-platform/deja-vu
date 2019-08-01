@@ -2,3 +2,17 @@
   color:#4f4f4f;
   margin:10px;
 }
+
+/deep/ .rating {
+  display: inline-block;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+/deep/ .rating-show-avg-rating-stars-container {
+  display: inline-block;
+}
+
+/deep/ .rating-show-avg-rating-stars-vote-count {
+  display: inline-block;
+}

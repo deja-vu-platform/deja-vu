@@ -72,9 +72,9 @@ main {
   padding: 30px 50px;
 }
 
-.mid-column {
+.fourth-column {
   float: left;
-  width: 35%;
+  width: 25%;
   padding: 30px 50px;
 }
 
@@ -82,12 +82,6 @@ main {
 .dv-stage-staged-entities {
   float: right;
   width: 65%;
-  padding: 30px 50px;
-}
-
-.right-column-thin {
-  float: right;
-  width: 30%;
   padding: 30px 50px;
 }
 
@@ -221,4 +215,3 @@ authentication-sign-in button.mat-button:hover {
   height: 150px;
   width: 120px;
 }
-
