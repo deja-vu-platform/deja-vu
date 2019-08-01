@@ -18,7 +18,7 @@ import {
   RunService
 } from '@deja-vu/core';
 
-import { getProperties, Property } from '../shared/property.model';
+import { getPropertiesFromConfig, Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -70,10 +70,28 @@ export class UpdateObjectComponent
    * Whether or not the create object button should be shown
    */
   @Input() showOptionToSubmit = true;
+
+  /**
+   * If set to true, the output "objectOnDisplay"
+   * will emit the current displayed object onChange
+   */
+  @Input() emitOnChange = false;
   /**
    * The updated object
    */
   @Output() object = new EventEmitter<any>();
+
+  /**
+   * Used for internal purpose to pass in the config from parents
+   */
+  @Input() _config;
+
+  /**
+   * Updates on change
+   * Used to let its parent object to get the information
+   * of what is on display
+   */
+  @Output() objectOnDisplay = new EventEmitter<any>();
 
   @ViewChild(FormGroupDirective) form;
 
@@ -83,6 +101,7 @@ export class UpdateObjectComponent
   objectUpdated = false;
   updateObjectError: string;
   formInitialized = false;
+
 
   config;
   private gs: GatewayService;
@@ -98,14 +117,26 @@ export class UpdateObjectComponent
     this.rs.register(this.elem, this);
 
     const cs = this.csf.createConfigService(this.elem);
-    this.config = cs.getConfig();
-    this.properties = getProperties(cs);
+    this.config = this._config ? this._config : cs.getConfig();
+    this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};
     for (const property of this.properties) {
       this[property.name] = new FormControl();
       formControls[property.name] = this[property.name];
     }
     this.updateObjectForm = this.builder.group(formControls);
+    if (this.emitOnChange) {
+      this.updateObjectForm.valueChanges.subscribe(
+        () => {
+          const input = { id: this.id };
+          for (const property of this.properties) {
+            input[property.name] = this[property.name].value;
+          }
+          this.objectOnDisplay.emit(input);
+        }
+      );
+    }
+
     this.formInitialized = true;
   }
 
