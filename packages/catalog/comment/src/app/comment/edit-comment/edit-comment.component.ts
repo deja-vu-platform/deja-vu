@@ -58,6 +58,8 @@ export class EditCommentComponent implements
   @Input() editCommentSavedText = 'Comment updated';
   @Input() startEditButtonLabel = 'Edit';
   @Input() stopEditButtonLabel = 'Cancel';
+  @Input() resetWhenSaved = true;
+  @Input() collapsible = true;
 
   @ViewChild(FormGroupDirective) form;
   contentControl = new FormControl('', Validators.required);
@@ -152,7 +154,7 @@ export class EditCommentComponent implements
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.updateTaskForm.reset();`
     // See https://github.com/angular/material2/issues/4190
-    if (this.form) {
+    if (this.form && this.resetWhenSaved) {
       this.form.resetForm();
     }
   }

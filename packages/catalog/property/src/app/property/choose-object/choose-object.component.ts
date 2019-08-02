@@ -82,6 +82,7 @@ export class ChooseObjectComponent implements
 
   chooseObject;
   _selectedObjectId;
+  config;
   private properties: string[];
   private gs: GatewayService;
   private cs: ConfigService;
@@ -97,6 +98,7 @@ export class ChooseObjectComponent implements
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.cs = this.csf.createConfigService(this.elem);
+    this.config = this.cs.getConfig();
   }
 
   ngAfterViewInit() {

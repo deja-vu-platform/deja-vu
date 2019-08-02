@@ -2,27 +2,43 @@
   <easypick.navbar accessRequired=false />
 
   <div class="center-column">
-    <class.filter-objects />
-    <div>Grading</div>
-    <gradingFair.filter-targets />
-    <div>Pace</div>
-    <paceReasonable.filter-targets />
-    <div>Contents</div>
-    <contentsManageable.filter-targets />
-    <div>Overall</div>
-    <overallRating.filter-targets />
+    <div>
+      <h3>Filters</h3>
+      <class.filter-objects />
+      <div>
+        <div class="fourth-column">
+          <div>Grading</div>
+          <gradingFair.filter-targets />
+        </div>
+        <div class="fourth-column">
+          <div>Pace</div>
+          <paceReasonable.filter-targets />
+        </div>
+        <div class="fourth-column">
+          <div>Contents</div>
+          <contentsManageable.filter-targets />
+        </div>
+        <div class="fourth-column">
+          <div>Overall</div>
+          <overallRating.filter-targets />
+        </div>
+      </div>
+    </div>
 
-    <dv.intersect lists=[gradingFair.filter-targets.loadedTargetIds,
-                  paceReasonable.filter-targets.loadedTargetIds,
-                  contentsManageable.filter-targets.loadedTargetIds,
-                  overallRating.filter-targets.loadedTargetIds,
-                  class.filter-objects.loadedObjectIds]
-    />
-
-    <dv.show-entities
-      entities=dv.intersect.intersectList
-      showEntity=<easypick.show-class classId=$entity />
-    />
+    <div>
+      <h3>Classes</h3>
+      <dv.intersect lists=[gradingFair.filter-targets.loadedTargetIds,
+                    paceReasonable.filter-targets.loadedTargetIds,
+                    contentsManageable.filter-targets.loadedTargetIds,
+                    overallRating.filter-targets.loadedTargetIds,
+                    class.filter-objects.loadedObjectIds]
+      />
+      <dv.show-entities
+        entities=dv.intersect.intersectList
+        noEntitiesToShowText="No class in this filter."
+        showEntity=<easypick.show-class classId=$entity />
+      />
+    </div>
 
   </div>
 </dv.action>

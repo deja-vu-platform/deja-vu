@@ -16,7 +16,7 @@ import { OnExecSuccess, RunService } from '../run.service';
 @Pipe({ name: 'camelToTitleCase'})
 export class CamelToTitleCasePipe implements PipeTransform {
   transform(camelCase: string): string {
-    return _.startCase(_.camelCase(camelCase));
+    return _.startCase(camelCase);
   }
 }
 
