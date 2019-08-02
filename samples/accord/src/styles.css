@@ -25,7 +25,6 @@ a:hover {
 
 h1 {
   font-family: 'Lato', sans-serif;
-  font-weight: bold;
   color: #28bdb1;
 }
 
@@ -82,7 +81,7 @@ main {
 
 .left-column, .dv-stage-stage-entity {
   float: left;
-  width: 35%;
+  width: 25%;
   padding: 30px 50px;
 }
 
@@ -95,7 +94,7 @@ main {
 .right-column, .dv-stage-stage-header,
 .dv-stage-staged-entities {
   float: right;
-  width: 65%;
+  width: 75%;
   padding: 30px 50px;
 }
 
@@ -203,27 +202,8 @@ authentication-sign-in button.mat-button:hover {
   width: 350px;
 }
 
-.property-filter-objects-property {
-  margin: 30px;
-  display: inline-block;
-}
-.property-filter-objects-property-title {
-  font-weight:bold;
-}
 .authentication-show-user-username {
   display: inline-block;
-}
-.list-group {
-  display:inline-block;
-}
-.list-group-item {
-  margin: 10px !important;
-  width: 400px !important;
-  vertical-align: top;
-  display:inline-block
-}
-.list-group-item:first-child {
-  border-radius: .25rem;
 }
 
 .rating {
