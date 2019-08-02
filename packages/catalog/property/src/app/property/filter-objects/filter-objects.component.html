@@ -2,8 +2,8 @@
   <div *ngFor="let property of properties" class="property-filter-objects-property">
     <div *ngIf="propertiesToShow.includes(property.name)">
       <div *ngIf="property.schema.enum">
-        {{property.name}}
-        <div *ngFor="let value of property.schema.enum">
+        <div class="property-filter-objects-property-title">{{property.name | camelToTitleCase}}</div>
+        <div *ngFor="let value of property.schema.enum" class="property-filter-objects-checkbox-enum">
           <mat-checkbox
             [value]="value"
             (change)="updateEnumFilter(property.name, value, $event.checked)"
@@ -14,21 +14,23 @@
       </div>
 
       <div *ngIf="!property.schema.enum">
-        <div *ngIf="property.schema.type === 'boolean' " >
+        <div *ngIf="property.schema.type === 'boolean' " class="property-filter-objects-checkbox-boolean">
           <mat-checkbox [value]="propertyValues[property.name]"
                         (change)="updateBooleanFilter(property.name, $event.checked)"
           >
-            {{property.name}}
+            {{property.name | camelToTitleCase}}
           </mat-checkbox>
         </div>
         <div *ngIf="property.schema.type === 'integer' || property.schema.type ==='number' " >
-          {{property.name}}
-          <ng5-slider [(value)]="propertyValues[property.name].minValue"
-                      [(highValue)]="propertyValues[property.name].maxValue"
-                      [options]="propertyOptions[property.name]"
-                      (userChangeEnd)="load()"
-          >
-          </ng5-slider>
+          <div class="property-filter-objects-property-title">{{property.name | camelToTitleCase}}</div>
+          <div class="property-filter-objects-slider">
+            <ng5-slider [(value)]="propertyValues[property.name].minValue"
+                        [(highValue)]="propertyValues[property.name].maxValue"
+                        [options]="propertyOptions[property.name]"
+                        (userChangeEnd)="load()"
+            >
+            </ng5-slider>
+          </div>
         </div>
       </div>
     </div>

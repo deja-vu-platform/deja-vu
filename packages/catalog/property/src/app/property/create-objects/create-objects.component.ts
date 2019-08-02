@@ -110,6 +110,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     if (_.isEmpty(this.objects)) {
       return;
     }
+
     const res = await this.gs
       .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         inputs: {

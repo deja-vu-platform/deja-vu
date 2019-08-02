@@ -1,0 +1,43 @@
+<dv.action name="input-price">
+  <groceryship.navbar accessRequired=true />
+  <request.show-objects fieldMatching={deliveryId:$deliveryId} hidden=true />
+  <dv.pick as pick-ids
+    entities=request.show-objects.objects keys=["id"] flatten=true hidden=true />
+  <dv.pick as pick-item-names
+    entities=request.show-objects.objects keys=["itemName"] flatten=true hidden=true />
+  <dv.pick as pick-tips
+    entities=request.show-objects.objects keys=["tips"] flatten=true hidden=true />
+  <dv.pick as pick-price-estimates
+           entities=request.show-objects.objects keys=["priceEstimate"] flatten=true hidden=true />
+  <div class="center-column">
+    <h3>Input the price</h3>
+    <dv.if condition=pick-ids.pickedEntities && pick-ids.pickedEntities[0]>
+      <div class="fourth-column">
+        <div class="bold">Item Name</div>
+        <dv.show-entities entities=pick-item-names.pickedEntities />
+      </div>
+      <div class="fourth-column">
+        <div class="bold">Price Estimate</div>
+        <dv.show-entities entities=pick-price-estimates.pickedEntities />
+      </div>
+      <div class="fourth-column">
+        <div class="bold">Price</div>
+        <dv.tx>
+          <request.update-objects ids=pick-ids.pickedEntities
+                                  showExclude=["itemName","quantity","priceEstimate","tips","due","pickupLocation","requesterId","deliveryId","delivererId","claimed"]
+          />
+          <delivery.update-object as set-delivered
+                                  id=$deliveryId
+                                  initialValue={delivered: true}
+                                  hidden=true />
+          <dv.button class="theme-button">Confirm</dv.button>
+          <dv.redirect href="/" onExecSuccess=true />
+        </dv.tx>
+      </div>
+      <div class="fourth-column">
+        <div class="bold">Tips</div>
+        <dv.show-entities entities=pick-tips.pickedEntities />
+      </div>
+    </dv.if>
+  </div>
+</dv.action>

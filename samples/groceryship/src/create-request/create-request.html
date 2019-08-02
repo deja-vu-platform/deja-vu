@@ -5,8 +5,9 @@
       stageEntity=<dv.action stage$=groceryship.stage-request.stagedRequest>
                     <groceryship.stage-request userId=groceryship.navbar.loggedInUserId />
                   </dv.action>
-      stageHeader=<h2>Requests in List</h2>
-      showEntity=<groceryship.show-request request=$entity />
+      stageHeader=<h3>Requests in List</h3>
+      tableView=true
+      filter=["itemName", "quantity", "priceEstimate", "tips", "due", "pickupLocation"]
     />
     <dv.if condition=dv.stage.stagedEntities>
       <dv.tx class="right-column">
