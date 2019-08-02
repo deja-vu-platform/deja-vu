@@ -17,9 +17,9 @@ function expectInputMatch(action: CompiledAction): string {
 
 function expectOutputMatch(output: string, action: CompiledAction): string {
   expect(action.ngTemplate)
-    .toMatch(`\\(${output}\\)=".+=\\$event"`);
+    .toMatch(`\\(${output}\\)="\\S+\\s*=\\s*\\$event"`);
   const outputField = action.ngTemplate
-    .match(`\\(${output}\\)="(.+)=\\$event"`)[1];
+    .match(`\\(${output}\\)="(\\S+)\\s*=\\s*\\$event"`)[1];
   expect(action.ngComponent)
     .toMatch(outputField);
 
@@ -128,7 +128,7 @@ describe('ActionCompiler', () => {
       .not
       .toMatch('dv.action');
     expect(compiledAction.ngTemplate)
-      .toMatch(`{{ 'hi' }}`);
+      .toMatch(`{{ "hi" }}`);
 
     const inputField = expectInputMatch(compiledAction);
     expect(compiledAction.ngTemplate)

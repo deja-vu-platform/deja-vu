@@ -146,8 +146,10 @@ export class AppCompiler {
         const actionStyle = existsSync(actionStylePath) ?
           readFileSync(actionStylePath, 'utf8') : '';
 
+        const pages = _.map(dvConfig.routes, 'action');
         const compiledAction = this.actionCompiler.compile(
-          dvConfig.name, actionContents, this.symbolTable, actionStyle);
+          dvConfig.name, actionContents, this.symbolTable,
+          actionStyle, pages);
         ngAppBuilder.addComponent(
           compiledAction.name, compiledAction.className,
           compiledAction.ngComponent, compiledAction.ngTemplate);
