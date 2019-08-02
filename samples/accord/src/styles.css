@@ -91,6 +91,12 @@ main {
   padding: 30px 50px;
 }
 
+.left-column-50 {
+  float: left;
+  width: 50%;
+  padding: 10px 10px;
+}
+
 .right-column, .dv-stage-stage-header,
 .dv-stage-staged-entities {
   float: right;
