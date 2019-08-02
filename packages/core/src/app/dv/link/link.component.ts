@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OnExecSuccess, RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 
@@ -13,6 +14,7 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   @Input() href: string;
   @Input() value: string | undefined;
   @Input() params;
+  @Input() reloadOnSameUrl = false;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -27,9 +29,14 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
-    console.log(this.href);
-    this.params = this.params ?
+    const newParams = this.params ?
       _.mapValues(this.params, (value) => JSON.stringify(value)) : null;
-    this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
+    const url = this.router
+      .createUrlTree([this.href, ...(newParams ? [newParams] : []) ]);
+    if (this.reloadOnSameUrl) {
+      window.location.href = this.router.serializeUrl(url);
+    } else {
+      this.router.navigateByUrl(url);
+    }
   }
 }
