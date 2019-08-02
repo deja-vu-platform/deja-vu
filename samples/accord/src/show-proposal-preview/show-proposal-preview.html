@@ -1,5 +1,5 @@
 <dv.action name="show-proposal-preview">
-  <div class="left-column-50">
+  <div class="left-column-50-thin-padding">
     <h3>
       <dv.show-entity entity=$proposal.songTitle />
     </h3>
@@ -8,7 +8,7 @@
     </div>
     <dv.link href="/proposal" params={ proposalId:$proposal.id, groupId:$groupId }>View</dv.link>
   </div>
-  <div class="left-column-50">
+  <div class="left-column-50-thin-padding">
     <div>
       Added By <userProfile.show-object id=$proposal.addedBy
                                         showOnly=["firstName"] />

@@ -5,38 +5,56 @@
   </div>
   <proposal.show-object id=$proposalId hidden=true />
 
-  <div class="mid-column">
+  <div class="left-column-50">
     <dv.if condition=!!proposal.show-object.loadedObject>
-      <h1>
-        <dv.show-entity entity=proposal.show-object.loadedObject.songTitle />
-        <dv.if condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
-          <dv.link class="plain" href="/edit-proposal" params={ groupId:$groupId, proposalId:$proposalId }> ✏️️</dv.link>
-        </dv.if>
-      </h1>
-      by <dv.show-entity entity=proposal.show-object.loadedObject.songArtist />
-      <h3>Lyrics</h3>
-      <dv.show-entity entity=proposal.show-object.loadedObject.lyrics />
-      <h3>Media</h3>
-      <dv.show-entity entity=proposal.show-object.loadedObject.mediaLink />
+      <div class="individual-card">
+        <h1>
+          <dv.show-entity entity=proposal.show-object.loadedObject.songTitle />
+          <dv.if class="inline-block" condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
+            <dv.link class="plain" href="/edit-proposal" params={ groupId:$groupId, proposalId:$proposalId }>
+              <mat-icon>
+                edit
+              </mat-icon>
+            </dv.link>
+          </dv.if>
+        </h1>
+        by <dv.show-entity entity=proposal.show-object.loadedObject.songArtist />
+      </div>
+
+      <div class="individual-card">
+        <h3>Lyrics</h3>
+        <dv.show-entity entity=proposal.show-object.loadedObject.lyrics />
+      </div>
+      <div class="individual-card">
+        <h3>Media</h3>
+        <dv.show-entity entity=proposal.show-object.loadedObject.mediaLink />
+      </div>
     </dv.if>
-    <h3>Comments</h3>
-    <comment.show-comments ofTargetId=$proposalId
-                           showId=false
-                           showAuthorId=false
-                           showTargetId=false
-                           showContent=true
-    />
-    <comment.create-comment authorId=accord.navbar.loggedInUserId targetId=$proposalId />
+    <div class="individual-card">
+      <h3>Comments</h3>
+      <comment.show-comments ofTargetId=$proposalId
+                             showId=false
+                             showAuthorId=false
+                             showTargetId=false
+                             showContent=true
+      />
+      <comment.create-comment authorId=accord.navbar.loggedInUserId targetId=$proposalId />
+    </div>
+
   </div>
-  <div class="right-column-thin">
+  <div class="left-column">
     <div>
       <dv.if condition=!!proposal.show-object.loadedObject>
         Added By <userProfile.show-object id=proposal.show-object.loadedObject.addedBy
                                           showOnly=["firstName"] />
       </dv.if>
     </div>
-    Your Rating: <rating.rate-target sourceId=accord.navbar.loggedInUserId
-                              targetId=$proposalId />
-    Average Rating: <rating.show-average-rating targetId=$proposalId />
+    <div>
+      Your Rating: <rating.rate-target sourceId=accord.navbar.loggedInUserId
+                                       targetId=$proposalId />
+    </div>
+    <div>
+      Average Rating: <rating.show-average-rating targetId=$proposalId />
+    </div>
   </div>
 </dv.action>

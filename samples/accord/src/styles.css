@@ -26,17 +26,19 @@ a:hover {
 h1 {
   font-family: 'Lato', sans-serif;
   color: #28bdb1;
+  margin:0;
 }
 
 h2 {
   font-family: 'Lato', sans-serif;
   color: #28bdb1;
+  margin:0;
 }
 
 h3 {
   font-family: 'Lato', sans-serif;
   color: #28bdb1;
-  margin: 10px;
+  margin: 0;
 }
 
 div {
@@ -85,13 +87,19 @@ main {
   padding: 30px 50px;
 }
 
+.left-column-50 {
+  float: left;
+  width: 50%;
+  padding: 30px 50px;
+}
+
 .fourth-column {
   float: left;
   width: 25%;
   padding: 30px 50px;
 }
 
-.left-column-50 {
+.left-column-50-thin-padding {
   float: left;
   width: 50%;
   padding: 10px 10px;
