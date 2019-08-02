@@ -1,7 +1,7 @@
 <dv.action name="signup">
   <easypick.navbar accessRequired=false />
-  <div id="content" class="center form-signin">
-    <h2 class="form-signin-heading">Welcome to EasyPick!</h2>
+  <div class="center-column-dynamic-auth">
+    <h2>Sign Up</h2>
     <dv.tx>
       <dv.gen-id />
       <userProfile.create-object id=dv.gen-id.id
@@ -9,9 +9,11 @@
                                  showOptionToSubmit=false />
       <authentication.register-user id=dv.gen-id.id
                                     showOptionToSubmit=false />
-      <dv.button>Sign Up</dv.button>
+      <dv.button class="theme-button">Sign Up</dv.button>
       <dv.redirect href="/" onExecSuccess=true />
     </dv.tx>
-    <dv.link href="/login">Back to Login page</dv.link>
+    <div>
+      Already have an account? <dv.link href="/login">Login</dv.link>
+    </div>
   </div>
 </dv.action>

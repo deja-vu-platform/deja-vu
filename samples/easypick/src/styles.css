@@ -72,6 +72,12 @@ main {
   width: 35%;
 }
 
+.center-column-dynamic-auth {
+  margin: auto;
+  padding-top: 40px;
+  width: 280px;
+}
+
 .left-column, .dv-stage-stage-entity {
   float: left;
   width: 35%;
