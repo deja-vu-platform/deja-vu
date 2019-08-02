@@ -63,11 +63,13 @@ main {
 }
 
 .center-column-dynamic-thin {
+  padding-top: 40px;
   margin: auto;
   width: 25%;
 }
 
 .center-column-dynamic-medium {
+  padding-top: 40px;
   margin: auto;
   width: 35%;
 }
