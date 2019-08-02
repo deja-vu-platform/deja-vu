@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type,
+  EventEmitter, Output
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from '@deja-vu/core';
 import * as _ from 'lodash';
@@ -38,6 +39,7 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
   };
   @Input() noCommentsToShowText = 'No comments to show';
   comments: Comment[] = [];
+  @Output() loadedComments = new EventEmitter<Comment[]>();
 
   showComments;
   private gs: GatewayService;
@@ -80,6 +82,7 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
         })
         .subscribe((res) => {
           this.comments = res.data.comments;
+          this.loadedComments.emit(this.comments);
         });
     }
   }

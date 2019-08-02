@@ -1,10 +1,17 @@
 <dv.action name="signup">
+  <easypick.navbar accessRequired=false />
   <div id="content" class="center form-signin">
     <h2 class="form-signin-heading">Welcome to EasyPick!</h2>
     <dv.tx>
-      <authentication.register-user />
-      <dv.callback defaultHref="/add-user-profile" onExecSuccess=true hidden=true />
+      <dv.gen-id />
+      <userProfile.create-object id=dv.gen-id.id
+                                 showExclude=["major","minor","graduationYear"]
+                                 showOptionToSubmit=false />
+      <authentication.register-user id=dv.gen-id.id
+                                    showOptionToSubmit=false />
+      <dv.button>Sign Up</dv.button>
+      <dv.redirect href="/" onExecSuccess=true />
     </dv.tx>
-    <dv.link href="/login" id='back-to-login'>Back to Login page</dv.link>
+    <dv.link href="/login">Back to Login page</dv.link>
   </div>
 </dv.action>

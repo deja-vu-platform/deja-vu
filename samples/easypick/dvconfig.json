@@ -3,18 +3,18 @@
   "usedCliches": {
     "authentication": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "authorization": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "class": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
+        "reinitDbOnStartup": false,
         "schema": {
           "title": "Class",
           "type": "object",
@@ -87,7 +87,7 @@
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
+        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
@@ -113,37 +113,37 @@
     },
     "comment": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "paceReasonable": {
       "name": "rating",
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "gradingFair": {
       "name": "rating",
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "contentsManageable": {
       "name": "rating",
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "overallRating": {
       "name": "rating",
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     },
     "reviewInfo": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
+        "reinitDbOnStartup": false,
         "schema": {
           "title": "Review",
           "type": "object",
@@ -155,10 +155,12 @@
               "type": "string"
             },
             "term": {
-              "type": "string"
+              "type": "string",
+              "enum": ["Fall", "Spring", "IAP"]
             },
             "year": {
-              "type": "string"
+              "type": "string",
+              "enum": ["2019", "2018", "2017", "2016", "2015"]
             }
           }
         }
@@ -170,7 +172,7 @@
     { "path": "login", "action": "login" },
     { "path": "signup", "action": "signup" },
     { "path": "search", "action": "search" },
-    { "path": "add-user-profile", "action": "add-user-profile" },
-    { "path": "feedback", "action": "feedback" }
+    { "path": "feedback", "action": "feedback" },
+    { "path": "profile", "action": "update-profile"}
   ]
 }

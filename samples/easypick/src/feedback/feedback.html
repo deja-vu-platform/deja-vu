@@ -1,10 +1,10 @@
 <dv.action name="feedback">
 	<easypick.navbar accessRequired=true/>
 	<div class="center-column">
-		<div> 
+		<div>
 			Input Your Review!
 		</div>
-		<class.choose-object showOnly=["classNumber","className"]/>
+		<class.choose-object showOnly=["classNumber","className"] />
 		<dv.tx>
 			<dv.gen-id />
 			<dv.status savedText="New feedback saved!"/>
@@ -15,39 +15,39 @@
 				showOptionToSubmit=false
 			 />
 			<p> Pace is reasonable </p>
-			<paceReasonable.rate-target 
+			<paceReasonable.rate-target
 				id=dv.gen-id.id
 				sourceId=$userId
-				targetId=class.choose-object.selectedObjectId  
-				execOnClick=false 
+				targetId=class.choose-object.selectedObjectId
+				execOnClick=false
 			/>
 
 			<p> Grading is fair </p>
-			<gradingFair.rate-target 
+			<gradingFair.rate-target
 				id=dv.gen-id.id
 				sourceId=$userId
-				targetId=class.choose-object.selectedObjectId  
-				execOnClick=false 
+				targetId=class.choose-object.selectedObjectId
+				execOnClick=false
 			/>
 
 			<p> Contents are interesting </p>
-			<contentsManageable.rate-target 
+			<contentsManageable.rate-target
 				id=dv.gen-id.id
 				sourceId=$userId
-				targetId=class.choose-object.selectedObjectId  
-				execOnClick=false 
+				targetId=class.choose-object.selectedObjectId
+				execOnClick=false
 			/>
 
 			<p> Overall, it is a good class </p>
 			<overallRating.rate-target
-				id=dv.gen-id.id 
-				sourceId=$userId
-				targetId=class.choose-object.selectedObjectId  
-				execOnClick=false 
-			/>
-			<comment.create-comment 
 				id=dv.gen-id.id
-				authorId=$userId 
+				sourceId=$userId
+				targetId=class.choose-object.selectedObjectId
+				execOnClick=false
+			/>
+			<comment.create-comment
+				id=dv.gen-id.id
+				authorId=$userId
 				targetId=class.choose-object.selectedObjectId
 				showOptionToSubmit=false
 			/>
