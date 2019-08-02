@@ -16,12 +16,14 @@
       <authorization.add-viewer id=$groupId
                                 viewerId=$userId
                                 buttonLabel="Make Admin"
+                                class="inline-block"
                                 viewerAddedSuccessText="Admin Added!"
                                 showResourceInputField=false
                                 showViewerInputField=false
       />
       <group.join-leave memberId=$userId
                         groupId=$groupId
+                        class="inline-block"
                         joinGroupText="Add back"
                         leaveGroupText="Remove" />
     </dv.if>
