@@ -179,7 +179,6 @@ authentication-sign-in button.mat-button:hover {
 }
 
 .bold {
-  display: inline-block !important;
   font-weight: 600 !important;
 }
 
