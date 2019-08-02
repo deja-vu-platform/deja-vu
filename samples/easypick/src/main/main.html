@@ -1,7 +1,7 @@
 <dv.action name="main">
   <easypick.navbar accessRequired=true/>
-  <div class="center-column">
-    <dv.if condition= easypick.navbar.loggedInUserId>
+  <dv.if condition= easypick.navbar.loggedInUserId>
+    <div class="center-column-dynamic-thin">
       <userProfile.show-object id=easypick.navbar.loggedInUserId hidden=true />
       <dv.if condition=userProfile.show-object.loadedObject>
         <h3>
@@ -20,16 +20,22 @@
           Graduation Year: <dv.show-entity entity=userProfile.show-object.loadedObject.graduationYear />
         </div>
         <dv.tx>
-          <dv.button>Edit Profile</dv.button>
+          <dv.button class="theme-button">Edit Profile</dv.button>
           <dv.link href="/profile" hidden=true />
         </dv.tx>
       </dv.if>
+    </div>
+    <div class="center-column-dynamic-medium">
       <hr width="80%"/>
       <h3>Courses/Reviews:</h3>
       <easypick.show-reviews userId=easypick.navbar.loggedInUserId />
-    	<dv.link href="/feedback" class="btn btn-primary" params={ userId:easypick.navbar.loggedInUserId } >
-              Write Your Review!
-      </dv.link>
-		</dv.if>
-  </div>
+      <dv.tx class="individual-card">
+        <dv.button class="theme-button">Review Course</dv.button>
+        <dv.link href="/feedback"
+                 hidden=true
+                 class="btn btn-primary"
+                 params={ userId:easypick.navbar.loggedInUserId } />
+      </dv.tx>
+    </div>
+  </dv.if>
 </dv.action>

@@ -1,40 +1,52 @@
 <dv.action name="show-review" >
   <mat-expansion-panel>
-    <mat-expansion-panel-header>
+    <mat-expansion-panel-header class="mat-elevation-z0">
       <class.show-object id=$review.targetId
                          showOnly=["classNumber","className"]
       />
     </mat-expansion-panel-header>
-    <reviewInfo.show-object
-      id=$review.id
-      showOnly=["year","term"]
-    />
-    <a> Pace: </a>
-    <paceReasonable.rate-target
-      sourceId=$review.sourceId
-      targetId=$review.targetId
-    />
-    <a> Grading: </a>
-    <gradingFair.rate-target
-      sourceId=$review.sourceId
-      targetId=$review.targetId
-    />
-    <a> Contents: </a>
-    <contentsManageable.rate-target
-      sourceId=$review.sourceId
-      targetId=$review.targetId
-    />
-    <a> Overall: </a>
-    <overallRating.rate-target
-      sourceId=$review.sourceId
-      targetId=$review.targetId
-    />
-    <a> Your Comments: </a>
-    <comment.edit-comment
-      id=$review.id
-      authorId=$review.sourceId
-      resetWhenSaved=false
-      collapsible=false
-    />
+    <div>
+      <reviewInfo.show-object
+        id=$review.id
+        showOnly=["year","term"]
+      />
+    </div>
+    <div>
+      <a> Pace: </a>
+      <paceReasonable.rate-target
+        sourceId=$review.sourceId
+        targetId=$review.targetId
+      />
+    </div>
+    <div>
+      <a> Grading: </a>
+      <gradingFair.rate-target
+        sourceId=$review.sourceId
+        targetId=$review.targetId
+      />
+    </div>
+    <div>
+      <a> Contents: </a>
+      <contentsManageable.rate-target
+        sourceId=$review.sourceId
+        targetId=$review.targetId
+      />
+    </div>
+    <div>
+      <a> Overall: </a>
+      <overallRating.rate-target
+        sourceId=$review.sourceId
+        targetId=$review.targetId
+      />
+    </div>
+    <div>
+      <a> Your Comments: </a>
+      <comment.edit-comment
+        id=$review.id
+        authorId=$review.sourceId
+        resetWhenSaved=false
+        collapsible=false
+      />
+    </div>
   </mat-expansion-panel>
 </dv.action>

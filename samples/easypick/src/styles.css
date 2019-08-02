@@ -54,7 +54,7 @@ main {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #fffff7 !important;
+  background-color: #ffffff !important;
 }
 
 /* Layouts */
@@ -62,8 +62,14 @@ main {
   margin: 30px 70px;
 }
 
-.center-column-thin {
-  margin: 50px 300px;
+.center-column-dynamic-thin {
+  margin: auto;
+  width: 25%;
+}
+
+.center-column-dynamic-medium {
+  margin: auto;
+  width: 35%;
 }
 
 .left-column, .dv-stage-stage-entity {
@@ -111,10 +117,9 @@ authentication-sign-in button.mat-button {
   line-height: 1.3333333;
   border-radius: 25px;
   display: block;
-  width: 150px;
 }
 
-.sign-up-btn button.mat-button:hover,
+.theme-button button.mat-button:hover, .sign-up-btn button.mat-button:hover,
 authentication-sign-in button.mat-button:hover {
   color: #44a7f2 !important;
   background-color: white;
@@ -217,4 +222,26 @@ authentication-sign-in button.mat-button:hover {
   margin: 20px 0;
   height: 150px;
   width: 120px;
+}
+
+.rating {
+  display: inline-block;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+/deep/ .mat-expansion-indicator::after {
+}
+
+.rating-show-avg-rating-stars-container {
+  display: inline-block;
+}
+
+.rating-show-avg-rating-stars-vote-count {
+  display: inline-block;
+}
+
+.property-show-object-property {
+  display: inline-block;
+  margin: 10px;
 }
