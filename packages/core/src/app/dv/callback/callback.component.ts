@@ -63,8 +63,8 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
 
   private redirectToCallback() {
     const href = this.loadedCallback ? this.loadedCallback : this.defaultHref;
-    this.params = this.params ?
+    const newParams = this.params ?
       _.mapValues(this.params, (value) => JSON.stringify(value)) : null;
-    this.router.navigate([href, ...(this.params ? [this.params] : []) ]);
+    this.router.navigate([href, ...(newParams ? [newParams] : []) ]);
   }
 }
