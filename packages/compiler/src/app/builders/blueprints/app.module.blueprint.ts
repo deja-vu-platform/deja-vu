@@ -10,6 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 
 
 import { AppComponent } from './app.component';
@@ -35,6 +36,7 @@ const components = [ AppComponent, @@components ];
     MatStepperModule,
     MatTabsModule,
     MatProgressSpinnerModule,
+    MatIconModule,
     @@modules
   ],
   entryComponents: components,

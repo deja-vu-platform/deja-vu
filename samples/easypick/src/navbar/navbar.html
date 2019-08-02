@@ -6,50 +6,44 @@
     </dv.if>
   </dv.tx>
 
-  <nav id="nav-bar" class="navbar navbar-light">
-    <div class="container-fluid">
-
-      <div class="navbar-header">
-        <dv.link class="easypick-heading navbar-brand" href="/">
+  <nav class="navbar">
+    <div>
+      <div class="navbar-header inline-block">
+        <dv.link href="/">
           EasyPick
         </dv.link>
       </div>
-
-      <dv.if condition=authentication.logged-in.user>
-        <div class="form-inline navbar-right inline-block">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/"
-                     class="mat-button btn btn-info profile-btn">
-              Home
-            </dv.link>
-            &nbsp;
-            <dv.link href="/search"
-              class="mat-button btn btn-info profile-btn">
-              Search
-            </dv.link>
-            &nbsp;
-            <dv.tx>
-              <authentication.sign-out id="navbar-logout" class="btn btn-danger"
-                buttonLabel="Logout"/>
-              <dv.link href="/login" hidden=true />
-            </dv.tx>
-          </div>
-        </div>
-      </dv.if>
-
-      <dv.if condition=!authentication.logged-in.user>
-        <div class="form-inline navbar-right">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/login" class="mat-button btn btn-info login-btn">
-              Login
-            </dv.link>
-            &nbsp;
-            <dv.link href="/signup" class="mat-button btn btn-info register-btn">
-              Register
-            </dv.link>
-          </div>
-        </div>
+      <dv.if condition=authentication.logged-in.user class="inline-block">
+        &nbsp;
+        &nbsp;
+        <dv.link href="/search">
+          <mat-icon>search</mat-icon>
+        </dv.link>
+        &nbsp;
+        <dv.link href="/">
+          <mat-icon>home</mat-icon>
+        </dv.link>
       </dv.if>
     </div>
+
+    <dv.if condition=authentication.logged-in.user>
+      <dv.tx>
+        <authentication.sign-out class="pull-right theme-button"
+                                 buttonLabel="Logout"/>
+        <dv.link href="/login" hidden=true />
+      </dv.tx>
+    </dv.if>
+
+    <dv.if condition=!authentication.logged-in.user>
+      <div class="form-inline navbar-right">
+        <dv.link href="/login" class="theme-button">
+          Login
+        </dv.link>
+        &nbsp;
+        <dv.link href="/signup" class="theme-button">
+          Register
+        </dv.link>
+      </div>
+    </dv.if>
   </nav>
 </dv.action>
