@@ -35,8 +35,8 @@ OnChanges {
    */
   @Input() id: string;
   /**
-   * The actual data of the object to show. Can be given instead of ID to avoid
-   * needing to retrieve object data from the database that you already have
+   * The object to show. Can be given instead of ID to avoid
+   * retrieving object data from the database
    */
   @Input() object: any;
   /**
@@ -78,6 +78,8 @@ OnChanges {
   showObject;
   private gs: GatewayService;
   private cs: ConfigService;
+
+  private idOfLoadedObject: string | undefined;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -144,6 +146,7 @@ OnChanges {
           if (!_.isEmpty(res.errors)) {
             this.errors.emit(res.errors);
           } else {
+            this.idOfLoadedObject = this.id;
             this.object = res.data.object;
             this.loadedObject.emit(this.object);
           }
@@ -158,6 +161,13 @@ OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(!this.object && this.id && this.gs);
+    return !!(
+      this.gs &&
+      (!this.object || this.objectByIdIsOld()) &&
+      this.id);
+  }
+
+  private objectByIdIsOld(): boolean {
+    return this.idOfLoadedObject && this.id !== this.idOfLoadedObject;
   }
 }
