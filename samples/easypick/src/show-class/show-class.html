@@ -1,20 +1,61 @@
 <dv.action name="show-class">
 	<div class="individual-card">
-		<class.show-object id=$classId/>
-		<a> Pace </a>
-		<paceReasonable.show-average-rating targetId=$classId  />
-		<a> Grading </a>
-		<gradingFair.show-average-rating targetId=$classId  />
-		<a> Contents </a>
-		<contentsManageable.show-average-rating targetId=$classId  />
-		<a> Overall </a>
-		<overallRating.show-average-rating targetId=$classId  />
-		<comment.show-comments
-			ofTargetId=$classId
-			showId=false
-			showAuthorId=false
-			showTargetId=false
-			noCommentsToShowText=""
-			/>
+		<class.show-object id=$classId hidden=true />
+    <dv.if condition=class.show-object.loadedObject >
+      <div class="bold">
+        <dv.show-entity entity=class.show-object.loadedObject.classNumber />
+        &nbsp;
+        <dv.show-entity entity=class.show-object.loadedObject.className />
+      </div>
+      <div>
+        <dv.if class="inline-block" condition=class.show-object.loadedObject.HASS>
+          HASS
+          &nbsp;
+        </dv.if>
+        <dv.if class="inline-block" condition=class.show-object.loadedObject.REST>
+          REST
+          &nbsp;
+        </dv.if>
+        <dv.if class="inline-block" condition=class.show-object.loadedObject.CIH>
+          CIH
+          &nbsp;
+        </dv.if>
+        <dv.if class="inline-block" condition=class.show-object.loadedObject.CIHW>
+          CIHW
+          &nbsp;
+        </dv.if>
+      </div>
+    </dv.if>
+    <div>
+      <a> Pace </a>
+      <paceReasonable.show-average-rating targetId=$classId  />
+    </div>
+    <div>
+      <a> Grading </a>
+      <gradingFair.show-average-rating targetId=$classId  />
+    </div>
+    <div>
+      <a> Contents </a>
+      <contentsManageable.show-average-rating targetId=$classId  />
+    </div>
+    <div>
+      <a> Overall </a>
+      <overallRating.show-average-rating targetId=$classId  />
+    </div>
+    <div>
+      <mat-expansion-panel class="mat-elevaton-z0">
+        <mat-expansion-panel-header>
+          Show Comments
+        </mat-expansion-panel-header>
+        <comment.show-comments
+          ofTargetId=$classId
+          showId=false
+          showAuthorId=false
+          showTargetId=false
+          noCommentsToShowText=""
+        />
+      </mat-expansion-panel>
+    </div>
+
 	</div>
 </dv.action>

@@ -2,6 +2,7 @@
                  [(ngModel)]="selectedMinimumAvgRating"
                  (change)="updateSelected($event.value)">
   <mat-radio-button *ngFor="let minimumAvgRating of minimumAvgRatings"
+                    class="rating-filter-targets-option"
                     [value]="minimumAvgRating">
     <star-rating-comp [showHalfStars]="true" [rating]="minimumAvgRating"
                       [readOnly]="true" [starType]="'svg'">
