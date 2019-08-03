@@ -93,6 +93,18 @@ main {
   padding: 30px 50px;
 }
 
+.left-column-80-thin-padding {
+  float: left;
+  width: 80%;
+  padding: 10px 10px;
+}
+
+.left-column-20-thin-padding {
+  float: left;
+  width: 20%;
+  padding: 10px 10px;
+}
+
 .fourth-column {
   float: left;
   width: 25%;
