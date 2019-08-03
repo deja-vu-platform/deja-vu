@@ -26,13 +26,14 @@
         </div>
         <div class="subtext">
           <scoreposts.show-target
-            class="inline-block"
+            class="inline-block score"
             id=$id
             showId=false
             showScores=false
             totalLabel="" />
-          points by {{ post.show-object.loadedObject.author }} |
-          <dv.link href="/item" params={ id: $id }>comments</dv.link>
+          points by {{ post.show-object.loadedObject.author }}
+          <div class="sep"></div>
+          <dv.link href="/post" params={ id: $id }>comments</dv.link>
         </div>
       </div>
     </dv.if>

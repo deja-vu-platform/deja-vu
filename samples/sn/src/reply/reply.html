@@ -21,17 +21,10 @@
             showId=false showAuthorId=false showTargetId=false />
         </div>
         <div class="write-comment-container">
-          <hr class="post-separator" />
-
-          <dv.tx>
-            <authentication.authenticate
-              user=sn.navbar.user hidden=true />
-            <comment.create-comment
-              authorId=sn.navbar.user?.username
-              buttonLabel="Reply"
-              showOptionToSubmit=!!sn.navbar.user
-              targetId=$id />
-          </dv.tx>
+          <sn.create-comment
+            user=sn.navbar.user
+            targetId=$id
+            buttonLabel="Reply" />
         </div>
       </div>
     </div>

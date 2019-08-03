@@ -33,10 +33,10 @@
     }
   },
   "routes": [
-    { "path": "item", "action": "show-post-details" },
     { "path": "login", "action": "login" },
-    { "path": "news", "action": "home" },
     { "path": "submit", "action": "submit-post" },
+    { "path": "post", "action": "show-post-details" },
+    { "path": "comment", "action": "show-comment-details" },
     { "path": "reply", "action": "reply" },
     { "path": "", "action": "home" }
   ]

@@ -1,32 +1,59 @@
 <dv.action name="show-comment">
   <div class="comment-container">
-    <dv.if condition=!$snComment>Comment not found</dv.if>
-
     <dv.if condition=$snComment>
       <div class="inline-block">
         <sn.upvote
-          disabled=!$user ||
-            $snComment.authorId === $user.username
+          disabled=!$user || $snComment.authorId === $user.username
           id=$snComment.id user=$user isPost=false />
       </div>
 
       <div class="inline-block">
         <span class="subtext">
-          <comment.show-comment comment=$snComment
+          <comment.show-comment class="subtext-comment" comment=$snComment
             showId=false showTargetId=false showContent=false />
+          <div class="sep"></div>
+          <dv.link href="/comment" params={ id: $snComment.id }>thread</dv.link>
+          <dv.if condition=$commentView>
+            <post.show-object id=$snComment.targetId hidden=true />
+            <dv.if condition=post.show-object.errors class="inline-flex">
+              <div class="sep"></div>
+              <dv.link href="/comment" params={ id: $snComment.targetId }>parent</dv.link>
+            </dv.if>
+            <dv.if condition=post.show-object.loadedObject
+              class="inline-flex">
+              <div class="sep"></div>
+              <dv.link href="/post" params={ id: $snComment.targetId }>post</dv.link>
+            </dv.if>
+          </dv.if>
         </span>
-        <dv.if condition=$showAncestorSummary>
-          | <dv.link href="/item" params={ id: $snComment.targetId }>parent</dv.link>
-          <!-- TODO: get original post title and link to it as well -->
-        </dv.if>
-        <!-- TODO: specify how long ago -->
         <comment.show-comment comment=$snComment
           showId=false showAuthorId=false showTargetId=false />
       </div>
 
-      <div class="reply-container">
-        <div class="subtext">
-          <dv.link href="/reply" params={ id: $snComment.id }>Reply</dv.link>
+      <dv.if condition=!$commentView>
+        <div class="reply-container">
+          <div class="subtext">
+            <dv.link
+              href=$user ? "/comment" : "/login"
+              params=$user ? { id: $snComment.id } : { callback: "/comment", callbackParams: { id: $snComment.id } }>
+              Reply
+            </dv.link>
+          </div>
+          <div>
+            <comment.show-comments
+              ofTargetId=$snComment.id
+              noCommentsToShowText=''
+              showComment=<sn.show-comment
+                snComment=$comment user=$user /> />
+          </div>
+        </div>
+      </dv.if>
+      <dv.if condition=$commentView>
+        <div class="write-comment-container">
+          <sn.create-comment
+            user=$user
+            targetId=$snComment.id
+            buttonLabel="Reply" />
         </div>
         <div>
           <comment.show-comments
@@ -35,7 +62,7 @@
             showComment=<sn.show-comment
               snComment=$comment user=$user /> />
         </div>
-      </div>
+      </dv.if>
     </dv.if>
   </div>
 </dv.action>
