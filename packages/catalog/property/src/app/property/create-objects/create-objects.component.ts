@@ -108,6 +108,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
   async dvOnExec(): Promise<void> {
     if (_.isEmpty(this.objects)) {
+      this.gs.noRequest();
       return;
     }
 

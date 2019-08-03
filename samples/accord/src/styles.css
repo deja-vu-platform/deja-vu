@@ -81,7 +81,7 @@ main {
   width: 280px;
 }
 
-.left-column, .dv-stage-stage-entity {
+.left-column {
   float: left;
   width: 25%;
   padding: 30px 50px;
@@ -105,8 +105,7 @@ main {
   padding: 10px 10px;
 }
 
-.right-column, .dv-stage-stage-header,
-.dv-stage-staged-entities {
+.right-column{
   float: right;
   width: 75%;
   padding: 30px 50px;
@@ -244,4 +243,8 @@ authentication-sign-in button.mat-button:hover {
 
 .rating-filter-targets-option {
   display: block;
+}
+
+.dv-stage-stage-entity {
+
 }

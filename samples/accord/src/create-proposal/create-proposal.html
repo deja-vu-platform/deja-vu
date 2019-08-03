@@ -9,10 +9,21 @@
       <dv.gen-id />
       <proposal.create-object initialValue={ setListId:$setListId, addedBy:accord.navbar.loggedInUserId }
                               showExclude=["setListId","addedBy"]
-                              buttonLabel="Create Proposal"
+                              showOptionToSubmit=false
                               id=dv.gen-id.id
       />
+      <dv.stage
+        stageEntity=<dv.action stage$=accord.stage-proposal.stage>
+                      <accord.stage-proposal id=dv.gen-id.id />
+                    </dv.action>
+        showEntity=<accord.show-media media=$entity />
+      />
+      <media.create-objects objects=dv.stage.stagedEntities?dv.stage.stagedEntities:[] hidden=true />
+      <dv.button class="theme-button">
+        Create Proposal
+      </dv.button>
       <dv.redirect href="/proposal" params={ proposalId:dv.gen-id.id, groupId:$groupId } onExecSuccess=true />
     </dv.tx>
+  <dv.debug-log entity=dv.stage.stagedEntity />
   </div>
 </dv.action>
