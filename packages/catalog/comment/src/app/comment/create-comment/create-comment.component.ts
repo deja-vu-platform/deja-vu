@@ -49,6 +49,7 @@ export class CreateCommentComponent implements
   @Input() targetId: string;
 
   @Input() showOptionToSubmit = true;
+  @Input() showDoneMessage = true;
 
   // Presentation text
   @Input() buttonLabel = 'Create Comment';
