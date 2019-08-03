@@ -145,6 +145,7 @@ OnChanges {
         .subscribe((res) => {
           if (!_.isEmpty(res.errors)) {
             this.idOfLoadedObject = undefined;
+            this.object = null;
             this.loadedObject.emit(null);
             this.errors.emit(res.errors);
           } else {

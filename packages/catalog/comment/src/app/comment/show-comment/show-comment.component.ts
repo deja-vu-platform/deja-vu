@@ -80,6 +80,7 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
           .subscribe((res) => {
             if (!_.isEmpty(res.errors)) {
               this.idOfLoadedComment = undefined;
+              this.loadedComment = null;
               this.loadedComment.emit(null);
               this.errors.emit(res.errors);
             } else {
