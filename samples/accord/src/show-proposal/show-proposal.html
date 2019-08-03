@@ -25,11 +25,14 @@
         <h3>Lyrics</h3>
         <dv.show-entity entity=proposal.show-object.loadedObject.lyrics />
       </div>
-      <div class="individual-card">
-        <h3>Media</h3>
-        <dv.show-entity entity=proposal.show-object.loadedObject.mediaLink />
-      </div>
     </dv.if>
+
+    <div class="individual-card">
+      <h3>Media</h3>
+      <media.show-objects showObject=<accord.show-media media=$object />
+                          fieldMatching={proposalId:$proposalId} />
+    </div>
+
     <div class="individual-card">
       <h3>Comments</h3>
       <comment.show-comments ofTargetId=$proposalId
