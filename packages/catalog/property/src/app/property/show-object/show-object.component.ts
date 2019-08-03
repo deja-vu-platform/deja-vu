@@ -144,11 +144,14 @@ OnChanges {
         })
         .subscribe((res) => {
           if (!_.isEmpty(res.errors)) {
+            this.idOfLoadedObject = undefined;
+            this.loadedObject.emit(null);
             this.errors.emit(res.errors);
           } else {
             this.idOfLoadedObject = this.id;
             this.object = res.data.object;
             this.loadedObject.emit(this.object);
+            this.errors.emit(null);
           }
         });
     } else if (this.gs) {

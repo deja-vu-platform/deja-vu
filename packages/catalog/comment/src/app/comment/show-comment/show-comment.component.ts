@@ -79,11 +79,14 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
         })
           .subscribe((res) => {
             if (!_.isEmpty(res.errors)) {
+              this.idOfLoadedComment = undefined;
+              this.loadedComment.emit(null);
               this.errors.emit(res.errors);
             } else {
               this.idOfLoadedComment = this.id;
               this.comment = res.data.comment;
               this.loadedComment.emit(this.comment);
+              this.errors.emit(null);
             }
           });
       } else if (this.authorId && this.targetId) {
@@ -111,10 +114,12 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
           })
           .subscribe((res) => {
             if (!_.isEmpty(res.errors)) {
+              this.loadedComment.emit(null);
               this.errors.emit(res.errors);
             } else {
               this.comment = res.data.commentByAuthorTarget;
               this.loadedComment.emit(this.comment);
+              this.errors.emit(null);
             }
           });
       }
