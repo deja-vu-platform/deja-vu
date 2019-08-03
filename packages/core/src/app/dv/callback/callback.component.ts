@@ -35,7 +35,7 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
-    this.route.paramMap.subscribe((params) => {
+    this.route.queryParamMap.subscribe((params) => {
       if (params.has('callback')) {
         this.loadedCallback = JSON.parse(params.get('callback'));
         this.callback.emit(this.loadedCallback);
@@ -71,11 +71,8 @@ implements OnEvalFailure, OnEvalSuccess, OnExecFailure, OnExecSuccess, OnInit {
     if (this.loadedCallback) {
       this.router.navigateByUrl(this.loadedCallback);
     } else {
-      const newParams =  _.mapValues(this.params, JSON.stringify);
-      this.router.navigate([
-        this.defaultHref,
-        ...(_.isEmpty(newParams) ? [] : [newParams])
-      ]);
+      const newParams = _.mapValues(this.params, JSON.stringify);
+      this.router.navigate([this.defaultHref], { queryParams: newParams });
     }
   }
 }

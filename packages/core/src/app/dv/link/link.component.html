@@ -1,4 +1,4 @@
-<a class="dvlink" tabindex="0" (click)="onClick()">
+<a href="{{aHref}}" class="dvlink" tabindex="0" (click)="onClick($event)">
   <span *ngIf="value">{{value}}</span>
   <ng-content></ng-content>
 </a>

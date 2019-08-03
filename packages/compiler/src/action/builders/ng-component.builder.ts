@@ -148,7 +148,7 @@ export class NgComponentBuilder {
         ngOnInit() {
           this.__dv__rs.registerAppAction(this.__dv__elem, this);
           ${!isPage || noInputs ? '' :
-          `this.__dv__route.paramMap.subscribe(params => {
+          `this.__dv__route.queryParamMap.subscribe(params => {
             ${inputParams.join('\n  ')}
           });`}
         }
