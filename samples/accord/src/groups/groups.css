@@ -1,0 +1,12 @@
+.list-group {
+  display:inline-block;
+}
+.list-group-item {
+  margin: 10px !important;
+  width: 400px !important;
+  vertical-align: top;
+  display:inline-block
+}
+.list-group-item:first-child {
+  border-radius: .25rem;
+}

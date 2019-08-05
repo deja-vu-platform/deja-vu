@@ -4,13 +4,14 @@
   <div class="center-column">
     <dv.if condition=authorization.can-view.canView>
       <h2>Edit Group</h2>
-      <groupInfo.update-object id=$groupId />
-      <h2>Members</h2>
+      <groupInfo.update-object id=$groupId buttonLabel="Update Group" />
+      <h3>Members</h3>
       <userProfile.choose-object chooseObjectSelectPlaceholder="Select user to invite"
                                  showOnly=["firstName","lastName"] />
       <dv.if condition=!!userProfile.choose-object.selectedObjectId>
         <group.add-to-group showInput=false
                             memberId=userProfile.choose-object.selectedObjectId
+                            buttonLabel="Invite Member"
                             id=$groupId />
       </dv.if>
       <h3>Current Members</h3>
@@ -18,9 +19,10 @@
                         showMembers=true
                         showGroupId=false
                         showMember=<accord.show-user-info userId=$id
-                        groupId=$groupId
-                        allowEdit=true
-                        currentUserId=accord.navbar.loggedInUserId />
+                                    groupId=$groupId
+                                    allowEdit=true
+                                    currentUserId=accord.navbar.loggedInUserId
+                                    />
       />
     </dv.if>
 

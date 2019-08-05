@@ -1,14 +1,24 @@
 <dv.action name="show-proposal-preview">
-  <div class="left-column-2">
-    <h3><dv.show-entity entity=$proposal.songTitle /></h3>
-    <div>By <dv.show-entity entity=$proposal.songArtist /></div>
+  <div class="left-column-50-thin-padding">
+    <h3>
+      <dv.show-entity entity=$proposal.songTitle />
+    </h3>
+    <div>
+      By <dv.show-entity entity=$proposal.songArtist />
+    </div>
     <dv.link href="/proposal" params={ proposalId:$proposal.id, groupId:$groupId }>View</dv.link>
   </div>
-  <div class="right-column-2">
-    Added By <userProfile.show-object id=$proposal.addedBy
-                                      showOnly=["firstName"] />
-    You Rating: <rating.rate-target sourceId=$loggedInUserId
-                              targetId=$proposal.id />
-    Average Rating: <rating.show-average-rating targetId=$proposal.id />
+  <div class="left-column-50-thin-padding">
+    <div>
+      Added By <userProfile.show-object id=$proposal.addedBy
+                                        showOnly=["firstName"] />
+    </div>
+    <div>
+      You Rating: <rating.rate-target sourceId=$loggedInUserId
+                                      targetId=$proposal.id />
+    </div>
+    <div>
+      Average Rating: <rating.show-average-rating targetId=$proposal.id />
+    </div>
   </div>
 </dv.action>

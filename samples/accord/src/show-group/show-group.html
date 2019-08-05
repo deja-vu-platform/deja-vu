@@ -5,24 +5,35 @@
     <accord.set-list-catalog groupId=$groupId currentUserId=accord.navbar.loggedInUserId />
   </div>
   <div class="right-column">
-    <h1>
-      <groupInfo.show-object id=$groupId showOnly=["name"] />
-    </h1>
-    <div>
-      <groupInfo.show-object id=$groupId showOnly=["description"] />
-      <dv.if condition=authorization.can-view.canView>
-        <dv.link href="/edit-group" params={ groupId:$groupId }>Edit Group Info</dv.link>
-      </dv.if>
+    <groupInfo.show-object id=$groupId hidden=true />
+    <dv.if condition=groupInfo.show-object.loadedObject class="individual-card">
+      <h1>
+        <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
+        &nbsp;
+        <dv.if condition=authorization.can-view.canView class="inline-block">
+          <dv.link href="/edit-group" params={ groupId:$groupId }>
+            <mat-icon>
+              settings
+            </mat-icon>
+          </dv.link>
+        </dv.if>
+      </h1>
+      <div>
+        <dv.show-entity entity=groupInfo.show-object.loadedObject.description />
+      </div>
+    </dv.if>
+
+    <div class="individual-card">
+      <h2>Members</h2>
+      <group.show-group id=$groupId
+                        showMembers=true
+                        showGroupId=false
+                        showMember=<accord.show-user-info userId=$id
+                        groupId=$groupId
+                        allowEdit=false
+                        currentUserId=accord.navbar.loggedInUserId />
+      />
     </div>
-    <h2>Members</h2>
-    <group.show-group id=$groupId
-                      showMembers=true
-                      showGroupId=false
-                      showMember=<accord.show-user-info userId=$id
-                                                        groupId=$groupId
-                                                        allowEdit=false
-                                                        currentUserId=accord.navbar.loggedInUserId />
-    />
   </div>
 </dv.action>
 

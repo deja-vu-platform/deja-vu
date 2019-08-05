@@ -1,18 +1,26 @@
 <dv.action name="set-list-catalog">
   <authorization.can-view resourceId=$groupId principalId=$currentUserId hidden=true />
-
   <h2>
-    <groupInfo.show-object id=$groupId showOnly=["name"] />
-  </h2>
-  <dv.link href="group" params={groupId:$groupId}>View Group</dv.link>
-  <div>
-    <dv.if condition=authorization.can-view.canView>
-      <dv.link href="/create-set-list" params={groupId:$groupId}>Add Setlist</dv.link>
+    <groupInfo.show-object id=$groupId showOnly=["name"] hidden=true />
+    <dv.if condition=groupInfo.show-object.loadedObject>
+      <dv.link href="group" params={groupId:$groupId}>
+        <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
+      </dv.link>
     </dv.if>
-    <setList.show-objects fieldMatching={groupId: $groupId}
+  </h2>
+  <div class="individual-card">
+    <setList.show-objects fieldMatching={ groupId:$groupId }
                           showOnly=["name"]
                           noObjectsToShowText="No setlists yet"
                           showObject=<accord.show-set-list-info setList=$object groupId=$groupId />
     />
+  </div>
+  <div>
+    <dv.if condition=authorization.can-view.canView>
+      <dv.tx>
+        <dv.button class="theme-button">Add Setlist</dv.button>
+        <dv.link href="/create-set-list" params={groupId:$groupId} hidden=true />
+      </dv.tx>
+    </dv.if>
   </div>
 </dv.action>
