@@ -39,6 +39,8 @@ export class FormatDateComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    // Work around the mement issue
+    // https://github.com/ng-packagr/ng-packagr/issues/217
     const moment = momentImported;
     this._formattedDate = moment(this.dateString)
       .format(this.format);
