@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output, Type} from '@angular/core';
 
 import { Action, GatewayService,
   GatewayServiceFactory, OnEval, RunService } from '@deja-vu/core';
@@ -23,6 +23,7 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
   };
+  @Output() loadedGroup = new EventEmitter<Group>();
 
   showGroup;
   private gs: GatewayService;
@@ -68,7 +69,9 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
           }
         })
         .subscribe((res) => {
+          console.log(res);
           this.group = res.data.group;
+          this.loadedGroup.emit(this.group);
         });
     } else if (this.gs) {
       this.gs.noRequest();

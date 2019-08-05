@@ -38,9 +38,7 @@
             />
             <dv.button class="highlight-button">Chat</dv.button>
             <dv.redirect href="/chat"
-                         params={ firstMemberId: $user.id,
-                         secondMemberId: $loggedInUserId,
-                         chatId: dv.gen-id.id }
+                         params={ chatId: dv.gen-id.id }
                          onExecSuccess=true
             />
           </dv.tx>

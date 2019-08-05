@@ -80,7 +80,7 @@
     }
   },
   "routes": [
-    { "path": "", "action": "conversations" },
+    { "path": "", "action": "show-chat" },
     { "path": "login", "action": "login" },
     { "path": "signup", "action": "signup" },
     { "path": "profile", "action": "profile" },
