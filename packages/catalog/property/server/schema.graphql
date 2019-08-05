@@ -17,7 +17,7 @@ type Query {
 
 type Mutation {
   createObject(input: CreateObjectInput!): Object
-  createObjects(input: [CreateObjectInput!]!): [Object]
+  createObjects(input: [CreateObjectInput!]): [Object]
   updateObject(input: UpdateObjectInput!): Boolean
   updateObjects(input: [UpdateObjectInput!]): Boolean
   removeObject(id: ID!): Boolean

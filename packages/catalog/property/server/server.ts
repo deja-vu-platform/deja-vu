@@ -63,7 +63,7 @@ const actionRequestTable: ActionRequestTable = {
         return loadSchemaQuery(extraInfo);
       case 'create':
         return `
-          mutation CreateObjects($input: [CreateObjectInput!]!) {
+          mutation CreateObjects($input: [CreateObjectInput!]) {
             createObjects(input: $input) ${getReturnFields(extraInfo)}
           }
         `;
@@ -297,7 +297,7 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
-        return await objects.insertMany(context, objDocs);
+        return await objDocs[0] ? objects.insertMany(context, objDocs) : [];
       },
 
       removeObject: async (_root, { id }, context: Context) => {

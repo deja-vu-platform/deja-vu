@@ -31,7 +31,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   /**
    * List of objects to save to the database as new entities
    */
-  @Input() objects: any[];
+  @Input() objects: any[] = [];
 
   /**
    * List of Id of the new objects to create
@@ -107,11 +107,6 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   }
 
   async dvOnExec(): Promise<void> {
-    if (_.isEmpty(this.objects)) {
-      this.gs.noRequest();
-      return;
-    }
-
     const res = await this.gs
       .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         inputs: {

@@ -51,7 +51,6 @@
   "actionsRequestOptional": [
     "property-show-object",
     "property-show-objects",
-    "property-create-objects",
     "property-create-object"
   ]
 }
