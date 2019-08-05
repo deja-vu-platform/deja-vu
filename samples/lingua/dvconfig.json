@@ -29,7 +29,8 @@
               "type": "string"
             },
             "learningLanguage": {
-              "type": "string"
+              "type": "string",
+              "enum": ["English", "French"]
             }
           }
         }
@@ -74,7 +75,7 @@
     },
     "rating": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
       }
     }
   },
