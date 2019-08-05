@@ -41,14 +41,42 @@ and much of the work in building an application involves combining pre-existing
 *concepts* in novel ways. If we could exploit this fact, applications might be
 assembled with much less effort.
 
-## Running
+## Create an App
 
-At this point, the easiest way to run Déjà Vu is to clone our repo and install
-everything from source. Good news is that if you want to contribute code, you'll
-be all set to do so.
+- If you haven't done so already, install [Node.js](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+
+- Clone the app-starter-repo
+- In a separate terminal, start MongoDB locally with `mongod`
+- On the root directory of your new repo, run `npm start` and visit
+`http://localhost:3000`.
+You should see a "hello world" page.
 
-You are going to need [yarn](https://yarnpkg.com) v1.10+,
-[node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+.
+You can now start including clichés and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
+server (Ctrl+C and run `npm start` again).
+
+
+## Deploying DV Apps
+
+A compiled DV app is a regular MEAN app
+(MongoDB-Express-Angular-Node.js). Since a compiled DV app uses popular,
+well-supported technologies, it shouldn't be too much work to find out
+how to deploy a DV app using your favorite cloud provider.
+
+But, if you don't want to spend too much time on this,
+here's how to deploy your app using
+Heroku, a popular PaaS:
+
+- Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- Run `heroku create myapp` to create a new heroku app. (Replace `myapp` with the name of your app)
+- Run `heroku addons:create mongolab` to provision a MongoDB instance
+- Deploy your changes by running `git push heroku`
+
+Your new changes should be live. To deploy new changes,
+create commits and run `git push heroku` again.
+
+
+## Contributing
+
+In addition to [node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
 Each cliché and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything

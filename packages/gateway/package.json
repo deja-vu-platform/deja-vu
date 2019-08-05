@@ -22,7 +22,7 @@
     "relaxed-json": "^1.0.1",
     "superagent": "^3.8.2",
     "uuid": "^3.2.1",
-    "vm2": "^3.6.10"
+    "vm2": "^3.8.2"
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.0",

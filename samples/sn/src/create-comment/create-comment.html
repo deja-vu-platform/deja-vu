@@ -1,0 +1,28 @@
+<dv.action name="create-comment">
+  <dv.if condition=!!$user>
+    <dv.tx>
+      <dv.gen-id />
+      <dv.link
+        href="/comment"
+        params={ id: dv.gen-id.id } hidden=true />
+      <authentication.authenticate
+        user=$user hidden=true />
+      <comment.create-comment
+        id=dv.gen-id.id
+        authorId=$user.username
+        buttonLabel=$buttonLabel
+        targetId=$targetId
+        showDoneMessage=false />
+      <scorecomments.create-score
+        sourceId=$user.username
+        targetId=dv.gen-id.id
+        value=0
+        hidden=true />
+    </dv.tx>
+  </dv.if>
+  <dv.if condition=!$user>
+    <dv.callback-link class="subtext" href="/login">
+      {{ $buttonLabel }}
+    </dv.callback-link>
+  </dv.if>
+</dv.action>

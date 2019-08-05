@@ -12,17 +12,42 @@
   display: inline-block;
 }
 
+.score {
+  margin-right: 2px;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
 .subtext {
   color: grey;
   font-size: 9pt; /* hacker news subtext font size */
+  display: inline-flex;
 }
 
-.black-link a {
+.sep {
+  border-left: 1px solid gray;
+  width: 1px;
+  height: 12px;
+  margin-top: 3px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.black-link a,
+.black-link a:hover {
   color: black;
 }
 
 .mat-icon-button .mat-button-wrapper > * {
   vertical-align: inherit !important;
+}
+
+.write-comment-container {
+  margin: 20px;
+  margin-top: 0px;
+  margin-left: 45px;
 }
 
 .write-comment-container textarea {
@@ -37,6 +62,10 @@
 
 .authentication-show-user-username {
   display: inline;
+}
+
+.dvlink, .dvlink:hover {
+  color: gray;
 }
 
 h1 {

@@ -1,0 +1,6 @@
+:host /deep/ .list-group-item {
+  background-color: initial;
+  padding: 0;
+  padding-bottom: 1rem;
+  border: none;
+}

@@ -40,6 +40,7 @@ export class CreateScoreComponent
 
   // Optional input value to override form control value
   @Input() set value(value: number) {
+    this.initialValue = value;
     this.valueControl.setValue(value);
   }
 
@@ -62,6 +63,7 @@ export class CreateScoreComponent
   newScoreError: string;
 
   private gs: GatewayService;
+  private initialValue;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -78,9 +80,6 @@ export class CreateScoreComponent
   }
 
   async dvOnExec(): Promise<void> {
-    if (!this.canExec()) {
-      return;
-    }
     const newScore: Score = {
       id: this.id,
       value: this.valueControl.value,
@@ -127,6 +126,7 @@ export class CreateScoreComponent
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();
+      this.valueControl.setValue(this.initialValue);
     }
   }
 

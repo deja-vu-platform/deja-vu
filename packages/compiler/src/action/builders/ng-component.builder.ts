@@ -70,7 +70,7 @@ export class NgComponentBuilder {
     return this;
   }
 
-  build(): string {
+  build(isPage?: boolean): string {
     const outputFields = _.map(
       this.outputs, (output: NgOutput) =>
         `@Output() ${output.name} = new EventEmitter();`);
@@ -107,7 +107,7 @@ export class NgComponentBuilder {
     const inputFields = _.map(this.inputs, (input: string) =>
       `@Input() ${input};`);
     const inputParams = _.map(this.inputs, (input: string) =>
-      `this.${input} = this.${input} || JSON.parse(params.get('${input}'));`);
+      `this.${input} = JSON.parse(params.get('${input}'));`);
 
     const fields = _.map(this.fields, (field: NgField) =>
       ((allUsedFields.has(field.name) ?
@@ -123,8 +123,8 @@ export class NgComponentBuilder {
 
     return `
       import { Component, ElementRef, OnInit } from '@angular/core';
-      ${noInputs ? '' :
-      'import { Input } from \'@angular/core\';\n' +
+      ${noInputs ? '' : 'import { Input } from \'@angular/core\';'}
+      ${!isPage || noInputs ? '' :
       'import { ActivatedRoute } from \'@angular/router\';'}
       ${_.isEmpty(outputFields) ?
         '' : 'import { Output, EventEmitter } from \'@angular/core\';'}
@@ -136,19 +136,19 @@ export class NgComponentBuilder {
         templateUrl: "${this.templateUrl}",
         styles: [\`${this.style}\`]
       })
-      export class ${this.className} ${noInputs ? '' : 'implements OnInit '}{
+      export class ${this.className} implements OnInit {
         ${outputFields.join('\n  ')}
         ${inputFields.join('\n  ')}
         ${fields.join('\n  ')}
 
         constructor(
-           ${noInputs ? '' : 'private __dv__route: ActivatedRoute,'}
+           ${!isPage || noInputs ? '' : 'private __dv__route: ActivatedRoute, '}
            private __dv__elem: ElementRef, private __dv__rs: RunService) {}
 
         ngOnInit() {
           this.__dv__rs.registerAppAction(this.__dv__elem, this);
-          ${noInputs ? '' :
-          `this.__dv__route.paramMap.subscribe(params => {
+          ${!isPage || noInputs ? '' :
+          `this.__dv__route.queryParamMap.subscribe(params => {
             ${inputParams.join('\n  ')}
           });`}
         }

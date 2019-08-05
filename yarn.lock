@@ -12229,10 +12229,10 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vm2@^3.6.10:
-  version "3.6.11"
-  resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.6.11.tgz#35d725613777c37ea1c19cdd0225f1e8743b7f79"
-  integrity sha512-l/+GDkesWKCRpk+3meLDauXisAmsfRZLvZwa/dBx1YKvP60NwXJsLHGEPW+t9fxdX+qjofF0/jN9eu42WRHAbQ==
+vm2@^3.8.2:
+  version "3.8.3"
+  resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.8.3.tgz#608d71f12584a1e898e60db5c4a61933bd7044bd"
+  integrity sha512-ENQFzvyofYuR6ADLwK7v3eTVXPx8R4EPDoOBb4vDZ18doMH6UR2xe735VZKz+BrgIpi5SAt9laBqZJf1FlqHTw==
 
 void-elements@^2.0.0:
   version "2.0.1"

@@ -6,6 +6,7 @@ import {
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
+import * as _ from 'lodash';
 
 import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
@@ -29,8 +30,11 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
   @Input() showContent = true;
 
   @Output() loadedComment = new EventEmitter<Comment>();
+  @Output() errors = new EventEmitter<any>();
 
   private gs: GatewayService;
+
+  private idOfLoadedComment: string | undefined;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -59,7 +63,7 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
     if (this.canEval()) {
 
       if (this.id) {
-        this.gs.get<{ data: { comment: Comment } }>(this.apiPath, {
+        this.gs.get<{ data: { comment: Comment }, errors: any }>(this.apiPath, {
           params: {
             inputs: { id: this.id },
             extraInfo: {
@@ -74,10 +78,22 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
           }
         })
           .subscribe((res) => {
-            this.comment = res.data.comment;
+            if (!_.isEmpty(res.errors)) {
+              this.idOfLoadedComment = undefined;
+              this.comment = null;
+              this.loadedComment.emit(null);
+              this.errors.emit(res.errors);
+            } else {
+              this.idOfLoadedComment = this.id;
+              this.comment = res.data.comment;
+              this.loadedComment.emit(this.comment);
+              this.errors.emit(null);
+            }
           });
       } else if (this.authorId && this.targetId) {
-        this.gs.get<{ data: { commentByAuthorTarget: Comment } }>(this.apiPath,
+        this.gs.get<{
+          data: { commentByAuthorTarget: Comment }, errors: any
+        }>(this.apiPath,
           {
             params: {
               inputs: {
@@ -98,8 +114,14 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
             }
           })
           .subscribe((res) => {
-            this.comment = res.data.commentByAuthorTarget;
-            this.loadedComment.emit(this.comment);
+            if (!_.isEmpty(res.errors)) {
+              this.loadedComment.emit(null);
+              this.errors.emit(res.errors);
+            } else {
+              this.comment = res.data.commentByAuthorTarget;
+              this.loadedComment.emit(this.comment);
+              this.errors.emit(null);
+            }
           });
       }
     } else if (this.gs) {
@@ -108,7 +130,15 @@ export class ShowCommentComponent implements OnInit, AfterViewInit, OnChanges,
   }
 
   private canEval(): boolean {
-    return !!(this.gs && !this.comment && (this.id ||
-      (this.authorId && this.targetId)));
+    return !!(
+      this.gs &&
+      (!this.comment || this.commentByIdIsOld()) &&
+      (this.id || (this.authorId && this.targetId))
+    );
+  }
+
+  private commentByIdIsOld() {
+    return this.idOfLoadedComment &&
+      this.idOfLoadedComment !== this.id;
   }
 }

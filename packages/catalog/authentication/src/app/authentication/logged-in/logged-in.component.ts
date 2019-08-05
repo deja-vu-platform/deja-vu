@@ -30,6 +30,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
     if (user) {
       this.user.emit(user);
     } else {
+      this.user.emit(null);
       throw new Error('No user is logged in');
     }
   }

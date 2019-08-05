@@ -35,8 +35,8 @@ OnChanges {
    */
   @Input() id: string;
   /**
-   * The actual data of the object to show. Can be given instead of ID to avoid
-   * needing to retrieve object data from the database that you already have
+   * The object to show. Can be given instead of ID to avoid
+   * retrieving object data from the database
    */
   @Input() object: any;
   /**
@@ -59,6 +59,7 @@ OnChanges {
    * The object being shown
    */
   @Output() loadedObject = new EventEmitter<any>();
+  @Output() errors = new EventEmitter<any>();
   /**
    * Used internally by the cliche for passing the configuration
    */
@@ -77,6 +78,8 @@ OnChanges {
   showObject;
   private gs: GatewayService;
   private cs: ConfigService;
+
+  private idOfLoadedObject: string | undefined;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -127,7 +130,7 @@ OnChanges {
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.gs
-        .get<{data: {object: Object}}>(this.apiPath, {
+        .get<{data: {object: Object}, errors: any}>(this.apiPath, {
           params: {
             inputs: { id: this.id },
             extraInfo: {
@@ -140,8 +143,17 @@ OnChanges {
           }
         })
         .subscribe((res) => {
-          this.object = res.data.object;
-          this.loadedObject.emit(this.object);
+          if (!_.isEmpty(res.errors)) {
+            this.idOfLoadedObject = undefined;
+            this.object = null;
+            this.loadedObject.emit(null);
+            this.errors.emit(res.errors);
+          } else {
+            this.idOfLoadedObject = this.id;
+            this.object = res.data.object;
+            this.loadedObject.emit(this.object);
+            this.errors.emit(null);
+          }
         });
     } else if (this.gs) {
       this.gs.noRequest();
@@ -153,6 +165,13 @@ OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(!this.object && this.id && this.gs);
+    return !!(
+      this.gs &&
+      (!this.object || this.objectByIdIsOld()) &&
+      this.id);
+  }
+
+  private objectByIdIsOld(): boolean {
+    return this.idOfLoadedObject && this.id !== this.idOfLoadedObject;
   }
 }

@@ -155,12 +155,12 @@ export class RunService {
       console.error(
         `Got error on ${runType} ${id} ` +
         `(${targetActionFqTag}): ${error.message}`);
+      this.removeRunIds(runType, targetAction);
       this.callDvOnRunFailure(runType, targetAction, error);
-      NodeUtils.RemoveRunId(targetAction);
     }
     if (runResultMap) { // no error
+      this.removeRunIds(runType, targetAction);
       this.callDvOnRunSuccess(runType, targetAction, runResultMap);
-      NodeUtils.RemoveRunId(targetAction);
     }
   }
 
@@ -206,14 +206,20 @@ export class RunService {
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnRunSuccess(
-    runType: RunType, node, runResultMap: RunResultMap): void {
+  private removeRunIds(runType: RunType, node): void {
+    NodeUtils.RemoveRunId(node);
     const dvOnRun = runFunctionNames[runType].onRun;
-    const dvOnSuccess = runFunctionNames[runType].onSuccess;
-    this.walkActions(node, (actionInfo, actionId) => {
+    this.walkActions(node, (actionInfo) => {
       if (actionInfo.action[dvOnRun]) {
         NodeUtils.RemoveRunId(actionInfo.node);
       }
+    });
+  }
+
+  private callDvOnRunSuccess(
+    runType: RunType, node, runResultMap: RunResultMap): void {
+    const dvOnSuccess = runFunctionNames[runType].onSuccess;
+    this.walkActions(node, (actionInfo, actionId) => {
       if (actionInfo.action[dvOnSuccess]) {
         actionInfo.action[dvOnSuccess](runResultMap[actionId]);
       }
@@ -222,11 +228,7 @@ export class RunService {
 
   private callDvOnRunFailure(runType: RunType, node, reason): void {
     this.walkActions(node, (actionInfo) => {
-      const dvOnRun = runFunctionNames[runType].onRun;
       const dvOnFailure = runFunctionNames[runType].onFailure;
-      if (actionInfo.action[dvOnRun]) {
-        NodeUtils.RemoveRunId(actionInfo.node);
-      }
       if (actionInfo.action[dvOnFailure]) {
         actionInfo.action[dvOnFailure](reason);
       }

@@ -1,4 +1,7 @@
-# Tutorial: Building a Hacker News clone
+---
+---
+
+# building apps with re#
 
 This tutorial covers the fundamentals of Déjà Vu through
 a social news aggregation app *SN*, that is a simple
@@ -286,6 +289,7 @@ the `id` input (inputs are preceded with `$`) to `show-object` and
     </dv.if>
   </div>
 </dv.action>
+```
 ```
 
 Each of these actions loads and displays its own

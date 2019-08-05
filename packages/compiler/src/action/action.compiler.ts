@@ -89,7 +89,7 @@ export class ActionCompiler {
    */
   compile(
     appName: string, actionContents: string, symbolTable: SymbolTable,
-    style?: string)
+    style?: string, pages?: string[])
     : CompiledAction {
     const thisActionSymbolTable: ActionSymbolTable = {};
     const actionInputs: CompiledAction[] = [];
@@ -152,6 +152,8 @@ export class ActionCompiler {
         name: appOutputEntry.ngOutputField,
         expr: appOutputEntry.expr
       }));
+
+    const isPage = _.includes(pages, thisActionName);
     const ngComponent = ngComponentBuilder
       .withStyle(style)
       .addInputs(ActionCompiler.GetNgFields('input', thisActionSymbolTable))
@@ -163,7 +165,7 @@ export class ActionCompiler {
           className: actionInput.className,
           actionName: actionInput.name
         })))
-      .build();
+      .build(isPage);
 
     return {
       name: thisActionName,
