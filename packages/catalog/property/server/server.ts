@@ -297,6 +297,10 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       createObjects: async (_root, { input }, context: Context) => {
         const objDocs: ObjectDoc[] = _.map(
           input, (i) => createObjectFromInput(config, i));
+
+        // if one insertion fails:
+        //  the remaining elements will not be inserted
+        //  the elements inserted before will remain inserted
         return await objDocs[0] ? objects.insertMany(context, objDocs) : [];
       },
 
