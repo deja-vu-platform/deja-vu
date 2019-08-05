@@ -79,26 +79,3 @@ you still need to
 write most of the code for the application logic---albeit
 at a much higher-level than with general-purpose
 languages and tools.
-
-## use case
-
-Re#'s sweet spot is limited-variability apps.
-A limited-variability app is an amalgamation of common
-functionality, with only small variations between the app and other apps
-in its category. (Hence the name of our tool! using re# you
-are, for the most part, rehashing concepts.)
-
-For example, if you want to build a social news aggregator,
-you'd most likely want functionality that allows users to submit news and rate
-or comment on submitted stories. Perhaps your app has some variations
-from other social news apps. For example, instead of upvoting/downvoting
-you'd like users to give a 5-star rating to submitted news. Or you want
-the posters to geolocate submissions. But, for the
-most part, your app could be built by configuring and
-combining a set of pre-built concepts
-(like rating and commenting).
-
-If you are building such an app, re# would be faster than the alternatives
-(see why section above) and because apps can be written with HTML/CSS,
-we hope re# will enable more people to build limited-variability apps.
-
