@@ -207,7 +207,7 @@ export class RunService {
   }
 
   private removeRunIds(runType: RunType, node): void {
-    NodeUtils.RemoveRunId(targetAction);
+    NodeUtils.RemoveRunId(node);
     const dvOnRun = runFunctionNames[runType].onRun;
     this.walkActions(node, (actionInfo) => {
       if (actionInfo.action[dvOnRun]) {
