@@ -9,8 +9,15 @@
 
       <div class="inline-block">
         <span class="subtext">
-          <comment.show-comment class="subtext-comment" comment=$snComment
-            showId=false showTargetId=false showContent=false />
+          comment by {{ $snComment.authorId }}
+          <div class="sep"></div>
+          <scorecomments.show-target
+            class="inline-block score"
+            id=$snComment.id
+            showId=false
+            showScores=false
+            totalLabel="" />
+          points
           <div class="sep"></div>
           <dv.link href="/comment" params={ id: $snComment.id }>thread</dv.link>
           <dv.if condition=$commentView>

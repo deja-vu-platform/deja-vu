@@ -9,10 +9,15 @@
         user=$user hidden=true />
       <comment.create-comment
         id=dv.gen-id.id
-        authorId=$user?.username
+        authorId=$user.username
         buttonLabel=$buttonLabel
         targetId=$targetId
         showDoneMessage=false />
+      <scorecomments.create-score
+        sourceId=$user.username
+        targetId=dv.gen-id.id
+        value=0
+        hidden=true />
     </dv.tx>
   </dv.if>
   <dv.if condition=!$user>

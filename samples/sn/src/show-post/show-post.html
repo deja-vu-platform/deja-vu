@@ -25,13 +25,15 @@
             url=post.show-object.loadedObject.url />)</span>
         </div>
         <div class="subtext">
+          posted by {{ post.show-object.loadedObject.author }}
+          <div class="sep"></div>
           <scoreposts.show-target
             class="inline-block score"
             id=$id
             showId=false
             showScores=false
             totalLabel="" />
-          points by {{ post.show-object.loadedObject.author }}
+          points
           <div class="sep"></div>
           <dv.link href="/post" params={ id: $id }>comments</dv.link>
         </div>
