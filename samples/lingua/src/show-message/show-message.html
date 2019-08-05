@@ -1,19 +1,19 @@
 <dv.action name="show-message">
-  <div>
-    <div class="message-info">
-      <span>
+  <div class="small-margin">
+    <div>
+      <div class="inline-block">
         <userProfile.show-object id=$message.authorId showOnly=["name"] /> :
-      </span>
-      <span class="pull-right">
+      </div>
+      <div class="pull-right">
         <dv.show-entity entity=$message.timestamp />
-      </span>
+      </div>
     </div>
 
-    <div class="message-content">
+    <div>
       <dv.show-entity entity=$message.content />
     </div>
 
-    <mat-expansion-panel>
+    <mat-expansion-panel class="mat-elevation-z0">
       <mat-expansion-panel-header>
         <mat-panel-title>Correct Words</mat-panel-title>
       </mat-expansion-panel-header>

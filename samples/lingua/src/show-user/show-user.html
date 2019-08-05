@@ -1,50 +1,48 @@
 <dv.action name="show-user">
-  <div class="panel-tight">
+  <div class="large-margin">
     <div>
-      <div>
-        <h3>
-          <dv.show-entity entity=$user.name />
-        </h3>
-        <hr />
-      </div>
-      <div>
-        <dv.if condition=$user.aboutMe && ($user.aboutMe!=="") class="align-center-middle bold">
-          "<dv.show-entity entity=$user.aboutMe />"
-        </dv.if>
-        <div class="inline-column-80-thin-padding">
-          <div class="bold">
-            Rating:<rating.show-average-rating targetId=$user.id />
-          </div>
-          <div class="bold">
-            Learning Language:
-            <dv.show-entity entity=$user.learningLanguage />
-          </div>
-          <!--The website assumes that the native language is either English or French-->
-          <dv.if class="bold" condition=$user.learningLanguage!=="English">
-            Native Language: English
-          </dv.if>
-          <dv.if class="bold" condition=$user.learningLanguage==="English">
-            Native Language: French
-          </dv.if>
-        </div>
-
-        <div class="inline-column-10-thin-padding">
-          <dv.tx>
-            <dv.gen-id />
-            <chatGroup.create-group memberIds=[$user.id, $loggedInUserId]
-                                    showOptionToAddMembers=false
-                                    showOptionToSubmit=false
-                                    id=dv.gen-id.id
-            />
-            <dv.button class="highlight-button">Chat</dv.button>
-            <dv.redirect href="/chat"
-                         params={ chatId: dv.gen-id.id }
-                         onExecSuccess=true
-            />
-          </dv.tx>
-        </div>
-     </div>
+      <h3>
+        <dv.show-entity entity=$user.name />
+      </h3>
+      <hr />
     </div>
+    <div>
+      <dv.if condition=$user.aboutMe && ($user.aboutMe!=="") class="align-center-middle bold">
+        "<dv.show-entity entity=$user.aboutMe />"
+      </dv.if>
+      <div class="inline-column-80-thin-padding">
+        <div class="bold">
+          Rating:<rating.show-average-rating targetId=$user.id />
+        </div>
+        <div class="bold">
+          Learning Language:
+          <dv.show-entity entity=$user.learningLanguage />
+        </div>
+        <!--The website assumes that the native language is either English or French-->
+        <dv.if class="bold" condition=$user.learningLanguage!=="English">
+          Native Language: English
+        </dv.if>
+        <dv.if class="bold" condition=$user.learningLanguage==="English">
+          Native Language: French
+        </dv.if>
+      </div>
+
+      <div class="inline-column-10-thin-padding">
+        <dv.tx>
+          <dv.gen-id />
+          <chatGroup.create-group memberIds=[$user.id, $loggedInUserId]
+                                  showOptionToAddMembers=false
+                                  showOptionToSubmit=false
+                                  id=dv.gen-id.id
+          />
+          <dv.button class="highlight-button">Chat</dv.button>
+          <dv.redirect href="/chat"
+                       params={ chatId: dv.gen-id.id }
+                       onExecSuccess=true
+          />
+        </dv.tx>
+      </div>
+   </div>
   </div>
 </dv.action>
 

@@ -6,7 +6,7 @@
     </dv.if>
   </dv.tx>
 
-  <nav id="nav-bar" class="navbar navbar-light">
+  <nav class="navbar">
     <div class="navbar-header">
       <dv.link href="/chat">
         Lingua
@@ -14,8 +14,8 @@
     </div>
 
     <dv.if condition=authentication.logged-in.user>
-      <div class="form-inline navbar-right inline-block">
-        <div class="btn-toolbar toolbar">
+      <div>
+        <div>
           <dv.link href="/users">
             Find Pen Pals
           </dv.link>
