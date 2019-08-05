@@ -5,7 +5,7 @@
         <userProfile.show-object id=$message.authorId showOnly=["name"] /> :
       </div>
       <div class="pull-right">
-        <dv.show-entity entity=$message.timestamp />
+        <dv.format-date dateString=$message.timestamp format="lll" />
       </div>
     </div>
 
@@ -18,6 +18,8 @@
         <mat-panel-title>Correct Words</mat-panel-title>
       </mat-expansion-panel-header>
       <correction.create-object showExclude=["authorId","chatId"]
+                                newObjectSavedText="New Correction Added"
+                                buttonLabel="Add Correction"
                                 initialValue={ authorId: $userId, chatId: $chatId }
       />
     </mat-expansion-panel>
