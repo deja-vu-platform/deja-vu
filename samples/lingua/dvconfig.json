@@ -77,6 +77,12 @@
       "config": {
         "reinitDbOnStartup": false
       }
+    },
+    "chatTotal": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartUp": false
+      }
     }
   },
   "routes": [

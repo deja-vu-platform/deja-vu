@@ -69,7 +69,6 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
           }
         })
         .subscribe((res) => {
-          console.log(res);
           this.group = res.data.group;
           this.loadedGroup.emit(this.group);
         });

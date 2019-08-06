@@ -1,13 +1,24 @@
 <dv.action name="users">
   <lingua.navbar accessRequired=true />
   <div class="center-column">
+    <chatTotal.show-group id=lingua.navbar.loggedInUserId hidden=true />
     <userProfile.show-objects hidden=true />
-    <dv.difference array=userProfile.show-objects.objects
-                   values=[[{id:lingua.navbar.loggedInUserId}]]
-                   key="id" />
-    <dv.show-entities entities=dv.difference.difference
-                      showEntity=<lingua.show-user
-                      user=$entity
-                      loggedInUserId=lingua.navbar.loggedInUserId /> />
+    <dv.if condition=chatTotal.show-group.loadedGroup>
+      <dv.filter entitiesToFilter=userProfile.show-objects.objects
+                 filterMultipleValues={id:chatTotal.show-group.loadedGroup.memberIds}
+                 hidden=true
+      />
+      <dv.difference array=userProfile.show-objects.objects
+                     values=[dv.filter.filteredEntities]
+                     hidden=true
+                     key="id" />
+      <dv.show-entities entities=dv.difference.difference
+                        showEntity=<lingua.show-user
+                        user=$entity
+                        loggedInUserId=lingua.navbar.loggedInUserId /> />
+    </dv.if>
+    <dv.if condition=!chatTotal.show-group.loadedGroup>
+      Loading...
+    </dv.if>
   </div>
 </dv.action>
