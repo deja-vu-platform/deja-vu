@@ -1,6 +1,6 @@
 <dv.action name="show-chat-info">
   <dv.if condition=!!$userId class="small-margin">
-    <userProfile.show-object id=$group.memberIds[0] showOnly=["name"] hidden=true />
+    <userProfile.show-object id=$group.memberIds[0]===$userId ? $group.memberIds[1] : $group.memberIds[0] showOnly=["name"] hidden=true />
     <dv.if condition=userProfile.show-object.loadedObject>
       <dv.link href="/chat"
                params={ chatId:$group.id, memberIds:$group.memberIds }>

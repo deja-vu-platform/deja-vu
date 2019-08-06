@@ -1,8 +1,13 @@
 <dv.action name="users">
   <lingua.navbar accessRequired=true />
   <div class="center-column">
-    <userProfile.show-objects showObject=<lingua.show-user
-                              user=$object
-                              loggedInUserId=lingua.navbar.loggedInUserId /> />
+    <userProfile.show-objects hidden=true />
+    <dv.difference array=userProfile.show-objects.objects
+                   values=[[{id:lingua.navbar.loggedInUserId}]]
+                   key="id" />
+    <dv.show-entities entities=dv.difference.difference
+                      showEntity=<lingua.show-user
+                      user=$entity
+                      loggedInUserId=lingua.navbar.loggedInUserId /> />
   </div>
 </dv.action>
