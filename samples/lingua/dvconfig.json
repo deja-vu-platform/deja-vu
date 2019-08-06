@@ -29,7 +29,8 @@
               "type": "string"
             },
             "learningLanguage": {
-              "type": "string"
+              "type": "string",
+              "enum": ["English", "French"]
             }
           }
         }
@@ -74,12 +75,18 @@
     },
     "rating": {
       "config": {
-        "reinitDbOnStartup": true
+        "reinitDbOnStartup": false
+      }
+    },
+    "chatTotal": {
+      "name": "group",
+      "config": {
+        "reinitDbOnStartUp": false
       }
     }
   },
   "routes": [
-    { "path": "", "action": "conversations" },
+    { "path": "", "action": "show-chat" },
     { "path": "login", "action": "login" },
     { "path": "signup", "action": "signup" },
     { "path": "profile", "action": "profile" },

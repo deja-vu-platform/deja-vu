@@ -1,10 +1,11 @@
 <dv.action name="show-chat-info">
-  <dv.if condition=!!$userId >
-    <dv.link href="/chat"
-             params={ chatId: $group.id, firstMemberId: $group.memberIds[0], secondMemberId: $group.memberIds[1] }>
-      <!--Commented out because it gives an invalid path-->
-      <!--<userProfile.show-object id=$group.memberIds[0] showOnly=["name"] />-->
-      PlaceHolder
-    </dv.link>
+  <dv.if condition=!!$userId class="small-margin">
+    <userProfile.show-object id=$group.memberIds[0]===$userId ? $group.memberIds[1] : $group.memberIds[0] showOnly=["name"] hidden=true />
+    <dv.if condition=userProfile.show-object.loadedObject>
+      <dv.link href="/chat"
+               params={ chatId:$group.id, memberIds:$group.memberIds }>
+        <dv.show-entity entity=userProfile.show-object.loadedObject.name />
+      </dv.link>
+    </dv.if>
   </dv.if >
 </dv.action>

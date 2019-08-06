@@ -17,6 +17,7 @@ import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
 import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
+import { FormatDateComponent } from './format-date/format-date.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { GenIdComponent } from './gen-id/gen-id.component';
 import { GenIdsComponent } from './gen-ids/gen-ids.component';
@@ -58,7 +59,7 @@ const allComponents = [
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
   DifferenceComponent, GroupByComponent, PickComponent, FilterComponent,
-  DebugLogComponent, SumComponent
+  DebugLogComponent, SumComponent, FormatDateComponent
 ];
 
 @NgModule({

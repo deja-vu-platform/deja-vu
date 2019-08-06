@@ -1,23 +1,25 @@
 <dv.action name="show-message">
-  <div>
-    <div class="message-info">
-      <span>
+  <div class="small-margin">
+    <div>
+      <div class="inline-block">
         <userProfile.show-object id=$message.authorId showOnly=["name"] /> :
-      </span>
-      <span class="pull-right">
-        <dv.show-entity entity=$message.timestamp />
-      </span>
+      </div>
+      <div class="pull-right">
+        <dv.format-date dateString=$message.timestamp format="lll" />
+      </div>
     </div>
 
-    <div class="message-content">
+    <div>
       <dv.show-entity entity=$message.content />
     </div>
 
-    <mat-expansion-panel>
+    <mat-expansion-panel class="mat-elevation-z0">
       <mat-expansion-panel-header>
         <mat-panel-title>Correct Words</mat-panel-title>
       </mat-expansion-panel-header>
       <correction.create-object showExclude=["authorId","chatId"]
+                                newObjectSavedText="New Correction Added"
+                                buttonLabel="Add Correction"
                                 initialValue={ authorId: $userId, chatId: $chatId }
       />
     </mat-expansion-panel>
