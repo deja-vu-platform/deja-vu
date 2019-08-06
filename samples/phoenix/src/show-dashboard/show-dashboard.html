@@ -11,8 +11,28 @@
 
   <div class="container" id="index-container">
     <div id="connection-ready">
-      <!-- TODO: indicate when ready; right now, you're always ready -->
-      <h2>We're looking for new connections for you!</h2>
+      <readyToConnect.show-object id=phoenix.show-sidebar.loggedInUser?.id hidden=true />
+      <dv.if condition=readyToConnect.show-object.loadedObject
+             && readyToConnect.show-object.loadedObject.ready>
+        <h2>We're looking for new connections for you!</h2>
+        <dv.tx>
+          <readyToConnect.update-object as cancel-ready
+                                        id=phoenix.show-sidebar.loggedInUser?.id
+                                        initialValue={ ready:false } hidden=true />
+          <dv.button>Cancel</dv.button>
+          <dv.link href="/dashboard" hidden=true></dv.link>
+        </dv.tx>
+      </dv.if>
+      <dv.if condition=!readyToConnect.show-object.loadedObject || !readyToConnect.show-object.loadedObject.ready>
+        <h2>Are you ready to look for a new connection?</h2>
+        <dv.tx>
+          <readyToConnect.update-object as set-ready
+                                        id=phoenix.show-sidebar.loggedInUser?.id
+                                        initialValue={ ready:true } hidden=true />
+          <dv.button>Ready</dv.button>
+          <dv.link href="/dashboard" hidden=true></dv.link>
+        </dv.tx>
+      </dv.if>
     </div>
 
     <div id="dashboard-container">
