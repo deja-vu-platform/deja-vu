@@ -1,6 +1,6 @@
 <dv.action name="show-post" loadedPost$=post.show-object.loadedObject>
   <div>
-    <post.show-object id=$id hidden=true />
+    <post.show-object id=$id includeTimestamp=true hidden=true />
 
     <dv.if condition=post.show-object.errors>
       Post not found
@@ -26,6 +26,9 @@
         </div>
         <div class="subtext">
           posted by {{ post.show-object.loadedObject.author }}
+          <dv.show-date class="post-date"
+            date=post.show-object.loadedObject.timestamp
+            format='time-ago' />
           <div class="sep"></div>
           <scoreposts.show-target
             class="inline-block score"

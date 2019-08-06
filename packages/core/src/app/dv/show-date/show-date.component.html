@@ -1,0 +1,6 @@
+<span *ngIf="_date && format !== 'time-ago'">
+  {{ _date | date: format }}
+</span>
+<span *ngIf="_date && format === 'time-ago'">
+  {{ _date | timeAgo }}
+</span>

@@ -7,6 +7,8 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { TimeAgoPipe } from 'time-ago-pipe';
+
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonLastComponent } from './button-last/button-last.component';
 import { ButtonComponent } from './button/button.component';
@@ -31,6 +33,7 @@ import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
+import { ShowDateComponent } from './show-date/show-date.component';
 import { ShowEntitiesComponent } from './show-entities/show-entities.component';
 import { ShowEntityComponent } from './show-entity/show-entity.component';
 import { StageComponent } from './stage/stage.component';
@@ -51,7 +54,7 @@ const allComponents = [
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
-  RedirectComponent, ZipComponent, ShowCountComponent,
+  RedirectComponent, ZipComponent, ShowCountComponent, ShowDateComponent,
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
   DifferenceComponent, GroupByComponent, PickComponent, FilterComponent
@@ -67,7 +70,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule, MatTableModule, MatCheckboxModule
   ],
-  declarations: [...allComponents, OfDirective],
+  declarations: [...allComponents, OfDirective, TimeAgoPipe],
   providers: [
     GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
     SubscriptionService
