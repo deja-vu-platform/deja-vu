@@ -1,11 +1,16 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, Type
+  OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
 
 import { ShowScoreComponent } from '../show-score/show-score.component';
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -20,7 +25,7 @@ import { Target } from '../shared/scoring.model';
   styleUrls: ['./show-targets-by-score.component.css']
 })
 export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
-  OnInit, OnChanges {
+  OnInit, OnChanges, OnDestroy {
   @Input() sourceId: string | undefined;
   @Input() targetIds: string[] | undefined;
 
@@ -53,8 +58,12 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   showTargetsByScore;
   private gs: GatewayService;
 
+  private destroyed = new Subject<any>();
+  private shouldReload = false;
+
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private router: Router,
     private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showTargetsByScore = this;
   }
@@ -62,6 +71,20 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.shouldReload = true;
+        this.rs.eval(this.elem);
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   ngAfterViewInit() {
@@ -108,6 +131,7 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
         .subscribe((res) => {
           this.targets = res.data.targetsByScore;
           this.loadedTargets.emit(this.targets);
+          this.shouldReload = false;
         });
     } else if (this.gs) {
       this.gs.noRequest();
@@ -115,6 +139,6 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   }
 
   private canEval(): boolean {
-    return !!(this.gs && !this.targets);
+    return !!(this.gs && (!this.targets || this.shouldReload));
   }
 }

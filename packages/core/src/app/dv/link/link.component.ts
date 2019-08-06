@@ -12,10 +12,10 @@ import * as _ from 'lodash';
 })
 export class LinkComponent implements OnInit, OnExecSuccess {
   // TODO: rename this to path
-  @Input() href: string;
+  @Input() href: string | undefined;
   @Input() value: string | undefined;
   @Input() params;
-  @Input() reloadOnSameUrl = false;
+  @Input() hardRefresh = false;
 
   aHref: string;
 
@@ -25,13 +25,22 @@ export class LinkComponent implements OnInit, OnExecSuccess {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
+    this.setHref();
   }
 
   ngOnChanges() {
-    const newParams = _.mapValues(this.params, JSON.stringify);
-    const url = this.router
-      .createUrlTree([this.href], { queryParams: newParams });
-    this.aHref = url.toString();
+    this.setHref();
+  }
+
+  setHref() {
+    if (this.href === undefined) {
+      this.aHref = this.router.url.toString();
+    } else {
+      const newParams = _.mapValues(this.params, JSON.stringify);
+      const url = this.router
+        .createUrlTree([this.href], { queryParams: newParams });
+      this.aHref = url.toString();
+    }
   }
 
   onClick(e) {
@@ -48,7 +57,7 @@ export class LinkComponent implements OnInit, OnExecSuccess {
   }
 
   dvOnExecSuccess() {
-    if (this.reloadOnSameUrl) {
+    if (this.hardRefresh) {
       window.location.href = this.aHref;
     } else {
       this.router.navigateByUrl(this.aHref);
