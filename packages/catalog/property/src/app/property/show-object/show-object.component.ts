@@ -8,7 +8,9 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getFilteredPropertyNames, getFilteredPropertyNamesFromConfig } from '../shared/property.model';
+import {
+  getFilteredPropertyNames, getFilteredPropertyNamesFromConfig
+} from '../shared/property.model';
 
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
@@ -54,7 +56,7 @@ OnChanges {
    * (For the default showUrl, this will cause any URL properties
    * to display without the protocol and path)
    */
-  @Input() showBaseUrlsOnly: boolean = false;
+  @Input() showBaseUrlsOnly = false;
   /**
    * The object being shown
    */
@@ -74,6 +76,8 @@ OnChanges {
    */
   @Input() properties: string[];
   private urlProps: Set<string> = new Set();
+
+  @Input() includeTimestamp = false;
 
   showObject;
   private gs: GatewayService;
@@ -138,6 +142,7 @@ OnChanges {
               returnFields: `
                 id
                 ${this.properties.join('\n')}
+                ${this.includeTimestamp ? 'timestamp' : ''}
               `
             }
           }

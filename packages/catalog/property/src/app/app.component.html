@@ -3,7 +3,12 @@
   <property-create-object id="ben"></property-create-object>
   <h1>Show Object with id Ben</h1>
   <property-show-object id="ben"></property-show-object>
-  lastname only: <property-show-object id="ben" [showOnly]="['lastName']">
+  lastname only:
+  <property-show-object id="ben" [showOnly]="['lastName']">
+  </property-show-object>
+  include timestamp:
+  <property-show-object id="ben" [showOnly]="['lastName']"
+    [showTimestamp]="true">
   </property-show-object>
   <h1>Create Objects</h1>
   <dv-tx>

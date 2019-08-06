@@ -72,6 +72,8 @@ OnChanges {
    */
   @Output() objectIds = new EventEmitter<string[]>();
 
+  @Input() includeTimestamp = false;
+
   properties: string[];
   showObjects;
 
@@ -123,6 +125,7 @@ OnChanges {
               returnFields: `
                 id
                 ${this.properties.join('\n')}
+                ${this.includeTimestamp ? 'timestamp' : ''}
               `
             }
           }
