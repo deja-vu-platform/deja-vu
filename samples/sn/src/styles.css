@@ -35,9 +35,19 @@
   margin-right: 4px;
 }
 
+.black-sep {
+  border-left: 1px solid black;
+  width: 1px;
+  height: 15px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
 .black-link a,
 .black-link a:hover {
   color: black;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .mat-icon-button .mat-button-wrapper > * {
@@ -70,4 +80,11 @@
 
 h1 {
   font-size: 1.5rem;
+}
+
+.list-group-item {
+  background-color: initial;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }

@@ -38,7 +38,12 @@ export class TxInputsValidator {
     // `freeze` prevents template exprs from modifying the context.
     // For some reason, doing `forEach(context, vm.freeze)` doesn't work
     // sometimes
-    _.forEach(context, (value: any, key: string) => vm.freeze(value, key));
+    _.forEach(context, (value: any, key: string) => {
+      // It's important not to return the result of `vm.freeze` because
+      // `vm.freeze` returns the freezed value, which could be `false` and cause
+      // the `forEach` to stop
+      vm.freeze(value, key);
+    });
 
     // I couldn't find a flag for returning `undefined` to the sandboxed script
     // if a reference doesn't exist in the context, so we have to do this hack

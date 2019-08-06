@@ -13,9 +13,9 @@ import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import {
-  jsonSchemaTypeToGraphQlType,
-  jsonSchemaTypeToGraphQlFilterType,
   jsonSchemaTypedEnumFilterToGraphQlFilter,
+  jsonSchemaTypeToGraphQlFilterType,
+  jsonSchemaTypeToGraphQlType,
   PropertyConfig
 } from './config-types';
 import { ObjectDoc } from './schema';
@@ -139,7 +139,6 @@ const actionRequestTable: ActionRequestTable = {
         throw new Error('extraInfo.action can only be update');
     }
   }
-
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -156,7 +155,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
   const joinedProperties = properties.join('\n');
 
   // Similar as properties, but it doesn't mark any field as required
-  // this is used as a filter mechanism where not all fields must present
+  // this is used for filter (where not all fields are required)
   const nonRequiredProperties = _
     .chain(config.schema.properties)
     .toPairs()
@@ -164,8 +163,8 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       return `${propertyName}: ` +
         jsonSchemaTypeToGraphQlType[schemaPropertyObject.type];
     })
-
     .value();
+
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
   const propertyFilters = _
@@ -189,6 +188,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
   return [`
     type Object {
       id: ID!
+      timestamp: Float!
       ${joinedProperties}
     }
 
@@ -196,7 +196,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       id: ID
       ${joinedProperties}
     }
-    
+
     input UpdateObjectInput {
       id: ID!
       ${joinedNonRequiredProperties}
@@ -208,8 +208,8 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
     }
 
     input FilterInput {
-      # filtering by id is not implemented currently
-      # the id field is included to prevent having and empty type
+      # filtering by id is currently not implemented
+      # the id field is included to prevent having an empty type
       id: ID
       ${joinedPropertyFilters}
     }
@@ -230,6 +230,13 @@ function createObjectFromInput(config: PropertyConfig, input) {
   return newObject;
 }
 
+function addTimestamp(obj: ObjectDoc) {
+  obj.timestamp = new Date(obj._id.getTimestamp())
+    .getTime();
+
+  return obj;
+}
+
 function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
   const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
@@ -246,16 +253,18 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
       object: async (_root, { id }) => {
         const obj: ObjectDoc | null = await objects.findOne({ id: id });
 
-        return _.get(obj, '_pending') ? null : obj;
+        return _.get(obj, '_pending') ? null : addTimestamp(obj);
       },
       objects: async (_root, { fields }) => {
-        return objects.find(fields);
+        const objs = await objects.find(fields);
+
+        return _.map(objs, addTimestamp);
       },
       filteredObjects: async (_root, { filters } ) => {
-        // it servers two purposes :
+        // it serves two purposes:
         // (1) get rid of null fields
         // (2) turn yes/no logic into yes/don't care logic for booleans
-        const filteredFilters = _.pickBy(filters, (value) => (!!value));
+        const filteredFilters = _.pickBy(filters, (value) => !!value);
 
         const modifiedFilters = _.mapValues(filteredFilters,
           (filter) => {
@@ -271,7 +280,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
           }
         });
 
-        return objects.find(modifiedFilters);
+        const objs = objects.find(modifiedFilters);
+
+        return _.map(objs, addTimestamp);
       },
       properties: (_root) => _
         .chain(config['schema'].properties)

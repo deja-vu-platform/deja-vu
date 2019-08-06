@@ -40,11 +40,13 @@
       <dv.if condition=!$commentView>
         <div class="reply-container">
           <div class="subtext">
-            <dv.link
-              href=$user ? "/comment" : "/login"
-              params=$user ? { id: $snComment.id } : { callback: "/comment", callbackParams: { id: $snComment.id } }>
-              Reply
-            </dv.link>
+            <dv.if condition=$user>
+              <dv.link href="/comment" params={ id: $snComment.id  }>Reply</dv.link>
+            </dv.if>
+            <dv.if condition=!$user>
+              <dv.callback-link
+                href="/login" callbackPath="/comment" callbackParams={ id: $snComment.id }>Reply</dv.callback-link>
+            </dv.if>
           </div>
           <div>
             <comment.show-comments

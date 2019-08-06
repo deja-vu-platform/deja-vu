@@ -4,7 +4,8 @@
     <dv-include [action]="showObject"
       default-showObject="{ tag: property-show-object }" [inputs]="{
         object: object, showOnly: showOnly, showExclude: showExclude,
-        showBaseUrlsOnly: showBaseUrlsOnly, _config: config
+        showBaseUrlsOnly: showBaseUrlsOnly,
+        includeTimestamp: includeTimestamp, _config: config
       }"
       [parent]="showObjects">
     </dv-include>

@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import * as _ from 'lodash';
+
 
 /**
  *  This component is intended to be used with `callback`.
@@ -19,10 +21,24 @@ export class CallbackLinkComponent implements OnInit {
   currentUrl: string;
   @Input() href: string;
 
-  constructor(private router: Router) {
-    this.currentUrl = this.router.url;
-  }
+  @Input() callbackPath: string | undefined;
+  @Input() callbackParams: {[key: string]: any} | undefined;
+
+  constructor(private router: Router) { }
 
   ngOnInit() {
+  }
+
+  get callbackUrl(): string {
+    return (this.callbackPath) ? this.buildUrl() : this.router.url;
+  }
+
+  buildUrl() {
+    const newParams = _.mapValues(this.callbackParams, JSON.stringify);
+    const url = this.router
+      .createUrlTree(
+        [this.callbackPath], { queryParams: newParams });
+
+    return url.toString();
   }
 }
