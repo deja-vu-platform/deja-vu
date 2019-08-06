@@ -23,13 +23,6 @@ import {
   getProperties, getPropertiesFromConfig, Property
 } from '../shared/property.model';
 
-@Pipe({ name: 'camelToTitleCase'})
-export class CamelToTitleCasePipe implements PipeTransform {
-  transform(camelCase: string): string {
-    return _.startCase(_.camelCase(camelCase));
-  }
-}
-
 /**
  * Create a single property
  * You probably don't want to use this on its own and instead want Create Object

@@ -2,7 +2,7 @@
   <dv.if condition=!$request.claimed && $userId !== $request.requesterId >
     <dv.tx>
     <request.update-object id=$request.id
-                           initialValue={claimed:"true",delivererId:$userId}
+                           initialValue={claimed:true,delivererId:$userId}
                            showOptionToSubmit=false
                            hidden=true
     />

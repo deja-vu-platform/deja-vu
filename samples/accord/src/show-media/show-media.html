@@ -1,0 +1,20 @@
+<dv.action name="show-media">
+  <div>
+    <a href="//"+$media.sourceLink>
+      <dv.show-entity entity=$media.sourceLink />
+    </a>
+  </div>
+  <div>
+    <dv.show-entity entity=$media.linkDescription />
+  </div>
+  <dv.if condition=$deletable>
+    <dv.tx>
+      <media.remove-object id=$media.id hidden=true />
+      <dv.button>
+        <mat-icon>
+          delete
+        </mat-icon>
+      </dv.button>
+    </dv.tx>
+  </dv.if>
+</dv.action>

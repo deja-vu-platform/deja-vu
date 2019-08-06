@@ -9,6 +9,11 @@
     <dv.if condition=authorization.can-view.canView>
       <h2>Edit Setlist</h2>
       <setList.update-object id=$setListId showExclude=["groupId"] buttonLabel="Update Setlist"/>
+      <dv.tx>
+        <setList.remove-object id=$setListId hidden=true />
+        <dv.link href="/group" params={groupId:$groupId} />
+        <dv.button>Delete Setlist</dv.button>
+      </dv.tx>
     </dv.if>
 
     <dv.if condition=!authorization.can-view.canView>

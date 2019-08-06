@@ -3,29 +3,31 @@
                            hidden=true
   />
   <authorization.can-view resourceId=$groupId principalId=$userId hidden=true />
-  <dv.if condition=!!userProfile.show-object.loadedObject class="plain">
+  <dv.if condition=!!userProfile.show-object.loadedObject class="inline-block">
     <dv.show-entity entity=userProfile.show-object.loadedObject.firstName />
     <dv.show-entity entity=userProfile.show-object.loadedObject.lastName />
   </dv.if>
-  <dv.if condition=!$allowEdit>
-    <dv.if condition=authorization.can-view.canView class="plain"> (Admin)</dv.if>
+  <dv.if condition=!$allowEdit class="inline-block">
+    <dv.if condition=authorization.can-view.canView class="inline-block"> (Admin)</dv.if>
   </dv.if>
 
-  <dv.if condition=$allowEdit>
-    <dv.if condition=!authorization.can-view.canView>
+  <dv.if condition=$allowEdit class="inline-block">
+    <dv.if condition=!authorization.can-view.canView class="inline-block">
       <authorization.add-viewer id=$groupId
                                 viewerId=$userId
                                 buttonLabel="Make Admin"
+                                class="inline-block"
                                 viewerAddedSuccessText="Admin Added!"
                                 showResourceInputField=false
                                 showViewerInputField=false
       />
       <group.join-leave memberId=$userId
                         groupId=$groupId
+                        class="inline-block"
                         joinGroupText="Add back"
                         leaveGroupText="Remove" />
     </dv.if>
-    <dv.if condition=($userId===$currentUserId)&&authorization.can-view.canView >
+    <dv.if condition=($userId===$currentUserId)&&authorization.can-view.canView class="inline-block">
       <authorization.remove-viewer id=$groupId
                                    viewerId=$userId
                                    buttonLabel="Give up my admin access"

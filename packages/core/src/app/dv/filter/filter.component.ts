@@ -22,6 +22,17 @@ export class FilterComponent implements OnInit, OnChanges {
    */
   @Input() filter: any;
 
+  /**
+   * Input an object with key : value[] pairs to get the entities
+   * with the key in the corresponding lists. Multple keys connect with `and` logic
+   * Example:
+   *    {
+   *      id: [2, 3, 5, 7, 11],
+   *      name: [Alice, Bob, Mike]
+   *    }
+   */
+  @Input() filterMultipleValues: any[];
+
   /** The output list */
   @Output() filteredEntities = new EventEmitter<any[]>();
 
@@ -33,6 +44,23 @@ export class FilterComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.filteredEntities.emit(_.filter(this.entitiesToFilter, this.filter));
+    let entitiesBeingFiltered = this.entitiesToFilter;
+    if (this.filter) {
+      entitiesBeingFiltered = _.filter(entitiesBeingFiltered, this.filter);
+    }
+    if (this.filterMultipleValues) {
+      entitiesBeingFiltered = _.filter(entitiesBeingFiltered,
+        (entity) => {
+          for (const key of Object.keys(this.filterMultipleValues)) {
+            if (!entity[key] ||
+              !_.includes(this.filterMultipleValues[key], entity[key])) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+    }
+    this.filteredEntities.emit(entitiesBeingFiltered);
   }
 }

@@ -93,13 +93,31 @@
             "lyrics": {
               "type": "string"
             },
-            "mediaLink": {
-              "type": "string"
-            },
             "setListId": {
               "type": "string"
             },
             "addedBy": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "media": {
+      "name": "property",
+      "config": {
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Media",
+          "type": "object",
+          "properties": {
+            "proposalId": {
+              "type": "string"
+            },
+            "sourceLink": {
+              "type": "string"
+            },
+            "linkDescription": {
               "type": "string"
             }
           }

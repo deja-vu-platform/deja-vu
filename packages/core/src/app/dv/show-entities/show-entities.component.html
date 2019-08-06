@@ -1,6 +1,6 @@
-<ul *ngIf="entities && entities.length > 0" class="list-group">
+<ul *ngIf="entities && entities.length > 0">
   <li *ngFor="let entity of entities"
-      class="list-group-item dv-show-entities-entity-item">
+      class="dv-show-entities-entity-item">
     <dv-include [action]="showEntity"
                 default-showEntity="{ tag: dv-show-entity }"
                 [inputs]="{ entity: entity }"

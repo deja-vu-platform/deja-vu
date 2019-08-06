@@ -1,6 +1,7 @@
 <dv.action name="login">
-  <div id="content" class="center text-font form-signin">
-    <h2 class="form-signin-heading">Welcome to EasyPick!</h2>
+  <easypick.navbar accessRequired=false />
+  <div class="center-column-dynamic-auth">
+    <h2>Log In</h2>
     <dv.tx>
       <authentication.sign-in />
       <dv.callback defaultHref="/" onExecSuccess=true hidden=true />

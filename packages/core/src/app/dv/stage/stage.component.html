@@ -34,27 +34,52 @@
 
 <div class="row dv-stage-staged-entities">
   <div class="col-md-12">
-    <ul *ngIf="staged && staged.length > 0" class="list-group">
-      <li *ngFor="let entity of staged; index as i" class="list-group-item">
-        <div class="row">
-          <div class="col-md-10">
-            <div *ngIf="showEntity">
-              <dv-include [action]="showEntity" [inputs]="{ entity: entity }"
-                          [parent]="stageComponent"
-                          default-showEntity="{ tag: dv-show-entity }">
-              </dv-include>
-            </div>
-            <div *ngIf="!showEntity">
-              {{entity}}
-            </div>
-          </div>
-          <div class="col-md-2">
-            <button mat-button (click)="unstage(i)" class="eject">
+    <div *ngIf="staged && staged.length > 0" class="list-group">
+
+      <div *ngIf="tableView">
+        <mat-table [dataSource]="staged" class="mat-elevation-z8">
+          <ng-container *ngFor="let columnName of (filter ? filter : Object.keys(staged[0]))" matColumnDef="{{columnName}}">
+            <mat-header-cell *matHeaderCellDef> {{columnName | camelToTitleCase}} </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element[columnName]}} </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="rowButton">
+            <mat-header-cell *matHeaderCellDef>Delete</mat-header-cell>
+            <mat-cell *matCellDef="let element; let i = index">
+              <button mat-button (click)="unstage(i)" class="eject">
                 <i class="material-icons icon">eject</i>
-            </button>
-          </div>
-        </div>
-      </li>
-    </ul>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="(filter ? filter : Object.keys(staged[0])).concat(['rowButton'])"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: (filter ? filter : Object.keys(staged[0])).concat(['rowButton']);"></mat-row>
+        </mat-table>
+      </div>
+
+      <div *ngIf="!tableView">
+        <ul class="list-group">
+          <li *ngFor="let entity of staged; index as i" class="list-group-item">
+            <div class="row">
+              <div class="col-md-10">
+                <div *ngIf="showEntity">
+                  <dv-include [action]="showEntity" [inputs]="{ entity: entity }"
+                              [parent]="stageComponent"
+                              default-showEntity="{ tag: dv-show-entity }">
+                  </dv-include>
+                </div>
+                <div *ngIf="!showEntity">
+                  {{entity}}
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button mat-button (click)="unstage(i)" class="eject">
+                  <i class="material-icons icon">eject</i>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 </div>

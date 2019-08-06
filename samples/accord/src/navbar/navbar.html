@@ -7,56 +7,53 @@
   </dv.tx>
 
   <nav class="navbar">
-    <div class="container">
-      <div class="navbar-header">
-        <dv.link class="navbar-brand" href="/">
+    <div>
+      <h3 class="navbar-header inline-block">
+        <dv.link href="/">
           Accord
         </dv.link>
-      </div>
-
-      <dv.if condition=authentication.logged-in.user>
-        <div class="form-inline navbar-right inline-block">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/"
-                     class="mat-button btn btn-info profile-btn">
-              Dashboard
-            </dv.link>
-            &nbsp;
-            <dv.link href="/about"
-                     class="mat-button btn btn-info profile-btn">
-              About
-            </dv.link>
-            &nbsp;
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                Logged In:
-                <userProfile.show-object id=authentication.logged-in.user.id showOnly=["firstName"] />
-              </mat-expansion-panel-header>
-              <dv.link href="/user-profile" class="mat-button btn btn-info profile-btn">Account Setting</dv.link>
-              <br />
-              <dv.tx>
-                <authentication.sign-out class="mat-button btn btn-info profile-btn"
-                                         buttonLabel="Logout"/>
-                <dv.link href="/sign-in" hidden=true />
-              </dv.tx>
-            </mat-expansion-panel>
-          </div>
-        </div>
+      </h3>
+      <dv.if class="inline-block" condition=authentication.logged-in.user>
+        &nbsp;
+        &nbsp;
+        <dv.link href="/">
+          Dashboard
+        </dv.link>
+        &nbsp;
+        <dv.link href="/about">
+          About
+        </dv.link>
+        &nbsp;
       </dv.if>
+    </div>
+
+    <dv.if condition=authentication.logged-in.user>
+      <mat-expansion-panel class="mat-elevation-z0">
+        <mat-expansion-panel-header>
+          <div class="navbar-right-elem">
+            Logged In:
+            <userProfile.show-object id=authentication.logged-in.user.id showOnly=["firstName"] />
+          </div>
+        </mat-expansion-panel-header>
+        <dv.link href="/user-profile">Account Setting</dv.link>
+        <br />
+        <dv.tx>
+          <authentication.sign-out buttonLabel="Logout"/>
+          <dv.link href="/sign-in" hidden=true />
+        </dv.tx>
+      </mat-expansion-panel>
+    </dv.if>
 
       <dv.if condition=!authentication.logged-in.user>
         <div class="form-inline navbar-right">
-          <div class="btn-toolbar toolbar">
-            <dv.link href="/sign-in" class="mat-button btn btn-info profile-btn">
-              Login
-            </dv.link>
+          <dv.link href="/sign-in">
+            Login
+          </dv.link>
 
-            <dv.link href="/signiup" class="mat-button btn btn-info profile-btn">
-              Register
-            </dv.link>
-          </div>
+          <dv.link href="/sign-up">
+            Register
+          </dv.link>
         </div>
       </dv.if>
-    </div>
   </nav>
 </dv.action>

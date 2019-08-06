@@ -18,9 +18,14 @@ import { API_PATH } from '../property.config';
 
 /**
  * Create objects in bulk
- * This action does not display anything.
- * The data for the objects must come from another action.
- * The action's execution must be triggered by another action (in a transaction)
+ * There are two ways to use this action:
+ *  1. if `objects` is inputted:
+ *      the action will not display anything.
+ *      the data for the objects must come from another action.
+ *      the action's execution must be triggered by another action (in a transaction)
+ *  2. if `objects` is not inputted:
+ *      the action works similar to when multiple `create-object` actions are stacked.
+ *      there must be a list of `ids` for the objects that will be created.
  */
 @Component({
   selector: 'property-create-objects',
@@ -31,7 +36,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   /**
    * List of objects to save to the database as new entities
    */
-  @Input() objects: any[];
+  @Input() objects: any[] = [];
 
   /**
    * List of Id of the new objects to create
@@ -107,9 +112,6 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   }
 
   async dvOnExec(): Promise<void> {
-    if (_.isEmpty(this.objects)) {
-      return;
-    }
     const res = await this.gs
       .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         inputs: {
