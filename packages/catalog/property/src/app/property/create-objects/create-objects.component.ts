@@ -36,7 +36,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
   /**
    * List of objects to save to the database as new entities
    */
-  @Input() objects: any[] = [];
+  @Input() objects: any[];
 
   /**
    * List of Id of the new objects to create
@@ -99,7 +99,6 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     }
 
     this.showInputForms = true;
-    this.objects = [];
 
     for (const index of Object.keys(this.ids)) {
       if (this.initialValues && this.initialValues[index] && this.initialValue) {

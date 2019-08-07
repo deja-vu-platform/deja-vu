@@ -3,18 +3,18 @@
   "usedCliches": {
     "authentication": {
       "config": {
-        "reinitDbOnStartup": false
+        "reinitDbOnStartup": true
       }
     },
     "authorization": {
       "config": {
-        "reinitDbOnStartup": false
+        "reinitDbOnStartup": true
       }
     },
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
+        "reinitDbOnStartup": true,
         "schema": {
           "title": "User",
           "type": "object",
@@ -32,7 +32,7 @@
     "request": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
+        "reinitDbOnStartup": true,
         "schema": {
           "title": "Request",
           "type": "object",
@@ -79,7 +79,7 @@
     "delivery": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
+        "reinitDbOnStartup": true,
         "schema": {
           "title": "Delivery",
           "type": "object",
@@ -108,7 +108,7 @@
     },
     "rating": {
       "config": {
-        "reinitDbOnStartup": false
+        "reinitDbOnStartup": true
       }
     }
   },
