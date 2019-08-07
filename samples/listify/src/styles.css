@@ -18,6 +18,10 @@ h2 .selected-tab {
   color: rgb(196, 191, 191);
 }
 
+.small-padding {
+  padding: 5px 10px;
+}
+
 .main {
   margin-top: 56px; /* height of navbar */
   padding: 15px 40px;
@@ -93,7 +97,7 @@ h2 .selected-tab {
 
 .card-container {
   margin-left: 40px;
-  margin-top: 40px;
+  margin-top: 20px;
   margin-bottom: -20px;
   width: 300px;
 
