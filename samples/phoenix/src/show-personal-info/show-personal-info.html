@@ -60,37 +60,12 @@
             showId=false class="inline-block"/>
         </h3>
         <div id="about-me">
-          <dv.if condition=personalinfo.show-object.loadedObject>
-            <personalinfo.show-object as show-description-property
-              class="personal-info-desc"
-              object=personalinfo.show-object.loadedObject
-              showOnly=['description'] />
-
-            <br/>
-            <p class="personal-info-label inline-block">Zip Code:</p>
-            <personalinfo.show-object as show-zipcode-property
-              class="inline-block"
-              object=personalinfo.show-object.loadedObject
-              showOnly=['zipCode'] />
-
-            <br/>
-            <p class="personal-info-label inline-block">Location Radius:</p>
-            <personalinfo.show-object as show-locationradius-property
-              class="inline-block"
-              object=personalinfo.show-object.loadedObject
-              showOnly=['locationRadius'] />
-            <p class="inline-block">miles</p>
-          </dv.if>
-
-          <dv.if condition=!personalinfo.show-object.loadedObject>
-            <dv.tx>
-              <!-- TODO: update-object -->
-              <personalinfo.create-object
-                id=phoenix.show-sidebar.loggedInUser?.id
-                buttonLabel="Add Personal Info"
-                newObjectSavedText="Profile Updated!" />
-            </dv.tx>
-          </dv.if>
+          <dv.tx>
+            <personalinfo.update-object
+              id=phoenix.show-sidebar.loggedInUser?.id
+              buttonLabel="Save Personal Info"
+              updateObjectSavedText="Profile Updated!" />
+          </dv.tx>
         </div>
 
         <div id="all-topics-stuff">

@@ -40,7 +40,8 @@
           "type": "object",
           "properties": {
             "description": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 250
             },
             "zipCode": {
               "type": "string"
