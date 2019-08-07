@@ -1,52 +1,39 @@
 <dv.action name="show-connection">
-  <readyToConnect.show-object as userA-ready
-                              hidden=true
-                              id=$connection?.userAId />
-  <readyToConnect.show-object as userB-ready
-                              hidden=true
-                              id=$connection?.userAId />
-  <dv.if condition=userA-ready.loadedObject && userA-ready.loadedObject.ready
-         && userB-ready.loadedObject && userB-ready.loadedObject.ready>
-    <dv.if condition=$connection?.userAId === $loggedInUserId>
-      <phoenix.show-user-info userId=$connection.userBId />
-    </dv.if>
-    <dv.if condition=$connection?.userAId !== $loggedInUserId>
-      <phoenix.show-user-info userId=$connection.userAId />
-    </dv.if>
+  <dv.if condition=$connection?.userAId === $loggedInUserId>
+    <phoenix.show-user-info userId=$connection.userBId />
+  </dv.if>
+  <dv.if condition=$connection?.userAId !== $loggedInUserId>
+    <phoenix.show-user-info userId=$connection.userAId />
+  </dv.if>
 
-    <div class="write-email-container">
-      <!-- TODO: send email using template -->
-      Coming Soon: Send an email to your match!
-    </div>
+  <div class="write-email-container">
+    <!-- TODO: send email using template -->
+    Coming Soon: Send an email to your match!
+  </div>
 
-    <div class="matching-time-and-connection-options">
-      <!-- TODO: show earliest overlaps in schedules -->
+  <div class="matching-time-and-connection-options">
+    <!-- TODO: show earliest overlaps in schedules -->
 
-      <div class="connection-options">
-        <!-- TODO: closing a connection should delete match + create connectionhistory
-          Unfortunately, these two actions wrapped in one tx somehow doesn't allow
-          both to happen at the same time -->
-        <dv.tx>
-          <connectionhistory.create-object
-            initialValue={
+    <div class="connection-options">
+      <!-- TODO: closing a connection should delete match + create connectionhistory
+        Unfortunately, these two actions wrapped in one tx somehow doesn't allow
+        both to happen at the same time -->
+      <dv.tx>
+        <connectionhistory.create-object
+          initialValue={
             pastConnection: $connection.userAId === $loggedInUserId ? $connection.userBId : $connection.userAId
-            }
-            showExclude=['pastConnection']
-            newObjectSavedText="Connection arhived in journal!"
-            buttonLabel="Archive Connection" />
-        </dv.tx>
-        <dv.tx>
-          <match.delete-match id=$connection?.id hidden=true />
-          <dv.button id="close-connection-btn" class="btn">
-            Close Connection
-          </dv.button>
-          <dv.callback defaultHref="/journal" onExecSuccess=true hidden=true />
-        </dv.tx>
-      </div>
+          }
+          showExclude=['pastConnection']
+          newObjectSavedText="Connection arhived in journal!"
+          buttonLabel="Archive Connection" />
+      </dv.tx>
+      <dv.tx>
+        <match.delete-match id=$connection?.id hidden=true />
+        <dv.button id="close-connection-btn" class="btn">
+          Close Connection
+        </dv.button>
+        <dv.callback defaultHref="/journal" onExecSuccess=true hidden=true />
+      </dv.tx>
     </div>
-  </dv.if>
-  <dv.if condition=!userA-ready.loadedObject || !userA-ready.loadedObject.ready
-         || !userB-ready.loadedObject || !userB-ready.loadedObject.ready>
-    One of you are not ready to meet yet.
-  </dv.if>
+  </div>
 </dv.action>

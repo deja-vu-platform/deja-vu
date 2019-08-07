@@ -54,22 +54,6 @@
         "required": ["description", "zipCode", "locationRadius"]
       }
     },
-    "readyToConnect": {
-      "name": "property",
-      "config": {
-        "reinitDbOnStartup": true,
-        "schema": {
-          "title": "ReadyToConnect",
-          "type": "object",
-          "properties": {
-            "ready": {
-              "type": "boolean"
-            }
-          }
-        }
-      }
-    }
-    ,
     "match": {
       "config": {
         "reinitDbOnStartup": true
