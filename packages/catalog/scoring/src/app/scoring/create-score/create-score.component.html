@@ -1,7 +1,8 @@
 <form (ngSubmit)="onSubmit()"
   [formGroup]="createScoreForm"
   class="form-horizontal">
-  <div *ngIf="showOptionToSubmit && save" class="form-group">
+  <div *ngIf="showOptionToSubmit && save && showDoneMessage"
+    class="form-group">
     <div *ngIf="newScoreSaved">
       <i class="material-icons">done</i>
         {{newScoreSavedText}}

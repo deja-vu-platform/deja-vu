@@ -18,6 +18,6 @@
   </ul>
 </div>
 
-<div *ngIf="!targets || targets.length === 0">
+<div *ngIf="loaded && (!targets || targets.length === 0)">
   {{noTargetsText}}
 </div>

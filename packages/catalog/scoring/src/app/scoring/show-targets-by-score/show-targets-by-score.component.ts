@@ -56,6 +56,7 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   @Output() loadedTargets = new EventEmitter<Target[]>();
 
   showTargetsByScore;
+  loaded = false;
   private gs: GatewayService;
 
   private destroyed = new Subject<any>();
@@ -132,6 +133,7 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
           this.targets = res.data.targetsByScore;
           this.loadedTargets.emit(this.targets);
           this.shouldReload = false;
+          this.loaded = true;
         });
     } else if (this.gs) {
       this.gs.noRequest();

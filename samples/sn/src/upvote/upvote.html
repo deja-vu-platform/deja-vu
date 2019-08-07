@@ -1,13 +1,16 @@
 <dv.action name="upvote">
   <dv.if condition=$id>
     <dv.if condition=$isPost>
+      <scoreposts.show-score hidden=true
+        sourceId=$user?.username targetId=$id />
       <dv.tx>
         <authentication.authenticate as upvote-post-authenticate
           id=$user?.id hidden=true />
         <scoreposts.create-score as upvote-post-create-score
-          buttonDisabled=$disabled || !$user
+          buttonDisabled=$disabled || !$user ||
+            !scoreposts.show-score.errors
           class="upvote-button"
-          newScoreSavedText=""
+          showDoneMessage=false
           showOptionToInputValue=false
           sourceId=$user?.username
           submitMatIconName="arrow_drop_up"
@@ -18,13 +21,16 @@
     </dv.if>
     <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
     <dv.if condition=!$isPost>
+      <scorecomments.show-score hidden=true
+        sourceId=$user?.username targetId=$id />
       <dv.tx>
         <authentication.authenticate
           id=$user?.id hidden=true />
         <scorecomments.create-score
-          buttonDisabled=$disabled || !$user
+          buttonDisabled=$disabled || !$user ||
+            !scorecomments.show-score.errors
           class="upvote-button"
-          newScoreSavedText=""
+          showDoneMessage=false
           showOptionToInputValue=false
           sourceId=$user?.username
           submitMatIconName="arrow_drop_up"
