@@ -15,8 +15,6 @@
   </div>
 
   <div class="list-option-description">
-    <dv.if condition=$description>
-      <dv.show-entity entity=$description />
-    </dv.if>
+    <dv.if condition=$description>{{description}}</dv.if>
   </div>
 </dv.action>
