@@ -50,6 +50,10 @@
   margin-right: 5px;
 }
 
+.navbar-brand a {
+  margin-left: 0px !important;
+}
+
 .mat-icon-button .mat-button-wrapper > * {
   vertical-align: inherit !important;
 }

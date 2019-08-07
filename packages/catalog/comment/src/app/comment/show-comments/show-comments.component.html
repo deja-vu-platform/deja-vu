@@ -11,6 +11,6 @@
   </li>
 </ul>
 
-<div *ngIf="!comments || comments.length === 0">
-  <span>{{noCommentsToShowText}}</span>
+<div *ngIf="loaded && (!comments || comments.length === 0)">
+  <span>{{ noCommentsToShowText }}</span>
 </div>

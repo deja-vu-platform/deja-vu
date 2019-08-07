@@ -26,7 +26,7 @@ const components = [ AppComponent, @@components ];
   imports: [
     BrowserModule,
     DvModule,
-    RouterModule.forRoot([ @@routes ]),
+    RouterModule.forRoot([ @@routes ], { onSameUrlNavigation: 'reload' }),
     // Material Modules
     MatCardModule,
     MatDividerModule,

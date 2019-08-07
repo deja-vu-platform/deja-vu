@@ -1,7 +1,12 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
-  OnChanges, OnInit, Output, Type
+  OnChanges, OnDestroy, OnInit, Output, Type
 } from '@angular/core';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
 
 import {
   Action, GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -19,7 +24,7 @@ import { Target } from '../shared/scoring.model';
   styleUrls: ['./show-target.component.css']
 })
 export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+  OnChanges, OnDestroy {
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() target: Target | undefined;
@@ -46,8 +51,12 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   showTarget;
   private gs: GatewayService;
 
+  private destroyed = new Subject<any>();
+  private shouldReload = false;
+
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private router: Router,
     private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showTarget = this;
   }
@@ -55,6 +64,20 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.shouldReload = true;
+        this.rs.eval(this.elem);
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   ngAfterViewInit() {
@@ -100,6 +123,7 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
         .subscribe((res) => {
           this.target = res.data.target;
           this.loadedTarget.emit(this.target);
+          this.shouldReload = false;
         });
     } else if (this.gs) {
       this.gs.noRequest();
@@ -107,6 +131,6 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.id && !this.target);
+    return !!(this.gs && this.id && (!this.target || this.shouldReload));
   }
 }

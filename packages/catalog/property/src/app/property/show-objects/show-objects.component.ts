@@ -76,6 +76,7 @@ OnChanges {
 
   properties: string[];
   showObjects;
+  loaded = false;
 
   config;
   schemas;
@@ -134,6 +135,7 @@ OnChanges {
           this._objects = res.data.objects;
           this.objects.emit(this._objects);
           this.objectIds.emit(_.map(this._objects, 'id'));
+          this.loaded = true;
         });
     } else if (this.gs) {
       this.gs.noRequest();

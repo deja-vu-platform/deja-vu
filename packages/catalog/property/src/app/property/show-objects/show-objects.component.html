@@ -11,6 +11,6 @@
     </dv-include>
   </li>
 </ul>
-<div *ngIf="!_objects || _objects.length === 0">
+<div *ngIf="loaded && (!_objects || _objects.length === 0)">
   {{ noObjectsToShowText }}
 </div>

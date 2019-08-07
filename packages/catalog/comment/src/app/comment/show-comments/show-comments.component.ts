@@ -43,6 +43,7 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
 
   showComments;
   private gs: GatewayService;
+  loaded = false;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -83,6 +84,7 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
         .subscribe((res) => {
           this.comments = res.data.comments;
           this.loadedComments.emit(this.comments);
+          this.loaded = true;
         });
     }
   }
