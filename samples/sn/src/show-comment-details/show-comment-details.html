@@ -4,14 +4,11 @@
   <div class="main">
     <div class="container">
       <comment.show-comment id=$id hidden=true />
-      <dv.if condition=comment.show-comment.errors>
-        Comment not found
-      </dv.if>
+      <dv.if condition=comment.show-comment.errors>Comment not found</dv.if>
       <dv.if condition=comment.show-comment.loadedComment>
         <sn.show-comment
           snComment=comment.show-comment.loadedComment
-          user=sn.navbar.user
-          commentView=true />
+          user=sn.navbar.user commentView=true />
       </dv.if>
     </div>
   </div>

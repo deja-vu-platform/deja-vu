@@ -18,12 +18,10 @@
       <span class="space-filler"></span>
       <dv.if condition=authentication.logged-in.user>
         <authentication.show-user user=authentication.logged-in.user />
-        <span>
-          <dv.tx>
-            <authentication.sign-out />
-            <dv.link href="/" hidden=true />
-          </dv.tx>
-        </span>
+        <dv.tx>
+          <authentication.sign-out />
+          <dv.link href="/" hidden=true />
+        </dv.tx>
       </dv.if>
       <dv.if condition=!authentication.logged-in.user>
         <dv.link class="black-link" href="/login">Login</dv.link>

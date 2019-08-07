@@ -8,16 +8,16 @@
       <dv.if condition=sn.show-post.loadedPost>
         <div class="write-comment-container">
           <sn.create-comment
-            user=sn.navbar.user
-            targetId=$id
+            user=sn.navbar.user targetId=$id
             buttonLabel="Add comment" />
         </div>
 
         <div class="post-show-comments">
           <comment.show-comments
             ofTargetId=$id
+            noCommentsToShowText=''
             showComment=<sn.show-comment
-            snComment=$comment user=sn.navbar.user /> />
+              snComment=$comment user=sn.navbar.user /> />
         </div>
       </dv.if>
     </div>
