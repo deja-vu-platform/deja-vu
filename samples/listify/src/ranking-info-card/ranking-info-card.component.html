@@ -6,9 +6,7 @@
     <span>This is the consensus ranking for <list.show-object
         class="inline-block"
         object=list.show-object.loadedObject
-        showOnly=['name'] /> according to
-      <dv.show-entity entity=$listVotes />
-      vote(s).
+        showOnly=['name'] /> according to {{listVotes}} vote(s).
       <dv.if condition=list.show-object.loadedObject?.locked>
        Voting has finished for this list.
       </dv.if>
