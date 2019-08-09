@@ -1,7 +1,7 @@
-import { ActionSymbolTable } from '../../symbolTable';
+import { ComponentSymbolTable } from '../../symbolTable';
 
 
-export function saveInputs(symbolTable: ActionSymbolTable) {
+export function saveInputs(symbolTable: ComponentSymbolTable) {
   const recurse = (expr) => expr.saveInputs();
   const binOpRecurse = (leftExpr, _op, rightExpr) => {
     leftExpr.saveInputs();

@@ -12,8 +12,8 @@ class Morg {
     writeFileSync(path.join(projectDir, 'dvconfig.json'), Morg.DvConfig());
     const srcDir = path.join(projectDir, 'src');
     mkdirSync(srcDir);
-    for (const action of Morg.Actions()) {
-      writeFileSync(path.join(srcDir, `${action.name}.html`), action.contents);
+    for (const component of Morg.Components()) {
+      writeFileSync(path.join(srcDir, `${component.name}.html`), component.contents);
     }
   }
 
@@ -43,16 +43,16 @@ class Morg {
           }
         },
         "routes": [
-          { "path": "", "action": "home" }
+          { "path": "", "component": "home" }
         ]
       }
     `;
   }
 
-  private static Actions(): { name: string, contents: string }[] {
+  private static Components(): { name: string, contents: string }[] {
     return [
       { name: 'home', contents: `
-        <dv.action name="home">
+        <dv.component name="home">
           <div class="container main">
             <div class="row">
               <div class="col-md-12">
@@ -97,10 +97,10 @@ class Morg {
               </div>
             </div>
           </div>
-        </dv.action>
+        </dv.component>
       `},
       { name: 'show-group-meeting', contents: `
-        <dv.action name="show-group-meeting">
+        <dv.component name="show-group-meeting">
           <div class="row">
             <div class="col-md-6">
               <event.show-event event=$groupMeeting />
@@ -124,7 +124,7 @@ class Morg {
               </dv.tx>
             </div>
           </div>
-        </dv.action>
+        </dv.component>
       `}
     ];
   }
@@ -153,6 +153,6 @@ describe('AppCompiler', () => {
   it('should generate index.html', () => {
   });
 
-  it('should generate a component per action', () => {
+  it('should generate an ng-component per component', () => {
   });
 });

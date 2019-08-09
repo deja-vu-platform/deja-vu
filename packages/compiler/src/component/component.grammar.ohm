@@ -1,4 +1,4 @@
-Action {
+Component {
   Element
     = NormalElement -- normal
     | VoidElement   -- void
@@ -20,14 +20,14 @@ Action {
   Text = (~"<" ~">" ~"{{" ~"}}" any)+
   Interpolation = "{{" Expr "}}"
   ElementName
-    = ActionNameMaybeAlias -- action
+    = ComponentNameMaybeAlias -- component
     | name                 -- html
   AttributeName
     = output -- output
     | name   -- name
-  ActionNameMaybeAlias = actionName Alias?
+  ComponentNameMaybeAlias = componentName Alias?
   Alias = "as" name
-  actionName = name "." name
+  componentName = name "." name
 
   comment = multiLineComment
   eol = "\r"?"\n"

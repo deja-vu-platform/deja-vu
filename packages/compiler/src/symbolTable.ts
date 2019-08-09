@@ -1,23 +1,23 @@
-export type EntryKind = 'cliche' | 'app' | 'action' | 'output' | 'input' |
+export type EntryKind = 'cliche' | 'app' | 'component' | 'output' | 'input' |
   'app-output';
 
 export interface ClicheStEntry {
   kind: 'cliche';
-  symbolTable?: SymbolTable<ActionStEntry>;
+  symbolTable?: SymbolTable<ComponentStEntry>;
   clicheName?: string;
 }
 
 export interface AppStEntry {
   kind: 'app';
-  symbolTable?: SymbolTable<ActionStEntry>;
+  symbolTable?: SymbolTable<ComponentStEntry>;
 }
 
-export interface ActionStEntry {
-  kind: 'action';
-  symbolTable?: ActionSymbolTable;
-  // Because actions can be aliased, we always record the cliche and action name
+export interface ComponentStEntry {
+  kind: 'component';
+  symbolTable?: ComponentSymbolTable;
+  // Because components can be aliased, we always record the cliche and component name
   of?: string;
-  actionName?: string;
+  componentName?: string;
 }
 
 export interface OutputStEntry {
@@ -40,18 +40,18 @@ export interface InputStEntry {
 }
 
 export type StEntry =
-  ClicheStEntry | AppStEntry | ActionStEntry | OutputStEntry | InputStEntry |
+  ClicheStEntry | AppStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppOutputStEntry;
 
-export type ActionSymbolTableStEntry =
-  ClicheStEntry | ActionStEntry | OutputStEntry | InputStEntry |
+export type ComponentSymbolTableStEntry =
+  ClicheStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppStEntry | AppOutputStEntry;
 
 /**
- * Each action has its own symbol table to keep track of the symbols that can
+ * Each component has its own symbol table to keep track of the symbols that can
  * appear in attribute exprs.
  */
-export type ActionSymbolTable = SymbolTable<ActionSymbolTableStEntry>;
+export type ComponentSymbolTable = SymbolTable<ComponentSymbolTableStEntry>;
 
 
 export interface SymbolTable<T = AppStEntry | ClicheStEntry> {

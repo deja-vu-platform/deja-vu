@@ -1,22 +1,22 @@
-import { ActionSymbolTable, pretty, StEntry } from '../../symbolTable';
+import { ComponentSymbolTable, pretty, StEntry } from '../../symbolTable';
 import { isInput, NAV_SPLIT_REGEX } from './shared';
 
 import * as _ from 'lodash';
 
 
 /**
- * Parse attribute exprs to discover the used outputs of included actions.
+ * Parse attribute exprs to discover the used outputs of included components.
  *
  * For the time being, instead of figuring out what the real outputs of a
- * cliché action are, we parse the attribute exprs to discover what outputs
+ * cliché component are, we parse the attribute exprs to discover what outputs
  * are used and save this information in the symbol table. If the user is
  * using an output that doesn't exist, ng will throw an error later.
  *
  * It is useful to know what outputs are used so that when we are converting
- * an action node to its corresponding ng template node we can bind the
+ * an component node to its corresponding ng template node we can bind the
  * used output.
  */
-export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
+export function saveUsedOutputs(symbolTable: ComponentSymbolTable) {
   const recurse = (expr) => expr.saveUsedOutputs();
   const binOpRecurse = (leftExpr, _op, rightExpr) => {
     leftExpr.saveUsedOutputs();
@@ -40,11 +40,11 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
     Expr_prop: recurse, Expr_literal: recurse,
     Expr_input: (input) => input.sourceString,
     Expr_element: (element) => {
-      // We need to figure out if the action input is using an output from this
-      // action. To do so, we can simply do the same thing we are doing for this
-      // action, the only difference being that we shouldn't throw an error if
+      // We need to figure out if the component input is using an output from this
+      // component. To do so, we can simply do the same thing we are doing for this
+      // component, the only difference being that we shouldn't throw an error if
       // we don't find a symbol on the table (because it could be a symbol
-      // that's local to the action input)
+      // that's local to the component input)
       throwErrorOnSymbolNotFound = false;
       element.saveUsedOutputs();
       throwErrorOnSymbolNotFound = true;
@@ -74,36 +74,36 @@ export function saveUsedOutputs(symbolTable: ActionSymbolTable) {
       if (isInput(nameOrInput)) {
         return;
       }
-      const [ clicheOrActionAlias, ...rest ] = _
+      const [ clicheOrComponentAlias, ...rest ] = _
         .split(fullMemberAccess, NAV_SPLIT_REGEX);
-      if (!_.has(symbolTable, clicheOrActionAlias)) {
+      if (!_.has(symbolTable, clicheOrComponentAlias)) {
         if (throwErrorOnSymbolNotFound) {
           throw new Error(
-            `${clicheOrActionAlias} not found in ` +
+            `${clicheOrComponentAlias} not found in ` +
             `symbol table ${pretty(symbolTable)}`);
         } else {
           return;
         }
       }
-      const stEntry: StEntry = symbolTable[clicheOrActionAlias];
+      const stEntry: StEntry = symbolTable[clicheOrComponentAlias];
       switch (stEntry.kind) {
         case 'cliche':
-          const clicheName = clicheOrActionAlias;
-          const [ actionName, output ] = rest;
-          if (!_.has(stEntry, [ 'symbolTable', actionName ])) {
+          const clicheName = clicheOrComponentAlias;
+          const [ componentName, output ] = rest;
+          if (!_.has(stEntry, [ 'symbolTable', componentName ])) {
             if (throwErrorOnSymbolNotFound) {
               throw new Error(
-                `${clicheName}.${actionName} not found in ` +
+                `${clicheName}.${componentName} not found in ` +
                 `symbol table ${pretty(symbolTable)}`);
             } else {
               return;
             }
           }
           _.set(
-            stEntry.symbolTable[actionName], [ 'symbolTable', output ],
+            stEntry.symbolTable[componentName], [ 'symbolTable', output ],
             { kind: 'output' });
           break;
-        case 'action':
+        case 'component':
           _.set(stEntry, [ 'symbolTable', rest[0]], { kind: 'output' });
           break;
         default:

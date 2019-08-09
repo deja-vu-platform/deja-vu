@@ -21,7 +21,7 @@ export class NgComponentBuilder {
   private inputs: string[] = [];
   private outputs: NgOutput[] = [];
   private fields: NgField[] = [];
-  private actionImportStatements: string[] = [];
+  private componentImportStatements: string[] = [];
   private style = '';
 
   constructor(
@@ -47,19 +47,19 @@ export class NgComponentBuilder {
     return this;
   }
 
-  withActionImports(
-    actionImports: { actionName: string, className: string }[])
+  withComponentImports(
+    componentImports: { componentName: string, className: string }[])
     : NgComponentBuilder {
-    for (const actionImport of actionImports) {
-      this.withActionImport(actionImport.actionName, actionImport.className);
+    for (const componentImport of componentImports) {
+      this.withComponentImport(componentImport.componentName, componentImport.className);
     }
 
     return this;
   }
 
-  withActionImport(actionName: string, className: string): NgComponentBuilder {
-    const from = `../${actionName}/${actionName}.component`;
-    this.actionImportStatements.push(`import { ${className} } from '${from}'`);
+  withComponentImport(componentName: string, className: string): NgComponentBuilder {
+    const from = `../${componentName}/${componentName}.component`;
+    this.componentImportStatements.push(`import { ${className} } from '${from}'`);
 
     return this;
   }
@@ -117,7 +117,7 @@ export class NgComponentBuilder {
         ` = ${JSON.stringify(field.value)
                 .slice(1, -1)};` :
         ';')));
-    const actionImports = _.join(this.actionImportStatements, '\n');
+    const componentImports = _.join(this.componentImportStatements, '\n');
     const noInputs = _.isEmpty(inputFields);
     this.style = this.style || '';
 
@@ -128,7 +128,7 @@ export class NgComponentBuilder {
       'import { ActivatedRoute } from \'@angular/router\';'}
       ${_.isEmpty(outputFields) ?
         '' : 'import { Output, EventEmitter } from \'@angular/core\';'}
-      ${actionImports}
+      ${componentImports}
       import { RunService } from \'@deja-vu/core\';
 
       @Component({
@@ -146,7 +146,7 @@ export class NgComponentBuilder {
            private __dv__elem: ElementRef, private __dv__rs: RunService) {}
 
         ngOnInit() {
-          this.__dv__rs.registerAppAction(this.__dv__elem, this);
+          this.__dv__rs.registerAppComponent(this.__dv__elem, this);
           ${!isPage || noInputs ? '' :
           `this.__dv__route.queryParamMap.subscribe(params => {
             ${inputParams.join('\n  ')}

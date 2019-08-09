@@ -185,7 +185,7 @@ export class NgAppBuilder {
     if (!_.includes(_.map(this.routes, 'path'), '')) {
       throw new Error(
         'Missing default route "". In your dvconfig.json file add:\n' +
-        '"routes": [ {"path": "", "action": "your-main-action-here"} ]');
+        '"routes": [ {"path": "", "component": "your-main-component-here"} ]');
     }
     const srcDir = path.join(cacheDir, 'src');
     const appDir = path.join(srcDir, 'app');
@@ -263,8 +263,8 @@ export class NgAppBuilder {
             const c = selectorToComponent[r.selector];
             if (c === undefined) {
               throw new Error(
-                `Action for route "${r.path}" (${r.selector}) not found\n` +
-                `Valid actions are: ${_.keys(selectorToComponent)}`);
+                `Component for route "${r.path}" (${r.selector}) not found\n` +
+                `Valid components are: ${_.keys(selectorToComponent)}`);
             }
 
             return `{ path: "${r.path}", component: ${c} }`;

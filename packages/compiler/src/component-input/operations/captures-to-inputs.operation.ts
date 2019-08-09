@@ -1,7 +1,7 @@
-import { ActionSymbolTable, pretty } from '../../symbolTable';
+import { ComponentSymbolTable, pretty } from '../../symbolTable';
 
 import * as _ from 'lodash';
-import { isInput, NAV_SPLIT_REGEX } from '../../action/operations/shared';
+import { isInput, NAV_SPLIT_REGEX } from '../../component/operations/shared';
 
 
 export interface InputFromContext {
@@ -14,14 +14,14 @@ function captureToInput(field: string) {
 }
 
 /**
- * Turn all references to the action input's context (captures) to inputs
+ * Turn all references to the component input's context (captures) to inputs
  *
- * @param symbolTable the symbol table of the input action
- * @param context the context information given by its wrapping action
+ * @param symbolTable the symbol table of the input component
+ * @param context the context information given by its wrapping component
  * @param inputsFromContext array where the inputs from context should be saved
  */
 export function capturesToInputs(
-  symbolTable: ActionSymbolTable, context: ActionSymbolTable,
+  symbolTable: ComponentSymbolTable, context: ComponentSymbolTable,
   inputsFromContext: InputFromContext[]) {
   const recurse = (expr) => expr.capturesToInputs();
   const binOpRecurse = (leftExpr, op, rightExpr) =>
@@ -93,24 +93,24 @@ export function capturesToInputs(
         if (_.has(symbolTable, name)) {
           const stEntry = _.get(symbolTable, name);
           if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
-            const action = rest.slice(1)
+            const component = rest.slice(1)
               .split(NAV_SPLIT_REGEX)[0];
-            if (_.has(symbolTable, [name, 'symbolTable', action])) {
+            if (_.has(symbolTable, [name, 'symbolTable', component])) {
               return name + rest;
             }
-          } else if (stEntry.kind === 'action') {
+          } else if (stEntry.kind === 'component') {
             return name + rest;
           } else {
             throw new Error(`Unexpected entry type for ${pretty(stEntry)}`);
           }
         }
         if (_.has(context, name)) {
-          const action = rest.slice(1)
+          const component = rest.slice(1)
             .split('.', 1)[0];
-          const memberAndOutputAccess = rest.slice(action.length + 1);
+          const memberAndOutputAccess = rest.slice(component.length + 1);
           const [memberAccess, outputAccess] = memberAndOutputAccess.slice(1)
             .split(NAV_SPLIT_REGEX);
-          const field = name + '.' + action + '.' + memberAccess;
+          const field = name + '.' + component + '.' + memberAccess;
 
           const input = captureToInput(field);
           inputsFromContext.push({ input: input, field: field });

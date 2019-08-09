@@ -3,7 +3,7 @@ import * as glob from 'glob';
 import * as path from 'path';
 
 import * as _ from 'lodash';
-import { ActionCompiler } from '../action/action.compiler';
+import { ComponentCompiler } from '../component/component.compiler';
 import { SymbolTable } from '../symbolTable';
 import { NgAppBuilder } from './builders/ng-app.builder';
 
@@ -13,11 +13,11 @@ interface DvConfig {
   config?: any;
   gateway?: { config?: any };
   usedCliches?: { [as: string]: ClicheInfo };
-  actions?: { app?: ActionsConfig };
-  routes?: { path: string, action: string }[];
+  components?: { app?: ComponentsConfig };
+  routes?: { path: string, component: string }[];
 }
 
-interface ActionsConfig {
+interface ComponentsConfig {
   readonly include?: string[];
   readonly exclude?: string[];
 }
@@ -35,18 +35,18 @@ const IGNORE = [
   'node_modules/**', 'dist/**', 'pkg/**', '**/!(*.html)', '**/index.html' ];
 
 function filesToParse(
-  rootDirectory: string, actionsConfig: ActionsConfig | undefined): string[] {
-  const globs = _.get(actionsConfig, 'include', DEFAULT);
+  rootDirectory: string, componentsConfig: ComponentsConfig | undefined): string[] {
+  const globs = _.get(componentsConfig, 'include', DEFAULT);
 
-  return htmlFilesFromGlobs(globs, rootDirectory, actionsConfig);
+  return htmlFilesFromGlobs(globs, rootDirectory, componentsConfig);
 }
 
 function htmlFilesFromGlobs(
   globs: string[], rootDirectory: string,
-  actionsConfig: ActionsConfig | undefined): string[] {
+  componentsConfig: ComponentsConfig | undefined): string[] {
   const globOptions = {
     cwd: rootDirectory,
-    ignore: [ ...IGNORE, ..._.get(actionsConfig, 'exclude', []) ],
+    ignore: [ ...IGNORE, ..._.get(componentsConfig, 'exclude', []) ],
     nodir: true
   };
 
@@ -57,7 +57,7 @@ function htmlFilesFromGlobs(
 export class AppCompiler {
   static DVCONFIG_FILE_PATH = 'dvconfig.json';
 
-  private readonly actionCompiler: ActionCompiler = new ActionCompiler();
+  private readonly componentCompiler: ComponentCompiler = new ComponentCompiler();
   private readonly symbolTable: SymbolTable = {};
 
 
@@ -114,7 +114,7 @@ export class AppCompiler {
 
     if (dvConfig.routes !== undefined) {
       for (const route of dvConfig.routes) {
-        const selector = `${appName}-${route.action}`;
+        const selector = `${appName}-${route.component}`;
         ngAppBuilder.addRoute(route.path, selector);
       }
     }
@@ -133,33 +133,33 @@ export class AppCompiler {
       ngAppBuilder.setAppAssetsDir(assetsDir);
     }
 
-    const actionsConfig = (dvConfig.actions !== undefined) ?
-      dvConfig.actions.app : undefined;
-    const htmlFilesToParse = filesToParse(this.projectDir, actionsConfig);
-    for (const actionFilePath of htmlFilesToParse) {
+    const componentsConfig = (dvConfig.components !== undefined) ?
+      dvConfig.components.app : undefined;
+    const htmlFilesToParse = filesToParse(this.projectDir, componentsConfig);
+    for (const componentFilePath of htmlFilesToParse) {
       try {
-        const actionContents = readFileSync(
-          path.join(this.projectDir, actionFilePath), 'utf8');
+        const componentContents = readFileSync(
+          path.join(this.projectDir, componentFilePath), 'utf8');
 
-        const actionStylePath = path.join(this.projectDir,
-          _.replace(actionFilePath, '.html', '.css'));
-        const actionStyle = existsSync(actionStylePath) ?
-          readFileSync(actionStylePath, 'utf8') : '';
+        const componentStylePath = path.join(this.projectDir,
+          _.replace(componentFilePath, '.html', '.css'));
+        const componentStyle = existsSync(componentStylePath) ?
+          readFileSync(componentStylePath, 'utf8') : '';
 
-        const pages = _.map(dvConfig.routes, 'action');
-        const compiledAction = this.actionCompiler.compile(
-          dvConfig.name, actionContents, this.symbolTable,
-          actionStyle, pages);
+        const pages = _.map(dvConfig.routes, 'component');
+        const compiledComponent = this.componentCompiler.compile(
+          dvConfig.name, componentContents, this.symbolTable,
+          componentStyle, pages);
         ngAppBuilder.addComponent(
-          compiledAction.name, compiledAction.className,
-          compiledAction.ngComponent, compiledAction.ngTemplate);
-        for (const actionInput of compiledAction.actionInputs) {
+          compiledComponent.name, compiledComponent.className,
+          compiledComponent.ngComponent, compiledComponent.ngTemplate);
+        for (const componentInput of compiledComponent.componentInputs) {
           ngAppBuilder.addComponent(
-            actionInput.name, actionInput.className,
-            actionInput.ngComponent, actionInput.ngTemplate);
+            componentInput.name, componentInput.className,
+            componentInput.ngComponent, componentInput.ngTemplate);
         }
       } catch (e) {
-        console.error(`Error in action ${actionFilePath}`);
+        console.error(`Error in component ${componentFilePath}`);
         throw e;
       }
     }

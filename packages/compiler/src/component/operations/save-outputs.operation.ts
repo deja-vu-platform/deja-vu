@@ -1,7 +1,7 @@
-import { ActionSymbolTable } from '../../symbolTable';
+import { ComponentSymbolTable } from '../../symbolTable';
 
 
-export function saveOutputs(symbolTable: ActionSymbolTable) {
+export function saveOutputs(symbolTable: ComponentSymbolTable) {
   return {
     Element: (element) => element.saveOutputs(),
     NormalElement: (startTag, _content, _endTag) => startTag.saveOutputs(),
