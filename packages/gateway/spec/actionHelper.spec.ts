@@ -224,12 +224,7 @@ describe('ActionHelper', () => {
       'property',
       'property'
     ];
-    const routes = [
-      {
-        path: 'parent',
-        action: 'chorestar-parent-home'
-      }
-    ];
+    const routes = ['chorestar-parent-home'];
     const actionHelper = new ActionHelper(usedCliches, actionTable, routes);
 
     const arrayActionPath = [
