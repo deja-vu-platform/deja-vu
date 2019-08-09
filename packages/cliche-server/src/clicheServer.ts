@@ -14,10 +14,10 @@ import { Config } from './config';
 import { ClicheDb } from './db/db';
 
 /**
- * The type of the table that maps action names to
+ * The type of the table that maps component names to
  * functions that return the corresponding graphql request
  */
-export interface ActionRequestTable {
+export interface ComponentRequestTable {
   [key: string]: (extraInfo) => string;
 }
 
@@ -53,7 +53,7 @@ export type InitResolversFn<C = Config> =
 export class ClicheServer<C extends Config = Config> {
   private readonly _name: string;
   private readonly _schemaPath: string;
-  private readonly _actionRequestTable: ActionRequestTable;
+  private readonly _componentRequestTable: ComponentRequestTable;
   private readonly _config: C;
   private _db: mongodb.Db | undefined;
   private _resolvers: IResolvers | undefined;
@@ -61,12 +61,12 @@ export class ClicheServer<C extends Config = Config> {
   private readonly _initResolvers: InitResolversFn<C> | undefined;
   private readonly _dynamicTypeDefs: string[];
 
-  constructor(name: string, actionRequestTable: ActionRequestTable,
+  constructor(name: string, componentRequestTable: ComponentRequestTable,
     config: C, schemaPath: string,
     initDbCallback?: InitDbCallbackFn<C>, initResolvers?: InitResolversFn<C>,
     dynamicTypeDefs: string[] = []) {
     this._name = name;
-    this._actionRequestTable = actionRequestTable;
+    this._componentRequestTable = componentRequestTable;
     this._config = config;
     this._schemaPath = schemaPath;
     this._initDbCallback = initDbCallback;
@@ -75,28 +75,28 @@ export class ClicheServer<C extends Config = Config> {
   }
 
   /**
-   * Get the action name from the full one
-   * @param fullActionName the action name that includes/begins
+   * Get the component name from the full one
+   * @param fullComponentName the component name that includes/begins
    *                           with the cliché name and a separator
    */
-  private getActionName(fullActionName: string) {
-    return fullActionName
+  private getComponentName(fullComponentName: string) {
+    return fullComponentName
       .split('-')
       .slice(1)
       .join('-');
   }
 
-  private getGraphqlRequest(fullActionName: string, extraInfo: any) {
-    const actionName = this.getActionName(fullActionName);
-    if (this._actionRequestTable[actionName]) {
-      return this._actionRequestTable[actionName](extraInfo);
+  private getGraphqlRequest(fullComponentName: string, extraInfo: any) {
+    const componentName = this.getComponentName(fullComponentName);
+    if (this._componentRequestTable[componentName]) {
+      return this._componentRequestTable[componentName](extraInfo);
     }
-    throw new Error(`Action ${actionName} request not defined`);
+    throw new Error(`Component ${componentName} request not defined`);
   }
 
   private setGraphqlQueryAndVariables(
-    graphqlParams, variables: object, fullActionName: string, extraInfo: any) {
-    graphqlParams.query = this.getGraphqlRequest(fullActionName, extraInfo);
+    graphqlParams, variables: object, fullComponentName: string, extraInfo: any) {
+    graphqlParams.query = this.getGraphqlRequest(fullComponentName, extraInfo);
     if (variables) {
       graphqlParams.variables = variables;
     }
@@ -112,7 +112,7 @@ export class ClicheServer<C extends Config = Config> {
       const reqField = req.method === 'GET' ? 'query' : 'body';
 
       setGraphqlQueryAndVariables(req[reqField], req[reqField].inputs,
-        req['fullActionName'], req[reqField].extraInfo);
+        req['fullComponentName'], req[reqField].extraInfo);
       next();
     };
   }
@@ -120,9 +120,9 @@ export class ClicheServer<C extends Config = Config> {
   private startApp(schema) {
     const app = express();
 
-    const reqParamNamesInOrder = ['fullActionName', 'reqId', 'reqType'];
+    const reqParamNamesInOrder = ['fullComponentName', 'reqId', 'reqType'];
 
-    // /dv-{fullActionName}/{reqId}/{reqType}/
+    // /dv-{fullComponentName}/{reqId}/{reqType}/
     app.use(/^\/dv-(.*)\/(.*)\/(vote|commit|abort)\/.*/,
       (req, _res, next) => {
         reqParamNamesInOrder.forEach(
@@ -158,12 +158,12 @@ export class ClicheServer<C extends Config = Config> {
       })
     );
 
-    app.use('/graphql/:fullActionName', bodyParser.json(),
+    app.use('/graphql/:fullComponentName', bodyParser.json(),
       bodyParser.urlencoded({
         extended: true
       }),
       (req, _res, next) => {
-        req['fullActionName'] = req.params.fullActionName;
+        req['fullComponentName'] = req.params.fullComponentName;
         next();
       },
       this.getGraphqlExpressMiddleware(),
@@ -190,7 +190,7 @@ export class ClicheServer<C extends Config = Config> {
           return this.setGraphqlQueryAndVariables(
             graphqlParams,
             dvParams.inputs,
-            dvParams.fullActionName,
+            dvParams.fullComponentName,
             dvParams.extraInfo);
         }
       }, {

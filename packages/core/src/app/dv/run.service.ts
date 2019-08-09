@@ -40,13 +40,13 @@ export interface OnEvalFailure {
   dvOnEvalFailure: onFailure;
 }
 
-interface ActionInfo {
-  action: any;
+interface ComponentInfo {
+  component: any;
   node: any;
 }
 
 interface RunResultMap {
-  [actionId: string]: any;
+  [componentId: string]: any;
 }
 
 type RunType = 'eval' | 'exec';
@@ -68,14 +68,14 @@ const runFunctionNames = {
 @Injectable()
 export class RunService {
   private renderer: Renderer2;
-  private actionTable: {[id: string]: ActionInfo} = {};
+  private componentTable: {[id: string]: ComponentInfo} = {};
 
   private static IsDvTx(node: Element) {
     return (
       node.nodeName.toLowerCase() === 'dv-tx'
       || (
         window['dv-designer']
-        && _.get(node, ['dataset', 'isaction']) === 'true'
+        && _.get(node, ['dataset', 'iscomponent']) === 'true'
         && node.getAttribute('dvAlias') === 'dv-tx'
       )
     );
@@ -93,91 +93,91 @@ export class RunService {
   }
 
   /**
-   * Register a new action. Should be called on init. Only actions that can be
+   * Register a new component. Should be called on init. Only components that can be
    * Exec are required to be registered.
    */
-  register(elem: ElementRef, action: any) {
-    const actionId = uuid();
+  register(elem: ElementRef, component: any) {
+    const componentId = uuid();
     const node = elem.nativeElement;
-    NodeUtils.SetActionId(node, actionId);
-    this.actionTable[actionId] = {action: action, node: node};
+    NodeUtils.SetComponentId(node, componentId);
+    this.componentTable[componentId] = {component: component, node: node};
   }
 
-  registerAppAction(elem: ElementRef, action: any) {
-    this.register(elem, action);
-    NodeUtils.MarkAsAppAction(elem.nativeElement);
+  registerAppComponent(elem: ElementRef, component: any) {
+    this.register(elem, component);
+    NodeUtils.MarkAsAppComponent(elem.nativeElement);
   }
 
-  getActionInstance(actionId: string): any | null {
-    return _.get(this.actionTable[actionId], 'action', null);
+  getComponentInstance(componentId: string): any | null {
+    return _.get(this.componentTable[componentId], 'component', null);
   }
 
   /**
-   * Cause the action given by `elem` to execute.
+   * Cause the component given by `elem` to execute.
    */
   async exec(elem: ElementRef) {
     this.run('exec', elem);
   }
 
   /**
-   * Cause the action given by `elem` to evaluate.
+   * Cause the component given by `elem` to evaluate.
    */
   async eval(elem: ElementRef) {
     this.run('eval', elem);
   }
 
-  private getTargetAction(initialNode) {
-    let parentAction = initialNode;
+  private getTargetComponent(initialNode) {
+    let parentComponent = initialNode;
     do {
-      parentAction = this.renderer.parentNode(parentAction);
-    } while (parentAction && parentAction.getAttribute &&
-    !NodeUtils.IsAction(parentAction));
+      parentComponent = this.renderer.parentNode(parentComponent);
+    } while (parentComponent && parentComponent.getAttribute &&
+    !NodeUtils.IsComponent(parentComponent));
 
-    return RunService.IsDvTx(parentAction) ? parentAction : initialNode;
+    return RunService.IsDvTx(parentComponent) ? parentComponent : initialNode;
   }
 
   private async run(runType: RunType, elem: ElementRef) {
-    const targetAction = this.getTargetAction(elem.nativeElement);
-    const targetActionFqTag = NodeUtils.GetFqTagOfNode(targetAction);
-    console.log(`Target action is ${targetActionFqTag}`);
-    if (NodeUtils.HasRunId(targetAction)) {
+    const targetComponent = this.getTargetComponent(elem.nativeElement);
+    const targetComponentFqTag = NodeUtils.GetFqTagOfNode(targetComponent);
+    console.log(`Target component is ${targetComponentFqTag}`);
+    if (NodeUtils.HasRunId(targetComponent)) {
       console.log(
         `Skipping ${runType} since the same one is already in progress`);
 
       return;
     }
     const id = uuid();
-    NodeUtils.SetRunId(targetAction, id);
+    NodeUtils.SetRunId(targetComponent, id);
     let runResultMap: RunResultMap | undefined;
     try {
-      runResultMap = await this.callDvOnRun(runType, targetAction, id);
+      runResultMap = await this.callDvOnRun(runType, targetComponent, id);
     } catch (error) {
       console.error(
         `Got error on ${runType} ${id} ` +
-        `(${targetActionFqTag}): ${error.message}`);
-      this.removeRunIds(runType, targetAction);
-      this.callDvOnRunFailure(runType, targetAction, error);
+        `(${targetComponentFqTag}): ${error.message}`);
+      this.removeRunIds(runType, targetComponent);
+      this.callDvOnRunFailure(runType, targetComponent, error);
     }
     if (runResultMap) { // no error
-      this.removeRunIds(runType, targetAction);
-      this.callDvOnRunSuccess(runType, targetAction, runResultMap);
+      this.removeRunIds(runType, targetComponent);
+      this.callDvOnRunSuccess(runType, targetComponent, runResultMap);
     }
   }
 
   /**
-   * Walks the dom starting from `node` calling `onAction` with the action info
-   * when an action is encountered. No child of actions are traversed.
+   * Walks the dom starting from `node` calling `onComponent` with the component info
+   * when an component is encountered. No child of components are traversed.
    */
-  private walkActions(node, onAction: (actionInfo, str?) => void): void {
-    const actionId = NodeUtils.GetActionId(node);
-    if (!actionId) {
-      // node is not a dv-action (e.g., it's a <div>) or is dv-tx
-      _.each(node.childNodes, (n) => this.walkActions(n, onAction));
+  private walkComponents(node, onComponent: (componentInfo, str?) => void): void {
+    const componentId = NodeUtils.GetComponentId(node);
+    if (!componentId) {
+      // node is not a dv-component (e.g., it's a <div>) or is dv-tx
+      _.each(node.childNodes, (n) => this.walkComponents(n, onComponent));
 
       return;
     }
-    const target = this.actionTable[actionId];
-    onAction(target, actionId);
+    const target = this.componentTable[componentId];
+    onComponent(target, componentId);
   }
 
   private async callDvOnRun(
@@ -185,20 +185,20 @@ export class RunService {
     const dvOnRun = runFunctionNames[runType].onRun;
     const runs: Promise<RunResultMap>[] = [];
 
-    // run the action, or each action in tx with the same RUN ID
-    this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action[dvOnRun]) {
-        NodeUtils.SetRunId(actionInfo.node, id);
+    // run the component, or each component in tx with the same RUN ID
+    this.walkComponents(node, (componentInfo, componentId) => {
+      if (componentInfo.component[dvOnRun]) {
+        NodeUtils.SetRunId(componentInfo.node, id);
         runs.push(
           Promise
-            .resolve(actionInfo.action[dvOnRun]())
-            .then((result) => ({[actionId]: result})));
+            .resolve(componentInfo.component[dvOnRun]())
+            .then((result) => ({[componentId]: result})));
       }
     });
 
     // send the request, if relevant
     if (GatewayService.txBatches[id]) {
-      GatewayService.txBatches[id].setNumActions(runs.length);
+      GatewayService.txBatches[id].setNumComponents(runs.length);
     }
 
     const resultMaps: RunResultMap[] = await Promise.all(runs);
@@ -209,9 +209,9 @@ export class RunService {
   private removeRunIds(runType: RunType, node): void {
     NodeUtils.RemoveRunId(node);
     const dvOnRun = runFunctionNames[runType].onRun;
-    this.walkActions(node, (actionInfo) => {
-      if (actionInfo.action[dvOnRun]) {
-        NodeUtils.RemoveRunId(actionInfo.node);
+    this.walkComponents(node, (componentInfo) => {
+      if (componentInfo.component[dvOnRun]) {
+        NodeUtils.RemoveRunId(componentInfo.node);
       }
     });
   }
@@ -219,18 +219,18 @@ export class RunService {
   private callDvOnRunSuccess(
     runType: RunType, node, runResultMap: RunResultMap): void {
     const dvOnSuccess = runFunctionNames[runType].onSuccess;
-    this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action[dvOnSuccess]) {
-        actionInfo.action[dvOnSuccess](runResultMap[actionId]);
+    this.walkComponents(node, (componentInfo, componentId) => {
+      if (componentInfo.component[dvOnSuccess]) {
+        componentInfo.component[dvOnSuccess](runResultMap[componentId]);
       }
     });
   }
 
   private callDvOnRunFailure(runType: RunType, node, reason): void {
-    this.walkActions(node, (actionInfo) => {
+    this.walkComponents(node, (componentInfo) => {
       const dvOnFailure = runFunctionNames[runType].onFailure;
-      if (actionInfo.action[dvOnFailure]) {
-        actionInfo.action[dvOnFailure](reason);
+      if (componentInfo.component[dvOnFailure]) {
+        componentInfo.component[dvOnFailure](reason);
       }
     });
   }

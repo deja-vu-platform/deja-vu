@@ -58,10 +58,10 @@ class DesignerConfigService extends AppConfigService {
 
   /**
    * The designer will always set the dvOf attribute on the element
-   * which is an ancestor of the cliche action.
+   * which is an ancestor of the cliche component.
    *
-   * Note that this assumes a cliche action that cares about the config
-   *   is never used in another cliche action.
+   * Note that this assumes a cliche component that cares about the config
+   *   is never used in another cliche component.
    */
   protected getClicheAlias(): string {
     let dvOf: string;

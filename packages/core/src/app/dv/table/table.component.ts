@@ -5,7 +5,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material';
 
 import { RunService } from '../run.service';
-import { Action } from '../include/include.component';
+import { ComponentValue } from '../include/include.component';
 
 export interface ColumnConfiguration {
   label: string;
@@ -28,9 +28,9 @@ export class TableComponent {
   @Input() columnInfo: ColumnConfiguration[] = [];
 
   /**
-   * Action that can be performed on each row
+   * Component that can be performed on each row
    */
-  @Input() rowAction: Action | undefined;
+  @Input() rowComponent: ComponentValue | undefined;
 
   /**
    * If true, a checkbox will appear on the left of each row
@@ -60,8 +60,8 @@ export class TableComponent {
     this.rs.register(this.elem, this);
 
     const displayedColumns = this.columnInfo.map((column) => column.fieldName);
-    if (this.rowAction) {
-      displayedColumns.push('rowAction');
+    if (this.rowComponent) {
+      displayedColumns.push('rowComponent');
     }
     if (this.enableSelection) {
       displayedColumns.unshift('select');

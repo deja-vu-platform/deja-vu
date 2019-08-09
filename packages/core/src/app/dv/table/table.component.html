@@ -22,12 +22,12 @@
     <mat-cell *matCellDef="let element"> {{element[column.fieldName]}}</mat-cell>
   </ng-container>
 
-  <ng-container *ngIf="!!rowAction" matColumnDef="rowAction">
-    <mat-header-cell *matHeaderCellDef>Row Action</mat-header-cell>
+  <ng-container *ngIf="!!rowComponent" matColumnDef="rowComponent">
+    <mat-header-cell *matHeaderCellDef>Row Component</mat-header-cell>
     <mat-cell *matCellDef="let element">
-      <dv-include [action]="rowAction"
+      <dv-include [component]="rowComponent"
                   [inputs]="{ rowObject: element }"
-                  [parent]="table" no-default-rowAction>
+                  [parent]="table" no-default-rowComponent>
       </dv-include>
     </mat-cell>
   </ng-container>

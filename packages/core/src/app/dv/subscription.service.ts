@@ -17,7 +17,7 @@ interface Subscription extends SubscriptionParams {}
 @Injectable()
 export class SubscriptionService {
   private websocket: WebSocketSubject<any>;
-  private actionSubscriptions: {[key: string]: Subject<any>} = {};
+  private componentSubscriptions: {[key: string]: Subject<any>} = {};
 
   constructor(@Inject(GATEWAY_URL) private gatewayUrl: string) {
     this.websocket = WebSocketSubject.create(`ws://${gatewayUrl}`);
@@ -32,11 +32,11 @@ export class SubscriptionService {
     const params: SubscriptionParams = this.buildParams(baseParams);
     const subscriptionId = params.subscriptionId;
     const subject = new ReplaySubject<T>();
-    this.actionSubscriptions[subscriptionId] = subject;
+    this.componentSubscriptions[subscriptionId] = subject;
 
     const subscription: Subscription = Object.assign(params, request, {
       extraInfo: {
-        action: 'subscribe',
+        component: 'subscribe',
         ...request['extraInfo'],
       }
     });
@@ -60,8 +60,8 @@ export class SubscriptionService {
   private handleMessage(msg): void {
     console.log('Message received from gateway: %s',
       JSON.stringify(msg));
-    if (msg.subscriptionId && this.actionSubscriptions[msg.subscriptionId]) {
-      this.actionSubscriptions[msg.subscriptionId].next(msg.data);
+    if (msg.subscriptionId && this.componentSubscriptions[msg.subscriptionId]) {
+      this.componentSubscriptions[msg.subscriptionId].next(msg.data);
     }
   }
 

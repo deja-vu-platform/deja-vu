@@ -2,7 +2,7 @@ import {
   Component, ElementRef, Input, Type
 } from '@angular/core';
 
-import { Action } from '../include/include.component';
+import { ComponentValue } from '../include/include.component';
 import { ShowEntityComponent } from '../show-entity/show-entity.component';
 import { RunService } from '../run.service';
 
@@ -21,7 +21,7 @@ export class ShowEntitiesComponent {
    * The user-defined component that overwrites
    * the default showEntity Component
    */
-  @Input() showEntity: Action = {
+  @Input() showEntity: ComponentValue = {
     type: <Type<Component>> ShowEntityComponent
   };
 

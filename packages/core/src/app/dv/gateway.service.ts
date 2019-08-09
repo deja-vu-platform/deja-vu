@@ -34,7 +34,7 @@ export enum Method {
 
 export interface BaseParams {
   from: string;
-  fullActionName: string;
+  fullComponentName: string;
   path?: string;
   options?: string;
 }
@@ -63,15 +63,15 @@ const headers = new HttpHeaders({ 'Content-type': 'application/json' });
  * Class for batching transaction requests.
  */
 export class TxRequest {
-  // info that would have been sent by each action individually
+  // info that would have been sent by each component individually
   private requests: ChildRequest[] = [];
-  // observables given to the actions to post responses to
+  // observables given to the components to post responses to
   private subjects: Subject<any>[] = [];
-  // the number of actions in this transaction that have posted
-  private numActionsDone = 0;
-  // the number of actions in the transaction
+  // the number of components in this transaction that have posted
+  private numComponentsDone = 0;
+  // the number of components in the transaction
   // this is known only in the runService so it must be set after construction
-  private numActionsTotal: number;
+  private numComponentsTotal: number;
 
   constructor(
     private gatewayUrl: string,
@@ -82,11 +82,11 @@ export class TxRequest {
   ) { }
 
   /**
-   * Set the number of actions that are part of the tx
+   * Set the number of components that are part of the tx
    * The tx request will never be sent until this is done
    */
-  setNumActions(numActions: number): void {
-    this.numActionsTotal = numActions;
+  setNumComponents(numComponents: number): void {
+    this.numComponentsTotal = numComponents;
     if (this.isReady()) {
       this.send();
     }
@@ -106,10 +106,10 @@ export class TxRequest {
   }
 
   /**
-   * Report an action in the tx group as not sending a request
+   * Report a component in the tx group as not sending a request
    */
   postNoRequest(): void {
-    this.numActionsDone += 1;
+    this.numComponentsDone += 1;
     if (this.isReady()) {
       this.send();
     }
@@ -120,36 +120,36 @@ export class TxRequest {
    */
   private isReady(): boolean {
     return (
-      this.numActionsTotal !== undefined
-      && this.numActionsDone === this.numActionsTotal
+      this.numComponentsTotal !== undefined
+      && this.numComponentsDone === this.numComponentsTotal
     );
   }
 
   /**
    * Gets the context for this tx request.
-   * The context is a map `field -> value` for all the fields of the app action
+   * The context is a map `field -> value` for all the fields of the app component
    * containing the tx. Only fields that can be referenced in template exprs
    * are included (e.g., `ngOnInit` is not part of the context)
    */
   private getContext(): { [field: string]: any } {
-    const appActionNode = NodeUtils
-      .GetAppActionNodeContainingNode(this.fromNode, this.renderer);
-    if (appActionNode === null) {
+    const appComponentNode = NodeUtils
+      .GetAppComponentNodeContainingNode(this.fromNode, this.renderer);
+    if (appComponentNode === null) {
       throw new Error(
         `App node for ${NodeUtils.GetFqTagOfNode(this.fromNode)} not found`);
     }
-    const actionId = NodeUtils.GetActionId(appActionNode);
-    const actionInstance = this.rs.getActionInstance(actionId);
-    if (actionInstance === null) {
+    const componentId = NodeUtils.GetComponentId(appComponentNode);
+    const componentInstance = this.rs.getComponentInstance(componentId);
+    if (componentInstance === null) {
       throw new Error(
-        `Action instance for id ${actionId} not found`);
+        `Component instance for id ${componentId} not found`);
     }
 
     // TODO: get the exact fields of the context that we need from the
     //  source code and send only those (instead of sending everything)
 
     // keys retains only enumerable properties
-    const contextKeys = _.without(_.keys(actionInstance), 'rs', 'elem');
+    const contextKeys = _.without(_.keys(componentInstance), 'rs', 'elem');
 
     const context = _.pickBy(
       // Output fields are implemented with getters and setters, which are not
@@ -159,7 +159,7 @@ export class TxRequest {
       // has the side effect that it will clobber the `EventEmitter` value,
       // which we don't need to send
       _.mapKeys(
-        _.pick(actionInstance, contextKeys),
+        _.pick(componentInstance, contextKeys),
         (_value, key: string) => key.startsWith('___') ? key.slice(1) : key),
       (value) => _.isArray(value) || _.isPlainObject(value) ||
         _.isBoolean(value) || _.isNumber(value) || _.isString(value) ||
@@ -249,7 +249,7 @@ export class GatewayService {
   }
 
   /**
-   * An action must call get, post, or noRequest exactly once
+   * A component must call get, post, or noRequest exactly once
    */
 
   get<T>(path?: string, options?: RequestOptions) {
@@ -280,19 +280,19 @@ export class GatewayService {
     return this.ss.subscribe<T>(request, this.buildBaseParams(path));
   }
 
-  protected isAction(node: Element): boolean {
-    return NodeUtils.IsAction(node);
+  protected isComponent(node: Element): boolean {
+    return NodeUtils.IsComponent(node);
   }
 
   /**
-   * Action path.
+   * Component path.
    */
   protected generateFromStr(): string {
     let node = this.from.nativeElement;
-    const seenActionNodes: string[] = [];
+    const seenComponentNodes: string[] = [];
     while (node && node.getAttribute) {
-      if (this.isAction(node)) {
-        seenActionNodes.push(NodeUtils.GetFqTagOfNode(node));
+      if (this.isComponent(node)) {
+        seenComponentNodes.push(NodeUtils.GetFqTagOfNode(node));
       }
 
       let dvClass: string | null = null;
@@ -307,7 +307,7 @@ export class GatewayService {
       }
     }
 
-    return JSON.stringify(_.reverse(seenActionNodes));
+    return JSON.stringify(_.reverse(seenComponentNodes));
   }
 
   /**
@@ -333,7 +333,7 @@ export class GatewayService {
     body?: string | Object,
     options?: RequestOptions
   ): Observable<T> {
-    console.log(`Sending ${method} from ${this.getActionName()}`);
+    console.log(`Sending ${method} from ${this.getComponentName()}`);
 
     const params = this.buildRunParams(path, options);
 
@@ -346,7 +346,7 @@ export class GatewayService {
     });
 
     if (!params.runId) {
-      txRequest.setNumActions(1);
+      txRequest.setNumComponents(1);
     }
 
     return individualResponseObservable;
@@ -355,7 +355,7 @@ export class GatewayService {
   private buildBaseParams(path?: string, options?: RequestOptions): BaseParams {
     const params: BaseParams = {
       from: this.fromStr,
-      fullActionName: this.getActionName(),
+      fullComponentName: this.getComponentName(),
     };
     if (path) {
       params.path = path;
@@ -374,7 +374,7 @@ export class GatewayService {
     };
   }
 
-  private getActionName(): string {
+  private getComponentName(): string {
     return this.from.nativeElement.nodeName.toLowerCase();
   }
 }
@@ -393,8 +393,8 @@ export class DesignerGatewayService extends GatewayService {
     super(gatewayUrl, http, renderer, rs, ss, from);
   }
 
-  protected isAction(node: Element): boolean {
-    return _.get(node, ['dataset', 'isaction']) === 'true';
+  protected isComponent(node: Element): boolean {
+    return _.get(node, ['dataset', 'iscomponent']) === 'true';
   }
 
   get fromStr() {

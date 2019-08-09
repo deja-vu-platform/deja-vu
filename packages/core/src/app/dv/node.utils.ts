@@ -6,9 +6,9 @@ export const OF_ATTR = 'dvOf';
 const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
 
-const ACTION_ID_ATTR = '_dvActionId';
+const COMPONENT_ID_ATTR = '_dvComponentId';
 const RUN_ID_ATTR = '_dvRunId';
-const IS_APP_ACTION_ATTR = '_dvIsAppAction';
+const IS_APP_COMPONENT_ATTR = '_dvIsAppComponent';
 
 
 export class NodeUtils {
@@ -16,7 +16,7 @@ export class NodeUtils {
     return tag.substring(0, tag.indexOf('-'));
   }
 
-  private static GetActionFromTag(tag: string): string {
+  private static GetComponentFromTag(tag: string): string {
     return tag.substring(tag.indexOf('-') + 1);
   }
 
@@ -28,7 +28,7 @@ export class NodeUtils {
     if (!_.isEmpty(dvAlias)) {
       return dvAlias;
     } else if (!_.isEmpty(dvOf)) {
-      return dvOf + '-' + NodeUtils.GetActionFromTag(tag);
+      return dvOf + '-' + NodeUtils.GetComponentFromTag(tag);
     } else {
       return tag;
     }
@@ -43,12 +43,12 @@ export class NodeUtils {
     return undefined;
   }
 
-  static SetActionId(node, actionId: string): void {
-    node.setAttribute(ACTION_ID_ATTR, actionId);
+  static SetComponentId(node, componentId: string): void {
+    node.setAttribute(COMPONENT_ID_ATTR, componentId);
   }
 
-  static GetActionId(node): string | undefined {
-    return NodeUtils.GetAttribute(node, ACTION_ID_ATTR);
+  static GetComponentId(node): string | undefined {
+    return NodeUtils.GetAttribute(node, COMPONENT_ID_ATTR);
   }
 
   static SetRunId(node, runId: string): void {
@@ -67,17 +67,17 @@ export class NodeUtils {
     node.removeAttribute(RUN_ID_ATTR);
   }
 
-  static IsAction(node): boolean {
+  static IsComponent(node): boolean {
     // No HTML tag has a hyphen
     return _.includes(NodeUtils.GetTag(node), '-') && !NodeUtils.GetTag(node).startsWith('mat-');
   }
 
-  static IsAppAction(node): boolean {
-    return node.hasAttribute(IS_APP_ACTION_ATTR);
+  static IsAppComponent(node): boolean {
+    return node.hasAttribute(IS_APP_COMPONENT_ATTR);
   }
 
-  static MarkAsAppAction(node): void {
-    node.setAttribute(IS_APP_ACTION_ATTR, '');
+  static MarkAsAppComponent(node): void {
+    node.setAttribute(IS_APP_COMPONENT_ATTR, '');
   }
 
   static GetClicheAliasOfNode(node): string {
@@ -130,11 +130,11 @@ export class NodeUtils {
     }
   }
 
-  static GetAppActionNodeContainingNode(node, renderer: Renderer2): any | null {
-    let appActionNode = null;
+  static GetAppComponentNodeContainingNode(node, renderer: Renderer2): any | null {
+    let appComponentNode = null;
     NodeUtils.WalkUpFromNode(node, renderer, (visitNode) => {
-      if (NodeUtils.IsAppAction(visitNode)) {
-        appActionNode = visitNode;
+      if (NodeUtils.IsAppComponent(visitNode)) {
+        appComponentNode = visitNode;
 
         return true;
       }
@@ -142,6 +142,6 @@ export class NodeUtils {
       return false;
     });
 
-    return appActionNode;
+    return appComponentNode;
   }
 }

@@ -3,7 +3,7 @@ import * as minimist from 'minimist';
 import * as path from 'path';
 
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheServer,
   InitDbCallbackFn,
   InitResolversFn
@@ -25,7 +25,7 @@ export class ClicheServerBuilder<C extends Config = Config> {
   private _schemaPath: string = path.join(
     path.dirname(callsite()[1]
         .getFileName()), 'schema.graphql');
-  private _actionRequestTable: ActionRequestTable = {};
+  private _componentRequestTable: ComponentRequestTable = {};
   private _config: C;
   private _initDbCallback?: InitDbCallbackFn<C>;
   private _initResolvers?: InitResolversFn<C>;
@@ -45,13 +45,13 @@ export class ClicheServerBuilder<C extends Config = Config> {
   }
 
   /**
-   * Set the action request table for the cliche server
-   * @param  actionRequestTable the table
+   * Set the component request table for the cliche server
+   * @param  componentRequestTable the table
    * @return                    this builder
    */
-  actionRequestTable(
-    actionRequestTable: ActionRequestTable): ClicheServerBuilder<C> {
-    this._actionRequestTable = actionRequestTable;
+  componentRequestTable(
+    componentRequestTable: ComponentRequestTable): ClicheServerBuilder<C> {
+    this._componentRequestTable = componentRequestTable;
 
     return this;
   }
@@ -126,7 +126,7 @@ export class ClicheServerBuilder<C extends Config = Config> {
    * @return the resulting cliche server
    */
   build(): ClicheServer<C> {
-    return new ClicheServer<C>(this._name, this._actionRequestTable,
+    return new ClicheServer<C>(this._name, this._componentRequestTable,
       this._config, this._schemaPath,
       this._initDbCallback, this._initResolvers,
       this._getDynamicTypeDefsFn(this._config));
