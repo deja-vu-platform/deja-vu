@@ -58,7 +58,6 @@ interface Cohort<Message, Payload> {
 interface TxDoc<Message, Payload> {
   id: string;
   state: TxState;
-  // Could be undefined if we haven't processed message from the cohort yet
   cohorts: Cohort<Message, Payload>[];
   // When the tx was started
   startedOn: Date;
@@ -144,7 +143,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     // one). The tx state could be 'voting', 'aborting' or 'aborted'
 
     // We might still end up sending an unnecessary vote message if the tx
-    // changes to abort right after we do the check but that won't cause any
+    // changes to abort right after we do the check, but that won't cause any
     // problems. The check here is mostly to save some unnecessary votes.
     if (this.shouldAbort(tx)) {
       this.config.sendAbortToClient(false, msg, undefined, state);
@@ -192,11 +191,13 @@ export class TxCoordinator<Message, Payload, State = any> {
     // (ii) when we receive the last 'yes' we are going to commit.
     const transition: Transition = await this.lock.acquire(txId, () => {
       return this.processVote(txId, cohortId, vote, () => {
+        // onCommit callback
         log(
           'Not waiting anymore (tx committed). ' +
           `Send payload to client of cohort ${cohortId}`, txId);
         this.config.sendToClient(vote.payload, state, index);
       }, () => {
+        // onAbort callback
         log(
           'Not waiting anymore (tx aborted). ' +
           `Send payload to client of cohort ${cohortId}`, txId);
@@ -213,11 +214,27 @@ export class TxCoordinator<Message, Payload, State = any> {
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
       log(`Tx committed. Send payload to client of cohort ${cohortId}`, txId);
-      this.config.sendToClient(vote.payload, state, index);
-      this.completed.emit(txId + '-commit');
-      ret = Promise.all([
-        this.completeTx(txId, true),
-        this.completeMessage(txId, cohortId, msg, true)]);
+      // While it is OK to send the messages back to the client at this point
+      // (because we know that the tx will commit), it has the problem that
+      // a client could quickly send another request that will get to the
+      // cliche server before the server commits. This has the unfortunate
+      // effect that if the client e.g., creates a post and then tries to
+      // load it immediately, it might say "post not found". To avoid this
+      // glitch, we only send the messages back to the client after we
+      // get confirmation that the cliche server committed.
+      // Thus, we don't do this now:
+      // this.config.sendToClient(vote.payload, state, index);
+      // this.completed.emit(txId + '-commit');
+      // And we do it after `completeTx` and `completeMessage`:
+      ret = Promise
+        .all([
+          this.completeTx(txId, true),
+          this.completeMessage(txId, cohortId, msg, true)
+        ])
+        .then(() => {
+          this.config.sendToClient(vote.payload, state, index);
+          this.completed.emit(txId + '-commit');
+        });
     } else if (!transition.newTxState &&
                transition.newCohortState === 'waitingForCompletion') {
       log(`Tx pending. Cohort ${cohortId} is waiting for completion`, txId);
@@ -389,6 +406,8 @@ export class TxCoordinator<Message, Payload, State = any> {
    * Send a complete ('commit' or 'abort') message to a cohort server.
    *
    * After an ACK is received, the cohort state is updated.
+   *
+   * Function returns after an ACK is received.
    */
   // Mutates the cohort state
   private async completeMessage(

@@ -600,7 +600,7 @@ export class ActionHelper {
    * @return a list of `ActionTag`s, one for each route
    */
   private getRouteActions(actionTable: ActionTable): ActionTag[] {
-    return _.map(this.routeActionSelectors, (action) => {
+    return _.map(this.routeActionSelectors, (action: string) => {
       if (!_.has(actionTable, action)) {
         throw new Error(`Route action ${action} doesn't exist`);
       }
