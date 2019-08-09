@@ -3,14 +3,14 @@ import * as posthtml from 'posthtml';
 import * as _ from 'lodash';
 
 
-export type ActionAst = ActionTag[];
-export interface ActionTag {
+export type ComponentAst = ComponentTag[];
+export interface ComponentTag {
   fqtag: string;
   dvOf?: string;
   dvAlias?: string;
   tag: string;
   inputs?: {[name: string]: string};
-  content?: ActionAst;
+  content?: ComponentAst;
 }
 
 interface TagInfo {
@@ -31,19 +31,19 @@ interface TagOnly extends TagInfo {
 }
 
 
-export function getActionAst(
-  projectName: string, actionName: string, usedCliches: ReadonlyArray<string>,
-  html: string): ActionAst {
+export function getComponentAst(
+  projectName: string, componentName: string, usedCliches: ReadonlyArray<string>,
+  html: string): ComponentAst {
   const tagsToKeep = new Set([ projectName, ...usedCliches, 'dv' ]);
   const shouldKeep = (tag: Tag): boolean =>  {
     return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
   };
 
   return posthtml([
-      pruneSubtreesWithNoActions(shouldKeep),
-      removeNonActions(shouldKeep),
-      buildActionAst(),
-      checkForErrors(actionName)
+      pruneSubtreesWithNoComponents(shouldKeep),
+      removeNonComponents(shouldKeep),
+      buildComponentAst(),
+      checkForErrors(componentName)
     ])
     .process(html, { sync: true })
     .tree;
@@ -53,23 +53,23 @@ export function getActionAst(
  *  Retain only elements s.t `shouldKeep(tag)` is true and its ancestors.
  *
  *  The goal of this pass is to prune the AST, cutting the branches that
- *  include no actions.
+ *  include no components.
  */
-function pruneSubtreesWithNoActions(shouldKeep: (tag: Tag) => boolean) {
-  const _pruneSubtreesWithNoActions = (tree: PostHtmlAst): TagOnlyAst => {
+function pruneSubtreesWithNoComponents(shouldKeep: (tag: Tag) => boolean) {
+  const _pruneSubtreesWithNoComponents = (tree: PostHtmlAst): TagOnlyAst => {
     const ret: TagOnlyAst = _.chain<PostHtmlAst>(tree)
       .map((tag: string | Tag): TagOnly | null => {
         if (_.isString(tag)) {
           return null;
         }
         if (shouldKeep(tag)) {
-          tag.content = _pruneSubtreesWithNoActions(tag.content);
+          tag.content = _pruneSubtreesWithNoComponents(tag.content);
           // We can't filter attrs to only include those that are not html
-          // global attributes because the action could use what would be valid
+          // global attributes because the component could use what would be valid
           // html global attributes as inputs (e.g., `<foo [id]="bar"></foo>`)
         } else {
           tag.attrs = {};
-          tag.content = _pruneSubtreesWithNoActions(tag.content);
+          tag.content = _pruneSubtreesWithNoComponents(tag.content);
           if (_.isEmpty(tag.content)) {
             return null;
           }
@@ -83,82 +83,82 @@ function pruneSubtreesWithNoActions(shouldKeep: (tag: Tag) => boolean) {
     return ret;
   };
 
-  return _pruneSubtreesWithNoActions;
+  return _pruneSubtreesWithNoComponents;
 }
 
 /**
- *  Replace non-action elements with its children
+ *  Replace non-component elements with its children
  */
-function removeNonActions(shouldKeep: (tag: Tag) => boolean) {
-  // The given AST will have actions and its ancestors (which could be actions
-  // or not). In this phase, we remove the non actions. Note that the leafs
-  // of the tree are always actions.
-  const _removeNonActions = (tree: TagOnlyAst): TagOnlyAst => {
+function removeNonComponents(shouldKeep: (tag: Tag) => boolean) {
+  // The given AST will have components and its ancestors (which could be components
+  // or not). In this phase, we remove the non components. Note that the leafs
+  // of the tree are always components.
+  const _removeNonComponents = (tree: TagOnlyAst): TagOnlyAst => {
     return _
       .chain(tree)
       .map((tag: TagOnly) => {
         if (shouldKeep(tag)) {
-          tag.content = _removeNonActions(tag.content);
+          tag.content = _removeNonComponents(tag.content);
 
           return [tag];
         } else {
-          return _removeNonActions(tag.content);
+          return _removeNonComponents(tag.content);
         }
       })
       .flatten()
       .value();
   };
 
-  return _removeNonActions;
+  return _removeNonComponents;
 }
 
 /**
- * Turn a `PostHtmlAst` consisting only of actions into an `ActionAst`
- * (i.e., enhance the AST with action-specific information)
+ * Turn a `PostHtmlAst` consisting only of components into an `ComponentAst`
+ * (i.e., enhance the AST with component-specific information)
  */
-function buildActionAst() {
-  const _buildActionAst = (tree: TagOnlyAst): ActionAst => {
-    const ret: ActionTag[] = _.map(tree, (tag: TagOnly): ActionTag => {
+function buildComponentAst() {
+  const _buildComponentAst = (tree: TagOnlyAst): ComponentAst => {
+    const ret: ComponentTag[] = _.map(tree, (tag: TagOnly): ComponentTag => {
       const dvOf = _.get(tag.attrs, 'dvOf');
       const dvAlias = _.get(tag.attrs, 'dvAlias');
-      const actionTag: ActionTag = {
+      const componentTag: ComponentTag = {
         fqtag: getFqTag(tag.tag, dvOf, dvAlias),
         dvOf: dvOf, dvAlias: dvAlias, tag: tag.tag,
-        inputs: tag.attrs, content: _buildActionAst(tag.content)
+        inputs: tag.attrs, content: _buildComponentAst(tag.content)
       };
 
-      return _.omitBy(actionTag, _.isEmpty) as ActionTag;
+      return _.omitBy(componentTag, _.isEmpty) as ComponentTag;
     });
 
     return ret;
   };
 
-  return _buildActionAst;
+  return _buildComponentAst;
 }
 
 
 /**
  * Check for errors in the tree. The following are considered errors:
- *   - having the same (request-sending) action as a child more than once
- *   - having sibling dv-tx nodes with the same child (request-sending) action
+ *   - having the same (request-sending) component as a child more than once
+ *   - having sibling dv-tx nodes with the same child (request-sending) component
  *
  * These are errors because at runtime we can't tell apart the requests from
- * these actions with the same path and we need to be able to tell them apart
+ * these components with the same path and we need to be able to tell them apart
  * because they are part of a tx.
  */
-function checkForErrors(actionName: string) {
-  const getRepeatedFqTags = (actionAst: ActionAst) => _.pickBy(
-    _.groupBy(actionAst, 'fqtag'),
-    (actions: ActionTag[], fqtag: string) => {
-      // TODO: filter non-request sending cliche actions
+function checkForErrors(componentName: string) {
+  const getRepeatedFqTags = (componentAst: ComponentAst) => _.pickBy(
+    _.groupBy(componentAst, 'fqtag'),
+    (components: ComponentTag[], fqtag: string) => {
+      // TODO: filter non-request sending cliche components
       if (fqtag !== 'dv-tx' && fqtag.startsWith('dv')) {
         return false;
       }
 
-      return actions.length > 1;
+      return components.length > 1;
     });
   const _checkForErrors = (path: string, fqtag: string) =>
-    (tree: ActionAst): ActionAst => {
+    (tree: ComponentAst): ComponentAst => {
       const currPath = path + ' -> ' + fqtag;
       const repeatedFqTags = getRepeatedFqTags(tree);
       if (!_.isEmpty(repeatedFqTags) && fqtag === 'dv-tx') {
@@ -182,21 +182,21 @@ function checkForErrors(actionName: string) {
           `);
         }
       }
-      _.each(tree, (actionTag: ActionTag): void => {
-        if (actionTag.content !== undefined) {
-          _checkForErrors(currPath, actionTag.fqtag)(actionTag.content);
+      _.each(tree, (componentTag: ComponentTag): void => {
+        if (componentTag.content !== undefined) {
+          _checkForErrors(currPath, componentTag.fqtag)(componentTag.content);
         }
       });
 
       return tree;
     };
 
-  return _checkForErrors('', actionName);
+  return _checkForErrors('', componentName);
 }
 
 /**
  *  @returns the fully-qualified tag for the given tag. The fully-qualified tag
- *           of an action is its `dvAlias` if one is given, `dvOf-actionName`
+ *           of a component is its `dvAlias` if one is given, `dvOf-componentName`
  *           if a `dvOf` is given or `tag` if otherwise
  */
 function getFqTag(
@@ -205,8 +205,8 @@ function getFqTag(
     return dvAlias;
   }
   // tslint:disable-next-line prefer-const
-  let [clicheName, ...actionTagName] = tag.split('-');
+  let [clicheName, ...componentTagName] = tag.split('-');
   if (dvOf) { clicheName = dvOf; }
 
-  return clicheName + '-' + actionTagName.join('-');
+  return clicheName + '-' + componentTagName.join('-');
 }

@@ -5,38 +5,38 @@ import {
   projectName
 } from '../../utils';
 
-// TODO: add option to add the new action to the README
+// TODO: add option to add the new component to the README
 // TODO: add option to add relevant server code
-exports.command = 'action <type> <entityName> [actionName]';
-exports.desc = 'create a new action';
+exports.command = 'component <type> <entityName> [componentName]';
+exports.desc = 'create a new component';
 exports.builder = (yargs) => yargs
   .positional('type', {
     choices: ['blank', 'create', 'delete', 'show', 'update'],
-    describe: 'The type of the action to create'
+    describe: 'The type of the component to create'
   })
   .positional('entityName', {
     describe: 'The name of the entity on which to perform the action, ' +
-      'or the name of the action if the action type is "blank"'
+      'or the name of the component if the component type is "blank"'
   })
-  .positional('actionName', {
-    describe: 'The name of the action to create, ' +
+  .positional('componentName', {
+    describe: 'The name of the component to create, ' +
       'which defaults to `type-entityName` if not provided and ' +
-      'the action type is not "blank"'
+      'the component type is not "blank"'
   })
   .options({
     skipAppComponentHtml: {
       default: false,
-      describe: 'When set, the new action will not be added to the app.component.html file.',
+      describe: 'When set, the new component will not be added to the app.component.html file.',
       type: 'boolean'
     },
     skipMetadataImport: {
       default: false,
-      describe: 'When set, the new action will not be added to the metadata file.',
+      describe: 'When set, the new component will not be added to the metadata file.',
       type: 'boolean'
     }
   });
 ;
-exports.handler = ({ type, entityName, actionName,
+exports.handler = ({ type, entityName, componentName,
   skipAppComponentHtml, skipMetadataImport }) => {
   if (!isInNgProjectRoot()) {
     console.log(
@@ -44,16 +44,16 @@ exports.handler = ({ type, entityName, actionName,
     return;
   }
 
-  const actualActionName = type === 'blank' ? entityName :
-    (actionName ? actionName : `${type}-${entityName}`);
-  console.log(`Creating new action ${actualActionName}`);
+  const actualComponentName = type === 'blank' ? entityName :
+    (componentName ? componentName : `${type}-${entityName}`);
+  console.log(`Creating new component ${actualComponentName}`);
 
   const clicheName = projectName();
   const schematicsPkgName = getDvPackageName('schematics');
 
   ng(['generate',
-    `${schematicsPkgName}:action`,
-    `--actionName=${actualActionName}`,
+    `${schematicsPkgName}:component`,
+    `--componentName=${actualComponentName}`,
     `--clicheName=${clicheName}`,
     `--entityName=${entityName}`,
     `--type=${type}`,

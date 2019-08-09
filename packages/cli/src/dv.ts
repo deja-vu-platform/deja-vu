@@ -8,8 +8,8 @@ const yargs = require('yargs'); // tslint:disable-line no-var-requires
 import { AppCompiler } from '@deja-vu/compiler';
 
 import {
-  ACTION_TABLE_FILE_NAME,
-  actionTable,
+  COMPONENT_TABLE_FILE_NAME,
+  componentTable,
   cmd,
   DvConfig,
   DVCONFIG_FILE_PATH,
@@ -63,8 +63,8 @@ yargs.commandDir('commands')
     // Serve everything (including all dep cliches)
     cmd('npm', ['run', `dv-build-${config.name}`]);
     writeFileOrFail(
-      path.join('dist', ACTION_TABLE_FILE_NAME),
-      actionTable(config, _.get(config.actions, 'app')));
+      path.join('dist', COMPONENT_TABLE_FILE_NAME),
+      componentTable(config, _.get(config.components, 'app')));
     const startServerOfCurrentProjectCmd =
       (existsSync(path.join('dist', 'server'))) ?
       [ startServerCmdOfCliche() ] : [];

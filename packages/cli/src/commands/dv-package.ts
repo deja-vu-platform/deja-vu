@@ -2,8 +2,8 @@ import { copySync, existsSync } from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
 import {
-  ACTION_TABLE_FILE_NAME,
-  actionTable,
+  COMPONENT_TABLE_FILE_NAME,
+  componentTable,
   cmd,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
@@ -21,8 +21,8 @@ exports.handler = () => {
 
   const pkgDir = NG_PACKAGR.configFileContents.dest;
   writeFileOrFail(
-    path.join(pkgDir, ACTION_TABLE_FILE_NAME),
-    actionTable(config, _.get(config.actions, 'package')));
+    path.join(pkgDir, COMPONENT_TABLE_FILE_NAME),
+    componentTable(config, _.get(config.components, 'package')));
   copySync(DVCONFIG_FILE_PATH, path.join(pkgDir, DVCONFIG_FILE_PATH));
 
   const assetsDir = path.join('src', 'app', config.name, 'assets');

@@ -3,9 +3,9 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import * as _ from 'lodash';
 import * as path from 'path';
 
-import { ActionsConfig, getActionTable } from './actionProcessor/actionTable';
+import { ComponentsConfig, getComponentTable } from './componentProcessor/componentTable';
 
-export const ACTION_TABLE_FILE_NAME = 'actionTable.json';
+export const COMPONENT_TABLE_FILE_NAME = 'componentTable.json';
 export const DVCONFIG_FILE_PATH = 'dvconfig.json';
 export const DV_PACKAGE_PREFIX = '@deja-vu';
 /**
@@ -167,18 +167,18 @@ export interface DvConfig {
   config?: any;
   gateway?: DvConfig;
   usedCliches?: { [as: string]: DvConfig };
-  actions?: { package?: ActionsConfig, app?: ActionsConfig };
-  routes?: { path: string, action: string }[];
+  components?: { package?: ComponentsConfig, app?: ComponentsConfig };
+  routes?: { path: string, component: string }[];
 }
 
-export function actionTable(
-  config: DvConfig, actionsConfig: ActionsConfig | undefined): string {
+export function componentTable(
+  config: DvConfig, componentsConfig: ComponentsConfig | undefined): string {
   const usedClicheNames = new Set(
     _.map(_.toPairs(config.usedCliches),
       ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
         usedClicheConfig, 'name', alias)));
-  const gotActionTable = getActionTable(
-    config.name, process.cwd(), actionsConfig, Array.from(usedClicheNames));
+  const gotComponentTable = getComponentTable(
+    config.name, process.cwd(), componentsConfig, Array.from(usedClicheNames));
 
-  return JSON.stringify(gotActionTable, null, INDENT_NUM_SPACES);
+  return JSON.stringify(gotComponentTable, null, INDENT_NUM_SPACES);
 }
