@@ -2,9 +2,11 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
+  MatButtonModule,
   MatCheckboxModule,
   MatDialogModule,
   MatDialogRef,
+  MatExpansionModule,
   MatIconModule,
   MatInputModule,
   MatListModule
@@ -23,8 +25,10 @@ describe('ConfigureComponentComponent', () => {
       imports: [
         BrowserAnimationsModule,
         FormsModule,
+        MatButtonModule,
         MatCheckboxModule,
         MatDialogModule,
+        MatExpansionModule,
         MatIconModule,
         MatInputModule,
         MatListModule

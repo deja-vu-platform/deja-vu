@@ -8,6 +8,7 @@ import {
   MatTooltipModule
 } from '@angular/material';
 
+import { ElectronService } from 'ngx-electron';
 import { ClicheInstancesComponent } from './cliche-instances.component';
 
 describe('ClicheInstancesComponent', () => {
@@ -26,6 +27,9 @@ describe('ClicheInstancesComponent', () => {
         MatIconModule,
         MatListModule,
         MatTooltipModule
+      ],
+      providers: [
+        ElectronService
       ]
     })
     .compileComponents();

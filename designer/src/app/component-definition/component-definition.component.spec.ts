@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import {
   MatCheckboxModule,
   MatIconModule,
@@ -41,7 +42,8 @@ describe('ComponentDefinitionComponent', () => {
         MatInputModule,
         MatSelectModule,
         MatTabsModule,
-        MatTooltipModule
+        MatTooltipModule,
+        RouterTestingModule
       ],
       providers: [
         { provide: RunService, useValue: { registerAppComponent: () => {} } }

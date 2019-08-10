@@ -10,6 +10,8 @@ import {
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { ElectronService } from 'ngx-electron';
+
 import { SideMenuComponent } from './side-menu.component';
 
 import {
@@ -38,6 +40,9 @@ describe('SideMenuComponent', () => {
         MatListModule,
         MatTabsModule,
         MatTooltipModule
+      ],
+      providers: [
+        ElectronService
       ]
     })
     .compileComponents();
