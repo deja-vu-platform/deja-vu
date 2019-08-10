@@ -8,7 +8,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [
         "src/app/task/**"
@@ -20,7 +20,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "task-show-task-count",
     "task-show-tasks"
   ]

@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
   GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
@@ -27,9 +27,9 @@ import { API_PATH } from '../property.config';
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   /**
-   * Action to use to show URL properties
+   * component to use to show URL properties
    */
-  @Input() showUrl: Action = {
+  @Input() showUrl: ComponentValue = {
     type: <Type<Component>> ShowUrlComponent
   };
   /**

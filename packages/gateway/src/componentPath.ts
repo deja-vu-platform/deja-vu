@@ -6,24 +6,24 @@ const INDENT_NUM_SPACES = 2;
 
 
 /**
- * A path of actions (represented by their fqtags). The first node is the root.
+ * A path of components (represented by their fqtags). The first node is the root.
  *
- * An action path is a DOM path that includes only actions (it filters HTML
+ * An component path is a DOM path that includes only components (it filters HTML
  * elements like `div`)
  */
-export class ActionPath {
+export class ComponentPath {
   private readonly path: ReadonlyArray<string>;
 
-  public static fromString(from: string): ActionPath {
-    return new ActionPath(JSON.parse(from));
+  public static fromString(from: string): ComponentPath {
+    return new ComponentPath(JSON.parse(from));
   }
 
   /**
-   * @param nodes a list of nodes starting from the action originating the req
+   * @param nodes a list of nodes starting from the component originating the req
    */
   constructor(nodes: ReadonlyArray<string>) {
     if (nodes.length < 1) {
-      throw new Error(`Can't create an empty action path`);
+      throw new Error(`Can't create an empty component path`);
     }
     this.path = nodes;
   }
@@ -44,8 +44,8 @@ export class ActionPath {
     return this.path.length;
   }
 
-  tail(): ActionPath {
-    return new ActionPath(_.tail(this.path));
+  tail(): ComponentPath {
+    return new ComponentPath(_.tail(this.path));
   }
 
   indexOfClosestTxNode(): number | null {
@@ -53,14 +53,14 @@ export class ActionPath {
   }
 
   /**
-   * @returns true if this action path is inside a dv transaction
+   * @returns true if this component path is inside a dv transaction
    */
   isDvTx(): boolean {
     return this.indexOfClosestTxNode() === this.length() - 2;
   }
 
   /**
-   * @returns a string representing this action path. To construct a new action
+   * @returns a string representing this component path. To construct a new component
    *          object from the string call `fromString`
    */
   serialize(): string {

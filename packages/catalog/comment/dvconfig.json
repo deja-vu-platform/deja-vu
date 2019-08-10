@@ -8,7 +8,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/comment/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "comment-show-comment",
     "comment-show-comment-count"
   ]

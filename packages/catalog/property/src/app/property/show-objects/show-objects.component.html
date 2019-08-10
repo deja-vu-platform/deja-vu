@@ -1,7 +1,7 @@
 <ul *ngIf="_objects && _objects.length > 0" class="list-group">
   <li *ngFor="let object of _objects"
     class="list-group-item property-show-objects-object-item">
-    <dv-include [action]="showObject"
+    <dv-include [component]="showObject"
       default-showObject="{ tag: property-show-object }" [inputs]="{
         object: object, showOnly: showOnly, showExclude: showExclude,
         showBaseUrlsOnly: showBaseUrlsOnly,

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -41,7 +41,7 @@ const loadSchemaAndObjectsQueries = (extraInfo) => {
 };
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'choose-object': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
   'create-object': (extraInfo) => {
     switch (extraInfo.action) {
@@ -367,7 +367,7 @@ const propertyCliche: ClicheServer<PropertyConfig> =
 
       return Promise.resolve();
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .dynamicTypeDefs(getDynamicTypeDefs)
     .build();

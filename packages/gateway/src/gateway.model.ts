@@ -18,9 +18,9 @@ export interface DvConfig {
   readonly config?: Config;
   readonly gateway: { config: GatewayConfig };
   readonly usedCliches?: UsedClichesMap;
-  // Actions that have no expected request
-  readonly actionsNoRequest?: { exec: string[] };
-  readonly routes?: { path: string, action: string }[];
+  // Components that have no expected request
+  readonly componentsNoRequest?: { exec: string[] };
+  readonly routes?: { path: string, component: string }[];
 }
 
 export interface Config {

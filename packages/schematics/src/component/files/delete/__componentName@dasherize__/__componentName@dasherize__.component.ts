@@ -9,17 +9,17 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
 
-interface <%= classify(actionName) %>Res {
-  data: { <%= camelize(actionName) %>: boolean };
+interface <%= classify(componentName) %>Res {
+  data: { <%= camelize(componentName) %>: boolean };
   errors: { message: string }[];
 }
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
-  templateUrl: './<%= dasherize(actionName) %>.component.html',
-  styleUrls: ['./<%= dasherize(actionName) %>.component.css']
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  templateUrl: './<%= dasherize(componentName) %>.component.html',
+  styleUrls: ['./<%= dasherize(componentName) %>.component.css']
 })
-export class <%= classify(actionName) %>Component implements OnInit, OnExec {
+export class <%= classify(componentName) %>Component implements OnInit, OnExec {
   @Input() id: string;
 
   private gs: GatewayService;
@@ -33,12 +33,12 @@ export class <%= classify(actionName) %>Component implements OnInit, OnExec {
     this.rs.register(this.elem, this);
   }
 
-  <%= camelize(actionName) %>() {
+  <%= camelize(componentName) %>() {
     this.rs.exec(this.elem);
   }
 
   async dvOnExec() {
-    const res = await this.gs.post<<%= classify(actionName) %>Res>(this.apiPath, {
+    const res = await this.gs.post<<%= classify(componentName) %>Res>(this.apiPath, {
         inputs: {
           id: this.id
         }

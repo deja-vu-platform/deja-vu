@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -35,7 +35,7 @@ class CommentValidation {
   }
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-comment': (extraInfo) => `
     mutation CreateComment($input: CreateCommentInput!) {
       createComment (input: $input) ${getReturnFields(extraInfo)}
@@ -185,7 +185,7 @@ const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

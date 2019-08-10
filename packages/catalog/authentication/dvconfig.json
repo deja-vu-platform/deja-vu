@@ -8,7 +8,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/authentication/**" ]
     },
@@ -18,12 +18,12 @@
       ]
     }
   },
-  "actionsNoRequest": {
+  "componentsNoRequest": {
     "exec": [
       "authentication-choose-user"
     ]
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "authentication-show-user",
     "authentication-show-user-count",
     "authentication-show-users"

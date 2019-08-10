@@ -1,42 +1,42 @@
 # Conventions
 
-## Show actions 
+## Show components 
 
-- Show actions should receive as input both an id and an object to show. They
+- Show components should receive as input both an id and an object to show. They
   should display the object if it is given or fetch the object using `id` if
   otherwise
 
-- Show actions should have a `show[Field]` boolean input to determine whether
-  a particular field should be shown or not. If within `show-foo`, the action
+- Show components should have a `show[Field]` boolean input to determine whether
+  a particular field should be shown or not. If within `show-foo`, the component
   shows another entity, say, `bar`, the boolean inputs for `bar`'s fields should
   have the format `showBar[Field]` to differentiate them from `foo`'s fields.
 
-- Actions that load some entity from the backend (usually `show-*`) should
+- Components that load some entity from the backend (usually `show-*`) should
   produce the object as output. For example, when `show-foo` loads a `Foo` if
   an `id` is given it should output the object `loadedFoo`.
 
-- Usually, show actions perform a check called `this.canEval()` to avoid
+- Usually, show components perform a check called `this.canEval()` to avoid
   unnecessary reloading of the data it had previously loaded. If this is the
-  case, instead of calling `this.gs.get(...)`, the action should call
-  `this.gs.noRequest()` so that the run service knows that the action does not
-  intend to perform a request. If there is a possibility that an action
+  case, instead of calling `this.gs.get(...)`, the component should call
+  `this.gs.noRequest()` so that the run service knows that the component does not
+  intend to perform a request. If there is a possibility that an component
   will not perform a request (e.g. because it calls `this.gs.noRequest()` in
-  some cases), the action name (e.g. `clichename-show-foo`) should be included
-  in the `actionsRequestOptional` array field of the cliché's `dvconfig.json`
+  some cases), the component name (e.g. `clichename-show-foo`) should be included
+  in the `componentsRequestOptional` array field of the cliché's `dvconfig.json`
   file.
 
-## Create actions
+## Create components
 
-- Create actions should have a `save` option to determine whether the
+- Create components should have a `save` option to determine whether the
   entity being created has to be saved in the database or not. This way, with
-  `[save]=false` the action can be used to create local objects.
+  `[save]=false` the component can be used to create local objects.
 
-- Create actions should have a `showOptionToSubmit` input to determine
+- Create components should have a `showOptionToSubmit` input to determine
   whether they should show a submit button or not.
 
 - When creating a custom `FormControl`, include an initial value as an `@Input`
   field and an event emitter for its value as an `@Output` field. The latter is
-  so that its value can be linked as an input to actions with `dvOnExec`.
+  so that its value can be linked as an input to components with `dvOnExec`.
   Subscribe to the value changes of the input field and emit the new values.
   Do this then set the initial value in `ngOnInit`. For example, in the
   `CreateGoodPrice` component of `Market`:
@@ -101,13 +101,13 @@
 
 - All form controls should reset themselves on exec success
 
-## Reactive actions
+## Reactive components
 
-- The `show-chat` action of the chat cliché is a good example of a reactive
-action. It automatically updates whenever a new message for the chat comes in.
+- The `show-chat` component of the chat cliché is a good example of a reactive
+component. It automatically updates whenever a new message for the chat comes in.
 It could be used as an example to follow for the steps below. 
 
-- Actions can be made reactive (i.e. automatically update its contents) by
+- Components can be made reactive (i.e. automatically update its contents) by
   including these things:
 
   - In the clichés `schema.graphql` file:
@@ -128,18 +128,18 @@ It could be used as an example to follow for the steps below.
     time a relevant event (e.g. a creation or an update) happens
     - include the GraphQL subscription resolvers. *For security reasons*, the
     return value of subscriptions should not contain any data. They should
-    just return `true`. When an action receives the reply, it should reload
-    the data so that if it is in a transaction, all the other actions in the
+    just return `true`. When an component receives the reply, it should reload
+    the data so that if it is in a transaction, all the other components in the
     transaction would also get re-run. This ensures, for example, that any
     authentication or authorization checks happen again.
     - just like other GraphQL requests, add the subscription request(s) to the
-    `ActionRequestTable`. By default, the value of `extraInfo.action` for
+    `ComponentRequestTable`. By default, the value of `extraInfo.action` for
     subscriptions is `'subscribe'`.
 
   - In the `foo.module.ts` file, include the following provider:
   `{ provide: SUBSCRIPTIONS_PATH, useValue: '/subscriptions' }`
 
-  - Call `this.gs.subscribe(...)` in the actions themselves. See the note on
+  - Call `this.gs.subscribe(...)` in the components themselves. See the note on
   security under the `server.ts` file.
 
 ## Misc
@@ -148,15 +148,15 @@ It could be used as an example to follow for the steps below.
   parameter for the query/mutation and for possibly `null` one-parameter
   methods.
 
-- Actions should be aware of the fact that their input objects might have more
+- Components should be aware of the fact that their input objects might have more
   fields than the ones they are expecting. For example, if `create-foo`
   expects a `Foo` it might get an object that is a `Foo` + some other
   merged objects.
 
-- If there's only one id input for an action, only use `id`. Otherwise, use
+- If there's only one id input for an component, only use `id`. Otherwise, use
   named ids, e.g. `fooId` and `barId`.
 
-- If you want to give the user of an action a way to ask to wait for an input
+- If you want to give the user of an component a way to ask to wait for an input
   value create a `waitOn: string[]` input that takes a list of input fields to
   wait on when run. In your Component class you have:
 
@@ -191,4 +191,4 @@ It could be used as an example to follow for the steps below.
 
 # Other Stuff
 
-- if you don't have a default action for an action input use `no-default-foo`. See [stage-header](https://github.com/spderosso/deja-vu/tree/master/packages/core/src/app/dv/stage) for an example.
+- if you don't have a default component for an component input use `no-default-foo`. See [stage-header](https://github.com/spderosso/deja-vu/tree/master/packages/core/src/app/dv/stage) for an example.

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -47,8 +47,8 @@ class MessageValidation {
   }
 }
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'create-message': (extraInfo) => `
     mutation CreateMessage($input: CreateMessageInput!) {
       createMessage(input: $input) ${getReturnFields(extraInfo)}
@@ -81,7 +81,7 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'subscribe':
         return `subscription NewChatMessage($chatId: ID!) {
-          newChatMessage(chatId: $chatId) 
+          newChatMessage(chatId: $chatId)
         }`;
       case 'new':
         // note that this is unused, but should potentially be used
@@ -199,7 +199,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
         subscribe: withFilter(
           () => pubsub.asyncIterator(NEW_MESSAGE_TOPIC),
           (payload, variables) =>
-            variables.chatId === payload.newMessage.chatId 
+            variables.chatId === payload.newMessage.chatId
         ),
       }
     }
@@ -215,7 +215,7 @@ const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
       messages.createIndex({ chatId: 1, timestamp: 1 })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

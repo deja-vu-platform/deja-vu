@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
-import { Action } from '@deja-vu/core';
+import { ComponentValue } from '@deja-vu/core';
 
 import { ShowUserComponent } from '../show-user/show-user.component';
 
@@ -14,7 +14,7 @@ import { User } from '../shared/authentication.model';
 })
 export class ChooseUserComponent {
   @Input() users: User[];
-  @Input() showUser: Action = {
+  @Input() showUser: ComponentValue = {
     type: <Type<Component>>ShowUserComponent,
     inputMap: { entity: 'user' }
   };

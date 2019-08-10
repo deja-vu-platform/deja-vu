@@ -2,7 +2,7 @@
 
 Organize members into groups so that they can be handled in aggregate
 
-## Actions
+## Components
 
 - add-to-group
 - choose-group

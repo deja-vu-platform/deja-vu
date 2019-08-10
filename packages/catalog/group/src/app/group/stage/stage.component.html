@@ -3,7 +3,7 @@
     <dv-tx>
       <form class="form-horizontal">
         <div class="form-group">
-          <dv-include [action]="inputMember" default-inputMember="{ tag: group-input-member }"
+          <dv-include [component]="inputMember" default-inputMember="{ tag: group-input-member }"
             [outputs]="{ memberId: 'memberId' }"
             [parent]="stageComponent">
           </dv-include>
@@ -21,7 +21,7 @@
 
 <div *ngIf="stageHeader" class="row">
   <div class="col-md-12">
-    <dv-include [action]="stageHeader" no-default-stageHeader [parent]="stageComponent">
+    <dv-include [component]="stageHeader" no-default-stageHeader [parent]="stageComponent">
     </dv-include>
   </div>
 </div>
@@ -32,7 +32,7 @@
       class="list-group">
       <li *ngFor="let id of staged" class="list-group-item row">
         <div class="col-md-10">
-          <dv-include [action]="showMember" default-showMember="{ tag: group-show-member }"
+          <dv-include [component]="showMember" default-showMember="{ tag: group-show-member }"
             [inputs]="{ id: id }"
             [parent]="stageComponent">
           </dv-include>

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -41,7 +41,7 @@ OnChanges {
   @Input() targetRankLabel = 'Rank: ';
   @Input() noTargetsText = 'No targets';
 
-  @Input() showTarget: Action = {
+  @Input() showTarget: ComponentValue = {
     type: <Type<Component>> ShowTargetComponent
   };
 

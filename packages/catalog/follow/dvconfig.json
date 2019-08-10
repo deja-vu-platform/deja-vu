@@ -8,7 +8,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/follow/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "follow-show-follower-count",
     "follow-show-followers",
     "follow-show-message-count",

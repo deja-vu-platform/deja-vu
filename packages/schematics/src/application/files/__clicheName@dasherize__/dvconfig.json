@@ -8,7 +8,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/<%= dasherize(clicheName) %>/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "<%= dasherize(clicheName) %>-show-<%= dasherize(clicheName) %>"
   ]
 }

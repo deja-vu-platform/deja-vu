@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -29,7 +29,7 @@ OnChanges {
   // Else, fetch the followers of the given publisher.
   @Input() ofPublisherId: string | undefined;
 
-  @Input() showFollower: Action = {
+  @Input() showFollower: ComponentValue = {
     type: <Type<Component>>ShowFollowerComponent
   };
 

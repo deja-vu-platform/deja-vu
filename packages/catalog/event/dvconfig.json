@@ -8,7 +8,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/event/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "event-show-event",
     "event-show-event-count",
     "event-show-events"

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -23,8 +23,8 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'attempt-match': (extraInfo) => `
     mutation AttemptMatch($input: AttemptMatchInput!) {
       attemptMatch(input: $input) ${getReturnFields(extraInfo)}
@@ -203,7 +203,7 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
         { unique: true, sparse: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

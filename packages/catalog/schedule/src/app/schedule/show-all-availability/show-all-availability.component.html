@@ -51,7 +51,7 @@
 <span *ngIf="allAvailability">
   <span *ngIf="showScheduleView">
     <dv-include
-      [action]="showSchedule"
+      [component]="showSchedule"
       default-showSchedule="{ tag: schedule-show-schedule }"
       [inputs]="{
         schedule: schedule, showId: showScheduleId,
@@ -65,7 +65,7 @@
 
   <span *ngIf="showSlotsView">
     <dv-include
-      [action]="showSlots"
+      [component]="showSlots"
       default-showSlots="{ tag: schedule-show-slots }"
       [inputs]="{
         slots: allAvailability, showId: showSlotId,

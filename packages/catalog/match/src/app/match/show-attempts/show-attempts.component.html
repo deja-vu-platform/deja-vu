@@ -1,7 +1,7 @@
 <ul *ngIf="attempts && attempts.length > 0" class="list-group">
   <li *ngFor="let attempt of attempts" class="list-group-item">
     <dv-include
-      [action]="showAttempt"
+      [component]="showAttempt"
       default-showAttempt="{ tag: match-show-attempt }"
       [inputs]="{
         attempt: attempt, showId: showId,

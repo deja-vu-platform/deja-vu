@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -21,7 +21,7 @@ import {
 } from './schema';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-allocation': (extraInfo) => `
     mutation CreateAllocation($input: CreateAllocationInput!) {
       createAllocation (input: $input) ${getReturnFields(extraInfo)}
@@ -153,7 +153,7 @@ const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
         { id: 1, 'assignments.resourceId': 1 }, { unique: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

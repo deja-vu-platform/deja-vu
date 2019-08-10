@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()"
-  [formGroup]="<%= camelize(actionName) %>Form"
+  [formGroup]="<%= camelize(componentName) %>Form"
   class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="new<%= classify(entityName) %>Saved">
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" [disabled]="!<%= camelize(actionName) %>Form.valid">
+    <button mat-button type="submit" [disabled]="!<%= camelize(componentName) %>Form.valid">
       {{buttonLabel}}
     </button>
   </div>

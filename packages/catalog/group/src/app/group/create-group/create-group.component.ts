@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from '@deja-vu/core';
 
@@ -44,11 +44,11 @@ implements OnInit, OnExecSuccess, OnExecFailure {
 
   @Input() showOptionToAddMembers = true;
   @Input() showOptionToSubmit = true;
-  @Input() showMember: Action = {
+  @Input() showMember: ComponentValue = {
     type: <Type<Component>> ShowMemberComponent
   };
 
-  @Input() stageHeader: Action | undefined;
+  @Input() stageHeader: ComponentValue | undefined;
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';

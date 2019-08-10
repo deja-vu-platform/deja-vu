@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { <%= classify(actionName) %>Component } from './<%= dasherize(actionName) %>.component';
+import { <%= classify(componentName) %>Component } from './<%= dasherize(componentName) %>.component';
 
 import { config } from '../testing/testbed.config';
 
 
-describe('<%= classify(actionName) %>Component', () => {
-  let component: <%= classify(actionName) %>Component;
-  let fixture: ComponentFixture<<%= classify(actionName) %>Component>;
+describe('<%= classify(componentName) %>Component', () => {
+  let component: <%= classify(componentName) %>Component;
+  let fixture: ComponentFixture<<%= classify(componentName) %>Component>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule(config)
@@ -15,7 +15,7 @@ describe('<%= classify(actionName) %>Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(<%= classify(actionName) %>Component);
+    fixture = TestBed.createComponent(<%= classify(componentName) %>Component);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

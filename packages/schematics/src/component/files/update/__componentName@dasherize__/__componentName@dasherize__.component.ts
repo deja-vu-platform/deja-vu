@@ -25,48 +25,48 @@ interface <%= classify(entityName) %>Res {
   errors: { message: string }[];
 }
 
-interface <%= classify(actionName) %>Res {
-  data: { <%= camelize(actionName) %>: boolean };
+interface <%= classify(componentName) %>Res {
+  data: { <%= camelize(componentName) %>: boolean };
   errors: { message: string }[];
 }
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
-  templateUrl: './<%= dasherize(actionName) %>.component.html',
-  styleUrls: ['./<%= dasherize(actionName) %>.component.css'],
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  templateUrl: './<%= dasherize(componentName) %>.component.html',
+  styleUrls: ['./<%= dasherize(componentName) %>.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: <%= classify(actionName) %>Component,
+      useExisting: <%= classify(componentName) %>Component,
       multi: true
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: <%= classify(actionName) %>Component,
+      useExisting: <%= classify(componentName) %>Component,
       multi: true
     }
   ]
 })
-export class <%= classify(actionName) %>Component implements
+export class <%= classify(componentName) %>Component implements
   OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
   @Input() id: string;
 
   // Presentation text
   @Input() buttonLabel = 'Update <%= capitalize(entityName) %>';
   @Input() inputContentLabel = 'Edit Content';
-  @Input() <%= camelize(actionName) %>SavedText = '<%= capitalize(entityName) %> updated';
+  @Input() <%= camelize(componentName) %>SavedText = '<%= capitalize(entityName) %> updated';
   @Input() startEditButtonLabel = 'Edit';
   @Input() stopEditButtonLabel = 'Cancel';
 
   @ViewChild(FormGroupDirective) form;
   contentControl = new FormControl('', Validators.required);
-  <%= camelize(actionName) %>Form: FormGroup = this.builder.group({
+  <%= camelize(componentName) %>Form: FormGroup = this.builder.group({
     contentControl: this.contentControl
   });
 
   isEditing = false;
-  <%= camelize(actionName) %>Saved = false;
-  <%= camelize(actionName) %>Error: string;
+  <%= camelize(componentName) %>Saved = false;
+  <%= camelize(componentName) %>Error: string;
 
   private gs: GatewayService;
 
@@ -94,7 +94,7 @@ export class <%= classify(actionName) %>Component implements
       params: {
         inputs: { id: this.id },
         extraInfo: {
-          action: 'load',
+          component: 'load',
           returnFields: 'id, content'
         }
       }
@@ -121,7 +121,7 @@ export class <%= classify(actionName) %>Component implements
   }
 
   async dvOnExec(): Promise<boolean> {
-    const res = await this.gs.post<<%= classify(actionName) %>Res>(this.apiPath, {
+    const res = await this.gs.post<<%= classify(componentName) %>Res>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -129,7 +129,7 @@ export class <%= classify(actionName) %>Component implements
         }
       },
       extraInfo: {
-        action: 'update'
+        component: 'update'
       }
     })
     .toPromise();
@@ -139,14 +139,14 @@ export class <%= classify(actionName) %>Component implements
         .join());
     }
 
-    return res.data.<%= camelize(actionName) %>;
+    return res.data.<%= camelize(componentName) %>;
   }
 
   dvOnExecSuccess() {
-    this.<%= camelize(actionName) %>Saved = true;
-    this.<%= camelize(actionName) %>Error = '';
+    this.<%= camelize(componentName) %>Saved = true;
+    this.<%= camelize(componentName) %>Error = '';
     window.setTimeout(() => {
-      this.<%= camelize(actionName) %>Saved = false;
+      this.<%= camelize(componentName) %>Saved = false;
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.updateTaskForm.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -156,6 +156,6 @@ export class <%= classify(actionName) %>Component implements
   }
 
   dvOnExecFailure(reason: Error) {
-    this.<%= camelize(actionName) %>Error = reason.message;
+    this.<%= camelize(componentName) %>Error = reason.message;
   }
 }

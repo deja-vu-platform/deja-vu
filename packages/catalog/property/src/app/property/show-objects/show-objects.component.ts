@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action,
+  ComponentValue,
   ConfigService, ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
@@ -34,14 +34,14 @@ OnChanges {
    */
   @Input() noObjectsToShowText = 'No objects';
   /**
-   * Action to use to render each object
+   * Component to use to render each object
    */
-  @Input() showObject: Action = {
+  @Input() showObject: ComponentValue = {
     type: <Type<Component>> ShowObjectComponent
   };
   _objects: Object[] = [];
   /**
-   * List of property names to pass to showObject action
+   * List of property names to pass to showObject component
    * (For the default showObject, this will cause only
    * these properties to be shown)
    */
@@ -52,13 +52,13 @@ OnChanges {
    */
   @Input() fieldMatching = {};
   /**
-   * List of property names to pass to showObject action
+   * List of property names to pass to showObject component
    * (For the default showObject, this will cause
    * these properties to not be shown)
    */
   @Input() showExclude: string[];
   /**
-   * Passed to showObject action
+   * Passed to showObject component
    * (For the default showObject, this will cause any URL properties
    * to display without the protocol and path)
    */

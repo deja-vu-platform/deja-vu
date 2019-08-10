@@ -2,7 +2,7 @@
 
 Describe an object with properties that have values
 
-## Actions
+## Components
 
 - choose-object
 - create-object

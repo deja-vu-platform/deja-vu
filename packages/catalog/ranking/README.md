@@ -2,7 +2,7 @@
 
 Rank items
 
-## Actions
+## Components
 
 - create-ranking
 - show-fractional-ranking

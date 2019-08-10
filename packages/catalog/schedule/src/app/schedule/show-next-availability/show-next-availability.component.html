@@ -1,6 +1,6 @@
 <span *ngIf="nextAvailability">
   <dv-include
-    [action]="showSlot"
+    [component]="showSlot"
     default-showSlot="{ tag: schedule-show-slot }"
     [inputs]="{
       slot: nextAvailability, showId: showId,

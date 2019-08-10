@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -79,7 +79,7 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   @Input() dayEndHour = 17;
   // The default length of a newly added event (in hours)
   @Input() eventLength = 1;
-  @Input() showSchedule: Action = {
+  @Input() showSchedule: ComponentValue = {
     type: <Type<Component>> ShowScheduleComponent
   };
 
@@ -89,10 +89,10 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
   @Input() showEndDate = true;
   // See https://angular.io/api/common/DatePipe
   @Input() dateTimeFormatString = 'medium';
-  @Input() showSlots: Action = {
+  @Input() showSlots: ComponentValue = {
     type: <Type<Component>> ShowSlotsComponent
   };
-  @Input() showSlot: Action = {
+  @Input() showSlot: ComponentValue = {
     type: <Type<Component>> ShowSlotComponent
   };
 

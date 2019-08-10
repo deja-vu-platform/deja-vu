@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -33,7 +33,7 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
   // See https://angular.io/api/common/DatePipe
   @Input() dateTimeFormatString = 'medium';
 
-  @Input() showSlot: Action = {
+  @Input() showSlot: ComponentValue = {
     type: <Type<Component>> ShowSlotComponent
   };
 

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -43,10 +43,10 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() noTargetsText = 'No targets';
   @Input() noRankingsText = 'No rankings';
 
-  @Input() showTarget: Action = {
+  @Input() showTarget: ComponentValue = {
     type: <Type<Component>> ShowTargetComponent
   };
-  @Input() showRanking: Action = {
+  @Input() showRanking: ComponentValue = {
     type: <Type<Component>> ShowRankingComponent
   };
 

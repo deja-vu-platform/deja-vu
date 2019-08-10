@@ -2,7 +2,7 @@
 
 Locate points of interest
 
-## Actions
+## Components
 
 - create-marker
 - delete-marker

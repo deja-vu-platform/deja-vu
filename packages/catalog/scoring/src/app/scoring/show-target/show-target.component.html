@@ -11,7 +11,7 @@
     <ul *ngIf="showScores" class="list-group">
       <li *ngFor="let score of target.scores" class="list-group-item">
         <dv-include
-          [action]="showScore"
+          [component]="showScore"
           [inputs]="{
             score: score, showId: showScoreId, showValue: showScoreValue,
             showScoreSourceId: showScoreSourceId,

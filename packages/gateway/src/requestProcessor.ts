@@ -9,15 +9,15 @@ import * as assert from 'assert';
 import * as _ from 'lodash';
 
 import {
-  ActionHelper,
-  ActionTable,
-  ActionTag,
-  ActionTagPath
-} from './actionHelper';
+  ComponentHelper,
+  ComponentTable,
+  ComponentTag,
+  ComponentTagPath
+} from './componentHelper';
 import { SubscriptionCoordinator } from './subscriptionCoordinator';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
-import { ActionPath } from './actionPath';
+import { ComponentPath } from './componentPath';
 import { DvConfig, GatewayConfig } from './gateway.model';
 
 import { InputValuesMap, TxInputsValidator } from './txInputsValidator';
@@ -56,8 +56,8 @@ export interface ChildRequest {
 }
 
 export interface GatewayRequest {
-  readonly fullActionName: string;
-  readonly from: ActionPath;
+  readonly fullComponentName: string;
+  readonly from: ComponentPath;
   readonly reqId: string;
   readonly runId?: string | undefined;
   readonly path?: string | undefined;
@@ -147,7 +147,7 @@ export abstract class RequestProcessor {
   protected readonly dstTable: { [cliche: string]: port } = {};
   protected readonly subscriptionCoordinator: SubscriptionCoordinator;
 
-  private static ClicheOf(node: ActionTag | undefined): string | undefined {
+  private static ClicheOf(node: ComponentTag | undefined): string | undefined {
     if (node === undefined) {
       return undefined;
     }
@@ -165,7 +165,7 @@ export abstract class RequestProcessor {
     if (gatewayRequest.path) {
       url += gatewayRequest.path;
     }
-    url +=  `/${gatewayRequest.fullActionName}`;
+    url +=  `/${gatewayRequest.fullComponentName}`;
     let clicheReq = request(gatewayRequest.method, url);
     if (gatewayRequest.options) {
       if (gatewayRequest.options.params) {
@@ -200,15 +200,15 @@ export abstract class RequestProcessor {
     : GatewayToClicheRequest {
     return _
       .assign({}, gcr, {
-        path: `/dv-${gcr.fullActionName}/${gcr.reqId}/${msg}` + gcr.path });
+        path: `/dv-${gcr.fullComponentName}/${gcr.reqId}/${msg}` + gcr.path });
   }
 
   private static BuildGatewayRequest(
     req: express.Request | ChildRequest
   ): GatewayRequest {
     return {
-      from: ActionPath.fromString(req.query.from),
-      fullActionName: req.query.fullActionName,
+      from: ComponentPath.fromString(req.query.from),
+      fullComponentName: req.query.fullComponentName,
       reqId: uuid(),
       runId: req.query.runId,
       path: req.query.path,
@@ -249,7 +249,7 @@ export abstract class RequestProcessor {
     if (!request['from']) {
       throw new RequestInvalidError('No from specified');
     }
-    const port = this.getToPort(ActionPath.fromString(request['from']));
+    const port = this.getToPort(ComponentPath.fromString(request['from']));
     const url = this.getUrl(port, request['path'], true);
 
     return this.subscriptionCoordinator.forwardRequest(url, request);
@@ -268,22 +268,22 @@ export abstract class RequestProcessor {
     const resBatch = new ResponseBatch(res, childRequests.length);
 
     let gatewayToClicheRequests: GatewayToClicheRequest[];
-    let prunedCohortActions: ActionTag[];
+    let prunedCohortComponents: ComponentTag[];
     try {
        gatewayToClicheRequests = childRequests
          .map((childRequest) => this.validateRequest(childRequest));
 
-      const actionPath = gatewayToClicheRequests[0].from;
-      const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
-      const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
-      prunedCohortActions = this.getPrunedCohortActions(cohortActions,
+      const componentPath = gatewayToClicheRequests[0].from;
+      const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
+      const cohortComponents = this.getCohortComponents(componentPath, dvTxNodeIndex);
+      prunedCohortComponents = this.getPrunedCohortComponents(cohortComponents,
         childRequests.map((childRequest) =>
-          ActionPath.fromString(childRequest.query.from)
+          ComponentPath.fromString(childRequest.query.from)
             .last()));
 
       const inputValuesMap: InputValuesMap = {};
       for (const childRequest of childRequests) {
-        const actionFqtag = ActionPath.fromString(childRequest.query.from)
+        const componentFqtag = ComponentPath.fromString(childRequest.query.from)
           .last();
         // Needs to match the way we extract inputs from the request in the
         // cliche-server
@@ -295,14 +295,14 @@ export abstract class RequestProcessor {
 
         console.log(`Got inputs ${JSON.stringify(inputs)}`);
         _.forEach(inputs, (value: any, inputName: string) => {
-          _.set(inputValuesMap, [actionFqtag, inputName], value);
+          _.set(inputValuesMap, [componentFqtag, inputName], value);
         });
       }
 
       console.log(
         `Checking with context ${JSON.stringify(context)}` +
         `Input values map ${JSON.stringify(inputValuesMap)}`);
-      TxInputsValidator.Validate(inputValuesMap, prunedCohortActions, context);
+      TxInputsValidator.Validate(inputValuesMap, prunedCohortComponents, context);
     } catch (e) {
       if (e instanceof RequestInvalidError) {
         resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
@@ -321,7 +321,7 @@ export abstract class RequestProcessor {
             gatewayToClicheRequest.runId,
             gatewayToClicheRequest.from.serialize(),
             this.getCohorts(
-              gatewayToClicheRequest.from.serialize(), prunedCohortActions),
+              gatewayToClicheRequest.from.serialize(), prunedCohortComponents),
             gatewayToClicheRequest, resBatch, index)))
       .then(() => {});
   }
@@ -338,15 +338,15 @@ export abstract class RequestProcessor {
        * be expected if this req is supposed to be part of a tx with more
        * than one cohort)
        */
-      const actionPath = gatewayToClicheRequest.from;
+      const componentPath = gatewayToClicheRequest.from;
 
-      if (actionPath.isDvTx()) {
-        const dvTxNodeIndex: number | null  = actionPath.indexOfClosestTxNode();
+      if (componentPath.isDvTx()) {
+        const dvTxNodeIndex: number | null  = componentPath.indexOfClosestTxNode();
         console.log('Validating request of no-op tx');
-        const cohortActions = this.getCohortActions(actionPath, dvTxNodeIndex);
+        const cohortComponents = this.getCohortComponents(componentPath, dvTxNodeIndex);
         // throws error if invalid
-        this.getPrunedCohortActions(cohortActions,
-          [actionPath.last()]);
+        this.getPrunedCohortComponents(cohortComponents,
+          [componentPath.last()]);
       }
 
       const clicheRes: ClicheResponse<string> = await RequestProcessor
@@ -357,8 +357,8 @@ export abstract class RequestProcessor {
     }
   }
 
-  protected getActionFromPath(actionPath: ActionPath): ActionTag {
-    const fqtag = _.last(actionPath.nodes());
+  protected getComponentFromPath(componentPath: ComponentPath): ComponentTag {
+    const fqtag = _.last(componentPath.nodes());
 
     return {
       fqtag,
@@ -366,13 +366,13 @@ export abstract class RequestProcessor {
     };
   }
 
-  protected abstract getCohortActions(
-    _actionPath: ActionPath,
+  protected abstract getCohortComponents(
+    _componentPath: ComponentPath,
     _dvTxNodeIndex: number
-  ): ActionTag[];
+  ): ComponentTag[];
 
-  protected abstract getPrunedCohortActions(cohortActions: ActionTag[],
-    receivedRequestFqTags: string[]): ActionTag[];
+  protected abstract getPrunedCohortComponents(cohortComponents: ComponentTag[],
+    receivedRequestFqTags: string[]): ComponentTag[];
 
   protected validateRequest(req: express.Request | ChildRequest)
     : GatewayToClicheRequest {
@@ -382,15 +382,15 @@ export abstract class RequestProcessor {
 
     const gatewayRequest = RequestProcessor.BuildGatewayRequest(req);
 
-    const { runId, from: actionPath } = gatewayRequest;
-    const toPort: port = this.getToPort(actionPath);
+    const { runId, from: componentPath } = gatewayRequest;
+    const toPort: port = this.getToPort(componentPath);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
 
     console.log(
       `Valid request: port: ${toPort}, ` +
-      `action path: ${actionPath}, runId: ${runId}` +
-      (actionPath.isDvTx() ? `, dvTxId: ${runId}` : ' not part of a tx'));
+      `component path: ${componentPath}, runId: ${runId}` +
+      (componentPath.isDvTx() ? `, dvTxId: ${runId}` : ' not part of a tx'));
 
     return {
       ...gatewayRequest,
@@ -403,28 +403,28 @@ export abstract class RequestProcessor {
   }
 
   protected getCohorts(
-    actionPathId: string, cohortActions: ActionTag[]): string[] {
-    const actionPath: ActionPath = ActionPath.fromString(actionPathId);
-    assert.ok(actionPath.isDvTx(),
-      `Getting cohorts of an action path that is not part of a ` +
-      `dv-tx: ${actionPath}`);
-    const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
+    componentPathId: string, cohortComponents: ComponentTag[]): string[] {
+    const componentPath: ComponentPath = ComponentPath.fromString(componentPathId);
+    assert.ok(componentPath.isDvTx(),
+      `Getting cohorts of an component path that is not part of a ` +
+      `dv-tx: ${componentPath}`);
+    const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
 
-    return _.map(cohortActions, (action: ActionTag) =>
-      new ActionPath([
-        ..._.take(actionPath.nodes(), dvTxNodeIndex + 1),
-        action.fqtag
+    return _.map(cohortComponents, (component: ComponentTag) =>
+      new ComponentPath([
+        ..._.take(componentPath.nodes(), dvTxNodeIndex + 1),
+        component.fqtag
       ]).serialize()
     );
   }
 
-  private getToPort(actionPath: ActionPath): port {
-    const actionTag = this.getActionFromPath(actionPath);
-    const to = RequestProcessor.ClicheOf(actionTag);
+  private getToPort(componentPath: ComponentPath): port {
+    const componentTag = this.getComponentFromPath(componentPath);
+    const to = RequestProcessor.ClicheOf(componentTag);
     const toPort: port | undefined = _.get(this.dstTable, to);
 
-    if (!actionTag) {
-      throw new RequestInvalidError(`Invalid action path: ${actionPath}`);
+    if (!componentTag) {
+      throw new RequestInvalidError(`Invalid component path: ${componentPath}`);
     }
     if (toPort === undefined) {
       throw new RequestInvalidError(
@@ -494,7 +494,7 @@ export abstract class RequestProcessor {
         } else {
           txRes!.add(
             INTERNAL_SERVER_ERROR,
-            'the tx that this action is part of aborted'
+            'the tx that this component is part of aborted'
           );
         }
       },
@@ -517,12 +517,12 @@ export abstract class RequestProcessor {
 }
 
 export class AppRequestProcessor extends RequestProcessor {
-  private readonly actionHelper: ActionHelper;
+  private readonly componentHelper: ComponentHelper;
 
   constructor(
     config: GatewayConfig,
     dvConfig?: DvConfig,
-    appActionTable?: ActionTable
+    appComponentTable?: ComponentTable
   ) {
     super(config);
 
@@ -540,91 +540,91 @@ export class AppRequestProcessor extends RequestProcessor {
       (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
     );
 
-    const routeActionSelectors = _.uniq(_.map(dvConfig.routes, ({action}) =>
-      `${dvConfig.name}-${action}`
+    const routeComponentSelectors = _.uniq(_.map(dvConfig.routes, ({component}) =>
+      `${dvConfig.name}-${component}`
     ));
-    this.actionHelper = new ActionHelper(
-      usedCliches, appActionTable, routeActionSelectors);
+    this.componentHelper = new ComponentHelper(
+      usedCliches, appComponentTable, routeComponentSelectors);
   }
 
-  protected getActionFromPath(actionPath: ActionPath): ActionTag {
-    return this.actionHelper.getMatchingActions(actionPath)[0];
+  protected getComponentFromPath(componentPath: ComponentPath): ComponentTag {
+    return this.componentHelper.getMatchingComponents(componentPath)[0];
   }
 
-  protected getCohortActions(actionPath: ActionPath, dvTxNodeIndex: number) {
-    const paths: ActionTagPath[] = this.actionHelper
-      .getMatchingPaths(actionPath);
-    // We know that the action path is a valid one because if otherwise the
+  protected getCohortComponents(componentPath: ComponentPath, dvTxNodeIndex: number) {
+    const paths: ComponentTagPath[] = this.componentHelper
+      .getMatchingPaths(componentPath);
+    // We know that the component path is a valid one because if otherwise the
     // tx would have never been initiated in the first place
     const debugPaths = _.map(
-      paths, (p) => ActionHelper.PickActionTagPath(p, ['fqtag']));
+      paths, (p) => ComponentHelper.PickComponentTagPath(p, ['fqtag']));
     assert.ok(paths.length === 1,
       `Expected 1 path but got ${paths.length} for ` +
-      `${actionPath.serialize()}: ${JSON.stringify(debugPaths)}`);
-    const actionTagPath: ActionTagPath = paths[0];
-    assert.ok(actionTagPath.length === actionPath.length(),
-      'Expected the length of the path to match the action path ' +
-      ` length but got ${stringify(actionTagPath)}`);
+      `${componentPath.serialize()}: ${JSON.stringify(debugPaths)}`);
+    const componentTagPath: ComponentTagPath = paths[0];
+    assert.ok(componentTagPath.length === componentPath.length(),
+      'Expected the length of the path to match the component path ' +
+      ` length but got ${stringify(componentTagPath)}`);
 
-    const dvTxNode = actionTagPath[dvTxNodeIndex];
+    const dvTxNode = componentTagPath[dvTxNodeIndex];
     assert.ok(dvTxNode !== null && dvTxNode !== undefined,
       'Expected the tx node to exist on the path');
 
-    return _.reject(dvTxNode.content, (action: ActionTag) =>
-      action.tag.split('-')[0] === 'dv'
-      || _.get(action.inputs, '[save]') === 'false'
-      || !this.actionHelper.shouldHaveExecRequest(action.tag)
+    return _.reject(dvTxNode.content, (component: ComponentTag) =>
+      component.tag.split('-')[0] === 'dv'
+      || _.get(component.inputs, '[save]') === 'false'
+      || !this.componentHelper.shouldHaveExecRequest(component.tag)
     );
   }
 
   /**
-   * Get the relevant subset of cohort actions based on the action tags
+   * Get the relevant subset of cohort components based on the component tags
    * from the received requests for the cohort.
    *
-   * @param  cohortActions - all the actions in the cohort
-   * @param  receivedRequestFqTags - the action tags received as a batch
+   * @param  cohortComponents - all the components in the cohort
+   * @param  receivedRequestFqTags - the component tags received as a batch
    *                                     for the cohort
-   * @return cohort actions s.t. those not present in receivedRequestFqTags
+   * @return cohort components s.t. those not present in receivedRequestFqTags
    *                        are excluded
-   * @throws RequestInvalidError if there are actions not present in
+   * @throws RequestInvalidError if there are components not present in
    *         receivedRequestFqTags, but those requests are not optional; or
    *         if there are more requests for an fqtag received than expected; or
    *         if there are fqtags received that are not part of the cohort at all
    */
-  protected getPrunedCohortActions(cohortActions: ActionTag[],
-    receivedRequestFqTags: string[]): ActionTag[] {
+  protected getPrunedCohortComponents(cohortComponents: ComponentTag[],
+    receivedRequestFqTags: string[]): ComponentTag[] {
     const fqTagsSet: Set<string> = new Set(receivedRequestFqTags);
     if (fqTagsSet.size < receivedRequestFqTags.length) {
       throw new RequestInvalidError('Got multiple requests from at least one ' +
         'fqtag');
     }
-    const prunedCohortActions: ActionTag[] = [];
+    const prunedCohortComponents: ComponentTag[] = [];
 
-    for (const action of cohortActions) {
-      const actionRequestExists = fqTagsSet.has(action.fqtag);
+    for (const component of cohortComponents) {
+      const componentRequestExists = fqTagsSet.has(component.fqtag);
 
-      if (!actionRequestExists &&
-        !this.actionHelper.isRequestOptional(action.tag)) {
+      if (!componentRequestExists &&
+        !this.componentHelper.isRequestOptional(component.tag)) {
         throw new RequestInvalidError(`Did not get any requests from ` +
-        `${action.fqtag} and ${action.tag}'s request is not optional`);
+        `${component.fqtag} and ${component.tag}'s request is not optional`);
       }
 
-      if (actionRequestExists) {
-        prunedCohortActions.push(action);
+      if (componentRequestExists) {
+        prunedCohortComponents.push(component);
       }
     }
 
-    if (prunedCohortActions.length < receivedRequestFqTags.length) {
-      throw new RequestInvalidError('Received requests include actions that ' +
+    if (prunedCohortComponents.length < receivedRequestFqTags.length) {
+      throw new RequestInvalidError('Received requests include components that ' +
         'that are not part of the cohort');
     }
 
-    return prunedCohortActions;
+    return prunedCohortComponents;
   }
 }
 
 export class DesignerRequestProcessor extends RequestProcessor {
-  private cohortActions: ActionTag[]; // for appless mode only
+  private cohortComponents: ComponentTag[]; // for appless mode only
 
   constructor(config: GatewayConfig) {
     super(config);
@@ -650,13 +650,13 @@ export class DesignerRequestProcessor extends RequestProcessor {
   ): Promise<void> {
     const childRequests: ChildRequest[] = req.body.requests;
 
-    // the cohorts cannot be determined from the (nonexistent) action table
+    // the cohorts cannot be determined from the (nonexistent) component table
     // so we get them from the paths in the request
     // I think this is actually not safe because we only save one set of cohorts
     // but this is designer only where problematic fast requesting is unlikely
-    this.cohortActions = childRequests.map((chReq) => {
-      const actionPath = ActionPath.fromString(chReq.query.from);
-      const fqtag = actionPath.nodes()[actionPath.indexOfClosestTxNode() + 1];
+    this.cohortComponents = childRequests.map((chReq) => {
+      const componentPath = ComponentPath.fromString(chReq.query.from);
+      const fqtag = componentPath.nodes()[componentPath.indexOfClosestTxNode() + 1];
 
       return {
         fqtag,
@@ -683,20 +683,20 @@ export class DesignerRequestProcessor extends RequestProcessor {
             gatewayToClicheRequest.runId,
             gatewayToClicheRequest.from.serialize(),
             this.getCohorts(
-              gatewayToClicheRequest.from.serialize(), this.cohortActions),
+              gatewayToClicheRequest.from.serialize(), this.cohortComponents),
             gatewayToClicheRequest, resBatch, index)))
       .then(() => {});
   }
 
-  protected getCohortActions(
-    _actionPath: ActionPath,
+  protected getCohortComponents(
+    _componentPath: ComponentPath,
     _dvTxNodeIndex: number
-  ): ActionTag[] {
-    return this.cohortActions;
+  ): ComponentTag[] {
+    return this.cohortComponents;
   }
 
-  protected getPrunedCohortActions(_cohortActions: ActionTag[],
-    _receivedRequestFqTags: string[]): ActionTag[] {
-    return this.cohortActions;
+  protected getPrunedCohortComponents(_cohortComponents: ComponentTag[],
+    _receivedRequestFqTags: string[]): ComponentTag[] {
+    return this.cohortComponents;
   }
 }

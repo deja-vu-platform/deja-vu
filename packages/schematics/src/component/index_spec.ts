@@ -4,30 +4,30 @@ import * as path from 'path';
 
 
 const collectionPath = path.join(__dirname, '../collection.json');
-const actionName = 'test action';
-const dasherizedActionName = 'test-action';
+const componentName = 'test component';
+const dasherizedComponentName = 'test-component';
 const clicheName = 'clichename';
 
-describe('action', () => {
+describe('component', () => {
   it('works', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
     const tree = runner.runSchematic(
-      'action', {
-        actionName,
+      'component', {
+        componentName,
         clicheName,
         skipAppComponentHtml: true,
         skipMetadataImport: true
       }, Tree.empty());
 
-    const actionFilePathPrefix =
-      `/src/app/${clicheName}/${dasherizedActionName}/${dasherizedActionName}`;
+    const componentFilePathPrefix =
+      `/src/app/${clicheName}/${dasherizedComponentName}/${dasherizedComponentName}`;
 
     expect(tree.files)
       .toEqual([
-        `${actionFilePathPrefix}.component.css`,
-        `${actionFilePathPrefix}.component.html`,
-        `${actionFilePathPrefix}.component.spec.ts`,
-        `${actionFilePathPrefix}.component.ts`
+        `${componentFilePathPrefix}.component.css`,
+        `${componentFilePathPrefix}.component.html`,
+        `${componentFilePathPrefix}.component.spec.ts`,
+        `${componentFilePathPrefix}.component.ts`
       ]);
   });
 });

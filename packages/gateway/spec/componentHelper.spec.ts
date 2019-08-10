@@ -1,9 +1,9 @@
-import { ActionHelper , ActionTable } from '../src/actionHelper';
-import { ActionPath } from '../src/actionPath';
+import { ComponentHelper , ComponentTable } from '../src/componentHelper';
+import { ComponentPath } from '../src/componentPath';
 
-describe('ActionHelper', () => {
+describe('ComponentHelper', () => {
   it('should require alias for duplicate paths', () => {
-    const actionTable: ActionTable = {
+    const componentTable: ComponentTable = {
       'chorestar-root': [
         {
           fqtag: 'router-outlet',
@@ -225,9 +225,9 @@ describe('ActionHelper', () => {
       'property'
     ];
     const routes = ['chorestar-parent-home'];
-    const actionHelper = new ActionHelper(usedCliches, actionTable, routes);
+    const componentHelper = new ComponentHelper(usedCliches, componentTable, routes);
 
-    const arrayActionPath = [
+    const arrayComponentPath = [
       'chorestar-root',
       'chorestar-parent-home',
       'task-show-tasks',
@@ -236,8 +236,8 @@ describe('ActionHelper', () => {
       'dv-tx',
       'task-approve-task'
     ];
-    const actionPath = new ActionPath(arrayActionPath);
-    const matchingPaths = actionHelper.getMatchingPaths(actionPath);
+    const componentPath = new ComponentPath(arrayComponentPath);
+    const matchingPaths = componentHelper.getMatchingPaths(componentPath);
     expect(matchingPaths.length)
       .toBe(2);
   });

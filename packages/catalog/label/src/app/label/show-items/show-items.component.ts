@@ -3,7 +3,7 @@ import {
   OnInit, SimpleChanges, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -34,7 +34,7 @@ export class ShowItemsComponent implements AfterViewInit, OnEval, OnInit,
 
   @Input() noItemsToShowText = 'No items to show';
 
-  @Input() showItem: Action = {
+  @Input() showItem: ComponentValue = {
     type: <Type<Component>> ShowItemComponent
   };
 

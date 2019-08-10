@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -23,7 +23,7 @@ import {
 
 import { v4 as uuid } from 'uuid';
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-message': (extraInfo) => `
     mutation CreateMessage($input: CreateMessageInput!) {
       createMessage (input: $input) ${getReturnFields(extraInfo)}
@@ -49,11 +49,11 @@ const actionRequestTable: ActionRequestTable = {
           }
         `;
       default:
-        throw new Error('Need to specify extraInfo.action');
+        throw new Error('Need to specify extraInfo.component');
     }
   },
   'follow-unfollow': (extraInfo) => {
-    switch (extraInfo.action) {
+    switch (extraInfo.component) {
       case 'follow':
         return `
           mutation FollowUnfollow($input: FollowUnfollowInput!) {
@@ -73,7 +73,7 @@ const actionRequestTable: ActionRequestTable = {
           }
         `;
       default:
-        throw new Error('Need to specify extraInfo.action');
+        throw new Error('Need to specify extraInfo.component');
     }
   },
   'show-followers': (extraInfo) => `
@@ -320,7 +320,7 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
       publishers.createIndex({ id: 1, 'messages.id': 1 }, { unique: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

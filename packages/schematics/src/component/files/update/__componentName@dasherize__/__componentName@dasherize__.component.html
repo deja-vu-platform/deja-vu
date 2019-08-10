@@ -2,16 +2,16 @@
     <button mat-button (click)="startEditing()" type="submit" *ngIf="!isEditing">
       {{startEditButtonLabel}}
     </button>
-    <form (ngSubmit)="onSubmit()" [formGroup]="<%= camelize(actionName) %>Form"
+    <form (ngSubmit)="onSubmit()" [formGroup]="<%= camelize(componentName) %>Form"
     class="form-horizontal" *ngIf="isEditing">
       <div class="form-group">
-        <div *ngIf="<%= camelize(actionName) %>Saved" class="edit-comment-success">
+        <div *ngIf="<%= camelize(componentName) %>Saved" class="edit-comment-success">
           <i class="material-icons">done</i>
-          {{<%= camelize(actionName) %>SavedText}}
+          {{<%= camelize(componentName) %>SavedText}}
         </div>
-        <mat-error *ngIf="<%= camelize(actionName) %>Error">
+        <mat-error *ngIf="<%= camelize(componentName) %>Error">
           <i class="material-icons">report_problem</i>
-          {{<%= camelize(actionName) %>Error}}
+          {{<%= camelize(componentName) %>Error}}
         </mat-error>
       </div>
       <div class="form-group">
@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="form-group">
-        <button mat-button type="submit" [disabled]="!<%= camelize(actionName) %>Form.valid">
+        <button mat-button type="submit" [disabled]="!<%= camelize(componentName) %>Form.valid">
           {{buttonLabel}}
         </button>
       </div>

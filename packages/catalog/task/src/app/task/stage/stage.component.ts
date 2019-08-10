@@ -9,7 +9,7 @@ import {
 
 
 import {
-  Action, GatewayService, GatewayServiceFactory, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -45,14 +45,14 @@ export class StageComponent
   @Input() initialStageIds: string[] = [];
   @Output() stagedIds = new EventEmitter<string[]>();
 
-  @Input() inputAssignee: Action = {
+  @Input() inputAssignee: ComponentValue = {
     type: <Type<Component>> InputAssigneeComponent
   };
-  @Input() showAssignee: Action = {
+  @Input() showAssignee: ComponentValue = {
     type: <Type<Component>> ShowAssigneeComponent
   };
 
-  @Input() stageHeader: Action | undefined;
+  @Input() stageHeader: ComponentValue | undefined;
 
   assigneeId: string;
 

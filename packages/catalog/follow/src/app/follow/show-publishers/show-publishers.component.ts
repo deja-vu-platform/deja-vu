@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -30,7 +30,7 @@ export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
   // Else, fetch the publishers of the given follower.
   @Input() followedById: string | undefined;
 
-  @Input() showPublisher: Action = {
+  @Input() showPublisher: ComponentValue = {
     type: <Type<Component>> ShowPublisherComponent
   };
 

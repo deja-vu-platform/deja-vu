@@ -1,10 +1,10 @@
 <ul *ngIf="events && events.length > 0" class="list-group">
   <li *ngFor="let event of events" class="list-group-item">
-    <dv-include 
-      [action]="showEvent" 
+    <dv-include
+      [component]="showEvent"
       default-showEvent="{ tag: event-show-event }"
       [inputs]="{
-        event: event, showId: showId, 
+        event: event, showId: showId,
         showStartDate: showStartDate, showEndDate: showEndDate
       }"
       [parent]="showEvents">

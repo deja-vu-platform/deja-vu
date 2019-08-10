@@ -3,7 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -30,7 +30,7 @@ export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
 OnChanges {
   @Input() createdBy: string | undefined;
   @Input() viewableBy: string | undefined;
-  @Input() showResource: Action = {
+  @Input() showResource: ComponentValue = {
     type: <Type<Component>> ShowResourceComponent
   };
   @Input() noResourcesText = 'No resources to show';

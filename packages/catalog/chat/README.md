@@ -2,7 +2,7 @@
 
 Exchange messages in real time with other users
 
-## Actions
+## Components
 
 - create-message
 - delete-message

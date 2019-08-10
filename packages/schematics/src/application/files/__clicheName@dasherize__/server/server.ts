@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -18,8 +18,8 @@ import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'create-<%= dasherize(clicheName) %>': (extraInfo) => `
     mutation Create<%= classify(clicheName) %>($input: Create<%= classify(clicheName) %>Input!) {
       create<%= classify(clicheName) %>(input: $input) ${getReturnFields(extraInfo)}
@@ -36,7 +36,7 @@ const actionRequestTable: ActionRequestTable = {
     }
   `,
   'update-<%= dasherize(clicheName) %>': (extraInfo) => {
-    switch (extraInfo.action) {
+    switch (extraInfo.component) {
       case 'update':
         return `
           mutation Update<%= classify(clicheName) %>($input: Update<%= classify(clicheName) %>Input!) {
@@ -50,7 +50,7 @@ const actionRequestTable: ActionRequestTable = {
           }
         `;
       default:
-        throw new Error('Need to specify extraInfo.action');
+        throw new Error('Need to specify extraInfo.component');
     }
   }
 };
@@ -99,7 +99,7 @@ const <%= camelize(clicheName) %>Cliche: ClicheServer = new ClicheServerBuilder(
 
     return <%= camelize(clicheName) %>s.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

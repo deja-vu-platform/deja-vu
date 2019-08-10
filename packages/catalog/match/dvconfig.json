@@ -8,7 +8,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/match/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "match-show-attempt",
     "match-show-attempts",
     "match-show-match",

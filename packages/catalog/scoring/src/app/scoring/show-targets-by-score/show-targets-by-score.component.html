@@ -1,7 +1,7 @@
 <div *ngIf="targets">
   <ul class="list-group">
     <li *ngFor="let target of targets; index as i" class="list-group-item">
-      <dv-include [action]="showTarget"
+      <dv-include [component]="showTarget"
         [inputs]="{
           id: target.id, target: target, showId: showId,
           showScores: showScores, showTotal: showTotal,

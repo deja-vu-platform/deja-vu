@@ -7,7 +7,7 @@ import {
   NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
+  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from '@deja-vu/core';
 
@@ -72,11 +72,11 @@ export class CreateTasksForAssigneesComponent implements OnInit, OnExec,
   @Input() showOptionToSubmit = true;
   @Input() showOptionToAddAssignees = true;
   @Input() showOptionToInputDueDate = true;
-  @Input() showAssignee: Action = {
+  @Input() showAssignee: ComponentValue = {
     type: <Type<Component>> ShowAssigneeComponent
   };
 
-  @Input() stageHeader: Action | undefined;
+  @Input() stageHeader: ComponentValue | undefined;
 
   // Presentation inputs
   @Input() assignerLabel = 'Assigner Id';

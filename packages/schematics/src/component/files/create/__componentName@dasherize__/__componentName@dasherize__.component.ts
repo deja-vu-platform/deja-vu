@@ -16,31 +16,31 @@ import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
 import { <%= classify(entityName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
 
 
-interface <%= classify(actionName) %>Res {
-  data: { <%= camelize(actionName) %>: <%= classify(entityName) %> };
+interface <%= classify(componentName) %>Res {
+  data: { <%= camelize(componentName) %>: <%= classify(entityName) %> };
   errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
-  templateUrl: './<%= dasherize(actionName) %>.component.html',
-  styleUrls: ['./<%= dasherize(actionName) %>.component.css'],
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  templateUrl: './<%= dasherize(componentName) %>.component.html',
+  styleUrls: ['./<%= dasherize(componentName) %>.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: <%= classify(actionName) %>Component,
+      useExisting: <%= classify(componentName) %>Component,
       multi: true
     },
     {
       provide: NG_VALIDATORS,
-      useExisting: <%= classify(actionName) %>Component,
+      useExisting: <%= classify(componentName) %>Component,
       multi: true
     }
   ]
 })
-export class <%= classify(actionName) %>Component implements OnInit, OnExec, OnExecFailure,
+export class <%= classify(componentName) %>Component implements OnInit, OnExec, OnExecFailure,
   OnExecSuccess {
   @Input() id: string | undefined;
   @Input() set content(inputContent: string) {
@@ -56,7 +56,7 @@ export class <%= classify(actionName) %>Component implements OnInit, OnExec, OnE
   @ViewChild(FormGroupDirective) form;
 
   contentControl = new FormControl('', Validators.required);
-  <%= camelize(actionName) %>Form: FormGroup = this.builder.group({
+  <%= camelize(componentName) %>Form: FormGroup = this.builder.group({
     contentControl: this.contentControl
   });
 
@@ -81,7 +81,7 @@ export class <%= classify(actionName) %>Component implements OnInit, OnExec, OnE
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<<%= classify(actionName) %>Res>(this.apiPath, {
+    const res = await this.gs.post<<%= classify(componentName) %>Res>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,

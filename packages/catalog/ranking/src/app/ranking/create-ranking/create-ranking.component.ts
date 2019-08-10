@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
+  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from '@deja-vu/core';
 
@@ -53,7 +53,7 @@ export class CreateRankingComponent
   @Input() buttonLabel = 'Create';
   @Input() newRankingSavedText = 'New ranking saved';
 
-  @Input() showTarget: Action = {
+  @Input() showTarget: ComponentValue = {
     type: <Type<Component>> ShowTargetComponent
   };
 

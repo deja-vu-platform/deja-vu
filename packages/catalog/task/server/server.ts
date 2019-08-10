@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -20,7 +20,7 @@ import {
 } from './schema';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'approve-task': (extraInfo) => `
     mutation ApproveTask($id: ID!) {
       approveTask (id: $id) ${getReturnFields(extraInfo)}
@@ -175,7 +175,7 @@ const taskCliche: ClicheServer = new ClicheServerBuilder('task')
 
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

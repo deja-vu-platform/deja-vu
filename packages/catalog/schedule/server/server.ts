@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -24,8 +24,8 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'create-schedule': (extraInfo) => `
     mutation CreateSchedule($input: CreateScheduleInput!) {
       createSchedule(input: $input) ${getReturnFields(extraInfo)}
@@ -394,7 +394,7 @@ const scheduleCliche: ClicheServer = new ClicheServerBuilder('schedule')
 
     return schedules.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

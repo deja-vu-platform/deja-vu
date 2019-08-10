@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  ConfigService, ConfigServiceFactory, GatewayService,
   GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';

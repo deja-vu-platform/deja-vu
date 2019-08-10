@@ -2,7 +2,7 @@
 
 Crowdsource evaluation of items
 
-## Actions
+## Components
 
 - delete-rating
 - delete-ratings

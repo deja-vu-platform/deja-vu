@@ -2,7 +2,7 @@
 
 Find times to meet
 
-## Actions
+## Components
 
 - create-schedule
 - delete-schedule

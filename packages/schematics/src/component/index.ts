@@ -24,7 +24,7 @@ import {
 import { InsertChange } from '../utils/change';
 
 
-export function action(options: any): Rule {
+export function component(options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
     const templateSource = apply(url(`./files/${options.type}`), [
         template({
@@ -107,10 +107,10 @@ function addComponentToMetadata(options: any): Rule {
       return tree;
     }
     const metadataPath = getMetadataPath(options.clicheName);
-    const componentPath = `./${strings.dasherize(options.actionName)}/`
-                          + strings.dasherize(options.actionName)
+    const componentPath = `./${strings.dasherize(options.componentName)}/`
+                          + strings.dasherize(options.componentName)
                           + '.component';
-    const componentName = `${strings.classify(options.actionName)}Component`;
+    const componentName = `${strings.classify(options.componentName)}Component`;
     const source = readIntoSourceFile(tree, metadataPath);
 
     const changeRecorder = tree.beginUpdate(metadataPath);
@@ -149,10 +149,10 @@ function addToAppComponentHtml(options: any): Rule {
     const filePath = '/src/app/app.component.html';
 
     const root = parse(getFileText(tree, filePath)) as HTMLElement;
-    const actionComponentSelector =
-      `${options.clicheName}-${strings.dasherize(options.actionName)}`;
+    const componentComponentSelector =
+      `${options.clicheName}-${strings.dasherize(options.componentName)}`;
     // skip if it's already there
-    if (root.querySelector(actionComponentSelector)) {
+    if (root.querySelector(componentComponentSelector)) {
       return tree;
     }
 
@@ -160,7 +160,7 @@ function addToAppComponentHtml(options: any): Rule {
       `${strings.capitalize(options.entityName)}`;
     const componentHtml =
       `  <h2>${title}</h2>\n` +
-      `  <${actionComponentSelector}></${actionComponentSelector}>\n`;
+      `  <${componentComponentSelector}></${componentComponentSelector}>\n`;
 
     const container = root.querySelector('div.container');
     if (!container) {

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -29,7 +29,7 @@ function standardizeLabel(id: string): string {
     .toLowerCase();
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'attach-labels': (extraInfo) => `
     mutation AttachLabels($input: AddLabelsToItemInput!) {
       addLabelsToItem(input: $input) ${getReturnFields(extraInfo)}
@@ -227,7 +227,7 @@ const labelCliche: ClicheServer = new ClicheServerBuilder('label')
 
     return Promise.resolve();
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

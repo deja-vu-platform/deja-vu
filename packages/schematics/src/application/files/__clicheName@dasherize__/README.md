@@ -2,7 +2,7 @@
 
 Description of the cliché
 
-## Actions
+## Components
 
 - create-<%= dasherize(clicheName) %>
 - delete-<%= dasherize(clicheName) %>

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -105,7 +105,7 @@ class UserValidation {
   }
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   authenticate: (extraInfo) => `
     query Authenticate($input: VerifyInput!) {
       verify(input: $input) ${getReturnFields(extraInfo)}
@@ -272,7 +272,7 @@ const authenticationCliche: ClicheServer =
         users.createIndex({ username: 1 }, { unique: true, sparse: true })
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 

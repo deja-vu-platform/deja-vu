@@ -29,7 +29,7 @@
       "required": ["firstName", "lastName"]
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/property/**" ]
     },
@@ -39,7 +39,7 @@
       ]
     }
   },
-  "actionsNoRequest": {
+  "componentsNoRequest": {
     "exec": [
       "property-choose-object",
       "property-create-property"
@@ -48,7 +48,7 @@
       "property-create-property"
     ]
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "property-show-object",
     "property-show-objects",
     "property-create-object"

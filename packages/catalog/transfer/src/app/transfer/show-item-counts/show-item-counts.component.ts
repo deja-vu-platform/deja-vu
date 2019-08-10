@@ -1,5 +1,5 @@
 import { Component, Input, Type } from '@angular/core';
-import { Action } from '@deja-vu/core';
+import { ComponentValue } from '@deja-vu/core';
 
 import {
   ShowItemCountComponent
@@ -15,7 +15,7 @@ import { ItemCount } from '../shared/transfer.model';
 })
 export class ShowItemCountsComponent {
   @Input() itemCounts: ItemCount[];
-  @Input() showItemCount: Action = {
+  @Input() showItemCount: ComponentValue = {
     type: <Type<Component>> ShowItemCountComponent
   };
 

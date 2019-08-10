@@ -3,7 +3,7 @@ import {
   Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -28,7 +28,7 @@ OnChanges {
   @Input() showMembers = true;
   @Input() loadMembers = true;
 
-  @Input() showGroup: Action = {
+  @Input() showGroup: ComponentValue = {
     type: <Type<Component>> ShowGroupComponent
   };
   _groups: Group[] = [];

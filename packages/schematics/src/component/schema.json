@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "id": "DvSchematicsGenerateAction",
-  "title": "Create an action for a Déjà Vu cliché",
+  "id": "DvSchematicsGenerateComponent",
+  "title": "Create a component for a Déjà Vu cliché",
   "type": "object",
   "properties": {
-    "actionName": {
+    "componentName": {
       "type": "string"
     },
     "clicheName": {
@@ -16,18 +16,18 @@
     "skipAppComponentHtml": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the new action will not be added to the app.component.html file"
+      "description": "When true, the new component will not be added to the app.component.html file"
     },
     "skipMetadataImport": {
       "type": "boolean",
       "default": false,
-      "description": "When true, the new action will not be added to the metadata file"
+      "description": "When true, the new component will not be added to the metadata file"
     },
     "type": {
       "type": "string",
       "default": "blank"
     }
   },
-  "required": [ "actionName", "clicheName" ],
+  "required": [ "componentName", "clicheName" ],
   "additionalProperties": false
 }

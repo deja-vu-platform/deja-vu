@@ -18,13 +18,13 @@ import { API_PATH } from '../property.config';
 
 /**
  * Create objects in bulk
- * There are two ways to use this action:
+ * There are two ways to use this component:
  *  1. if `objects` is inputted:
- *      the action will not display anything.
- *      the data for the objects must come from another action.
- *      the action's execution must be triggered by another action (in a transaction)
+ *      the component will not display anything.
+ *      the data for the objects must come from another component.
+ *      the component's execution must be triggered by another component (in a transaction)
  *  2. if `objects` is not inputted:
- *      the action works similar to when multiple `create-object` actions are stacked.
+ *      the component works similar to when multiple `create-object` components are stacked.
  *      there must be a list of `ids` for the objects that will be created.
  */
 @Component({

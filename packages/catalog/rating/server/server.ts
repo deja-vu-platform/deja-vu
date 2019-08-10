@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -19,7 +19,7 @@ import {
   SetRatingInput
 } from './schema';
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'rate-target': (extraInfo) => {
     switch (extraInfo.action) {
       case 'load':
@@ -208,7 +208,7 @@ const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -35,7 +35,7 @@ const DEFAULT_TOTAL_SCORE_FN = (scores: number[]): number =>
   scores.reduce((total, score) => total + score, 0);
 
 // TODO: maybe write a function that will autogenerate some repetitive parts
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-score': (extraInfo) => `
     mutation CreateScore($input: CreateScoreInput!) {
       createScore (input: $input) ${getReturnFields(extraInfo)}
@@ -245,7 +245,7 @@ const scoringCliche: ClicheServer<ScoringConfig> =
           { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 

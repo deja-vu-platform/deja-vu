@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
@@ -39,7 +39,7 @@ OnInit {
   @Input() showMessageAuthorId = true;
   @Input() showMessageChatId = true;
 
-  @Input() showMessage: Action = {
+  @Input() showMessage: ComponentValue = {
     type: <Type<Component>> ShowMessageComponent
   };
   @Input() noMessagesToShowText = 'No messages yet';

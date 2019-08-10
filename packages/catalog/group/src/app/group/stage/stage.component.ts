@@ -10,7 +10,7 @@ import {
 
 
 import {
-  Action, GatewayService, GatewayServiceFactory, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, RunService
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -42,14 +42,14 @@ implements OnInit, ControlValueAccessor, Validator {
   @Input() initialStageIds: string[] = [];
   @Output() stagedIds = new EventEmitter<string[]>();
 
-  @Input() inputMember: Action = {
+  @Input() inputMember: ComponentValue = {
     type: <Type<Component>> InputMemberComponent
   };
-  @Input() showMember: Action = {
+  @Input() showMember: ComponentValue = {
     type: <Type<Component>> ShowMemberComponent
   };
 
-  @Input() stageHeader: Action | undefined;
+  @Input() stageHeader: ComponentValue | undefined;
 
   memberId: string;
 

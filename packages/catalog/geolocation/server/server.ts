@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -18,7 +18,7 @@ import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'show-marker': (extraInfo) => `
     query ShowMarker($id: ID!) {
       marker(id: $id) ${getReturnFields(extraInfo)}
@@ -132,7 +132,7 @@ const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
         { unique: true, sparse: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

@@ -9,7 +9,7 @@ import { createServer } from 'http';
 import * as path from 'path';
 import * as WebSocket from 'ws';
 
-import { ActionTable } from './actionHelper';
+import { ComponentTable } from './componentHelper';
 import { DvConfig, GatewayConfig } from './gateway.model';
 import {
   AppRequestProcessor,
@@ -30,12 +30,12 @@ const DEFAULT_CONFIG: GatewayConfig = {
 };
 
 const DV_CONFIG_FLAG = 'configFilePath';
-const ACTION_TABLE_FP = 'actionTable.json';
+const COMPONENT_TABLE_FP = 'componentTable.json';
 
 
 export interface AppInfo {
   dvConfig: DvConfig;
-  appActionTable: ActionTable;
+  appComponentTable: ComponentTable;
   distFolder: string;
 }
 
@@ -67,7 +67,7 @@ export function startGateway(
     .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
   const app = express();
   const requestProcessor: RequestProcessor = info
-    ? new AppRequestProcessor(gatewayConfig, info.dvConfig, info.appActionTable)
+    ? new AppRequestProcessor(gatewayConfig, info.dvConfig, info.appComponentTable)
     : new DesignerRequestProcessor(gatewayConfig);
 
   // Handle API requests
@@ -149,16 +149,16 @@ function main() {
 
   let gatewayConfig: GatewayConfigOptions;
   let dvConfig: DvConfig;
-  let appActionTable: ActionTable;
+  let appComponentTable: ComponentTable;
   if (dvConfigPath) {
     dvConfig = JSON.parse(readFileSync(dvConfigPath, 'utf8'));
     gatewayConfig = Object.assign({}, dvConfig.gateway.config);
-    appActionTable = JSON.parse(
-      readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')
+    appComponentTable = JSON.parse(
+      readFileSync(path.join(distFolder, COMPONENT_TABLE_FP), 'utf8')
     );
   }
 
-  startGateway(gatewayConfig, { dvConfig, appActionTable, distFolder });
+  startGateway(gatewayConfig, { dvConfig, appComponentTable, distFolder });
 }
 
 // if executed from command line

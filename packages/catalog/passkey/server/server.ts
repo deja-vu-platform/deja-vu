@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheDbDuplicateKeyError,
   ClicheServer,
@@ -42,7 +42,7 @@ class PasskeyValidation {
   }
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-passkey': (extraInfo) => {
     switch (extraInfo.action) {
       case 'login':
@@ -203,7 +203,7 @@ const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
 
     return Promise.resolve();
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

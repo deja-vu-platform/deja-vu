@@ -2,7 +2,7 @@
 
 Share reactions to items
 
-## Actions
+## Components
 
 - create-comment
 - delete-comment

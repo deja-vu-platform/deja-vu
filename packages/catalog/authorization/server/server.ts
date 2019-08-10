@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -22,7 +22,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'add-remove-viewer': (extraInfo) => {
     switch (extraInfo.action) {
       case 'add':
@@ -216,7 +216,7 @@ const authorizationCliche: ClicheServer =
         resources.createIndex({ id: 1, ownerId: 1 }, { unique: true })
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 

@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -25,7 +25,7 @@ interface RankingConfig extends Config {
   oneToOneRanking?: boolean;
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-ranking': (extraInfo) => `
     mutation CreateRanking($input: CreateRankingInput!) {
       createRanking(input: $input) ${getReturnFields(extraInfo)}
@@ -191,7 +191,7 @@ const rankingCliche: ClicheServer<RankingConfig> =
           { sourceId: 1, targetId: 1 }, sourceTargetIndexOptions)
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 

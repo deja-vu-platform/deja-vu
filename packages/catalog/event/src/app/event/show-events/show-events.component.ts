@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { Event, GraphQlEvent, toEvent } from '../../../../shared/data';
@@ -30,7 +30,7 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showStartDate = true;
   @Input() showEndDate = true;
 
-  @Input() showEvent: Action = {
+  @Input() showEvent: ComponentValue = {
     type: <Type<Component>> ShowEventComponent
   };
   @Input() noEventsToShowText = 'No events to show';

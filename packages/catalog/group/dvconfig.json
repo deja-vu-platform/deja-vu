@@ -9,7 +9,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [
         "src/app/group/**"
@@ -21,7 +21,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "group-show-group-count",
     "group-show-groups",
     "group-show-member-count",

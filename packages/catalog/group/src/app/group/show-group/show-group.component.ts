@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output, Type} from '@angular/core';
 
-import { Action, GatewayService,
+import { ComponentValue, GatewayService,
   GatewayServiceFactory, OnEval, RunService } from '@deja-vu/core';
 
 import { Group } from '../shared/group.model';
@@ -20,7 +20,7 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showMembers = true;
   @Input() showGroupId = true;
 
-  @Input() showMember: Action = {
+  @Input() showMember: ComponentValue = {
     type: <Type<Component>> ShowMemberComponent
   };
   @Output() loadedGroup = new EventEmitter<Group>();

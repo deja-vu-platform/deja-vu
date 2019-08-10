@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheDbNotFoundError,
   ClicheServer,
@@ -29,7 +29,7 @@ interface TransferConfig extends Config {
   balanceType: 'money' | 'items';
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'add-to-balance': (extraInfo) => `
     mutation AddToBalance($input: AddToBalanceInput!) {
       addToBalance(input: $input) ${getReturnFields(extraInfo)}
@@ -376,7 +376,7 @@ const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
       transfers.createIndex({ toId: 1 }, { sparse: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .dynamicTypeDefs(getDynamicTypeDefs)
   .build();

@@ -17,10 +17,10 @@ interface <%= classify(entityName) %>Res {
 
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(actionName) %>',
-  templateUrl: './<%= dasherize(actionName) %>.component.html'
+  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  templateUrl: './<%= dasherize(componentName) %>.component.html'
 })
-export class <%= classify(actionName) %>Component implements AfterViewInit, OnChanges, OnEval,
+export class <%= classify(componentName) %>Component implements AfterViewInit, OnChanges, OnEval,
 OnInit {
   // Provide one of the following: id or <%= entityName %>
   @Input() id: string | undefined;

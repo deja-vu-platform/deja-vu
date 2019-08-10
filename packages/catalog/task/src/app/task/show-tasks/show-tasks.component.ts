@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
@@ -43,7 +43,7 @@ OnChanges {
   @Input() showOptionToComplete = false;
   @Input() showOptionToApprove = false;
 
-  @Input() showTask: Action = {
+  @Input() showTask: ComponentValue = {
     type: <Type<Component>> ShowTaskComponent
   };
   @Input() noTasksToShowText = 'No tasks to show';

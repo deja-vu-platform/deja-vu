@@ -8,7 +8,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/geolocation/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "geolocation-show-marker",
     "geolocation-show-marker-count",
     "geolocation-show-markers"

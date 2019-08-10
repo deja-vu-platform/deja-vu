@@ -2,7 +2,7 @@
 
 Schedule events
 
-## Actions
+## Components
 
 - choose-and-show-series
 - create-event

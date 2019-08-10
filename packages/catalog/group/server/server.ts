@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheServer,
   ClicheServerBuilder,
@@ -20,7 +20,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'add-to-group': (extraInfo) => `
     mutation AddToGroup($groupId: ID!, $id: ID!) {
       addMember(groupId: $groupId, id: $id) ${getReturnFields(extraInfo)}
@@ -229,7 +229,7 @@ const groupCliche: ClicheServer = new ClicheServerBuilder('group')
 
     return groups.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

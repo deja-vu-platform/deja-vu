@@ -2,7 +2,7 @@
 
 Controls access to resources
 
-## Actions
+## Components
 
 - add-remove-viewer
 - add-viewer

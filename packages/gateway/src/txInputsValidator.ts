@@ -1,4 +1,4 @@
-import { ActionTag } from './actionHelper';
+import { ComponentTag } from './componentHelper';
 
 import { RequestInvalidError } from './requestProcessor';
 
@@ -64,34 +64,34 @@ export class TxInputsValidator {
   }
 
   public static Validate(
-    inputValues: InputValuesMap, txActions: ActionTag[], context: TxContext)
+    inputValues: InputValuesMap, txComponents: ComponentTag[], context: TxContext)
      : void {
     // fqtag -> { i1: expr1, ..., in: exprn }
-    const actions = {};
-    for (const txAction of txActions) {
-      _.forEach(txAction.inputs, (unparsedExpr: string, input: string) => {
+    const components = {};
+    for (const txComponent of txComponents) {
+      _.forEach(txComponent.inputs, (unparsedExpr: string, input: string) => {
         const inputName = input.startsWith('[') ?
           input.slice(1, -1) : input;
-        _.set(actions, [txAction.fqtag, inputName], unparsedExpr);
+        _.set(components, [txComponent.fqtag, inputName], unparsedExpr);
       });
     }
 
     // We do the checking by inputs. For each input value we receive, we
     // evaluate the expr that appears in the HTML source code and check that
     // we get the same value.
-    _.forEach(inputValues, (input, actionFqTag: string) => {
+    _.forEach(inputValues, (input, componentFqTag: string) => {
       _.forEach(input, (inputValue: any, inputName: string) => {
         TxInputsValidator.ValidateInput(
-          actionFqTag, inputName, inputValue, context, actions);
+          componentFqTag, inputName, inputValue, context, components);
       });
     });
   }
 
   private static ValidateInput(
     fqtag: string, inputName: string, inputValue: any,
-    context: {[name: string]: any}, actions)
+    context: {[name: string]: any}, components)
     : void {
-    const unparsedExpr = _.get(actions, [fqtag, inputName]);
+    const unparsedExpr = _.get(components, [fqtag, inputName]);
     if (unparsedExpr === undefined) {
       console.log(
         `Not checking ${fqtag}.${inputName} since it's an internal input`);
@@ -103,7 +103,7 @@ export class TxInputsValidator {
     console.log(`Expected value for ${fqtag}.${inputName} is ${expectedValue}`);
     // TODO: handle the case in which the expected value is `undefined` and
     // the input value is something other than `undefined` and it's ok
-    // because the behavior of the action is to use a default value for an
+    // because the behavior of the component is to use a default value for an
     // input if none is given
     if (!_.isEqual(expectedValue, inputValue)) {
       throw new RequestInvalidError(

@@ -2,7 +2,7 @@
 
 Transfer money or items between accounts
 
-## Actions
+## Components
 
 - add-to-balance
 - create-item-count

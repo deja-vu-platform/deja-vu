@@ -3,7 +3,7 @@ Styling Applications with Themes
 
 DV Themes
 ---------
-To make it easier to style common app actions, we have created a collection of
+To make it easier to style common app components, we have created a collection of
 themes that you can import and use in your applications. These style sheets
 also provide a guide for styling components in general. For example, to use DV's default styling for navbars, include the following into your app's `styles.css`.
 ```css

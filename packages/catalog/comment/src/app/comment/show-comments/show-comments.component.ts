@@ -3,7 +3,7 @@ import {
   OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -37,7 +37,7 @@ OnInit, AfterViewInit, OnChanges, OnEval {
   @Input() showTargetId = true;
   @Input() showContent = true;
 
-  @Input() showComment: Action = {
+  @Input() showComment: ComponentValue = {
     type: <Type<Component>> ShowCommentComponent
   };
   @Input() noCommentsToShowText = 'No comments to show';

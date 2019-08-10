@@ -51,7 +51,7 @@
 <ul *ngIf="slots && slots.length > 0" class="list-group">
   <li *ngFor="let slot of slots" class="list-group-item">
     <dv-include
-      [action]="showSlot"
+      [component]="showSlot"
       default-showSlot="{ tag: schedule-show-slot }"
       [inputs]="{
         slot: slot, showId: showId,

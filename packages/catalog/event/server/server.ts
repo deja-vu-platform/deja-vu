@@ -1,5 +1,5 @@
 import {
-  ActionRequestTable,
+  ComponentRequestTable,
   ClicheDb,
   ClicheDbNotFoundError,
   ClicheServer,
@@ -35,7 +35,7 @@ function dateToUnixTime(date: Date): number {
   return date.valueOf() / MS_IN_S;
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'choose-and-show-series': (extraInfo) => {
     switch (extraInfo.action) {
       case 'all-series':
@@ -216,7 +216,7 @@ const eventCliche: ClicheServer = new ClicheServerBuilder('event')
       series.createIndex({ 'events.id': 1 }, { unique: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 

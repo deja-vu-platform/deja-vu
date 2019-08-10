@@ -94,7 +94,7 @@ export class Update<%= classify(clicheName) %>Component implements
       params: {
         inputs: { id: this.id },
         extraInfo: {
-          action: 'load',
+          component: 'load',
           returnFields: 'id, content'
         }
       }
@@ -129,7 +129,7 @@ export class Update<%= classify(clicheName) %>Component implements
         }
       },
       extraInfo: {
-        action: 'update'
+        component: 'update'
       }
     })
     .toPromise();

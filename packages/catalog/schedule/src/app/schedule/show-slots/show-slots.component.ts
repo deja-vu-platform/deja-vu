@@ -6,7 +6,7 @@ import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -70,7 +70,7 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
   // See https://angular.io/api/common/DatePipe
   @Input() dateTimeFormatString = 'medium';
 
-  @Input() showSlot: Action = {
+  @Input() showSlot: ComponentValue = {
     type: <Type<Component>> ShowSlotComponent
   };
 
@@ -160,7 +160,7 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
         });
     } else if (this.gs) {
       this.gs.noRequest();
-    } 
+    }
   }
 
   private canEval(): boolean {

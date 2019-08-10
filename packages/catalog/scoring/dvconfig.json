@@ -8,7 +8,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/scoring/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "scoring-show-score",
     "scoring-show-target",
     "scoring-show-targets-by-score"
