@@ -17,9 +17,9 @@ import * as _ from 'lodash';
 import * as tinycolor from 'tinycolor2';
 
 import {
-  ActionInstance,
+  ComponentInstance,
   App,
-  AppActionDefinition,
+  AppComponentDefinition,
   flexAlign,
   flexJustify,
   Row
@@ -33,7 +33,7 @@ import findReferences, {
 
 interface Reference extends IOReference {
   forIO: string;
-  forActionID: string;
+  forComponentID: string;
 }
 
 export const MIN_ALPHA_FOR_DARK = 0.25;
@@ -67,26 +67,26 @@ const COLORS = [
 ];
 
 interface ColorAssignments {
-  [actionID: string]: {
+  [componentID: string]: {
     [ioName: string]: string;
   };
 }
 
 @Component({
-  selector: 'app-action-definition',
-  templateUrl: './action-definition.component.html',
-  styleUrls: ['./action-definition.component.scss']
+  selector: 'app-component-definition',
+  templateUrl: './component-definition.component.html',
+  styleUrls: ['./component-definition.component.scss']
 })
-export class ActionDefinitionComponent
+export class ComponentDefinitionComponent
 implements AfterViewInit, OnChanges, OnInit {
   @Input() app: App;
-  @Input() actionInstance: ActionInstance;
+  @Input() componentInstance: ComponentInstance;
   @Input() dragging = false;
   @Input() showIoHints = false;
 
   @ViewChildren('instanceContainer')
     private instanceContainers: QueryList<ElementRef>;
-  private lastNumActions = 0;
+  private lastNumComponents = 0;
   readonly scopeIO: ScopeIO = new ScopeIO();
   readonly flexAlignEntries = Object.entries(flexAlign);
   readonly flexJustifyEntries = Object.entries(flexJustify);
@@ -105,8 +105,8 @@ implements AfterViewInit, OnChanges, OnInit {
     private readonly router: Router) { }
 
   ngOnChanges() {
-    const action = this.actionInstance.of as AppActionDefinition;
-    const color = tinycolor(action.styles.backgroundColor);
+    const component = this.componentInstance.of as AppComponentDefinition;
+    const color = tinycolor(component.styles.backgroundColor);
     document
       .querySelector('body').style
       .setProperty(
@@ -119,21 +119,21 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   ngOnInit() {
-    this.rs.registerAppAction(this.elem, {});
+    this.rs.registerAppComponent(this.elem, {});
   }
 
   ngAfterViewInit() {
     this.instanceContainers.changes.subscribe(() => {
       const instanceContainersArr = this.instanceContainers.toArray();
 
-      // show the name of any action on the screen with size 0
+      // show the name of any component on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
-        // if an action was removed we need to re-do the data layer
-        if (this.lastNumActions > instanceContainersArr.length) {
+        // if an component was removed we need to re-do the data layer
+        if (this.lastNumComponents > instanceContainersArr.length) {
           this.updateReferences();
         }
-        this.lastNumActions = instanceContainersArr.length;
+        this.lastNumComponents = instanceContainersArr.length;
         this.calcShowNoContentHint(instanceContainersArr);
         this.calcShowHiddenHint(instanceContainersArr);
       });
@@ -157,15 +157,15 @@ implements AfterViewInit, OnChanges, OnInit {
     this._rows.length = 0;
     this._rows.push.apply(
       this._rows,
-      (<AppActionDefinition>this.actionInstance.of).rows
+      (<AppComponentDefinition>this.componentInstance.of).rows
     );
     this._rows.push(emptyRow);
 
     return this._rows;
   }
 
-  onActionMenuClosed(forAction: ActionInstance) {
-    forAction.shouldReLink.emit();
+  onActionMenuClosed(forComponent: ComponentInstance) {
+    forComponent.shouldReLink.emit();
     this.updateReferences();
     // need to wait for values to propogate
     setTimeout(() => {
@@ -207,26 +207,26 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Get all sibling outputs / parent inputs referenced by an action
+   * Get all sibling outputs / parent inputs referenced by an component
    */
-  ioReferences(by: ActionInstance): Reference[] {
+  ioReferences(by: ComponentInstance): Reference[] {
     if (by.id in this.ioReferencesCache) {
       return this.ioReferencesCache[by.id];
     }
 
-    const ids = [by.id, ..._.map(by.getInputtedActions(true), (a) => a.id)];
+    const ids = [by.id, ..._.map(by.getInputtedComponents(true), (a) => a.id)];
     const resolutions: Reference[] = ids
       .map((id) => Object
         .entries(this.inReferences[id] || {})
         .map(([ioName, references]) => references
-          .map((r): Reference => ({ ...r, forIO: ioName, forActionID: id }))
+          .map((r): Reference => ({ ...r, forIO: ioName, forComponentID: id }))
         )
         .flat()
       )
       .flat();
     const uniqueResolutions = _.uniqBy(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.action.id, r.forIO, r.forActionID])
+      (r) => JSON.stringify([r.ioName, r.component.id, r.forIO, r.forComponentID])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 
@@ -234,10 +234,10 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Get all outputs of an action which are referenced in this scope
+   * Get all outputs of an component which are referenced in this scope
    */
   ioReferenced(
-    from: ActionInstance
+    from: ComponentInstance
   ): { ioName: string }[] {
     if (from.id in this.ioReferencedCache) {
       return this.ioReferencedCache[from.id];
@@ -246,9 +246,9 @@ implements AfterViewInit, OnChanges, OnInit {
     const ret = _.uniqBy(
       Array
         .from(this.outReferences[from.id] || [])
-        .filter(({ ioName, action }) => from
-          .getInputtedActions(true)
-          .indexOf(action) === -1
+        .filter(({ ioName, component }) => from
+          .getInputtedComponents(true)
+          .indexOf(component) === -1
         ),
       (r) => r.ioName
     );
@@ -259,12 +259,12 @@ implements AfterViewInit, OnChanges, OnInit {
 
   /**
    * Used for color-coding I/O
-   * Each action x ioName combo should have a unique color
+   * Each component x ioName combo should have a unique color
    */
-  color(fromAction: ActionInstance, ioName: string): string {
+  color(fromComponent: ComponentInstance, ioName: string): string {
     return _.get(
       this.colorAssignments,
-      [fromAction.id, ioName],
+      [fromComponent.id, ioName],
       '#a9a9a9' // default, solves async issues and > 20 outputs to show
     ) as string; // the default typing is wrong
   }
@@ -278,19 +278,19 @@ implements AfterViewInit, OnChanges, OnInit {
 
   deleteRow(rowNum: number): void {
     if (window.confirm('Are you sure you want to remove this row?')) {
-      (<AppActionDefinition> this.actionInstance.of).rows
+      (<AppComponentDefinition> this.componentInstance.of).rows
         .splice(rowNum, 1);
     }
   }
 
-  editAction(action: ActionInstance) {
-    this.router.navigateByUrl('/' + action.of.name);
+  editComponent(component: ComponentInstance) {
+    this.router.navigateByUrl('/' + component.of.name);
   }
 
-  deleteAction(rowNum: number, actionNum: number) {
-    if (window.confirm('Are you sure you want to remove this action?')) {
-      (<AppActionDefinition> this.actionInstance.of).rows[rowNum]
-        .actions.splice(actionNum, 1);
+  deleteComponent(rowNum: number, componentNum: number) {
+    if (window.confirm('Are you sure you want to remove this component?')) {
+      (<AppComponentDefinition> this.componentInstance.of).rows[rowNum]
+        .components.splice(componentNum, 1);
     }
   }
 
@@ -299,7 +299,7 @@ implements AfterViewInit, OnChanges, OnInit {
    * Allocate colors to referenced parent inputs / sibling outputs
    */
   private updateReferences() {
-    const { inReferences, outReferences} = findReferences(this.actionInstance);
+    const { inReferences, outReferences} = findReferences(this.componentInstance);
     this.inReferences = inReferences;
     this.outReferences = outReferences;
     this.ioReferencedCache = {};
@@ -312,9 +312,9 @@ implements AfterViewInit, OnChanges, OnInit {
    */
   private allocateColors() {
     // free colors assigned to IOs that are no longer referenced
-    _.forOwn(this.colorAssignments, (obj, actionID) => {
+    _.forOwn(this.colorAssignments, (obj, componentID) => {
       _.forOwn(obj, (color, ioName) => {
-        const ios = this.outReferences[actionID] || [];
+        const ios = this.outReferences[componentID] || [];
         if (!ios.find((r) => r.ioName === ioName)) {
           this.availableColors.add(color);
         }
@@ -342,19 +342,19 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Set the showNoContentHint property on each child action
-   * This property is set to true if the action is not rendering anything
-   * Since actions are broken up into rows but the ViewChildren gives us
+   * Set the showNoContentHint property on each child component
+   * This property is set to true if the component is not rendering anything
+   * Since components are broken up into rows but the ViewChildren gives us
    *   one array it makes the most sense to do this all at once in a loop
    */
   private calcShowNoContentHint(instanceContainersArr: ElementRef[]) {
-    let rowActions = 0;
+    let rowComponents = 0;
     this.rows.forEach((row) => {
-      row.actions.forEach((action, actionNum) => {
-        const index = rowActions + actionNum;
-        const actionContainer = instanceContainersArr[index];
-        const firstChild = actionContainer
-          && actionContainer.nativeElement.firstElementChild.firstElementChild;
+      row.components.forEach((component, componentNum) => {
+        const index = rowComponents + componentNum;
+        const componentContainer = instanceContainersArr[index];
+        const firstChild = componentContainer
+          && componentContainer.nativeElement.firstElementChild.firstElementChild;
         const showNoContentHint = (
           firstChild
           && (
@@ -362,16 +362,16 @@ implements AfterViewInit, OnChanges, OnInit {
             || firstChild.offsetWidth === 0
           )
         );
-        action['showNoContentHint'] = showNoContentHint;
+        component['showNoContentHint'] = showNoContentHint;
       });
-      rowActions += row.actions.length;
+      rowComponents += row.components.length;
     });
   }
 
   private calcShowHiddenHint(instanceContainersArr: ElementRef[]) {
     this.rows.forEach((row) => {
-      row.actions.forEach((action: ActionInstance, actionNum) => {
-        action['showHiddenHint'] = (action.inputSettings['hidden'] === 'true');
+      row.components.forEach((component: ComponentInstance, componentNum) => {
+        component['showHiddenHint'] = (component.inputSettings['hidden'] === 'true');
       });
     });
   }

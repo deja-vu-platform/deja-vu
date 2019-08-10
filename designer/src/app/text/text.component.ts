@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
-import { ActionInstance } from '../datatypes';
+import { ComponentInstance } from '../datatypes';
 
 export const modules = {
   toolbar: [
@@ -35,7 +35,7 @@ export const modules = {
 
 // same as component inputs
 export interface DialogData {
-  actionInstance: ActionInstance;
+  componentInstance: ComponentInstance;
   readOnly: boolean;
 }
 
@@ -45,7 +45,7 @@ export interface DialogData {
   styleUrls: ['./text.component.scss']
 })
 export class TextComponent implements OnInit, OnDestroy {
-  @Input() readonly actionInstance: ActionInstance;
+  @Input() readonly componentInstance: ComponentInstance;
   @Input() readonly readOnly: boolean = true;
   readonly modules = modules;
   private html: string;
@@ -54,14 +54,14 @@ export class TextComponent implements OnInit, OnDestroy {
     @Optional() @Inject(MAT_DIALOG_DATA) public readonly data?: DialogData
   ) {
     if (data) {
-      this.actionInstance = data.actionInstance;
+      this.componentInstance = data.componentInstance;
       this.readOnly = data.readOnly;
     }
   }
 
   ngOnInit() {
     if (!this.readOnly) {
-      this.html = this.actionInstance['data'];
+      this.html = this.componentInstance['data'];
     }
   }
 
@@ -73,7 +73,7 @@ export class TextComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (!this.readOnly) {
-      this.actionInstance['data'] = this.html;
+      this.componentInstance['data'] = this.html;
     }
   }
 }

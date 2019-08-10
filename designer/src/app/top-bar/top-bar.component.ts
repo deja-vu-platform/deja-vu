@@ -18,14 +18,14 @@ import * as _ from 'lodash';
 import { ElectronService } from 'ngx-electron';
 
 import {
-  AddAppActionIoComponent,
-  DialogData as AddAppActionIoDialogData
-} from '../add-app-action-io/add-app-action-io.component';
+  AddAppComponentIoComponent,
+  DialogData as AddAppComponentIoDialogData
+} from '../add-app-component-io/add-app-component-io.component';
 import {
-  ConfigureActionComponent,
-  DialogData as ConfigureActionDialogData
-} from '../configure-action/configure-action.component';
-import { App, AppActionDefinition, IO } from '../datatypes';
+  ConfigureComponentComponent,
+  DialogData as ConfigureComponentDialogData
+} from '../configure-component/configure-component.component';
+import { App, AppComponentDefinition, IO } from '../datatypes';
 
 
 const NUM_CONST_FILES = 3;
@@ -47,7 +47,7 @@ export class TopBarComponent {
   get app(): App {
     return this._app;
   }
-  @Input() readonly openAction: AppActionDefinition;
+  @Input() readonly openComponent: AppComponentDefinition;
   @Output() readonly load = new EventEmitter<string>(true); // async
   @Output() readonly preview = new EventEmitter<void>();
   @Output() readonly showIoHintChange = new EventEmitter<boolean>();
@@ -78,26 +78,26 @@ export class TopBarComponent {
     this.preview.emit();
   }
 
-  onSelectAction() {
-    this.router.navigateByUrl('/' + this.openAction.name);
+  onSelectComponent() {
+    this.router.navigateByUrl('/' + this.openComponent.name);
   }
 
-  createAction = () => {
-    const data: ConfigureActionDialogData = {
+  createComponent = () => {
+    const data: ConfigureComponentDialogData = {
       app: this.app
     };
-    this.dialog.open(ConfigureActionComponent, {
+    this.dialog.open(ConfigureComponentComponent, {
       width: '50vw',
       data
     });
   }
 
-  editAction() {
-    const data: ConfigureActionDialogData = {
+  editComponent() {
+    const data: ConfigureComponentDialogData = {
       app: this.app,
-      action: this.openAction
+      component: this.openComponent
     };
-    this.dialog.open(ConfigureActionComponent, {
+    this.dialog.open(ConfigureComponentComponent, {
       width: '50vw',
       data
     });
@@ -145,7 +145,7 @@ export class TopBarComponent {
     const { path } = event.target.files[0];
     this.exporting = true;
     // count callbacks (since fs isn't promise-based)
-    let numFilesToWrite = this.app.actions.length + NUM_CONST_FILES;
+    let numFilesToWrite = this.app.components.length + NUM_CONST_FILES;
     let numFilesWritten = 0;
     let exportError = false;
     const writeCallback = (e) => {
@@ -173,22 +173,22 @@ export class TopBarComponent {
       const css = this.app.toCSS();
       this.fs.writeFile(`${path}/src/styles.css`, css, writeCallback);
 
-      this.app.actions.forEach((action) => {
-        const actionRoot = `${path}/src/${action.name}`;
-        this.fs.mkdir(actionRoot, (e2) => {
+      this.app.components.forEach((component) => {
+        const componentRoot = `${path}/src/${component.name}`;
+        this.fs.mkdir(componentRoot, (e2) => {
           if (e2 && e2.code !== 'EEXIST') { throw e2; }
-          let html = action.toHTML();
+          let html = component.toHTML();
           let imageNum = 0;
           html = html.replace(/"data:image\/png;base64,(.*)"/g, (s, data) => {
             imageNum += 1;
             numFilesToWrite += 1;
             const pngFileName = `img-${imageNum}.png`;
-            const pngFilePath = `${actionRoot}/${pngFileName}`;
+            const pngFilePath = `${componentRoot}/${pngFileName}`;
             this.fs.writeFile(pngFilePath, data, 'base64', writeCallback);
 
             return `"${pngFileName}"`; // relative reference
           });
-          const htmlFilePath = `${actionRoot}/${action.name}.html`;
+          const htmlFilePath = `${componentRoot}/${component.name}.html`;
           this.fs.writeFile(htmlFilePath, html, writeCallback);
         });
       });
@@ -249,19 +249,19 @@ export class TopBarComponent {
   }
 
   addIO(ioType: 'input' | 'output') {
-    const data: AddAppActionIoDialogData = {
-      action: this.openAction,
+    const data: AddAppComponentIoDialogData = {
+      component: this.openComponent,
       ioType
     };
-    this.dialog.open(AddAppActionIoComponent, {
+    this.dialog.open(AddAppComponentIoComponent, {
       width: '50vw',
       data
     });
   }
 
   removeIO(io: IO) {
-    _.remove(this.openAction.inputSettings, io);
-    _.remove(this.openAction.outputSettings, io);
+    _.remove(this.openComponent.inputSettings, io);
+    _.remove(this.openComponent.outputSettings, io);
   }
 
   addOutput(output: IO, event: CustomEvent) {
@@ -273,15 +273,15 @@ export class TopBarComponent {
     this.showIoHintChange.emit(checkedEvt.checked);
   }
 
-  isTx(action: AppActionDefinition): boolean {
-    return action.transaction;
+  isTx(component: AppComponentDefinition): boolean {
+    return component.transaction;
   }
 
-  getActionIcon(action: AppActionDefinition):
+  getComponentIcon(component: AppComponentDefinition):
   'home' | 'insert_drive_file' | 'note' {
-    if (action.name === this.app.homepage.name) {
+    if (component.name === this.app.homepage.name) {
       return 'home';
-    } else if (this.appPages.has(action.name)) {
+    } else if (this.appPages.has(component.name)) {
       return 'insert_drive_file';
     } else {
       return 'note';

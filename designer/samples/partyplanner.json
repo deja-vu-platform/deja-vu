@@ -1,6 +1,6 @@
 {
   "name": "partyplanner",
-  "actions": [
+  "components": [
     {
       "name": "show-party",
       "inputSettings": [
@@ -12,7 +12,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "show-object",
               "from": "property",
@@ -28,7 +28,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "show-event",
               "from": "event",
@@ -58,7 +58,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -73,7 +73,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "link",
               "from": "dv",
@@ -98,7 +98,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "show-objects",
               "from": "property",
@@ -138,7 +138,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -153,7 +153,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "link",
               "from": "dv",
@@ -178,7 +178,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "gen-id",
               "from": "dv",
@@ -192,7 +192,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-object",
               "from": "property",
@@ -210,7 +210,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-event",
               "from": "event",

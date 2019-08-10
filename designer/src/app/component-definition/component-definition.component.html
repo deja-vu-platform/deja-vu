@@ -1,12 +1,12 @@
 <div
-  *ngIf="actionInstance"
+  *ngIf="componentInstance"
   id="main-view"
-  [attr.data-isaction]="true"
-  [attr.dvAlias]="actionInstance.fqtag"
+  [attr.data-iscomponent]="true"
+  [attr.dvAlias]="componentInstance.fqtag"
 >
   <div
     id="page"
-    [attr.data-isaction]="!!actionInstance.of.transaction"
+    [attr.data-iscomponent]="!!componentInstance.of.transaction"
     [attr.dvAlias]="'dv-tx'"
     dragula="row"
   >
@@ -47,97 +47,97 @@
         [ngClass]="['j' + row.hJust, 'a' + row.vAlign,
         (row.hover && !dragging && rowNum < rows.length - 1) ?
           'hover-row' : '-row']"
-        dragula="action"
+        dragula="component"
         [attr.data-index]="rowNum"
-        [ngStyle]="actionInstance.of.styles"
+        [ngStyle]="componentInstance.of.styles"
       >
         <div
-          *ngFor="let action of row.actions; let actionNum = index"
-          class="action"
-          [attr.data-index]="actionNum"
-          [ngClass]="action.styles.stretch ? 'stretch' : ''"
+          *ngFor="let component of row.components; let componentNum = index"
+          class="component"
+          [attr.data-index]="componentNum"
+          [ngClass]="component.styles.stretch ? 'stretch' : ''"
         >
           <div
             #instanceContainer
             class="instance-container"
             [ngStyle]="{
-              'grid-row': 'span ' + max(ioReferences(action).length, ioReferenced(action).length)
+              'grid-row': 'span ' + max(ioReferences(component).length, ioReferenced(component).length)
             }"
           >
-            <app-action-instance
-              [actionInstance]="action"
+            <app-component-instance
+              [componentInstance]="component"
               [parentScopeIO]="scopeIO"
-              [shouldReLink]="action.shouldReLink"
+              [shouldReLink]="component.shouldReLink"
               (click)="stopPropIfShift($event)"
               [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
             >
-            </app-action-instance>
-            <div *ngIf="!action.showHiddenHint && action.showNoContentHint"
+            </app-component-instance>
+            <div *ngIf="!component.showHiddenHint && component.showNoContentHint"
               class="hint">
-              {{action.fqtag}}
+              {{component.fqtag}}
             </div>
-            <div *ngIf="action.showHiddenHint" class="hint">
-              Hidden: {{action.fqtag}}
+            <div *ngIf="component.showHiddenHint" class="hint">
+              Hidden: {{component.fqtag}}
             </div>
             <div class="instance-container-buttons">
               <button
-                *ngIf="action.isAppAction"
+                *ngIf="component.isAppComponent"
                 mat-icon-button
                 class="mat-small"
-                (click)="editAction(action)"
-                matTooltip="Edit Action"
+                (click)="editComponent(component)"
+                matTooltip="Edit Component"
               >
                 <mat-icon>edit</mat-icon>
               </button>
               <button
                 mat-icon-button
                 class="mat-small"
-                #actionMenuTrigger="matMenuTrigger"
-                [matMenuTriggerFor]="actionMenu.matMenu"
-                matTooltip="Set Inputs/Outputs of Action"
+                #componentMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="componentMenu.matMenu"
+                matTooltip="Set Inputs/Outputs of Component"
               >
                 <mat-icon>swap_horiz</mat-icon>
               </button>
               <button
                 mat-icon-button
                 class="mat-small"
-                (click)="deleteAction(rowNum, actionNum)"
-                matTooltip="Delete Action"
+                (click)="deleteComponent(rowNum, componentNum)"
+                matTooltip="Delete Component"
               >
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
             <app-floating-menu
-              #actionMenu
-              [title]="action.fqtag"
-              (opened)="clickFirstTab(actionMenuContent)"
-              (closed)="onActionMenuClosed(action)"
-              (shouldClose)="closeMenu(actionMenuTrigger)"
+              #componentMenu
+              [title]="component.fqtag"
+              (opened)="clickFirstTab(componentMenuContent)"
+              (closed)="onComponentMenuClosed(component)"
+              (shouldClose)="closeMenu(componentMenuTrigger)"
             >
-              <mat-tab-group #actionMenuContent class="popup-menu action-menu">
+              <mat-tab-group #componentMenuContent class="popup-menu component-menu">
                 <mat-tab label="Inputs">
                   <app-set-inputs
                     [app]="app"
-                    [actionInstance]="action"
-                    [openAction]="actionInstance.of"
+                    [componentInstance]="component"
+                    [openComponent]="componentInstance.of"
                   >
                   </app-set-inputs>
                 </mat-tab>
                 <mat-tab label="Outputs">
-                  <div *ngIf="action.of.outputs.length > 0"
+                  <div *ngIf="component.of.outputs.length > 0"
                     class="use-outputs-hint">
                     Drag an output into an input textbox to use it
                   </div>
                   <div dragula="expression-io" class="inputtables">
                     <div
-                      *ngFor="let output of action.of.outputs"
-                      [attr.data-output]="action.from.name + '.' + action.of.name + '.' + output"
-                      [matTooltip]="action.of.ioDescriptions[output]"
+                      *ngFor="let output of component.of.outputs"
+                      [attr.data-output]="component.from.name + '.' + component.of.name + '.' + output"
+                      [matTooltip]="component.of.ioDescriptions[output]"
                     >
                       {{output}}
                     </div>
-                    <div *ngIf="action.of.outputs.length === 0" class="no-drag">
-                      This action has no outputs.
+                    <div *ngIf="component.of.outputs.length === 0" class="no-drag">
+                      This component has no outputs.
                     </div>
                   </div>
                 </mat-tab>
@@ -146,22 +146,22 @@
           </div>
           <div
             class="ref-indicator input-ref-indicator hide-on-drag"
-            *ngFor="let ioRef of ioReferences(action); let refNum = index"
+            *ngFor="let ioRef of ioReferences(component); let refNum = index"
             [hidden]="!showIoHints"
             [ngStyle]="{
               'grid-row': 1 + refNum,
-              color: color(ioRef.action, ioRef.ioName)
+              color: color(ioRef.component, ioRef.ioName)
             }"
           >
             <div class="ref-for-io">{{ioRef.forIO}}</div>
-            <div class="ref-io-name">{{ioRef.ioName}} {{ioRef.forActionID === action.id ? '→' : '↓'}}</div>
+            <div class="ref-io-name">{{ioRef.ioName}} {{ioRef.forComponentID === component.id ? '→' : '↓'}}</div>
           </div>
           <div
             class="ref-indicator output-ref-indicator hide-on-drag"
-            *ngFor="let ioRef of ioReferenced(action); let refNum = index"
+            *ngFor="let ioRef of ioReferenced(component); let refNum = index"
             [ngStyle]="{
               'grid-row': 1 + refNum,
-              color: color(action, ioRef.ioName)
+              color: color(component, ioRef.ioName)
             }"
           >
           <div class="ref-io-name"
@@ -203,9 +203,9 @@
   <div *ngIf="showIoHints" class="parent-refs">
     <div
       class="ref-indicator input-ref-indicator hide-on-drag"
-      *ngFor="let ioRef of ioReferences(actionInstance); let refNum = index"
+      *ngFor="let ioRef of ioReferences(componentInstance); let refNum = index"
       [ngStyle]="{
-        color: color(ioRef.action, ioRef.ioName)
+        color: color(ioRef.component, ioRef.ioName)
       }"
     >
       <div class="ref-for-io">{{ioRef.forIO}}</div>
@@ -213,9 +213,9 @@
     </div>
     <div
       class="ref-indicator output-ref-indicator hide-on-drag"
-      *ngFor="let ioRef of ioReferenced(actionInstance); let refNum = index"
+      *ngFor="let ioRef of ioReferenced(componentInstance); let refNum = index"
       [ngStyle]="{
-        color: color(actionInstance, ioRef.ioName)
+        color: color(componentInstance, ioRef.ioName)
       }"
     >
       <div class="ref-io-name">{{ioRef.ioName}} ←</div>

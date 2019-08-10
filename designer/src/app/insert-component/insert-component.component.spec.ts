@@ -5,16 +5,16 @@ import {
   MatTooltipModule
 } from '@angular/material';
 
-import { InsertActionComponent } from './insert-action.component';
+import { InsertComponentComponent } from './insert-component.component';
 
-describe('InsertActionComponent', () => {
-  let component: InsertActionComponent;
-  let fixture: ComponentFixture<InsertActionComponent>;
+describe('InsertComponentComponent', () => {
+  let component: InsertComponentComponent;
+  let fixture: ComponentFixture<InsertComponentComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        InsertActionComponent
+        InsertComponentComponent
       ],
       imports: [
         MatExpansionModule,
@@ -26,7 +26,7 @@ describe('InsertActionComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InsertActionComponent);
+    fixture = TestBed.createComponent(InsertComponentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -197,7 +197,7 @@ export class ConfigureClicheComponent implements OnInit {
   delete() {
     if (window.confirm(
       'Are you sure you want to remove this cliché instance? ' +
-      'All of the actions of this cliché instance ' +
+      'All of the components of this cliché instance ' +
       'that you are using will be removed as well.'
     )) {
       this.data.app.deleteClicheInstance(this.data.cliche);

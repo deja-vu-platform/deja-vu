@@ -1,9 +1,9 @@
-<form id="configure-action"
-  #configureActionForm="ngForm"
-  (ngSubmit)="save(configureActionForm)"
+<form id="configure-component"
+  #configureComponentForm="ngForm"
+  (ngSubmit)="save(configureComponentForm)"
 >
   <h1 mat-dialog-title>
-    {{ data.action ? 'Configure': 'New' }} Action
+    {{ data.component ? 'Configure': 'New' }} Component
   </h1>
 
   <mat-dialog-content>
@@ -26,13 +26,13 @@
         <div
           class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
           <div class="mat-hint">
-            Check this box if you want this action to be accessible via a URL
+            Check this box if you want this component to be accessible via a URL
           </div>
         </div>
       </div>
       <button
         mat-button
-        *ngIf="!home && page && data.action"
+        *ngIf="!home && page && data.component"
         color="accent"
         (click)="makeHomepage()"
       >
@@ -47,7 +47,7 @@
       </mat-checkbox>
       <div class="mat-input-hint-wrapper mat-form-field-hint-wrapper checkbox-hint">
         <div class="mat-hint">
-          Check this box if you want child cliché actions to run together
+          Check this box if you want child cliché components to run together
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
           <mat-expansion-panel-header>
             <mat-panel-title>Presentation</mat-panel-title>
             <mat-panel-description>
-              Change this action's format and style
+              Change this component's format and style
               <mat-icon>palette</mat-icon>
             </mat-panel-description>
           </mat-expansion-panel-header>
@@ -126,10 +126,10 @@
   </mat-dialog-content>
 
 
-  <mat-dialog-actions [ngClass]="data.action ? 'delete-save' : 'save-only'">
+  <mat-dialog-actions [ngClass]="data.component ? 'delete-save' : 'save-only'">
     <button
       mat-button
-      *ngIf="data.action"
+      *ngIf="data.component"
       color="warn"
       type="button"
       (click)="delete()"
@@ -145,9 +145,9 @@
         mat-button
         color="primary"
         type="submit"
-        [disabled]="!validate(configureActionForm)"
+        [disabled]="!validate(configureComponentForm)"
       >
-        {{ data.action ? 'Save' : 'Create' }}
+        {{ data.component ? 'Save' : 'Create' }}
       </button>
     </div>
   </mat-dialog-actions>

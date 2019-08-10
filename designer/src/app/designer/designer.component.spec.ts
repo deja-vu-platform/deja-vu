@@ -21,11 +21,11 @@ import { DvModule } from '@deja-vu/core';
 import { DesignerComponent } from './designer.component';
 
 import {
-  ActionDefinitionComponent
-} from '../action-definition/action-definition.component';
+  ComponentDefinitionComponent
+} from '../component-definition/component-definition.component';
 import {
-  ActionInstanceComponent
-} from '../action-instance/action-instance.component';
+  ComponentInstanceComponent
+} from '../component-instance/component-instance.component';
 import {
   ClicheInstancesComponent
 } from '../cliche-instances/cliche-instances.component';
@@ -33,8 +33,8 @@ import {
   FloatingMenuComponent
 } from '../floating-menu/floating-menu.component';
 import {
-  InsertActionComponent
-} from '../insert-action/insert-action.component';
+  InsertComponentComponent
+} from '../insert-component/insert-component.component';
 import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 import { SideMenuComponent } from '../side-menu/side-menu.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
@@ -43,12 +43,12 @@ describe('DesignerComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ActionDefinitionComponent,
-        ActionInstanceComponent,
+        ComponentDefinitionComponent,
+        ComponentInstanceComponent,
         ClicheInstancesComponent,
         DesignerComponent,
         FloatingMenuComponent,
-        InsertActionComponent,
+        InsertComponentComponent,
         SetInputsComponent,
         SideMenuComponent,
         TopBarComponent

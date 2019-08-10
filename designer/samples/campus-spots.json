@@ -1,13 +1,13 @@
 {
   "name": "spots",
-  "actions": [
+  "components": [
     {
       "name": "navbar",
       "inputSettings": [],
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -31,7 +31,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "link",
               "from": "dv",
@@ -88,7 +88,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "navbar",
               "from": "spots",
@@ -102,7 +102,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -117,7 +117,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "show-markers",
               "from": "geolocation",
@@ -158,7 +158,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "navbar",
               "from": "spots",
@@ -172,7 +172,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -187,7 +187,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-marker-from-map",
               "from": "geolocation",
@@ -203,7 +203,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-object",
               "from": "review",
@@ -219,7 +219,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "button",
               "from": "dv",

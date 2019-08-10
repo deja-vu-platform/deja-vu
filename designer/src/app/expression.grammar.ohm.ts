@@ -1,6 +1,6 @@
 /**
  * should be consistent with
- *   `@deja-vu/packages/compiler/src/action/action.grammar.ohm`
+ *   `@deja-vu/packages/compiler/src/component/component.grammar.ohm`
  * @todo figure out how to just import .ohm as a string
  *
  * **Changes:**

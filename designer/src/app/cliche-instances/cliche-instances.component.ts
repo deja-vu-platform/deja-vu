@@ -10,9 +10,9 @@ import {
   DialogData
 } from '../configure-cliche/configure-cliche.component';
 import {
-  ActionDefinition,
+  ComponentDefinition,
   App,
-  AppActionDefinition,
+  AppComponentDefinition,
   ClicheInstance
 } from '../datatypes';
 
@@ -78,7 +78,7 @@ export class ClicheInstancesComponent {
   deleteClicheInstance(ci: ClicheInstance) {
     if (window.confirm(
       'Are you sure you want to remove this cliché instance? ' +
-      'All of the actions of this cliché instance ' +
+      'All of the components of this cliché instance ' +
       'that you are using will be removed as well.'
     )) {
       this.app.deleteClicheInstance(ci);

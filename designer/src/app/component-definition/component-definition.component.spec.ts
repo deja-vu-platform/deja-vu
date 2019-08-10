@@ -11,25 +11,25 @@ import {
 } from '@angular/material';
 import { RunService } from '@deja-vu/core';
 
-import { ActionDefinitionComponent } from './action-definition.component';
+import { ComponentDefinitionComponent } from './component-definition.component';
 
 import {
-  ActionInstanceComponent
-} from '../action-instance/action-instance.component';
+  ComponentInstanceComponent
+} from '../component-instance/component-instance.component';
 import {
   FloatingMenuComponent
 } from '../floating-menu/floating-menu.component';
 import { SetInputsComponent } from '../set-inputs/set-inputs.component';
 
-describe('ActionDefinitionComponent', () => {
-  let component: ActionDefinitionComponent;
-  let fixture: ComponentFixture<ActionDefinitionComponent>;
+describe('ComponentDefinitionComponent', () => {
+  let component: ComponentDefinitionComponent;
+  let fixture: ComponentFixture<ComponentDefinitionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ActionDefinitionComponent,
-        ActionInstanceComponent,
+        ComponentDefinitionComponent,
+        ComponentInstanceComponent,
         FloatingMenuComponent,
         SetInputsComponent
       ],
@@ -44,14 +44,14 @@ describe('ActionDefinitionComponent', () => {
         MatTooltipModule
       ],
       providers: [
-        { provide: RunService, useValue: { registerAppAction: () => {} } }
+        { provide: RunService, useValue: { registerAppComponent: () => {} } }
       ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ActionDefinitionComponent);
+    fixture = TestBed.createComponent(ComponentDefinitionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

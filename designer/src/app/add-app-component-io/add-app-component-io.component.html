@@ -1,6 +1,6 @@
 <form
-  #AddAppActionIoForm="ngForm"
-  (ngSubmit)="save(AddAppActionIoForm)"
+  #AddAppComponentValueIoForm="ngForm"
+  (ngSubmit)="save(AddAppComponentValueIoForm)"
 >
   <h1 mat-dialog-title>Create {{ioType}}</h1>
 
@@ -27,7 +27,7 @@
       mat-button
       color="primary"
       type="submit"
-      [disabled]="!validate(AddAppActionIoForm)"
+      [disabled]="!validate(AddAppComponentValueIoForm)"
     >Save</button>
   </mat-dialog-actions>
 </form>

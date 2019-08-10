@@ -63,7 +63,7 @@ export default `
   flex-grow: 1;
 }
 
-body > * > * > .dvd-action {
+body > * > * > .dvd-component {
   min-height: 100vh;
 }
 `;

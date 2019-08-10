@@ -14,7 +14,7 @@ export class Output {
     this.container = <HTMLElement>document
       .querySelector(options.containerSelector);
     this.container.innerHTML =
-      '<span class="text-button-text">Action Output</span>';
+      '<span class="text-button-text">Component Output</span>';
 
     this.container.addEventListener('click', (e) => {
       e.preventDefault();

@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { AppActionDefinition } from '../datatypes';
+import { AppComponentDefinition } from '../datatypes';
 
 export interface DialogData {
   ioType: 'input' | 'output';
-  action: AppActionDefinition;
+  component: AppComponentDefinition;
 }
 
 interface ControlGroup {
@@ -12,16 +12,16 @@ interface ControlGroup {
 }
 
 @Component({
-  selector: 'app-add-app-action-io',
-  templateUrl: './add-app-action-io.component.html',
-  styleUrls: ['./add-app-action-io.component.scss']
+  selector: 'app-add-app-component-io',
+  templateUrl: './add-app-component-io.component.html',
+  styleUrls: ['./add-app-component-io.component.scss']
 })
-export class AddAppActionIoComponent implements OnInit {
+export class AddAppComponentIoComponent implements OnInit {
   name = '';
   ioType: string;
 
   constructor(
-    private readonly dialogRef: MatDialogRef<AddAppActionIoComponent>,
+    private readonly dialogRef: MatDialogRef<AddAppComponentIoComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: DialogData
   ) { }
 
@@ -38,7 +38,7 @@ export class AddAppActionIoComponent implements OnInit {
   }
 
   save() {
-    this.data.action[this.ioType + 'Settings'].push({
+    this.data.component[this.ioType + 'Settings'].push({
       name: this.name, value: ''
     });
     this.dialogRef.close();

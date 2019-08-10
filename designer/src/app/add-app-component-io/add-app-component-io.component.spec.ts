@@ -8,15 +8,15 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AddAppActionIoComponent } from './add-app-action-io.component';
+import { AddAppComponentIoComponent } from './add-app-component-io.component';
 
-describe('AddAppActionIoComponent', () => {
-  let component: AddAppActionIoComponent;
-  let fixture: ComponentFixture<AddAppActionIoComponent>;
+describe('AddAppComponentIoComponent', () => {
+  let component: AddAppComponentIoComponent;
+  let fixture: ComponentFixture<AddAppComponentIoComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddAppActionIoComponent ],
+      declarations: [ AddAppComponentIoComponent ],
       imports: [
         BrowserAnimationsModule,
         FormsModule,
@@ -32,7 +32,7 @@ describe('AddAppActionIoComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddAppActionIoComponent);
+    fixture = TestBed.createComponent(AddAppComponentIoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

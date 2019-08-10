@@ -16,8 +16,8 @@ import {
   ClicheInstancesComponent
 } from '../cliche-instances/cliche-instances.component';
 import {
-  InsertActionComponent
-} from '../insert-action/insert-action.component';
+  InsertComponentComponent
+} from '../insert-component/insert-component.component';
 
 describe('SideMenuComponent', () => {
   let component: SideMenuComponent;
@@ -27,7 +27,7 @@ describe('SideMenuComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         SideMenuComponent,
-        InsertActionComponent,
+        InsertComponentComponent,
         ClicheInstancesComponent
       ],
       imports: [

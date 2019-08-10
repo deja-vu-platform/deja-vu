@@ -2,34 +2,34 @@
   <div class="flex dir-col grow">
     <app-top-bar
       [app]="app"
-      [openAction]="openAction"
+      [openComponent]="openComponent"
       (load)="load($event)"
       (preview)="showPreview()"
       (showIoHintChange)="showIoHints=$event"
       ></app-top-bar>
     <div class="grow scroll">
-      <app-action-definition
+      <app-component-definition
         class="grow"
-        [actionInstance]="openActionInstance"
+        [componentInstance]="openComponentInstance"
         [app]="app"
         [dragging]="dragging"
         [showIoHints]="showIoHints"
       >
-      </app-action-definition>
+      </app-component-definition>
     </div>
   </div>
   <app-side-menu
     [app]="app"
-    [openAction]="openAction"
+    [openComponent]="openComponent"
     class="scroll"
     (clicheAdded)="addCliche($event)"
     (clicheRemoved)="removeCliche($event)"
   >
   </app-side-menu>
 </div>
-<app-action-instance
+<app-component-instance
   *ngIf="previewMode"
   class="designer"
-  [actionInstance]="openActionInstance"
+  [componentInstance]="openComponentInstance"
 >
-</app-action-instance>
+</app-component-instance>

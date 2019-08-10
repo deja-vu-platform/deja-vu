@@ -56,9 +56,9 @@ import * as transferDocs from '@deja-vu/transfer/pkg/documentation.json';
 transfer['documentation'] = transferDocs;
 
 import {
-  ActionInputs,
+  ComponentInputs,
   App,
-  ClicheActionDefinition,
+  ClicheComponentDefinition,
   ClicheDefinition,
   OMNIPRESENT_INPUTS
 } from './datatypes';
@@ -119,7 +119,7 @@ function isComponent(f: any) {
   return f && _.isString(f.name) && f.name.endsWith(componentSuffix);
 }
 
-function isAction(f: any) {
+function isClicheComponent(f: any) {
   return isComponent(f) && f.name !== configWizardComponentName;
 }
 
@@ -146,13 +146,13 @@ function clicheDefinitionFromModule(
 ): ClicheDefinition {
   return {
     name: moduleName,
-    actions: Object.values(importedModule)
-      .filter(isAction)
-      .map((component): ClicheActionDefinition => {
+    components: Object.values(importedModule)
+      .filter(isClicheComponent)
+      .map((component): ClicheComponentDefinition => {
         // get inputs and outputs
         const inputs = OMNIPRESENT_INPUTS.slice();
         const outputs = [];
-        const actionInputs: ActionInputs = {};
+        const componentInputs: ComponentInputs = {};
         _.forEach(component.propDecorators, (val, key) => {
           const type = val[0].type.prototype.ngMetadataName;
           if (type === 'Input') {
@@ -162,7 +162,7 @@ function clicheDefinitionFromModule(
           }
         });
 
-        // detect action inputs
+        // detect component inputs
         let instance;
         try {
           instance = new component();
@@ -171,24 +171,24 @@ function clicheDefinitionFromModule(
           // TODO: figure out how to handle components that err on undef inputs
         }
 
-        const actionInputNames = inputs.filter((input) =>
+        const componentInputNames = inputs.filter((input) =>
           isComponent(_.get(instance, [input, 'type']))
         );
 
-        // parse the template to get the action map
+        // parse the template to get the component map
         // since angular uses valid HTML, we can use built-in dom methods
         const template: string = component.decorators[0].args[0].template;
-        if (actionInputNames.length > 0) {
+        if (componentInputNames.length > 0) {
           const div = document.createElement('div');
           div.innerHTML = template;
           const includes = Array.from(div.getElementsByTagName('dv-include'));
           includes.forEach((include) => {
-            const inputName = include.getAttribute('[action]');
+            const inputName = include.getAttribute('[component]');
             const inputsAttr = (include.getAttribute('[inputs]') || '');
             const inputsRes = /{([\s\S]*?)}/.exec(inputsAttr);
             if (inputsRes && inputsRes[1]) {
               // TODO: handle legitimate uses of : or , (e.g. in strings)
-              actionInputs[inputName] = _.fromPairs(
+              componentInputs[inputName] = _.fromPairs(
                 inputsRes[1]
                   .split(',')
                   .map((s1) => s1.split(':'))
@@ -204,26 +204,26 @@ function clicheDefinitionFromModule(
           div.remove();
         }
 
-        actionInputNames.forEach((actionInputName) => {
-          if (!actionInputs[actionInputName]) {
-            actionInputs[actionInputName] = {};
+        componentInputNames.forEach((componentInputName) => {
+          if (!componentInputs[componentInputName]) {
+            componentInputs[componentInputName] = {};
           }
         });
 
         if (template.includes('ng-content')) {
           inputs.push('*content');
-          actionInputs['*content'] = {};
+          componentInputs['*content'] = {};
         }
 
         inputs.sort();
         outputs.sort();
 
-        const actionName = _.kebabCase(component.name
+        const componentName = _.kebabCase(component.name
           .slice(0, componentSuffix.length * -1));
 
         let description = '';
         const ioDescriptions = {
-          hidden: '(boolean) If true, do not display the action'
+          hidden: '(boolean) If true, do not display the component'
         };
         const moduleDocs = importedModule['documentation'];
         if (moduleDocs) {
@@ -265,11 +265,11 @@ function clicheDefinitionFromModule(
         }
 
         return {
-          name: actionName,
+          name: componentName,
           component,
           inputs,
           outputs,
-          actionInputs,
+          componentInputs,
           description,
           ioDescriptions
         };
@@ -285,20 +285,20 @@ export const clicheDefinitions = _
 
 const dvClicheIdx = clicheDefinitions.findIndex((cd) => cd.name === 'dv');
 const [dvCliche] = clicheDefinitions.splice(dvClicheIdx, 1);
-// TODO: filter actions in dvCliche
+// TODO: filter components in dvCliche
 
 App.clicheDefinitions = clicheDefinitions;
 App.dvCliche = dvCliche;
 
-export const dvCoreActions = dvCliche.actions
+export const dvCoreComponents = dvCliche.components
   .map(({ component: c }) => <any>c);
 
-dvCliche.actions.push(({
+dvCliche.components.push(({
   name: 'text',
   component: <Component>TextComponent,
   inputs: [],
   outputs: [],
-  actionInputs: {},
+  componentInputs: {},
   description: 'Display custom text, images, and other content',
   ioDescriptions: {}
 }));

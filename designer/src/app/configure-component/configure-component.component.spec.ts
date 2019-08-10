@@ -11,15 +11,15 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ConfigureActionComponent } from './configure-action.component';
+import { ConfigureComponentComponent } from './configure-component.component';
 
-describe('ConfigureActionComponent', () => {
-  let component: ConfigureActionComponent;
-  let fixture: ComponentFixture<ConfigureActionComponent>;
+describe('ConfigureComponentComponent', () => {
+  let component: ConfigureComponentComponent;
+  let fixture: ComponentFixture<ConfigureComponentComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfigureActionComponent ],
+      declarations: [ ConfigureComponentComponent ],
       imports: [
         BrowserAnimationsModule,
         FormsModule,
@@ -38,7 +38,7 @@ describe('ConfigureActionComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfigureActionComponent);
+    fixture = TestBed.createComponent(ConfigureComponentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

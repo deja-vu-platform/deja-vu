@@ -1,6 +1,6 @@
 {
   "name": "fritter",
-  "actions": [
+  "components": [
     {
       "name": "show-freet",
       "inputSettings": [
@@ -12,7 +12,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "show-object",
               "from": "freet",
@@ -30,7 +30,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -69,7 +69,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -84,7 +84,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "register-user",
               "from": "authentication",
@@ -98,7 +98,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "callback-link",
               "from": "dv",
@@ -130,7 +130,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "sign-out",
               "from": "authentication",
@@ -170,7 +170,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "logged-in",
               "from": "authentication",
@@ -218,7 +218,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -233,7 +233,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "sign-in",
               "from": "authentication",
@@ -247,7 +247,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "callback-link",
               "from": "dv",
@@ -279,7 +279,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -294,7 +294,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "login",
               "from": "fritter",
@@ -331,7 +331,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -346,7 +346,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-object",
               "from": "freet",
@@ -365,7 +365,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "logged-in",
               "from": "authentication",
@@ -394,7 +394,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "appbar",
               "from": "fritter",
@@ -408,7 +408,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-freet",
               "from": "fritter",
@@ -422,7 +422,7 @@
           "vAlign": "s"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "show-objects",
               "from": "freet",

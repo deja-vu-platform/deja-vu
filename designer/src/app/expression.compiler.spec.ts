@@ -51,8 +51,8 @@ describe('exportDvExpr', () => {
   });
 
   it('should convert . to ?. except in names', () => {
-    const dvdExpr = 'cliche.action.input.property';
+    const dvdExpr = 'cliche.component.input.property';
     expect(exportDvExpr(dvdExpr))
-      .toBe('cliche.action.input?.property');
+      .toBe('cliche.component.input?.property');
   });
 });

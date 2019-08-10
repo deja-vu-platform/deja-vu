@@ -10,7 +10,7 @@ import { QuillModule } from 'ngx-quill';
 import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
 
 import { AppRoutingModule } from './app-routing.module';
-import { ClicheModule, dvCoreActions } from './cliche.module';
+import { ClicheModule, dvCoreComponents } from './cliche.module';
 import { MatModule } from './mat.module';
 
 import { DynamicComponentDirective } from './dynamic-component.directive';
@@ -18,27 +18,27 @@ import { DynamicComponentDirective } from './dynamic-component.directive';
 import { usedClichesConfig } from './datatypes';
 
 import {
-  ActionDefinitionComponent
-} from './action-definition/action-definition.component';
+  ComponentDefinitionComponent
+} from './component-definition/component-definition.component';
 import {
-  ActionInstanceComponent
-} from './action-instance/action-instance.component';
+  ComponentInstanceComponent
+} from './component-instance/component-instance.component';
 import {
-  AddAppActionIoComponent
-} from './add-app-action-io/add-app-action-io.component';
+  AddAppComponentIoComponent
+} from './add-app-component-io/add-app-component-io.component';
 import { AppComponent } from './app.component';
 import {
   ClicheInstancesComponent
 } from './cliche-instances/cliche-instances.component';
 import {
-  ConfigureActionComponent
-} from './configure-action/configure-action.component';
+  ConfigureComponentComponent
+} from './configure-component/configure-component.component';
 import {
   ConfigureClicheComponent
 } from './configure-cliche/configure-cliche.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
-import { InsertActionComponent } from './insert-action/insert-action.component';
+import { InsertComponentComponent } from './insert-component/insert-component.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
@@ -52,25 +52,25 @@ export function getUsedClichesConfig() {
   return usedClichesConfig;
 }
 
-ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
+ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
 
 @NgModule({
   declarations: [
     DynamicComponentDirective,
-    ActionDefinitionComponent,
-    ActionInstanceComponent,
+    ComponentDefinitionComponent,
+    ComponentInstanceComponent,
     AppComponent,
     ClicheInstancesComponent,
-    ConfigureActionComponent,
+    ConfigureComponentComponent,
     ConfigureClicheComponent,
     DesignerComponent,
     FloatingMenuComponent,
-    InsertActionComponent,
+    InsertComponentComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
     TopBarComponent,
-    AddAppActionIoComponent
+    AddAppComponentIoComponent
   ],
   imports: [
     BrowserModule,
@@ -99,11 +99,11 @@ ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    ActionInstanceComponent,
-    AddAppActionIoComponent,
-    ConfigureActionComponent,
+    ComponentInstanceComponent,
+    AddAppComponentIoComponent,
+    ConfigureComponentComponent,
     ConfigureClicheComponent,
     TextComponent
-  ].concat(dvCoreActions)
+  ].concat(dvCoreComponents)
 })
 export class AppModule { }

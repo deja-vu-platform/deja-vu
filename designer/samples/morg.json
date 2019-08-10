@@ -1,6 +1,6 @@
 {
   "name": "morg",
-  "actions": [
+  "components": [
     {
       "name": "create-group-meeting-series",
       "inputSettings": [
@@ -12,7 +12,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "gen-id",
               "from": "dv",
@@ -26,7 +26,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "status",
               "from": "dv",
@@ -42,7 +42,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "gen-ids",
               "from": "dv",
@@ -58,7 +58,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-series",
               "from": "event",
@@ -77,7 +77,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-weekly-series",
               "from": "event",
@@ -94,7 +94,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-allocation",
               "from": "allocator",
@@ -133,7 +133,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "choose-object",
               "from": "property",
@@ -150,7 +150,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "edit-consumer",
               "from": "allocator",
@@ -193,7 +193,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "delete-event",
               "from": "event",
@@ -210,7 +210,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "delete-resource",
               "from": "allocator",
@@ -252,7 +252,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "show-event",
               "from": "event",
@@ -270,7 +270,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "choose-champion",
               "from": "morg",
@@ -311,7 +311,7 @@
       "outputSettings": [],
       "rows": [
         {
-          "actions": [
+          "components": [
             {
               "of": "text",
               "from": "dv",
@@ -326,7 +326,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "create-group-meeting-series",
               "from": "morg",
@@ -342,7 +342,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "choose-and-show-series",
               "from": "event",
@@ -370,7 +370,7 @@
           "vAlign": "fs"
         },
         {
-          "actions": [
+          "components": [
             {
               "of": "show-objects",
               "from": "property",
