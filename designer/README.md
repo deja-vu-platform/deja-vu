@@ -4,6 +4,8 @@
 ## Development
 Run `yarn start` to host the app at `localhost:4200` and open it in Electron. If you'd rather use a browser, run `yarn serve` to host the app without starting Electron (some features will be disabled).
 
+Don't forget to start the mongo daemon with `mongod` in a separate shell.
+
 ## Production
 Run `yarn prod` build the app and open it in Electron. Currently the production build fails due to issues in the clichés so this is a development build.
 
