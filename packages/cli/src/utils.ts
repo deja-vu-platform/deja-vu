@@ -143,7 +143,7 @@ export function locatePackage(pkg: string) {
   return require.resolve(pkg);
 }
 
-export function locateClichePackage(pkg: string) {
+export function locateConceptPackage(pkg: string) {
   return locatePackage(`@deja-vu/${pkg}`);
 }
 
@@ -166,19 +166,19 @@ export interface DvConfig {
   watch?: boolean;
   config?: any;
   gateway?: DvConfig;
-  usedCliches?: { [as: string]: DvConfig };
+  usedConcepts?: { [as: string]: DvConfig };
   components?: { package?: ComponentsConfig, app?: ComponentsConfig };
   routes?: { path: string, component: string }[];
 }
 
 export function componentTable(
   config: DvConfig, componentsConfig: ComponentsConfig | undefined): string {
-  const usedClicheNames = new Set(
-    _.map(_.toPairs(config.usedCliches),
-      ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
-        usedClicheConfig, 'name', alias)));
+  const usedConceptNames = new Set(
+    _.map(_.toPairs(config.usedConcepts),
+      ([alias, usedConceptConfig]: [string, DvConfig]): string => _.get(
+        usedConceptConfig, 'name', alias)));
   const gotComponentTable = getComponentTable(
-    config.name, process.cwd(), componentsConfig, Array.from(usedClicheNames));
+    config.name, process.cwd(), componentsConfig, Array.from(usedConceptNames));
 
   return JSON.stringify(gotComponentTable, null, INDENT_NUM_SPACES);
 }

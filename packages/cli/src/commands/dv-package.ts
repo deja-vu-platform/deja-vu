@@ -16,7 +16,7 @@ exports.command = 'package';
 exports.desc = 'package a cliché';
 exports.handler = () => {
   const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-  console.log('Packaging cliche');
+  console.log('Packaging concept');
   yarn([`dv-package-${config.name}`]);
 
   const pkgDir = NG_PACKAGR.configFileContents.dest;
@@ -35,10 +35,10 @@ exports.handler = () => {
 
   // compodoc does not support absolute paths
   const cwd = path.resolve(__dirname, '..', '..'); // cli root folder
-  const pathToClicheDir = path.relative(cwd, path.resolve('.'));
+  const pathToConceptDir = path.relative(cwd, path.resolve('.'));
   const pathToTsconfig = existsSync(path.join('src', 'tsconfig.app.json'))
-    ? path.join(pathToClicheDir, 'src', 'tsconfig.app.json')
-    : path.join(pathToClicheDir, 'tsconfig.json');  // core has diff structure
+    ? path.join(pathToConceptDir, 'src', 'tsconfig.app.json')
+    : path.join(pathToConceptDir, 'tsconfig.json');  // core has diff structure
   try {
     cmd(
       'yarn',
@@ -46,7 +46,7 @@ exports.handler = () => {
         'compodoc',
         '--exportFormat=json',
         `--tsconfig=${pathToTsconfig}`,
-        `--output=${path.join(pathToClicheDir, pkgDir)}`,
+        `--output=${path.join(pathToConceptDir, pkgDir)}`,
         '--minimal',
         '--disableSourceCode',
         '--disableDomTree',
@@ -58,13 +58,13 @@ exports.handler = () => {
         // /dev/null on Unix or NUL on Windows
         // (we have silent anyways for performance reasons)
         stdio: 'ignore',
-        // use cli compodoc so it doesn't need to be a dep of every cliche
+        // use cli compodoc so it doesn't need to be a dep of every concept
         cwd
       }
     );
     console.log('Created documentation');
   } catch (e) {
-    console.warn('Could not document cliche', config.name);
+    console.warn('Could not document concept', config.name);
   }
 
   console.log('Done');

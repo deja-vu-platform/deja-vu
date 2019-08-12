@@ -30,8 +30,8 @@ const IGNORE = [
 export function getComponentTable(
   projectName: string, rootDirectory: string,
   componentsConfig: ComponentsConfig | undefined,
-  // the name of the used cliches (not the aliases)
-  usedCliches: ReadonlyArray<string>): ComponentTable {
+  // the name of the used concepts (not the aliases)
+  usedConcepts: ReadonlyArray<string>): ComponentTable {
   const fpToNameMap = _.reduce(
     _.get(componentsConfig, 'names'),
     (fpToNameMapAccumulator, value: ComponentNameForFilePath) => {
@@ -46,7 +46,7 @@ export function getComponentTable(
       const componentName = _.get(
         fpToNameMap, fp, getComponentNameFromFilePath(fp, projectName));
       componentTable[componentName] = getComponentAst(
-        projectName, componentName, usedCliches,
+        projectName, componentName, usedConcepts,
         fs.readFileSync(fp, { encoding: 'utf8' }));
 
       return componentTable;

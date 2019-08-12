@@ -48,13 +48,13 @@ exports.handler = ({ type, entityName, componentName,
     (componentName ? componentName : `${type}-${entityName}`);
   console.log(`Creating new component ${actualComponentName}`);
 
-  const clicheName = projectName();
+  const conceptName = projectName();
   const schematicsPkgName = getDvPackageName('schematics');
 
   ng(['generate',
     `${schematicsPkgName}:component`,
     `--componentName=${actualComponentName}`,
-    `--clicheName=${clicheName}`,
+    `--conceptName=${conceptName}`,
     `--entityName=${entityName}`,
     `--type=${type}`,
     getOptionalFlag(skipAppComponentHtml, '--skipAppComponentHtml'),

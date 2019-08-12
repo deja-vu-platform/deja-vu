@@ -9,7 +9,7 @@ import {
 } from '../../utils';
 
 
-exports.command = 'cliche <name>';
+exports.command = 'concept <name>';
 exports.desc = 'create a new cliché';
 exports.builder = (yargs) => yargs.option('pathToDv', {
   default: 'deja-vu',
@@ -36,13 +36,13 @@ exports.handler = ({ name, pathToDv }) => {
     // create outside monorepo first to satisfy new Angular project constraints,
     // then move it to the catalog
     ng(['new', `--collection=${schematicsPkgName}`,
-      `--clicheName=${name}`, name]);
+      `--conceptName=${name}`, name]);
     cmd('mv', [name, catalogPath]);
 
-    // install and package new cliche
-    const clichePath = path.join(catalogPath, name);
-    yarn([], clichePath);
-    console.log(`Cliché ${name} successfully created at ${clichePath}`);
+    // install and package new concept
+    const conceptPath = path.join(catalogPath, name);
+    yarn([], conceptPath);
+    console.log(`Cliché ${name} successfully created at ${conceptPath}`);
 
   } finally {
     // undo the hack

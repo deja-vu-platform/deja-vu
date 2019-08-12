@@ -32,9 +32,9 @@ interface TagOnly extends TagInfo {
 
 
 export function getComponentAst(
-  projectName: string, componentName: string, usedCliches: ReadonlyArray<string>,
+  projectName: string, componentName: string, usedConcepts: ReadonlyArray<string>,
   html: string): ComponentAst {
-  const tagsToKeep = new Set([ projectName, ...usedCliches, 'dv' ]);
+  const tagsToKeep = new Set([ projectName, ...usedConcepts, 'dv' ]);
   const shouldKeep = (tag: Tag): boolean =>  {
     return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
   };
@@ -150,7 +150,7 @@ function checkForErrors(componentName: string) {
   const getRepeatedFqTags = (componentAst: ComponentAst) => _.pickBy(
     _.groupBy(componentAst, 'fqtag'),
     (components: ComponentTag[], fqtag: string) => {
-      // TODO: filter non-request sending cliche components
+      // TODO: filter non-request sending concept components
       if (fqtag !== 'dv-tx' && fqtag.startsWith('dv')) {
         return false;
       }
@@ -205,8 +205,8 @@ function getFqTag(
     return dvAlias;
   }
   // tslint:disable-next-line prefer-const
-  let [clicheName, ...componentTagName] = tag.split('-');
-  if (dvOf) { clicheName = dvOf; }
+  let [conceptName, ...componentTagName] = tag.split('-');
+  if (dvOf) { conceptName = dvOf; }
 
-  return clicheName + '-' + componentTagName.join('-');
+  return conceptName + '-' + componentTagName.join('-');
 }
