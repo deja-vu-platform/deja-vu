@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 
 import { BrowserModule } from '@angular/platform-browser';
 
-import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 import { CommentModule } from './comment/comment.module';
 
 
@@ -20,7 +20,7 @@ describe('AppComponent', () => {
       ],
       providers: [
         { provide: GATEWAY_URL, useValue: 'test' },
-        { provide: USED_CLICHES_CONFIG, useValue: {} }
+        { provide: USED_CONCEPTS_CONFIG, useValue: {} }
       ]
     })
       .compileComponents();

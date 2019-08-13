@@ -53,7 +53,7 @@ export interface ComponentValue {
   type: Type<Component>;
   tag?: string;
   dvAlias?: string;
-  // Optional value to specify the cliche the component is from
+  // Optional value to specify the concept the component is from
   dvOf?: string;
   // A map of (adapter input name) -> (component input name)
   inputMap?: FieldMap;

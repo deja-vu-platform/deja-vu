@@ -19,7 +19,7 @@ import {
 import { CalendarWeekHoursViewModule } from 'angular-calendar-week-hours-view';
 
 
-// import and export all cliché components here
+// import and export all concept components here
 import {
   CreateScheduleComponent
 } from './create-schedule/create-schedule.component';
@@ -47,7 +47,7 @@ import {
 } from './show-all-availability/show-all-availability.component';
 export { ShowAllAvailabilityComponent };
 
-// add all cliché components here
+// add all concept components here
 const allComponents = [
   CreateScheduleComponent, DeleteScheduleComponent,
   ShowScheduleComponent, UpdateScheduleComponent,

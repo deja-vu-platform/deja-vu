@@ -15,8 +15,8 @@ import { ElectronService } from 'ngx-electron';
 import { SideMenuComponent } from './side-menu.component';
 
 import {
-  ClicheInstancesComponent
-} from '../cliche-instances/cliche-instances.component';
+  ConceptInstancesComponent
+} from '../concept-instances/concept-instances.component';
 import {
   InsertComponentComponent
 } from '../insert-component/insert-component.component';
@@ -30,7 +30,7 @@ describe('SideMenuComponent', () => {
       declarations: [
         SideMenuComponent,
         InsertComponentComponent,
-        ClicheInstancesComponent
+        ConceptInstancesComponent
       ],
       imports: [
         BrowserAnimationsModule,

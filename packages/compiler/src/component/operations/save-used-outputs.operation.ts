@@ -8,7 +8,7 @@ import * as _ from 'lodash';
  * Parse attribute exprs to discover the used outputs of included components.
  *
  * For the time being, instead of figuring out what the real outputs of a
- * cliché component are, we parse the attribute exprs to discover what outputs
+ * concept component are, we parse the attribute exprs to discover what outputs
  * are used and save this information in the symbol table. If the user is
  * using an output that doesn't exist, ng will throw an error later.
  *
@@ -74,26 +74,26 @@ export function saveUsedOutputs(symbolTable: ComponentSymbolTable) {
       if (isInput(nameOrInput)) {
         return;
       }
-      const [ clicheOrComponentAlias, ...rest ] = _
+      const [ conceptOrComponentAlias, ...rest ] = _
         .split(fullMemberAccess, NAV_SPLIT_REGEX);
-      if (!_.has(symbolTable, clicheOrComponentAlias)) {
+      if (!_.has(symbolTable, conceptOrComponentAlias)) {
         if (throwErrorOnSymbolNotFound) {
           throw new Error(
-            `${clicheOrComponentAlias} not found in ` +
+            `${conceptOrComponentAlias} not found in ` +
             `symbol table ${pretty(symbolTable)}`);
         } else {
           return;
         }
       }
-      const stEntry: StEntry = symbolTable[clicheOrComponentAlias];
+      const stEntry: StEntry = symbolTable[conceptOrComponentAlias];
       switch (stEntry.kind) {
-        case 'cliche':
-          const clicheName = clicheOrComponentAlias;
+        case 'concept':
+          const conceptName = conceptOrComponentAlias;
           const [ componentName, output ] = rest;
           if (!_.has(stEntry, [ 'symbolTable', componentName ])) {
             if (throwErrorOnSymbolNotFound) {
               throw new Error(
-                `${clicheName}.${componentName} not found in ` +
+                `${conceptName}.${componentName} not found in ` +
                 `symbol table ${pretty(symbolTable)}`);
             } else {
               return;

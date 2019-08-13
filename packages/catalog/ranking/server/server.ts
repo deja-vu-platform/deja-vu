@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -65,7 +65,7 @@ function rankingDocsToRanking(rankingDocs: RankingDoc[]): Ranking {
   };
 }
 
-function resolvers(db: ClicheDb, _config: RankingConfig): IResolvers {
+function resolvers(db: ConceptDb, _config: RankingConfig): IResolvers {
   const rankings: Collection<RankingDoc> = db.collection('rankings');
 
   return {
@@ -177,9 +177,9 @@ function resolvers(db: ClicheDb, _config: RankingConfig): IResolvers {
   };
 }
 
-const rankingCliche: ClicheServer<RankingConfig> =
-  new ClicheServerBuilder<RankingConfig>('ranking')
-    .initDb((db: ClicheDb, config: RankingConfig): Promise<any> => {
+const rankingConcept: ConceptServer<RankingConfig> =
+  new ConceptServerBuilder<RankingConfig>('ranking')
+    .initDb((db: ConceptDb, config: RankingConfig): Promise<any> => {
       const rankings: Collection<RankingDoc> = db.collection('rankings');
       const sourceTargetIndexOptions = config.oneToOneRanking ?
         { unique: true, sparse: true } : {};
@@ -195,4 +195,4 @@ const rankingCliche: ClicheServer<RankingConfig> =
     .resolvers(resolvers)
     .build();
 
-rankingCliche.start();
+rankingConcept.start();

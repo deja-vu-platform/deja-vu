@@ -9,7 +9,7 @@ import { ComponentInstance, AppComponentDefinition } from './datatypes';
 import compileDvExpr, { dvToNgName } from './expression.compiler';
 
 /**
- * ioName + component => cliche.component.ioName
+ * ioName + component => concept.component.ioName
  * @todo handle name collisions
  */
 export function fullyQualifyName(

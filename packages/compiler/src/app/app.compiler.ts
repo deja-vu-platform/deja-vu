@@ -12,7 +12,7 @@ interface DvConfig {
   name: string;
   config?: any;
   gateway?: { config?: any };
-  usedCliches?: { [as: string]: ClicheInfo };
+  usedConcepts?: { [as: string]: ConceptInfo };
   components?: { app?: ComponentsConfig };
   routes?: { path: string, component: string }[];
 }
@@ -22,7 +22,7 @@ interface ComponentsConfig {
   readonly exclude?: string[];
 }
 
-interface ClicheInfo {
+interface ConceptInfo {
   name?: string;
   config?: any;
 }
@@ -89,27 +89,27 @@ export class AppCompiler {
 
     const appName = dvConfig.name;
     this.symbolTable[appName] = { kind: 'app' };
-    const aliasToClicheNameMap = _.mapValues(
-      dvConfig.usedCliches, (value: ClicheInfo, alias: string) => {
+    const aliasToConceptNameMap = _.mapValues(
+      dvConfig.usedConcepts, (value: ConceptInfo, alias: string) => {
         return {
-          kind: 'cliche',
-          clicheName: _.get(value, 'name', alias)
+          kind: 'concept',
+          conceptName: _.get(value, 'name', alias)
         };
       });
-    _.extend(this.symbolTable, aliasToClicheNameMap);
+    _.extend(this.symbolTable, aliasToConceptNameMap);
 
-    const usedCliches: string[] = _
-      .chain(dvConfig.usedCliches)
+    const usedConcepts: string[] = _
+      .chain(dvConfig.usedConcepts)
       .toPairs()
-      .map(([clicheAlias, clicheConfig]) =>
-        _.get(clicheConfig, 'name', clicheAlias))
+      .map(([conceptAlias, conceptConfig]) =>
+        _.get(conceptConfig, 'name', conceptAlias))
       .uniq()
       .value();
 
     const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
-    _.each(usedCliches, (usedCliche: string) => {
+    _.each(usedConcepts, (usedConcept: string) => {
       // TODO: get the current version instead of hard-coding a value
-      ngAppBuilder.addDependency(usedCliche, '0.0.1');
+      ngAppBuilder.addDependency(usedConcept, '0.0.1');
     });
 
     if (dvConfig.routes !== undefined) {

@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -90,7 +90,7 @@ function getOneToOneScoring(config: ScoringConfig): boolean {
   return config.oneToOneScoring === undefined ? true : config.oneToOneScoring;
 }
 
-function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
+function resolvers(db: ConceptDb, config: ScoringConfig): IResolvers {
   const scores: Collection<ScoreDoc> = db.collection('scores');
   const totalScoreFn = config.totalScoreFn ?
     new Function('scores', config.totalScoreFn) : DEFAULT_TOTAL_SCORE_FN;
@@ -232,9 +232,9 @@ function resolvers(db: ClicheDb, config: ScoringConfig): IResolvers {
   };
 }
 
-const scoringCliche: ClicheServer<ScoringConfig> =
-  new ClicheServerBuilder<ScoringConfig>('scoring')
-    .initDb((db: ClicheDb, config: ScoringConfig): Promise<any> => {
+const scoringConcept: ConceptServer<ScoringConfig> =
+  new ConceptServerBuilder<ScoringConfig>('scoring')
+    .initDb((db: ConceptDb, config: ScoringConfig): Promise<any> => {
       const scores: Collection<ScoreDoc> = db.collection('scores');
       const sourceTargetIndexOptions = getOneToOneScoring(config) ?
         { unique: true, sparse: true } : {};
@@ -249,4 +249,4 @@ const scoringCliche: ClicheServer<ScoringConfig> =
     .resolvers(resolvers)
     .build();
 
-scoringCliche.start();
+scoringConcept.start();

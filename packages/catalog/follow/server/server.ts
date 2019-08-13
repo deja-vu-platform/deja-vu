@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -145,7 +145,7 @@ async function getAggregatedMessages(
     .toArray();
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
   return {
@@ -311,8 +311,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const followCliche: ClicheServer = new ClicheServerBuilder('follow')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const followConcept: ConceptServer = new ConceptServerBuilder('follow')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
     return Promise.all([
@@ -324,4 +324,4 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
   .resolvers(resolvers)
   .build();
 
-followCliche.start();
+followConcept.start();

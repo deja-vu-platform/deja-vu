@@ -1,6 +1,6 @@
 {
   "name": "rendezvous",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": true

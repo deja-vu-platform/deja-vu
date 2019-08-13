@@ -1,6 +1,6 @@
 import {
   ComponentStEntry,
-  ComponentSymbolTable, ClicheStEntry,
+  ComponentSymbolTable, ConceptStEntry,
   InputStEntry,
   OutputStEntry,
   pretty,
@@ -31,32 +31,32 @@ const ATTRS_NO_PROP = new Set(['colspan', 'rowspan']);
 
 function nonInputMemberAccessToField(
   fullMemberAccess: string, symbolTable: ComponentSymbolTable) {
-  const clicheOrComponentAlias = _
+  const conceptOrComponentAlias = _
     .split(fullMemberAccess, '.', 1)[0];
-  const stEntry: StEntry | undefined = symbolTable[clicheOrComponentAlias];
+  const stEntry: StEntry | undefined = symbolTable[conceptOrComponentAlias];
   if (stEntry === undefined) {
     throw new Error(
-      `Symbol ${clicheOrComponentAlias} not found in ` +
+      `Symbol ${conceptOrComponentAlias} not found in ` +
       `symbol table ${pretty(symbolTable)}`);
   }
 
-  let clicheName: string, componentName: string, output: string;
+  let conceptName: string, componentName: string, output: string;
   let alias: string | undefined;
   let memberAccesses: string;
   switch (stEntry.kind) {
-    case 'cliche':
-      clicheName = clicheOrComponentAlias;
+    case 'concept':
+      conceptName = conceptOrComponentAlias;
       [ componentName, output ] = fullMemberAccess
-        .slice(clicheName.length + 1)
+        .slice(conceptName.length + 1)
         .split('.', 2);
       memberAccesses = fullMemberAccess
-        .slice(clicheName.length + componentName.length +
+        .slice(conceptName.length + componentName.length +
           output.length + 2);
       break;
     case 'component':
-      clicheName = stEntry.of;
+      conceptName = stEntry.of;
       componentName = stEntry.componentName;
-      alias = clicheOrComponentAlias;
+      alias = conceptOrComponentAlias;
       output = fullMemberAccess
         .slice(alias.length + 1)
         .split('.', 1)[0];
@@ -74,7 +74,7 @@ function nonInputMemberAccessToField(
   }
 
   const outputField = outputToNgField(
-    clicheName, componentName, output, alias);
+    conceptName, componentName, output, alias);
 
   return `${outputField}${memberAccesses}`;
 }
@@ -122,24 +122,24 @@ export function toNgTemplate(
             return `(${outputKey})="${ngOutputField}=$event"`;
           });
 
-      const clicheAlias = _.split(transformedComponentName, '-', 1)[0];
-      if (clicheAlias !== 'dv' && clicheAlias !== appName) {
-        const clicheContextEntry = context[clicheAlias];
-        if (clicheContextEntry === undefined) {
-          throw new Error(`Cliché ${clicheAlias} not found`);
+      const conceptAlias = _.split(transformedComponentName, '-', 1)[0];
+      if (conceptAlias !== 'dv' && conceptAlias !== appName) {
+        const conceptContextEntry = context[conceptAlias];
+        if (conceptContextEntry === undefined) {
+          throw new Error(`Cliché ${conceptAlias} not found`);
         }
-        assert.ok(clicheContextEntry.kind === 'cliche',
-          `Unexpected entry type ${clicheContextEntry.kind} ` +
-          `for cliche ${clicheAlias}`);
-        const clicheName = (<ClicheStEntry>clicheContextEntry).clicheName;
-        if (clicheName !== clicheAlias) {
+        assert.ok(conceptContextEntry.kind === 'concept',
+          `Unexpected entry type ${conceptContextEntry.kind} ` +
+          `for concept ${conceptAlias}`);
+        const conceptName = (<ConceptStEntry>conceptContextEntry).conceptName;
+        if (conceptName !== conceptAlias) {
           const elemRest = transformedElementName
             .slice(transformedElementName.indexOf('-'));
-          transformedElementName = clicheName + elemRest +
-            ` dvOf="${clicheAlias}"`;
+          transformedElementName = conceptName + elemRest +
+            ` dvOf="${conceptAlias}"`;
           const componentRest = transformedComponentName
             .slice(transformedComponentName.indexOf('-'));
-          transformedComponentName = clicheName + componentRest;
+          transformedComponentName = conceptName + componentRest;
         }
       }
     }
@@ -188,20 +188,20 @@ export function toNgTemplate(
     EndTag: (open, elementNameNode, close): string => {
       let elementName = elementNameNode.toNgTemplate();
       if (isComponent(elementName)) {
-        const clicheAlias = _.split(elementName, '-', 1)[0];
-        if (clicheAlias !== 'dv' && clicheAlias !== appName) {
-          const clicheContextEntry = context[clicheAlias];
-          if (clicheContextEntry === undefined) {
-            throw new Error(`Cliché ${clicheAlias} not found`);
+        const conceptAlias = _.split(elementName, '-', 1)[0];
+        if (conceptAlias !== 'dv' && conceptAlias !== appName) {
+          const conceptContextEntry = context[conceptAlias];
+          if (conceptContextEntry === undefined) {
+            throw new Error(`Cliché ${conceptAlias} not found`);
           }
-          assert.ok(clicheContextEntry.kind === 'cliche',
-            `Unexpected entry type ${clicheContextEntry.kind} ` +
-            `for cliche ${clicheAlias}`);
-          const clicheName = (<ClicheStEntry> clicheContextEntry).clicheName;
-          if (clicheName !== clicheAlias) {
+          assert.ok(conceptContextEntry.kind === 'concept',
+            `Unexpected entry type ${conceptContextEntry.kind} ` +
+            `for concept ${conceptAlias}`);
+          const conceptName = (<ConceptStEntry> conceptContextEntry).conceptName;
+          if (conceptName !== conceptAlias) {
             const rest = elementName
               .slice(elementName.indexOf('-'));
-            elementName = clicheName + rest;
+            elementName = conceptName + rest;
           }
         }
 

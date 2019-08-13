@@ -7,15 +7,15 @@ import { DragulaModule } from 'ng2-dragula';
 import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
-import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 
 import { AppRoutingModule } from './app-routing.module';
-import { ClicheModule, dvCoreComponents } from './cliche.module';
+import { ConceptModule, dvCoreComponents } from './concept.module';
 import { MatModule } from './mat.module';
 
 import { DynamicComponentDirective } from './dynamic-component.directive';
 
-import { usedClichesConfig } from './datatypes';
+import { usedConceptsConfig } from './datatypes';
 
 import {
   ComponentDefinitionComponent
@@ -28,14 +28,14 @@ import {
 } from './add-app-component-io/add-app-component-io.component';
 import { AppComponent } from './app.component';
 import {
-  ClicheInstancesComponent
-} from './cliche-instances/cliche-instances.component';
+  ConceptInstancesComponent
+} from './concept-instances/concept-instances.component';
 import {
   ConfigureComponentComponent
 } from './configure-component/configure-component.component';
 import {
-  ConfigureClicheComponent
-} from './configure-cliche/configure-cliche.component';
+  ConfigureConceptComponent
+} from './configure-concept/configure-concept.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
 import { InsertComponentComponent } from './insert-component/insert-component.component';
@@ -48,8 +48,8 @@ import { TopBarComponent } from './top-bar/top-bar.component';
 
 import { ChildScopeIO } from './io';
 
-export function getUsedClichesConfig() {
-  return usedClichesConfig;
+export function getUsedConceptsConfig() {
+  return usedConceptsConfig;
 }
 
 ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
@@ -60,9 +60,9 @@ ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
     ComponentDefinitionComponent,
     ComponentInstanceComponent,
     AppComponent,
-    ClicheInstancesComponent,
+    ConceptInstancesComponent,
     ConfigureComponentComponent,
-    ConfigureClicheComponent,
+    ConfigureConceptComponent,
     DesignerComponent,
     FloatingMenuComponent,
     InsertComponentComponent,
@@ -82,7 +82,7 @@ ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
     NgxElectronModule,
     QuillModule,
     DvModule,
-    ClicheModule,
+    ConceptModule,
     AppRoutingModule
   ],
   providers: [
@@ -93,8 +93,8 @@ ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
       useValue: 'localhost:4200/api'
     },
     {
-      provide: USED_CLICHES_CONFIG,
-      useFactory: getUsedClichesConfig
+      provide: USED_CONCEPTS_CONFIG,
+      useFactory: getUsedConceptsConfig
     }
   ],
   bootstrap: [AppComponent],
@@ -102,7 +102,7 @@ ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
     ComponentInstanceComponent,
     AddAppComponentIoComponent,
     ConfigureComponentComponent,
-    ConfigureClicheComponent,
+    ConfigureConceptComponent,
     TextComponent
   ].concat(dvCoreComponents)
 })

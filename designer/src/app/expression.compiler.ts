@@ -90,7 +90,7 @@ export default function compileDvExpr(dvExpr: string): {
         .replace(/\?/g, '') // ignore elvis operator
         .split('.')
         // tslint:disable-next-line no-magic-numbers
-        .slice(0, name.startsWith('$') ? 1 : 3) // $input or cliche.component.input
+        .slice(0, name.startsWith('$') ? 1 : 3) // $input or concept.component.input
         .join('.')
     ); // drop object path
   const ngExpr: string = parsedExpr.toNgExpr();

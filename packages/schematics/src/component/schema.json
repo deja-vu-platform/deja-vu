@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/schema",
   "id": "DvSchematicsGenerateComponent",
-  "title": "Create a component for a Déjà Vu cliché",
+  "title": "Create a component for a Déjà Vu concept",
   "type": "object",
   "properties": {
     "componentName": {
       "type": "string"
     },
-    "clicheName": {
+    "conceptName": {
       "type": "string"
     },
     "entityName": {
@@ -28,6 +28,6 @@
       "default": "blank"
     }
   },
-  "required": [ "componentName", "clicheName" ],
+  "required": [ "componentName", "conceptName" ],
   "additionalProperties": false
 }

@@ -13,26 +13,26 @@ which can then be voted up by other members (posts with
 more upvotes appear towards the top of the home page).
 Registered users can also comment on a post or comment and upvote comments.
 
-## Including and Configuring Clichés
+## Including and Configuring Concepts
 
 The process of building a Déjà Vu app begins by navigating the
-[catalog of clichés](../packages/catalog/README), to find 
+[catalog of concepts](../packages/catalog/README), to find 
 one that has the functionality you are looking for.
 
-Clichés are freestanding, without any mutual dependencies. As a
+Concepts are freestanding, without any mutual dependencies. As a
 user of Déjà Vu, you can ignore
-the (front-end and back-end) code that implements the cliché. The only
-aspects of a cliché you'll interact with are the configuration options and exported actions. The
-documentation accompanying a cliché includes information about the configuration options
+the (front-end and back-end) code that implements the concept. The only
+aspects of a concept you'll interact with are the configuration options and exported actions. The
+documentation accompanying a concept includes information about the configuration options
 (e.g., their effect on behavior) and the exported actions.
 
-Cliché actions are interactive user interface elements that can read and
+Concept actions are interactive user interface elements that can read and
 write back-end data.
 They can
 also have inputs and produce outputs.
 
 *SN* uses the [Authentication](../packages/catalog/authentication/README.md)
-cliché to handle user authentication,
+concept to handle user authentication,
 [Comment](../packages/catalog/comment/README.md) to comment on both posts and other comments,
 [Property](../packages/catalog/property/README.md) to save a post's author, title, and link, and
 [Scoring](../packages/catalog/scoring/README.md) twice: once for keeping track of each post's upvotes;
@@ -42,7 +42,7 @@ The app's config file (dvconfig.json) is shown below:
 ```json
 {
   "name": "sn",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {},
     "comment": {},
     "property": {
@@ -79,19 +79,19 @@ The app's config file (dvconfig.json) is shown below:
 }
 ```
 
-The config file specifies the clichés used by the app. This is also
+The config file specifies the concepts used by the app. This is also
 where other information, such as the name of the app and routes are specified.
-The value of `usedCliches` determines what clichés are included in the application.
-This object has one key-value pair per cliché instance. The key (e.g., `property`)
+The value of `usedConcepts` determines what concepts are included in the application.
+This object has one key-value pair per concept instance. The key (e.g., `property`)
 determines the name (or alias) that is going to be used in the HTML to refer to that instance.
-The value provides information about the instance, such as the name of the cliché
-(e.g., `scoring` in `scoringposts`) and its configuration options. (If no cliché
-name is given, the cliché of same name as the given alias will be used.)
+The value provides information about the instance, such as the name of the concept
+(e.g., `scoring` in `scoringposts`) and its configuration options. (If no concept
+name is given, the concept of same name as the given alias will be used.)
 
 *Property* accepts a configuration variable (`schema`) that expects a [JSON 
 Schema](http://json-schema.org/) to describe the properties of the objects it will be 
 saving.
-(The *Property* cliché essentially gives you a data modeling
+(The *Property* concept essentially gives you a data modeling
 defining facility, albeit with simple CRUD behavior.)
 
 In *SN*, we use `schema` to configure the type of properties we expect our
@@ -114,17 +114,17 @@ action will be shown.
 
 ## Linking Actions
 
-There are two types of actions: *cliché actions* and
-*app actions*. Cliché actions
-are the actions defined by clichés; app actions
+There are two types of actions: *concept actions* and
+*app actions*. Concept actions
+are the actions defined by concepts; app actions
 are the actions that are part of the app being developed.
 
 Each app
 action is written in a separate HTML file.
 App actions can contain other actions, which can be
-of either kind (cliché actions or app actions).
+of either kind (concept actions or app actions).
 Actions are included as if they were HTML
-elements, with the tag given by `cliche.action-name` or
+elements, with the tag given by `concept.action-name` or
 `app.action-name`.
 
 Below is a code excerpt of *SN*'s `submit-post` definition:
@@ -163,18 +163,18 @@ Below is a code excerpt of *SN*'s `submit-post` definition:
 
 `submit-post` includes one app action, `navbar`
 ([defined elsewhere](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/navbar/navbar.html));
-three cliché actions,
+three concept actions,
 `authenticate` of `authentication`, `create-object` of
 `property`, and
 `create-score` of the `scoringposts` instance of *Scoring*; 
-and three built-in actions (which can be regarded as free-standing cliché actions): `dv.if`, which
+and three built-in actions (which can be regarded as free-standing concept actions): `dv.if`, which
 shows the enclosed content if the given condition is true, `dv.gen-id`,
 which generates a unique ID, `dv.link` which redirects the user to
 another page (in this case, it navigates to the action matching
 the `/item` route and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
 which synchronizes the actions it wraps (explained in more detail later).
 
-App actions, like cliché actions, can have input and
+App actions, like concept actions, can have input and
 output values (which can be used in other app actions).
 Inputs to an action are bound with the syntax `parameter=value`.
 The value could
@@ -191,18 +191,18 @@ default button label "Create Object".
 
 ## Action Synchronization
 
-Cliché actions have two phases: an *evaluation* phase (eval) and an
+Concept actions have two phases: an *evaluation* phase (eval) and an
 *execution* phase (exec). App actions don't have phases.
 
 Both phases can take inputs and produce outputs.
-When a cliché action execs or evals, it expects all its
+When a concept action execs or evals, it expects all its
 required inputs
 to be available&mdash;blocking the evaluation or
 execution until inputs are given.
 After the phase runs, it will produce its outputs.
 
 What happens
-on eval or exec is up to the author of the cliché, but
+on eval or exec is up to the author of the concept, but
 by convention the evaluation phase fetches data from the server (e.g., loading scores), and
 the execution phase produces some side-effect on the server 
 (e.g., creating a new score).
@@ -215,7 +215,7 @@ triggers its execution.
 
 There are two types of app actions: a regular action and
 a transaction (tx) action. A tx action synchronizes
-the evaluation and execution of the cliché actions it wraps, so that the
+the evaluation and execution of the concept actions it wraps, so that the
 evaluation/execution of one action triggers the evaluation/execution of all the other sibling
 actions, and they either complete in their entirety (if all succeeded) or have no effect whatsoever
 (if one of them fails).
@@ -227,11 +227,11 @@ be thought of as an "or" action and a tx action as an "and" action.
 
 The button in the `create-object` action of *Property* causes
 the action to execute on click. Thus, if this action is wrapped in a
-`dv.tx`, it will trigger the execution of all its sibling cliché actions
+`dv.tx`, it will trigger the execution of all its sibling concept actions
 when a user clicks on the button.
 
-There is no shared state between clichés, but objects in
-different clichés may be associated by sharing ids. 
+There is no shared state between concepts, but objects in
+different concepts may be associated by sharing ids. 
 In `submit-post`, for example,  the same uniquely generated id is passed
 to `create-score` and `create-object`. As a result, 
 when a user clicks on the "Submit" button of `create-object`,
@@ -301,7 +301,7 @@ including its appearance, to be customized; thus the hidden parameter of
 and used in several parts of the view). (Any action can be hidden with `hidden=true`,
 but the action still runs as if it wasn't hidden, the only difference
 is that it won't be shown to the user&mdash;and as a result, the user won't be able
-to interact with it.) All `show-*` actions of clichés follow
+to interact with it.) All `show-*` actions of concepts follow
 this pattern: when loaded, the action evaluates and if an id was given
 it fetches the entity (e.g., the object, score) with the given id
 from its database and emits it as output.}

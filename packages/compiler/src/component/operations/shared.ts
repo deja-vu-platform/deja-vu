@@ -31,18 +31,18 @@ export function classNameToNgField(name: string): string {
 export function getStEntryForNgComponent(
   ngComponentName: string, symbolTable: ComponentSymbolTable, alias?: string)
   : ComponentStEntry | undefined {
-  const [ clicheName, componentName ] = _.split(ngComponentName, /-(.+)/ );
+  const [ conceptName, componentName ] = _.split(ngComponentName, /-(.+)/ );
   const stPath = (alias === undefined) ?
-    `${clicheName}.symbolTable.${componentName}` : alias;
+    `${conceptName}.symbolTable.${componentName}` : alias;
 
   return <ComponentStEntry | undefined> _.get(symbolTable, stPath);
 }
 
 export function outputToNgField(
-  clicheName: string, componentName: string, output: string, alias?: string) {
+  conceptName: string, componentName: string, output: string, alias?: string) {
   const aliasStr = (alias === undefined) ? '' : `__${alias.replace(/-/g, '_')}`;
   const componentNameNoHyphens = componentName.replace(/-/g, '_');
 
-  return `__ngOutput__${clicheName}__` +
+  return `__ngOutput__${conceptName}__` +
     `${componentNameNoHyphens}__${output}${aliasStr}`;
 }

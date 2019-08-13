@@ -1,0 +1,46 @@
+<button
+  mat-button color="primary"
+  id="import-concept"
+  (click)="newConceptInstance()">
+  <mat-icon>add_circle</mat-icon> New Concept Instance
+</button>
+<div *ngIf="app">
+  <div class="help" *ngIf="app.concepts?.length === 0">
+    Create a new concept instance to add behavior
+    to your app
+  </div>
+  <div *ngFor="let ci of app.concepts">
+    <div class="concept-instance">
+      <div class="concept-instance-info">
+        <div class="alias">{{ci.name}}</div>
+        <div class="of">
+          {{ci.of.name}}
+          <mat-icon
+            matTooltip="Info"
+            class="info-icon" (click)="docs(ci.of)">info</mat-icon>
+        </div>
+      </div>
+      <div class="concept-instance-buttons">
+        <button
+          mat-icon-button
+          class="mat-small"
+          *ngIf="ci.config"
+          (click)="$event.stopPropagation(); editConceptInstance(ci);"
+          matTooltip="Configure"
+        >
+          <mat-icon>settings</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="mat-small"
+          *ngIf="ci.config"
+          matTooltip="Delete"
+          (click)="deleteConceptInstance(ci)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</div>

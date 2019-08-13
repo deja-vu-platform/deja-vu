@@ -64,13 +64,13 @@ export interface GatewayRequest {
   readonly options?: RequestOptions;
 }
 
-export interface GatewayToClicheRequest extends GatewayRequest {
+export interface GatewayToConceptRequest extends GatewayRequest {
   readonly url: string;
   readonly method: string;
   readonly body: string;
 }
 
-export interface ClicheResponse<T> {
+export interface ConceptResponse<T> {
   readonly status: number;
   readonly text: T;
   readonly index?: number;
@@ -86,7 +86,7 @@ function stringify(json: any) {
  * Class for batching responses.
  */
 export class ResponseBatch {
-  private responses: ClicheResponse<string>[] = [];
+  private responses: ConceptResponse<string>[] = [];
 
   constructor(private res: express.Response, private batchSize: number) { }
 
@@ -143,11 +143,11 @@ export class RequestInvalidError {
 
 export abstract class RequestProcessor {
   protected readonly txCoordinator: TxCoordinator<
-    GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch>;
-  protected readonly dstTable: { [cliche: string]: port } = {};
+    GatewayToConceptRequest, ConceptResponse<string>, ResponseBatch>;
+  protected readonly dstTable: { [concept: string]: port } = {};
   protected readonly subscriptionCoordinator: SubscriptionCoordinator;
 
-  private static ClicheOf(node: ComponentTag | undefined): string | undefined {
+  private static ConceptOf(node: ComponentTag | undefined): string | undefined {
     if (node === undefined) {
       return undefined;
     }
@@ -156,35 +156,35 @@ export abstract class RequestProcessor {
   }
 
   /**
-   *  Forwards to the cliche the given request.
+   *  Forwards to the concept the given request.
    */
   private static async ForwardRequest<T>(
-    gatewayRequest: GatewayToClicheRequest
-  ): Promise<ClicheResponse<T>> {
+    gatewayRequest: GatewayToConceptRequest
+  ): Promise<ConceptResponse<T>> {
     let url = gatewayRequest.url;
     if (gatewayRequest.path) {
       url += gatewayRequest.path;
     }
     url +=  `/${gatewayRequest.fullComponentName}`;
-    let clicheReq = request(gatewayRequest.method, url);
+    let conceptReq = request(gatewayRequest.method, url);
     if (gatewayRequest.options) {
       if (gatewayRequest.options.params) {
-        clicheReq = clicheReq.query(gatewayRequest.options.params);
+        conceptReq = conceptReq.query(gatewayRequest.options.params);
       }
       if (gatewayRequest.options.headers) {
-        clicheReq = clicheReq.set(gatewayRequest.options.headers);
+        conceptReq = conceptReq.set(gatewayRequest.options.headers);
       }
     }
-    clicheReq.send(gatewayRequest.body);
+    conceptReq.send(gatewayRequest.body);
     let response: request.Response;
     try {
-      response = await clicheReq;
+      response = await conceptReq;
     } catch (err) {
       response = err.response;
     }
     if (!response) {
-      const errMsg = `Got an undefined response for cliche ` +
-        `request ${stringify(clicheReq)}`;
+      const errMsg = `Got an undefined response for concept ` +
+        `request ${stringify(conceptReq)}`;
       console.error(errMsg);
 
       throw new Error(errMsg);
@@ -196,8 +196,8 @@ export abstract class RequestProcessor {
     };
   }
 
-  private static NewReqFor(msg: string, gcr: GatewayToClicheRequest)
-    : GatewayToClicheRequest {
+  private static NewReqFor(msg: string, gcr: GatewayToConceptRequest)
+    : GatewayToConceptRequest {
     return _
       .assign({}, gcr, {
         path: `/dv-${gcr.fullComponentName}/${gcr.reqId}/${msg}` + gcr.path });
@@ -227,8 +227,8 @@ export abstract class RequestProcessor {
 
   protected constructor(config: GatewayConfig) {
     const txConfig = this.getTxConfig(config);
-    this.txCoordinator = new TxCoordinator<GatewayToClicheRequest,
-      ClicheResponse<string>, ResponseBatch>(txConfig);
+    this.txCoordinator = new TxCoordinator<GatewayToConceptRequest,
+      ConceptResponse<string>, ResponseBatch>(txConfig);
     this.subscriptionCoordinator = new SubscriptionCoordinator();
   }
 
@@ -267,13 +267,13 @@ export abstract class RequestProcessor {
     const childRequests: ChildRequest[] = req.body.requests;
     const resBatch = new ResponseBatch(res, childRequests.length);
 
-    let gatewayToClicheRequests: GatewayToClicheRequest[];
+    let gatewayToConceptRequests: GatewayToConceptRequest[];
     let prunedCohortComponents: ComponentTag[];
     try {
-       gatewayToClicheRequests = childRequests
+       gatewayToConceptRequests = childRequests
          .map((childRequest) => this.validateRequest(childRequest));
 
-      const componentPath = gatewayToClicheRequests[0].from;
+      const componentPath = gatewayToConceptRequests[0].from;
       const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
       const cohortComponents = this.getCohortComponents(componentPath, dvTxNodeIndex);
       prunedCohortComponents = this.getPrunedCohortComponents(cohortComponents,
@@ -286,7 +286,7 @@ export abstract class RequestProcessor {
         const componentFqtag = ComponentPath.fromString(childRequest.query.from)
           .last();
         // Needs to match the way we extract inputs from the request in the
-        // cliche-server
+        // concept-server
         const inputs = childRequest.method === 'GET' ?
           // query.options is not parsed so we need to parse it
           _.get(JSON.parse(_.get(childRequest, 'query.options')),
@@ -315,14 +315,14 @@ export abstract class RequestProcessor {
     }
 
     return Promise
-      .all(gatewayToClicheRequests
-        .map((gatewayToClicheRequest, index) =>
+      .all(gatewayToConceptRequests
+        .map((gatewayToConceptRequest, index) =>
           this.txCoordinator.processMessage(
-            gatewayToClicheRequest.runId,
-            gatewayToClicheRequest.from.serialize(),
+            gatewayToConceptRequest.runId,
+            gatewayToConceptRequest.from.serialize(),
             this.getCohorts(
-              gatewayToClicheRequest.from.serialize(), prunedCohortComponents),
-            gatewayToClicheRequest, resBatch, index)))
+              gatewayToConceptRequest.from.serialize(), prunedCohortComponents),
+            gatewayToConceptRequest, resBatch, index)))
       .then(() => {});
   }
 
@@ -332,13 +332,13 @@ export abstract class RequestProcessor {
   ): Promise<void> {
     const resBatch = new ResponseBatch(res, 1);
     try {
-      const gatewayToClicheRequest = this.validateRequest(req);
+      const gatewayToConceptRequest = this.validateRequest(req);
       /**
        * We need to check that no other req is expected (another req could
        * be expected if this req is supposed to be part of a tx with more
        * than one cohort)
        */
-      const componentPath = gatewayToClicheRequest.from;
+      const componentPath = gatewayToConceptRequest.from;
 
       if (componentPath.isDvTx()) {
         const dvTxNodeIndex: number | null  = componentPath.indexOfClosestTxNode();
@@ -349,9 +349,9 @@ export abstract class RequestProcessor {
           [componentPath.last()]);
       }
 
-      const clicheRes: ClicheResponse<string> = await RequestProcessor
-        .ForwardRequest<string>(gatewayToClicheRequest);
-      resBatch.add(clicheRes.status, clicheRes.text, 1);
+      const conceptRes: ConceptResponse<string> = await RequestProcessor
+        .ForwardRequest<string>(gatewayToConceptRequest);
+      resBatch.add(conceptRes.status, conceptRes.text, 1);
     } catch (e) {
       resBatch.add(INTERNAL_SERVER_ERROR, e.message);
     }
@@ -375,7 +375,7 @@ export abstract class RequestProcessor {
     receivedRequestFqTags: string[]): ComponentTag[];
 
   protected validateRequest(req: express.Request | ChildRequest)
-    : GatewayToClicheRequest {
+    : GatewayToConceptRequest {
     if (!req.query.from) {
       throw new RequestInvalidError('No from specified');
     }
@@ -420,7 +420,7 @@ export abstract class RequestProcessor {
 
   private getToPort(componentPath: ComponentPath): port {
     const componentTag = this.getComponentFromPath(componentPath);
-    const to = RequestProcessor.ClicheOf(componentTag);
+    const to = RequestProcessor.ConceptOf(componentTag);
     const toPort: port | undefined = _.get(this.dstTable, to);
 
     if (!componentTag) {
@@ -441,14 +441,14 @@ export abstract class RequestProcessor {
   }
 
   private getTxConfig(config: GatewayConfig):
-    TxConfig<GatewayToClicheRequest, ClicheResponse<string>, ResponseBatch> {
+    TxConfig<GatewayToConceptRequest, ConceptResponse<string>, ResponseBatch> {
     return {
       dbHost: config.dbHost,
       dbPort: config.dbPort,
       dbName: config.dbName,
       reinitDbOnStartup: config.reinitDbOnStartup,
 
-      sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+      sendCommitToCohort: (gcr: GatewayToConceptRequest): Promise<void> => {
         // cohort doesn't need to commit for GET requests
         if (gcr.method === 'GET') {
           return Promise.resolve();
@@ -459,7 +459,7 @@ export abstract class RequestProcessor {
           .then((_unusedResp) => undefined);
       },
 
-      sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+      sendAbortToCohort: (gcr: GatewayToConceptRequest): Promise<void> => {
         if (gcr.method === 'GET') {
           return Promise.resolve();
         }
@@ -469,12 +469,12 @@ export abstract class RequestProcessor {
           .then((_unusedResp) => undefined);
       },
 
-      sendVoteToCohort: (gcr: GatewayToClicheRequest)
-        : Promise<Vote<ClicheResponse<string>>> => {
+      sendVoteToCohort: (gcr: GatewayToConceptRequest)
+        : Promise<Vote<ConceptResponse<string>>> => {
         return RequestProcessor
           .ForwardRequest<Vote<string>>(RequestProcessor.NewReqFor('vote', gcr))
-          .then((resp: ClicheResponse<Vote<string>>)
-            : Vote<ClicheResponse<string>> => {
+          .then((resp: ConceptResponse<Vote<string>>)
+            : Vote<ConceptResponse<string>> => {
             const vote = {
               result: resp.text.result,
               payload: { status: resp.status, text: resp.text.payload }
@@ -485,8 +485,8 @@ export abstract class RequestProcessor {
       },
 
       sendAbortToClient: (
-        causedAbort: boolean, _gcr?: GatewayToClicheRequest,
-        payload?: ClicheResponse<string>, txRes?: ResponseBatch) => {
+        causedAbort: boolean, _gcr?: GatewayToConceptRequest,
+        payload?: ConceptResponse<string>, txRes?: ResponseBatch) => {
         assert.ok(txRes !== undefined);
         if (causedAbort) {
           assert.ok(payload !== undefined);
@@ -500,7 +500,7 @@ export abstract class RequestProcessor {
       },
 
       sendToClient: (
-        payload: ClicheResponse<string>,
+        payload: ConceptResponse<string>,
         txRes?: ResponseBatch,
         index?: number
       ) => {
@@ -508,7 +508,7 @@ export abstract class RequestProcessor {
       },
 
       onError: (
-        e: Error, _gcr: GatewayToClicheRequest, txRes?: ResponseBatch) => {
+        e: Error, _gcr: GatewayToConceptRequest, txRes?: ResponseBatch) => {
         console.error(e);
         txRes!.add(INTERNAL_SERVER_ERROR, e.message);
       }
@@ -526,25 +526,25 @@ export class AppRequestProcessor extends RequestProcessor {
   ) {
     super(config);
 
-    _.forEach(dvConfig.usedCliches, (clicheConfig, name) => {
-      this.dstTable[name] = clicheConfig.config.wsPort;
+    _.forEach(dvConfig.usedConcepts, (conceptConfig, name) => {
+      this.dstTable[name] = conceptConfig.config.wsPort;
     });
     if (dvConfig.config) {
       this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
     }
     console.log(`Using dst table ${stringify(this.dstTable)}`);
 
-    // names of the cliches used (not the aliases), repeats don't matter
-    const usedCliches: string[] = _.map(
-      dvConfig.usedCliches,
-      (usedClicheConfig, alias) => _.get(usedClicheConfig, 'name', alias)
+    // names of the concepts used (not the aliases), repeats don't matter
+    const usedConcepts: string[] = _.map(
+      dvConfig.usedConcepts,
+      (usedConceptConfig, alias) => _.get(usedConceptConfig, 'name', alias)
     );
 
     const routeComponentSelectors = _.uniq(_.map(dvConfig.routes, ({component}) =>
       `${dvConfig.name}-${component}`
     ));
     this.componentHelper = new ComponentHelper(
-      usedCliches, appComponentTable, routeComponentSelectors);
+      usedConcepts, appComponentTable, routeComponentSelectors);
   }
 
   protected getComponentFromPath(componentPath: ComponentPath): ComponentTag {
@@ -631,16 +631,16 @@ export class DesignerRequestProcessor extends RequestProcessor {
   }
 
   /**
-   * Add a cliche (for appless mode for the designer)
+   * Add a concept (for appless mode for the designer)
    */
-  addCliche(name: string, wsPort: port, alias?: string) {
+  addConcept(name: string, wsPort: port, alias?: string) {
     this.dstTable[alias || name] = wsPort;
   }
 
   /**
-   * Remove a cliche (for appless mode for the designer)
+   * Remove a concept (for appless mode for the designer)
    */
-  removeCliche(name: string, alias?: string) {
+  removeConcept(name: string, alias?: string) {
     delete this.dstTable[alias || name];
   }
 
@@ -667,9 +667,9 @@ export class DesignerRequestProcessor extends RequestProcessor {
 
     // this is the same as in the app version except we skip input validation
     const resBatch = new ResponseBatch(res, childRequests.length);
-    let gatewayToClicheRequests: GatewayToClicheRequest[];
+    let gatewayToConceptRequests: GatewayToConceptRequest[];
     try {
-      gatewayToClicheRequests = childRequests
+      gatewayToConceptRequests = childRequests
         .map((childRequest) => this.validateRequest(childRequest));
     } catch (e) {
       resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
@@ -677,14 +677,14 @@ export class DesignerRequestProcessor extends RequestProcessor {
 
     // same as in the app version
     return Promise
-      .all(gatewayToClicheRequests
-        .map((gatewayToClicheRequest, index) =>
+      .all(gatewayToConceptRequests
+        .map((gatewayToConceptRequest, index) =>
           this.txCoordinator.processMessage(
-            gatewayToClicheRequest.runId,
-            gatewayToClicheRequest.from.serialize(),
+            gatewayToConceptRequest.runId,
+            gatewayToConceptRequest.from.serialize(),
             this.getCohorts(
-              gatewayToClicheRequest.from.serialize(), this.cohortComponents),
-            gatewayToClicheRequest, resBatch, index)))
+              gatewayToConceptRequest.from.serialize(), this.cohortComponents),
+            gatewayToConceptRequest, resBatch, index)))
       .then(() => {});
   }
 

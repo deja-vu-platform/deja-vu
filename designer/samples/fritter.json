@@ -461,7 +461,7 @@
     "main"
   ],
   "homepage": "login-register",
-  "cliches": [
+  "concepts": [
     {
       "name": "authentication",
       "of": "authentication",

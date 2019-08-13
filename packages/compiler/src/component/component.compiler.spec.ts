@@ -69,7 +69,7 @@ describe('ComponentCompiler', () => {
     const componentName = 'component-with-exprs';
     const st: SymbolTable = {
       foo: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -110,7 +110,7 @@ describe('ComponentCompiler', () => {
     const componentName = 'component-with-interpolation';
     const st: SymbolTable = {
       foo: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -142,7 +142,7 @@ describe('ComponentCompiler', () => {
   it('should handle strings correctly', () => {
     const st: SymbolTable = {
       foo: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const componentName = 'component-strings';
@@ -201,8 +201,8 @@ describe('ComponentCompiler', () => {
   it('should compile component with dv.if with component', () => {
     const st: SymbolTable = {
       foo: {
-        kind: 'cliche',
-        clicheName: 'foo'
+        kind: 'concept',
+        conceptName: 'foo'
       }
     };
     const componentName = 'component-with-if';
@@ -230,7 +230,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with input component with dv.if', () => {
     const st: SymbolTable = {
       event: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const componentName = 'component-with-if';
@@ -264,8 +264,8 @@ describe('ComponentCompiler', () => {
   it('should compile component with input component with dv.if', () => {
     const st: SymbolTable = {
       transfer: {
-        kind: 'cliche',
-        clicheName: 'transfer'
+        kind: 'concept',
+        conceptName: 'transfer'
       }
     };
     const componentName = 'component-with-if';
@@ -304,13 +304,13 @@ describe('ComponentCompiler', () => {
     const heading = 'Group meeting organizer';
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       event: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       allocator: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -363,10 +363,10 @@ describe('ComponentCompiler', () => {
   it('should compile component accessing member of output', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       allocator: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -392,10 +392,10 @@ describe('ComponentCompiler', () => {
     'aliased component', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       allocator: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -421,10 +421,10 @@ describe('ComponentCompiler', () => {
     'with elvis', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       allocator: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -452,7 +452,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with output', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -477,7 +477,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with output expr', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -502,7 +502,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with output expr', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -525,7 +525,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with input', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -543,7 +543,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with component input', () => {
     const st: SymbolTable = {
       event: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -573,7 +573,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with component input with inputs', () => {
     const st: SymbolTable = {
       task: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -604,7 +604,7 @@ describe('ComponentCompiler', () => {
   it('should compile component with html component input', () => {
     const st: SymbolTable = {
       event: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -629,10 +629,10 @@ describe('ComponentCompiler', () => {
     'that uses context outputs', () => {
       const st: SymbolTable = {
         event: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -687,14 +687,14 @@ describe('ComponentCompiler', () => {
         .toMatch('capture__');
     });
 
-  it('should compile cliche component with component input ' +
+  it('should compile concept component with component input ' +
     'that uses context outputs', () => {
       const st: SymbolTable = {
         scoring: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -753,10 +753,10 @@ describe('ComponentCompiler', () => {
     'that uses context', () => {
       const st: SymbolTable = {
         scoring: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -815,10 +815,10 @@ describe('ComponentCompiler', () => {
     'that captures context inputs with member access', () => {
       const st: SymbolTable = {
         scoring: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -867,10 +867,10 @@ describe('ComponentCompiler', () => {
     'that captures context inputs', () => {
       const st: SymbolTable = {
         scoring: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -917,10 +917,10 @@ describe('ComponentCompiler', () => {
     'that captures context inputs', () => {
       const st: SymbolTable = {
         scoring: {
-          kind: 'cliche'
+          kind: 'concept'
         },
         foo: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -967,7 +967,7 @@ describe('ComponentCompiler', () => {
     'that maps outputs', () => {
       const st: SymbolTable = {
         event: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -995,10 +995,10 @@ describe('ComponentCompiler', () => {
     });
 
   it('should compile component with component input that maps outputs ' +
-    'where multiple components are from the same cliche', () => {
+    'where multiple components are from the same concept', () => {
       const st: SymbolTable = {
         event: {
-          kind: 'cliche'
+          kind: 'concept'
         }
       };
       const component = `
@@ -1026,10 +1026,10 @@ describe('ComponentCompiler', () => {
   it('should compile component with an alias', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       foo: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `
@@ -1044,10 +1044,10 @@ describe('ComponentCompiler', () => {
   it('should fail if dv-tx is aliased', () => {
     const st: SymbolTable = {
       property: {
-        kind: 'cliche'
+        kind: 'concept'
       },
       scoring: {
-        kind: 'cliche'
+        kind: 'concept'
       }
     };
     const component = `

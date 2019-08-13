@@ -1,4 +1,4 @@
-import { Config } from '@deja-vu/cliche-server';
+import { Config } from '@deja-vu/concept-server';
 
 export const jsonSchemaTypeToGraphQlType = {
   integer: 'Int',

@@ -1,6 +1,6 @@
 {
   "name": "sweetspots",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": true

@@ -18,47 +18,47 @@ yarn global add @deja-vu/cli
 Interface
 ---------
 
-  - `dv new <type> <name>` - create a new cliché or action, must be run outside of the dv repo
-  - `dv serve` - build the app or cliché in the current directory and run it locally
-  - `dv package` - package the cliché so that it can be used in other projects
+  - `dv new <type> <name>` - create a new concept or action, must be run outside of the dv repo
+  - `dv serve` - build the app or concept in the current directory and run it locally
+  - `dv package` - package the concept so that it can be used in other projects
   - `dv --help` - show the list of dv commands
 
 
 Guide
 -----
 
-### Create a new cliché
+### Create a new concept
 
-To create and serve a new cliché:
+To create and serve a new concept:
 
 ```
-dv new cliche clichename --pathToDv=deja-vu
-cd deja-vu/packages/catalog/cliche-name
+dv new concept conceptname --pathToDv=deja-vu
+cd deja-vu/packages/catalog/concept-name
 dv serve
 ```
 
-`clichename` must be a single word, all lowercase.
+`conceptname` must be a single word, all lowercase.
 
 `pathToDv` is the path to the folder where the dv code is located (the repo).
 This argument is optional and the default value is the name of the repo,
 `deja-vu`. As such, it is recommended that the command be run in the directory
 that contains the dv repo.
 
-The newly-created cliché comes with four initial actions to serve as examples
+The newly-created concept comes with four initial actions to serve as examples
 for each of the CRUD (create, read, update, and delete) operations.
-They are called `create-clichename`, `delete-clichename`, `show-clichename`, and `update-clichename`,
-under the assumption that `clichename` is usually the name of the primary entity
-in the cliché. Each `clichename` object starts out with an `id` field to
+They are called `create-conceptname`, `delete-conceptname`, `show-conceptname`, and `update-conceptname`,
+under the assumption that `conceptname` is usually the name of the primary entity
+in the concept. Each `conceptname` object starts out with an `id` field to
 uniquely identify each object, and an editable `content` field.
 Of course, all of the above can and should be updated.
 
-Navigate to ()[http://localhost:3000/] and see the four cliché actions in action.
+Navigate to ()[http://localhost:3000/] and see the four concept actions in action.
 All the CRUD operations they represent should already work.
 
-### Create actions in a cliché
+### Create actions in a concept
 
-To create an action in a cliché, run the following from the root of
-the cliché's directory:
+To create an action in a concept, run the following from the root of
+the concept's directory:
 
 ```
 dv new action type entityname action-name
@@ -86,7 +86,7 @@ dv new action udpate event edit-event
 ```
 
 The command will create the HTML, TypeScript, CSS, and test files for the action.
-It will also add the action to `clichename.metadata.ts` and to `app.component.html`
+It will also add the action to `conceptname.metadata.ts` and to `app.component.html`
 so that it can be used and tested right away. In order for it to be added
 correctly to those files, the initial structure of those files shouldn't be changed.
 These additions can be skipped using the flags `--skipMetadataImport` and `--skipAppComponentHtml`. The command skips a modification if the relevant code
@@ -103,7 +103,7 @@ and reinstall it globally with:
 npm run package && npm uninstall -g && npm install -g
 ```
 
-Every cliché package also comes with the `dv` command, so you can prepend `yarn`
+Every concept package also comes with the `dv` command, so you can prepend `yarn`
 or `npm run` to the usual `dv` command, e.g. `yarn dv serve`.
 
 
@@ -115,7 +115,7 @@ is the root of a Deja Vu project.
 
 The "actions" property specifies the location of the actions. It has two
 properties: "package" and "app". "package" is for specifying the actions that
-should be included when packaging a cliche. "app" is for specifying the actions
+should be included when packaging a concept. "app" is for specifying the actions
 that will be used when running an app.
 
 By default, all `.html` files are included but the list

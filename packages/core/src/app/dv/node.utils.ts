@@ -12,7 +12,7 @@ const IS_APP_COMPONENT_ATTR = '_dvIsAppComponent';
 
 
 export class NodeUtils {
-  private static GetClicheFromTag(tag: string): string {
+  private static GetConceptFromTag(tag: string): string {
     return tag.substring(0, tag.indexOf('-'));
   }
 
@@ -80,11 +80,11 @@ export class NodeUtils {
     node.setAttribute(IS_APP_COMPONENT_ATTR, '');
   }
 
-  static GetClicheAliasOfNode(node): string {
-    const clicheOfTag = NodeUtils.GetClicheFromTag(NodeUtils.GetTag(node));
+  static GetConceptAliasOfNode(node): string {
+    const conceptOfTag = NodeUtils.GetConceptFromTag(NodeUtils.GetTag(node));
     const dvOf = NodeUtils.GetAttribute(node, OF_ATTR);
 
-    return !_.isEmpty(dvOf) ? dvOf : clicheOfTag;
+    return !_.isEmpty(dvOf) ? dvOf : conceptOfTag;
   }
 
   static GetFqTagOfNode(node): string {

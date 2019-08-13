@@ -1,15 +1,15 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields,
   isSuccessfulContext,
   Validation
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 import { IResolvers } from 'graphql-tools';
 import {
@@ -106,7 +106,7 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
+function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
   const messages: Collection<MessageDoc> = db.collection('messages');
 
   return {
@@ -172,7 +172,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
           // only because Message authorIds CANNOT be changed.
           // If for some reason editing Message authorIds becomes possible,
           // this functionality will be broken.
-          // Note that the authorization cliché could also be used
+          // Note that the authorization concept could also be used
           // to get the same functionality.
           if (message.authorId !== input.authorId) {
             throw new Error('Only the author of the message can edit it.');
@@ -206,8 +206,8 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
   };
 }
 
-const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const chatConcept: ConceptServer = new ConceptServerBuilder('chat')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const messages: Collection<MessageDoc> = db.collection('messages');
 
     return Promise.all([
@@ -219,4 +219,4 @@ const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
   .resolvers(resolvers)
   .build();
 
-chatCliche.start();
+chatConcept.start();

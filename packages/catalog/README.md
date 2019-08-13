@@ -1,6 +1,6 @@
-# Cliché Catalog
+# Concept Catalog
 
-| Cliché | Purpose |
+| Concept | Purpose |
 | ------ | ------- |
 | [Allocator](allocator/README.md) | Distribute resources among consumers |
 | [Authentication](authentication/README.md) | Verify the user's identity with a username and password |

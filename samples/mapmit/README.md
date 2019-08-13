@@ -15,7 +15,7 @@ Team RECD
 
 [Original App](http://mapmit.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Authorization
 - Geolocation
@@ -28,7 +28,7 @@ Team RECD
 - Filter events by time (search events by time widget)
 - Pick location from list of MIT buildings (location from list widget…if we want to support this)
 - Search for events by location (show markers by location widget, but should probably move away from lat+lng)
-- Ability to edit events (edit event cliche)
-- Only the event host can edit the event (edit event cliche and authorization can edit cliche)
-- Restrict MapMIT to the MIT community (authentication cliche - add regex to sign up)
+- Ability to edit events (edit event concept)
+- Only the event host can edit the event (edit event concept and authorization can edit concept)
+- Restrict MapMIT to the MIT community (authentication concept - add regex to sign up)
 - Filter events by public/group (depends on how group visibility is done)

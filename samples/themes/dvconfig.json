@@ -1,6 +1,6 @@
 {
   "name": "themes",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {}
   },
   "routes": [

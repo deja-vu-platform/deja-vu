@@ -212,7 +212,7 @@ describe('ComponentHelper', () => {
         }
       ],
     };
-    const usedCliches = [
+    const usedConcepts = [
       'authentication',
       'authorization',
       'authentication',
@@ -225,7 +225,7 @@ describe('ComponentHelper', () => {
       'property'
     ];
     const routes = ['chorestar-parent-home'];
-    const componentHelper = new ComponentHelper(usedCliches, componentTable, routes);
+    const componentHelper = new ComponentHelper(usedConcepts, componentTable, routes);
 
     const arrayComponentPath = [
       'chorestar-root',

@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   CreateMarkerInput,
   MarkerDoc,
@@ -62,7 +62,7 @@ function milesToRadian(miles: number) {
   return miles / earthRadiusInMiles;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const markers: Collection<MarkerDoc> = db.collection('markers');
 
   return {
@@ -122,8 +122,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const geolocationConcept: ConceptServer = new ConceptServerBuilder('geolocation')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const markers: Collection<MarkerDoc> = db.collection('markers');
 
     return Promise.all([
@@ -136,4 +136,4 @@ const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
   .resolvers(resolvers)
   .build();
 
-geolocationCliche.start();
+geolocationConcept.start();

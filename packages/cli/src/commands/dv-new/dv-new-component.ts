@@ -40,7 +40,7 @@ exports.handler = ({ type, entityName, componentName,
   skipAppComponentHtml, skipMetadataImport }) => {
   if (!isInNgProjectRoot()) {
     console.log(
-      'Error: Please run this command from the root of a cliché directory.');
+      'Error: Please run this command from the root of a concept directory.');
     return;
   }
 

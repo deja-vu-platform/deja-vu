@@ -14,7 +14,7 @@ Team Reach
 
 [Original App](http://livescorecard.herokuapp.com)
 
-## Cliches Used
+## Concepts Used
 - Authorization
 - Authentication
 - Passkey (x2)
@@ -33,11 +33,11 @@ Team Reach
 - Delete participant info ->  Property, Passkey, Label
 - Edit climb info ->  Property, Scoring, Label
 - Delete climb info -> Property, Scoring, Label
-- Sort climbers in alphabetical order -> Needs a Sort or Filter cliche
+- Sort climbers in alphabetical order -> Needs a Sort or Filter concept
 
 ### Climber
-- Sort climbs by number -> Needs a Sort cliche
+- Sort climbs by number -> Needs a Sort concept
 - Filter climbers by sex and category (also filter climbs by categoery) ->
 Use `search-items-by label` action, but need to add `waitOn` input to
 `show-tasks` action.
-- Give approval by entering credentials -> Needs new widget in the Task cliche
+- Give approval by entering credentials -> Needs new widget in the Task concept

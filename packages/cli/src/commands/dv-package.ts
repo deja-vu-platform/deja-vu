@@ -13,7 +13,7 @@ import {
 } from '../utils';
 
 exports.command = 'package';
-exports.desc = 'package a cliché';
+exports.desc = 'package a concept';
 exports.handler = () => {
   const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
   console.log('Packaging concept');

@@ -1,15 +1,15 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheDbNotFoundError,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptDbNotFoundError,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { readFileSync } from 'fs';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
@@ -66,7 +66,7 @@ type ZeroBalanceFn<Balance> = () => Balance;
 type IsZeroBalanceFn<Balance> = (balance: Balance) => boolean;
 
 function getResolvers<Balance>(
-  db: ClicheDb,
+  db: ConceptDb,
   accounts: Collection<AccountDoc<Balance>>,
   transfers: Collection<TransferDoc<Balance>>,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
@@ -83,7 +83,7 @@ function getResolvers<Balance>(
 
           return account.balance;
         } catch (err) {
-          if (err.errorCode !== ClicheDbNotFoundError.ERROR_CODE) {
+          if (err.errorCode !== ConceptDbNotFoundError.ERROR_CODE) {
             throw err;
           }
 
@@ -172,7 +172,7 @@ async function addToBalanceOperation<Balance>(context: Context,
     (fetchedAccount: AccountDoc<Balance>) => {
     // Throw an error if the balance in acct would be negative after updating
     if (!accountHasFundsFn(fetchedAccount.balance, amount)) {
-      // ClicheDb will take care of rolling back
+      // ConceptDb will take care of rolling back
       throw new Error(`Account ${accountId} has insufficient funds`);
     }
   });
@@ -199,7 +199,7 @@ async function addToBalanceOperation<Balance>(context: Context,
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
  */
-async function addToBalance<Balance>(db: ClicheDb, context: Context,
+async function addToBalance<Balance>(db: ConceptDb, context: Context,
   accounts: Collection<AccountDoc<Balance>>,
   transfers: Collection<TransferDoc<Balance>>,
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
@@ -267,7 +267,7 @@ function getDynamicTypeDefs(config: TransferConfig): string[] {
   }
 }
 
-function resolvers(db: ClicheDb, config: TransferConfig): IResolvers {
+function resolvers(db: ConceptDb, config: TransferConfig): IResolvers {
   if (config.balanceType === 'money') {
     const accounts: Collection<AccountDoc<number>> =
       db.collection('accounts');
@@ -358,8 +358,8 @@ function resolvers(db: ClicheDb, config: TransferConfig): IResolvers {
   }
 }
 
-const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const transferConcept: ConceptServer = new ConceptServerBuilder('transfer')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     /**
      * `transfers` is the main collection,
      * the only reason why we have an `accounts`
@@ -381,4 +381,4 @@ const transferCliche: ClicheServer = new ClicheServerBuilder('transfer')
   .dynamicTypeDefs(getDynamicTypeDefs)
   .build();
 
-transferCliche.start();
+transferConcept.start();

@@ -1,14 +1,14 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheDbNotFoundError,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptDbNotFoundError,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   CreateEventInput,
   CreateSeriesInput,
@@ -91,7 +91,7 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const events: Collection<EventDoc> = db.collection('events');
   const series: Collection<SeriesDoc> = db.collection('series');
 
@@ -156,7 +156,7 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
         try {
           await events.findOne({ id: id }, { projection: { _id: 1 }});
         } catch (err) {
-          if (err.errorCode !== ClicheDbNotFoundError.ERROR_CODE) {
+          if (err.errorCode !== ConceptDbNotFoundError.ERROR_CODE) {
             throw err;
           }
           isPartOfSeries = true;
@@ -202,8 +202,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const eventCliche: ClicheServer = new ClicheServerBuilder('event')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const eventConcept: ConceptServer = new ConceptServerBuilder('event')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     // Stores individual events that are not part of any series
     const events: Collection<EventDoc> = db.collection('events');
     // Stores event series. Its constituent events are embedded in `SeriesDoc`
@@ -220,4 +220,4 @@ const eventCliche: ClicheServer = new ClicheServerBuilder('event')
   .resolvers(resolvers)
   .build();
 
-eventCliche.start();
+eventConcept.start();

@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from '@deja-vu/core';
 
-// import and export all cliché components here
+// import and export all concept components here
 import { CreateMatchComponent } from './create-match/create-match.component';
 export { CreateMatchComponent };
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
@@ -29,7 +29,7 @@ import { ShowAttemptsComponent } from './show-attempts/show-attempts.component';
 export { ShowAttemptsComponent };
 
 
-// add all cliché components here
+// add all concept components here
 const allComponents = [
   CreateMatchComponent, DeleteMatchComponent, ShowMatchComponent,
   AttemptMatchComponent, WithdrawAttemptComponent, ShowMatchesComponent,

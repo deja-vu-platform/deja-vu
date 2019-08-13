@@ -12,8 +12,8 @@ import {
 
 import * as _ from 'lodash';
 
-import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
-import { <%= classify(entityName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
+import { API_PATH } from '../<%= dasherize(conceptName) %>.config';
+import { <%= classify(entityName) %> } from '../shared/<%= dasherize(conceptName) %>.model';
 
 
 interface <%= classify(componentName) %>Res {
@@ -24,7 +24,7 @@ interface <%= classify(componentName) %>Res {
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  selector: '<%= dasherize(conceptName) %>-<%= dasherize(componentName) %>',
   templateUrl: './<%= dasherize(componentName) %>.component.html',
   styleUrls: ['./<%= dasherize(componentName) %>.component.css'],
   providers: [

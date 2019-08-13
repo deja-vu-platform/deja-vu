@@ -16,7 +16,7 @@ import {
   ComponentInstance,
   App,
   AppComponentDefinition,
-  ClicheInstance,
+  ConceptInstance,
   Row
 } from '../datatypes';
 
@@ -52,7 +52,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
     private readonly router: Router
   ) {
     this.openComponent = this.app.homepage;
-    window['dv-designer'] = true; // alters how cliche server finds components
+    window['dv-designer'] = true; // alters how concept server finds components
     this.configureDragula(); // dragula needs to be configured at the top level
     this.dragulaService.drag()
       .subscribe(() => {
@@ -63,7 +63,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         this.dragging = false;
       });
 
-    // imports for addCliche
+    // imports for addConcept
     if (this.electronService.remote) {
       this.requestProcessor = this.electronService.remote
         .require('./electron.js').requestProcessor;
@@ -111,50 +111,50 @@ export class DesignerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.removeAllCliches();
+    this.removeAllConcepts();
   }
 
   /**
-   * Start the cliche server
+   * Start the concept server
    */
-  addCliche(cliche: ClicheInstance) {
+  addConcept(concept: ConceptInstance) {
     if (this.electronService.remote) {
       this.requestProcessor
-        .addCliche(cliche.of.name, this.nextPort, cliche.name);
-      const clichePkg = this.path.join(this.path.dirname(
-        this.cli.locateClichePackage(cliche.of.name)), '..');
-      const serverPath = this.path.join(clichePkg, 'server', 'server.js');
-      const configObj = Object.assign({ wsPort: this.nextPort }, cliche.config);
+        .addConcept(concept.of.name, this.nextPort, concept.name);
+      const conceptPkg = this.path.join(this.path.dirname(
+        this.cli.locateConceptPackage(concept.of.name)), '..');
+      const serverPath = this.path.join(conceptPkg, 'server', 'server.js');
+      const configObj = Object.assign({ wsPort: this.nextPort }, concept.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;
-      if (cliche.name !== cliche.of.name) {
-        command += ` --as ${cliche.name}`;
+      if (concept.name !== concept.of.name) {
+        command += ` --as ${concept.name}`;
       }
-      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
+      this.processes[concept.name] = this.cp.spawn(command, [], { shell: true });
       this.nextPort += 1;
 
       // We also need to copy assets to the assets folder
-      const clicheAssetsPath = this.path.join(clichePkg, 'assets');
+      const conceptAssetsPath = this.path.join(conceptPkg, 'assets');
       // rating hack: see ng-ap-builder.ts in the compiler package
-      const appAssetsDir = cliche.of.name === 'rating' ? this.assetsDir :
-        this.path.join(this.assetsDir, cliche.of.name);
-      if (this.fsExtra.existsSync(clicheAssetsPath)) {
-        this.fsExtra.copySync(clicheAssetsPath, appAssetsDir);
+      const appAssetsDir = concept.of.name === 'rating' ? this.assetsDir :
+        this.path.join(this.assetsDir, concept.of.name);
+      if (this.fsExtra.existsSync(conceptAssetsPath)) {
+        this.fsExtra.copySync(conceptAssetsPath, appAssetsDir);
       }
     }
   }
 
   /**
-   * Stop the cliche server, if one is running
+   * Stop the concept server, if one is running
    */
-  removeCliche(clicheName: string) {
-    const childProcess = this.processes[clicheName];
+  removeConcept(conceptName: string) {
+    const childProcess = this.processes[conceptName];
     if (childProcess) {
       childProcess.kill('SIGINT');
-      delete this.processes[clicheName];
+      delete this.processes[conceptName];
     }
     if (this.requestProcessor) {
-      this.requestProcessor.removeCliche(clicheName);
+      this.requestProcessor.removeConcept(conceptName);
     }
   }
 
@@ -163,9 +163,9 @@ export class DesignerComponent implements OnInit, OnDestroy {
    */
   load(appJSON: string) {
     this.zone.run(() => {
-      this.removeAllCliches();
+      this.removeAllConcepts();
       this.app = App.fromJSON(appJSON);
-      this.app.cliches.forEach((cliche) => this.addCliche(cliche));
+      this.app.concepts.forEach((concept) => this.addConcept(concept));
       this.openComponent = this.app.homepage;
       this.snackBar.open('App has been loaded.', 'dismiss', {
         duration: 2500
@@ -174,11 +174,11 @@ export class DesignerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Stop all cliche backends to avoid port collisions
+   * Stop all concept backends to avoid port collisions
    */
-  private removeAllCliches() {
-    this.app.cliches.forEach((c) => {
-      this.removeCliche(c.name);
+  private removeAllConcepts() {
+    this.app.concepts.forEach((c) => {
+      this.removeConcept(c.name);
     });
   }
 

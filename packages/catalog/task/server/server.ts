@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -94,7 +94,7 @@ async function updateTask(
   return await tasks.updateOne(context, { id }, updateOp);
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const tasks: Collection<TaskDoc> = db.collection('tasks');
 
   return {
@@ -169,8 +169,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const taskCliche: ClicheServer = new ClicheServerBuilder('task')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const taskConcept: ConceptServer = new ConceptServerBuilder('task')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const tasks: Collection<TaskDoc> = db.collection('tasks');
 
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
@@ -179,4 +179,4 @@ const taskCliche: ClicheServer = new ClicheServerBuilder('task')
   .resolvers(resolvers)
   .build();
 
-taskCliche.start();
+taskConcept.start();

@@ -27,8 +27,8 @@ import {
   ComponentInstanceComponent
 } from '../component-instance/component-instance.component';
 import {
-  ClicheInstancesComponent
-} from '../cliche-instances/cliche-instances.component';
+  ConceptInstancesComponent
+} from '../concept-instances/concept-instances.component';
 import {
   FloatingMenuComponent
 } from '../floating-menu/floating-menu.component';
@@ -45,7 +45,7 @@ describe('DesignerComponent', () => {
       declarations: [
         ComponentDefinitionComponent,
         ComponentInstanceComponent,
-        ClicheInstancesComponent,
+        ConceptInstancesComponent,
         DesignerComponent,
         FloatingMenuComponent,
         InsertComponentComponent,

@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import {
   ComponentStEntry, ComponentSymbolTable, ComponentSymbolTableStEntry, AppOutputStEntry,
-  ClicheStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
+  ConceptStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
 } from '../symbolTable';
 
 import * as _ from 'lodash';
@@ -128,15 +128,15 @@ export class ComponentCompiler {
       templateUrl, className, selector);
 
     const fields: NgField[] =  _
-      .chain(ComponentCompiler.FilterKind('cliche', thisComponentSymbolTable))
-      .map((clicheEntry: ClicheStEntry): ComponentStEntry[] =>
+      .chain(ComponentCompiler.FilterKind('concept', thisComponentSymbolTable))
+      .map((conceptEntry: ConceptStEntry): ComponentStEntry[] =>
         <ComponentStEntry[]> ComponentCompiler
-          .FilterKind('component', clicheEntry.symbolTable))
+          .FilterKind('component', conceptEntry.symbolTable))
       .flatten()
       // Include aliased components
       .concat(ComponentCompiler.FilterKind('component', thisComponentSymbolTable))
-      .map((clicheEntry: ComponentStEntry): string[] =>
-        ComponentCompiler.GetNgFields('output', clicheEntry.symbolTable))
+      .map((conceptEntry: ComponentStEntry): string[] =>
+        ComponentCompiler.GetNgFields('output', conceptEntry.symbolTable))
       .flatten()
       .map((fieldName: string): NgField => ({ name: fieldName }))
       .value();

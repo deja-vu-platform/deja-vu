@@ -1,4 +1,4 @@
-import { ComponentSymbolTable, ClicheStEntry } from '../../symbolTable';
+import { ComponentSymbolTable, ConceptStEntry } from '../../symbolTable';
 
 import * as _ from 'lodash';
 import { NAV_SPLIT_REGEX } from './shared';
@@ -23,11 +23,11 @@ export function saveUsedComponents(symbolTable: ComponentSymbolTable) {
     ComponentNameMaybeAlias: (componentNameNode, maybeAliasNode) => {
       const maybeAlias = maybeAliasNode.saveUsedComponents();
       if (!_.isEmpty(maybeAlias)) {
-        const [ clicheName, componentName ] = _
+        const [ conceptName, componentName ] = _
           .split(componentNameNode.sourceString, NAV_SPLIT_REGEX);
         symbolTable[maybeAlias] = {
           kind: 'component',
-          of: clicheName,
+          of: conceptName,
           componentName: componentName
         };
       } else {
@@ -35,16 +35,16 @@ export function saveUsedComponents(symbolTable: ComponentSymbolTable) {
       }
     },
     Alias: (_as, alias) => alias.sourceString,
-    componentName: (clicheAliasNode, _dot, componentNameNode) => {
-      const clicheAlias = clicheAliasNode.sourceString;
+    componentName: (conceptAliasNode, _dot, componentNameNode) => {
+      const conceptAlias = conceptAliasNode.sourceString;
       const componentName = componentNameNode.sourceString;
-      if (!_.has(symbolTable, clicheAlias)) {
-        symbolTable[clicheAlias] = { kind: 'cliche' };
+      if (!_.has(symbolTable, conceptAlias)) {
+        symbolTable[conceptAlias] = { kind: 'concept' };
       }
-      const clicheEntry = <ClicheStEntry> symbolTable[clicheAlias];
-      _.set(clicheEntry, `symbolTable.${componentName}`, {
+      const conceptEntry = <ConceptStEntry> symbolTable[conceptAlias];
+      _.set(conceptEntry, `symbolTable.${componentName}`, {
         kind: 'component',
-        of: clicheAlias,
+        of: conceptAlias,
         componentName: componentName
       });
     }

@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   AttemptDoc,
   AttemptMatchInput,
@@ -67,7 +67,7 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const matches: Collection<MatchDoc> = db.collection('matches');
   const attempts: Collection<AttemptDoc> = db.collection('attempts');
 
@@ -188,8 +188,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const matchCliche: ClicheServer = new ClicheServerBuilder('match')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const matchConcept: ConceptServer = new ConceptServerBuilder('match')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const matches: Collection<MatchDoc> = db.collection('matches');
     const attempts: Collection<AttemptDoc> = db.collection('attempts');
 
@@ -207,4 +207,4 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
   .resolvers(resolvers)
   .build();
 
-matchCliche.start();
+matchConcept.start();

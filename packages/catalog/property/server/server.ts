@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import * as Ajv from 'ajv';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
@@ -237,7 +237,7 @@ function addTimestamp(obj: ObjectDoc) {
   return obj;
 }
 
-function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
+function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
   const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {
@@ -350,9 +350,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
   return resolversObj;
 }
 
-const propertyCliche: ClicheServer<PropertyConfig> =
-  new ClicheServerBuilder<PropertyConfig>('property')
-    .initDb(async (db: ClicheDb, config: PropertyConfig): Promise<any> => {
+const propertyConcept: ConceptServer<PropertyConfig> =
+  new ConceptServerBuilder<PropertyConfig>('property')
+    .initDb(async (db: ConceptDb, config: PropertyConfig): Promise<any> => {
       const objects: Collection<ObjectDoc> = db.collection('objects');
       await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
       if (!_.isEmpty(config.initialObjects)) {
@@ -372,4 +372,4 @@ const propertyCliche: ClicheServer<PropertyConfig> =
     .dynamicTypeDefs(getDynamicTypeDefs)
     .build();
 
-propertyCliche.start();
+propertyConcept.start();

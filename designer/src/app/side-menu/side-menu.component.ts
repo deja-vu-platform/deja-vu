@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   App,
   AppComponentDefinition,
-  ClicheInstance
+  ConceptInstance
 } from '../datatypes';
 
 
@@ -15,6 +15,6 @@ import {
 export class SideMenuComponent {
   @Input() readonly app: App;
   @Input() readonly openComponent: AppComponentDefinition;
-  @Output() readonly clicheAdded = new EventEmitter<ClicheInstance>();
-  @Output() readonly clicheRemoved = new EventEmitter<string>();
+  @Output() readonly conceptAdded = new EventEmitter<ConceptInstance>();
+  @Output() readonly conceptRemoved = new EventEmitter<string>();
 }

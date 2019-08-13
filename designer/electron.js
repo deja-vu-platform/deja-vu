@@ -57,5 +57,5 @@ function startElectron(url, serveDelay = 0) {
 module.exports = {
   startElectron,
   assetsDir,
-  requestProcessor, // designer imports this to manage cliches dynamically
+  requestProcessor, // designer imports this to manage concepts dynamically
 };

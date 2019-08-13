@@ -1,6 +1,6 @@
 {
   "name": "livescorecard",
-  "usedCliches": {
+  "usedConcepts": {
     "hostauthentication": {
       "name": "authentication",
       "config": {

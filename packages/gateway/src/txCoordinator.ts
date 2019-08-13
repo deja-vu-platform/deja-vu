@@ -217,11 +217,11 @@ export class TxCoordinator<Message, Payload, State = any> {
       // While it is OK to send the messages back to the client at this point
       // (because we know that the tx will commit), it has the problem that
       // a client could quickly send another request that will get to the
-      // cliche server before the server commits. This has the unfortunate
+      // concept server before the server commits. This has the unfortunate
       // effect that if the client e.g., creates a post and then tries to
       // load it immediately, it might say "post not found". To avoid this
       // glitch, we only send the messages back to the client after we
-      // get confirmation that the cliche server committed.
+      // get confirmation that the concept server committed.
       // Thus, we don't do this now:
       // this.config.sendToClient(vote.payload, state, index);
       // this.completed.emit(txId + '-commit');
@@ -310,7 +310,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     } else { // The vote was 'no'
       if (vote.result !== 'no') {
         log(
-          `Got a vote back that was not 'yes'/'no'. The cliche ` +
+          `Got a vote back that was not 'yes'/'no'. The concept ` +
           'doesn\'t correctly implement voting', txId, cohortId);
       }
       // We know that all previous votes were 'yes' because if o/w the state

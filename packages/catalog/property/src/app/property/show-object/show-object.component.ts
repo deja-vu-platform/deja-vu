@@ -63,7 +63,7 @@ OnChanges {
   @Output() loadedObject = new EventEmitter<any>();
   @Output() errors = new EventEmitter<any>();
   /**
-   * Used internally by the cliche for passing the configuration
+   * Used internally by the concept for passing the configuration
    */
   @Input() _config;
 
@@ -71,7 +71,7 @@ OnChanges {
    * List of property names.
    * If given, causes exactly these properties to be shown.
    * Takes precedence over showOnly and showExclude.
-   * Primarily intended for use within the cliché.
+   * Primarily intended for use within the concept.
    * App creators probably want showOnly.
    */
   @Input() properties: string[];

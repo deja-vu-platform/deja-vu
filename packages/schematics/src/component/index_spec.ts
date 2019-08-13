@@ -6,7 +6,7 @@ import * as path from 'path';
 const collectionPath = path.join(__dirname, '../collection.json');
 const componentName = 'test component';
 const dasherizedComponentName = 'test-component';
-const clicheName = 'clichename';
+const conceptName = 'conceptname';
 
 describe('component', () => {
   it('works', () => {
@@ -14,13 +14,13 @@ describe('component', () => {
     const tree = runner.runSchematic(
       'component', {
         componentName,
-        clicheName,
+        conceptName,
         skipAppComponentHtml: true,
         skipMetadataImport: true
       }, Tree.empty());
 
     const componentFilePathPrefix =
-      `/src/app/${clicheName}/${dasherizedComponentName}/${dasherizedComponentName}`;
+      `/src/app/${conceptName}/${dasherizedComponentName}/${dasherizedComponentName}`;
 
     expect(tree.files)
       .toEqual([

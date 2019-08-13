@@ -92,7 +92,7 @@ export function capturesToInputs(
         const name = nameOrInput;
         if (_.has(symbolTable, name)) {
           const stEntry = _.get(symbolTable, name);
-          if (stEntry.kind === 'cliche' || stEntry.kind === 'app') {
+          if (stEntry.kind === 'concept' || stEntry.kind === 'app') {
             const component = rest.slice(1)
               .split(NAV_SPLIT_REGEX)[0];
             if (_.has(symbolTable, [name, 'symbolTable', component])) {

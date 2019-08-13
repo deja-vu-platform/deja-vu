@@ -13,7 +13,7 @@ Team invalids
 
 [Original App](https://dtt-phoenix.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Authorization
 - Comment
@@ -24,14 +24,14 @@ Team invalids
 
 ## Missing Features
 *In parenthesis is what's needed for the feature.*
-- Send email to connection (email cliche)
+- Send email to connection (email concept)
 - Indicate when you are ready to make connections
-- Suggestions should be based on some choice of topics and/ positions, location and availability (filter cliche)
-- Positions (possibly label cliche or property containing topics and positions)
+- Suggestions should be based on some choice of topics and/ positions, location and availability (filter concept)
+- Positions (possibly label concept or property containing topics and positions)
 - Do not show a suggestion for someone whom you've already matched with
-- Filter journal entries by username (filter cliche)
-- Sort journal entries by username, when connection was made (sort/ log cliche)
-- Show when the connection was made and ended (log cliche)
+- Filter journal entries by username (filter concept)
+- Sort journal entries by username, when connection was made (sort/ log concept)
+- Show when the connection was made and ended (log concept)
 - Limit input length (general)
 - Update personal information (property-update-object)
 - Update topics (labels-update-labels)

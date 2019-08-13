@@ -1,14 +1,14 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -135,7 +135,7 @@ function getItemAggregationPipeline(input: ItemsInput, getCount = false) {
   return pipeline;
 }
 
-function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
+function resolvers(db: ConceptDb, _config: LabelConfig): IResolvers {
   const labels: Collection<LabelDoc> = db.collection('labels');
 
   return {
@@ -215,8 +215,8 @@ function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
   };
 }
 
-const labelCliche: ClicheServer = new ClicheServerBuilder('label')
-  .initDb(async (db: ClicheDb, config: LabelConfig): Promise<any> => {
+const labelConcept: ConceptServer = new ConceptServerBuilder('label')
+  .initDb(async (db: ConceptDb, config: LabelConfig): Promise<any> => {
     const labels: Collection<LabelDoc> = db.collection('labels');
     await labels.createIndex({ id: 1 }, { unique: true, sparse: true });
     await labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
@@ -231,4 +231,4 @@ const labelCliche: ClicheServer = new ClicheServerBuilder('label')
   .resolvers(resolvers)
   .build();
 
-labelCliche.start();
+labelConcept.start();

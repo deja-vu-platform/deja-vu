@@ -35,7 +35,7 @@ describe('ComponentInputCompiler', () => {
     const componentInput = `<event.show-event event=foo.show-bar.loadedBar />`;
     const context: ComponentSymbolTable = {
       foo: {
-        kind: 'cliche',
+        kind: 'concept',
         symbolTable: {
           'show-bar': {
             kind: 'component'

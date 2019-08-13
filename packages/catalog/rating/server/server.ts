@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -97,7 +97,7 @@ function getRatingFilter(input: RatingsInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const ratings: Collection<RatingDoc> = db.collection('ratings');
 
   return {
@@ -201,8 +201,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const ratingConcept: ConceptServer = new ConceptServerBuilder('rating')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const ratings: Collection<RatingDoc> = db.collection('ratings');
 
     return ratings.createIndex(
@@ -212,4 +212,4 @@ const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
   .resolvers(resolvers)
   .build();
 
-ratingCliche.start();
+ratingConcept.start();

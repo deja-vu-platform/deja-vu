@@ -15,7 +15,7 @@ Team Winner Winner Chicken Dinner
 
 [Original App](http://rendezvous-6170.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Authorization
 - Geolocation
@@ -35,7 +35,7 @@ Team Winner Winner Chicken Dinner
 - User Major, Choose multiple from a list (labels from preset options)
 - Password Recovery (authentication)
 - Timestamps for comments (comment)
-- Need MIT email to sign up (regex? email cliche for verification)
+- Need MIT email to sign up (regex? email concept for verification)
 - Events are hidden once they pass (Show events by date w/ current date)
 - Only show one event filter at a time (probably want some user scripting)
 - Recenter Button (probably won’t do)

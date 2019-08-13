@@ -1,6 +1,6 @@
 {
   "name": "mapmit",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": true

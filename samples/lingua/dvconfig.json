@@ -1,6 +1,6 @@
 {
   "name": "lingua",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": false

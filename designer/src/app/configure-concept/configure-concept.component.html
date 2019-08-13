@@ -1,0 +1,108 @@
+<form
+  id="configure-concept"
+  #configureConceptForm="ngForm"
+  (ngSubmit)="save(configureConceptForm)"
+>
+  <h1 mat-dialog-title>
+    {{ data.concept ? 'Configure' : 'New' }} Concept Instance
+  </h1>
+
+  <mat-dialog-content>
+    <mat-form-field>
+      <input type="text"
+        required
+        placeholder="Concept"
+        matInput
+        [matAutocomplete]="auto"
+        [formControl]="ofControl"
+        (blur)="onSelectConcept()"
+        [disabled]="data.concept"
+        >
+      <mat-error *ngIf="ofControl.errors?.invalidName">
+        You must choose an existing concept
+      </mat-error>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          *ngFor="let conceptDefinitionName of filteredConceptDefinitionNames | async"
+          [value]="conceptDefinitionName"
+        >
+          {{conceptDefinitionName}}
+        </mat-option>
+      </mat-autocomplete>
+      <button
+        mat-icon-button
+        matSuffix
+        class="mat-small"
+        matTooltip="Help"
+        (click)="help()">
+        <mat-icon>help</mat-icon>
+      </button>
+      <mat-hint>The concept to instantiate</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input
+        matInput
+        required
+        name="name"
+        #ngFormName="ngModel"
+        placeholder="Alias"
+        [(ngModel)]="name"
+      >
+      <mat-hint>The name to use to refer to this concept instance</mat-hint>
+    </mat-form-field>
+
+    <div class="mat-form-field">
+      <mat-accordion class="options-headers-align">
+        <mat-expansion-panel hideToggle class="options-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Options</mat-panel-title>
+            <mat-panel-description>
+              Set concept instance options
+              <mat-icon>build</mat-icon>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <ng-template propertyDynamicComponent>
+          </ng-template>
+
+          <mat-form-field [hidden]="!of || !!of.configWizardComponent">
+            <textarea
+              matInput
+              name="config"
+              #ngFormConfig="ngModel"
+              placeholder="Config (JSON)"
+              [(ngModel)]="configString"
+              [errorStateMatcher]="jsonValidator"
+            >
+            </textarea>
+          </mat-form-field>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions [ngClass]="data.concept ? 'delete-save' : 'save-only'">
+    <button
+      mat-button
+      *ngIf="data.concept"
+      color="warn"
+      type="button"
+      (click)="delete()"
+    >Delete</button>
+    <div class="save">
+      <button
+        mat-button
+        type="button"
+        (click)="cancel()"
+      >Cancel</button>
+      <button
+        mat-button
+        color="primary"
+        type="submit"
+        [disabled]="!validate(configureConceptForm)"
+      >{{ data.concept ? 'Save' : 'Create' }}</button>
+    </div>
+  </mat-dialog-actions>
+
+</form>

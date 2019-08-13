@@ -1,6 +1,6 @@
 {
   "name": "chorestar",
-  "usedCliches": {
+  "usedConcepts": {
     "parentauthentication": {
       "name": "authentication",
       "config": {

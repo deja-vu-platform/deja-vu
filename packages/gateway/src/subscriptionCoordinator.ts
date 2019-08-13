@@ -37,7 +37,7 @@ export class SubscriptionCoordinator {
       {
         applyMiddleware: (options: OperationOptions, next) => {
           // query is required by SubscriptionClient
-          // but will be set by each cliche based on the component name
+          // but will be set by each concept based on the component name
           if (!options.query) {
             options.query = 'to be set';
           }

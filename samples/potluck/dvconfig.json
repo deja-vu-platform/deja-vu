@@ -1,6 +1,6 @@
 {
   "name": "potluck",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": true

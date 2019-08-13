@@ -32,7 +32,7 @@ export function component(options: any): Rule {
           ...options
         }),
         filter((path) => !path.endsWith('.DS_Store') && !tree.exists(path)),
-        move(getClicheAppPath(options.clicheName))
+        move(getConceptAppPath(options.conceptName))
     ]);
 
     return chain([
@@ -59,16 +59,16 @@ function readIntoSourceFile(tree: Tree, filePath: string): ts.SourceFile {
     filePath, sourceText, ts.ScriptTarget.Latest, true);
 }
 
-function getClicheAppPath(clicheName: string): string {
-  const dasherizedName = strings.dasherize(clicheName);
+function getConceptAppPath(conceptName: string): string {
+  const dasherizedName = strings.dasherize(conceptName);
 
   return `/src/app/${dasherizedName}`;
 }
 
-function getMetadataPath(clicheName: string): string {
-  const dasherizedName = strings.dasherize(clicheName);
+function getMetadataPath(conceptName: string): string {
+  const dasherizedName = strings.dasherize(conceptName);
 
-  return `${getClicheAppPath(clicheName)}/${dasherizedName}.metadata.ts`;
+  return `${getConceptAppPath(conceptName)}/${dasherizedName}.metadata.ts`;
 }
 
 function findLastComponentImportExportPos(source: ts.SourceFile) {
@@ -106,7 +106,7 @@ function addComponentToMetadata(options: any): Rule {
     if (options.skipMetadataImport) {
       return tree;
     }
-    const metadataPath = getMetadataPath(options.clicheName);
+    const metadataPath = getMetadataPath(options.conceptName);
     const componentPath = `./${strings.dasherize(options.componentName)}/`
                           + strings.dasherize(options.componentName)
                           + '.component';
@@ -150,7 +150,7 @@ function addToAppComponentHtml(options: any): Rule {
 
     const root = parse(getFileText(tree, filePath)) as HTMLElement;
     const componentComponentSelector =
-      `${options.clicheName}-${strings.dasherize(options.componentName)}`;
+      `${options.conceptName}-${strings.dasherize(options.componentName)}`;
     // skip if it's already there
     if (root.querySelector(componentComponentSelector)) {
       return tree;

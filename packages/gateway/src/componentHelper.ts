@@ -42,7 +42,7 @@ export interface FieldMap {
 }
 export interface ComponentInput {
   tag: string;
-  // Optional value to specify the cliche the component is from
+  // Optional value to specify the concept the component is from
   dvOf?: string;
   dvAlias?: string;
   // A map of (adapter input name) -> (component input name)
@@ -53,7 +53,7 @@ export interface ComponentInput {
 
 const COMPONENT_TABLE_FILE_NAME = 'componentTable.json';
 const CONFIG_FILE_NAME = 'dvconfig.json';
-const DV_CORE_CLICHE = 'core';
+const DV_CORE_CONCEPT = 'core';
 const INDENT_NUM_SPACES = 2;
 
 
@@ -73,10 +73,10 @@ export class ComponentHelper {
       return dvAlias;
     }
     // tslint:disable-next-line prefer-const
-    let [clicheName, ...componentTagName] = tag.split('-');
-    if (dvOf) { clicheName = dvOf; }
+    let [conceptName, ...componentTagName] = tag.split('-');
+    if (dvOf) { conceptName = dvOf; }
 
-    return clicheName + '-' + componentTagName.join('-');
+    return conceptName + '-' + componentTagName.join('-');
   }
 
   /**
@@ -228,50 +228,50 @@ export class ComponentHelper {
   }
 
   /**
-   * @return the component table of the given cliche
+   * @return the component table of the given concept
    */
-  private static GetComponentTableOfCliche(cliche: string): ComponentTable {
+  private static GetComponentTableOfConcept(concept: string): ComponentTable {
     const fp = path.join(
-      ComponentHelper.GetClicheFolder(cliche), COMPONENT_TABLE_FILE_NAME);
+      ComponentHelper.GetConceptFolder(concept), COMPONENT_TABLE_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8'));
   }
 
   /**
-   * @return the set of components from the given cliche that are not expected to
+   * @return the set of components from the given concept that are not expected to
    * issue a request
    */
-  private static GetComponentsNoRequest(cliche: string)
+  private static GetComponentsNoRequest(concept: string)
     : { exec: string[] } | undefined {
       const fp = path.join(
-        ComponentHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
+        ComponentHelper.GetConceptFolder(concept), CONFIG_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8')).componentsNoRequest;
   }
 
   /**
-   * @return the set of components from the given cliche that only optionally issue
+   * @return the set of components from the given concept that only optionally issue
    * requests
    */
-  private static GetComponentsRequestOptional(cliche: string)
+  private static GetComponentsRequestOptional(concept: string)
     : string[] | undefined {
       const fp = path.join(
-        ComponentHelper.GetClicheFolder(cliche), CONFIG_FILE_NAME);
+        ComponentHelper.GetConceptFolder(concept), CONFIG_FILE_NAME);
 
     return JSON.parse(readFileSync(fp, 'utf8')).componentsRequestOptional;
   }
 
-  private static GetClicheFolder(cliche: string): string {
-    // Cliches specify as a main their typings (so that when apps do `import
-    // 'cliche'` it works) . To get to their folder we need to go up a dir
+  private static GetConceptFolder(concept: string): string {
+    // Concepts specify as a main their typings (so that when apps do `import
+    // 'concept'` it works) . To get to their folder we need to go up a dir
     return path.join(path.dirname(
-      require.resolve(`@deja-vu/${cliche}`)), '..');
+      require.resolve(`@deja-vu/${concept}`)), '..');
   }
 
   /**
-   * @returns the cliche of the component represented by the given tag
+   * @returns the concept of the component represented by the given tag
    */
-  private static ClicheOfTag(tag: string) {
+  private static ConceptOfTag(tag: string) {
     return tag.split('-')[0];
   }
 
@@ -279,8 +279,8 @@ export class ComponentHelper {
     componentTag: ComponentTag, childComponentTag: ComponentTag): string | undefined {
     if (
       !_.isEmpty(componentTag.dvOf) && _.isEmpty(childComponentTag.dvOf) &&
-      ComponentHelper.ClicheOfTag(componentTag.tag) ===
-      ComponentHelper.ClicheOfTag(childComponentTag.tag)) {
+      ComponentHelper.ConceptOfTag(componentTag.tag) ===
+      ComponentHelper.ConceptOfTag(childComponentTag.tag)) {
       return componentTag.dvOf;
     }
 
@@ -332,34 +332,34 @@ export class ComponentHelper {
   /**
    * Create a new component helper
    *
-   * @param usedCliches a list of the names of all cliches used (not their
+   * @param usedConcepts a list of the names of all concepts used (not their
    *                    aliases)
    * @param appComponentTable the component table for this app
    * @param routeComponentSelectors tags of components that have a route
    *   tag should be of form appname-component-name
    */
   constructor(
-    usedCliches?: string[],
+    usedConcepts?: string[],
     appComponentTable?: ComponentTable,
     private readonly routeComponentSelectors?: string[]
   ) {
-    const clicheComponentTables = _.map(_
-      .uniq(usedCliches), ComponentHelper.GetComponentTableOfCliche);
+    const conceptComponentTables = _.map(_
+      .uniq(usedConcepts), ComponentHelper.GetComponentTableOfConcept);
     const dvCoreComponentTable = ComponentHelper
-      .GetComponentTableOfCliche(DV_CORE_CLICHE);
+      .GetComponentTableOfConcept(DV_CORE_CONCEPT);
     this.componentTable = _.assign(
       {},
       appComponentTable || {},
-      ...clicheComponentTables,
+      ...conceptComponentTables,
       dvCoreComponentTable
     );
 
     this.componentsNoExecRequest = new Set<string>(
-      _.flatMap(usedCliches, (cliche: string) => _.get(
-        ComponentHelper.GetComponentsNoRequest(cliche), 'exec', [])));
+      _.flatMap(usedConcepts, (concept: string) => _.get(
+        ComponentHelper.GetComponentsNoRequest(concept), 'exec', [])));
     this.componentsRequestOptional = new Set<string>(
-      _.flatMap(usedCliches, (cliche: string): string[] =>
-        ComponentHelper.GetComponentsRequestOptional(cliche) || []));
+      _.flatMap(usedConcepts, (concept: string): string[] =>
+        ComponentHelper.GetComponentsRequestOptional(concept) || []));
 
     if (!appComponentTable) {
       this.noApp = true;
@@ -458,7 +458,7 @@ export class ComponentHelper {
   getMatchingPaths(componentPath: ComponentPath): ComponentTagPath[] {
     // We assume here that the first tag in the component path is a simple tag
     // so that fqtag = tag (i.e., the root component is not aliased and it is not
-    // from some cliche for which there's more than one instance of in the app)
+    // from some concept for which there's more than one instance of in the app)
     if (this.noApp) {
       return [_.map(componentPath.nodes(), (fqtag: string) => ({
         fqtag,

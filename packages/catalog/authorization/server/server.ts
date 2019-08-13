@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   AddViewerToResourceInput,
   CreateResourceInput,
@@ -114,7 +114,7 @@ function getResourceFilter(input: ResourcesInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const resources: Collection<ResourceDoc> = db.collection('resources');
 
   return {
@@ -205,9 +205,9 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const authorizationCliche: ClicheServer =
-  new ClicheServerBuilder('authorization')
-    .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const authorizationConcept: ConceptServer =
+  new ConceptServerBuilder('authorization')
+    .initDb((db: ConceptDb, _config: Config): Promise<any> => {
       const resources: Collection<ResourceDoc> = db.collection('resources');
 
       return Promise.all([
@@ -220,4 +220,4 @@ const authorizationCliche: ClicheServer =
     .resolvers(resolvers)
     .build();
 
-authorizationCliche.start();
+authorizationConcept.start();

@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 import {
   ComponentInstance,
   AppComponentDefinition,
-  ClicheComponentDefinition
+  ConceptComponentDefinition
 } from '../datatypes';
 import { DynamicComponentDirective } from '../dynamic-component.directive';
 import { ChildScopeIO, fullyQualifyName, ScopeIO } from '../io';
@@ -112,7 +112,7 @@ implements OnInit, AfterViewInit, OnDestroy {
   private loadContent() {
     if (!(this.componentInstance.of instanceof AppComponentDefinition)) {
       // setTimeout is necessary to avoid angular change detection errors
-      setTimeout(() => this.loadClicheComponent());
+      setTimeout(() => this.loadConceptComponent());
     }
     setTimeout(() => {
       const sub = this.scopeIO.getSubject('hidden')
@@ -126,9 +126,9 @@ implements OnInit, AfterViewInit, OnDestroy {
   /**
    * To be called in a new thread AfterViewInit
    */
-  private loadClicheComponent() {
+  private loadConceptComponent() {
     // create component and add to DOM
-    const componentDefinition = <ClicheComponentDefinition>this.componentInstance.of;
+    const componentDefinition = <ConceptComponentDefinition>this.componentInstance.of;
     const { component } = componentDefinition;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);
@@ -169,7 +169,7 @@ implements OnInit, AfterViewInit, OnDestroy {
             const childComponentFactory = this.componentFactoryResolver
               .resolveComponentFactory<ComponentInstanceComponent>(val.type);
             childComponentRef = childComponentFactory.create(this.injector);
-            // we need to recreate the cliche component component with content
+            // we need to recreate the concept component component with content
             viewContainerRef.clear();
             componentRef = viewContainerRef.createComponent(
               componentFactory,

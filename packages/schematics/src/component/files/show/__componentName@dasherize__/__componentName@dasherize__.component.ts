@@ -8,8 +8,8 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
-import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
-import { <%= classify(entityName) %> } from '../shared/<%= dasherize(clicheName) %>.model';
+import { API_PATH } from '../<%= dasherize(conceptName) %>.config';
+import { <%= classify(entityName) %> } from '../shared/<%= dasherize(conceptName) %>.model';
 
 interface <%= classify(entityName) %>Res {
   data: { <%= camelize(entityName) %>: <%= classify(entityName) %> };
@@ -17,7 +17,7 @@ interface <%= classify(entityName) %>Res {
 
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  selector: '<%= dasherize(conceptName) %>-<%= dasherize(componentName) %>',
   templateUrl: './<%= dasherize(componentName) %>.component.html'
 })
 export class <%= classify(componentName) %>Component implements AfterViewInit, OnChanges, OnEval,

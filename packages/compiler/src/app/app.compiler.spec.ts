@@ -22,7 +22,7 @@ class Morg {
       {
         "name": "morg",
         "type": "app",
-        "usedCliches": {
+        "usedConcepts": {
           "event": { },
           "allocator": { },
           "property": {

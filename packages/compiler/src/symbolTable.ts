@@ -1,10 +1,10 @@
-export type EntryKind = 'cliche' | 'app' | 'component' | 'output' | 'input' |
+export type EntryKind = 'concept' | 'app' | 'component' | 'output' | 'input' |
   'app-output';
 
-export interface ClicheStEntry {
-  kind: 'cliche';
+export interface ConceptStEntry {
+  kind: 'concept';
   symbolTable?: SymbolTable<ComponentStEntry>;
-  clicheName?: string;
+  conceptName?: string;
 }
 
 export interface AppStEntry {
@@ -15,7 +15,7 @@ export interface AppStEntry {
 export interface ComponentStEntry {
   kind: 'component';
   symbolTable?: ComponentSymbolTable;
-  // Because components can be aliased, we always record the cliche and component name
+  // Because components can be aliased, we always record the concept and component name
   of?: string;
   componentName?: string;
 }
@@ -40,11 +40,11 @@ export interface InputStEntry {
 }
 
 export type StEntry =
-  ClicheStEntry | AppStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
+  ConceptStEntry | AppStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppOutputStEntry;
 
 export type ComponentSymbolTableStEntry =
-  ClicheStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
+  ConceptStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppStEntry | AppOutputStEntry;
 
 /**
@@ -54,7 +54,7 @@ export type ComponentSymbolTableStEntry =
 export type ComponentSymbolTable = SymbolTable<ComponentSymbolTableStEntry>;
 
 
-export interface SymbolTable<T = AppStEntry | ClicheStEntry> {
+export interface SymbolTable<T = AppStEntry | ConceptStEntry> {
   [symbol: string]: T;
 }
 

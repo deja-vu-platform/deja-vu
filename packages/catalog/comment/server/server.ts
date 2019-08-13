@@ -1,14 +1,14 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields,
   Validation
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -94,7 +94,7 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
+function resolvers(db: ConceptDb, config: CommentConfig): IResolvers {
   const comments: Collection<CommentDoc> = db.collection('comments');
 
   return {
@@ -150,7 +150,7 @@ function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
             // only because Comment authorIds CANNOT be changed.
             // If for some reason editing Comment authorIds becomes possible,
             // this functionality will be broken.
-            // Note that the authorization cliché could also be used
+            // Note that the authorization concept could also be used
             // to get the same functionality.
             if (comment.authorId !== input.authorId) {
               throw new Error('Only the author of the comment can edit it.');
@@ -179,8 +179,8 @@ function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
   };
 }
 
-const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
-  .initDb((db: ClicheDb, _config: CommentConfig): Promise<any> => {
+const commentConcept: ConceptServer = new ConceptServerBuilder('comment')
+  .initDb((db: ConceptDb, _config: CommentConfig): Promise<any> => {
     const comments: Collection<CommentDoc> = db.collection('comments');
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
@@ -189,4 +189,4 @@ const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
   .resolvers(resolvers)
   .build();
 
-commentCliche.start();
+commentConcept.start();

@@ -10,7 +10,7 @@ import {
 
 
 exports.command = 'concept <name>';
-exports.desc = 'create a new cliché';
+exports.desc = 'create a new concept';
 exports.builder = (yargs) => yargs.option('pathToDv', {
   default: 'deja-vu',
   describe: 'the location of the Déjà Vu monorepo',
@@ -23,7 +23,7 @@ exports.handler = ({ name, pathToDv }) => {
       'Error: You cannot run this command inside of an Angular project.');
     return;
   }
-  console.log(`Creating new cliché ${name}`);
+  console.log(`Creating new concept ${name}`);
 
   // hack to find the schematics from outside the dv monorepo
   const schematicsPath = getSchematicsPath(pathToDv);
@@ -42,7 +42,7 @@ exports.handler = ({ name, pathToDv }) => {
     // install and package new concept
     const conceptPath = path.join(catalogPath, name);
     yarn([], conceptPath);
-    console.log(`Cliché ${name} successfully created at ${conceptPath}`);
+    console.log(`Concept ${name} successfully created at ${conceptPath}`);
 
   } finally {
     // undo the hack

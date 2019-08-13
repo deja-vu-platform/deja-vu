@@ -1,6 +1,6 @@
 {
   "name": "groceryship",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {
       "config": {
         "reinitDbOnStartup": false

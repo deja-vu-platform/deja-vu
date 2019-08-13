@@ -48,10 +48,10 @@ export function resolveName(
     }
   } else {
     // getting an output from a sibling
-    let clicheN: string;
+    let conceptN: string;
     let componentN: string;
-    [clicheN, componentN, ioName] = name.split('.');
-    const maybeFA = appComponentDefinition.findChild(clicheN, componentN);
+    [conceptN, componentN, ioName] = name.split('.');
+    const maybeFA = appComponentDefinition.findChild(conceptN, componentN);
     if (maybeFA && maybeFA.of.outputs.includes(ioName)) {
       fromComponent = maybeFA;
     }

@@ -7,7 +7,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { API_PATH } from '../<%= dasherize(clicheName) %>.config';
+import { API_PATH } from '../<%= dasherize(conceptName) %>.config';
 
 interface <%= classify(componentName) %>Res {
   data: { <%= camelize(componentName) %>: boolean };
@@ -15,7 +15,7 @@ interface <%= classify(componentName) %>Res {
 }
 
 @Component({
-  selector: '<%= dasherize(clicheName) %>-<%= dasherize(componentName) %>',
+  selector: '<%= dasherize(conceptName) %>-<%= dasherize(componentName) %>',
   templateUrl: './<%= dasherize(componentName) %>.component.html',
   styleUrls: ['./<%= dasherize(componentName) %>.component.css']
 })

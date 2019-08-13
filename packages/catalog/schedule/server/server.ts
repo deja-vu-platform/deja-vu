@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   AllAvailabilityInput,
   CreateScheduleInput,
@@ -232,7 +232,7 @@ function getSlotsPipeline(matchQuery: any, filterCondition: any,
   ];
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const schedules: Collection<ScheduleDoc> = db.collection('schedules');
 
   return {
@@ -388,8 +388,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const scheduleCliche: ClicheServer = new ClicheServerBuilder('schedule')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const scheduleConcept: ConceptServer = new ConceptServerBuilder('schedule')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const schedules: Collection<ScheduleDoc> = db.collection('schedules');
 
     return schedules.createIndex({ id: 1 }, { unique: true, sparse: true });
@@ -398,4 +398,4 @@ const scheduleCliche: ClicheServer = new ClicheServerBuilder('schedule')
   .resolvers(resolvers)
   .build();
 
-scheduleCliche.start();
+scheduleConcept.start();

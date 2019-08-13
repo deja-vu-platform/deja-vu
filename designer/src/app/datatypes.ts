@@ -10,7 +10,7 @@ import { exportDvExpr } from './expression.compiler';
 
 /**
  * A named collection of components
- * Could be App, ClicheDefinition, ClicheInstance, etc.
+ * Could be App, ConceptDefinition, ConceptInstance, etc.
  */
 export interface ComponentCollection {
   name: string;
@@ -28,14 +28,14 @@ export interface ComponentInputs {
 
 /**
  * inputs that are present on **every** component
- * cliche components should already have these
+ * concept components should already have these
  * these need to be added to app components
  */
 export const OMNIPRESENT_INPUTS = [
   'hidden'
 ];
 
-export const usedClichesConfig = {};
+export const usedConceptsConfig = {};
 
 /**
  * Component Definition
@@ -51,7 +51,7 @@ export interface ComponentDefinition {
 }
 
 
-export interface ClicheComponentDefinition extends ComponentDefinition {
+export interface ConceptComponentDefinition extends ComponentDefinition {
   readonly component: Component;
   description: string;
 }
@@ -136,17 +136,17 @@ export class AppComponentDefinition implements ComponentDefinition {
   }
 
   /**
-   * Find the child component instance with given cliche and component name
+   * Find the child component instance with given concept and component name
    * Returns undefined if none is found
-   * TODO: stop assuming each cliche x component combo is unique
+   * TODO: stop assuming each concept x component combo is unique
    */
   findChild(
-    clicheName: string,
+    conceptName: string,
     componentName: string
   ): ComponentInstance | undefined {
     for (const row of this.rows) {
       const component = row.components.find((a) =>
-        a.from.name === clicheName && a.of.name === componentName
+        a.from.name === conceptName && a.of.name === componentName
       );
       if (component) { return component; }
     }
@@ -306,7 +306,7 @@ export class ComponentInstance {
         this.of instanceof AppComponentDefinition
         && this.of.contains(componentDefinition, deep)
       )
-      // contains (component input, cliche component only but no need to check this)
+      // contains (component input, concept component only but no need to check this)
       || _.some(
           _.pickBy(this.inputSettings, (_v, k) => k in this.of.componentInputs),
           (a: ComponentInstance) => a && a.isOrContains(componentDefinition, deep)
@@ -412,32 +412,32 @@ export class ComponentInstance {
   }
 }
 
-// AppComponentInstance vs ClicheComponentInstance isn't relevant
+// AppComponentInstance vs ConceptComponentInstance isn't relevant
 // For the cases when it does matter, inspecting .of is fine
 
 /**
- * A cliche is defined by its names and the components it has
+ * A concept is defined by its names and the components it has
  */
-export interface ClicheDefinition {
+export interface ConceptDefinition {
   readonly name: string;
-  readonly components: ClicheComponentDefinition[];
+  readonly components: ConceptComponentDefinition[];
   readonly configWizardComponent: any;
   // TODO: config options
 }
 
 /**
- * The same cliche can be instantiated ("included") multiple times
+ * The same concept can be instantiated ("included") multiple times
  * One reason for this is getting a second db
  * Another is to use different config options
  */
-export class ClicheInstance {
+export class ConceptInstance {
   name: string;
-  readonly of: ClicheDefinition;
+  readonly of: ConceptDefinition;
   readonly config: { [s: string]: any } = {};
 
-  constructor(name: string, ofCliche: ClicheDefinition) {
+  constructor(name: string, ofConcept: ConceptDefinition) {
     this.name = name;
-    this.of = ofCliche;
+    this.of = ofConcept;
   }
 
   get components() {
@@ -457,15 +457,15 @@ export class ClicheInstance {
  * A DV App created with the Designer
  */
 export class App {
-  // populated in cliche.module.ts to avoid circular dependencies
-  static dvCliche: ComponentCollection;
-  static clicheDefinitions: ClicheDefinition[];
+  // populated in concept.module.ts to avoid circular dependencies
+  static dvConcept: ComponentCollection;
+  static conceptDefinitions: ConceptDefinition[];
 
   name: string; // no dashes
   readonly components: AppComponentDefinition[];
   readonly pages: AppComponentDefinition[]; // subset of components
   homepage: AppComponentDefinition; // member of pages
-  readonly cliches: ClicheInstance[] = [];
+  readonly concepts: ConceptInstance[] = [];
   readonly ioDescriptions = {};
 
   // need consistent object to return
@@ -486,12 +486,12 @@ export class App {
     app.components.pop();
     app.pages.pop();
 
-    appJSON.cliches.forEach((ci) => {
-      const ofCliche = App.clicheDefinitions.find((cd) => cd.name === ci.of);
-      const clicheInstance = new ClicheInstance(ci.name, ofCliche);
-      Object.assign(clicheInstance.config, ci.config);
-      usedClichesConfig[ci.name] = { config: clicheInstance.config };
-      app.cliches.push(clicheInstance);
+    appJSON.concepts.forEach((ci) => {
+      const ofConcept = App.conceptDefinitions.find((cd) => cd.name === ci.of);
+      const conceptInstance = new ConceptInstance(ci.name, ofConcept);
+      Object.assign(conceptInstance.config, ci.config);
+      usedConceptsConfig[ci.name] = { config: conceptInstance.config };
+      app.concepts.push(conceptInstance);
     });
 
     appJSON.components.forEach((aad) => {
@@ -559,7 +559,7 @@ export class App {
         .map((component) => component.toJSON()),
       pages: this.pages.map((p) => p.name),
       homepage: this.homepage.name,
-      cliches: this.cliches
+      concepts: this.concepts
     };
   }
 
@@ -592,7 +592,7 @@ export class App {
    */
   toDVConfigJSON() {
     const basePort = 3000;
-    const clichePortOffset = 2;
+    const conceptPortOffset = 2;
 
     return JSON.stringify({
       name: this.name,
@@ -602,12 +602,12 @@ export class App {
           wsPort: basePort
         }
       },
-      usedCliches: _.reduce(this.cliches, (obj, cliche, idx) => (
-        (obj[cliche.name] = {
-          name: cliche.of.name,
+      usedConcepts: _.reduce(this.concepts, (obj, concept, idx) => (
+        (obj[concept.name] = {
+          name: concept.of.name,
           config: {
-            wsPort: basePort + clichePortOffset + idx,
-            ...cliche.config
+            wsPort: basePort + conceptPortOffset + idx,
+            ...concept.config
           }
         }) && obj // mutate and then return obj
       ), {}),
@@ -632,10 +632,10 @@ export class App {
   get componentCollections(): ComponentCollection[] {
     this._componentCollections.splice(0);
     this._componentCollections.push(this);
-    this._componentCollections.push(App.dvCliche);
+    this._componentCollections.push(App.dvConcept);
     this._componentCollections.push.apply(
       this._componentCollections,
-      this.cliches
+      this.concepts
         .sort(({ name: nameA }, { name: nameB }) =>
           nameA === nameB ? 0 : (nameA < nameB ? -1 : 1)
         )
@@ -645,8 +645,8 @@ export class App {
   }
 
   /**
-   * @param ofName name of component declared in app, imported cliche, or DV cliche
-   * @param fromName name of cliche instance, or app, or the DV cliche
+   * @param ofName name of component declared in app, imported concept, or DV concept
+   * @param fromName name of concept instance, or app, or the DV concept
    * @return a new component instance or undefined if the names do not resolve
    */
   newComponentInstanceByName(ofName: string, fromName: string): ComponentInstance {
@@ -661,13 +661,13 @@ export class App {
       : undefined;
   }
 
-  deleteClicheInstance(ci: ClicheInstance) {
+  deleteConceptInstance(ci: ConceptInstance) {
     this.components.forEach((ad) => {
       ad.rows.forEach((r) => {
         _.remove(r.components, (ai) => ai.from === ci);
       });
     });
-    _.remove(this.cliches, (c) => c === ci);
+    _.remove(this.concepts, (c) => c === ci);
   }
 
   /**

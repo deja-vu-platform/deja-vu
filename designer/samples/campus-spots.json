@@ -259,7 +259,7 @@
     "create-spot"
   ],
   "homepage": "home",
-  "cliches": [
+  "concepts": [
     {
       "name": "geolocation",
       "of": "geolocation",

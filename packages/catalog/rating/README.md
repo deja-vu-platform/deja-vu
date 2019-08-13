@@ -14,7 +14,7 @@ Crowdsource evaluation of items
 
 ## Notes
 
-To use this cliché in your app you need to add the following
+To use this concept in your app you need to add the following
 to `styles.css`:
 
 ```css

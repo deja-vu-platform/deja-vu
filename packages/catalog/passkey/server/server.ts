@@ -1,15 +1,15 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheDbDuplicateKeyError,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptDbDuplicateKeyError,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
@@ -125,7 +125,7 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
       await passkeys.insertOne(
         context, { id: input.id, code: input.code, used: true });
     } catch (err) {
-      if (err.errorCode === ClicheDbDuplicateKeyError.ERROR_CODE) {
+      if (err.errorCode === ConceptDbDuplicateKeyError.ERROR_CODE) {
         throw new Error('Code is already in use. Please try another one.');
       }
       throw err;
@@ -137,7 +137,7 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
   return { id, code };
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
 
   return {
@@ -188,8 +188,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
-  .initDb(async (db: ClicheDb, _config: Config): Promise<any> => {
+const passkeyConcept: ConceptServer = new ConceptServerBuilder('passkey')
+  .initDb(async (db: ConceptDb, _config: Config): Promise<any> => {
     const passkeys: Collection<PasskeyDoc> = db.collection('passkeys');
     await Promise.all([
       passkeys.createIndex({ id: 1 }, { unique: true, sparse: true }),
@@ -207,4 +207,4 @@ const passkeyCliche: ClicheServer = new ClicheServerBuilder('passkey')
   .resolvers(resolvers)
   .build();
 
-passkeyCliche.start();
+passkeyConcept.start();

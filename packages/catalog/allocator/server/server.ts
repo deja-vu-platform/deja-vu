@@ -1,13 +1,13 @@
 import {
   ComponentRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Collection,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -58,7 +58,7 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
   return {
@@ -143,8 +143,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const allocatorConcept: ConceptServer = new ConceptServerBuilder('allocator')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
     return Promise.all([
@@ -157,4 +157,4 @@ const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
   .resolvers(resolvers)
   .build();
 
-allocatorCliche.start();
+allocatorConcept.start();

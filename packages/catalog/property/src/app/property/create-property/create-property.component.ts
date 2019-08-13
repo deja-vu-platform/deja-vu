@@ -49,7 +49,7 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator,
 OnExecSuccess {
   /**
    * The name of the property to create
-   * (should match a name in the schama the cliche is configured with)
+   * (should match a name in the schama the concept is configured with)
    */
   @Input() name: string;
   /**
@@ -61,7 +61,7 @@ OnExecSuccess {
    */
   @Output() value = new EventEmitter();
   /**
-   * Used internally by the cliche for passing the configuration
+   * Used internally by the concept for passing the configuration
    */
   @Input() _config;
 

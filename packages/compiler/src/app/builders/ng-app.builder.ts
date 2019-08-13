@@ -273,8 +273,8 @@ export class NgAppBuilder {
       modules: _
         .map(_.map(this.dependencies, 'name'), NgAppBuilder.DepToModule)
         .join(', '),
-      usedClichesConfig: JSON.stringify(
-        _.get(JSON.parse(this.dvConfigContents), 'usedCliches'))
+      usedConceptsConfig: JSON.stringify(
+        _.get(JSON.parse(this.dvConfigContents), 'usedConcepts'))
     };
 
     // /
@@ -290,11 +290,11 @@ export class NgAppBuilder {
     const newDvConfigContents = _
       .merge({ gateway: { config: { wsPort: 3000 } } },
         _.omit(JSON.parse(this.dvConfigContents), 'type'));
-    // choose wsPorts for the clichés that have no `wsPort` value
-    let clichePort = 3002;
-    newDvConfigContents['usedCliches'] = _
-      .mapValues(newDvConfigContents['usedCliches'], (uc) => _
-        .merge({ config: { wsPort: clichePort++ } }, uc));
+    // choose wsPorts for the concepts that have no `wsPort` value
+    let conceptPort = 3002;
+    newDvConfigContents['usedConcepts'] = _
+      .mapValues(newDvConfigContents['usedConcepts'], (uc) => _
+        .merge({ config: { wsPort: conceptPort++ } }, uc));
 
     const newDvConfigContentsStr = prettier
       .format(JSON.stringify(newDvConfigContents), { parser: 'json' });
@@ -351,12 +351,12 @@ export class NgAppBuilder {
 
     // | assets/
     for (const d of this.dependencies) {
-      const clichePackageLocation = NgAppBuilder.FindPackage(d.name);
-      const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+      const conceptPackageLocation = NgAppBuilder.FindPackage(d.name);
+      const conceptAssets = path.join(conceptPackageLocation, 'pkg', 'assets');
 
       /**
-       * Image assets for a cliche are in `assets/<cliche-name>/<img-file>`,
-       * but the library used to display stars in the rating cliche looks
+       * Image assets for a concept are in `assets/<concept-name>/<img-file>`,
+       * but the library used to display stars in the rating concept looks
        * for the image in `assets/images/<img-name>`. As a temporary hack,
        * we detect if we are dealing with rating and put the assets where the
        * library expects them. TODO: check to see if there's a way to change
@@ -364,8 +364,8 @@ export class NgAppBuilder {
        */
       const appAssetsDir = d.name === 'rating' ? assetsDir :
         path.join(assetsDir, d.name);
-      if (existsSync(clicheAssets)) {
-        copySync(clicheAssets, appAssetsDir);
+      if (existsSync(conceptAssets)) {
+        copySync(conceptAssets, appAssetsDir);
       }
     }
 
