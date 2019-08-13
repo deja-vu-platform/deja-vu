@@ -256,7 +256,10 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
         return _.get(obj, '_pending') ? null : addTimestamp(obj);
       },
       objects: async (_root, { fields }) => {
-        const objs = await objects.find(fields);
+        const objsCursor = await objects.findCursor(fields);
+        const objs = await objsCursor
+          .sort({ _id: -1 })
+          .toArray();
 
         return _.map(objs, addTimestamp);
       },
@@ -280,7 +283,10 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
           }
         });
 
-        const objs = await objects.find(modifiedFilters);
+        const objsCursor = await objects.findCursor(modifiedFilters);
+        const objs = await objsCursor
+          .sort({ _id: -1 })
+          .toArray();
 
         return _.map(objs, addTimestamp);
       },
