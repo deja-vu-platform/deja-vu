@@ -1,5 +1,5 @@
 {
-  "name": "mapmit",
+  "name": "mapcampus",
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",

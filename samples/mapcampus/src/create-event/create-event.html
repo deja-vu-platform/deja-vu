@@ -1,5 +1,5 @@
 <dv.component name="create-event">
-  <mapmit.navbar />
+  <mapcampus.navbar />
 
   <div class="events-container">
     <div class="events-panel card">
@@ -37,7 +37,7 @@
                      and a group may be used for multiple events -->
           <!-- Instead, we will assume a 1-1 mapping between group and event -->
           <group.create-group id=dv.gen-id.id
-            memberIds=[mapmit.navbar.loggedInUserId]
+            memberIds=[mapcampus.navbar.loggedInUserId]
             showOptionToAddMembers=false
             showOptionToSubmit=false hidden=true />
 
@@ -49,8 +49,8 @@
             </div>
             <div class="save-button">
               <authorization.create-resource id=dv.gen-id.id
-                ownerId=mapmit.navbar.loggedInUserId hidden=true />
-              <authentication.authenticate id=mapmit.navbar.loggedInUserId
+                ownerId=mapcampus.navbar.loggedInUserId hidden=true />
+              <authentication.authenticate id=mapcampus.navbar.loggedInUserId
                 hidden=true />
               <dv.button class='btn btn-default btn-blue event-submit-btn'>
                 Save Event

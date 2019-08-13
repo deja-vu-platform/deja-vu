@@ -1,5 +1,5 @@
 <dv.component name="show-my-groups">
-  <mapmit.navbar />
+  <mapcampus.navbar />
 
   <div id="my-groups-column-container">
     <div class="my-groups-column" id="my-groups-column-left">
@@ -8,11 +8,11 @@
         <div class="card-body groups-panel-body">
           <h2>Groups I Own</h2>
           <group.show-groups
-            withMemberId=mapmit.navbar.loggedInUserId
-            showGroup=<mapmit.show-group
+            withMemberId=mapcampus.navbar.loggedInUserId
+            showGroup=<mapcampus.show-group
               group=$group
-              loggedInUserId=mapmit.navbar.loggedInUserId
-              createdByUser=mapmit.navbar.loggedInUserId /> />
+              loggedInUserId=mapcampus.navbar.loggedInUserId
+              createdByUser=mapcampus.navbar.loggedInUserId /> />
         </div>
       </div>
     </div>
@@ -23,11 +23,11 @@
         <div class="card-body groups-panel-body">
           <h2>Groups I'm In</h2>
           <group.show-groups
-            withMemberId=mapmit.navbar.loggedInUserId
-            showGroup=<mapmit.show-group
+            withMemberId=mapcampus.navbar.loggedInUserId
+            showGroup=<mapcampus.show-group
               group=$group
-              loggedInUserId=mapmit.navbar.loggedInUserId
-              isMemberOf=mapmit.navbar.loggedInUserId /> />
+              loggedInUserId=mapcampus.navbar.loggedInUserId
+              isMemberOf=mapcampus.navbar.loggedInUserId /> />
         </div>
       </div>
     </div>

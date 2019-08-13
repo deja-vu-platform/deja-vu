@@ -1,4 +1,4 @@
-# mapMIT
+# mapcampus
 
 *A clone of a 6.170 project built with Deja Vu.*
 
@@ -13,7 +13,6 @@ Team RECD
 - Jisoo Hong
 - Rena Liu
 
-[Original App](http://mapmit.herokuapp.com/)
 
 ## Concepts Used
 - Authentication
@@ -30,5 +29,5 @@ Team RECD
 - Search for events by location (show markers by location widget, but should probably move away from lat+lng)
 - Ability to edit events (edit event concept)
 - Only the event host can edit the event (edit event concept and authorization can edit concept)
-- Restrict MapMIT to the MIT community (authentication concept - add regex to sign up)
+- Restrict mapcampus to the a university community (authentication concept - add regex to sign up)
 - Filter events by public/group (depends on how group visibility is done)
