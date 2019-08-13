@@ -137,18 +137,18 @@
   },
   "routes": [
     { "path": "", "component": "groups" },
-    { "path": "sign-in", "component": "sign-in" },
-    { "path": "sign-up", "component": "sign-up" },
-    { "path": "user-profile", "component": "user-profile" },
-    { "path": "about", "component": "about" },
-    { "path": "edit-group", "component": "edit-group" },
-    { "path": "group", "component": "show-group" },
-    { "path": "create-group", "component": "create-group" },
-    { "path": "set-list", "component": "show-set-list" },
-    { "path": "edit-set-list", "component": "edit-set-list" },
-    { "path": "create-set-list", "component": "create-set-list" },
-    { "path": "proposal", "component": "show-proposal" },
-    { "path": "edit-proposal", "component": "edit-proposal" },
-    { "path": "create-proposal", "component": "create-proposal" }
+    { "path": "/sign-in", "component": "sign-in" },
+    { "path": "/sign-up", "component": "sign-up" },
+    { "path": "/user-profile", "component": "user-profile" },
+    { "path": "/about", "component": "about" },
+    { "path": "/edit-group", "component": "edit-group" },
+    { "path": "/group", "component": "show-group" },
+    { "path": "/create-group", "component": "create-group" },
+    { "path": "/set-list", "component": "show-set-list" },
+    { "path": "/edit-set-list", "component": "edit-set-list" },
+    { "path": "/create-set-list", "component": "create-set-list" },
+    { "path": "/proposal", "component": "show-proposal" },
+    { "path": "/edit-proposal", "component": "edit-proposal" },
+    { "path": "/create-proposal", "component": "create-proposal" }
   ]
 }

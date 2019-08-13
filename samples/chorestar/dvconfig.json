@@ -97,8 +97,8 @@
     }
   },
   "routes": [
-    {"path": "parent", "component": "parent-home"},
-    {"path": "child", "component": "child-home"},
+    {"path": "/parent", "component": "parent-home"},
+    {"path": "/child", "component": "child-home"},
     {"path": "", "component": "landing"}
   ]
 }

@@ -224,8 +224,9 @@ describe('ComponentHelper', () => {
       'property',
       'property'
     ];
-    const routes = ['chorestar-parent-home'];
-    const componentHelper = new ComponentHelper(usedConcepts, componentTable, routes);
+    const routeComponentSelectors = ['chorestar-parent-home'];
+    const componentHelper = new ComponentHelper(
+      usedConcepts, componentTable, routeComponentSelectors);
 
     const arrayComponentPath = [
       'chorestar-root',

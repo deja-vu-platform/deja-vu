@@ -87,10 +87,10 @@
   },
   "routes": [
     { "path": "", "component": "show-chat" },
-    { "path": "login", "component": "login" },
-    { "path": "signup", "component": "signup" },
-    { "path": "profile", "component": "profile" },
-    { "path": "users", "component": "users"},
-    { "path": "chat", "component": "show-chat"}
+    { "path": "/login", "component": "login" },
+    { "path": "/signup", "component": "signup" },
+    { "path": "/profile", "component": "profile" },
+    { "path": "/users", "component": "users"},
+    { "path": "/chat", "component": "show-chat"}
   ]
 }

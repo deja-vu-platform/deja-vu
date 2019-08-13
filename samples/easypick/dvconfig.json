@@ -169,10 +169,10 @@
   },
   "routes": [
     { "path": "", "component": "main" },
-    { "path": "login", "component": "login" },
-    { "path": "signup", "component": "signup" },
-    { "path": "search", "component": "search" },
-    { "path": "feedback", "component": "feedback" },
-    { "path": "profile", "component": "update-profile"}
+    { "path": "/login", "component": "login" },
+    { "path": "/signup", "component": "signup" },
+    { "path": "/search", "component": "search" },
+    { "path": "/feedback", "component": "feedback" },
+    { "path": "/profile", "component": "update-profile"}
   ]
 }

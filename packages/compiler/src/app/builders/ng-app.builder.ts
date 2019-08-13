@@ -182,7 +182,7 @@ export class NgAppBuilder {
   }
 
   build(cacheDir: string, installDependencies = true) {
-    if (!_.includes(_.map(this.routes, 'path'), '')) {
+    if (!_.some(_.map(this.routes, 'path'), (v) => v === '' || v === '/')) {
       throw new Error(
         'Missing default route "". In your dvconfig.json file add:\n' +
         '"routes": [ {"path": "", "component": "your-main-component-here"} ]');
@@ -265,6 +265,11 @@ export class NgAppBuilder {
               throw new Error(
                 `Component for route "${r.path}" (${r.selector}) not found\n` +
                 `Valid components are: ${_.keys(selectorToComponent)}`);
+            }
+            // There are supposed to be no leading slashes in the path given to
+            // ng. Thus, we remove it if we find it.
+            if (r.path[0] === '/') {
+              r.path = r.path.slice(1);
             }
 
             return `{ path: "${r.path}", component: ${c} }`;

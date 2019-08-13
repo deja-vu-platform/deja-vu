@@ -68,11 +68,11 @@
     }
   },
   "routes": [
-    { "path": "login", "component": "login" },
-    { "path": "main", "component": "main" },
-    { "path": "profile", "component": "show-user-profile" },
-    { "path": "register", "component": "register" },
-    { "path": "spot-details", "component": "show-spot-details" },
+    { "path": "/login", "component": "login" },
+    { "path": "/main", "component": "main" },
+    { "path": "/profile", "component": "show-user-profile" },
+    { "path": "/register", "component": "register" },
+    { "path": "/spot-details", "component": "show-spot-details" },
     { "path": "", "component": "main" }
   ]
 }

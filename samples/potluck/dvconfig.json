@@ -70,9 +70,9 @@
     }
   },
   "routes": [
-    { "path": "parties", "component": "show-parties" },
-    { "path": "create-party", "component": "create-party" },
-    { "path": "login", "component": "landing" },
+    { "path": "/parties", "component": "show-parties" },
+    { "path": "/create-party", "component": "create-party" },
+    { "path": "/login", "component": "landing" },
     { "path": "", "component": "landing" }
   ]
 }

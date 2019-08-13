@@ -53,12 +53,12 @@
     }
   },
   "routes": [
-    { "path": "home", "component": "home" },
-    { "path": "signup", "component": "signup" },
-    { "path": "login", "component": "login" },
-    { "path": "my-events", "component": "show-my-events" },
-    { "path": "create-event", "component": "create-event" },
-    { "path": "my-groups", "component": "show-my-groups" },
+    { "path": "/home", "component": "home" },
+    { "path": "/signup", "component": "signup" },
+    { "path": "/login", "component": "login" },
+    { "path": "/my-events", "component": "show-my-events" },
+    { "path": "/create-event", "component": "create-event" },
+    { "path": "/my-groups", "component": "show-my-groups" },
     { "path": "", "component": "home" }
   ]
 }

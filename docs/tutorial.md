@@ -70,10 +70,10 @@ The app's config file (dvconfig.json) is shown below:
     }
   },
   "routes": [
-    { "path": "item", "component": "show-post-details" },
-    { "path": "login", "component": "login" },
-    { "path": "news", "component": "home" },
-    { "path": "submit", "component": "submit-post" },
+    { "path": "/item", "component": "show-post-details" },
+    { "path": "/login", "component": "login" },
+    { "path": "/news", "component": "home" },
+    { "path": "/submit", "component": "submit-post" },
     { "path": "", "component": "home" }
   ]
 }

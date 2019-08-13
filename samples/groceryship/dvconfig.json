@@ -114,12 +114,12 @@
   },
   "routes": [
     { "path": "", "component": "main" },
-    { "path": "sign-in", "component": "sign-in" },
-    { "path": "sign-up", "component": "sign-up" },
-    { "path": "requests", "component": "show-requests" },
-    { "path": "make-request", "component": "create-request" },
-    { "path": "make-delivery", "component": "create-deliveries" },
-    { "path": "profile", "component": "update-profile" },
-    { "path": "input-price", "component": "input-price" }
+    { "path": "/sign-in", "component": "sign-in" },
+    { "path": "/sign-up", "component": "sign-up" },
+    { "path": "/requests", "component": "show-requests" },
+    { "path": "/make-request", "component": "create-request" },
+    { "path": "/make-delivery", "component": "create-deliveries" },
+    { "path": "/profile", "component": "update-profile" },
+    { "path": "/input-price", "component": "input-price" }
   ]
 }
