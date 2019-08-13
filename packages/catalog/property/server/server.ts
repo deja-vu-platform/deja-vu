@@ -280,7 +280,7 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
           }
         });
 
-        const objs = objects.find(modifiedFilters);
+        const objs = await objects.find(modifiedFilters);
 
         return _.map(objs, addTimestamp);
       },

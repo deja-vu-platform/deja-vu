@@ -70,6 +70,8 @@ OnExecSuccess {
   required = false;
   type;
   enumList = null;
+  maxLength = null;
+  minLength = null;
 
   private gs: GatewayService;
   private cs: ConfigService;
@@ -122,6 +124,12 @@ OnExecSuccess {
       this.type = String;
     } else {
       this.type = Boolean;
+    }
+    if (schema.maxLength) {
+      this.maxLength = schema.maxLength;
+    }
+    if (schema.minLength) {
+      this.minLength = schema.minLength;
     }
     const validators = [this.schemaValidator.bind(this)];
     if (property.required) {

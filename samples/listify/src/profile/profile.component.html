@@ -48,7 +48,11 @@
             showVote=false /> />
       </dv.if>
       <dv.if condition=$showYourLists>
-        TODO
+        <list.show-objects fieldMatching={ creator:listify.navbar.loggedInUser?.id }
+                           showObject=<listify.list-card  gotoOnClick="/lists/consensus"
+                                                          id=$object.id
+                                                          loggedInUser=listify.navbar.loggedInUser
+                                                          showVote=true /> />
       </dv.if>
       <dv.if condition=$showListsInvitedTo>
         TODO

@@ -6,11 +6,20 @@
     hidden=true />
 
   <div>
-    <listify.list-summary
-      listScoring=$listScoring
-      loggedInUser=$loggedInUser
-      showVote=$showVote
-      showMarkers=true />
+    <dv.if condition=$listScoring>
+      <listify.list-summary
+        listScoring=$listScoring
+        loggedInUser=$loggedInUser
+        showVote=$showVote
+        showMarkers=true />
+    </dv.if>
+    <dv.if condition=!$listScoring && scoring.show-target.loadedTarget>
+      <listify.list-summary
+        listScoring=scoring.show-target.loadedTarget
+        loggedInUser=$loggedInUser
+        showVote=$showVote
+        showMarkers=true />
+    </dv.if>
 
     <dv.link href=$gotoOnClick params={ id: $id }>View</dv.link>
   </div>
