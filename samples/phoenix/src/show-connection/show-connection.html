@@ -1,4 +1,4 @@
-<dv.action name="show-connection">
+<dv.component name="show-connection">
   <dv.if condition=$connection?.userAId === $loggedInUserId>
     <phoenix.show-user-info userId=$connection.userBId />
   </dv.if>
@@ -16,7 +16,7 @@
 
     <div class="connection-options">
       <!-- TODO: closing a connection should delete match + create connectionhistory
-        Unfortunately, these two actions wrapped in one tx somehow doesn't allow
+        Unfortunately, these two components wrapped in one tx somehow doesn't allow
         both to happen at the same time -->
       <dv.tx>
         <connectionhistory.create-object
@@ -36,4 +36,4 @@
       </dv.tx>
     </div>
   </div>
-</dv.action>
+</dv.component>

@@ -1,4 +1,4 @@
-<dv.action name="cancel-request">
+<dv.component name="cancel-request">
   <dv.if condition=!$request.claimed >
     <request.remove-object id=$request.id buttonLabel="Cancel" />
   </dv.if>
@@ -8,4 +8,4 @@
       <authentication.show-user id=$request.delivererId />
     </div>
   </dv.if>
-</dv.action>
+</dv.component>

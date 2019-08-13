@@ -7,7 +7,8 @@
     "package": "dv package",
     "prepare": "npm run package",
     "dv-package-dv": "ng-packagr -p ng-package.json",
-    "lint": "tslint -p . -c tslint.json src/*.ts"
+    "lint": "tslint -p . -c tslint.json src/*.ts",
+    "clean": "rm -rf ./dist ./pkg"
   },
   "peerDependencies": {
     "@angular/common": "^5.2.0",

@@ -328,13 +328,13 @@ div.inline {
   margin-top: 0;
 }
 
-/* Used in show-parties to style child actions */
+/* Used in show-parties to style child components */
 
 .authorization-show-resources-resource-item {
   margin-bottom: 10px;
 }
 
-/* Used in show-party to style child actions */
+/* Used in show-party to style child components */
 
 .event-show-event,
 .event-show-event-same-day-event,

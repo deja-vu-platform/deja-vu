@@ -9,7 +9,7 @@
     "build": "tsc && chmod +x dist/dv.js",
     "package": "npm run clean && npm run build",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
-    "clean": "rm -rf ./dist",
+    "clean": "rm -rf ./dist ./pkg",
     "prepare": "npm run package"
   },
   "dependencies": {

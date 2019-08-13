@@ -1,4 +1,4 @@
-<dv.action name="create-party">
+<dv.component name="create-party">
   <potluck.navbar />
   <authentication.show-users hidden=true />
 
@@ -41,12 +41,12 @@
                     <div class="col-md-5">
                       <dv.stage as potluck-add-to-guest-list
                         stageEntity=
-                          <dv.action stage$=authentication.choose-user.selectedUser>
+                          <dv.component stage$=authentication.choose-user.selectedUser>
                             <authentication.choose-user
                               users=authentication.show-users.fetchedUsers
                               chooseSelectPlaceholder="Choose Guest"
                               addButtonLabel="Add to Guest List" />
-                          </dv.action>
+                          </dv.component>
                         showEntity=<authentication.show-user user=$entity />
                         stageHeader=<potluck.guest-list-header /> />
                       <group.create-group
@@ -60,9 +60,9 @@
                       <!-- stage-objects -->
                       <dv.stage
                         stageEntity=
-                          <dv.action stage$=potluck.stage-supply.stagedSupply>
+                          <dv.component stage$=potluck.stage-supply.stagedSupply>
                             <potluck.stage-supply />
-                          </dv.action>
+                          </dv.component>
                         showEntity=<potluck.show-supply supplyObj=$entity />
                         stageHeader=<potluck.supply-list-header />
                         filter=['id','count'] />
@@ -96,4 +96,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

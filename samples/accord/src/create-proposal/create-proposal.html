@@ -1,4 +1,4 @@
-<dv.action name="create-proposal">
+<dv.component name="create-proposal">
   <accord.navbar accessRequired=true />
   <div class="left-column">
     <accord.set-list-catalog groupId=$groupId />
@@ -15,9 +15,9 @@
       />
       <div class="bold">Add Media Links (Optional)</div>
       <dv.stage
-        stageEntity=<dv.action stage$=accord.stage-proposal.stage>
+        stageEntity=<dv.component stage$=accord.stage-proposal.stage>
                       <accord.stage-proposal id=dv.gen-id.id />
-                    </dv.action>
+                    </dv.component>
         showEntity=<accord.show-media media=$entity deletable=false/>
       />
       <media.create-objects objects=dv.stage.stagedEntities?dv.stage.stagedEntities:[] hidden=true />
@@ -27,4 +27,4 @@
       <dv.redirect href="/proposal" params={ proposalId:dv.gen-id.id, groupId:$groupId } onExecSuccess=true />
     </dv.tx>
   </div>
-</dv.action>
+</dv.component>

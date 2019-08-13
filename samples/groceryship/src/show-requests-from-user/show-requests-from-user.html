@@ -1,4 +1,4 @@
-<dv.action name="show-requests-from-user">
+<dv.component name="show-requests-from-user">
   <div class="individual-card">
     <h3>Your Requests</h3>
     <request.show-objects fieldMatching={ requesterId:$userId } hidden=true />
@@ -12,9 +12,9 @@
     {label:"Pickup Location",fieldName:"pickupLocation"},
     {label:"Tips",fieldName:"tips"}]
     noDataToShowText="You don't have any non in-delivery requests."
-    rowAction=<groceryship.cancel-request request=$rowObject />
+    rowComponent=<groceryship.cancel-request request=$rowObject />
     />
   </div>
-</dv.action>
+</dv.component>
 
 

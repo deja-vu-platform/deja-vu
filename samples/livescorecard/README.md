@@ -38,6 +38,6 @@ Team Reach
 ### Climber
 - Sort climbs by number -> Needs a Sort concept
 - Filter climbers by sex and category (also filter climbs by categoery) ->
-Use `search-items-by label` action, but need to add `waitOn` input to
-`show-tasks` action.
+Use `search-items-by label` component, but need to add `waitOn` input to
+`show-tasks` component.
 - Give approval by entering credentials -> Needs new widget in the Task concept

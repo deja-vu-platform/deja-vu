@@ -15,7 +15,7 @@ exports.builder = (yargs) => yargs
     describe: 'The type of the component to create'
   })
   .positional('entityName', {
-    describe: 'The name of the entity on which to perform the action, ' +
+    describe: 'The name of the entity on which to perform the component, ' +
       'or the name of the component if the component type is "blank"'
   })
   .positional('componentName', {

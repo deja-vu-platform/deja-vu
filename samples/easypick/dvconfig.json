@@ -168,11 +168,11 @@
     }
   },
   "routes": [
-    { "path": "", "action": "main" },
-    { "path": "login", "action": "login" },
-    { "path": "signup", "action": "signup" },
-    { "path": "search", "action": "search" },
-    { "path": "feedback", "action": "feedback" },
-    { "path": "profile", "action": "update-profile"}
+    { "path": "", "component": "main" },
+    { "path": "login", "component": "login" },
+    { "path": "signup", "component": "signup" },
+    { "path": "search", "component": "search" },
+    { "path": "feedback", "component": "feedback" },
+    { "path": "profile", "component": "update-profile"}
   ]
 }

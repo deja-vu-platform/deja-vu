@@ -22,11 +22,11 @@ one that has the functionality you are looking for.
 Concepts are freestanding, without any mutual dependencies. As a
 user of Déjà Vu, you can ignore
 the (front-end and back-end) code that implements the concept. The only
-aspects of a concept you'll interact with are the configuration options and exported actions. The
+aspects of a concept you'll interact with are the configuration options and exported components. The
 documentation accompanying a concept includes information about the configuration options
-(e.g., their effect on behavior) and the exported actions.
+(e.g., their effect on behavior) and the exported components.
 
-Concept actions are interactive user interface elements that can read and
+Concept components are interactive user interface elements that can read and
 write back-end data.
 They can
 also have inputs and produce outputs.
@@ -70,11 +70,11 @@ The app's config file (dvconfig.json) is shown below:
     }
   },
   "routes": [
-    { "path": "item", "action": "show-post-details" },
-    { "path": "login", "action": "login" },
-    { "path": "news", "action": "home" },
-    { "path": "submit", "action": "submit-post" },
-    { "path": "", "action": "home" }
+    { "path": "item", "component": "show-post-details" },
+    { "path": "login", "component": "login" },
+    { "path": "news", "component": "home" },
+    { "path": "submit", "component": "submit-post" },
+    { "path": "", "component": "home" }
   ]
 }
 ```
@@ -96,40 +96,40 @@ defining facility, albeit with simple CRUD behavior.)
 
 In *SN*, we use `schema` to configure the type of properties we expect our
 objects (the posts) to have (an author, a title, and a url). The effect of this is that when we
-use an action from *Property* to, for example, create an object, the action will allow
+use an component from *Property* to, for example, create an object, the component will allow
 the user to input those fields&mdash;author, title, and url.
-Moreover, since we specified they are all required fields, the action
+Moreover, since we specified they are all required fields, the component
 will expect the user to provide a value for each one (and show an
 error if she doesn't).
 
 In the app's configuration file, we also define the routes of
 our app, given as
-a list of path and action name pairs.
-Each page is an app action, and app actions&mdash;as we'll see later&mdash;can contain other actions.
+a list of path and component name pairs.
+Each page is an app component, and app components&mdash;as we'll see later&mdash;can contain other components.
 Our homepage
-is the action `home` because `path` is empty.
-If the user navigates to `/login`, the `login` action
+is the component `home` because `path` is empty.
+If the user navigates to `/login`, the `login` component
 will be shown; if she navigates to `/item`, the `show-post-details`
-action will be shown.
+component will be shown.
 
-## Linking Actions
+## Linking Components
 
-There are two types of actions: *concept actions* and
-*app actions*. Concept actions
-are the actions defined by concepts; app actions
-are the actions that are part of the app being developed.
+There are two types of components: *concept components* and
+*app components*. Concept components
+are the components defined by concepts; app components
+are the components that are part of the app being developed.
 
 Each app
-action is written in a separate HTML file.
-App actions can contain other actions, which can be
-of either kind (concept actions or app actions).
-Actions are included as if they were HTML
-elements, with the tag given by `concept.action-name` or
-`app.action-name`.
+component is written in a separate HTML file.
+App components can contain other components, which can be
+of either kind (concept components or app components).
+Components are included as if they were HTML
+elements, with the tag given by `concept.component-name` or
+`app.component-name`.
 
 Below is a code excerpt of *SN*'s `submit-post` definition:
 ```html
-<dv.action name="submit-post">
+<dv.component name="submit-post">
   <sn.navbar /> ...
   <div class="main">
     <div class="container">
@@ -157,45 +157,45 @@ Below is a code excerpt of *SN*'s `submit-post` definition:
       </dv.if>
     </div>
   </div>
-</dv.action>
+</dv.component>
 ```
 
 
-`submit-post` includes one app action, `navbar`
+`submit-post` includes one app component, `navbar`
 ([defined elsewhere](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/navbar/navbar.html));
-three concept actions,
+three concept components,
 `authenticate` of `authentication`, `create-object` of
 `property`, and
 `create-score` of the `scoringposts` instance of *Scoring*; 
-and three built-in actions (which can be regarded as free-standing concept actions): `dv.if`, which
+and three built-in components (which can be regarded as free-standing concept components): `dv.if`, which
 shows the enclosed content if the given condition is true, `dv.gen-id`,
 which generates a unique ID, `dv.link` which redirects the user to
-another page (in this case, it navigates to the action matching
+another page (in this case, it navigates to the component matching
 the `/item` route and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
-which synchronizes the actions it wraps (explained in more detail later).
+which synchronizes the components it wraps (explained in more detail later).
 
-App actions, like concept actions, can have input and
-output values (which can be used in other app actions).
-Inputs to an action are bound with the syntax `parameter=value`.
+App components, like concept components, can have input and
+output values (which can be used in other app components).
+Inputs to an component are bound with the syntax `parameter=value`.
 The value could
-be a literal or an output from some other action on the page.
-Actions can be fired repeatedly, and the output variables
+be a literal or an output from some other component on the page.
+Components can be fired repeatedly, and the output variables
 hold the values from the last execution.
 
-Some action inputs are for customizing
-appearance and have no impact on the behavior of the action.
+Some component inputs are for customizing
+appearance and have no impact on the behavior of the component.
 For example, as a result of setting
 `buttonLabel` to `"Submit"`,
 `create-object`'s button will carry the label "Submit" instead of the
 default button label "Create Object".
 
-## Action Synchronization
+## Component Synchronization
 
-Concept actions have two phases: an *evaluation* phase (eval) and an
-*execution* phase (exec). App actions don't have phases.
+Concept components have two phases: an *evaluation* phase (eval) and an
+*execution* phase (exec). App components don't have phases.
 
 Both phases can take inputs and produce outputs.
-When a concept action execs or evals, it expects all its
+When a concept component execs or evals, it expects all its
 required inputs
 to be available&mdash;blocking the evaluation or
 execution until inputs are given.
@@ -206,28 +206,28 @@ on eval or exec is up to the author of the concept, but
 by convention the evaluation phase fetches data from the server (e.g., loading scores), and
 the execution phase produces some side-effect on the server 
 (e.g., creating a new score).
-The action author determines what triggers the evaluation or
-execution of the action. Typically, the loading of
-the action itself triggers the evaluation of an action,
+The component author determines what triggers the evaluation or
+execution of the component. Typically, the loading of
+the component itself triggers the evaluation of an component,
 and some user interaction
 (e.g., a button click or a selection of an item from a dropdown)
 triggers its execution.
 
-There are two types of app actions: a regular action and
-a transaction (tx) action. A tx action synchronizes
-the evaluation and execution of the concept actions it wraps, so that the
-evaluation/execution of one action triggers the evaluation/execution of all the other sibling
-actions, and they either complete in their entirety (if all succeeded) or have no effect whatsoever
+There are two types of app components: a regular component and
+a transaction (tx) component. A tx component synchronizes
+the evaluation and execution of the concept components it wraps, so that the
+evaluation/execution of one component triggers the evaluation/execution of all the other sibling
+components, and they either complete in their entirety (if all succeeded) or have no effect whatsoever
 (if one of them fails).
-Instead of putting each action in separate HTML files,
-you can wrap elements in another action with the `dv.tx` tag to create an
-anonymous tx action with content equal to the content of the tag.
-In contrast, a regular action allows any one of its children actions to execute; thus a regular action can
-be thought of as an "or" action and a tx action as an "and" action.
+Instead of putting each component in separate HTML files,
+you can wrap elements in another component with the `dv.tx` tag to create an
+anonymous tx component with content equal to the content of the tag.
+In contrast, a regular component allows any one of its children components to execute; thus a regular component can
+be thought of as an "or" component and a tx component as an "and" component.
 
-The button in the `create-object` action of *Property* causes
-the action to execute on click. Thus, if this action is wrapped in a
-`dv.tx`, it will trigger the execution of all its sibling concept actions
+The button in the `create-object` component of *Property* causes
+the component to execute on click. Thus, if this component is wrapped in a
+`dv.tx`, it will trigger the execution of all its sibling concept components
 when a user clicks on the button.
 
 There is no shared state between concepts, but objects in
@@ -239,12 +239,12 @@ when a user clicks on the "Submit" button of `create-object`,
 with the same id as the object `create-object` will create. These two objects can be
 thought of as views of the same *SN* post.
 
-Similarly, in *SN*'s `show-post` action, we feed
+Similarly, in *SN*'s `show-post` component, we feed
 the `id` input (inputs are preceded with `$`) to `show-object` and
 `show-target`:
 
 ```html
-<dv.action name="show-post" loadedPost$=property.show-object.loadedObject>
+<dv.component name="show-post" loadedPost$=property.show-object.loadedObject>
   <div>
     <property.show-object id=$id hidden=true />
 
@@ -288,20 +288,20 @@ the `id` input (inputs are preceded with `$`) to `show-object` and
       </div>
     </dv.if>
   </div>
-</dv.action>
+</dv.component>
 ```
 ```
 
-Each of these actions loads and displays its own
+Each of these components loads and displays its own
 view of the post entity; the effect when put together is to display a
-*SN* post object. The configuration parameters of an action allow its effect,
+*SN* post object. The configuration parameters of an component allow its effect,
 including its appearance, to be customized; thus the hidden parameter of
 `show-object` marks it as a hidden HTML element, so that it does not appear
 (even though the object data itself is still loaded, emitted as an output,
-and used in several parts of the view). (Any action can be hidden with `hidden=true`,
-but the action still runs as if it wasn't hidden, the only difference
+and used in several parts of the view). (Any component can be hidden with `hidden=true`,
+but the component still runs as if it wasn't hidden, the only difference
 is that it won't be shown to the user&mdash;and as a result, the user won't be able
-to interact with it.) All `show-*` actions of concepts follow
-this pattern: when loaded, the action evaluates and if an id was given
+to interact with it.) All `show-*` components of concepts follow
+this pattern: when loaded, the component evaluates and if an id was given
 it fetches the entity (e.g., the object, score) with the given id
 from its database and emits it as output.}

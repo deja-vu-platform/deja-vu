@@ -7,7 +7,7 @@
     "build": "tsc && cp src/component/component.grammar.ohm dist/component && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
     "package": "npm run clean && npm run build",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist ./pkg"
   },
   "dependencies": {
     "fs-extra": "^6.0.1",

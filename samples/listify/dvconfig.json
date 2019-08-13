@@ -51,18 +51,18 @@
     }
   },
   "routes": [
-    { "path": "login", "action": "login" },
-    { "path": "signup", "action": "signup" },
-    { "path": "profile", "action": "profile-rankings" },
-    { "path": "profile/rankings", "action": "profile-rankings" },
-    { "path": "profile/lists", "action": "profile-lists" },
-    { "path": "profile/list-invites", "action": "profile-list-invites" },
-    { "path": "ranking", "action": "ranking" },
-    { "path": "lists/create", "action": "create-list" },
-    { "path": "lists/consensus", "action": "view-list-rankings" },
-    { "path": "lists/rankings/edit", "action": "edit-list-rankings" },
-    { "path": "home/recent", "action": "home-show-recent" },
-    { "path": "home/trending", "action": "home-show-trending" },
-    { "path": "", "action": "home-show-trending" }
+    { "path": "login", "component": "login" },
+    { "path": "signup", "component": "signup" },
+    { "path": "profile", "component": "profile-rankings" },
+    { "path": "profile/rankings", "component": "profile-rankings" },
+    { "path": "profile/lists", "component": "profile-lists" },
+    { "path": "profile/list-invites", "component": "profile-list-invites" },
+    { "path": "ranking", "component": "ranking" },
+    { "path": "lists/create", "component": "create-list" },
+    { "path": "lists/consensus", "component": "view-list-rankings" },
+    { "path": "lists/rankings/edit", "component": "edit-list-rankings" },
+    { "path": "home/recent", "component": "home-show-recent" },
+    { "path": "home/trending", "component": "home-show-trending" },
+    { "path": "", "component": "home-show-trending" }
   ]
 }

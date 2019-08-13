@@ -33,11 +33,11 @@
     }
   },
   "routes": [
-    { "path": "login", "action": "login" },
-    { "path": "submit", "action": "submit-post" },
-    { "path": "post", "action": "show-post-details" },
-    { "path": "comment", "action": "show-comment-details" },
-    { "path": "", "action": "home" },
-    { "path": "new", "action": "new" }
+    { "path": "login", "component": "login" },
+    { "path": "submit", "component": "submit-post" },
+    { "path": "post", "component": "show-post-details" },
+    { "path": "comment", "component": "show-comment-details" },
+    { "path": "", "component": "home" },
+    { "path": "new", "component": "new" }
   ]
 }

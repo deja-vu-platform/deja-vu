@@ -97,13 +97,13 @@
     }
   },
   "routes": [
-    { "path": "main", "action": "main" },
-    { "path": "login", "action": "login" },
-    { "path": "register", "action": "register" },
-    { "path": "event-details", "action": "show-event-details" },
-    { "path": "create-event", "action": "create-event" },
-    { "path": "profile", "action": "show-user-profile" },
-    { "path": "edit-profile", "action": "edit-user-profile" },
-    { "path": "", "action": "main" }
+    { "path": "main", "component": "main" },
+    { "path": "login", "component": "login" },
+    { "path": "register", "component": "register" },
+    { "path": "event-details", "component": "show-event-details" },
+    { "path": "create-event", "component": "create-event" },
+    { "path": "profile", "component": "show-user-profile" },
+    { "path": "edit-profile", "component": "edit-user-profile" },
+    { "path": "", "component": "main" }
   ]
 }

@@ -1,4 +1,4 @@
-<dv.action name="vote">
+<dv.component name="vote">
   <scoring.show-score
     sourceId=$loggedInUser?.id
     targetId=$listId
@@ -31,7 +31,7 @@
         sourceId=$loggedInUser?.id
         targetId=$listId
         value=1 />
-      <!-- upvote action -->
+      <!-- upvote component -->
     </dv.tx>
 
     <!-- show vote count only when it's nonzero -->
@@ -80,4 +80,4 @@
         value=-1 />
     </dv.tx>
   </div>
-</dv.action>
+</dv.component>

@@ -1,7 +1,7 @@
-<dv.action name="show-claim">
+<dv.component name="show-claim">
   <potluck.show-supply supplyObj=$transfer.amount[0] useIdForObject=true />
 
   Claimed by
   <authentication.show-user id=$transfer.toId
     showId=false />
-</dv.action>
+</dv.component>

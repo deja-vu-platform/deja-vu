@@ -81,12 +81,12 @@
     }
   },
   "routes": [
-    { "path": "dashboard", "action": "show-dashboard" },
-    { "path": "faq", "action": "show-faq" },
-    { "path": "journal", "action": "show-journal" },
-    { "path": "personal", "action": "show-personal-info" },
-    { "path": "signin", "action": "signin" },
-    { "path": "register", "action": "register" },
-    { "path": "", "action": "show-dashboard" }
+    { "path": "dashboard", "component": "show-dashboard" },
+    { "path": "faq", "component": "show-faq" },
+    { "path": "journal", "component": "show-journal" },
+    { "path": "personal", "component": "show-personal-info" },
+    { "path": "signin", "component": "signin" },
+    { "path": "register", "component": "register" },
+    { "path": "", "component": "show-dashboard" }
   ]
 }

@@ -9,7 +9,7 @@
     "prepare": "npm run package",
     "package": "npm run build",
     "start": "node dist/gateway.js --configFilePath dvconfig.json",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist ./pkg"
   },
   "dependencies": {
     "@babel/core": "^7.3.4",

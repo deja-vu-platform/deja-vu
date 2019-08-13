@@ -1,4 +1,4 @@
-<dv.action name="claim-request">
+<dv.component name="claim-request">
   <dv.if condition=!$request.claimed && $userId !== $request.requesterId >
     <dv.tx>
     <request.update-object id=$request.id
@@ -12,4 +12,4 @@
   <dv.if condition=$userId === $request.requesterId >
     <div class="disabled">Yours</div>
   </dv.if>
-</dv.action>
+</dv.component>
