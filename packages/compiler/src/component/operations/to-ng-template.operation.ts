@@ -126,7 +126,7 @@ export function toNgTemplate(
       if (conceptAlias !== 'dv' && conceptAlias !== appName) {
         const conceptContextEntry = context[conceptAlias];
         if (conceptContextEntry === undefined) {
-          throw new Error(`Cliché ${conceptAlias} not found`);
+          throw new Error(`Concept ${conceptAlias} not found`);
         }
         assert.ok(conceptContextEntry.kind === 'concept',
           `Unexpected entry type ${conceptContextEntry.kind} ` +
@@ -192,7 +192,7 @@ export function toNgTemplate(
         if (conceptAlias !== 'dv' && conceptAlias !== appName) {
           const conceptContextEntry = context[conceptAlias];
           if (conceptContextEntry === undefined) {
-            throw new Error(`Cliché ${conceptAlias} not found`);
+            throw new Error(`Concept ${conceptAlias} not found`);
           }
           assert.ok(conceptContextEntry.kind === 'concept',
             `Unexpected entry type ${conceptContextEntry.kind} ` +
