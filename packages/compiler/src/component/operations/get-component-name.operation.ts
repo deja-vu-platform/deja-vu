@@ -1,4 +1,6 @@
-import { DV_COMPONENT, DV_COMPONENT_NAME_ATTR } from './shared';
+import {
+  DV_COMPONENT, DV_COMPONENT_NAME_ATTR, DV_TX_COMPONENT
+} from './shared';
 
 import * as _ from 'lodash';
 
@@ -14,7 +16,9 @@ export function getComponentName() {
       throw new Error('Component should start with a dv.component tag');
     },
     StartTag: (_open, elementName, attributes, _close): string | null => {
-      if (elementName.getComponentName() === DV_COMPONENT) {
+      const componentName = elementName.getComponentName();
+      if (componentName === DV_COMPONENT ||
+        componentName === DV_TX_COMPONENT) {
         const attrValues: string[] = _.compact(attributes.getComponentName());
         if (attrValues.length === 0) {
           throw new Error('Missing component name');

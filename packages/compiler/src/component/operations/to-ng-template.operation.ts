@@ -180,6 +180,8 @@ export function toNgTemplate(
       const content = _.join(contentNode.toNgTemplate(), ' ');
       if (_.startsWith(startTagNg, '<dv-component')) {
         return content;
+      } else if (_.startsWith(startTagNg, '<dv-tx-component')) {
+        return `<dv-tx>${content}</dv-tx>`;
       }
 
       return startTagNg + content + endTag.toNgTemplate();

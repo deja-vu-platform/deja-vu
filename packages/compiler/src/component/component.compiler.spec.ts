@@ -300,6 +300,26 @@ describe('ComponentCompiler', () => {
       .toMatch(`gt`);
   });
 
+  it('should compile tx-component', () => {
+    const componentName = 'tx-component';
+    const component = `
+      <dv.tx-component name="${componentName}">
+        <h1>Hello</h1>
+      </dv.tx-component>
+    `;
+    const compiledComponent: CompiledComponent = componentCompiler
+      .compile(appName, component, {});
+    expect(compiledComponent.ngTemplate)
+      .toMatch('Hello');
+    expect(compiledComponent.ngTemplate)
+      .toMatch('dv-tx');
+    expect(compiledComponent.ngTemplate)
+      .not
+      .toMatch('dv.tx-component');
+    expect(compiledComponent.ngComponent)
+      .toMatch(`selector: "${appName}-tx-component"`);
+  });
+
   it('should compile component with components', () => {
     const heading = 'Group meeting organizer';
     const st: SymbolTable = {

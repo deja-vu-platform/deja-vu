@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 
 
 export const DV_COMPONENT = 'dv.component';
+export const DV_TX_COMPONENT = 'dv.tx-component';
 export const DV_COMPONENT_NAME_ATTR = 'name';
 export const NAV_SPLIT_REGEX = /(?:\.|\?\.)/;
 
