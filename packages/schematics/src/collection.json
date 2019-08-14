@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "component": {
-      "description": "Generate an component for a concept",
+      "description": "Generate a component for a concept",
       "factory": "./component/index#component",
       "schema": "./component/schema.json"
     },
