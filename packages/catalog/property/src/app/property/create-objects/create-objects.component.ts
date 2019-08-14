@@ -12,7 +12,9 @@ import { CreateObjectComponent } from '../create-object/create-object.component'
 
 import * as _ from 'lodash';
 
-import { getPropertyNames } from '../shared/property.model';
+import {
+  getObjectTitleFromConfig, getPropertyNamesFromConfig
+} from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
 
@@ -65,7 +67,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
    * The label that shows on the button that triggers
    * the object creation
    */
-  @Input() buttonLabel = 'Create Objects';
+  @Input() buttonLabel;
 
   /**
    * Only used when there is no objects
@@ -92,7 +94,12 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
     const cs = this.csf.createConfigService(this.elem);
     this.config = cs.getConfig();
-    this.properties = getPropertyNames(cs);
+
+    if (this.buttonLabel === undefined) {
+      const objTitle = getObjectTitleFromConfig(this.config);
+      this.buttonLabel = `Create ${objTitle}s`;
+    }
+    this.properties = getPropertyNamesFromConfig(this.config);
 
     if (this.objects) {
       return;
@@ -100,6 +107,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
     this.showInputForms = true;
 
+    this.objects = [];
     for (const index of Object.keys(this.ids)) {
       if (this.initialValues && this.initialValues[index] && this.initialValue) {
         this.mergedInitialValues[index] = {...this.initialValues[index], ...this.initialValue};

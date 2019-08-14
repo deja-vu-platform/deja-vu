@@ -23,6 +23,10 @@ export function getPropertyNames(cs: ConfigService): string[] {
   return _.keys(cs.getConfig()['schema'].properties);
 }
 
+export function getObjectTitleFromConfig(config: object) {
+  return config['schema'].title;
+}
+
 export function getPropertyNamesFromConfig(config: object): string[] {
   return _.keys(config['schema'].properties);
 }
