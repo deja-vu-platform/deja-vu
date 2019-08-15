@@ -104,6 +104,9 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     if (this.objects) {
       return;
     }
+    if (!this.ids) {
+      throw new Error('One of objects or ids must be given');
+    }
 
     this.showInputForms = true;
 

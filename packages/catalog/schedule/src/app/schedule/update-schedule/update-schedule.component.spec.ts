@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditScheduleComponent } from './edit-schedule.component';
+import { UpdateScheduleComponent } from './update-schedule.component';
 
 import { config } from '../testing/testbed.config';
 
 
-describe('EditScheduleComponent', () => {
-  let component: EditScheduleComponent;
-  let fixture: ComponentFixture<EditScheduleComponent>;
+describe('UpdateScheduleComponent', () => {
+  let component: UpdateScheduleComponent;
+  let fixture: ComponentFixture<UpdateScheduleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule(config)
@@ -15,7 +15,7 @@ describe('EditScheduleComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditScheduleComponent);
+    fixture = TestBed.createComponent(UpdateScheduleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

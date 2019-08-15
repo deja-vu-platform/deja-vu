@@ -49,7 +49,7 @@ export function getConfigBuilder(
       { provide: apiPathToken, useValue: '/test-api' },
       { provide: GatewayServiceFactory,
         useValue: new DummyGatewayServiceFactory(getResp, postResp) },
-      { provide: USED_CONCEPTS_CONFIG, useValue: {} },
+      { provide: USED_CONCEPTS_CONFIG, useValue: {} }, // not used
       { provide: ConfigServiceFactory,
         useValue: new DummyConfigServiceFactory(configResp) }
     ])
