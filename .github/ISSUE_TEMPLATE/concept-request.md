@@ -7,7 +7,10 @@ assignees: ''
 
 ---
 
-- Name
-- Purpose
-- Essential Components
-- Examples of this concept in the wild
+**Name**
+
+**Purpose**
+
+**Essential components**
+
+**Examples of this concept in the wild**
