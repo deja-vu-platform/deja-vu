@@ -19,8 +19,8 @@ export class JoinLeaveComponent implements OnExec, OnInit {
   // One of `group` or `groupId` is required
   @Input() group: Group;
   @Input() groupId: string;
-  @Input() joinGroupText = "Join Group";
-  @Input() leaveGroupText = "Leave Group";
+  @Input() joinGroupText = 'Join Group';
+  @Input() leaveGroupText = 'Leave Group';
 
   inGroup = false;
 

@@ -7,7 +7,8 @@
     "clean": "rm -rf ./dist ./pkg",
     "package": "yarn clean && yarn run build",
     "prepare": "yarn run package",
-    "lint": "tslint -p . -c tslint.json src/*.ts"
+    "lint": "tslint -p . -c tslint.json src/*.ts",
+    "lint-fix": "tslint -p . -c tslint.json src/*.ts"
   },
   "dependencies": {
     "apollo-server-express": "1.3.2",

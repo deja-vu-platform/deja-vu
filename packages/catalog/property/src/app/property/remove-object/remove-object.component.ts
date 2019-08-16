@@ -4,11 +4,11 @@ import {
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec,
-  OnExecSuccess, OnExecFailure, RunService
+  OnExecFailure, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
-import { API_PATH } from '../property.config';
 import * as _ from 'lodash';
+import { API_PATH } from '../property.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;

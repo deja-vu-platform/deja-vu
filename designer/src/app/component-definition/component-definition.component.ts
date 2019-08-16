@@ -17,9 +17,9 @@ import * as _ from 'lodash';
 import * as tinycolor from 'tinycolor2';
 
 import {
-  ComponentInstance,
   App,
   AppComponentDefinition,
+  ComponentInstance,
   flexAlign,
   flexJustify,
   Row

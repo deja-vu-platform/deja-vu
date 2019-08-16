@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, ViewChildren, QueryList
+  OnInit, QueryList, ViewChildren
 } from '@angular/core';
 
 import {

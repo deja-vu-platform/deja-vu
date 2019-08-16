@@ -8,10 +8,10 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getProperties, getPropertyNames, getFilteredPropertyNames } from '../shared/property.model';
+import { getFilteredPropertyNames, getProperties, getPropertyNames } from '../shared/property.model';
 
-import { API_PATH } from '../property.config';
 import { Options } from 'ng5-slider';
+import { API_PATH } from '../property.config';
 
 export const DEFAULT_INTEGER_OPTIONS: Options = {
   floor: 0,

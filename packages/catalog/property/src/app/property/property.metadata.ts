@@ -11,8 +11,8 @@ import {
   MatTableModule,
   MatTooltipModule
 } from '@angular/material';
-import { Ng5SliderModule }  from "ng5-slider";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Ng5SliderModule }  from 'ng5-slider';
 
 import { DvModule } from '@deja-vu/core';
 
@@ -40,12 +40,12 @@ import { ShowObjectsComponent } from './show-objects/show-objects.component';
 export { ShowObjectsComponent };
 import { ShowUrlComponent } from './show-url/show-url.component';
 export { ShowUrlComponent };
-import { UpdateObjectComponent } from './update-object/update-object.component';
-import { UpdateObjectsComponent } from './update-objects/update-objects.component';
 import { ConfigWizardComponent } from './config-wizard/config-wizard.component';
 import {
   TriStateCheckboxComponent
 } from './tri-state-checkbox/tri-state-checkbox.component';
+import { UpdateObjectComponent } from './update-object/update-object.component';
+import { UpdateObjectsComponent } from './update-objects/update-objects.component';
 
 const publicComponents = [
   ChooseObjectComponent,

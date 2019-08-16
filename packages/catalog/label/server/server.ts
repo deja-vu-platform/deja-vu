@@ -1,9 +1,9 @@
 import {
+  Collection,
   ComponentRequestTable,
   ConceptDb,
   ConceptServer,
   ConceptServerBuilder,
-  Collection,
   Config,
   Context,
   EMPTY_CONTEXT,

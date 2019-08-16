@@ -1,6 +1,6 @@
 import { ComponentSymbolTable } from '../symbolTable';
 import {
-  ComponentInputCompiler, CompiledComponentInput
+  CompiledComponentInput, ComponentInputCompiler
 } from './component-input.compiler';
 
 

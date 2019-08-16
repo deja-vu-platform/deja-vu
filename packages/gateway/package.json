@@ -14,6 +14,7 @@
     "build": "tsc && chmod +x ./dist/gateway.js",
     "clean": "rm -rf ./dist ./pkg",
     "lint": "tslint -p . -c tslint.json src/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/*.ts",
     "package": "npm run build",
     "prepare": "npm run package",
     "start": "node dist/gateway.js --configFilePath dvconfig.json",

@@ -14,6 +14,7 @@
     "build": "tsc && cp src/component/component.grammar.ohm dist/component && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
     "clean": "rm -rf ./dist ./pkg",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/**/*.ts",
     "package": "npm run clean && npm run build",
     "test": "jasmine-ts"
   },

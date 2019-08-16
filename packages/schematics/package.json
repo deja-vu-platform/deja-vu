@@ -13,6 +13,7 @@
     "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' src/ dist/",
     "clean": "rm -rf ./dist",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/**/*.ts",
     "package": "npm run clean && npm run build",
     "prepare": "npm run package",
     "test": "npm run package && jasmine dist/**/*_spec.js"

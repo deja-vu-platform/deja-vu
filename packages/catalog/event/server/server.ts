@@ -1,10 +1,10 @@
 import {
+  Collection,
   ComponentRequestTable,
   ConceptDb,
   ConceptDbNotFoundError,
   ConceptServer,
   ConceptServerBuilder,
-  Collection,
   Config,
   Context,
   getReturnFields

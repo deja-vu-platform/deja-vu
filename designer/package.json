@@ -8,7 +8,8 @@
     "serve": "ng serve",
     "test": "ng test --no-watch --no-progress --browsers=ChromeHeadlessCI",
     "test-debug": "ng test --no-watch -sm=false",
-    "lint": "ng lint --type-check --fix",
+    "lint": "ng lint --type-check",
+    "lint-fix": "ng lint --fix --type-check --fix",
     "e2e": "ng e2e"
   },
   "private": true,

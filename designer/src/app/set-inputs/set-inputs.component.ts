@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { MatDialog, MatMenuTrigger } from '@angular/material';
 import * as _ from 'lodash';
 
-import { ComponentInstance, App, AppComponentDefinition } from '../datatypes';
+import { App, AppComponentDefinition, ComponentInstance } from '../datatypes';
 import {
   DialogData as TextDialogData,
   TextComponent

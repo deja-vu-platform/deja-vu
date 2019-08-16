@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { GeolocationModule } from './geolocation/geolocation.module';
 
-import { USED_CONCEPTS_CONFIG, DvModule, GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 
 import { AppComponent } from './app.component';
 

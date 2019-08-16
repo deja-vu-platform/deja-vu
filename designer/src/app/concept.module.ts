@@ -56,8 +56,8 @@ import * as transferDocs from '@deja-vu/transfer/pkg/documentation.json';
 transfer['documentation'] = transferDocs;
 
 import {
-  ComponentInputs,
   App,
+  ComponentInputs,
   ConceptComponentDefinition,
   ConceptDefinition,
   OMNIPRESENT_INPUTS

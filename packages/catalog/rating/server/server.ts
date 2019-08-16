@@ -1,9 +1,9 @@
 import {
+  Collection,
   ComponentRequestTable,
   ConceptDb,
   ConceptServer,
   ConceptServerBuilder,
-  Collection,
   Config,
   Context,
   getReturnFields
@@ -142,22 +142,22 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
           ratings.aggregate([
             {
               $group: {
-                _id: "$targetId",
-                targetId: { $first: "$targetId"},
-                rating: {$avg: "$rating"},
+                _id: '$targetId',
+                targetId: { $first: '$targetId'},
+                rating: {$avg: '$rating'},
                 count: {$sum: 1}
               }
             },
             {
-              $match: {"rating": {$gte: input.minimumAvgRating}}
+              $match: {rating: {$gte: input.minimumAvgRating}}
             }
           ]) :
           ratings.aggregate([
             {
               $group: {
-                _id: "$targetId",
-                targetId: { $first: "$targetId"},
-                rating: {$avg: "$rating"},
+                _id: '$targetId',
+                targetId: { $first: '$targetId'},
+                rating: {$avg: '$rating'},
                 count: {$sum: 1}
               }
             }
@@ -195,7 +195,7 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
 
       deleteRatings: async (
         _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
-        return await ratings.deleteMany(context, getRatingFilter(input))
+        return await ratings.deleteMany(context, getRatingFilter(input));
       }
     }
   };

@@ -4,7 +4,7 @@
  */
 
 import * as _ from 'lodash';
-import { ComponentInstance, AppComponentDefinition, InInput } from './datatypes';
+import { AppComponentDefinition, ComponentInstance, InInput } from './datatypes';
 import compileDvExpr from './expression.compiler';
 
 export interface Reference {

@@ -5,8 +5,8 @@ import {
   EventEmitter,
   Inject,
   Input,
-  OnInit,
   OnChanges,
+  OnInit,
   Output,
   Type
 } from '@angular/core';

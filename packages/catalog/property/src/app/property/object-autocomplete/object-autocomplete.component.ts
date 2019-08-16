@@ -90,7 +90,7 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
    * (For the default showObject, this will cause any URL properties
    * to display without the protocol and path)
    */
-  @Input() showBaseUrlsOnly: boolean = false;
+  @Input() showBaseUrlsOnly = false;
   /**
    * If given, the select input with the object with the given ID selected
    */

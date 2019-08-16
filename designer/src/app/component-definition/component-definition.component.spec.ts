@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
 import {
   MatCheckboxModule,
   MatIconModule,
@@ -10,6 +9,7 @@ import {
   MatTabsModule,
   MatTooltipModule
 } from '@angular/material';
+import { RouterTestingModule } from '@angular/router/testing';
 import { RunService } from '@deja-vu/core';
 
 import { ComponentDefinitionComponent } from './component-definition.component';

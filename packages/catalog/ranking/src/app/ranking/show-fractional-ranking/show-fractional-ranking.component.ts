@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 
 import {

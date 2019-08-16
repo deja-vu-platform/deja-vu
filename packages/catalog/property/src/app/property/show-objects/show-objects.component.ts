@@ -62,7 +62,7 @@ OnChanges {
    * (For the default showObject, this will cause any URL properties
    * to display without the protocol and path)
    */
-  @Input() showBaseUrlsOnly: boolean = false;
+  @Input() showBaseUrlsOnly = false;
   /**
    * All objects
    */

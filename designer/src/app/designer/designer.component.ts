@@ -13,9 +13,9 @@ import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
 
 import {
-  ComponentInstance,
   App,
   AppComponentDefinition,
+  ComponentInstance,
   ConceptInstance,
   Row
 } from '../datatypes';

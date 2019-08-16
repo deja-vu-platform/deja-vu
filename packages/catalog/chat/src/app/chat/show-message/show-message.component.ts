@@ -76,7 +76,7 @@ OnInit {
               ${this.showChatId ? 'chatId' : ''}
             `
           }
-        },
+        }
       })
       .subscribe((res: MessageRes) => {
         if (res.data) {

@@ -20,8 +20,7 @@ import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
   templateUrl: './filter-ratings.component.html',
   styleUrls: ['./filter-ratings.component.css']
 })
-export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit
-  {
+export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit {
   /**
    * A list of choices of minimumRatings that the user can filter with
    * Example:

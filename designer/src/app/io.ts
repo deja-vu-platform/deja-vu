@@ -5,7 +5,7 @@
 import { EventEmitter } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { ComponentInstance, AppComponentDefinition } from './datatypes';
+import { AppComponentDefinition, ComponentInstance } from './datatypes';
 import compileDvExpr, { dvToNgName } from './expression.compiler';
 
 /**

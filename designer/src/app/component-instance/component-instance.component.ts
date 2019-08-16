@@ -18,8 +18,8 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 
 import {
-  ComponentInstance,
   AppComponentDefinition,
+  ComponentInstance,
   ConceptComponentDefinition
 } from '../datatypes';
 import { DynamicComponentDirective } from '../dynamic-component.directive';

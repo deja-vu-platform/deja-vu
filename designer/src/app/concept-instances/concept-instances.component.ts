@@ -10,9 +10,9 @@ import {
   DialogData
 } from '../configure-concept/configure-concept.component';
 import {
-  ComponentDefinition,
   App,
   AppComponentDefinition,
+  ComponentDefinition,
   ConceptInstance
 } from '../datatypes';
 

@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import {
-  ComponentStEntry, ComponentSymbolTable, ComponentSymbolTableStEntry, AppOutputStEntry,
+  AppOutputStEntry, ComponentStEntry, ComponentSymbolTable, ComponentSymbolTableStEntry,
   ConceptStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
 } from '../symbolTable';
 

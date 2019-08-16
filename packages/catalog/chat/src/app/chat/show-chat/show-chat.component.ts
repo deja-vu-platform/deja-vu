@@ -28,7 +28,7 @@ export class ShowChatComponent implements AfterViewInit, OnChanges, OnEval,
 OnInit {
   // Provide one of the following: id or chat
   @Input() id: string | undefined;
-  @Input() maxMessageCount: number = 0; // 0 for no limit
+  @Input() maxMessageCount = 0; // 0 for no limit
   @Input() chat: Message[] | undefined;
   @Output() loadedChat = new EventEmitter();
 
@@ -95,7 +95,7 @@ OnInit {
               ${this.showMessageAuthorId ? 'authorId' : ''}
             `
           }
-        },
+        }
       })
       .subscribe((res: ShowChatRes) => {
         if (res.data) {

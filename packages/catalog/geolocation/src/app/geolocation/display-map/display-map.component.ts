@@ -296,6 +296,6 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   private idIsReady(): boolean {
     return this.id !== DEFAULT_MAP_ID ||
-      (this.id === DEFAULT_MAP_ID && this.waitOnId === false);
+      (this.id === DEFAULT_MAP_ID && !this.waitOnId);
   }
 }

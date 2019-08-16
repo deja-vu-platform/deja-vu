@@ -1,9 +1,9 @@
 import {
+  Collection,
   ComponentRequestTable,
   ConceptDb,
   ConceptServer,
   ConceptServerBuilder,
-  Collection,
   Config,
   Context,
   getReturnFields,
@@ -122,7 +122,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
         }))
         .sort({ timestamp: -1 })
         .limit(limit)
-        .toArray()
+        .toArray();
       },
       newChatMessages: async (_root, { input }: { input: NewChatMessagesInput })
       : Promise<MessageDoc[]> =>
@@ -131,7 +131,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
           timestamp: { $gt: input.lastMessageTimestamp }
         }))
         .sort({ timestamp: 1 })
-        .toArray(),
+        .toArray()
     },
 
     Message: {
@@ -139,7 +139,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
       content: (message: MessageDoc) => message.content,
       timestamp: (message: MessageDoc) => dateToUnixTime(message.timestamp),
       authorId: (message: MessageDoc) => message.authorId,
-      chatId: (message: MessageDoc) => message.chatId,
+      chatId: (message: MessageDoc) => message.chatId
     },
 
     Mutation: {
@@ -160,7 +160,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
             }
 
             return newMessage;
-          })
+          });
       },
 
       updateMessage: async (
@@ -200,7 +200,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
           () => pubsub.asyncIterator(NEW_MESSAGE_TOPIC),
           (payload, variables) =>
             variables.chatId === payload.newMessage.chatId
-        ),
+        )
       }
     }
   };

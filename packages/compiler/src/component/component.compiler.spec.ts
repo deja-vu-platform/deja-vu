@@ -1,5 +1,5 @@
 import { SymbolTable } from '../symbolTable';
-import { ComponentCompiler, CompiledComponent } from './component.compiler';
+import { CompiledComponent, ComponentCompiler } from './component.compiler';
 
 
 function expectInputMatch(component: CompiledComponent): string {

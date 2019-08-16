@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 
 import {
-  ComponentDefinition,
   App,
-  AppComponentDefinition
+  AppComponentDefinition,
+  ComponentDefinition
 } from '../datatypes';
 
 

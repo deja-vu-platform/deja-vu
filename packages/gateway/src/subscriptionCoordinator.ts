@@ -1,6 +1,6 @@
 import { ExecutionResult } from 'graphql';
 import {
-  SubscriptionClient, OperationOptions, Observable
+  Observable, OperationOptions, SubscriptionClient
 } from 'subscriptions-transport-ws';
 import * as WebSocket from 'ws';
 

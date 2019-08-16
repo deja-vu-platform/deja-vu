@@ -18,15 +18,15 @@ import { DynamicComponentDirective } from './dynamic-component.directive';
 import { usedConceptsConfig } from './datatypes';
 
 import {
+  AddAppComponentIoComponent
+} from './add-app-component-io/add-app-component-io.component';
+import { AppComponent } from './app.component';
+import {
   ComponentDefinitionComponent
 } from './component-definition/component-definition.component';
 import {
   ComponentInstanceComponent
 } from './component-instance/component-instance.component';
-import {
-  AddAppComponentIoComponent
-} from './add-app-component-io/add-app-component-io.component';
-import { AppComponent } from './app.component';
 import {
   ConceptInstancesComponent
 } from './concept-instances/concept-instances.component';

@@ -1,10 +1,10 @@
 import {
+  Collection,
   ComponentRequestTable,
   ConceptDb,
   ConceptDbDuplicateKeyError,
   ConceptServer,
   ConceptServerBuilder,
-  Collection,
   Config,
   Context,
   EMPTY_CONTEXT,

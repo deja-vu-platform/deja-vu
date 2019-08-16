@@ -5,8 +5,8 @@ import {
   EventEmitter,
   Inject,
   Input,
-  OnInit,
   OnChanges,
+  OnInit,
   Output,
   Type
 } from '@angular/core';
@@ -15,8 +15,8 @@ import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
-import { ShowTargetComponent } from '../show-target/show-target.component';
 import { ShowRankingComponent } from '../show-ranking/show-ranking.component';
+import { ShowTargetComponent } from '../show-target/show-target.component';
 
 import { API_PATH } from '../ranking.config';
 import { Ranking, TargetRank } from '../shared/ranking.model';

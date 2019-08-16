@@ -8,6 +8,7 @@
     "prepare": "npm run package",
     "dv-package-dv": "ng-packagr -p ng-package.json",
     "lint": "tslint -p . -c tslint.json src/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/*.ts",
     "clean": "rm -rf ./dist ./pkg"
   },
   "peerDependencies": {
