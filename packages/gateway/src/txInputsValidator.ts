@@ -64,8 +64,8 @@ export class TxInputsValidator {
   }
 
   public static Validate(
-    inputValues: InputValuesMap, txComponents: ComponentTag[], context: TxContext)
-     : void {
+    inputValues: InputValuesMap, txComponents: ComponentTag[],
+    context: TxContext): void {
     // fqtag -> { i1: expr1, ..., in: exprn }
     const components = {};
     for (const txComponent of txComponents) {

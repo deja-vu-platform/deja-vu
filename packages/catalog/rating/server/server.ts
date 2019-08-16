@@ -135,10 +135,13 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
         };
       },
 
-      findRatingsHigher: async (_root, { input }) => ( !!input.minimumRating && input.minimumRating > 0 ?
-          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() ),
+      findRatingsHigher: async (_root, { input }) =>
+        !!input.minimumRating && input.minimumRating > 0 ?
+          ratings.find({ rating: { $gte: input.minimumRating} }) :
+          ratings.find(),
 
-      targetsRatedHigherThan: async (_root, { input }) => (!!input && !!input.minimumAvgRating ?
+      targetsRatedHigherThan: async (_root, { input }) =>
+        (!!input && !!input.minimumAvgRating ?
           ratings.aggregate([
             {
               $group: {

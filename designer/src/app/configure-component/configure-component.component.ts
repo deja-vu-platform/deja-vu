@@ -99,7 +99,8 @@ export class ConfigureComponentComponent implements OnInit {
       component.name = this.name;
     } else {
       component = new AppComponentDefinition(this.name);
-      const insertIdx = _.sortedIndexBy(this.data.app.components, component, 'name');
+      const insertIdx = _
+        .sortedIndexBy(this.data.app.components, component, 'name');
       this.data.app.components.splice(insertIdx, 0, component);
     }
 

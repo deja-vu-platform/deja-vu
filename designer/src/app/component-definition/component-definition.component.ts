@@ -226,7 +226,8 @@ implements AfterViewInit, OnChanges, OnInit {
       .flat();
     const uniqueResolutions = _.uniqBy(
       resolutions,
-      (r) => JSON.stringify([r.ioName, r.component.id, r.forIO, r.forComponentID])
+      (r) => JSON.stringify([
+        r.ioName, r.component.id, r.forIO, r.forComponentID])
     );
     this.ioReferencesCache[by.id] = uniqueResolutions;
 
@@ -299,7 +300,8 @@ implements AfterViewInit, OnChanges, OnInit {
    * Allocate colors to referenced parent inputs / sibling outputs
    */
   private updateReferences() {
-    const { inReferences, outReferences} = findReferences(this.componentInstance);
+    const { inReferences, outReferences} =
+      findReferences(this.componentInstance);
     this.inReferences = inReferences;
     this.outReferences = outReferences;
     this.ioReferencedCache = {};
@@ -353,8 +355,8 @@ implements AfterViewInit, OnChanges, OnInit {
       row.components.forEach((component, componentNum) => {
         const index = rowComponents + componentNum;
         const componentContainer = instanceContainersArr[index];
-        const firstChild = componentContainer
-          && componentContainer.nativeElement.firstElementChild.firstElementChild;
+        const firstChild = componentContainer && componentContainer
+          .nativeElement.firstElementChild.firstElementChild;
         const showNoContentHint = (
           firstChild
           && (
@@ -371,7 +373,8 @@ implements AfterViewInit, OnChanges, OnInit {
   private calcShowHiddenHint(instanceContainersArr: ElementRef[]) {
     this.rows.forEach((row) => {
       row.components.forEach((component: ComponentInstance, componentNum) => {
-        component['showHiddenHint'] = (component.inputSettings['hidden'] === 'true');
+        component['showHiddenHint'] = (
+          component.inputSettings['hidden'] === 'true');
       });
     });
   }

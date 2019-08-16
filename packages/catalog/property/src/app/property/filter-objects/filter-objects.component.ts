@@ -8,7 +8,9 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getFilteredPropertyNames, getProperties, getPropertyNames } from '../shared/property.model';
+import {
+  getFilteredPropertyNames, getProperties, getPropertyNames
+} from '../shared/property.model';
 
 import { Options } from 'ng5-slider';
 import { API_PATH } from '../property.config';

@@ -275,7 +275,8 @@ export abstract class RequestProcessor {
 
       const componentPath = gatewayToConceptRequests[0].from;
       const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
-      const cohortComponents = this.getCohortComponents(componentPath, dvTxNodeIndex);
+      const cohortComponents = this.getCohortComponents(
+        componentPath, dvTxNodeIndex);
       prunedCohortComponents = this.getPrunedCohortComponents(cohortComponents,
         childRequests.map((childRequest) =>
           ComponentPath.fromString(childRequest.query.from)
@@ -302,7 +303,8 @@ export abstract class RequestProcessor {
       console.log(
         `Checking with context ${JSON.stringify(context)}` +
         `Input values map ${JSON.stringify(inputValuesMap)}`);
-      TxInputsValidator.Validate(inputValuesMap, prunedCohortComponents, context);
+      TxInputsValidator.Validate(
+        inputValuesMap, prunedCohortComponents, context);
     } catch (e) {
       if (e instanceof RequestInvalidError) {
         resBatch.fail(INTERNAL_SERVER_ERROR, e.message);
@@ -341,9 +343,11 @@ export abstract class RequestProcessor {
       const componentPath = gatewayToConceptRequest.from;
 
       if (componentPath.isDvTx()) {
-        const dvTxNodeIndex: number | null  = componentPath.indexOfClosestTxNode();
+        const dvTxNodeIndex: number | null  = componentPath
+          .indexOfClosestTxNode();
         console.log('Validating request of no-op tx');
-        const cohortComponents = this.getCohortComponents(componentPath, dvTxNodeIndex);
+        const cohortComponents = this
+          .getCohortComponents(componentPath, dvTxNodeIndex);
         // throws error if invalid
         this.getPrunedCohortComponents(cohortComponents,
           [componentPath.last()]);
@@ -404,7 +408,8 @@ export abstract class RequestProcessor {
 
   protected getCohorts(
     componentPathId: string, cohortComponents: ComponentTag[]): string[] {
-    const componentPath: ComponentPath = ComponentPath.fromString(componentPathId);
+    const componentPath: ComponentPath = ComponentPath
+      .fromString(componentPathId);
     assert.ok(componentPath.isDvTx(),
       `Getting cohorts of an component path that is not part of a ` +
       `dv-tx: ${componentPath}`);
@@ -540,9 +545,10 @@ export class AppRequestProcessor extends RequestProcessor {
       (usedConceptConfig, alias) => _.get(usedConceptConfig, 'name', alias)
     );
 
-    const routeComponentSelectors = _.uniq(_.map(dvConfig.routes, ({component}) =>
-      `${dvConfig.name}-${component}`
-    ));
+    const routeComponentSelectors = _
+      .uniq(_.map(dvConfig.routes, ({component}) =>
+        `${dvConfig.name}-${component}`
+      ));
     this.componentHelper = new ComponentHelper(
       usedConcepts, appComponentTable, routeComponentSelectors);
   }
@@ -551,7 +557,8 @@ export class AppRequestProcessor extends RequestProcessor {
     return this.componentHelper.getMatchingComponents(componentPath)[0];
   }
 
-  protected getCohortComponents(componentPath: ComponentPath, dvTxNodeIndex: number) {
+  protected getCohortComponents(
+    componentPath: ComponentPath, dvTxNodeIndex: number) {
     const paths: ComponentTagPath[] = this.componentHelper
       .getMatchingPaths(componentPath);
     // We know that the component path is a valid one because if otherwise the
@@ -615,8 +622,8 @@ export class AppRequestProcessor extends RequestProcessor {
     }
 
     if (prunedCohortComponents.length < receivedRequestFqTags.length) {
-      throw new RequestInvalidError('Received requests include components that ' +
-        'that are not part of the cohort');
+      throw new RequestInvalidError(
+        'Received requests include components that are not part of the cohort');
     }
 
     return prunedCohortComponents;
@@ -656,7 +663,8 @@ export class DesignerRequestProcessor extends RequestProcessor {
     // but this is designer only where problematic fast requesting is unlikely
     this.cohortComponents = childRequests.map((chReq) => {
       const componentPath = ComponentPath.fromString(chReq.query.from);
-      const fqtag = componentPath.nodes()[componentPath.indexOfClosestTxNode() + 1];
+      const fqtag = componentPath.nodes()[
+        componentPath.indexOfClosestTxNode() + 1];
 
       return {
         fqtag,

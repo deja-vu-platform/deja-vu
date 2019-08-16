@@ -2,8 +2,8 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, ConfigServiceFactory, GatewayService, GatewayServiceFactory, OnEval,
-  RunService
+  ComponentValue, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
+  OnEval, RunService
 } from '@deja-vu/core';
 
 import { Transfer } from '../shared/transfer.model';

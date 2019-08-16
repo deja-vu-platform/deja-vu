@@ -25,7 +25,9 @@ export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
   @Input() targetId: string;
 
-  @Input() showRating: ComponentValue = { type: <Type<Component>>ShowRatingComponent };
+  @Input() showRating: ComponentValue = {
+    type: <Type<Component>>ShowRatingComponent
+  };
 
   @Input() noRatingsToShowText = 'No ratings to show';
   ratings: Rating[] = [];

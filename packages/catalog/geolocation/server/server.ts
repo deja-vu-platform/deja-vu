@@ -122,18 +122,19 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
   };
 }
 
-const geolocationConcept: ConceptServer = new ConceptServerBuilder('geolocation')
-  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
-    const markers: Collection<MarkerDoc> = db.collection('markers');
+const geolocationConcept: ConceptServer =
+  new ConceptServerBuilder('geolocation')
+    .initDb((db: ConceptDb, _config: Config): Promise<any> => {
+      const markers: Collection<MarkerDoc> = db.collection('markers');
 
-    return Promise.all([
-      markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
-        { unique: true, sparse: true })
-    ]);
-  })
-  .componentRequestTable(componentRequestTable)
-  .resolvers(resolvers)
-  .build();
+      return Promise.all([
+        markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
+        markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
+          { unique: true, sparse: true })
+      ]);
+    })
+    .componentRequestTable(componentRequestTable)
+    .resolvers(resolvers)
+    .build();
 
 geolocationConcept.start();

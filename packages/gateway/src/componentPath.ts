@@ -6,10 +6,11 @@ const INDENT_NUM_SPACES = 2;
 
 
 /**
- * A path of components (represented by their fqtags). The first node is the root.
+ * A path of components (represented by their fqtags). The first node is the
+ * root.
  *
- * An component path is a DOM path that includes only components (it filters HTML
- * elements like `div`)
+ * A component path is a DOM path that includes only components (it filters
+ * HTML elements like `div`)
  */
 export class ComponentPath {
   private readonly path: ReadonlyArray<string>;
@@ -19,7 +20,8 @@ export class ComponentPath {
   }
 
   /**
-   * @param nodes a list of nodes starting from the component originating the req
+   * @param nodes a list of nodes starting from the component originating the
+   *              req
    */
   constructor(nodes: ReadonlyArray<string>) {
     if (nodes.length < 1) {
@@ -60,8 +62,8 @@ export class ComponentPath {
   }
 
   /**
-   * @returns a string representing this component path. To construct a new component
-   *          object from the string call `fromString`
+   * @returns a string representing this component path. To construct a new
+   * component object from the string call `fromString`
    */
   serialize(): string {
     return JSON.stringify(this.path);

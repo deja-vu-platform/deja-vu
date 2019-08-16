@@ -2,9 +2,9 @@ import { copySync, existsSync } from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
 import {
-  COMPONENT_TABLE_FILE_NAME,
-  componentTable,
   cmd,
+  componentTable,
+  COMPONENT_TABLE_FILE_NAME,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
   readFileOrFail,

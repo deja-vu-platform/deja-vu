@@ -16,7 +16,9 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../property.config';
-import { UpdateObjectComponent } from '../update-object/update-object.component';
+import {
+  UpdateObjectComponent
+} from '../update-object/update-object.component';
 
 /**
  * Updates an array of objects at once
@@ -88,6 +90,7 @@ export class UpdateObjectsComponent
     if (_.isEmpty(this.objectsToUpdate)
       && (_.isEmpty(this.updateObjectsList))) {
       this.gs.noRequest();
+
       return;
     }
 

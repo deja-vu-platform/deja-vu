@@ -67,7 +67,8 @@ export function startGateway(
     .assign({}, DEFAULT_CONFIG, gatewayConfigOptions || {});
   const app = express();
   const requestProcessor: RequestProcessor = info
-    ? new AppRequestProcessor(gatewayConfig, info.dvConfig, info.appComponentTable)
+    ? new AppRequestProcessor(
+        gatewayConfig, info.dvConfig, info.appComponentTable)
     : new DesignerRequestProcessor(gatewayConfig);
 
   // Handle API requests

@@ -13,7 +13,8 @@ class Morg {
     const srcDir = path.join(projectDir, 'src');
     mkdirSync(srcDir);
     for (const component of Morg.Components()) {
-      writeFileSync(path.join(srcDir, `${component.name}.html`), component.contents);
+      writeFileSync(
+        path.join(srcDir, `${component.name}.html`), component.contents);
     }
   }
 

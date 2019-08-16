@@ -226,7 +226,8 @@ export const flexAlign = {
 };
 
 /**
- * Components in AppComponentDefinitions are grouped into rows for stylistic reasons
+ * Components in AppComponentDefinitions are grouped into rows for stylistic
+ * reasons
  */
 export class Row {
   readonly components: ComponentInstance[] = [];
@@ -265,7 +266,8 @@ export class ComponentInstance {
   readonly of: ComponentDefinition;
   readonly from: ComponentCollection;
   // type is ComponentInstance iff inputName in of.componentInputs
-  readonly inputSettings: { [inputName: string]: string | ComponentInstance } = {};
+  readonly inputSettings: { [inputName: string]: string | ComponentInstance } =
+    {};
   // TODO: export styles
   data?: any; // currently only used for the text widget
   readonly styles = { stretch: false };
@@ -297,7 +299,8 @@ export class ComponentInstance {
     );
   }
 
-  isOrContains(componentDefinition: ComponentDefinition, deep: boolean): boolean {
+  isOrContains(componentDefinition: ComponentDefinition, deep: boolean)
+    : boolean {
     return (
       // is
       this.of === componentDefinition
@@ -306,10 +309,12 @@ export class ComponentInstance {
         this.of instanceof AppComponentDefinition
         && this.of.contains(componentDefinition, deep)
       )
-      // contains (component input, concept component only but no need to check this)
+      // contains (component input, concept component only but no need to check
+      // this)
       || _.some(
           _.pickBy(this.inputSettings, (_v, k) => k in this.of.componentInputs),
-          (a: ComponentInstance) => a && a.isOrContains(componentDefinition, deep)
+          (a: ComponentInstance) =>
+            a && a.isOrContains(componentDefinition, deep)
         )
     );
   }
@@ -624,7 +629,8 @@ export class App {
     return (
       dvdAppStyles
       + '\n'
-      + this.components.reduce((css, component) => css + '\n\n' + component.toCSS(), '')
+      + this.components
+        .reduce((css, component) => css + '\n\n' + component.toCSS(), '')
     );
   }
 
@@ -645,15 +651,19 @@ export class App {
   }
 
   /**
-   * @param ofName name of component declared in app, imported concept, or DV concept
+   * @param ofName name of component declared in app, imported concept, or DV
+   *        concept
    * @param fromName name of concept instance, or app, or the DV concept
    * @return a new component instance or undefined if the names do not resolve
    */
-  newComponentInstanceByName(ofName: string, fromName: string): ComponentInstance {
-    const fromSource = this.componentCollections.find((c) => c.name === fromName);
+  newComponentInstanceByName(
+    ofName: string, fromName: string): ComponentInstance {
+    const fromSource = this.componentCollections
+      .find((c) => c.name === fromName);
 
-    const ofComponent = fromSource
-      ? (<ComponentDefinition[]>fromSource.components).find((a) => a.name === ofName)
+    const ofComponent = fromSource ?
+      (<ComponentDefinition[]> fromSource.components)
+        .find((a) => a.name === ofName)
       : undefined;
 
     return ofComponent

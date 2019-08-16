@@ -55,7 +55,8 @@ export class ChooseObjectComponent implements
    */
   @Input() showBaseUrlsOnly = false;
   /**
-   * Whether or not the component should execute upon the user selecting an object
+   * Whether or not the component should execute upon the user selecting an
+   * object
    */
   @Input() execOnSelection = true;
   /**

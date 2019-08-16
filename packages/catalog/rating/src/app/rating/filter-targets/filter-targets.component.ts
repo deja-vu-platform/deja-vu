@@ -9,7 +9,9 @@ import {
 
 import * as _ from 'lodash';
 import { API_PATH } from '../rating.config';
-import { AverageRatingForInputRes, DEFAULT_RATING_FILTER } from '../shared/rating.model';
+import {
+  AverageRatingForInputRes, DEFAULT_RATING_FILTER
+} from '../shared/rating.model';
 
 /**
  * Filter rating targets so that only targets with average rating

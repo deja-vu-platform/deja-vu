@@ -15,7 +15,8 @@ function expectInputMatch(component: CompiledComponent): string {
   return inputField;
 }
 
-function expectOutputMatch(output: string, component: CompiledComponent): string {
+function expectOutputMatch(
+  output: string, component: CompiledComponent): string {
   expect(component.ngTemplate)
     .toMatch(`\\(${output}\\)="\\S+\\s*=\\s*\\$event"`);
   const outputField = component.ngTemplate
@@ -437,8 +438,8 @@ describe('ComponentCompiler', () => {
       .toMatch(outputField);
   });
 
-  it('should compile component accessing member of output of aliased component ' +
-    'with elvis', () => {
+  it('should compile component accessing member of output of aliased ' +
+    'component with elvis', () => {
     const st: SymbolTable = {
       property: {
         kind: 'concept'
@@ -994,7 +995,8 @@ describe('ComponentCompiler', () => {
     <dv.component name="home">
       <event.choose-and-show-series
         showEvent=
-          <dv.component meeting$=${appName}.show-group-meeting.shownGroupMeeting>
+          <dv.component
+            meeting$=${appName}.show-group-meeting.shownGroupMeeting>
             <${appName}.show-group-meeting
               groupMeeting=$event
               groupMeetings=$events />

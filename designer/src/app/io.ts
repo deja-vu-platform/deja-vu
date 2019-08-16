@@ -16,7 +16,8 @@ export function fullyQualifyName(
   ioName: string,
   componentInstance: ComponentInstance
   ): string {
-    return `${componentInstance.from.name}.${componentInstance.of.name}.${ioName}`;
+    return (
+      `${componentInstance.from.name}.${componentInstance.of.name}.${ioName}`);
 }
 
 export class ScopeIO {

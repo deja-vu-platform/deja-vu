@@ -4,7 +4,9 @@
  */
 
 import * as _ from 'lodash';
-import { AppComponentDefinition, ComponentInstance, InInput } from './datatypes';
+import {
+  AppComponentDefinition, ComponentInstance, InInput
+} from './datatypes';
 import compileDvExpr from './expression.compiler';
 
 export interface Reference {
@@ -31,7 +33,8 @@ export function resolveName(
   if (!(appComponentInstance.of instanceof AppComponentDefinition)) {
     throw new Error('Component is not an app component.');
   }
-  const appComponentDefinition: AppComponentDefinition = appComponentInstance.of;
+  const appComponentDefinition: AppComponentDefinition =
+    appComponentInstance.of;
 
   // parse the name
   let ioName: string;
@@ -63,39 +66,46 @@ export function resolveName(
   };
 }
 
-export default function findReferences(appComponentInstance: ComponentInstance) {
+export default function findReferences(
+  appComponentInstance: ComponentInstance) {
   if (!(appComponentInstance.of instanceof AppComponentDefinition)) {
     throw new Error('Component is not an app component.');
   }
-  const appComponentDefinition: AppComponentDefinition = appComponentInstance.of;
+  const appComponentDefinition: AppComponentDefinition =
+    appComponentInstance.of;
 
   const inReferences: InReferences = {};
   const outReferences: OutReferences = {};
   appComponentDefinition
     .getChildren(true)
     .forEach((component: ComponentInstance) => {
-      component.walkInputs(true, (inputName, inputValue, ofComponent, inInput) => {
-        if (!_.isString(inputValue)) { return; }
+      component.walkInputs(true,
+        (inputName, inputValue, ofComponent, inInput) => {
+          if (!_.isString(inputValue)) {
+            return;
+          }
           let compiledDvExpr;
           try {
             compiledDvExpr = compileDvExpr(inputValue);
           } catch (e) {
             console.error(
               `Coulnd't find references for expression "${inputValue}",` +
-              `used in component "${component.of.name}" for input "${inputName}"`);
+              `used in component "${component.of.name}" for input ` +
+              `"${inputName}"`);
             console.error(e);
 
             return;
           }
-        const { names } = compiledDvExpr;
-        names.forEach((name) => {
-          const { fromComponent, ioName } = resolveName(
-            name,
-            appComponentInstance,
-            inInput
+          const { names } = compiledDvExpr;
+          names.forEach((name) => {
+            const { fromComponent, ioName } = resolveName(
+              name,
+              appComponentInstance,
+              inInput
           );
           if (fromComponent) {
-            let ioInReferences = (inReferences[ofComponent.id] || {})[inputName];
+            let ioInReferences = (
+              inReferences[ofComponent.id] || {})[inputName];
             if (!ioInReferences) {
               ioInReferences = [];
               _.set(inReferences, [ofComponent.id, inputName], ioInReferences);

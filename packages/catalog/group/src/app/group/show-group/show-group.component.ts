@@ -1,7 +1,11 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output, Type} from '@angular/core';
+import {
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
+} from '@angular/core';
 
-import { ComponentValue, GatewayService,
-  GatewayServiceFactory, OnEval, RunService } from '@deja-vu/core';
+import {
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from '@deja-vu/core';
 
 import { Group } from '../shared/group.model';
 import { ShowMemberComponent } from '../show-member/show-member.component';

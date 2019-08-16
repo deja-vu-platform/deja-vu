@@ -13,8 +13,8 @@ describe('ComponentInputCompiler', () => {
 
   it('should compile component input with HTML only', () => {
     const componentInput = `<h1>Hello</h1>`;
-    const compiledComponentInput: CompiledComponentInput = componentInputCompiler
-      .compile(componentInput, {});
+    const compiledComponentInput: CompiledComponentInput =
+      componentInputCompiler.compile(componentInput, {});
     expect(compiledComponentInput.component)
       .toMatch('Hello');
     expect(compiledComponentInput.component)
@@ -23,8 +23,8 @@ describe('ComponentInputCompiler', () => {
 
   it('should compile wrapped component input with HTML only', () => {
     const componentInput = `<dv.component><h1>Hello</h1></dv.component>`;
-    const compiledComponentInput: CompiledComponentInput = componentInputCompiler
-      .compile(componentInput, {});
+    const compiledComponentInput: CompiledComponentInput =
+      componentInputCompiler.compile(componentInput, {});
     expect(compiledComponentInput.component)
       .toMatch('Hello');
     expect(compiledComponentInput.component)
@@ -43,8 +43,8 @@ describe('ComponentInputCompiler', () => {
         }
       }
     };
-    const compiledComponentInput: CompiledComponentInput = componentInputCompiler
-      .compile(componentInput, context);
+    const compiledComponentInput: CompiledComponentInput =
+      componentInputCompiler.compile(componentInput, context);
     expect(compiledComponentInput.component)
       .toMatch('event.show-event');
     expect(compiledComponentInput.component)
@@ -59,8 +59,8 @@ describe('ComponentInputCompiler', () => {
       .toThrow();
   });
 
-  it('should compile component with the output of an component as the input of ' +
-    'the innermost of two nested inputs', () => {
+  it('should compile component with the output of an component as the input ' +
+    'of the innermost of two nested inputs', () => {
       const componentInput = `
         <authentication.logged-in />
         <event.choose-and-show-series
@@ -72,8 +72,8 @@ describe('ComponentInputCompiler', () => {
           chooseSeriesSelectPlaceholder="Choose Meeting Series" />
       `;
 
-      const compiledComponentInput: CompiledComponentInput = componentInputCompiler
-        .compile(componentInput, {});
+      const compiledComponentInput: CompiledComponentInput =
+        componentInputCompiler.compile(componentInput, {});
       expect(compiledComponentInput.component)
         .toMatch(/authentication\.logged\-in\.user\?\.id/);
     });

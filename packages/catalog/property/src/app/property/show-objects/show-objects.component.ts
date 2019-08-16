@@ -12,7 +12,9 @@ import {
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
-import { getFilteredPropertyNames, getPropertiesFromConfig } from '../shared/property.model';
+import {
+  getFilteredPropertyNames, getPropertiesFromConfig
+} from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
 

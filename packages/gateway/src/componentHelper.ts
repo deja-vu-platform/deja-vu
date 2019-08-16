@@ -27,9 +27,9 @@ export interface ComponentTag {
 export type ComponentTagPath = ComponentTag[];
 
 /**
- * The component table is indexed by tag. If in the content of two components we have
- * a component of the same tag (but different `of`, or different `alias`) there
- * would still be only one entry for that component in the table.
+ * The component table is indexed by tag. If in the content of two components we
+ * have a component of the same tag (but different `of`, or different `alias`)
+ * there would still be only one entry for that component in the table.
  */
 export interface ComponentTable {
   // note: this is the real component tag, not the fqtag
@@ -86,8 +86,9 @@ export class ComponentHelper {
     const errMsg = (invalidExpr) =>
       `Expected component object or a variable but found ${invalidExpr}.` +
       `(For an object to be an component object it must have a 'tag' field)`;
-    // `componentExpr` could technically be any JavaScript expression, but anything
-    // other than a component input object or a variable name will be an error
+    // `componentExpr` could technically be any JavaScript expression, but
+    // anything other than a component input object or a variable name will be
+    // an error
     let componentExpr: any;
     try {
       componentExpr = RJSON.parse(expr);
@@ -144,23 +145,26 @@ export class ComponentHelper {
   /**
    *  Determine the included component tag from a `dv-include` component tag.
    *
-   *  The `component` input of `dv-include` expects an `ComponentInput` value. The
-   *  component author could have specified the component input value in two ways:
-   *    - by using an object literal in the HTML (<dv-include [component]="{...}">)
-   *    - by using a variable and a "default" hint (<dv-include [component]="foo"
-   *      default-foo="{...}"). Using a "variable + default hint" allows the
-   *      component author to use an input as the component value, but specify a
-   *      default one to be used if no component input is given. The default hint
-   *      is given with the `default-variableName` attribute. The value of this
-   *      attribute should be a `ComponentInput` object. Also, if there's no
-   *      default component, the author can use the `no-default-variableName`
-   *      attribute.
+   *  The `component` input of `dv-include` expects an `ComponentInput` value.
+   *  The  component author could have specified the component input value in
+   *  two ways:
+   *    - by using an object literal in the HTML
+   *      (<dv-include [component]="{...}">)
+   *    - by using a variable and a "default" hint
+   *      (<dv-include [component]="foo" default-foo="{...}").
+   *      Using a "variable + default hint" allows the component author to use
+   *      an input as the component value, but specify a default one to be used
+   *      if no component input is given. The default hint is given with the
+   *      `default-variableName` attribute. The value of this attribute should
+   *      be a `ComponentInput` object. Also, if there's no default component,
+   *      the author can use the `no-default-variableName` attribute.
    *
    *      (We need a hint because we only parse the HTML files so it's
-   *      impossible for us to tell what the default component input is when that
-   *      information is specified in the TypeScript file.)
+   *      impossible for us to tell what the default component input is when
+   *      that information is specified in the TypeScript file.)
    *
-   *  @param includeComponentTag - the component tag to get the included component from
+   *  @param includeComponentTag - the component tag to get the included
+   *                               component from
    *  @returns the included component tag or `null` if there is no included tag.
    *    It is `null` if there is no default component and the user hasn't
    *    provided one as input
@@ -168,7 +172,8 @@ export class ComponentHelper {
   private static GetIncludedComponentTag(includeComponentTag: ComponentTag)
     : ComponentTag | null {
     const noComponentErrorMsg = (cause: string) => `
-      Couldn't find the included component in ${JSON.stringify(includeComponentTag)}:
+      Couldn't find the included component in
+      ${JSON.stringify(includeComponentTag)}:
       ${cause} \n Context is ${JSON.stringify(includeComponentTag.context)}
     `;
 
@@ -180,7 +185,8 @@ export class ComponentHelper {
 
     let componentInput: ComponentInput | null;
     try {
-      const componentExpr = this.ParseComponentExpr(unparsedComponentExpr as string);
+      const componentExpr = this
+        .ParseComponentExpr(unparsedComponentExpr as string);
       if (this.IsComponentInput(componentExpr)) {
         componentInput = componentExpr;
       } else {
@@ -208,9 +214,10 @@ export class ComponentHelper {
 
     const fqtag = ComponentHelper.GetFqTag(
       componentInput.tag, componentInput.dvOf, componentInput.dvAlias);
-    const componentInputs: InputMap = <InputMap> _.get(componentInput, 'inputs', {});
+    const componentInputs: InputMap = <InputMap> _
+      .get(componentInput, 'inputs', {});
     const inputs = _.assign({},
-      // `componentInput.inputMap` could actually be `undefined` but the `invert`
+      // `componentInput.inputMap` could actually be `undefined` but `invert`
       // typings are wrong (`_.invert(undefined)` -> `undefined`)
       _.mapValues(_.invert(<InputMap> componentInput.inputMap), (value) => {
         return _.get(includeComponentTag.context, value);
@@ -238,8 +245,8 @@ export class ComponentHelper {
   }
 
   /**
-   * @return the set of components from the given concept that are not expected to
-   * issue a request
+   * @return the set of components from the given concept that are not expected
+   * to issue a request
    */
   private static GetComponentsNoRequest(concept: string)
     : { exec: string[] } | undefined {
@@ -250,8 +257,8 @@ export class ComponentHelper {
   }
 
   /**
-   * @return the set of components from the given concept that only optionally issue
-   * requests
+   * @return the set of components from the given concept that only optionally
+   * issue requests
    */
   private static GetComponentsRequestOptional(concept: string)
     : string[] | undefined {
@@ -276,7 +283,8 @@ export class ComponentHelper {
   }
 
   private static GetDvOfForChild(
-    componentTag: ComponentTag, childComponentTag: ComponentTag): string | undefined {
+    componentTag: ComponentTag,
+    childComponentTag: ComponentTag): string | undefined {
     if (
       !_.isEmpty(componentTag.dvOf) && _.isEmpty(childComponentTag.dvOf) &&
       ComponentHelper.ConceptOfTag(componentTag.tag) ===
@@ -310,8 +318,8 @@ export class ComponentHelper {
      return;
     }
     if (!_.has(componentTable, component.tag)) {
-      const errMsg = `Component ${component.tag} doesn't exist in component table ` +
-        `with keys ${JSON.stringify(
+      const errMsg = `Component ${component.tag} doesn't exist in component ` +
+        `table with keys ${JSON.stringify(
           _.keys(componentTable), null, INDENT_NUM_SPACES)}`;
       throw new Error(errMsg);
     }
@@ -407,7 +415,8 @@ export class ComponentHelper {
       throw e;
     }
 
-    this.componentTable = _.pick(this.componentTable, Array.from(usedComponents));
+    this.componentTable = _.pick(
+      this.componentTable, Array.from(usedComponents));
   }
 
   /**
@@ -432,7 +441,8 @@ export class ComponentHelper {
       throw new Error(`No component ${componentPath} found`);
     }
     if (ret.length > 1) {
-      throw new Error(`Found more than one matching component for ${componentPath}`);
+      throw new Error(
+      `Found more than one matching component for ${componentPath}`);
     }
 
     return ret[0];
@@ -446,7 +456,8 @@ export class ComponentHelper {
   }
 
   /**
-   * @returns the `ComponentTag`s corresponding to the last node of the component path
+   * @returns the `ComponentTag`s corresponding to the last node of the
+   * component path
    */
   getMatchingComponents(componentPath: ComponentPath): ComponentTag[] {
     return <ComponentTag[]> _.map(this.getMatchingPaths(componentPath), _.last);
@@ -457,8 +468,9 @@ export class ComponentHelper {
    */
   getMatchingPaths(componentPath: ComponentPath): ComponentTagPath[] {
     // We assume here that the first tag in the component path is a simple tag
-    // so that fqtag = tag (i.e., the root component is not aliased and it is not
-    // from some concept for which there's more than one instance of in the app)
+    // so that fqtag = tag (i.e., the root component is not aliased and it is
+    // not from some concept for which there's more than one instance of in the
+    // app)
     if (this.noApp) {
       return [_.map(componentPath.nodes(), (fqtag: string) => ({
         fqtag,
@@ -526,7 +538,8 @@ export class ComponentHelper {
         ret = [];
       } else {
         // TODO: what will happen if we don't have this check?
-        ComponentHelper.ComponentExistsOrFail(includedComponentTag, this.componentTable);
+        ComponentHelper.ComponentExistsOrFail(
+          includedComponentTag, this.componentTable);
         const childDvOf = ComponentHelper
           .GetDvOfForChild(componentTag, includedComponentTag);
 
@@ -542,9 +555,10 @@ export class ComponentHelper {
     } else {
       /**
        * By default, the context of the children of this component will be this
-       * component's inputs. But if we are passing along a component and there's a
-       * value for that in the context, we need to detect that and replace the
-       * value with the component input. (If otherwise, we'd loose the information)
+       * component's inputs. But if we are passing along a component and there's
+       * a value for that in the context, we need to detect that and replace the
+       * value with the component input. (If otherwise, we'd loose the
+       * information)
        */
       const childContext: InputMap | undefined = componentTag.inputs;
       _.each(componentTag.inputs, (inputValue: string, inputName: string) => {
@@ -558,7 +572,8 @@ export class ComponentHelper {
             const componentExpr = ComponentHelper.ParseComponentExpr(
               componentTag.context![inputValue]);
             childContext![inputName] = JSON.stringify(
-              ComponentHelper.GetComponentInput(componentExpr, componentTag.context));
+              ComponentHelper.GetComponentInput(
+                componentExpr, componentTag.context));
           } catch (e) {
             // Do nothing. If the attempt to parse and obtain an component input
             // failed it means that it was not an component expr.
@@ -583,7 +598,8 @@ export class ComponentHelper {
     // ```
     const contentTags: string[] = _.map(ret, 'tag');
     if (_.includes(contentTags, 'router-outlet')) {
-      // user could have multiple routes to the same component so we need to dedup
+      // user could have multiple routes to the same component so we need to
+      // dedup
       const routeComponents: ComponentTag[] = _.uniqBy(
         this.getRouteComponents(this.componentTable), 'fqtag');
       ret = <ComponentTag[]> _.concat(<ComponentTag[]> ret, routeComponents);

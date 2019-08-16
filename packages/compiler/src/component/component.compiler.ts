@@ -3,8 +3,9 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import {
-  AppOutputStEntry, ComponentStEntry, ComponentSymbolTable, ComponentSymbolTableStEntry,
-  ConceptStEntry, EntryKind, InputStEntry, OutputStEntry, SymbolTable
+  AppOutputStEntry, ComponentStEntry, ComponentSymbolTable,
+  ComponentSymbolTableStEntry, ConceptStEntry, EntryKind, InputStEntry,
+  OutputStEntry, SymbolTable
 } from '../symbolTable';
 
 import * as _ from 'lodash';
@@ -15,7 +16,9 @@ import {
 import { getComponentName } from './operations/get-component-name.operation';
 import { saveInputs } from './operations/save-inputs.operation';
 import { saveOutputs } from './operations/save-outputs.operation';
-import { saveUsedComponents } from './operations/save-used-components.operation';
+import {
+  saveUsedComponents
+} from './operations/save-used-components.operation';
 import { saveUsedOutputs } from './operations/save-used-outputs.operation';
 import { classNameToNgField } from './operations/shared';
 import { toNgTemplate } from './operations/to-ng-template.operation';
@@ -96,8 +99,10 @@ export class ComponentCompiler {
     const semantics = this.grammar.createSemantics();
     semantics
       .addOperation('getComponentName', getComponentName())
-      .addOperation('saveUsedComponents', saveUsedComponents(thisComponentSymbolTable))
-      .addOperation('saveUsedOutputs', saveUsedOutputs(thisComponentSymbolTable))
+      .addOperation(
+        'saveUsedComponents', saveUsedComponents(thisComponentSymbolTable))
+      .addOperation(
+        'saveUsedOutputs', saveUsedOutputs(thisComponentSymbolTable))
       .addOperation('saveInputs', saveInputs(thisComponentSymbolTable))
       .addOperation('saveOutputs', saveOutputs(thisComponentSymbolTable))
       .addOperation(
@@ -134,7 +139,8 @@ export class ComponentCompiler {
           .FilterKind('component', conceptEntry.symbolTable))
       .flatten()
       // Include aliased components
-      .concat(ComponentCompiler.FilterKind('component', thisComponentSymbolTable))
+      .concat(ComponentCompiler
+        .FilterKind('component', thisComponentSymbolTable))
       .map((conceptEntry: ComponentStEntry): string[] =>
         ComponentCompiler.GetNgFields('output', conceptEntry.symbolTable))
       .flatten()
@@ -156,7 +162,8 @@ export class ComponentCompiler {
     const isPage = _.includes(pages, thisComponentName);
     const ngComponent = ngComponentBuilder
       .withStyle(style)
-      .addInputs(ComponentCompiler.GetNgFields('input', thisComponentSymbolTable))
+      .addInputs(ComponentCompiler
+        .GetNgFields('input', thisComponentSymbolTable))
       .addOutputs(appOutputFields)
       .addFields(fields)
       .addFields(componentInputFields)

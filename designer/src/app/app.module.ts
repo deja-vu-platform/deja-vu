@@ -38,7 +38,9 @@ import {
 } from './configure-concept/configure-concept.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
-import { InsertComponentComponent } from './insert-component/insert-component.component';
+import {
+  InsertComponentComponent
+} from './insert-component/insert-component.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';

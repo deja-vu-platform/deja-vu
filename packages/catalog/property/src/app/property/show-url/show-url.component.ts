@@ -70,6 +70,7 @@ export class ShowUrlComponent {
   getBaseUrl(url: string): string {
     const baseUrlGroupIndex = 1;
     const groups = url.match(URL_REGEX);
+
     return (groups && groups.length > baseUrlGroupIndex) ?
       groups[baseUrlGroupIndex] : '';
   }

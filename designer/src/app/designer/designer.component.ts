@@ -93,7 +93,8 @@ export class DesignerComponent implements OnInit, OnDestroy {
         if (name === '') {
           this.openComponent = this.app.homepage;
         } else {
-          const openComponent = this.app.components.find((a) => a.name === name);
+          const openComponent = this.app.components
+            .find((a) => a.name === name);
           if (openComponent) {
             this.openComponent = openComponent;
           } else if (!this.router.navigated) {
@@ -124,13 +125,15 @@ export class DesignerComponent implements OnInit, OnDestroy {
       const conceptPkg = this.path.join(this.path.dirname(
         this.cli.locateConceptPackage(concept.of.name)), '..');
       const serverPath = this.path.join(conceptPkg, 'server', 'server.js');
-      const configObj = Object.assign({ wsPort: this.nextPort }, concept.config);
+      const configObj = Object
+        .assign({ wsPort: this.nextPort }, concept.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;
       if (concept.name !== concept.of.name) {
         command += ` --as ${concept.name}`;
       }
-      this.processes[concept.name] = this.cp.spawn(command, [], { shell: true });
+      this.processes[concept.name] = this
+        .cp.spawn(command, [], { shell: true });
       this.nextPort += 1;
 
       // We also need to copy assets to the assets folder
@@ -230,7 +233,8 @@ export class DesignerComponent implements OnInit, OnDestroy {
               disabled
             } = el['dataset'];
             if (disabled !== 'true') {
-              component = this.app.newComponentInstanceByName(componentName, sourceName);
+              component = this.app
+                .newComponentInstanceByName(componentName, sourceName);
             }
           } else if (source.classList.contains('dvd-row')) {
             // case 2: moving an component
@@ -240,7 +244,8 @@ export class DesignerComponent implements OnInit, OnDestroy {
               .splice(componentIdx, 1);
             if (fromRowIdx === toRowIdx) {
               // this is when ng does not generate a new element
-              if (componentIdx < newComponentIndex || newComponentIndex === -1) {
+              if (componentIdx < newComponentIndex ||
+                newComponentIndex === -1) {
                 shouldRemoveCopy = false;
               }
               // account for chaning the index of the sibling

@@ -64,7 +64,8 @@ function getComponentNameFromFilePath(fp: string, projectName: string) {
 }
 
 function filesToParse(
-  rootDirectory: string, componentsConfig: ComponentsConfig | undefined): string[] {
+  rootDirectory: string,
+  componentsConfig: ComponentsConfig | undefined): string[] {
   const globs = <string[]> _.get(componentsConfig, 'include', DEFAULT);
 
   return htmlFilesFromGlobs(globs, rootDirectory, componentsConfig);

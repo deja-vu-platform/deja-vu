@@ -308,6 +308,7 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
     Mutation: {
       createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
+
         return await objects.insertOne(context, newObject);
       },
 
@@ -318,17 +319,18 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
         // if one insertion fails:
         //  the remaining elements will not be inserted
         //  the elements inserted before will remain inserted
-        return await objDocs[0] ? objects.insertMany(context, objDocs) : [];
+        return objDocs[0] ? await objects.insertMany(context, objDocs) : [];
       },
 
       removeObject: async (_root, { id }, context: Context) => {
-        return await objects.deleteOne(context, {id: id});
+        return await objects.deleteOne(context, { id: id });
       },
 
       updateObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-        return await objects.updateOne(context, {id: input.id},
-          {$set: newObject}, {upsert: true});
+
+        return await objects.updateOne(context, { id: input.id },
+          { $set: newObject }, { upsert: true });
       },
 
       updateObjects: async (_root, { input }, context: Context) => {

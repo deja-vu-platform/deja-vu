@@ -32,8 +32,8 @@ interface TagOnly extends TagInfo {
 
 
 export function getComponentAst(
-  projectName: string, componentName: string, usedConcepts: ReadonlyArray<string>,
-  html: string): ComponentAst {
+  projectName: string, componentName: string,
+  usedConcepts: ReadonlyArray<string>, html: string): ComponentAst {
   const tagsToKeep = new Set([ projectName, ...usedConcepts, 'dv' ]);
   const shouldKeep = (tag: Tag): boolean =>  {
     return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
@@ -65,8 +65,9 @@ function pruneSubtreesWithNoComponents(shouldKeep: (tag: Tag) => boolean) {
         if (shouldKeep(tag)) {
           tag.content = _pruneSubtreesWithNoComponents(tag.content);
           // We can't filter attrs to only include those that are not html
-          // global attributes because the component could use what would be valid
-          // html global attributes as inputs (e.g., `<foo [id]="bar"></foo>`)
+          // global attributes because the component could use what would be
+          // valid html global attributes as inputs (e.g.,
+          // `<foo [id]="bar"></foo>`)
         } else {
           tag.attrs = {};
           tag.content = _pruneSubtreesWithNoComponents(tag.content);
@@ -90,9 +91,9 @@ function pruneSubtreesWithNoComponents(shouldKeep: (tag: Tag) => boolean) {
  *  Replace non-component elements with its children
  */
 function removeNonComponents(shouldKeep: (tag: Tag) => boolean) {
-  // The given AST will have components and its ancestors (which could be components
-  // or not). In this phase, we remove the non components. Note that the leafs
-  // of the tree are always components.
+  // The given AST will have components and its ancestors (which could be
+  // components or not). In this phase, we remove the non components. Note that
+  // the leafs of the tree are always components.
   const _removeNonComponents = (tree: TagOnlyAst): TagOnlyAst => {
     return _
       .chain(tree)
@@ -140,7 +141,8 @@ function buildComponentAst() {
 /**
  * Check for errors in the tree. The following are considered errors:
  *   - having the same (request-sending) component as a child more than once
- *   - having sibling dv-tx nodes with the same child (request-sending) component
+ *   - having sibling dv-tx nodes with the same child (request-sending)
+ *     component
  *
  * These are errors because at runtime we can't tell apart the requests from
  * these components with the same path and we need to be able to tell them apart
@@ -196,8 +198,8 @@ function checkForErrors(componentName: string) {
 
 /**
  *  @returns the fully-qualified tag for the given tag. The fully-qualified tag
- *           of a component is its `dvAlias` if one is given, `dvOf-componentName`
- *           if a `dvOf` is given or `tag` if otherwise
+ *  of a component is its `dvAlias` if one is given, `dvOf-componentName`
+ *  if a `dvOf` is given or `tag` if otherwise
  */
 function getFqTag(
   tag: string, dvOf: string | undefined, dvAlias: string | undefined): string {

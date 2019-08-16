@@ -8,7 +8,9 @@ import {
   OnExec, RunService
 } from '@deja-vu/core';
 
-import { CreateObjectComponent } from '../create-object/create-object.component';
+import {
+  CreateObjectComponent
+} from '../create-object/create-object.component';
 
 import * as _ from 'lodash';
 
@@ -24,9 +26,11 @@ import { API_PATH } from '../property.config';
  *  1. if `objects` is inputted:
  *      the component will not display anything.
  *      the data for the objects must come from another component.
- *      the component's execution must be triggered by another component (in a transaction)
+ *      the component's execution must be triggered by another component (in a
+ *      transaction)
  *  2. if `objects` is not inputted:
- *      the component works similar to when multiple `create-object` components are stacked.
+ *      the component works similar to when multiple `create-object` components
+ *      are stacked.
  *      there must be a list of `ids` for the objects that will be created.
  */
 @Component({
@@ -112,8 +116,13 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
     this.objects = [];
     for (const index of Object.keys(this.ids)) {
-      if (this.initialValues && this.initialValues[index] && this.initialValue) {
-        this.mergedInitialValues[index] = {...this.initialValues[index], ...this.initialValue};
+      if (this.initialValues &&
+        this.initialValues[index] &&
+        this.initialValue) {
+        this.mergedInitialValues[index] = {
+          ...this.initialValues[index],
+          ...this.initialValue
+        };
       } else {
         this.mergedInitialValues[index] = this.initialValue;
       }

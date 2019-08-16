@@ -35,7 +35,8 @@ const IGNORE = [
   'node_modules/**', 'dist/**', 'pkg/**', '**/!(*.html)', '**/index.html' ];
 
 function filesToParse(
-  rootDirectory: string, componentsConfig: ComponentsConfig | undefined): string[] {
+  rootDirectory: string,
+  componentsConfig: ComponentsConfig | undefined): string[] {
   const globs = _.get(componentsConfig, 'include', DEFAULT);
 
   return htmlFilesFromGlobs(globs, rootDirectory, componentsConfig);
@@ -57,7 +58,7 @@ function htmlFilesFromGlobs(
 export class AppCompiler {
   static DVCONFIG_FILE_PATH = 'dvconfig.json';
 
-  private readonly componentCompiler: ComponentCompiler = new ComponentCompiler();
+  private readonly componentCompiler = new ComponentCompiler();
   private readonly symbolTable: SymbolTable = {};
 
 

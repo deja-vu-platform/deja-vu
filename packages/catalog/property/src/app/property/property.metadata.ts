@@ -24,9 +24,13 @@ import {
   CreateObjectsComponent
 } from './create-objects/create-objects.component';
 export { CreateObjectsComponent };
-import { CreatePropertyComponent } from './create-property/create-property.component';
+import {
+  CreatePropertyComponent
+} from './create-property/create-property.component';
 export { CreatePropertyComponent };
-import { FilterObjectsComponent} from './filter-objects/filter-objects.component';
+import {
+  FilterObjectsComponent
+} from './filter-objects/filter-objects.component';
 export { FilterObjectsComponent };
 import {
   ObjectAutocompleteComponent
@@ -45,7 +49,9 @@ import {
   TriStateCheckboxComponent
 } from './tri-state-checkbox/tri-state-checkbox.component';
 import { UpdateObjectComponent } from './update-object/update-object.component';
-import { UpdateObjectsComponent } from './update-objects/update-objects.component';
+import {
+  UpdateObjectsComponent
+} from './update-objects/update-objects.component';
 
 const publicComponents = [
   ChooseObjectComponent,

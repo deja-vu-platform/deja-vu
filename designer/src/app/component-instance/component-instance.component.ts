@@ -128,7 +128,8 @@ implements OnInit, AfterViewInit, OnDestroy {
    */
   private loadConceptComponent() {
     // create component and add to DOM
-    const componentDefinition = <ConceptComponentDefinition>this.componentInstance.of;
+    const componentDefinition = <ConceptComponentDefinition> this
+      .componentInstance.of;
     const { component } = componentDefinition;
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(<Type<{}>>component);

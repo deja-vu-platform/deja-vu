@@ -9,7 +9,8 @@ export class SubscriptionCoordinator {
   private readonly wsClientTable: { [url: string]: SubscriptionClient } = {};
 
   forwardRequest(url: string, request: Object): Observable<ExecutionResult> {
-    return this.getClient(url).request(request);
+    return this.getClient(url)
+      .request(request);
   }
 
   unsubscribeAll() {
