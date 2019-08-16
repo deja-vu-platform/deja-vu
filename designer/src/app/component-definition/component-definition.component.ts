@@ -129,7 +129,7 @@ implements AfterViewInit, OnChanges, OnInit {
       // show the name of any component on the screen with size 0
       // causes changes to *ngIf so must happen in new microtask
       setTimeout(() => {
-        // if an component was removed we need to re-do the data layer
+        // if a component was removed we need to re-do the data layer
         if (this.lastNumComponents > instanceContainersArr.length) {
           this.updateReferences();
         }
@@ -207,7 +207,7 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Get all sibling outputs / parent inputs referenced by an component
+   * Get all sibling outputs / parent inputs referenced by a component
    */
   ioReferences(by: ComponentInstance): Reference[] {
     if (by.id in this.ioReferencesCache) {
@@ -235,7 +235,7 @@ implements AfterViewInit, OnChanges, OnInit {
   }
 
   /**
-   * Get all outputs of an component which are referenced in this scope
+   * Get all outputs of a component which are referenced in this scope
    */
   ioReferenced(
     from: ComponentInstance

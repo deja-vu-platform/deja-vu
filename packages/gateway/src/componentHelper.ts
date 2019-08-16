@@ -80,12 +80,12 @@ export class ComponentHelper {
   }
 
   /**
-   * Attempts to parse an component expression
+   * Attempts to parse a component expression
    */
   private static ParseComponentExpr(expr: string): ComponentInput | string {
     const errMsg = (invalidExpr) =>
       `Expected component object or a variable but found ${invalidExpr}.` +
-      `(For an object to be an component object it must have a 'tag' field)`;
+      `(For an object to be a component object it must have a 'tag' field)`;
     // `componentExpr` could technically be any JavaScript expression, but
     // anything other than a component input object or a variable name will be
     // an error
@@ -115,7 +115,7 @@ export class ComponentHelper {
   }
 
   /**
-   * Retrieves an component input object from the given component expression or
+   * Retrieves a component input object from the given component expression or
    * defaultSpec depending on the value of expr
    */
   private static GetComponentInput(
@@ -564,7 +564,7 @@ export class ComponentHelper {
       _.each(componentTag.inputs, (inputValue: string, inputName: string) => {
         /**
          * If one of the inputs has a variable as a value and we have that
-         * value defined in the context and the value happens to be an component
+         * value defined in the context and the value happens to be a component
          * then replace the value of that input with the component literal.
          */
         if (_.has(componentTag.context, inputValue)) {
@@ -575,8 +575,8 @@ export class ComponentHelper {
               ComponentHelper.GetComponentInput(
                 componentExpr, componentTag.context));
           } catch (e) {
-            // Do nothing. If the attempt to parse and obtain an component input
-            // failed it means that it was not an component expr.
+            // Do nothing. If the attempt to parse and obtain a component input
+            // failed it means that it was not a component expr.
           }
         }
       });

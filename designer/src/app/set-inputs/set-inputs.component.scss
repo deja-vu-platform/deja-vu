@@ -47,7 +47,7 @@ $component-input-padding: 4px;
   .prompt {
     color: $mat-placeholder-color; // mat input placeholder color
     cursor: default;
-    // hide the prompt message when an component is dragged in
+    // hide the prompt message when a component is dragged in
     &:not(:only-child) {
       display: none;
     }

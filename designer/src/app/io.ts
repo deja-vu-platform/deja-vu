@@ -141,7 +141,7 @@ export class ChildScopeIO extends ScopeIO {
       const fromAbove = refdName.startsWith('$');
       // keys for subjects in ScopeIO do not have leading $
       const ioScopeName = fromAbove ? refdName.slice(1) : refdName;
-      // if in an component input, $ gets input to replaced component
+      // if in a component input, $ gets input to replaced component
       //   falling back to parent input
       if (
         fromAbove
@@ -170,7 +170,7 @@ export class ChildScopeIO extends ScopeIO {
   }
 
   /**
-   * Send an component instance to the given input (on this component).
+   * Send a component instance to the given input (on this component).
    * It's less general than emitExpressionValue since components can only
    *   be inputted.
    */

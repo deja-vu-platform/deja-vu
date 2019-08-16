@@ -57,7 +57,7 @@ All the CRUD operations they represent should already work.
 
 ### Create components in a concept
 
-To create an component in a concept, run the following from the root of
+To create a component in a concept, run the following from the root of
 the concept's directory:
 
 ```
@@ -69,7 +69,7 @@ the `entityname` on which to perform the component.
 
 There are five possible `type` parameters that can be used:
 `blank`, `create`, `show`, `update`, and `delete`. The first creates a blank
-component, while the rest each create an component for the one of the CRUD operations,
+component, while the rest each create a component for the one of the CRUD operations,
 respectively. If `blank` is specified as the `type`, the parameter `entityName`
 will be the component name (the parameter `component-name` will be unused). For other `type`s, the default component name is `type-entityname`.
 Here are a few examples that demonstrate the above rules:

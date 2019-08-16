@@ -13,7 +13,7 @@ import * as _ from 'lodash';
  * using an output that doesn't exist, ng will throw an error later.
  *
  * It is useful to know what outputs are used so that when we are converting
- * an component node to its corresponding ng template node we can bind the
+ * a component node to its corresponding ng template node we can bind the
  * used output.
  */
 export function saveUsedOutputs(symbolTable: ComponentSymbolTable) {

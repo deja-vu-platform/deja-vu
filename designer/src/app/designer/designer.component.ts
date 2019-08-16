@@ -213,7 +213,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         let shouldRemoveCopy = true;
 
         if (target.classList.contains('dvd-row')) {
-          // use case 1: instantiating an component by dragging it into a row
+          // use case 1: instantiating a component by dragging it into a row
           // find target row (-1 means new last row)
           let toRowIdx = parseInt(target['dataset'].index, 10);
           if (toRowIdx === this.openComponent.rows.length) {
@@ -237,7 +237,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
                 .newComponentInstanceByName(componentName, sourceName);
             }
           } else if (source.classList.contains('dvd-row')) {
-            // case 2: moving an component
+            // case 2: moving a component
             const fromRowIdx = parseInt(source['dataset'].index, 10);
             const componentIdx = parseInt(el['dataset'].index, 10);
             [component] = this.openComponent.rows[fromRowIdx].components
@@ -271,7 +271,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
           target.classList.contains('component-input')
           && source.classList.contains('component-list')
         ) {
-          // use case 2: passing an component to an input
+          // use case 2: passing a component to an input
           const {
             source: sourceName,
             component: componentName,
@@ -283,7 +283,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
             }));
           }
         } else {
-          // do nothing when dragging an component from the page to an input
+          // do nothing when dragging a component from the page to an input
           shouldRemoveCopy = false;
         }
         if (shouldRemoveCopy) {

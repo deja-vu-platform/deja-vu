@@ -43,7 +43,7 @@ export function resolveName(
     // getting an input from above
     ioName = name.slice(1); // strip leading '$'
     if (inInput && inInput.of.of.componentInputs[inInput.name][ioName]) {
-      // getting an input from within an component input
+      // getting an input from within a component input
       fromComponent = inInput.of;
     } else if (appComponentDefinition.inputs.includes(ioName)) {
       // getting an input from the parent

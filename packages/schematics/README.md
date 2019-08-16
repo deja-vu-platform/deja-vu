@@ -14,6 +14,6 @@ just like regular Angular schematics.
     create a new concept with the given name
     (cannot be run inside an Angular project)
 - `ng generate @deja-vu/schematics:component --conceptName=conceptName
-    --componentName=componentName` - create an component in a concept
+    --componentName=componentName` - create a component in a concept
     (must be run inside the `componentName` concept directory)
  

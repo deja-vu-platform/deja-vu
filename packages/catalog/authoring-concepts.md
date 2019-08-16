@@ -19,7 +19,7 @@
   unnecessary reloading of the data it had previously loaded. If this is the
   case, instead of calling `this.gs.get(...)`, the component should call
   `this.gs.noRequest()` so that the run service knows that the component does not
-  intend to perform a request. If there is a possibility that an component
+  intend to perform a request. If there is a possibility that a component
   will not perform a request (e.g. because it calls `this.gs.noRequest()` in
   some cases), the component name (e.g. `conceptname-show-foo`) should be included
   in the `componentsRequestOptional` array field of the concept's `dvconfig.json`
@@ -128,7 +128,7 @@ It could be used as an example to follow for the steps below.
     time a relevant event (e.g. a creation or an update) happens
     - include the GraphQL subscription resolvers. *For security reasons*, the
     return value of subscriptions should not contain any data. They should
-    just return `true`. When an component receives the reply, it should reload
+    just return `true`. When a component receives the reply, it should reload
     the data so that if it is in a transaction, all the other components in the
     transaction would also get re-run. This ensures, for example, that any
     authentication or authorization checks happen again.
@@ -153,10 +153,10 @@ It could be used as an example to follow for the steps below.
   expects a `Foo` it might get an object that is a `Foo` + some other
   merged objects.
 
-- If there's only one id input for an component, only use `id`. Otherwise, use
+- If there's only one id input for a component, only use `id`. Otherwise, use
   named ids, e.g. `fooId` and `barId`.
 
-- If you want to give the user of an component a way to ask to wait for an input
+- If you want to give the user of a component a way to ask to wait for an input
   value create a `waitOn: string[]` input that takes a list of input fields to
   wait on when run. In your Component class you have:
 
@@ -191,4 +191,4 @@ It could be used as an example to follow for the steps below.
 
 # Other Stuff
 
-- if you don't have a default component for an component input use `no-default-foo`. See [stage-header](https://github.com/spderosso/deja-vu/tree/master/packages/core/src/app/dv/stage) for an example.
+- if you don't have a default component for a component input use `no-default-foo`. See [stage-header](https://github.com/spderosso/deja-vu/tree/master/packages/core/src/app/dv/stage) for an example.

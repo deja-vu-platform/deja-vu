@@ -165,8 +165,8 @@ export class RunService {
   }
 
   /**
-   * Walks the dom starting from `node` calling `onComponent` with the component info
-   * when an component is encountered. No child of components are traversed.
+   * Walks the dom starting from `node` calling `onComponent` with the component
+   * info when a component is encountered. No child of components are traversed.
    */
   private walkComponents(node, onComponent: (componentInfo, str?) => void): void {
     const componentId = NodeUtils.GetComponentId(node);

@@ -40,7 +40,7 @@ export const usedConceptsConfig = {};
 /**
  * Component Definition
  * Defines the name you use, the inputs you provide,
- * and the outputs and content you get when you instantiate an component
+ * and the outputs and content you get when you instantiate a component
  */
 export interface ComponentDefinition {
   name: string;
@@ -126,7 +126,7 @@ export class AppComponentDefinition implements ComponentDefinition {
   }
 
   /**
-   * Determines whether or not this contains an instance of an component
+   * Determines whether or not this contains an instance of a component
    * @param deep false: A parent of B; true: A ancestor of B
    */
   contains(componentDefinition: ComponentDefinition, deep = false) {
@@ -257,7 +257,7 @@ export class Row {
 }
 
 /**
- * An Component Instance is a single usage (HTML Tag) of an component
+ * A Component Instance is a single usage (HTML Tag) of a component
  * It has its own input settings and its own outputs
  * But these are defined by its definition
  */

@@ -48,7 +48,7 @@ export class ComponentInputCompiler {
    * @param componentInputContents the contents of the component to compile
    * @param context the context information, given by its enclosing component
    *
-   * @return a Deja Vu component. The result of compiling an component input
+   * @return a Deja Vu component. The result of compiling a component input
    *         is a valid Deja Vu component, which can be then compiled into an
    *         ng component (see ComponentCompiler).
    */

@@ -411,7 +411,7 @@ export abstract class RequestProcessor {
     const componentPath: ComponentPath = ComponentPath
       .fromString(componentPathId);
     assert.ok(componentPath.isDvTx(),
-      `Getting cohorts of an component path that is not part of a ` +
+      `Getting cohorts of a component path that is not part of a ` +
       `dv-tx: ${componentPath}`);
     const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
 

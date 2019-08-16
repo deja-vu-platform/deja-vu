@@ -96,7 +96,7 @@ defining facility, albeit with simple CRUD behavior.)
 
 In *SN*, we use `schema` to configure the type of properties we expect our
 objects (the posts) to have (an author, a title, and a url). The effect of this is that when we
-use an component from *Property* to, for example, create an object, the component will allow
+use a component from *Property* to, for example, create an object, the component will allow
 the user to input those fields&mdash;author, title, and url.
 Moreover, since we specified they are all required fields, the component
 will expect the user to provide a value for each one (and show an
@@ -176,7 +176,7 @@ which synchronizes the components it wraps (explained in more detail later).
 
 App components, like concept components, can have input and
 output values (which can be used in other app components).
-Inputs to an component are bound with the syntax `parameter=value`.
+Inputs to a component are bound with the syntax `parameter=value`.
 The value could
 be a literal or an output from some other component on the page.
 Components can be fired repeatedly, and the output variables
@@ -208,7 +208,7 @@ the execution phase produces some side-effect on the server
 (e.g., creating a new score).
 The component author determines what triggers the evaluation or
 execution of the component. Typically, the loading of
-the component itself triggers the evaluation of an component,
+the component itself triggers the evaluation of a component,
 and some user interaction
 (e.g., a button click or a selection of an item from a dropdown)
 triggers its execution.
@@ -294,7 +294,7 @@ the `id` input (inputs are preceded with `$`) to `show-object` and
 
 Each of these components loads and displays its own
 view of the post entity; the effect when put together is to display a
-*SN* post object. The configuration parameters of an component allow its effect,
+*SN* post object. The configuration parameters of a component allow its effect,
 including its appearance, to be customized; thus the hidden parameter of
 `show-object` marks it as a hidden HTML element, so that it does not appear
 (even though the object data itself is still loaded, emitted as an output,

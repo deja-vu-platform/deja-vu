@@ -59,7 +59,7 @@ describe('ComponentInputCompiler', () => {
       .toThrow();
   });
 
-  it('should compile component with the output of an component as the input ' +
+  it('should compile component with the output of a component as the input ' +
     'of the innermost of two nested inputs', () => {
       const componentInput = `
         <authentication.logged-in />
