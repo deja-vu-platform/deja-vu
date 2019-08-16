@@ -50,6 +50,7 @@
     "@types/superagent": "^3.5.7",
     "@types/uuid": "^3.4.3",
     "jasmine": "~3.4.0",
+    "prettier": "^1.18.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"

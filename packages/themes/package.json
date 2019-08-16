@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
 }
