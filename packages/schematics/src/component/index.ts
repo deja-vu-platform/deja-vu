@@ -166,6 +166,7 @@ function addToAppComponentHtml(options: any): Rule {
     if (!container) {
       console.log('Could not find div with class container, ' +
         `skipping update to ${filePath}`);
+
       return tree;
     }
 

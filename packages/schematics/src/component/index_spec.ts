@@ -20,7 +20,8 @@ describe('component', () => {
       }, Tree.empty());
 
     const componentFilePathPrefix =
-      `/src/app/${conceptName}/${dasherizedComponentName}/${dasherizedComponentName}`;
+      `/src/app/${conceptName}/${dasherizedComponentName}` +
+      `/${dasherizedComponentName}`;
 
     expect(tree.files)
       .toEqual([

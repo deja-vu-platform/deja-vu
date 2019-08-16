@@ -95,7 +95,8 @@ export class ConceptServer<C extends Config = Config> {
   }
 
   private setGraphqlQueryAndVariables(
-    graphqlParams, variables: object, fullComponentName: string, extraInfo: any) {
+    graphqlParams, variables: object, fullComponentName: string,
+    extraInfo: any) {
     graphqlParams.query = this.getGraphqlRequest(fullComponentName, extraInfo);
     if (variables) {
       graphqlParams.variables = variables;
