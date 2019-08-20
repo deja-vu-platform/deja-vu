@@ -65,7 +65,9 @@ def get_data(appsdir, exclude):
     for concept in usedCatalog:
       usageTable[app][concept] = usageData[app].count(concept)
 
-  return pd.DataFrame(usageTable)
+  return (pd.DataFrame(usageTable)
+    .drop(['morg', 'sn', 'themes'], 1)
+    .drop(['allocator'], 0))
 
 def main():
   args = parser.parse_args()
@@ -73,18 +75,22 @@ def main():
   print ("Output dir: " + args.out)
   df = get_data(args.appsdir, args.exclude)
 
+  print('# Usage Table')
+  print(df.keys());
+  print(df.sort_index(0).sort_index(1));
+
   print("# Concept Types")
-  print(df.astype(bool).sum(axis=0))
+  print(df.astype(bool).sum(axis=0).sort_index(0))
   print(df.astype(bool).sum(axis=0).describe())
   print("# Concept Instances")
-  print(df.sum(axis=0))
+  print(df.sum(axis=0).sort_index(0))
   print(df.sum(axis=0).describe())
 
   print("# Apps")
-  print(df.transpose().astype(bool).sum(axis=0))
+  print(df.transpose().astype(bool).sum(axis=0).sort_index(0))
   print(df.transpose().astype(bool).sum(axis=0).describe())
   print("# Instances")
-  print(df.transpose().sum(axis=0))
+  print(df.transpose().sum(axis=0).sort_index(0))
   print(df.transpose().sum(axis=0).describe())
 
   if os.path.exists(OUT_DIR):
@@ -103,14 +109,14 @@ def concept_usage_heatmap(df, transpose=False):
     if transpose:
       figsize = (7, 5)
       cu = df.transpose()
-      xlabel = "cliché"
+      xlabel = "concept"
       ylabel = "app"
       fp = out(CONCEPT_USAGE_TRANSPOSE_FILE)
     else:
       figsize = (6, 7)
       cu = df
       xlabel = "app"
-      ylabel = "cliché"
+      ylabel = "concept"
       fp = out(CONCEPT_USAGE_FILE)
     plt.figure(figsize=figsize)
     plot = sns.heatmap(
@@ -146,8 +152,8 @@ def concept_corr_heatmap(df):
     plot = sns.heatmap(
         corr_matrix, annot=True, square=True, cmap="YlGnBu", fmt=".2f",
         linewidths=.5)
-    plt.xlabel("cliché")
-    plt.ylabel("cliché")
+    plt.xlabel("concept")
+    plt.ylabel("concept")
     plt.tight_layout()
     plt.savefig(out(CONCEPT_CORR_FILE), dpi=DPI)
     return corr_matrix
@@ -196,7 +202,7 @@ def concept_dev(df):
     bp = ret.boxplot(
       column="concepts_developed_count", by="order")
     bp.get_figure().suptitle('')
-    bp.set_ylabel('# of clichés developed')
+    bp.set_ylabel('# of concepts developed')
     plt.title('')
     plt.tight_layout()
     plt.savefig(out(CONCEPT_DEV_FILE), dpi=DPI)
