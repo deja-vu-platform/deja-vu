@@ -1,44 +1,53 @@
 ---
 ---
 
-# building apps with re#
+# tutorial: building apps with re#
+{:.no_toc}
 
 This tutorial covers the fundamentals of Déjà Vu through
 a social news aggregation app *SN*, that is a simple
 clone of [Hacker News](https://news.ycombinator.com/).
+In *SN*, users can submit links,
+which can then be voted up by other members.
+Users can also comment on a post or comment and upvote comments.
 The code of the app can be found in [samples/sn](../samples/sn).
 
-In *SN*, registered users can submit links,
-which can then be voted up by other members (posts with
-more upvotes appear towards the top of the home page).
-Registered users can also comment on a post or comment and upvote comments.
+## Contents
+{:.no_toc}
+
+1. This is replaced
+{:toc}
 
 ## Including and Configuring Concepts
 
-The process of building a Déjà Vu app begins by navigating the
-[catalog of concepts](../packages/catalog/README), to find 
-one that has the functionality you are looking for.
+### Choosing Concepts
 
-Concepts are freestanding, without any mutual dependencies. As a
-user of Déjà Vu, you can ignore
-the (front-end and back-end) code that implements the concept. The only
-aspects of a concept you'll interact with are the configuration options and exported components. The
+The process of building a Déjà Vu app begins by navigating the
+[catalog of concepts](../packages/catalog/README) to find 
+the concepts that provide the functionality you need for your app.
+The
 documentation accompanying a concept includes information about the configuration options
 (e.g., their effect on behavior) and the exported components.
-
-Concept components are interactive user interface elements that can read and
-write back-end data.
-They can
-also have inputs and produce outputs.
+Concept components control a patch of the screen, are
+interactive, and can read and write back-end data.
+They
+also have input and output properties.
 
 *SN* uses the [Authentication](../packages/catalog/authentication/README.md)
 concept to handle user authentication,
-[Comment](../packages/catalog/comment/README.md) to comment on both posts and other comments,
-[Property](../packages/catalog/property/README.md) to save a post's author, title, and link, and
-[Scoring](../packages/catalog/scoring/README.md) twice: once for keeping track of each post's upvotes;
-and another one for the upvotes of comments.
+[Comment](../packages/catalog/comment/README.md) to comment on posts and reply to comments,
+and [Scoring](../packages/catalog/scoring/README.md) twice:
+for keeping track of upvotes on both posts and on comments separately.
+It also uses [Property](../packages/catalog/property/README.md) to save a post's author, title, and link---the Property concept gives you
+a data-model-defining facility for simple CRUD behavior.
 
-The app's config file (dvconfig.json) is shown below:
+
+### Including Concepts
+
+The concepts used by the app are specified in
+the app's JSON config file (dvconfig.json). An excerpt of
+[*SN*'s config file](../samples/sn/dvconfig.json) is shown below:
+
 ```json
 {
   "name": "sn",
@@ -79,55 +88,80 @@ The app's config file (dvconfig.json) is shown below:
 }
 ```
 
-The config file specifies the concepts used by the app. This is also
-where other information, such as the name of the app and routes are specified.
-The value of `usedConcepts` determines what concepts are included in the application.
-This object has one key-value pair per concept instance. The key (e.g., `property`)
-determines the name (or alias) that is going to be used in the HTML to refer to that instance.
-The value provides information about the instance, such as the name of the concept
-(e.g., `scoring` in `scoringposts`) and its configuration options. (If no concept
-name is given, the concept of same name as the given alias will be used.)
+The `usedConcepts` object has one key-value pair per concept instance. The key
+(e.g., `post` on line 6)
+determines the name that is going to be used in the HTML to refer to that instance.
+The value is another object with two
+optional
+key-value pairs: `concept` for providing the name of the concept to
+be
+instantiated (e.g., `property` on line 7), and
+`config` for specifying the configuring options
+for the concept instance (e.g., the object in lines
+8-18).
+If no concept name is provided, the concept instantiated is
+the one with name equal to the
+instance name. Thus, on line 4,
+the concept to be instantiated for `authentication`
+is Authentication.
+If no
+configuration object is given, the default configuration
+for that concept is used.
+The format of the values of configuration options
+is also JSON.
 
-*Property* accepts a configuration variable (`schema`) that expects a [JSON 
-Schema](http://json-schema.org/) to describe the properties of the objects it will be 
+### Configuring Concepts
+
+In *SN*, we only have to configure Property.
+Property accepts a configuration variable (`schema`) that expects a
+[JSON Schema](http://json-schema.org/) to describe the objects it will be
 saving.
-(The *Property* concept essentially gives you a data modeling
-defining facility, albeit with simple CRUD behavior.)
-
-In *SN*, we use `schema` to configure the type of properties we expect our
+We use `schema` to specify the type of properties we expect our
 objects (the posts) to have (an author, a title, and a url). The effect of this is that when we
-use a component from *Property* to, for example, create an object, the component will allow
-the user to input those fields&mdash;author, title, and url.
-Moreover, since we specified they are all required fields, the component
-will expect the user to provide a value for each one (and show an
-error if she doesn't).
+include a component from Property,
+such as `create-object`,
+the component will allow
+the user to input only those fields---author, title, and url.
+Moreover, since we specified that
+that the format of the
+url field is `url` (line 14) and that
+all fields (author, title, and url) are
+required (line 16), `create-object`
+will expect the user to provide a value for each
+one and check that the value given for
+the url field is
+a valid URL. If the user
+doesn't provide a value for each field or
+the value for url is invalid, `create-object` will show an
+error message.
 
-In the app's configuration file, we also define the routes of
-our app, given as
-a list of path and component name pairs.
-Each page is an app component, and app components&mdash;as we'll see later&mdash;can contain other components.
-Our homepage
-is the component `home` because `path` is empty.
-If the user navigates to `/login`, the `login` component
-will be shown; if she navigates to `/item`, the `show-post-details`
-component will be shown.
+### Routes
+
+In the app's config file, we also define the
+name (line 2) and
+routes (lines 23-27) of our app.
+Each route
+maps a URL path to a component.
+Any app component can be a page (i.e., accessible
+via a URL).
+*SN*'s homepage
+is the component `home` (line 24) because `path` is empty.
+If the user navigates to "/login", the `login`
+component
+will be shown (line 25) and if they navigate to "/item", the
+`show-post-details`
+component will be shown (line 26).
 
 ## Linking Components
 
-There are two types of components: *concept components* and
-*app components*. Concept components
-are the components defined by concepts; app components
-are the components that are part of the app being developed.
-
 Each app
 component is written in a separate HTML file.
-App components can contain other components, which can be
-of either kind (concept components or app components).
-Components are included as if they were HTML
-elements, with the tag given by `concept.component-name` or
-`app.component-name`.
+Excerpts
+of the code for [*SN*'s `submit-post`]()
+and [`show-post`]() components, together with a
+screenshot
+of how they appear to users, are shown below:
 
-Below is a code excerpt of *SN*'s `submit-post` definition:
 ```html
 <dv.component name="submit-post">
   <sn.navbar /> ...
@@ -160,148 +194,164 @@ Below is a code excerpt of *SN*'s `submit-post` definition:
 </dv.component>
 ```
 
+Our template language looks, by design,
+similar to other template languages. To create an app
+component, users include
+components and
+synchronize them to implement
+the desired functionality.
 
-`submit-post` includes one app component, `navbar`
-([defined elsewhere](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/navbar/navbar.html));
-three concept components,
-`authenticate` of `authentication`, `create-object` of
-`property`, and
-`create-score` of the `scoringposts` instance of *Scoring*; 
-and three built-in components (which can be regarded as free-standing concept components): `dv.if`, which
-shows the enclosed content if the given condition is true, `dv.gen-id`,
-which generates a unique ID, `dv.link` which redirects the user to
-another page (in this case, it navigates to the component matching
-the `/item` route and uses `dv.gen-id.id` for its `id` input), and `dv.tx`
-which synchronizes the components it wraps (explained in more detail later).
+### Including Components
 
-App components, like concept components, can have input and
-output values (which can be used in other app components).
-Inputs to a component are bound with the syntax `parameter=value`.
-The value could
-be a literal or an output from some other component on the page.
+App components can contain other components, which can be
+concept components (i.e., components defined by concepts) or app components (i.e., components that
+are defined as part of the app being developed).
+Components are included as if they were HTML
+elements, with the tag given by the
+concept instance or app name,
+followed by the component name.
+Thus, `submit-post` includes one app component,
+`navbar` (line 2); two concept components, `create-object` of the
+`post` instance of *Property*
+(lines 5-8), and
+`create-score` of the `scoreposts` instance of
+*Scoring* (lines 9-10);
+and one built-in component,
+`dv.gen-id` (line 4),
+which generates a unique ID
+(built-in components
+can be regarded as free-standing concept components).
+
+#### I/O Binding
+
+Inputs to a component are bound with the syntax `property=expr`.
+Template expressions can include
+literal values, app component inputs,
+outputs from other components
+on the page, and
+standard
+operators. The
+syntax of template expressions is
+similar to that of JavaScript expressions,
+but no function calls, or JavaScript
+operators
+that produce side-effects are allowed.
+
 Components can be fired repeatedly, and the output variables
-hold the values from the last execution.
+hold the values from the last execution. This is how a selector widget such as a dropdown would typically be connected to another component: the dropdown sets an output property every time it is activated containing the choice the user made, which is then bound to the input variable of components that use that choice.
 
-Some component inputs are for customizing
+Some inputs are for customizing
 appearance and have no impact on the behavior of the component.
 For example, as a result of setting
-`buttonLabel` to `"Submit"`,
+`buttonLabel` to `"Submit"` on line 7 of `submit-post`,
 `create-object`'s button will carry the label "Submit" instead of the
-default button label "Create Object".
+default button label "Create Post".
+The `hidden` parameter of `show-object` in `show-post` marks `show-object`
+as hidden.
+Hidden components are not shown to the user, but still run
+as if they were visible. Thus
+the object data itself is still loaded, emitted as
+an output, and used in several parts of the view---the title
+and the link are used and shown through lines 5-6, while
+the author is displayed on line 11.
 
-## Component Synchronization
+App component inputs are preceded with `\$`. For example, `show-post`
+has an input named `id` that it uses in lines 2, 4, 9, and 12.
+Based on this input, `how-object` will show the post whose ID matches the given one;
+`upvote` will use the ID as the target of the score if one is created;
+`show-target` will show the score with the given ID;
+and clicking on the "comments" link will take
+the user to `show-post-details` with its
+input `id`
+set to the given ID.
 
-Concept components have two phases: an *evaluation* phase (eval) and an
-*execution* phase (exec). App components don't have phases.
+#### ID Sharing
 
-Both phases can take inputs and produce outputs.
-When a concept component execs or evals, it expects all its
-required inputs
-to be available&mdash;blocking the evaluation or
-execution until inputs are given.
-After the phase runs, it will produce its outputs.
+To bind entities in different concepts we use a common identifier.
+In `submit-post`, for example,
+the same ID, generated by `gen-id` (line 4), is passed
+to `create-object` (line 5) and `create-score` (line 9). As a result,
+`create-score` will create a score
+with the same target ID as the object `create-object` will create.
+Similarly, in `show-post`, we feed
+the `id` input
+to `show-object` (line 2) and
+`show-target` (line 9). Each of these components loads and
+displays its own
+view of the post entity; the effect when put together is to
+display a *SN* post object.
 
-What happens
-on eval or exec is up to the author of the concept, but
-by convention the evaluation phase fetches data from the server (e.g., loading scores), and
-the execution phase produces some side-effect on the server 
-(e.g., creating a new score).
-The component author determines what triggers the evaluation or
+### Synchronizing Components
+
+#### Action Types
+
+Concept components have two actions: an
+*evaluation* action (eval) and an
+*execution* action
+(exec). 
+The concept author determines what triggers the evaluation or
 execution of the component. Typically, the loading of
 the component itself triggers the evaluation of a component,
 and some user interaction
-(e.g., a button click or a selection of an item from a dropdown)
+(e.g., a button click)
 triggers its execution.
+What happens
+on eval or exec is also up to the author of the concept---the only
+restriction is that an
+eval action cannot produce
+a side effect. 
+App components don't have actions.
+This is because
+app components have no
+back-end functionality of their own---all
+data and behavior is pushed
+to concepts.
 
-There are two types of app components: a regular component and
-a transaction (tx) component. A tx component synchronizes
-the evaluation and execution of the concept components it wraps, so that the
-evaluation/execution of one component triggers the evaluation/execution of all the other sibling
-components, and they either complete in their entirety (if all succeeded) or have no effect whatsoever
-(if one of them fails).
+Eval/exec actions support the conventional
+user interaction pattern of web apps:
+data is loaded and displayed, and then
+the user executes commands to mutate the
+data.
+But perhaps concept components could offer
+arbitrary action types.
+This would require more work from the user (who
+would now have to specify what action types are to be
+coordinated), but
+could allow more complicated applications to
+be built, without requiring the modification
+or creation of a concept.
+
+
+#### Synchronizing Actions
+
+There are two kinds of app component: a regular component and
+a transaction (tx) component.
+A regular component
+allows any of its children
+components to eval/exec without
+synchronization.
+A tx component, on the other
+hand, synchronizes
+the eval/exec of the concept components it wraps.
+As a result, the eval (or exec) of one concept
+component triggers the eval (or exec) of all its
+sibling concept components and they either
+complete in their entirety (if all succeeded) or
+have no effect whatsoever other than displaying an error
+message to the user (if one or more aborts).
 Instead of putting each component in separate HTML files,
 you can wrap elements in another component with the `dv.tx` tag to create an
 anonymous tx component with content equal to the content of the tag.
-In contrast, a regular component allows any one of its children components to execute; thus a regular component can
-be thought of as an "or" component and a tx component as an "and" component.
 
-The button in the `create-object` component of *Property* causes
-the component to execute on click. Thus, if this component is wrapped in a
-`dv.tx`, it will trigger the execution of all its sibling concept components
-when a user clicks on the button.
-
-There is no shared state between concepts, but objects in
-different concepts may be associated by sharing ids. 
-In `submit-post`, for example,  the same uniquely generated id is passed
-to `create-score` and `create-object`. As a result, 
-when a user clicks on the "Submit" button of `create-object`,
-`create-score` will create a score
-with the same id as the object `create-object` will create. These two objects can be
-thought of as views of the same *SN* post.
-
-Similarly, in *SN*'s `show-post` component, we feed
-the `id` input (inputs are preceded with `$`) to `show-object` and
-`show-target`:
-
-```html
-<dv.component name="show-post" loadedPost$=property.show-object.loadedObject>
-  <div>
-    <property.show-object id=$id hidden=true />
-
-    <dv.if condition=!property.show-object.loadedObject>
-      Post not found
-    </dv.if>
-
-    <dv.if condition=property.show-object.loadedObject class="post-container">
-      <div class="inline-block">
-        <sn.upvote
-          disabled=!$loggedInUser ||
-            property.show-object.loadedObject.author === $loggedInUser.username
-          id=$id isPost=true loggedInUser=$loggedInUser />
-      </div>
-      <div class="inline-block">
-        <div>
-          <span class="post-title">
-            <a href=property.show-object.loadedObject.url>
-              <property.show-object class="inline-block"
-                object=property.show-object.loadedObject
-                showOnly=['title'] />
-            </a>
-          </span>
-          <span class="subtext">(<property.show-url class="inline-block"
-            showBaseUrlOnly=true
-            url=property.show-object.loadedObject.url />)</span>
-        </div>
-        <div class="subtext">
-          <scoringposts.show-target
-            class="inline-block"
-            id=$id
-            showId=false
-            showScores=false
-            totalLabel="" />
-          points by
-          <property.show-object class="inline-block"
-            object=property.show-object.loadedObject
-            showOnly=['author'] /> |
-          <dv.link href="/item" params={ id: $id }>comments</dv.link>
-        </div>
-      </div>
-    </dv.if>
-  </div>
-</dv.component>
-```
-```
-
-Each of these components loads and displays its own
-view of the post entity; the effect when put together is to display a
-*SN* post object. The configuration parameters of a component allow its effect,
-including its appearance, to be customized; thus the hidden parameter of
-`show-object` marks it as a hidden HTML element, so that it does not appear
-(even though the object data itself is still loaded, emitted as an output,
-and used in several parts of the view). (Any component can be hidden with `hidden=true`,
-but the component still runs as if it wasn't hidden, the only difference
-is that it won't be shown to the user&mdash;and as a result, the user won't be able
-to interact with it.) All `show-*` components of concepts follow
-this pattern: when loaded, the component evaluates and if an id was given
-it fetches the entity (e.g., the object, score) with the given id
-from its database and emits it as output.}
+In *SN*'s `submit-post`,
+the tx is triggered by
+`create-object` (line 5)
+when the user clicks on the button.
+This is because
+the button in the `create-object` component of *Property* causes
+the component to execute on click,
+and
+since `create-object`
+is wrapped in a `dv.tx`, it will trigger the execution of all its sibling concept components. As a result,
+a new post and a new score will be created, bound by
+the shared id (the target id of the score is the post id).
