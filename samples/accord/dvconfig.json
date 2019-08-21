@@ -1,20 +1,11 @@
 {
   "name": "accord",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "authentication": {},
+    "authorization": {},
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
@@ -29,15 +20,10 @@
         }
       }
     },
-    "group": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "group": {},
     "groupInfo": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "GroupInfo",
           "type": "object",
@@ -55,7 +41,6 @@
     "setList": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "SetList",
           "type": "object",
@@ -79,7 +64,6 @@
     "proposal": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Proposal",
           "type": "object",
@@ -106,7 +90,6 @@
     "media": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Media",
           "type": "object",
@@ -124,16 +107,8 @@
         }
       }
     },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    }
+    "rating": {},
+    "comment": {}
   },
   "routes": [
     { "path": "", "component": "groups" },

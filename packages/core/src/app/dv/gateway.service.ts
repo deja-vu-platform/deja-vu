@@ -100,7 +100,7 @@ export class TxRequest {
     const subject = new Subject<T>();
     this.requests.push(chReq);
     this.subjects.push(subject);
-    this.postNoRequest();
+    this.incDoneCountAndMaybeSend();
 
     return subject.asObservable();
   }
@@ -109,6 +109,10 @@ export class TxRequest {
    * Report a component in the tx group as not sending a request
    */
   postNoRequest(): void {
+    this.incDoneCountAndMaybeSend();
+  }
+
+  private incDoneCountAndMaybeSend(): void {
     this.numComponentsDone += 1;
     if (this.isReady()) {
       this.send();
@@ -127,9 +131,9 @@ export class TxRequest {
 
   /**
    * Gets the context for this tx request.
-   * The context is a map `field -> value` for all the fields of the app component
-   * containing the tx. Only fields that can be referenced in template exprs
-   * are included (e.g., `ngOnInit` is not part of the context)
+   * The context is a map `field -> value` for all the fields of the app
+   * component containing the tx. Only fields that can be referenced in template
+   * exprs are included (e.g., `ngOnInit` is not part of the context)
    */
   private getContext(): { [field: string]: any } {
     const appComponentNode = NodeUtils
@@ -227,7 +231,6 @@ export class TxRequest {
     // this object will never be used again so we can drop the reference
     delete GatewayService.txBatches[NodeUtils.GetRunId(this.fromNode)];
   }
-
 }
 
 
@@ -252,7 +255,7 @@ export class GatewayService {
    * A component must call get, post, or noRequest exactly once
    */
 
-  get<T>(path?: string, options?: RequestOptions) {
+  get<T>(path?: string, options?: RequestOptions): Observable<T> {
     return this.request<T>(
       Method.GET,
       path,
@@ -261,7 +264,8 @@ export class GatewayService {
     );
   }
 
-  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
+  post<T>(path?: string, body?: string | Object, options?: RequestOptions)
+    : Observable<T> {
     return this.request<T>(
       Method.POST,
       path,
@@ -270,7 +274,7 @@ export class GatewayService {
     );
   }
 
-  noRequest() {
+  noRequest(): void {
     const runId = NodeUtils.GetRunId(this.from.nativeElement);
     const txRequest = this.getTxReq(runId);
     txRequest.postNoRequest();

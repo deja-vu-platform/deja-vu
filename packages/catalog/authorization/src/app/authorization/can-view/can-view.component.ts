@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter,
+  AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
@@ -20,7 +20,8 @@ interface CanViewRes {
   templateUrl: './can-view.component.html',
   styleUrls: ['./can-view.component.css']
 })
-export class CanViewComponent implements OnInit, OnChanges, OnExec {
+export class CanViewComponent implements
+  AfterViewInit, OnInit, OnChanges, OnExec {
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
@@ -35,6 +36,9 @@ export class CanViewComponent implements OnInit, OnChanges, OnExec {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -43,6 +47,12 @@ export class CanViewComponent implements OnInit, OnChanges, OnExec {
   }
 
   load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  dvOnEval() {
     this.doRequest();
   }
 
@@ -51,7 +61,7 @@ export class CanViewComponent implements OnInit, OnChanges, OnExec {
   }
 
   doRequest() {
-    if (!this.gs) {
+    if (!this.canEval()) {
       return;
     }
     this.gs.get<CanViewRes>(this.apiPath, {
@@ -68,5 +78,9 @@ export class CanViewComponent implements OnInit, OnChanges, OnExec {
       this._canView = res.data.canView;
       this.canView.emit(this._canView);
     });
+  }
+
+  canEval() {
+    return this.gs && this.principalId && this.resourceId;
   }
 }

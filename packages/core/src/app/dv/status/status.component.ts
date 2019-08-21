@@ -12,8 +12,9 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class StatusComponent
 implements OnInit, OnExecSuccess, OnExecFailure {
   @Input() savedText = 'Saved';
+  @Input() showSavedText = true;
   saved = false;
-  error: string = '';
+  error = '';
 
   constructor(private elem: ElementRef, private rs: RunService) {}
 

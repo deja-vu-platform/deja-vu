@@ -2,10 +2,12 @@
   <accord.navbar accessRequired=false />
   <div class="center-column-dynamic-auth">
     <h1>Sign In</h1>
-    <dv.tx>
-      <authentication.sign-in />
-      <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
-    </dv.tx>
-    Don't have an account? <dv.link href="/sign-up"> Sign up here!</dv.link>
+    <div class="auth-form">
+      <dv.tx>
+        <authentication.sign-in />
+        <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+      </dv.tx>
+    </div>
+    Don't have an account? <dv.link href="/sign-up">Sign up here!</dv.link>
   </div>
 </dv.component>

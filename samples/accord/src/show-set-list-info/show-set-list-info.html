@@ -4,8 +4,9 @@
                        hidden=true
   />
   <dv.if condition=setList.show-object.loadedObject>
-    <dv.link href="set-list" params={groupId:$groupId,setListId:$setList.id}>
-      <dv.show-entity entity=setList.show-object.loadedObject.name />
+    <dv.show-entity entity=setList.show-object.loadedObject.name />
+    <dv.link href="set-list" params={ groupId:$groupId, setListId:$setList.id }>
+      View
     </dv.link>
   </dv.if>
 </dv.component>

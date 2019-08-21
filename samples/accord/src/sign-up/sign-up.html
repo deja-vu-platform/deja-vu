@@ -2,13 +2,16 @@
   <accord.navbar accessRequired=false />
   <div class="center-column-dynamic-auth">
     <h1>Sign Up</h1>
-    <dv.tx>
-      <dv.gen-id />
-      <userProfile.create-object showOptionToSubmit=false id=dv.gen-id.id />
-      <authentication.register-user showOptionToSubmit=false id=dv.gen-id.id/>
-      <dv.button class="theme-button">Sign Up</dv.button>
-      <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
-    </dv.tx>
-    Already have an account? <dv.link href="/sign-in"> Log in here!</dv.link>
+    <div class="auth-form">
+      <dv.tx>
+        <dv.status showSavedText=false />
+        <dv.gen-id />
+        <userProfile.create-object showOptionToSubmit=false id=dv.gen-id.id />
+        <authentication.register-user showOptionToSubmit=false id=dv.gen-id.id/>
+        <dv.button class="theme-button">Sign Up</dv.button>
+        <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+      </dv.tx>
+    </div>
+    Already have an account? <dv.link href="/sign-in">Log in here!</dv.link>
   </div>
 </dv.component>

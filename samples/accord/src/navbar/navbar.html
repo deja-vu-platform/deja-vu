@@ -9,51 +9,31 @@
   <nav class="navbar">
     <div>
       <h3 class="navbar-header inline-block">
-        <dv.link href="/">
-          Accord
-        </dv.link>
+        <dv.link href="/">Accord</dv.link>
       </h3>
       <dv.if class="inline-block" condition=authentication.logged-in.user>
-        &nbsp;
-        &nbsp;
-        <dv.link href="/">
-          Dashboard
-        </dv.link>
-        &nbsp;
-        <dv.link href="/about">
-          About
-        </dv.link>
-        &nbsp;
+        <dv.link href="/">Dashboard</dv.link>
+        <dv.link href="/about">About</dv.link>
       </dv.if>
     </div>
 
     <dv.if condition=authentication.logged-in.user>
-      <mat-expansion-panel class="mat-elevation-z0">
-        <mat-expansion-panel-header>
-          <div class="navbar-right-elem">
-            Logged In:
-            <userProfile.show-object id=authentication.logged-in.user.id showOnly=["firstName"] />
-          </div>
-        </mat-expansion-panel-header>
-        <dv.link href="/user-profile">Account Setting</dv.link>
-        <br />
+      <div class="navbar-right-elem">
+        <userProfile.show-object
+          id=authentication.logged-in.user.id showOnly=["firstName"] />
+        <dv.link href="/user-profile">Profile</dv.link>
         <dv.tx>
           <authentication.sign-out buttonLabel="Logout"/>
           <dv.link href="/sign-in" hidden=true />
         </dv.tx>
-      </mat-expansion-panel>
+      </div>
     </dv.if>
 
-      <dv.if condition=!authentication.logged-in.user>
-        <div class="form-inline navbar-right">
-          <dv.link href="/sign-in">
-            Login
-          </dv.link>
-
-          <dv.link href="/sign-up">
-            Register
-          </dv.link>
-        </div>
-      </dv.if>
+    <dv.if condition=!authentication.logged-in.user>
+      <div class="form-inline navbar-right">
+        <dv.link href="/sign-in">Login</dv.link>
+        <dv.link href="/sign-up">Register</dv.link>
+      </div>
+    </dv.if>
   </nav>
 </dv.component>

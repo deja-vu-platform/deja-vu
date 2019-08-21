@@ -9,12 +9,9 @@
     <dv.if condition=groupInfo.show-object.loadedObject class="individual-card">
       <h1>
         <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
-        &nbsp;
         <dv.if condition=authorization.can-view.canView class="inline-block">
           <dv.link href="/edit-group" params={ groupId:$groupId }>
-            <mat-icon>
-              settings
-            </mat-icon>
+            <mat-icon>settings</mat-icon>
           </dv.link>
         </dv.if>
       </h1>

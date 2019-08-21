@@ -1,6 +1,11 @@
 # Authorization
 
-Controls access to resources
+Controls access to resources.
+
+Implements a simple authorization model where
+each resource has an owner (who can view and edit)
+and viewers (who can only view the resource but
+not edit).
 
 ## Components
 

@@ -8,7 +8,7 @@
     <dv.show-entity entity=userProfile.show-object.loadedObject.lastName />
   </dv.if>
   <dv.if condition=!$allowEdit class="inline-block">
-    <dv.if condition=authorization.can-view.canView class="inline-block"> (Admin)</dv.if>
+    <dv.if condition=authorization.can-view.canView class="inline-block">(Admin)</dv.if>
   </dv.if>
 
   <dv.if condition=$allowEdit class="inline-block">
@@ -27,7 +27,8 @@
                         joinGroupText="Add back"
                         leaveGroupText="Remove" />
     </dv.if>
-    <dv.if condition=($userId===$currentUserId)&&authorization.can-view.canView class="inline-block">
+    <dv.if condition=($userId===$currentUserId) && authorization.can-view.canView
+           class="inline-block">
       <authorization.remove-viewer id=$groupId
                                    viewerId=$userId
                                    buttonLabel="Give up my admin access"
