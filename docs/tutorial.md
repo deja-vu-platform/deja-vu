@@ -15,7 +15,7 @@ The code of the app can be found in [samples/sn](../samples/sn).
 ## Contents
 {:.no_toc}
 
-1. This is replaced
+- This is replaced
 {:toc}
 
 ## Including and Configuring Concepts
