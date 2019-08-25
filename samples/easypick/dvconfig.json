@@ -1,20 +1,11 @@
 {
   "name": "easypick",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "authentication": {},
+    "authorization": {},
     "class": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Class",
           "type": "object",
@@ -87,7 +78,6 @@
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
@@ -111,39 +101,22 @@
         }
       }
     },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "comment": {},
     "paceReasonable": {
-      "name": "rating",
-      "config": {
-        "reinitDbOnStartup": false
-      }
+      "name": "rating"
     },
     "gradingFair": {
-      "name": "rating",
-      "config": {
-        "reinitDbOnStartup": false
-      }
+      "name": "rating"
     },
     "contentsManageable": {
-      "name": "rating",
-      "config": {
-        "reinitDbOnStartup": false
-      }
+      "name": "rating"
     },
     "overallRating": {
-      "name": "rating",
-      "config": {
-        "reinitDbOnStartup": false
-      }
+      "name": "rating"
     },
     "reviewInfo": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Review",
           "type": "object",

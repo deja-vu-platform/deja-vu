@@ -2,14 +2,16 @@ import {
   Component, ElementRef, EventEmitter, Input, Output, Type
 } from '@angular/core';
 
+import { v4 as uuid } from 'uuid';
+
 import { ComponentValue } from '../include/include.component';
-import { ShowEntityComponent } from '../show-entity/show-entity.component';
 import { RunService } from '../run.service';
+import { ShowEntityComponent } from '../show-entity/show-entity.component';
 
 
 @Component({
   selector: 'dv-choose',
-  templateUrl: './choose.component.html',
+  templateUrl: './choose.component.html'
 })
 export class ChooseComponent {
   @Input() chooseSelectPlaceholder = 'Choose';
@@ -19,6 +21,11 @@ export class ChooseComponent {
 
   @Input() addButtonLabel = 'Add';
   @Input() showChooseButton = true;
+  /**
+   * Whether or not the selection should be cleared when the component
+   * executes sucessfully
+   */
+  @Input() resetOnExecSuccess = false;
 
   @Input() entities: any[] = [];
   entityIndex: number | undefined;
@@ -26,6 +33,8 @@ export class ChooseComponent {
   @Output() selectedEntity = new EventEmitter<any>();
 
   choose;
+  parentId = uuid();
+
 
   constructor(private elem: ElementRef, private rs: RunService) {
     this.choose = this;
@@ -44,5 +53,11 @@ export class ChooseComponent {
   add() {
     this.selectedEntity.emit(this.entities[this.entityIndex!]);
     this.entityIndex = undefined;
+  }
+
+  dvOnExecSuccess() {
+    if (this.resetOnExecSuccess) {
+      this.entityIndex = undefined;
+    }
   }
 }

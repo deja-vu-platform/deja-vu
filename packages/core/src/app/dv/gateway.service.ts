@@ -62,6 +62,7 @@ const headers = new HttpHeaders({ 'Content-type': 'application/json' });
 /**
  * Class for batching transaction requests.
  */
+// TODO: refactor this class to have a clear sep between tx and non-tx reqs
 export class TxRequest {
   // info that would have been sent by each component individually
   private requests: ChildRequest[] = [];
@@ -123,6 +124,10 @@ export class TxRequest {
    * Whether or not the request is ready to send
    */
   private isReady(): boolean {
+    console.log(
+      `Checking if req is ready: got ` +
+      `${this.numComponentsDone}/${this.numComponentsTotal}`);
+
     return (
       this.numComponentsTotal !== undefined
       && this.numComponentsDone === this.numComponentsTotal
@@ -197,6 +202,7 @@ export class TxRequest {
           break;
       }
       const subject = this.subjects[0];
+      console.log('Sending non-tx request');
       obs.subscribe(
         (resBody) => {
           subject.next(resBody);
@@ -208,6 +214,7 @@ export class TxRequest {
         }
       );
     } else {
+      console.log('Sending TX request');
       this.http.post<ChildResponse[]>(
         this.gatewayUrl,
         { context: this.getContext(), requests: this.requests },
@@ -233,9 +240,10 @@ export class TxRequest {
   }
 }
 
-
+// Note: this code operates on the assumption that no runId => no tx
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
+  static txPendingNumComponents: { [txId: string]: number } = {};
   fromStr: string;
   private readonly gatewayHttpUrl: string;
 
@@ -292,24 +300,13 @@ export class GatewayService {
    * Component path.
    */
   protected generateFromStr(): string {
-    let node = this.from.nativeElement;
+    const node = this.from.nativeElement;
     const seenComponentNodes: string[] = [];
-    while (node && node.getAttribute) {
-      if (this.isComponent(node)) {
-        seenComponentNodes.push(NodeUtils.GetFqTagOfNode(node));
+    NodeUtils.WalkUpFromNode(node, this.renderer, undefined, (vNode) => {
+      if (this.isComponent(vNode)) {
+        seenComponentNodes.push(NodeUtils.GetFqTagOfNode(vNode));
       }
-
-      let dvClass: string | null = null;
-      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
-        const match = /dv-parent-is-(.*)/i.exec(cssClass);
-        dvClass = match ? match[1] : null;
-      }
-      if (dvClass !== null) {
-        node = this.renderer.selectRootElement('.dv-' + dvClass);
-      } else {
-        node = this.renderer.parentNode(node);
-      }
-    }
+    });
 
     return JSON.stringify(_.reverse(seenComponentNodes));
   }
@@ -323,6 +320,13 @@ export class GatewayService {
       txRequest = new TxRequest(
         this.gatewayHttpUrl, this.http, this.from.nativeElement,
         this.renderer, this.rs);
+      const maybeNumComponents = GatewayService
+        .txPendingNumComponents[runId];
+      if (maybeNumComponents) {
+        console.log(`Pulled up pending num components for ${runId}`);
+        txRequest.setNumComponents(maybeNumComponents);
+        delete GatewayService.txPendingNumComponents[runId];
+      }
       if (runId) {
         GatewayService.txBatches[runId] = txRequest;
       }
@@ -359,7 +363,7 @@ export class GatewayService {
   private buildBaseParams(path?: string, options?: RequestOptions): BaseParams {
     const params: BaseParams = {
       from: this.fromStr,
-      fullComponentName: this.getComponentName(),
+      fullComponentName: this.getComponentName()
     };
     if (path) {
       params.path = path;

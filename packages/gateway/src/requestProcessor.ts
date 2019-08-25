@@ -277,7 +277,7 @@ export abstract class RequestProcessor {
       const dvTxNodeIndex: number = componentPath.indexOfClosestTxNode()!;
       const cohortComponents = this.getCohortComponents(
         componentPath, dvTxNodeIndex);
-      prunedCohortComponents = this.getPrunedCohortComponents(cohortComponents,
+      prunedCohortComponents = this.pruneCohortComponents(cohortComponents,
         childRequests.map((childRequest) =>
           ComponentPath.fromString(childRequest.query.from)
             .last()));
@@ -349,7 +349,7 @@ export abstract class RequestProcessor {
         const cohortComponents = this
           .getCohortComponents(componentPath, dvTxNodeIndex);
         // throws error if invalid
-        this.getPrunedCohortComponents(cohortComponents,
+        this.pruneCohortComponents(cohortComponents,
           [componentPath.last()]);
       }
 
@@ -375,7 +375,7 @@ export abstract class RequestProcessor {
     _dvTxNodeIndex: number
   ): ComponentTag[];
 
-  protected abstract getPrunedCohortComponents(cohortComponents: ComponentTag[],
+  protected abstract pruneCohortComponents(cohortComponents: ComponentTag[],
     receivedRequestFqTags: string[]): ComponentTag[];
 
   protected validateRequest(req: express.Request | ChildRequest)
@@ -598,7 +598,7 @@ export class AppRequestProcessor extends RequestProcessor {
    *         if there are more requests for an fqtag received than expected; or
    *         if there are fqtags received that are not part of the cohort at all
    */
-  protected getPrunedCohortComponents(cohortComponents: ComponentTag[],
+  protected pruneCohortComponents(cohortComponents: ComponentTag[],
     receivedRequestFqTags: string[]): ComponentTag[] {
     const fqTagsSet: Set<string> = new Set(receivedRequestFqTags);
     if (fqTagsSet.size < receivedRequestFqTags.length) {
@@ -703,7 +703,7 @@ export class DesignerRequestProcessor extends RequestProcessor {
     return this.cohortComponents;
   }
 
-  protected getPrunedCohortComponents(_cohortComponents: ComponentTag[],
+  protected pruneCohortComponents(_cohortComponents: ComponentTag[],
     _receivedRequestFqTags: string[]): ComponentTag[] {
     return this.cohortComponents;
   }

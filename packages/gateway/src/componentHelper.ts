@@ -60,6 +60,7 @@ const INDENT_NUM_SPACES = 2;
 export class ComponentHelper {
   private readonly componentTable: ComponentTable;
   private readonly componentsNoExecRequest: Set<string>;
+  private readonly componentsNoEvalRequest: Set<string>;
   private readonly componentsRequestOptional: Set<string>;
   private readonly noApp: boolean = false;
 
@@ -180,7 +181,7 @@ export class ComponentHelper {
     const unparsedComponentExpr: string | undefined = _
       .get(includeComponentTag.inputs, '[component]');
     if (_.isEmpty(unparsedComponentExpr)) {
-      throw new Error(noComponentErrorMsg('no component input'));
+      throw new Error(noComponentErrorMsg(`No "component" input`));
     }
 
     let componentInput: ComponentInput | null;
@@ -365,6 +366,9 @@ export class ComponentHelper {
     this.componentsNoExecRequest = new Set<string>(
       _.flatMap(usedConcepts, (concept: string) => _.get(
         ComponentHelper.GetComponentsNoRequest(concept), 'exec', [])));
+    this.componentsNoEvalRequest = new Set<string>(
+      _.flatMap(usedConcepts, (concept: string) => _.get(
+        ComponentHelper.GetComponentsNoRequest(concept), 'eval', [])));
     this.componentsRequestOptional = new Set<string>(
       _.flatMap(usedConcepts, (concept: string): string[] =>
         ComponentHelper.GetComponentsRequestOptional(concept) || []));
@@ -425,6 +429,14 @@ export class ComponentHelper {
    */
   shouldHaveExecRequest(tag: string): boolean {
     return !this.componentsNoExecRequest.has(tag);
+  }
+
+  /**
+   * @returns true if the component given by `tag` is expected to do an eval
+   * request
+   */
+  shouldHaveEvalRequest(tag: string): boolean {
+    return !this.componentsNoEvalRequest.has(tag);
   }
 
   isRequestOptional(tag: string): boolean {

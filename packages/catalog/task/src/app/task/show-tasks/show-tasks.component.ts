@@ -1,5 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -9,6 +10,9 @@ import { ShowTaskComponent } from '../show-task/show-task.component';
 
 import { Task } from '../shared/task.model';
 
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
+
 
 @Component({
   selector: 'task-show-tasks',
@@ -16,7 +20,13 @@ import { Task } from '../shared/task.model';
   styleUrls: ['./show-tasks.component.css']
 })
 export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   // Fetch rules
   // If undefined then the fetched tasks are not filtered by that property
   @Input() assigneeId: string | undefined;
@@ -67,8 +77,23 @@ OnChanges {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we'd send double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
   load() {
@@ -79,6 +104,19 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
       this.gs
         .get<{data: {tasks: Task[]}}>('/graphql', {
           params: {

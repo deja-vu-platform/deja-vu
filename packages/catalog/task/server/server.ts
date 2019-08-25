@@ -101,7 +101,7 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
     Query: {
       tasks: async (_root, { input }: { input: TasksInput }) => {
         const filterOp = _.omit(input, ['assigned']);
-        if (!input.assigned) {
+        if (input.assigned === false) {
           filterOp['assigneeId'] = null;
         }
 

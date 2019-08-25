@@ -25,16 +25,17 @@
               <h2>Add a New Child</h2>
               <dv.gen-id />
               <dv.status savedText="Child created" />
+              <parentauthentication.authenticate as new-child-auth
+                user=chorestar.parent-navbar.user
+                waitOn=['user'] hidden=true />
               <child.create-object
+                initialValue={ parentId: chorestar.parent-navbar.user?.id }
+                showExclude=['parentId']
                 id=dv.gen-id.id showOptionToSubmit=false />
               <childauthentication.register-user
                 id=dv.gen-id.id
                 signIn=false
                 showOptionToSubmit=false />
-              <group.add-to-group
-                id=chorestar.parent-navbar.user?.id
-                memberId=dv.gen-id.id
-                hidden=true />
               <dv.button>Create Child</dv.button>
             </dv.tx>
           </div>
@@ -43,24 +44,35 @@
         <div class="col-md-6">
           <div class="white-box">
             <h2>Chores to Approve</h2>
-            <task.show-tasks
-              approved=false
-              completed=true
-              assignerId=chorestar.parent-navbar.user?.id
-              noTasksToShowText="No chores to approve"
-              showTask=<chorestar.show-chore
-                chore=$task showOptionToApprove=true
-                view="parent" /> />
+            <dv.tx>
+              <parentauthentication.authenticate as chores-to-approve-auth
+                user=chorestar.parent-navbar.user
+                waitOn=['user'] hidden=true />
+              <task.show-tasks as chores-to-approve-tasks
+                approved=false
+                completed=true
+                assignerId=chorestar.parent-navbar.user?.id
+                waitOn=['assignerId']
+                noTasksToShowText="No chores to approve"
+                showTask=<chorestar.show-chore
+                  chore=$task showOptionToApprove=true
+                  view="parent" /> />
+            </dv.tx>
           </div>
 
-          <!-- TODO: rewards to approve -->
           <div class="white-box">
             <h2>Assigned Chores</h2>
-            <task.show-tasks
-              completed=false
-              assignerId=chorestar.parent-navbar.user?.id
-              noTasksToShowText="No assigned chores"
-              showTask=<chorestar.show-chore chore=$task /> />
+            <dv.tx>
+              <parentauthentication.authenticate as assigned-chores-auth
+                user=chorestar.parent-navbar.user
+                waitOn=['user'] hidden=true />
+              <task.show-tasks as assigned-chores-task
+                completed=false
+                assignerId=chorestar.parent-navbar.user?.id
+                waitOn=['assignerId']
+                noTasksToShowText="No assigned chores"
+                showTask=<chorestar.show-chore chore=$task /> />
+            </dv.tx>
           </div>
 
           <div class="white-box">
@@ -68,7 +80,6 @@
             <reward.show-objects
               showObject=<chorestar.show-reward reward=$object /> />
           </div>
-
         </div>
       </div>
     </div>

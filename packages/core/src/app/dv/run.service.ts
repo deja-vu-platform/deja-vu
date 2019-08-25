@@ -93,8 +93,8 @@ export class RunService {
   }
 
   /**
-   * Register a new component. Should be called on init. Only components that can be
-   * Exec are required to be registered.
+   * Register a new component. Should be called on init. Only components that
+   * can be run are required to be registered.
    */
   register(elem: ElementRef, component: any) {
     const componentId = uuid();
@@ -127,27 +127,40 @@ export class RunService {
   }
 
   private getTargetComponent(initialNode) {
-    let parentComponent = initialNode;
-    do {
-      parentComponent = this.renderer.parentNode(parentComponent);
-    } while (parentComponent && parentComponent.getAttribute &&
-    !NodeUtils.IsComponent(parentComponent));
+    let pComponent = this.renderer.parentNode(initialNode);
+    NodeUtils.WalkUpFromNode(pComponent, this.renderer,
+      (node) => {
+        if (NodeUtils.IsComponent(node)) {
+          pComponent = node;
 
-    return RunService.IsDvTx(parentComponent) ? parentComponent : initialNode;
+          return true;
+        }
+
+        return false;
+      });
+
+    return RunService.IsDvTx(pComponent) ? pComponent : initialNode;
   }
 
   private async run(runType: RunType, elem: ElementRef) {
     const targetComponent = this.getTargetComponent(elem.nativeElement);
     const targetComponentFqTag = NodeUtils.GetFqTagOfNode(targetComponent);
-    console.log(`Target component is ${targetComponentFqTag}`);
-    if (NodeUtils.HasRunId(targetComponent)) {
+    const runId = NodeUtils.GetRunId(targetComponent);
+    if (runId) {
       console.log(
-        `Skipping ${runType} since the same one is already in progress`);
+        `Skipping ${runType} (${runId}) since there's already one in ` +
+        `progress`);
 
       return;
     }
-    const id = uuid();
-    NodeUtils.SetRunId(targetComponent, id);
+    let id;
+    if (RunService.IsDvTx(targetComponent)) {
+      id = uuid();
+      NodeUtils.SetRunId(targetComponent, id);
+    }
+
+    console.log(
+      `Target component is ${targetComponentFqTag} (${runType}, ${id})`);
     let runResultMap: RunResultMap | undefined;
     try {
       runResultMap = await this.callDvOnRun(runType, targetComponent, id);
@@ -168,7 +181,8 @@ export class RunService {
    * Walks the dom starting from `node` calling `onComponent` with the component
    * info when a component is encountered. No child of components are traversed.
    */
-  private walkComponents(node, onComponent: (componentInfo, str?) => void): void {
+  private walkComponents(
+    node, onComponent: (componentInfo, str?) => void): void {
     const componentId = NodeUtils.GetComponentId(node);
     if (!componentId) {
       // node is not a dv-component (e.g., it's a <div>) or is dv-tx
@@ -181,14 +195,16 @@ export class RunService {
   }
 
   private async callDvOnRun(
-    runType: RunType, node, id: string): Promise<RunResultMap> {
+    runType: RunType, node, id: string | undefined): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
     const runs: Promise<RunResultMap>[] = [];
 
     // run the component, or each component in tx with the same RUN ID
     this.walkComponents(node, (componentInfo, componentId) => {
       if (componentInfo.component[dvOnRun]) {
-        NodeUtils.SetRunId(componentInfo.node, id);
+        if (id !== undefined) {
+          NodeUtils.SetRunId(componentInfo.node, id);
+        }
         runs.push(
           Promise
             .resolve(componentInfo.component[dvOnRun]())
@@ -199,6 +215,12 @@ export class RunService {
     // send the request, if relevant
     if (GatewayService.txBatches[id]) {
       GatewayService.txBatches[id].setNumComponents(runs.length);
+    } else if (id) {
+      // If no one initialized the tx batch then then we can't mark the
+      // num components expected. We have to add it to pending and the gateway
+      // is going to set num components for us
+      console.log(`Set num comps pending for id ${id}`);
+      GatewayService.txPendingNumComponents[id] = runs.length;
     }
 
     const resultMaps: RunResultMap[] = await Promise.all(runs);

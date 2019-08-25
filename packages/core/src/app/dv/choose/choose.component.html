@@ -1,19 +1,23 @@
-<mat-form-field>
-  <mat-select [placeholder]="chooseSelectPlaceholder"
-              [(value)]="entityIndex" (selectionChange)="entitySelected()">
-    <mat-option>None</mat-option>
-    <mat-option *ngFor="let entity of entities; index as i" [value]="i">
-      <dv-include [component]="showEntity" default-showEntity="{ tag: dv-show-entity }"
-                  [inputs]="{
-                    entity: entity
-                  }"
-                  [parent]="choose">
-      </dv-include>
-    </mat-option>
-  </mat-select>
-</mat-form-field>
-<div *ngIf="showChooseButton">
-  <button mat-button (click)="add()" [disabled]="entityIndex === undefined">
-    {{addButtonLabel}}
-  </button>
-</div>
+<!-- <span [ngClass]="'dv-parent-' + parentId"> -->
+  <mat-form-field>
+    <mat-select
+      [placeholder]="chooseSelectPlaceholder"
+      [(value)]="entityIndex" (selectionChange)="entitySelected()">
+      <mat-option>None</mat-option>
+      <mat-option
+        *ngFor="let entity of entities; index as i" [value]="i">
+        <!-- [attr.dvParentIs]="parentId"> -->
+        <dv-include
+          [component]="showEntity" default-showEntity="{ tag: dv-show-entity }"
+          [inputs]="{ entity: entity }"
+          [parent]="choose">
+        </dv-include>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div *ngIf="showChooseButton">
+    <button mat-button (click)="add()" [disabled]="entityIndex === undefined">
+      {{addButtonLabel}}
+    </button>
+  </div>
+  <!-- </span> -->

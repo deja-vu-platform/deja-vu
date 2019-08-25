@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 export const OF_ATTR = 'dvOf';
 const ALIAS_ATTR = 'dvAlias';
 const CLASS_ATTR = 'class';
+const PARENT_ID_ATTR = 'dvParentIs';
 
 const COMPONENT_ID_ATTR = '_dvComponentId';
 const RUN_ID_ATTR = '_dvRunId';
@@ -69,7 +70,9 @@ export class NodeUtils {
 
   static IsComponent(node): boolean {
     // No HTML tag has a hyphen
-    return _.includes(NodeUtils.GetTag(node), '-') && !NodeUtils.GetTag(node).startsWith('mat-');
+    return _.includes(NodeUtils.GetTag(node), '-') &&
+      !NodeUtils.GetTag(node)
+        .startsWith('mat-');
   }
 
   static IsAppComponent(node): boolean {
@@ -117,20 +120,17 @@ export class NodeUtils {
         visitFn(node);
       }
 
-      let dvClass: string | null = null;
-      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
-        const match = /dv-parent-is-(.*)/i.exec(cssClass);
-        dvClass = match ? match[1] : null;
-      }
-      if (dvClass !== null) {
-        node = renderer.selectRootElement('.dv-' + dvClass);
+      const parentAttr = NodeUtils.GetAttribute(node, PARENT_ID_ATTR);
+      if (parentAttr !== undefined) {
+        node = renderer.selectRootElement(`.dv-parent-${parentAttr}`);
       } else {
         node = renderer.parentNode(node);
       }
     }
   }
 
-  static GetAppComponentNodeContainingNode(node, renderer: Renderer2): any | null {
+  static GetAppComponentNodeContainingNode(
+    node, renderer: Renderer2): any | null {
     let appComponentNode = null;
     NodeUtils.WalkUpFromNode(node, renderer, (visitNode) => {
       if (NodeUtils.IsAppComponent(visitNode)) {

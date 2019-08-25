@@ -2,49 +2,20 @@
   "name": "chorestar",
   "usedConcepts": {
     "parentauthentication": {
-      "name": "authentication",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "parentauthorization": {
-      "name": "authorization",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+      "name": "authentication"
     },
     "childauthentication": {
-      "name": "authentication",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "childauthorization": {
-      "name": "authorization",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+      "name": "authentication"
     },
     "transfer": {
       "config": {
-        "reinitDbOnStartup": true,
         "balanceType": "money"
       }
     },
-    "task": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "group": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "task": {},
     "chore": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Chore",
           "type": "object",
@@ -63,12 +34,14 @@
     "child": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Child",
           "type": "object",
           "properties": {
               "name": {
+                "type": "string"
+              },
+              "parentId": {
                 "type": "string"
               }
           },
@@ -79,7 +52,6 @@
     "reward": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Reward",
           "type": "object",

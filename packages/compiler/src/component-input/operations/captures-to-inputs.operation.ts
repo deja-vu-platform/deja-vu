@@ -136,16 +136,19 @@ export function capturesToInputs(
     ObjectLiteral_noTrailingComma: (openCb, propAssignments, closeCb) =>
       openCb.sourceString +
       propAssignments.capturesToInputs()
+        .asIteration()
         .join(', ') +
       closeCb.sourceString,
     ObjectLiteral_trailingComma: (openCb, propAssignments, _comma, closeCb) =>
       openCb.sourceString +
       propAssignments.capturesToInputs()
+        .asIteration()
         .join(', ') +
       closeCb.sourceString,
     Literal_array: (openSb, exprs, closeSb) =>
       openSb.sourceString +
-      exprs.capturesToInputs()
+      exprs.asIteration()
+        .capturesToInputs()
         .join(', ') +
       closeSb.sourceString,
     Content_element: (element) => element.capturesToInputs(),

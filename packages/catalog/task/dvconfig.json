@@ -20,6 +20,11 @@
       ]
     }
   },
+  "componentsNoRequest": {
+    "eval": [
+      "task-create-task"
+    ]
+  },
   "componentsRequestOptional": [
     "task-show-task-count",
     "task-show-tasks"

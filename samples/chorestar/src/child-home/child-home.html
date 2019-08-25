@@ -1,8 +1,6 @@
 <dv.component name="child-home">
   <div class="body">
     <chorestar.child-navbar />
-    <group.show-groups
-      withMemberId=chorestar.child-navbar.user?.id hidden=true />
 
     <div class="container-fluid main">
       <div id="child-heading" class="col-md-12">
@@ -11,8 +9,13 @@
             <h3>
               StarBank Total:
               <i class="material-icons icon">star_rate</i>
-              <transfer.show-balance
-                accountId=chorestar.child-navbar.user?.id />
+              <dv.tx>
+               <childauthentication.authenticate as bank-auth
+                  user=chorestar.child-navbar.user waitOn=['user']
+                  hidden=true />
+                <transfer.show-balance
+                  accountId=chorestar.child-navbar.user?.id />
+              </dv.tx>
             </h3>
           </div>
         </div>
@@ -22,34 +25,52 @@
             <div class="row section">
               <div class="col-md-12">
                 <h3>Uncompleted Chores</h3>
-                <task.show-tasks
-                  noTasksToShowText="No uncompleted chores"
-                  assigneeId=chorestar.child-navbar.user?.id
-                  completed=false
-                  showOptionToComplete=true
-                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+                <dv.tx>
+                  <childauthentication.authenticate as uchores-auth
+                    user=chorestar.child-navbar.user waitOn=['user']
+                    hidden=true />
+                  <task.show-tasks as uchores-tasks
+                    noTasksToShowText="No uncompleted chores"
+                    assigneeId=chorestar.child-navbar.user?.id
+                    waitOn=['assigneeId']
+                    completed=false
+                    showOptionToComplete=true
+                    showTask=<chorestar.show-chore chore=$task view="child" /> />
+                </dv.tx>
               </div>
             </div>
             <div class="row section">
               <div class="col-md-12">
                 <h3>Chores Pending Approval</h3>
-                <task.show-tasks
-                  noTasksToShowText="No chores pending approval"
-                  assigneeId=chorestar.child-navbar.user?.id
-                  completed=true
-                  approved=false
-                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+                <dv.tx>
+                  <childauthentication.authenticate as chorespa-auth
+                    user=chorestar.child-navbar.user waitOn=['user']
+                    hidden=true />
+                  <task.show-tasks as chorespa-tasks
+                    noTasksToShowText="No chores pending approval"
+                    assigneeId=chorestar.child-navbar.user?.id
+                    waitOn=['assigneeId']
+                    completed=true
+                    approved=false
+                    showTask=<chorestar.show-chore chore=$task view="child" /> />
+                </dv.tx>
               </div>
             </div>
             <div class="row section">
               <div class="col-md-12">
                 <h3>Completed and Approved Chores</h3>
-                <task.show-tasks
-                  noTasksToShowText="No approved chores"
-                  assigneeId=chorestar.child-navbar.user?.id
-                  completed=true
-                  approved=true
-                  showTask=<chorestar.show-chore chore=$task view="child" /> />
+                <dv.tx>
+                  <childauthentication.authenticate as cachores-auth
+                    user=chorestar.child-navbar.user waitOn=['user']
+                    hidden=true />
+                  <task.show-tasks as cachores-tasks
+                    noTasksToShowText="No approved chores"
+                    assigneeId=chorestar.child-navbar.user?.id
+                    waitOn=['assigneeId']
+                    completed=true
+                    approved=true
+                    showTask=<chorestar.show-chore chore=$task view="child" /> />
+                </dv.tx>
               </div>
             </div>
           </div>
@@ -78,9 +99,7 @@
                   showElem= <dv.if
                   condition=$elem.cost gt transfer.show-balance.fetchedBalance>
                     <chorestar.show-reward
-                      reward=$elem
-                      user=chorestar.child-navbar.user
-                      showOptionToPurchase=false />
+                      reward=$elem showOptionToPurchase=false />
                   </dv.if>
                 />
               </div>
