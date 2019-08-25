@@ -1,28 +1,16 @@
 {
   "name": "lingua",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "authentication": {},
+    "authorization": {},
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
           "properties": {
             "name": {
-              "type": "string"
-            },
-            "email": {
               "type": "string"
             },
             "aboutMe": {
@@ -36,16 +24,9 @@
         }
       }
     },
-    "chat": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "chat": {},
     "chatGroup": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartUp": false
-      }
+      "name": "group"
     },
     "correction": {
       "name": "property",
@@ -73,16 +54,9 @@
         }
       }
     },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "rating": {},
     "chatTotal": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartUp": false
-      }
+      "name": "group"
     }
   },
   "routes": [

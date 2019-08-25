@@ -2,7 +2,7 @@
   [formGroup]="createMessageForm"
   class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <div *ngIf="newMessageSaved">
+    <div *ngIf="showMessageSavedText && newMessageSaved">
       <i class="material-icons">done</i>
         {{newMessageSavedText}}
     </div>

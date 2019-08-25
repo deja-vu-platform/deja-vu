@@ -1,8 +1,9 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 /**
@@ -34,14 +35,15 @@ export class DifferenceComponent implements OnInit, OnChanges {
   }
 
   /**
-   * if the original list is null, it will output and empty list
-   * if the subtractor is null, it will output the original list
+   * if the original list is `null`, it outputs an empty list
+   * if the subtractor is `null`, it outputs the original list
    */
   ngOnChanges() {
     if (!this.key) {
       this.difference.emit(_.difference(this.array, ...this.values));
     } else {
-      this.difference.emit(_.differenceBy(this.array, ...this.values, this.key));
+      this.difference.emit(
+        _.differenceBy(this.array, ...this.values, this.key));
     }
   }
 }

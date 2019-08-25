@@ -89,7 +89,7 @@ OnInit {
           },
           extraInfo: {
             returnFields: `
-              ${this.showMessageId ? 'id' : ''}
+              id
               ${this.showMessageContent ? 'content' : ''}
               ${this.showMessageTimestamp ? 'timestamp' : ''}
               ${this.showMessageAuthorId ? 'authorId' : ''}

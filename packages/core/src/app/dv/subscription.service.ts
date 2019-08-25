@@ -14,6 +14,7 @@ interface SubscriptionParams extends BaseParams {
 
 interface Subscription extends SubscriptionParams {}
 
+
 @Injectable()
 export class SubscriptionService {
   private websocket: WebSocketSubject<any>;
@@ -36,8 +37,8 @@ export class SubscriptionService {
 
     const subscription: Subscription = Object.assign(params, request, {
       extraInfo: {
-        component: 'subscribe',
-        ...request['extraInfo'],
+        action: 'subscribe',
+        ...request['extraInfo']
       }
     });
 
@@ -50,11 +51,13 @@ export class SubscriptionService {
 
   private buildParams(baseParams: BaseParams): SubscriptionParams {
     const subscriptionId = uuid();
+
     return Object.assign({}, baseParams, { subscriptionId });
   }
 
   private sendSubscription(subscription: Subscription) {
-    this.getWebSocket().next(JSON.stringify(subscription));
+    this.getWebSocket()
+      .next(JSON.stringify(subscription));
   }
 
   private handleMessage(msg): void {
@@ -74,6 +77,6 @@ export class SubscriptionService {
   }
 
   private createWebSocket(): WebSocketSubject<any> {
-    return WebSocketSubject.create(`ws://${this.gatewayUrl}`)
+    return WebSocketSubject.create(`ws://${this.gatewayUrl}`);
   }
 }

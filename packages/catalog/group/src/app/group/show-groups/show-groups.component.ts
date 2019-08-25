@@ -31,6 +31,7 @@ OnChanges {
   @Input() showGroup: ComponentValue = {
     type: <Type<Component>> ShowGroupComponent
   };
+  @Input() noGroupsToShowText = 'No groups to show';
   _groups: Group[] = [];
   @Output() groups = new EventEmitter<Group[]>();
 

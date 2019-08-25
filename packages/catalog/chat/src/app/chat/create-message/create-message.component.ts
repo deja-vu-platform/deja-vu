@@ -54,6 +54,7 @@ export class CreateMessageComponent implements OnInit, OnExec, OnExecFailure,
   @Input() buttonLabel = 'Create Message';
   @Input() inputContentLabel = 'Content';
   @Input() newMessageSavedText = 'New message saved';
+  @Input() showMessageSavedText = true;
 
   @ViewChild(FormGroupDirective) form;
 

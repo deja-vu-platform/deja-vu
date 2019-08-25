@@ -91,11 +91,11 @@ export function startGateway(
     console.log('New gateway ws connection');
 
     ws.on('message', (message: string) => {
-        console.log('Gateway received message from client: %s', message);
-        const subscriptionObj = JSON.parse(message);
-        const subscriptionId = subscriptionObj.subscriptionId;
+      console.log('Gateway received message from client: %s', message);
+      const subscriptionObj = JSON.parse(message);
+      const subscriptionId = subscriptionObj.subscriptionId;
 
-        requestProcessor
+      requestProcessor
         .processSubscription(subscriptionObj)
         .subscribe({
           next: (res) => {

@@ -311,7 +311,8 @@ export class TxCoordinator<Message, Payload, State = any> {
       if (vote.result !== 'no') {
         log(
           `Got a vote back that was not 'yes'/'no'. The concept ` +
-          'doesn\'t correctly implement voting', txId, cohortId);
+          'doesn\'t correctly implement voting. We got back ' +
+          JSON.stringify(vote), txId, cohortId);
       }
       // We know that all previous votes were 'yes' because if o/w the state
       // would be 'aborting'/'aborted'. Thus, we are in the 'voting' phase and

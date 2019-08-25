@@ -13,6 +13,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { Config } from './config';
 import { ConceptDb } from './db/db';
 
+
 /**
  * The type of the table that maps component names to
  * functions that return the corresponding graphql request
@@ -26,9 +27,8 @@ export interface ComponentRequestTable {
  * @param e - extra information to include with the graphql request
  */
 export function getReturnFields(e: any) {
-  const hasValue = !(_.isEmpty(e) || _.isNil(e));
-  const hasReturnFields = hasValue ?
-    !(_.isEmpty(e.returnFields) || _.isNil(e.returnFields)) : false;
+  const hasValue = !_.isEmpty(e);
+  const hasReturnFields = hasValue ? !_.isEmpty(e.returnFields) : false;
 
   return hasReturnFields ? '{' + e.returnFields + '}' : '';
 }

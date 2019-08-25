@@ -84,7 +84,7 @@ export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
       }
     }
     // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we'd send double request)
+    // waiting on (because if ow we would send a double request)
     let shouldLoad = false;
     for (const fieldThatChanged of _.keys(changes)) {
       if (!this.activeWaits.has(fieldThatChanged)) {

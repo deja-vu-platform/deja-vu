@@ -1,4 +1,4 @@
-<dv.component name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+<dv.component name="navbar" user$=authentication.logged-in.user>
   <dv.tx>
     <authentication.logged-in />
     <dv.if condition=$accessRequired>
@@ -8,38 +8,28 @@
 
   <nav class="navbar">
     <div class="navbar-header">
-      <dv.link href="/chat">
-        Lingua
-      </dv.link>
+      <dv.link href="/chat">Lingua</dv.link>
     </div>
 
     <dv.if condition=authentication.logged-in.user>
       <div>
-        <div>
-          <dv.link href="/users">
-            Find Pen Pals
-          </dv.link>
-          &nbsp;
-          <dv.link href="/profile">
-            <dv.show-entity entity=authentication.logged-in.user.username />
-          </dv.link>
-          &nbsp;
-          <dv.tx>
-            <authentication.sign-out class="clear-button" buttonLabel="Logout"/>
-            <dv.link href="/login" hidden=true />
-          </dv.tx>
-        </div>
+        <dv.link href="/chat">Chats</dv.link>
+        <dv.link href="/users">Pen Pals</dv.link>
+        &nbsp;
+        <dv.link href="/profile">
+          <dv.show-entity entity=authentication.logged-in.user.username />
+        </dv.link>
+        &nbsp;
+        <dv.tx>
+          <authentication.sign-out class="clear-button" buttonLabel="Logout" />
+          <dv.link href="/login" hidden=true />
+        </dv.tx>
       </div>
     </dv.if>
 
     <dv.if condition=!authentication.logged-in.user>
-      <dv.link href="/login">
-        Login
-      </dv.link>
-
-      <dv.link href="/signup">
-        Register
-      </dv.link>
+      <dv.link href="/login">Login</dv.link>
+      <dv.link href="/signup">Register</dv.link>
     </dv.if>
   </nav>
 </dv.component>
