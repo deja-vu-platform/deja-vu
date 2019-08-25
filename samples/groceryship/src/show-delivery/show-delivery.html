@@ -15,32 +15,31 @@
     <dv.show-entity entity=$delivery.pickupLocation />
 
     <mat-expansion-panel class="mat-elevation-z1">
-      <mat-expansion-panel-header>
-        Items
-      </mat-expansion-panel-header>
-      <request.show-objects fieldMatching={ deliveryId:$delivery.id }
-                            hidden=true
-      />
-      <dv.table data=request.show-objects.objects
-                columnInfo=[{label:"Item Name",fieldName:"itemName"},
-      {label:"Quantity",fieldName:"quantity"},
-      {label:"Price Estimate",fieldName:"priceEstimate"},
-      {label:"Tips",fieldName:"tips"}]
-      />
+      <mat-expansion-panel-header>Items</mat-expansion-panel-header>
+      <request.show-objects
+        fieldMatching={ deliveryId: $delivery.id, waitOn: ['deliveryId'] }
+        hidden=true />
+      <dv.table
+        data=request.show-objects.objects
+        columnInfo=[
+          {label: "Item Name", fieldName: "itemName"},
+          {label: "Quantity", fieldName: "quantity"},
+          {label: "Price Estimate", fieldName: "priceEstimate"},
+          {label: "Tips", fieldName: "tips"}
+        ] />
     </mat-expansion-panel>
 
     <hr width="80%"/>
 
-    <dv.if condition=$isDeliverer && !$delivery.delivered >
+    <dv.if condition=$isDeliverer && !$delivery.delivered>
       <dv.tx>
-        <dv.button>Delivered</dv.button>
-        <dv.link href="/input-price" params={ deliveryId:$delivery.id } />
+        <dv.button>Mark as Delivered</dv.button>
+        <dv.link href="/input-price" params={ deliveryId: $delivery.id } />
       </dv.tx>
-
-    <!--Status-->
     </dv.if>
-    <dv.if condition=$isDeliverer && $delivery.delivered && !$delivery.confirmed >
-      Status: Waiting for the requester to confirm
+
+    <dv.if condition=$isDeliverer && $delivery.delivered && !$delivery.confirmed>
+      Status: Waiting for requester to confirm
     </dv.if>
 
     <dv.if condition=!$isDeliverer && !$delivery.delivered >
@@ -53,18 +52,21 @@
         <div class="bold"><authentication.show-user id=$delivery.delivererId /></div>
         <dv.if condition=userProfile.show-object.loadedObject>
           <div>
-            Phone Number: <dv.show-entity entity=userProfile.show-object.loadedObject.phoneNumber />
+            Phone Number: <dv.show-entity
+              entity=userProfile.show-object.loadedObject.phoneNumber />
           </div>
           <div>
-            Dorm: <dv.show-entity entity=userProfile.show-object.loadedObject.dorm />
+            Dorm: <dv.show-entity
+              entity=userProfile.show-object.loadedObject.dorm />
           </div>
           <div>
-            Rating: <rating.show-average-rating targetId=$delivery.delivererId />
+            Rating: <rating.show-average-rating
+              targetId=$delivery.delivererId />
           </div>
         </dv.if>
       </mat-expansion-panel>
     </dv.if>
-    <dv.if condition=!$isDeliverer && $delivery.delivered && !$delivery.confirmed >
+    <dv.if condition=!$isDeliverer && $delivery.delivered && !$delivery.confirmed>
       Status: Your request has been delivered!
       <dv.sum as sum-price
               arrayToSum=request.show-objects.objects key="price" />
@@ -78,31 +80,27 @@
           Tips: <dv.show-entity entity=sum-tips.sum /> &nbsp;
           Total: <dv.show-entity entity=sum-total.sum /> &nbsp;
         </mat-expansion-panel-header>
-        <dv.table data=request.show-objects.objects
-                  columnInfo=[{label:"Item Name",fieldName:"itemName"},
-                              {label:"Price Estimate",fieldName:"priceEstimate"},
-                              {label:"Price",fieldName:"price"},
-                              {label:"Tips",fieldName:"tips"}]
-        />
+        <dv.table
+          data=request.show-objects.objects
+          columnInfo=[
+            {label: "Item Name", fieldName:"itemName"},
+            {label: "Price Estimate", fieldName:"priceEstimate"},
+            {label: "Price", fieldName:"price"},
+            {label: "Tips", fieldName:"tips"}
+          ] />
       </mat-expansion-panel>
       <dv.tx>
         Rate Deliverer:
-        <rating.rate-target sourceId=$delivery.id
-                            targetId=$delivery.delivererId
-                            execOnClick=false />
+        <rating.rate-target
+          sourceId=$delivery.id
+          targetId=$delivery.delivererId
+          execOnClick=false />
         <delivery.update-object as confirm-delivery
-                                id=$delivery.id
-                                initialValue={confirmed: true}
-                                hidden=true />
+          id=$delivery.id
+          initialValue={ confirmed: true }
+          hidden=true />
         <dv.button>Confirm Delivered</dv.button>
       </dv.tx>
-
     </dv.if>
-    <dv.if condition=$delivery.delivered && $delivery.confirmed >
-      shouldn't appear
-    </dv.if>
-    <!--Status Ends-->
-
-
   </div>
 </dv.component>

@@ -1,10 +1,11 @@
 import {
-  Component, ElementRef, EventEmitter, Input, Type, Output
+  Component, ElementRef, EventEmitter, Input, Output
 } from '@angular/core';
+
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatTableDataSource } from '@angular/material';
 
 import { RunService } from '../run.service';
+
 import { ComponentValue } from '../include/include.component';
 
 export interface ColumnConfiguration {
@@ -28,13 +29,15 @@ export class TableComponent {
   @Input() columnInfo: ColumnConfiguration[] = [];
 
   /**
-   * Component that can be performed on each row
+   * Component to be added to the end of each row
    */
   @Input() rowComponent: ComponentValue | undefined;
 
+  @Input() rowComponentLabel = 'Action';
+
   /**
    * If true, a checkbox will appear on the left of each row
-   * selected objects will be emitted to the output selectedRowObjects
+   * selected objects will be emitted to the output `selectedRowObjects`
    */
   @Input() enableSelection = false;
 
@@ -76,21 +79,24 @@ export class TableComponent {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.data.length;
+
     return numSelected === numRows;
   }
 
-  /** Toggle one row */
+  // Toggle one row
   toggle(row) {
     this.selection.toggle(row);
     this._selectedRowObjects = this.selection.selected;
     this.selectedRowObjects.emit(this._selectedRowObjects);
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  /**
+   * Selects all rows if they are not all selected; otherwise clear selection
+   */
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.data.forEach(row => this.selection.select(row));
+      this.data.forEach((row) => this.selection.select(row));
     this._selectedRowObjects = this.selection.selected;
     this.selectedRowObjects.emit(this._selectedRowObjects);
   }
@@ -100,11 +106,7 @@ export class TableComponent {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
     }
+
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'}`;
   }
-
-
-
-
-
 }

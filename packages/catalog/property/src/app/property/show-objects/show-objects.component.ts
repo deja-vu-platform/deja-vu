@@ -142,14 +142,17 @@ OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const fmChanges = changes['fieldMatching'];
-    if (fmChanges) {
-      for (const field of this.fieldMatching['waitOn']) {
-        if (!_.isNil(this.fieldMatching[field])) {
-          this.fieldChange.emit(field);
+    if (!_.isEmpty(this.fieldMatching['waitOn'])) {
+      const fmChanges = changes['fieldMatching'];
+      if (fmChanges) {
+        for (const field of this.fieldMatching['waitOn']) {
+          if (!_.isNil(this.fieldMatching[field])) {
+            this.fieldChange.emit(field);
+          }
         }
       }
     }
+
     this.load();
   }
 

@@ -7,11 +7,16 @@
                   </dv.component>
       stageHeader=<h3>Requests in List</h3>
       tableView=true
-      filter=["itemName", "quantity", "priceEstimate", "tips", "due", "pickupLocation"]
-    />
-    <dv.if condition=dv.stage.stagedEntities>
+      filter=[
+        "itemName", "quantity", "priceEstimate", "tips", "due",
+        "pickupLocation"
+      ] />
+  <dv.if condition=dv.stage.stagedEntities>
+      <!-- TODO: check user id -->
       <dv.tx class="right-column">
         <request.create-objects objects=dv.stage.stagedEntities />
+        <authentication.authenticate
+          id=groceryship.navbar.loggedInUserId hidden=true />
         <dv.button>Confirm Requests</dv.button>
         <dv.redirect href="/" onExecSuccess=true />
       </dv.tx>

@@ -23,7 +23,7 @@
   </ng-container>
 
   <ng-container *ngIf="!!rowComponent" matColumnDef="rowComponent">
-    <mat-header-cell *matHeaderCellDef>Row Component</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef>{{rowComponentLabel}}</mat-header-cell>
     <mat-cell *matCellDef="let element">
       <dv-include [component]="rowComponent"
                   [inputs]="{ rowObject: element }"
