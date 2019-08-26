@@ -2,6 +2,7 @@
   "name": "listify",
   "usedConcepts": {
     "authentication": {},
+    "authorization": {},
     "group": {},
     "list": {
       "name": "property",
@@ -56,11 +57,10 @@
     { "path": "/profile", "component": "profile-rankings" },
     { "path": "/profile/rankings", "component": "profile-rankings" },
     { "path": "/profile/lists", "component": "profile-lists" },
-    { "path": "/profile/list-invites", "component": "profile-list-invites" },
     { "path": "/ranking", "component": "ranking" },
     { "path": "/lists/create", "component": "create-list" },
     { "path": "/lists/consensus", "component": "view-list-rankings" },
-    { "path": "/lists/rankings/edit", "component": "edit-list-rankings" },
+    { "path": "/lists/rankings/submit", "component": "submit-ranking" },
     { "path": "/home/recent", "component": "home-show-recent" },
     { "path": "/home/trending", "component": "home-show-trending" },
     { "path": "", "component": "home-show-trending" }

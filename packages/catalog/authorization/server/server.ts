@@ -59,6 +59,11 @@ const componentRequestTable: ComponentRequestTable = {
       canEdit(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'verify-can-edit': (extraInfo) => `
+    query VerifyCanEdit($input: PrincipalResourceInput!) {
+      verifyCanEdit(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'can-view': (extraInfo) => `
     query CanView($input: PrincipalResourceInput!) {
       canView(input: $input) ${getReturnFields(extraInfo)}
@@ -157,6 +162,21 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
             { projection: { _id: 1 } });
 
         return !_.isNil(resource);
+      },
+
+      verifyCanEdit: async (
+        _root, { input }: { input: PrincipalResourceInput }) => {
+        const resource = await resources
+          .findOne({ id: input.resourceId, ownerId: input.principalId },
+            { projection: { _id: 1 } });
+
+        if (!_.isNil(resource)) {
+          return true;
+        }
+
+        throw new Error(
+          `Principal ${input.principalId} can't edit ` +
+          `resource ${input.resourceId}`);
       }
     },
 

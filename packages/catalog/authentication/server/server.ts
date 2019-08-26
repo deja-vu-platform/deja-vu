@@ -201,8 +201,13 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
       users: async () => await users.find(),
       user: async (_root, { username }) => await users.findOne({ username }),
       userById: async (_root, { id }) => await users.findOne({ id: id }),
-      verify: (_root, { input }: { input: VerifyInput }) => verify(
-        input.token, input.id)
+      verify: (_root, { input }: { input: VerifyInput }) => {
+        if (verify(input.token, input.id)) {
+          return true;
+        }
+
+        throw new Error(`Verification for id {input.id} failed`);
+      }
     },
 
     User: {

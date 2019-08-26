@@ -8,6 +8,8 @@ export interface Property {
   schema: any;
 }
 
+// note: none of these functions include `id` because it's not part of `schema`
+
 export function filterPropertyNames(only: string[], exclude: string[],
   propertyNames: string[]): string[] {
   if (!_.isEmpty(only)) {

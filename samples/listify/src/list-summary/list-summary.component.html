@@ -1,46 +1,69 @@
 <dv.component name="list-summary">
-  <list.show-object id=$listScoring?.id hidden=true />
+  <dv.tx>
+    <list.show-object id=$id object=$object hidden=true />
+    <authentication.authenticate as auth-show-object
+      user=$loggedInUser waitOn=['user'] hidden=true />
+  </dv.tx>
 
-  <dv.if condition=list.show-object.loadedObject && $listScoring>
-
+  <dv.if condition=($object || list.show-object.loadedObject) && $id>
     <dv.if condition=$showVote>
-      <listify.vote
-        listId=$listScoring.id
-        loggedInUser=$loggedInUser />
+      <listify.vote listId=$id loggedInUser=$loggedInUser />
     </dv.if>
 
     <div>
       <span class="list-card-title">
         <list.show-object class="inline-block"
-          object=list.show-object.loadedObject
+          object=$object || list.show-object.loadedObject
           showOnly=['name'] />
       </span>
     </div>
     <div>
-      <span class="list-card-creator">Created by <authentication.show-user id=list.show-object.loadedObject.creator showId=false /></span>
+      <span class="list-card-creator">
+        Created by
+        <authentication.show-user
+          id=$object ? $object.creator : list.show-object.loadedObject.creator
+          showId=false />
+      </span>
 
       <dv.if condition=$showMarkers>
         <dv.if class="inline-block"
-          condition=list.show-object.loadedObject.locked>
+          condition=$object ?
+            $object.locked :
+            list.show-object.loadedObject.locked>
           <div className="locked-list-marker"></div>
         </dv.if>
 
 
-        <ranking.show-ranking
-          id=$listScoring.id
-          sourceId=$loggedInUser?.id
-          hidden=true />
+        <dv.tx>
+          <authentication.authenticate as auth-show-ranking
+            user=$loggedInUser waitOn=['user'] hidden=true />
+          <ranking.show-ranking
+            id=$id
+            sourceId=$loggedInUser?.id
+            hidden=true />
+        </dv.tx>
         <dv.if class="inline-block" condition=ranking.show-ranking.loadedRanking>
           <div className="contributed-marker"></div>
         </dv.if>
       </dv.if>
 
       <dv.if class="inline-block"
-        condition=list.show-object.loadedObject.creator === $loggedInUser?.id>
+        condition=($object ?
+          $object.creator :
+          list.show-object.loadedObject.creator) === $loggedInUser?.id>
         <dv.tx>
-          <!-- TODO: authorization -->
-          <dv.button>Close Voting</dv.button>
-          <!-- TODO: edit list object locked property to true -->
+          <authentication.authenticate
+            user=$loggedInUser waitOn=['user'] hidden=true />
+          <authorization.verify-can-edit
+            resourceId=$id principalId=$loggedInUser?.id
+            hidden=true />
+          <list.update-object useObject=$object || list.show-object.loadedObject
+            initialValue={ locked: true } hidden=true />
+          <dv.button valid=$object ?
+            !$object.locked :
+            !list.show-object.loadedObject.locked>
+            Close Voting
+          </dv.button>
         </dv.tx>
       </dv.if>
     </div>

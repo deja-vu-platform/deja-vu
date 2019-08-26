@@ -33,7 +33,8 @@ export interface ValueMap {
 const SAVED_MSG_TIMEOUT = 3000;
 
 /**
- * Edit an object, which has one or more properties
+ * Edit an object, which has one or more properties.
+ *
  */
 @Component({
   selector: 'property-update-object',
@@ -43,14 +44,27 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class UpdateObjectComponent
   implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   /**
-   * The ID which should be used by the created object.
-   * If not given, a random ID is generated.
+   * The ID of the object to update. If `id` is given and there's no `useObject`
+   * input, then this component will use `show-object` to fetch the object
+   * of the given id and populate the update form. If no `id` and no `useObject`
+   * is given, a random ID is generated to create a new object.
+   *
+   * Note: using `id` will do an unprotected show-object.
    */
-  @Input() id: string;
+  @Input() id: string | undefined;
+
+  @Input()
+  set useObject(v: any | undefined) {
+    if (v !== undefined) {
+      this._useObject = v;
+      this.setInitialValues(v);
+    }
+  }
+  _useObject;
 
   /**
    * The preset initialValues that overwrites
-   * the return value from showObject
+   * the return value from `show-object` or the values from `object`
    */
   @Input() initialValue: ValueMap = {};
 
@@ -101,6 +115,7 @@ export class UpdateObjectComponent
   objectUpdated = false;
   updateObjectError: string;
   formInitialized = false;
+  savedInitialValue;
 
 
   config;
@@ -128,7 +143,7 @@ export class UpdateObjectComponent
     if (this.emitOnChange) {
       this.updateObjectForm.valueChanges.subscribe(
         () => {
-          const input = { id: this.id };
+          const input = { id: this.getId() };
           for (const property of this.properties) {
             input[property.name] = this[property.name].value;
           }
@@ -138,6 +153,9 @@ export class UpdateObjectComponent
     }
 
     this.formInitialized = true;
+    if (!_.isEmpty(this.savedInitialValue)) {
+      this.setInitialValues(this.savedInitialValue);
+    }
   }
 
   onSubmit() {
@@ -145,7 +163,7 @@ export class UpdateObjectComponent
   }
 
   async dvOnExec(): Promise<void> {
-    const input = { id: this.id };
+    const input = { id: this.getId() };
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
     }
@@ -184,12 +202,20 @@ export class UpdateObjectComponent
   }
 
   setInitialValues(value) {
-    if (value) {
-      this.updateObjectForm.patchValue(value);
-    }
+    if (!this.formInitialized) {
+      this.savedInitialValue = value;
+    } else {
+      if (!_.isEmpty(value)) {
+        this.updateObjectForm.patchValue(value);
+      }
 
-    if (this.initialValue) {
-      this.updateObjectForm.patchValue(this.initialValue);
+      if (!_.isEmpty(this.initialValue)) {
+        this.updateObjectForm.patchValue(this.initialValue);
+      }
     }
+  }
+
+  private getId() {
+    return (this._useObject !== undefined) ? this._useObject.id : this.id;
   }
 }

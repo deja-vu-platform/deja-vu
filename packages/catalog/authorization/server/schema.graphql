@@ -38,6 +38,7 @@ type Query {
   resources(input: ResourcesInput!): [Resource!]
   canView(input: PrincipalResourceInput!): Boolean
   canEdit(input: PrincipalResourceInput!): Boolean
+  verifyCanEdit(input: PrincipalResourceInput!): Boolean
 }
 
 type Mutation {

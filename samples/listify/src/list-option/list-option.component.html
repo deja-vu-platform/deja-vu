@@ -9,12 +9,14 @@
         target=$listOption showId=false rankLabel="" />.
     </div>
     <dv.tx>
+      <authentication.authenticate as auth-show-members
+        user=$loggedInUser waitOn=['user'] hidden=true />
       <listoption.show-object class="inline-block"
         id=$listOption.id showOnly=['name'] />
     </dv.tx>
   </div>
 
   <div class="list-option-description">
-    <dv.if condition=$description>{{description}}</dv.if>
+    <dv.if condition=$description>{{$description}}</dv.if>
   </div>
 </dv.component>

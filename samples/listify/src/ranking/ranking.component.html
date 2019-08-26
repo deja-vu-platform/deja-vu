@@ -18,10 +18,6 @@
           <dv.button>View Consensus</dv.button>
           <dv.link href='/lists/consensus' params={ id: $id } />
         </dv.tx>
-        <dv.tx>
-          <dv.button>Edit Ranking</dv.button>
-          <dv.link href='TODO' params={ id: $id } />
-        </dv.tx>
       </div>
 
       <dv.if condition=listify.navbar.loggedInUser &&
@@ -29,7 +25,6 @@
         <listify.list-summary
           id=$id
           loggedInUser=listify.navbar.loggedInUser
-          listScoring=scoring.show-target.loadedTarget
           showMarkers=true />
 
         <ranking.show-ranking
@@ -37,7 +32,9 @@
           showSourceId=false
           id=$id
           sourceId=listify.navbar.loggedInUser?.id
-          showTarget=<listify.list-option listOption=$target /> />
+          showTarget=<listify.list-option
+            listOption=$target
+            loggedInUser=listify.navbar.loggedInUser /> />
       </dv.if>
     </div>
 

@@ -1,4 +1,4 @@
-<dv.component name="edit-list-rankings">
+<dv.component name="submit-ranking">
   <listify.navbar />
 
   <dv.tx>
@@ -13,11 +13,12 @@
       <scoring.show-target id=$id hidden=true />
       <group.show-members inGroupId=$id hidden=true />
 
-      <dv.if condition=listify.navbar.loggedInUser && scoring.show-target.loadedTarget && group.show-members.loadedMemberIds >
+      <dv.if condition=listify.navbar.loggedInUser &&
+        scoring.show-target.loadedTarget &&
+        group.show-members.loadedMemberIds >
         <listify.list-summary
           id=$id
           loggedInUser=listify.navbar.loggedInUser
-          listScoring=scoring.show-target.loadedTarget
           showVote=false />
 
         <dv.tx>
@@ -26,7 +27,9 @@
             id=$id
             sourceId=listify.navbar.loggedInUser.id
             targetIds=group.show-members.loadedMemberIds
-            showTarget=<listify.list-option listOption=$target /> />
+            showTarget=<listify.list-option
+              listOption=$target
+              loggedInUser=listify.navbar.loggedInUser /> />
 
           <dv.button class="bottom-right-button">
             <img src="assets/check.svg" />

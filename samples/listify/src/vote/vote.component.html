@@ -1,27 +1,30 @@
 <dv.component name="vote">
-  <scoring.show-score
-    sourceId=$loggedInUser?.id
-    targetId=$listId
-    hidden=true />
+  <dv.tx>
+    <authentication.authenticate as auth-show-score
+      user=$loggedInUser hidden=true />
+    <scoring.show-score
+      sourceId=$loggedInUser?.id
+      targetId=$listId
+      hidden=true />
+  </dv.tx>
 
   <div class="vote-buttons">
     <dv.tx>
-      <authentication.authenticate as upvote-authentication
-        id=$loggedInUser?.id hidden=true />
+      <authentication.authenticate as auth-upvote
+        user=$loggedInUser hidden=true />
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === 1>
           <img
              className="vote-button upvote"
              src="assets/active-upvote.svg"/>
         </dv.if>
-        <dv.if condition=!scoring.show-score.loadedScore || scoring.show-score.loadedScore?.value !== 1>
+        <dv.if condition=!scoring.show-score.loadedScore ||
+          scoring.show-score.loadedScore?.value !== 1>
           <img
              className="vote-button upvote"
              src="assets/upvote.svg"/>
         </dv.if>
       </dv.button>
-
-      <!-- TODO: clicking on something already upvoted undoes the upvote -->
       <scoring.create-score as upvote-create-score
         buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
         class="vote-button upvote"
@@ -31,15 +34,18 @@
         sourceId=$loggedInUser?.id
         targetId=$listId
         value=1 />
-      <!-- upvote component -->
     </dv.tx>
 
     <!-- show vote count only when it's nonzero -->
-    <scoring.show-target
-      id=$listId
-      showId=false
-      showScores=false
-      hidden=true />
+    <dv.tx>
+      <authentication.authenticate as auth-show-target
+        user=$loggedInUser waitOn=['user'] hidden=true />
+      <scoring.show-target
+        id=$listId
+        showId=false
+        showScores=false
+        hidden=true />
+    </dv.tx>
     <dv.if condition=scoring.show-target.loadedTarget?.total !== 0>
       <p
         className=scoring.show-target.loadedTarget?.total gt 0 ?
@@ -53,22 +59,22 @@
     </dv.if>
 
     <dv.tx>
-      <authentication.authenticate as downvote-authenticate
-        id=$loggedInUser?.id hidden=true />
+      <authentication.authenticate as auth-downvote
+        user=$loggedInUser hidden=true />
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === -1>
           <img
              className="vote-button downvote"
              src="assets/active-downvote.svg"/>
         </dv.if>
-        <dv.if condition=!scoring.show-score.loadedScore || scoring.show-score.loadedScore?.value !== -1>
+        <dv.if condition=!scoring.show-score.loadedScore ||
+          scoring.show-score.loadedScore?.value !== -1>
           <img
              className="vote-button downvote"
              src="assets/downvote.svg"/>
         </dv.if>
       </dv.button>
 
-      <!-- TODO: clicking on something already downvoted undoes the downvote -->
       <scoring.create-score as downvote-create-score
         buttonDisabled=!$loggedInUser || scoring.show-score.loadedScore
         class="vote-button downvote"

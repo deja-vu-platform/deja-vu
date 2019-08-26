@@ -9,12 +9,25 @@
       onEvalFailure=true />
   </dv.tx>
 
-  <scoring.show-target id=$id hidden=true />
-  <group.show-members inGroupId=$id hidden=true />
-  <ranking.show-rankings id=$id hidden=true />
+  <dv.tx>
+    <authentication.authenticate as auth-show-target
+      user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+    <scoring.show-target id=$id hidden=true />
+  </dv.tx>
+  <dv.tx>
+    <authentication.authenticate as auth-show-members
+      user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+    <group.show-members inGroupId=$id hidden=true />
+  </dv.tx>
+  <dv.tx>
+    <authentication.authenticate as auth-show-rankings
+      user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+    <ranking.show-rankings id=$id hidden=true />
+  </dv.tx>
 
   <dv.if class="main"
-    condition=scoring.show-target.loadedTarget && group.show-members.loadedMemberIds>
+    condition=scoring.show-target.loadedTarget &&
+      group.show-members.loadedMemberIds>
     <div class="container">
       <listify.ranking-info-card class="right-container"
         list=scoring.show-target.loadedTarget
@@ -24,13 +37,18 @@
       <listify.list-summary
         id=$id
         loggedInUser=listify.navbar.loggedInUser
-        listScoring=scoring.show-target.loadedTarget
         showMarkers=true />
 
-      <ranking.show-fractional-ranking
-        noTargetsText="No rankings submitted yet."
-        targetIds=group.show-members.loadedMemberIds
-        showTarget=<listify.list-option listOption=$target /> />
+      <dv.tx>
+        <authentication.authenticate as auth-show-fractional-ranking
+          user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+        <ranking.show-fractional-ranking
+          noTargetsText="No rankings submitted yet."
+          targetIds=group.show-members.loadedMemberIds
+          showTarget=<listify.list-option
+            listOption=$target
+            loggedInUser=listify.navbar.loggedInUser /> />
+      </dv.tx>
     </div>
   </dv.if>
 </dv.component>

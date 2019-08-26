@@ -219,7 +219,7 @@ export class RunService {
       // If no one initialized the tx batch then then we can't mark the
       // num components expected. We have to add it to pending and the gateway
       // is going to set num components for us
-      console.log(`Set num comps pending for id ${id}`);
+      console.log(`Set num comps pending for id ${id} to ${runs.length}`);
       GatewayService.txPendingNumComponents[id] = runs.length;
     }
 
