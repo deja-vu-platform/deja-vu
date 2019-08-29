@@ -2,7 +2,7 @@
 
 Keep track of pieces of work to be done
 
-## Actions
+## Components
 
 - approve-task
 - claim-task

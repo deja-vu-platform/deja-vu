@@ -1,20 +1,33 @@
-<dv.action name="create-chore">
+<dv.component name="create-chore">
+  <dv.tx>
+    <child.show-objects
+      fieldMatching={ parentId: $parent?.id, waitOn: ['parentId'] }
+      showOnly=['name'] hidden=true />
+    <parentauthentication.authenticate as members-auth
+      user=$parent waitOn=['user'] hidden=true />
+  </dv.tx>
   <dv.tx>
     <dv.gen-id />
     <dv.status savedText="Chore created" />
+    <parentauthentication.authenticate as create-auth
+      user=$parent waitOn=['user'] hidden=true />
     <chore.create-object id=dv.gen-id.id showOptionToSubmit=false />
     <task.create-task
       id=dv.gen-id.id
       assignerId=$parent?.id
-      assigneeId=child.choose-object.selectedObjectId
+      assigneeId=dv.choose.selectedEntity?.id
       showOptionToInputAssignee=false
       showOptionToSubmit=false />
-    <!-- TODO: check assignerId and check asignee is child -->
+
+    <!-- TODO: check that assignee is member -->
     <div>
-      <child.choose-object
-        chooseObjectSelectPlaceholder="Select Assignee"
-        showOnly=['name'] execOnSelection=false resetOnExecSuccess=true />
+      <dv.choose
+        entities=child.show-objects.objects
+        showChooseButton=false
+        chooseSelectPlaceholder="Select Assignee"
+        resetOnExecSuccess=true
+        showEntity=<child.show-object object=$entity showOnly=['name'] /> />
     </div>
     <dv.button>Create Chore</dv.button>
   </dv.tx>
-</dv.action>
+</dv.component>

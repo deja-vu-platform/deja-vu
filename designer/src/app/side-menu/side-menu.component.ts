@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
   App,
-  AppActionDefinition,
-  ClicheInstance
+  AppComponentDefinition,
+  ConceptInstance
 } from '../datatypes';
 
 
@@ -14,7 +14,7 @@ import {
 })
 export class SideMenuComponent {
   @Input() readonly app: App;
-  @Input() readonly openAction: AppActionDefinition;
-  @Output() readonly clicheAdded = new EventEmitter<ClicheInstance>();
-  @Output() readonly clicheRemoved = new EventEmitter<string>();
+  @Input() readonly openComponent: AppComponentDefinition;
+  @Output() readonly conceptAdded = new EventEmitter<ConceptInstance>();
+  @Output() readonly conceptRemoved = new EventEmitter<string>();
 }

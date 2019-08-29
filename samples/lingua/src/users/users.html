@@ -1,24 +1,31 @@
-<dv.action name="users">
+<dv.component name="users">
   <lingua.navbar accessRequired=true />
   <div class="center-column">
-    <chatTotal.show-group id=lingua.navbar.loggedInUserId hidden=true />
-    <userProfile.show-objects hidden=true />
+    <dv.tx>
+      <authentication.authenticate
+        user=lingua.navbar.user waitOn=['user'] hidden=true />
+      <chatTotal.show-group
+        id=lingua.navbar.user?.id waitOn=['id'] hidden=true />
+      <userProfile.show-objects hidden=true />
+    </dv.tx>
+    <!-- filter out the users that are already pen pals -->
     <dv.if condition=chatTotal.show-group.loadedGroup>
-      <dv.filter entitiesToFilter=userProfile.show-objects.objects
-                 filterMultipleValues={id:chatTotal.show-group.loadedGroup.memberIds}
-                 hidden=true
-      />
-      <dv.difference array=userProfile.show-objects.objects
-                     values=[dv.filter.filteredEntities]
-                     hidden=true
-                     key="id" />
-      <dv.show-entities entities=dv.difference.difference
-                        showEntity=<lingua.show-user
-                        user=$entity
-                        loggedInUserId=lingua.navbar.loggedInUserId /> />
+      <dv.filter
+        entitiesToFilter=userProfile.show-objects.objects
+        filterMultipleValues={ id: chatTotal.show-group.loadedGroup.memberIds }
+        hidden=true />
+      <dv.difference
+        array=userProfile.show-objects.objects
+        values=[dv.filter.filteredEntities, [ lingua.navbar.user ]]
+        hidden=true key="id" />
+      <dv.show-entities
+        entities=dv.difference.difference
+        noEntitiesToShowText="There are no users to chat with yet. Please try again later"
+        showEntity=<lingua.show-user user=$entity
+          loggedInUserId=lingua.navbar.user?.id /> />
     </dv.if>
     <dv.if condition=!chatTotal.show-group.loadedGroup>
       Loading...
     </dv.if>
   </div>
-</dv.action>
+</dv.component>

@@ -1,0 +1,19 @@
+<dv.component name="login">
+  <div class="blue-background">
+    <div class="container login-signup-container">
+      <div class="card login-register-panel">
+        <div class="card-body">
+          MapCampus
+          <dv.tx>
+            <authentication.sign-in class="username-password-container" />
+            <dv.callback defaultHref="/home" onExecSuccess=true hidden=true />
+          </dv.tx>
+          <div class="switch-login-register">
+            Don't have an account yet? Sign up
+            <dv.link href="/signup" class="signup-link">here</dv.link>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.component>

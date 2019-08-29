@@ -1,15 +1,16 @@
-<dv.action name="claim-request">
-  <dv.if condition=!$request.claimed && $userId !== $request.requesterId >
+<dv.component name="claim-request">
+  <dv.if condition=!$request.claimed && $userId !== $request.requesterId>
     <dv.tx>
-    <request.update-object id=$request.id
-                           initialValue={claimed:true,delivererId:$userId}
-                           showOptionToSubmit=false
-                           hidden=true
-    />
-    <dv.button>Claim</dv.button>
+      <authentication.authenticate id=$userId hidden=true />
+      <request.update-object
+        id=$request.id
+        initialValue={ claimed: true, delivererId: $userId }
+        showOptionToSubmit=false
+        hidden=true />
+      <dv.button>Claim</dv.button>
     </dv.tx>
   </dv.if>
-  <dv.if condition=$userId === $request.requesterId >
+  <dv.if condition=$userId === $request.requesterId>
     <div class="disabled">Yours</div>
   </dv.if>
-</dv.action>
+</dv.component>

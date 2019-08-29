@@ -81,6 +81,11 @@ main {
   width: 280px;
 }
 
+.auth-form {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 .left-column {
   float: left;
   width: 25%;
@@ -137,7 +142,10 @@ main {
 
 /* Auth Related */
 .theme-button button.mat-button,
-authentication-sign-in button.mat-button {
+authentication-sign-in button.mat-button,
+property-create-object button.mat-button,
+property-update-object button.mat-button,
+property-delete-object button.mat-button {
   background-color: #28bdb1;
   color: #FFFFFF !important;
   border: 2px solid white;
@@ -152,14 +160,17 @@ authentication-sign-in button.mat-button {
 }
 
 .theme-button button.mat-button:hover, .sign-up-btn button.mat-button:hover,
-authentication-sign-in button.mat-button:hover {
+authentication-sign-in button.mat-button:hover
+property-create-object button.mat-button:hover,
+property-update-object button.mat-button:hover,
+property-delete-object button.mat-button:hover {
   color: #28bdb1 !important;
   background-color: white;
   border: 2px solid #28bdb1;
 }
 
 /* Navbar */
-.navbar a{
+.navbar a {
   color: #FFFFFF;
   display: inline-block;
   text-align:center;
@@ -182,6 +193,7 @@ authentication-sign-in button.mat-button:hover {
 
 .navbar {
   background-color: #28bdb1;
+  height: 70px;
 }
 
 .login-btn a,

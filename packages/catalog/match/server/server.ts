@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   AttemptDoc,
   AttemptMatchInput,
@@ -23,8 +23,8 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'attempt-match': (extraInfo) => `
     mutation AttemptMatch($input: AttemptMatchInput!) {
       attemptMatch(input: $input) ${getReturnFields(extraInfo)}
@@ -67,7 +67,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const matches: Collection<MatchDoc> = db.collection('matches');
   const attempts: Collection<AttemptDoc> = db.collection('attempts');
 
@@ -188,8 +188,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const matchCliche: ClicheServer = new ClicheServerBuilder('match')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const matchConcept: ConceptServer = new ConceptServerBuilder('match')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const matches: Collection<MatchDoc> = db.collection('matches');
     const attempts: Collection<AttemptDoc> = db.collection('attempts');
 
@@ -203,8 +203,8 @@ const matchCliche: ClicheServer = new ClicheServerBuilder('match')
         { unique: true, sparse: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-matchCliche.start();
+matchConcept.start();

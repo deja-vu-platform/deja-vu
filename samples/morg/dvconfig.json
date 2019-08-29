@@ -1,6 +1,6 @@
 {
   "name": "morg",
-  "usedCliches": {
+  "usedConcepts": {
     "event": {},
     "allocator": {},
     "property": {
@@ -20,6 +20,6 @@
     }
   },
   "routes": [
-    { "path": "", "action": "home" }
+    { "path": "", "component": "home" }
   ]
 }

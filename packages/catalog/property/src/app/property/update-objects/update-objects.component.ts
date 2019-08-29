@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input, OnInit,
-  ViewChildren, QueryList
+  QueryList, ViewChildren
 } from '@angular/core';
 
 import {
@@ -16,7 +16,9 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../property.config';
-import { UpdateObjectComponent } from '../update-object/update-object.component';
+import {
+  UpdateObjectComponent
+} from '../update-object/update-object.component';
 
 /**
  * Updates an array of objects at once
@@ -25,7 +27,7 @@ import { UpdateObjectComponent } from '../update-object/update-object.component'
  */
 @Component({
   selector: 'property-update-objects',
-  templateUrl: './update-objects.component.html',
+  templateUrl: './update-objects.component.html'
 })
 export class UpdateObjectsComponent
   implements OnInit, OnExec {
@@ -88,6 +90,7 @@ export class UpdateObjectsComponent
     if (_.isEmpty(this.objectsToUpdate)
       && (_.isEmpty(this.updateObjectsList))) {
       this.gs.noRequest();
+
       return;
     }
 

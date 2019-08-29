@@ -1,15 +1,15 @@
 <div id="side-menu">
   <mat-tab-group>
-    <mat-tab label="Actions">
-      <app-insert-action [app]="app" [openAction]="openAction">
-      </app-insert-action>
+    <mat-tab label="Components">
+      <app-insert-component [app]="app" [openComponent]="openComponent">
+      </app-insert-component>
     </mat-tab>
-    <mat-tab label="Clichés">
-      <app-cliche-instances
+    <mat-tab label="Concepts">
+      <app-concept-instances
         [app]="app"
-        (clicheAdded)="clicheAdded.emit($event)"
-        (clicheRemoved)="clicheRemoved.emit($event)">
-      </app-cliche-instances>
+        (conceptAdded)="conceptAdded.emit($event)"
+        (conceptRemoved)="conceptRemoved.emit($event)">
+      </app-concept-instances>
     </mat-tab>
   </mat-tab-group>
 </div>

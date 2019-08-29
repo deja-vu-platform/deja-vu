@@ -182,10 +182,10 @@ export class NgAppBuilder {
   }
 
   build(cacheDir: string, installDependencies = true) {
-    if (!_.includes(_.map(this.routes, 'path'), '')) {
+    if (!_.some(_.map(this.routes, 'path'), (v) => v === '' || v === '/')) {
       throw new Error(
         'Missing default route "". In your dvconfig.json file add:\n' +
-        '"routes": [ {"path": "", "action": "your-main-action-here"} ]');
+        '"routes": [ {"path": "", "component": "your-main-component-here"} ]');
     }
     const srcDir = path.join(cacheDir, 'src');
     const appDir = path.join(srcDir, 'app');
@@ -263,8 +263,13 @@ export class NgAppBuilder {
             const c = selectorToComponent[r.selector];
             if (c === undefined) {
               throw new Error(
-                `Action for route "${r.path}" (${r.selector}) not found\n` +
-                `Valid actions are: ${_.keys(selectorToComponent)}`);
+                `Component for route "${r.path}" (${r.selector}) not found\n` +
+                `Valid components are: ${_.keys(selectorToComponent)}`);
+            }
+            // There are supposed to be no leading slashes in the path given to
+            // ng. Thus, we remove it if we find it.
+            if (r.path[0] === '/') {
+              r.path = r.path.slice(1);
             }
 
             return `{ path: "${r.path}", component: ${c} }`;
@@ -273,8 +278,8 @@ export class NgAppBuilder {
       modules: _
         .map(_.map(this.dependencies, 'name'), NgAppBuilder.DepToModule)
         .join(', '),
-      usedClichesConfig: JSON.stringify(
-        _.get(JSON.parse(this.dvConfigContents), 'usedCliches'))
+      usedConceptsConfig: JSON.stringify(
+        _.get(JSON.parse(this.dvConfigContents), 'usedConcepts'))
     };
 
     // /
@@ -290,11 +295,11 @@ export class NgAppBuilder {
     const newDvConfigContents = _
       .merge({ gateway: { config: { wsPort: 3000 } } },
         _.omit(JSON.parse(this.dvConfigContents), 'type'));
-    // choose wsPorts for the clichés that have no `wsPort` value
-    let clichePort = 3002;
-    newDvConfigContents['usedCliches'] = _
-      .mapValues(newDvConfigContents['usedCliches'], (uc) => _
-        .merge({ config: { wsPort: clichePort++ } }, uc));
+    // choose wsPorts for the concepts that have no `wsPort` value
+    let conceptPort = 3002;
+    newDvConfigContents['usedConcepts'] = _
+      .mapValues(newDvConfigContents['usedConcepts'], (uc) => _
+        .merge({ config: { wsPort: conceptPort++ } }, uc));
 
     const newDvConfigContentsStr = prettier
       .format(JSON.stringify(newDvConfigContents), { parser: 'json' });
@@ -351,12 +356,12 @@ export class NgAppBuilder {
 
     // | assets/
     for (const d of this.dependencies) {
-      const clichePackageLocation = NgAppBuilder.FindPackage(d.name);
-      const clicheAssets = path.join(clichePackageLocation, 'pkg', 'assets');
+      const conceptPackageLocation = NgAppBuilder.FindPackage(d.name);
+      const conceptAssets = path.join(conceptPackageLocation, 'pkg', 'assets');
 
       /**
-       * Image assets for a cliche are in `assets/<cliche-name>/<img-file>`,
-       * but the library used to display stars in the rating cliche looks
+       * Image assets for a concept are in `assets/<concept-name>/<img-file>`,
+       * but the library used to display stars in the rating concept looks
        * for the image in `assets/images/<img-name>`. As a temporary hack,
        * we detect if we are dealing with rating and put the assets where the
        * library expects them. TODO: check to see if there's a way to change
@@ -364,8 +369,8 @@ export class NgAppBuilder {
        */
       const appAssetsDir = d.name === 'rating' ? assetsDir :
         path.join(assetsDir, d.name);
-      if (existsSync(clicheAssets)) {
-        copySync(clicheAssets, appAssetsDir);
+      if (existsSync(conceptAssets)) {
+        copySync(conceptAssets, appAssetsDir);
       }
     }
 

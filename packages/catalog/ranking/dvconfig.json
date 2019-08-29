@@ -8,7 +8,7 @@
   "config": {
     "wsPort": 3001
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/ranking/**" ]
     },
@@ -18,7 +18,7 @@
       ]
     }
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "ranking-show-fractional-ranking",
     "ranking-show-ranking",
     "ranking-show-rankings"

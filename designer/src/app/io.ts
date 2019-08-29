@@ -5,18 +5,19 @@
 import { EventEmitter } from '@angular/core';
 import * as _ from 'lodash';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { ActionInstance, AppActionDefinition } from './datatypes';
+import { AppComponentDefinition, ComponentInstance } from './datatypes';
 import compileDvExpr, { dvToNgName } from './expression.compiler';
 
 /**
- * ioName + action => cliche.action.ioName
+ * ioName + component => concept.component.ioName
  * @todo handle name collisions
  */
 export function fullyQualifyName(
   ioName: string,
-  actionInstance: ActionInstance
+  componentInstance: ComponentInstance
   ): string {
-    return `${actionInstance.from.name}.${actionInstance.of.name}.${ioName}`;
+    return (
+      `${componentInstance.from.name}.${componentInstance.of.name}.${ioName}`);
 }
 
 export class ScopeIO {
@@ -40,17 +41,17 @@ export class ScopeIO {
 
 export class ChildScopeIO extends ScopeIO {
   // populated in app.module.ts to avoid cyclic imports
-  static actionInstanceComponent: any;
+  static componentInstanceComponent: any;
 
   private readonly subscriptions: Subscription[] = [];
 
   /**
-   * @param actionInstance
+   * @param componentInstance
    * @param parentScope
-   * @param extra - only present if this action was given to an input
+   * @param extra - only present if this component was given to an input
    */
   constructor(
-    private readonly actionInstance: ActionInstance,
+    private readonly componentInstance: ComponentInstance,
     private readonly parentScope: ScopeIO,
     private readonly shouldReLink?: EventEmitter<void>,
     private readonly extra?: { inputs: string[], scope: ScopeIO }
@@ -61,13 +62,13 @@ export class ChildScopeIO extends ScopeIO {
   /**
    * Parses all expressions.
    * Retrieves values from the parent scope to set inputs here.
-   * Sets values on the parent scope from outputs here (if app action).
+   * Sets values on the parent scope from outputs here (if app component).
    */
   link() {
     this.unlink();
     this.linkInputs();
-    if (this.actionInstance.of instanceof AppActionDefinition) {
-      this.linkOutputsForAppAction();
+    if (this.componentInstance.of instanceof AppComponentDefinition) {
+      this.linkOutputsForAppComponent();
     }
   }
 
@@ -84,28 +85,28 @@ export class ChildScopeIO extends ScopeIO {
    * Cannot be called externally because it does not clean up subs.
    */
   private linkInputs() {
-    this.actionInstance.of.inputs.forEach((inputName) => {
-      const inputValue = this.actionInstance.inputSettings[inputName];
+    this.componentInstance.of.inputs.forEach((inputName) => {
+      const inputValue = this.componentInstance.inputSettings[inputName];
       if (_.isString(inputValue)) { // expression input
         const toSubject = this.getSubject(inputName);
         this.emitExpressionValue(inputValue, toSubject, this.parentScope);
-      } else if (inputValue instanceof ActionInstance) { // action input
-        this.emitAction(inputValue, inputName);
+      } else if (inputValue instanceof ComponentInstance) { // component input
+        this.emitComponent(inputValue, inputName);
       }
     });
   }
 
   /**
-   * Sets values on the parent scope from outputs here (if app action).
+   * Sets values on the parent scope from outputs here (if app component).
    * Cannot be called externally because it does not clean up subs.
    */
-  private linkOutputsForAppAction() {
-    if (!(this.actionInstance.of instanceof AppActionDefinition)) {
-      throw new Error('Action is not an app action.');
+  private linkOutputsForAppComponent() {
+    if (!(this.componentInstance.of instanceof AppComponentDefinition)) {
+      throw new Error('Component is not an app component.');
     }
 
-    this.actionInstance.of.outputSettings.forEach(({ name, value }) => {
-      const fqName = fullyQualifyName(name, this.actionInstance);
+    this.componentInstance.of.outputSettings.forEach(({ name, value }) => {
+      const fqName = fullyQualifyName(name, this.componentInstance);
       const toSubject = this.parentScope.getSubject(fqName);
       this.emitExpressionValue(value, toSubject, this);
     });
@@ -136,11 +137,11 @@ export class ChildScopeIO extends ScopeIO {
     const ngScope = {};
     const send = () => toSubject.next(evaluate(ngScope));
     names.forEach((refdName) => {
-      // $ means get input to parent or replaced action
+      // $ means get input to parent or replaced component
       const fromAbove = refdName.startsWith('$');
       // keys for subjects in ScopeIO do not have leading $
       const ioScopeName = fromAbove ? refdName.slice(1) : refdName;
-      // if in an action input, $ gets input to replaced action
+      // if in a component input, $ gets input to replaced component
       //   falling back to parent input
       if (
         fromAbove
@@ -169,22 +170,22 @@ export class ChildScopeIO extends ScopeIO {
   }
 
   /**
-   * Send an action instance to the given input (on this action).
-   * It's less general than emitExpressionValue since actions can only
+   * Send a component instance to the given input (on this component).
+   * It's less general than emitExpressionValue since components can only
    *   be inputted.
    */
-  private emitAction(
-    actionInstance: ActionInstance,
+  private emitComponent(
+    componentInstance: ComponentInstance,
     toInputName: string
   ) {
     const toSubject = this.getSubject(toInputName);
     toSubject.next({
-      type: ChildScopeIO.actionInstanceComponent,
+      type: ChildScopeIO.componentInstanceComponent,
       inputs: {
-        actionInstance: actionInstance,
+        componentInstance: componentInstance,
         parentScope: this,
         shouldReLink: this.shouldReLink,
-        extraInputs: this.actionInstance.of.actionInputs[toInputName]
+        extraInputs: this.componentInstance.of.componentInputs[toInputName]
       }
     });
   }

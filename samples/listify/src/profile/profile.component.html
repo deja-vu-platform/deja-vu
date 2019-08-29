@@ -1,4 +1,4 @@
-<dv.action name="profile">
+<dv.component name="profile">
   <listify.navbar />
 
   <dv.tx>
@@ -11,11 +11,8 @@
   <div class="main">
     <div class="container">
       <dv.if class="right-container" condition=listify.navbar.loggedInUser>
-        <ranking.show-rankings
-          sourceId=listify.navbar.loggedInUser.id hidden=true />
         <listify.profile-card
-          username=listify.navbar.loggedInUser.username
-          rankingsSubmitted=ranking.show-rankings.loadedRankings?.length/>
+          loggedInUser=listify.navbar.loggedInUser />
       </dv.if>
 
       <h2 class="tabs">
@@ -30,32 +27,27 @@
             <span className=$showYourLists ? 'selected-tab' : ''>Your Lists</span>
           </dv.button>
           <dv.link href="/profile/lists" />
-        </dv.tx>|
-        <dv.tx>
-          <dv.button>
-            <span className=$showListsInvitedTo ? 'selected-tab' : ''>Lists Invited To</span>
-          </dv.button>
-          <dv.link href="/profile/list-invites" />
         </dv.tx>
       </h2>
       <dv.if condition=$showYourRankings>
         <ranking.show-rankings
           sourceId=listify.navbar.loggedInUser?.id
+          noRankingsText="No rankings yet."
           showRanking=<listify.list-card
             gotoOnClick="/ranking"
-            listScoring=$ranking id=$id
+            id=$id
             loggedInUser=listify.navbar.loggedInUser
             showVote=false /> />
       </dv.if>
       <dv.if condition=$showYourLists>
-        <list.show-objects fieldMatching={ creator:listify.navbar.loggedInUser?.id }
-                           showObject=<listify.list-card  gotoOnClick="/lists/consensus"
-                                                          id=$object.id
-                                                          loggedInUser=listify.navbar.loggedInUser
-                                                          showVote=true /> />
-      </dv.if>
-      <dv.if condition=$showListsInvitedTo>
-        TODO
+        <list.show-objects
+          fieldMatching={ creator:listify.navbar.loggedInUser?.id }
+          noObjectsToShowText="No lists yet."
+          showObject=<listify.list-card
+            gotoOnClick="/lists/consensus"
+            id=$object.id
+            loggedInUser=listify.navbar.loggedInUser
+            showVote=true /> />
       </dv.if>
 
       <div>
@@ -69,4 +61,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

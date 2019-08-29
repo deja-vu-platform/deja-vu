@@ -29,4 +29,5 @@ export interface MarkersInput {
   centerLat?: number;
   centerLng?: number;
   radius?: number; // in miles
+  markerIds?: string[];
 }

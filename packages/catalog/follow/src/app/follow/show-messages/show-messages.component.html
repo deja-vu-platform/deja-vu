@@ -1,7 +1,7 @@
 <ul *ngIf="messages && messages.length > 0" class="list-group">
   <li *ngFor="let message of messages" class="list-group-item">
     <dv-include
-      [action]="showMessage"
+      [component]="showMessage"
       default-showMessage="{ tag: follow-show-message }"
       [inputs]="{
         message: message,

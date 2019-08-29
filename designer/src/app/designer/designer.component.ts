@@ -13,10 +13,10 @@ import { DragulaService } from 'ng2-dragula';
 import { ElectronService } from 'ngx-electron';
 
 import {
-  ActionInstance,
   App,
-  AppActionDefinition,
-  ClicheInstance,
+  AppComponentDefinition,
+  ComponentInstance,
+  ConceptInstance,
   Row
 } from '../datatypes';
 
@@ -29,12 +29,12 @@ import {
 })
 export class DesignerComponent implements OnInit, OnDestroy {
   app = new App('myapp');
-  openActionInstance: ActionInstance;
+  openComponentInstance: ComponentInstance;
   previewMode = false;
   dragging = false;
   showIoHints = false;
 
-  private _openAction: AppActionDefinition;
+  private _openComponent: AppComponentDefinition;
   private nextPort = 3002;
   private readonly processes: {[n: string]: { kill: (s: string) => void }} = {};
   private readonly requestProcessor: any; // dv-gateway.DesignerRequestProcessor
@@ -51,8 +51,8 @@ export class DesignerComponent implements OnInit, OnDestroy {
     private readonly electronService: ElectronService,
     private readonly router: Router
   ) {
-    this.openAction = this.app.homepage;
-    window['dv-designer'] = true; // alters how cliche server finds actions
+    this.openComponent = this.app.homepage;
+    window['dv-designer'] = true; // alters how concept server finds components
     this.configureDragula(); // dragula needs to be configured at the top level
     this.dragulaService.drag()
       .subscribe(() => {
@@ -63,7 +63,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
         this.dragging = false;
       });
 
-    // imports for addCliche
+    // imports for addConcept
     if (this.electronService.remote) {
       this.requestProcessor = this.electronService.remote
         .require('./electron.js').requestProcessor;
@@ -76,13 +76,13 @@ export class DesignerComponent implements OnInit, OnDestroy {
     }
   }
 
-  get openAction(): AppActionDefinition {
-    return this._openAction;
+  get openComponent(): AppComponentDefinition {
+    return this._openComponent;
   }
 
-  set openAction(action: AppActionDefinition) {
-    this._openAction = action;
-    this.openActionInstance = new ActionInstance(action, this.app);
+  set openComponent(component: AppComponentDefinition) {
+    this._openComponent = component;
+    this.openComponentInstance = new ComponentInstance(component, this.app);
   }
 
   ngOnInit() {
@@ -91,11 +91,12 @@ export class DesignerComponent implements OnInit, OnDestroy {
         const [name] = (e.url.startsWith('/') ? e.url.slice(1) : e.url)
           .split(';');
         if (name === '') {
-          this.openAction = this.app.homepage;
+          this.openComponent = this.app.homepage;
         } else {
-          const openAction = this.app.actions.find((a) => a.name === name);
-          if (openAction) {
-            this.openAction = openAction;
+          const openComponent = this.app.components
+            .find((a) => a.name === name);
+          if (openComponent) {
+            this.openComponent = openComponent;
           } else if (!this.router.navigated) {
             this.router.navigateByUrl('');
           } else {
@@ -111,50 +112,52 @@ export class DesignerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.removeAllCliches();
+    this.removeAllConcepts();
   }
 
   /**
-   * Start the cliche server
+   * Start the concept server
    */
-  addCliche(cliche: ClicheInstance) {
+  addConcept(concept: ConceptInstance) {
     if (this.electronService.remote) {
       this.requestProcessor
-        .addCliche(cliche.of.name, this.nextPort, cliche.name);
-      const clichePkg = this.path.join(this.path.dirname(
-        this.cli.locateClichePackage(cliche.of.name)), '..');
-      const serverPath = this.path.join(clichePkg, 'server', 'server.js');
-      const configObj = Object.assign({ wsPort: this.nextPort }, cliche.config);
+        .addConcept(concept.of.name, this.nextPort, concept.name);
+      const conceptPkg = this.path.join(this.path.dirname(
+        this.cli.locateConceptPackage(concept.of.name)), '..');
+      const serverPath = this.path.join(conceptPkg, 'server', 'server.js');
+      const configObj = Object
+        .assign({ wsPort: this.nextPort }, concept.config);
       const configStr = JSON.stringify(JSON.stringify(configObj));
       let command = `node ${serverPath} --config ${configStr}`;
-      if (cliche.name !== cliche.of.name) {
-        command += ` --as ${cliche.name}`;
+      if (concept.name !== concept.of.name) {
+        command += ` --as ${concept.name}`;
       }
-      this.processes[cliche.name] = this.cp.spawn(command, [], { shell: true });
+      this.processes[concept.name] = this
+        .cp.spawn(command, [], { shell: true });
       this.nextPort += 1;
 
       // We also need to copy assets to the assets folder
-      const clicheAssetsPath = this.path.join(clichePkg, 'assets');
+      const conceptAssetsPath = this.path.join(conceptPkg, 'assets');
       // rating hack: see ng-ap-builder.ts in the compiler package
-      const appAssetsDir = cliche.of.name === 'rating' ? this.assetsDir :
-        this.path.join(this.assetsDir, cliche.of.name);
-      if (this.fsExtra.existsSync(clicheAssetsPath)) {
-        this.fsExtra.copySync(clicheAssetsPath, appAssetsDir);
+      const appAssetsDir = concept.of.name === 'rating' ? this.assetsDir :
+        this.path.join(this.assetsDir, concept.of.name);
+      if (this.fsExtra.existsSync(conceptAssetsPath)) {
+        this.fsExtra.copySync(conceptAssetsPath, appAssetsDir);
       }
     }
   }
 
   /**
-   * Stop the cliche server, if one is running
+   * Stop the concept server, if one is running
    */
-  removeCliche(clicheName: string) {
-    const childProcess = this.processes[clicheName];
+  removeConcept(conceptName: string) {
+    const childProcess = this.processes[conceptName];
     if (childProcess) {
       childProcess.kill('SIGINT');
-      delete this.processes[clicheName];
+      delete this.processes[conceptName];
     }
     if (this.requestProcessor) {
-      this.requestProcessor.removeCliche(clicheName);
+      this.requestProcessor.removeConcept(conceptName);
     }
   }
 
@@ -163,10 +166,10 @@ export class DesignerComponent implements OnInit, OnDestroy {
    */
   load(appJSON: string) {
     this.zone.run(() => {
-      this.removeAllCliches();
+      this.removeAllConcepts();
       this.app = App.fromJSON(appJSON);
-      this.app.cliches.forEach((cliche) => this.addCliche(cliche));
-      this.openAction = this.app.homepage;
+      this.app.concepts.forEach((concept) => this.addConcept(concept));
+      this.openComponent = this.app.homepage;
       this.snackBar.open('App has been loaded.', 'dismiss', {
         duration: 2500
       });
@@ -174,11 +177,11 @@ export class DesignerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Stop all cliche backends to avoid port collisions
+   * Stop all concept backends to avoid port collisions
    */
-  private removeAllCliches() {
-    this.app.cliches.forEach((c) => {
-      this.removeCliche(c.name);
+  private removeAllConcepts() {
+    this.app.concepts.forEach((c) => {
+      this.removeConcept(c.name);
     });
   }
 
@@ -186,23 +189,23 @@ export class DesignerComponent implements OnInit, OnDestroy {
    * Must run in constructor
    */
   private configureDragula() {
-    // drag actions on the page to add them
+    // drag components on the page to add them
     // drag them between rows to move them
-    this.dragulaService.createGroup('action', {
-      moves: (el, source) => source.classList.contains('action-list')
+    this.dragulaService.createGroup('component', {
+      moves: (el, source) => source.classList.contains('component-list')
         || source.classList.contains('dvd-row'),
-      // we use copy to prevent depletion of the action list
-      copy: (el, source) => source.classList.contains('action-list'),
+      // we use copy to prevent depletion of the component list
+      copy: (el, source) => source.classList.contains('component-list'),
       accepts: (el, target, source) => target.classList.contains('dvd-row')
         || (
-          target.classList.contains('action-input')
-          && source.classList.contains('action-list')
+          target.classList.contains('component-input')
+          && source.classList.contains('component-list')
         )
     });
 
     // this function is unfortunately kind of complicated
     // because you cannot put two dragula groups on one element
-    this.dragulaService.drop('action')
+    this.dragulaService.drop('component')
       .subscribe(({ el, source, target, sibling }) => {
         // usually we want to get rid of the copy that dragula creates
         // however in some circumstances angular does not create a new elm
@@ -210,75 +213,77 @@ export class DesignerComponent implements OnInit, OnDestroy {
         let shouldRemoveCopy = true;
 
         if (target.classList.contains('dvd-row')) {
-          // use case 1: instantiating an action by dragging it into a row
+          // use case 1: instantiating a component by dragging it into a row
           // find target row (-1 means new last row)
           let toRowIdx = parseInt(target['dataset'].index, 10);
-          if (toRowIdx === this.openAction.rows.length) {
+          if (toRowIdx === this.openComponent.rows.length) {
             toRowIdx = -1;
           }
           // find target index within row (-1 means last)
-          let newActionIndex = sibling
+          let newComponentIndex = sibling
             ? parseInt(sibling['dataset'].index, 10)
             : -1;
-          // find source action
-          let action: ActionInstance;
-          if (source.classList.contains('action-list')) {
-            // case 1: dragging in a new action
+          // find source component
+          let component: ComponentInstance;
+          if (source.classList.contains('component-list')) {
+            // case 1: dragging in a new component
             const {
               source: sourceName,
-              action: actionName,
+              component: componentName,
               disabled
             } = el['dataset'];
             if (disabled !== 'true') {
-              action = this.app.newActionInstanceByName(actionName, sourceName);
+              component = this.app
+                .newComponentInstanceByName(componentName, sourceName);
             }
           } else if (source.classList.contains('dvd-row')) {
-            // case 2: moving an action
+            // case 2: moving a component
             const fromRowIdx = parseInt(source['dataset'].index, 10);
-            const actionIdx = parseInt(el['dataset'].index, 10);
-            [action] = this.openAction.rows[fromRowIdx].actions
-              .splice(actionIdx, 1);
+            const componentIdx = parseInt(el['dataset'].index, 10);
+            [component] = this.openComponent.rows[fromRowIdx].components
+              .splice(componentIdx, 1);
             if (fromRowIdx === toRowIdx) {
               // this is when ng does not generate a new element
-              if (actionIdx < newActionIndex || newActionIndex === -1) {
+              if (componentIdx < newComponentIndex ||
+                newComponentIndex === -1) {
                 shouldRemoveCopy = false;
               }
               // account for chaning the index of the sibling
               // we want to insert in front of
-              if (actionIdx < newActionIndex) {
-                newActionIndex -= 1;
+              if (componentIdx < newComponentIndex) {
+                newComponentIndex -= 1;
               }
             }
           }
 
-          if (action) {
-            const toRow = this.openAction.rows[toRowIdx] || new Row();
-            if (newActionIndex >= 0) {
-              toRow.actions.splice(newActionIndex, 0, action);
+          if (component) {
+            const toRow = this.openComponent.rows[toRowIdx] || new Row();
+            if (newComponentIndex >= 0) {
+              toRow.components.splice(newComponentIndex, 0, component);
             } else {
-              toRow.actions.push(action);
+              toRow.components.push(component);
             }
             if (toRowIdx === -1) {
-              this.openAction.rows.push(toRow);
+              this.openComponent.rows.push(toRow);
             }
           }
         } else if (
-          target.classList.contains('action-input')
-          && source.classList.contains('action-list')
+          target.classList.contains('component-input')
+          && source.classList.contains('component-list')
         ) {
-          // use case 2: passing an action to an input
+          // use case 2: passing a component to an input
           const {
             source: sourceName,
-            action: actionName,
+            component: componentName,
             disabled
           } = el['dataset'];
           if (disabled !== 'true') {
-            target.dispatchEvent(new CustomEvent('inputAction', {
-              detail: { sourceName, actionName }
+            target.dispatchEvent(new CustomEvent('inputComponent', {
+              detail: { sourceName, componentName }
             }));
           }
         } else {
-          // do nothing when dragging an action from the page to an input
+          // do nothing when dragging a component from the page to an input
           shouldRemoveCopy = false;
         }
         if (shouldRemoveCopy) {
@@ -286,14 +291,14 @@ export class DesignerComponent implements OnInit, OnDestroy {
         }
       });
 
-    // drag away an inputted action to remove it
-    this.dragulaService.createGroup('inputted-action', {
-      moves: (el) => el.classList.contains('inputted-action'),
+    // drag away an inputted component to remove it
+    this.dragulaService.createGroup('inputted-component', {
+      moves: (el) => el.classList.contains('inputted-component'),
       removeOnSpill: true
     });
-    this.dragulaService.remove('inputted-action')
+    this.dragulaService.remove('inputted-component')
       .subscribe(({ source }) => {
-        source.dispatchEvent(new CustomEvent('unInputAction'));
+        source.dispatchEvent(new CustomEvent('unInputComponent'));
       });
 
     // drag an output into an expression input to populate the input
@@ -327,7 +332,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
     this.dragulaService.drop('row')
       .subscribe(({ el, sibling }) => {
         const fromRowIdx = parseInt(el['dataset'].index, 10);
-        const [moveRow] = this.openAction.rows.splice(fromRowIdx, 1);
+        const [moveRow] = this.openComponent.rows.splice(fromRowIdx, 1);
         let toRowIdx = sibling ?
           parseInt(sibling['dataset'].index, 10)
           : -1;
@@ -335,9 +340,9 @@ export class DesignerComponent implements OnInit, OnDestroy {
           toRowIdx -= 1;
         }
         if (toRowIdx >= 0) {
-          this.openAction.rows.splice(toRowIdx, 0, moveRow);
+          this.openComponent.rows.splice(toRowIdx, 0, moveRow);
         } else {
-          this.openAction.rows.push(moveRow);
+          this.openComponent.rows.push(moveRow);
         }
       });
   }

@@ -17,7 +17,7 @@ import { startWith } from 'rxjs/operators/startWith';
 import * as _ from 'lodash';
 
 import {
-  Action, ConfigService, ConfigServiceFactory,
+  ComponentValue, ConfigService, ConfigServiceFactory,
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
@@ -45,11 +45,11 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
   @Input() objectAutocompletePlaceholder = 'Choose One';
   /**
    * Whether or not choosing an object is required
-   * (if this is action is used in a larger form)
+   * (if this is component is used in a larger form)
    */
   @Input() required = true;
   /**
-   * Text so show if the user tries to execute the action before selecting
+   * Text so show if the user tries to execute the component before selecting
    * an object.
    * HTML is supported here
    */
@@ -68,9 +68,9 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
    */
   @Input() disabledIds: string[] = [];
   /**
-   * Action to use to render each object
+   * Component to use to render each object
    */
-  @Input() showObject: Action = {
+  @Input() showObject: ComponentValue = {
     type: <Type<Component>> ShowObjectComponent
   };
   /**
@@ -86,11 +86,11 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
    */
   @Input() showExclude: string[];
   /**
-   * Passed to showObject action
+   * Passed to showObject component
    * (For the default showObject, this will cause any URL properties
    * to display without the protocol and path)
    */
-  @Input() showBaseUrlsOnly: boolean = false;
+  @Input() showBaseUrlsOnly = false;
   /**
    * If given, the select input with the object with the given ID selected
    */

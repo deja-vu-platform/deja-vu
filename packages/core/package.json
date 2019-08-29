@@ -7,7 +7,9 @@
     "package": "dv package",
     "prepare": "npm run package",
     "dv-package-dv": "ng-packagr -p ng-package.json",
-    "lint": "tslint -p . -c tslint.json src/*.ts"
+    "lint": "tslint -p . -c tslint.json src/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/*.ts",
+    "clean": "rm -rf ./dist ./pkg"
   },
   "peerDependencies": {
     "@angular/common": "^5.2.0",
@@ -35,6 +37,7 @@
     "@types/lodash": "ts2.5",
     "@types/uuid": "^3.4.3",
     "ng-packagr": "^2.0.0",
+    "prettier": "^1.18.2",
     "rxjs": "5.5.6",
     "subscriptions-transport-ws": "^0.9.16",
     "tslint": "~5.9.1",

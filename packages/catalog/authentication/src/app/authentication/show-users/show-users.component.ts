@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { User } from '../shared/authentication.model';
@@ -25,7 +25,7 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showUsername = true;
   @Input() showId = true;
 
-  @Input() showUser: Action = {
+  @Input() showUser: ComponentValue = {
     type: <Type<Component>> ShowUserComponent
   };
   @Input() noUsersToShowText = 'No users to show';

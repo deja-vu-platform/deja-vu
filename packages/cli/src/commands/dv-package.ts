@@ -2,9 +2,9 @@ import { copySync, existsSync } from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
 import {
-  ACTION_TABLE_FILE_NAME,
-  actionTable,
   cmd,
+  componentTable,
+  COMPONENT_TABLE_FILE_NAME,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
   readFileOrFail,
@@ -13,16 +13,16 @@ import {
 } from '../utils';
 
 exports.command = 'package';
-exports.desc = 'package a cliché';
+exports.desc = 'package a concept';
 exports.handler = () => {
   const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-  console.log('Packaging cliche');
+  console.log('Packaging concept');
   yarn([`dv-package-${config.name}`]);
 
   const pkgDir = NG_PACKAGR.configFileContents.dest;
   writeFileOrFail(
-    path.join(pkgDir, ACTION_TABLE_FILE_NAME),
-    actionTable(config, _.get(config.actions, 'package')));
+    path.join(pkgDir, COMPONENT_TABLE_FILE_NAME),
+    componentTable(config, _.get(config.components, 'package')));
   copySync(DVCONFIG_FILE_PATH, path.join(pkgDir, DVCONFIG_FILE_PATH));
 
   const assetsDir = path.join('src', 'app', config.name, 'assets');
@@ -35,10 +35,10 @@ exports.handler = () => {
 
   // compodoc does not support absolute paths
   const cwd = path.resolve(__dirname, '..', '..'); // cli root folder
-  const pathToClicheDir = path.relative(cwd, path.resolve('.'));
+  const pathToConceptDir = path.relative(cwd, path.resolve('.'));
   const pathToTsconfig = existsSync(path.join('src', 'tsconfig.app.json'))
-    ? path.join(pathToClicheDir, 'src', 'tsconfig.app.json')
-    : path.join(pathToClicheDir, 'tsconfig.json');  // core has diff structure
+    ? path.join(pathToConceptDir, 'src', 'tsconfig.app.json')
+    : path.join(pathToConceptDir, 'tsconfig.json');  // core has diff structure
   try {
     cmd(
       'yarn',
@@ -46,7 +46,7 @@ exports.handler = () => {
         'compodoc',
         '--exportFormat=json',
         `--tsconfig=${pathToTsconfig}`,
-        `--output=${path.join(pathToClicheDir, pkgDir)}`,
+        `--output=${path.join(pathToConceptDir, pkgDir)}`,
         '--minimal',
         '--disableSourceCode',
         '--disableDomTree',
@@ -58,13 +58,13 @@ exports.handler = () => {
         // /dev/null on Unix or NUL on Windows
         // (we have silent anyways for performance reasons)
         stdio: 'ignore',
-        // use cli compodoc so it doesn't need to be a dep of every cliche
+        // use cli compodoc so it doesn't need to be a dep of every concept
         cwd
       }
     );
     console.log('Created documentation');
   } catch (e) {
-    console.warn('Could not document cliche', config.name);
+    console.warn('Could not document concept', config.name);
   }
 
   console.log('Done');

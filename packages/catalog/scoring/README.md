@@ -2,7 +2,7 @@
 
 Keep track of scores
 
-## Actions
+## Components
 
 - create-score
 - delete-score

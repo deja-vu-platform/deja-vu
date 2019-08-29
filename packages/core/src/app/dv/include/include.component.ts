@@ -24,14 +24,14 @@ export interface ValueMap {
 }
 
 /**
- *  Represents a DV action to include with `dv-include`
+ *  Represents a DV component to include with `dv-include`
  *
- *  The action given in `type` can be curried and wrapped with an adapter that
- *  allows the interface of the action (input/output names) to be used as
+ *  The component given in `type` can be curried and wrapped with an adapter that
+ *  allows the interface of the component (input/output names) to be used as
  *  another interface.
  *
  *  For example:
- *  The action given by type=f(fi_1) -> fo_1,
+ *  The component given by type=f(fi_1) -> fo_1,
  *  inputMap={i_1: 'fi_1'}, outputMap={o_1: 'fo_1'},
  *  inputs={i_2: 'hello'} is equivalent to:
  *
@@ -48,19 +48,19 @@ export interface ValueMap {
  *    return {o_1: f_result.fo_1};
  *  }
  */
-export interface Action {
-  // The type of the action to include
+export interface ComponentValue {
+  // The type of the component to include
   type: Type<Component>;
   tag?: string;
   dvAlias?: string;
-  // Optional value to specify the cliche the action is from
+  // Optional value to specify the concept the component is from
   dvOf?: string;
-  // A map of (adapter input name) -> (action input name)
+  // A map of (adapter input name) -> (component input name)
   inputMap?: FieldMap;
-  // A map of (adapter output name) -> (action output name)
+  // A map of (adapter output name) -> (component output name)
   outputMap?: FieldMap;
-  // A map of input names to values. This will be passed to the action when
-  // invoked. If an input of the same name is given to the action the input
+  // A map of input names to values. This will be passed to the component when
+  // invoked. If an input of the same name is given to the component the input
   // given in `inputs` takes precedence.
   inputs?: FieldMap;
 }
@@ -71,14 +71,14 @@ export interface Action {
   templateUrl: './include.component.html'
 })
 export class IncludeComponent implements AfterViewInit {
-  // The DV action to include (see interface Action)
-  @Input() action: Action;
+  // The DV component to include (see interface Component)
+  @Input() component: ComponentValue;
 
-  // The inputs to `action` (`g`, see above)
+  // The inputs to `component` (`g`, see above)
   // Map of the form (adapter input) -> value
   @Input() inputs: ValueMap | undefined;
   // A map of the form (adapter output name -> parent field name). When the
-  // action outputs a value (`g`, see above) the field in `parent` of name
+  // component outputs a value (`g`, see above) the field in `parent` of name
   // `field name` is set to the output value if it's a string. If it's a
   // function then it's called with the new value
   @Input() outputs: FieldMap | undefined;
@@ -125,62 +125,62 @@ export class IncludeComponent implements AfterViewInit {
     if (!this.isViewInitialized) {
       return;
     }
-    if (this.action === undefined || this.action.type === undefined) {
+    if (this.component === undefined || this.component.type === undefined) {
       throw new Error('No type given to include');
     }
     if (this.parent === undefined) {
       throw new Error('No parent given to include');
     }
 
-    const actionName: string =
-      (this.action.dvOf ? `${this.action.dvOf}.` : '') +
-      this.action.type.name;
-    console.log(`Loading "${actionName}"`);
+    const componentName: string =
+      (this.component.dvOf ? `${this.component.dvOf}.` : '') +
+      this.component.type.name;
+    console.log(`Loading "${componentName}"`);
     const componentFactory = this.componentFactoryResolver
-      .resolveComponentFactory(this.action.type);
+      .resolveComponentFactory(this.component.type);
 
     const viewContainerRef = this.host.viewContainerRef;
     viewContainerRef.clear();
 
     this.componentRef = viewContainerRef.createComponent(componentFactory);
-    if (this.action.dvOf) {
+    if (this.component.dvOf) {
       NodeUtils.SetOfOfNode(
-        this.componentRef.location.nativeElement, this.action.dvOf);
+        this.componentRef.location.nativeElement, this.component.dvOf);
     }
 
     let shouldCallDetectChanges = false;
 
-    this.action.inputMap = IncludeComponent.initFieldMap(
-      this.inputs, this.action.inputMap);
+    this.component.inputMap = IncludeComponent.initFieldMap(
+      this.inputs, this.component.inputMap);
     for (const inputKey of _.keys(this.inputs)) {
       this.componentRef.instance[
-        this.action.inputMap[inputKey]] = this.inputs![inputKey];
+        this.component.inputMap[inputKey]] = this.inputs![inputKey];
       shouldCallDetectChanges = true;
     }
 
-    for (const inputKey of _.keys(this.action.inputs)) {
-      this.componentRef.instance[inputKey] = this.action.inputs![inputKey];
+    for (const inputKey of _.keys(this.component.inputs)) {
+      this.componentRef.instance[inputKey] = this.component.inputs![inputKey];
       shouldCallDetectChanges = true;
     }
 
-    this.action.outputMap = IncludeComponent.initFieldMap(
-      this.outputs, this.action.outputMap);
+    this.component.outputMap = IncludeComponent.initFieldMap(
+      this.outputs, this.component.outputMap);
     for (const outputKey of _.keys(this.outputs)) {
       // The call to `subscribe` is mutating the state of the component
       // ref so we need to call detect changes to avoid getting the expression
       // changed after it has been checked error
       shouldCallDetectChanges = true;
-      const componentField: string = this.action.outputMap[outputKey];
+      const componentField: string = this.component.outputMap[outputKey];
       if (componentField === undefined) {
        console.warn(
-         `Output field ${outputKey} of included action ` +
-         `${actionName} is ignored`);
+         `Output field ${outputKey} of included component ` +
+         `${componentName} is ignored`);
        continue;
       }
       if (!_.has(this.componentRef.instance, componentField)) {
         throw new Error(
-          `Included action ${actionName} has no field ${componentField}, ` +
-          `output map ${JSON.stringify(this.action.outputMap)} is wrong`);
+          `Included component ${componentName} has no field ${componentField}, ` +
+          `output map ${JSON.stringify(this.component.outputMap)} is wrong`);
       }
       this.componentRef.instance[componentField]
         .subscribe(newVal => {

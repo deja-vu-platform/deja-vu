@@ -1,32 +1,32 @@
-<dv.action name="feedback">
-	<easypick.navbar accessRequired=true/>
-	<div class="center-column-dynamic-medium">
-		<h3>
-			Input Your Review!
-		</h3>
-		<class.choose-object showOnly=["classNumber","className"]
-                         chooseObjectSelectPlaceholder="Choose A Class"
-    />
+<dv.component name="feedback">
+  <easypick.navbar accessRequired=true/>
+  <div class="center-column-dynamic-medium">
+    <h3>Input Your Review!</h3>
+    <class.choose-object
+      showOnly=["classNumber","className"]
+      chooseObjectSelectPlaceholder="Choose A Class" />
 
-    <reviewInfo.show-objects fieldMatching={ sourceId:easypick.navbar.loggedInUserId,
-                             targetId:class.choose-object.selectedObjectId }
-                             hidden=true
-    />
-    <dv.if condition=class.choose-object.selectedObjectId && (reviewInfo.show-objects.objects && reviewInfo.show-objects.objects[0])>
+    <reviewInfo.show-objects
+      fieldMatching={
+        sourceId:easypick.navbar.loggedInUserId,
+        targetId:class.choose-object.selectedObjectId }
+        hidden=true/>
+    <dv.if condition=class.choose-object.selectedObjectId &&
+      (reviewInfo.show-objects.objects && reviewInfo.show-objects.objects[0])>
       You have already rated this class. You can update it in your
       <dv.link href="/">homepage</dv.link>.
     </dv.if>
-    <dv.if condition=class.choose-object.selectedObjectId && (!reviewInfo.show-objects.objects || !reviewInfo.show-objects.objects[0]) >
+    <dv.if condition=class.choose-object.selectedObjectId &&
+      (!reviewInfo.show-objects.objects || !reviewInfo.show-objects.objects[0]) >
       <dv.tx>
         <dv.gen-id />
-        <dv.status savedText="New feedback saved!"/>
+        <authentication.authenticate id=$userId waitOn=['id'] hidden=true />
         <reviewInfo.create-object
           id=dv.gen-id.id
           initialValue={ sourceId: $userId, targetId: class.choose-object.selectedObjectId }
           showExclude=["sourceId", "targetId"]
-        showOptionToSubmit=false
-        />
-        <p> Pace is reasonable </p>
+          showOptionToSubmit=false />
+        <p>Pace is reasonable</p>
         <paceReasonable.rate-target
           id=dv.gen-id.id
           sourceId=$userId
@@ -34,7 +34,7 @@
           execOnClick=false
         />
 
-        <p> Grading is fair </p>
+        <p>Grading is fair</p>
         <gradingFair.rate-target
           id=dv.gen-id.id
           sourceId=$userId
@@ -42,7 +42,7 @@
           execOnClick=false
         />
 
-        <p> Contents are interesting </p>
+        <p>Contents are interesting</p>
         <contentsManageable.rate-target
           id=dv.gen-id.id
           sourceId=$userId
@@ -50,7 +50,7 @@
           execOnClick=false
         />
 
-        <p> Overall, it is a good class </p>
+        <p>Overall, it is a good class</p>
         <overallRating.rate-target
           id=dv.gen-id.id
           sourceId=$userId
@@ -61,11 +61,10 @@
           id=dv.gen-id.id
           authorId=$userId
           targetId=class.choose-object.selectedObjectId
-          showOptionToSubmit=false
-        />
+          showOptionToSubmit=false />
         <dv.button class="theme-button">Submit Feedback</dv.button>
+        <dv.link href="/" hidden=true />
       </dv.tx>
     </dv.if>
-	</div>
-
-</dv.action>
+  </div>
+</dv.component>

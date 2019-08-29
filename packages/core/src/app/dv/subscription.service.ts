@@ -14,10 +14,11 @@ interface SubscriptionParams extends BaseParams {
 
 interface Subscription extends SubscriptionParams {}
 
+
 @Injectable()
 export class SubscriptionService {
   private websocket: WebSocketSubject<any>;
-  private actionSubscriptions: {[key: string]: Subject<any>} = {};
+  private componentSubscriptions: {[key: string]: Subject<any>} = {};
 
   constructor(@Inject(GATEWAY_URL) private gatewayUrl: string) {
     this.websocket = WebSocketSubject.create(`ws://${gatewayUrl}`);
@@ -32,12 +33,12 @@ export class SubscriptionService {
     const params: SubscriptionParams = this.buildParams(baseParams);
     const subscriptionId = params.subscriptionId;
     const subject = new ReplaySubject<T>();
-    this.actionSubscriptions[subscriptionId] = subject;
+    this.componentSubscriptions[subscriptionId] = subject;
 
     const subscription: Subscription = Object.assign(params, request, {
       extraInfo: {
         action: 'subscribe',
-        ...request['extraInfo'],
+        ...request['extraInfo']
       }
     });
 
@@ -50,18 +51,20 @@ export class SubscriptionService {
 
   private buildParams(baseParams: BaseParams): SubscriptionParams {
     const subscriptionId = uuid();
+
     return Object.assign({}, baseParams, { subscriptionId });
   }
 
   private sendSubscription(subscription: Subscription) {
-    this.getWebSocket().next(JSON.stringify(subscription));
+    this.getWebSocket()
+      .next(JSON.stringify(subscription));
   }
 
   private handleMessage(msg): void {
     console.log('Message received from gateway: %s',
       JSON.stringify(msg));
-    if (msg.subscriptionId && this.actionSubscriptions[msg.subscriptionId]) {
-      this.actionSubscriptions[msg.subscriptionId].next(msg.data);
+    if (msg.subscriptionId && this.componentSubscriptions[msg.subscriptionId]) {
+      this.componentSubscriptions[msg.subscriptionId].next(msg.data);
     }
   }
 
@@ -74,6 +77,6 @@ export class SubscriptionService {
   }
 
   private createWebSocket(): WebSocketSubject<any> {
-    return WebSocketSubject.create(`ws://${this.gatewayUrl}`)
+    return WebSocketSubject.create(`ws://${this.gatewayUrl}`);
   }
 }

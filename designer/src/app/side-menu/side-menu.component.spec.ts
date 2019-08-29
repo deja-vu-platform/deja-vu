@@ -10,14 +10,16 @@ import {
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { ElectronService } from 'ngx-electron';
+
 import { SideMenuComponent } from './side-menu.component';
 
 import {
-  ClicheInstancesComponent
-} from '../cliche-instances/cliche-instances.component';
+  ConceptInstancesComponent
+} from '../concept-instances/concept-instances.component';
 import {
-  InsertActionComponent
-} from '../insert-action/insert-action.component';
+  InsertComponentComponent
+} from '../insert-component/insert-component.component';
 
 describe('SideMenuComponent', () => {
   let component: SideMenuComponent;
@@ -27,8 +29,8 @@ describe('SideMenuComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         SideMenuComponent,
-        InsertActionComponent,
-        ClicheInstancesComponent
+        InsertComponentComponent,
+        ConceptInstancesComponent
       ],
       imports: [
         BrowserAnimationsModule,
@@ -38,6 +40,9 @@ describe('SideMenuComponent', () => {
         MatListModule,
         MatTabsModule,
         MatTooltipModule
+      ],
+      providers: [
+        ElectronService
       ]
     })
     .compileComponents();

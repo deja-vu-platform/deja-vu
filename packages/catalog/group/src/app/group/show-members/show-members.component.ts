@@ -10,7 +10,7 @@ import {
   Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -30,7 +30,7 @@ export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
   // Presentation rules
   @Input() noMembersText = 'No members';
 
-  @Input() showMember: Action = {
+  @Input() showMember: ComponentValue = {
     type: <Type<Component>> ShowMemberComponent
   };
 

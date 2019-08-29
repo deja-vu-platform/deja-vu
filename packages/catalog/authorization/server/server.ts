@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   AddViewerToResourceInput,
   CreateResourceInput,
@@ -22,7 +22,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'add-remove-viewer': (extraInfo) => {
     switch (extraInfo.action) {
       case 'add':
@@ -57,6 +57,11 @@ const actionRequestTable: ActionRequestTable = {
   'can-edit': (extraInfo) => `
     query CanEdit($input: PrincipalResourceInput!) {
       canEdit(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'verify-can-edit': (extraInfo) => `
+    query VerifyCanEdit($input: PrincipalResourceInput!) {
+      verifyCanEdit(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'can-view': (extraInfo) => `
@@ -114,7 +119,7 @@ function getResourceFilter(input: ResourcesInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const resources: Collection<ResourceDoc> = db.collection('resources');
 
   return {
@@ -144,19 +149,42 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
       },
 
       canView: async (_root, { input }: { input: PrincipalResourceInput }) => {
-        const resource = await resources
-          .findOne({ id: input.resourceId, viewerIds: input.principalId },
-            { projection: { _id: 1 } });
+        try {
+          const resource = await resources
+            .findOne({ id: input.resourceId, viewerIds: input.principalId },
+              { projection: { _id: 1 } });
 
-        return !_.isNil(resource);
+          return !_.isNil(resource);
+        } catch (e) {
+          return false;
+        }
       },
 
       canEdit: async (_root, { input }: { input: PrincipalResourceInput }) => {
+        try {
+          const resource = await resources
+            .findOne({ id: input.resourceId, ownerId: input.principalId },
+              { projection: { _id: 1 } });
+
+          return !_.isNil(resource);
+        } catch (e) {
+          return false;
+        }
+      },
+
+      verifyCanEdit: async (
+        _root, { input }: { input: PrincipalResourceInput }) => {
         const resource = await resources
           .findOne({ id: input.resourceId, ownerId: input.principalId },
             { projection: { _id: 1 } });
 
-        return !_.isNil(resource);
+        if (!_.isNil(resource)) {
+          return true;
+        }
+
+        throw new Error(
+          `Principal ${input.principalId} can't edit ` +
+          `resource ${input.resourceId}`);
       }
     },
 
@@ -205,9 +233,9 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const authorizationCliche: ClicheServer =
-  new ClicheServerBuilder('authorization')
-    .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const authorizationConcept: ConceptServer =
+  new ConceptServerBuilder('authorization')
+    .initDb((db: ConceptDb, _config: Config): Promise<any> => {
       const resources: Collection<ResourceDoc> = db.collection('resources');
 
       return Promise.all([
@@ -216,8 +244,8 @@ const authorizationCliche: ClicheServer =
         resources.createIndex({ id: 1, ownerId: 1 }, { unique: true })
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 
-authorizationCliche.start();
+authorizationConcept.start();

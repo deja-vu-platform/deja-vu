@@ -1,0 +1,24 @@
+<mat-accordion *ngIf="app">
+  <mat-expansion-panel *ngFor="let collection of app.componentCollections">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{collection.name}}
+        <span class="collection-hint">
+          {{(collection.name === 'dv') ? '(built-in components)' : ''}}
+          {{(collection.name === app.name) ? '(app components)' : ''}}
+        </span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-list class="component-list" dragula="component">
+      <mat-list-item
+        *ngFor="let component of collection.components"
+        [attr.data-source]="collection.name"
+        [attr.data-component]="component.name"
+        [attr.data-disabled]="disable(component)"
+        [matTooltip]="component.description"
+      >
+        {{component.name}}
+      </mat-list-item>
+    </mat-list>
+  </mat-expansion-panel>
+</mat-accordion>

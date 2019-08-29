@@ -53,6 +53,8 @@ import {
   ShowResourceCountComponent
 } from './show-resource-count/show-resource-count.component';
 export { ShowResourceCountComponent };
+import { VerifyCanEditComponent } from './verify-can-edit/verify-can-edit.component';
+export { VerifyCanEditComponent };
 
 
 const allComponents = [
@@ -61,7 +63,7 @@ const allComponents = [
   CreateResourceComponent, DeleteResourceComponent,
   RemoveViewerComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent, ShowResourceCountComponent,
-  ConfigWizardComponent
+  ConfigWizardComponent, VerifyCanEditComponent
 ];
 
 const metadata = {

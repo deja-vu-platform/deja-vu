@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -23,7 +23,7 @@ import {
 
 import { v4 as uuid } from 'uuid';
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-message': (extraInfo) => `
     mutation CreateMessage($input: CreateMessageInput!) {
       createMessage (input: $input) ${getReturnFields(extraInfo)}
@@ -145,7 +145,7 @@ async function getAggregatedMessages(
     .toArray();
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
   return {
@@ -311,8 +311,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const followCliche: ClicheServer = new ClicheServerBuilder('follow')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const followConcept: ConceptServer = new ConceptServerBuilder('follow')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const publishers: Collection<PublisherDoc> = db.collection('publishers');
 
     return Promise.all([
@@ -320,8 +320,8 @@ const followCliche: ClicheServer = new ClicheServerBuilder('follow')
       publishers.createIndex({ id: 1, 'messages.id': 1 }, { unique: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-followCliche.start();
+followConcept.start();

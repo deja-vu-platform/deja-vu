@@ -1,18 +1,19 @@
-<dv.action name="show-set-list">
+<dv.component name="show-set-list">
   <accord.navbar accessRequired=true />
-  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <authorization.can-view
+    resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId />
+    <accord.set-list-catalog
+      groupId=$groupId currentUserId=accord.navbar.loggedInUserId />
   </div>
   <div class="right-column">
     <h1>
       <setList.show-object id=$setListId showOnly=["name"] />
-      &nbsp;
       <dv.if condition=authorization.can-view.canView class="inline-block">
-        <dv.link href="/edit-set-list" params={ groupId:$groupId, setListId:$setListId }>
-          <mat-icon>
-            settings
-          </mat-icon>
+        <dv.link
+          href="/edit-set-list"
+          params={ groupId:$groupId, setListId:$setListId }>
+          <mat-icon>settings</mat-icon>
         </dv.link>
       </dv.if>
     </h1>
@@ -21,16 +22,21 @@
     </div>
 
     <div class="individual-card">
-      <proposal.show-objects fieldMatching={ setListId:$setListId }
-                             noObjectsToShowText="No proposals yet"
-                             showObject=<accord.show-proposal-preview proposal=$object groupId=$groupId loggedInUserId=accord.navbar.loggedInUserId />
+      <proposal.show-objects
+        fieldMatching={ setListId: $setListId }
+        noObjectsToShowText="No proposals yet"
+        showObject=<accord.show-proposal-preview
+          proposal=$object groupId=$groupId
+          loggedInUserId=accord.navbar.loggedInUserId />
       />
       &nbsp;
       <dv.tx>
-        <dv.link href="/create-proposal" params={ groupId:$groupId, setListId:$setListId } hidden=true />
+        <dv.link
+          href="/create-proposal"
+          params={ groupId:$groupId, setListId:$setListId } hidden=true />
         <dv.button class="theme-button">Add Proposal</dv.button>
       </dv.tx>
     </div>
   </div>
-</dv.action>
+</dv.component>
 

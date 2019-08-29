@@ -1,20 +1,11 @@
 {
   "name": "groceryship",
-  "usedCliches": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+  "usedConcepts": {
+    "authentication": {},
+    "authorization": {},
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "User",
           "type": "object",
@@ -32,7 +23,6 @@
     "request": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Request",
           "type": "object",
@@ -57,8 +47,10 @@
             },
             "pickupLocation": {
               "type": "string",
-              "enum": ["EC", "Senior House", "New House", "Next House",
-                "Maseeh", "McCormick", "Baker", "MacGregor", "Random", "Burton Connor"]
+              "enum": [
+                "EC", "Senior House", "New House", "Next House",
+                "Maseeh", "McCormick", "Baker", "MacGregor", "Random",
+                "Burton Connor"]
             },
             "requesterId": {
               "type": "string"
@@ -79,7 +71,6 @@
     "delivery": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Delivery",
           "type": "object",
@@ -106,20 +97,16 @@
         }
       }
     },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    }
+    "rating": {}
   },
   "routes": [
-    { "path": "", "action": "main" },
-    { "path": "sign-in", "action": "sign-in" },
-    { "path": "sign-up", "action": "sign-up" },
-    { "path": "requests", "action": "show-requests" },
-    { "path": "make-request", "action": "create-request" },
-    { "path": "make-delivery", "action": "create-deliveries" },
-    { "path": "profile", "action": "update-profile" },
-    { "path": "input-price", "action": "input-price" }
+    { "path": "", "component": "main" },
+    { "path": "/sign-in", "component": "sign-in" },
+    { "path": "/sign-up", "component": "sign-up" },
+    { "path": "/requests", "component": "show-requests" },
+    { "path": "/make-request", "component": "create-request" },
+    { "path": "/make-delivery", "component": "create-deliveries" },
+    { "path": "/profile", "component": "update-profile" },
+    { "path": "/input-price", "component": "input-price" }
   ]
 }

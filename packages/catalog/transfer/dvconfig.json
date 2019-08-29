@@ -9,7 +9,7 @@
     "wsPort": 3001,
     "balanceType": "items"
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [
         "src/app/transfer/**"
@@ -21,12 +21,12 @@
       ]
     }
   },
-  "actionsNoRequest": {
+  "componentsNoRequest": {
     "exec": [
       "transfer-create-item-count"
     ]
   },
-  "actionsRequestOptional": [
+  "componentsRequestOptional": [
     "transfer-show-balance",
     "transfer-show-transfer",
     "transfer-show-transfers"

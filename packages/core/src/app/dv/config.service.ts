@@ -9,12 +9,12 @@ import {
 import * as _ from 'lodash';
 import { NodeUtils, OF_ATTR } from './node.utils';
 
-export interface UsedClichesConfig {
-  [clicheAlias: string]: { config: any };
+export interface UsedConceptsConfig {
+  [conceptAlias: string]: { config: any };
 }
 
-export const USED_CLICHES_CONFIG = new InjectionToken<string>(
-  'usedClichesConfig'
+export const USED_CONCEPTS_CONFIG = new InjectionToken<string>(
+  'usedConceptsConfig'
 );
 
 // an abstract class is used so that we can export the type without
@@ -25,45 +25,45 @@ export abstract class ConfigService {
 
 class AppConfigService extends ConfigService {
   constructor(
-    private readonly usedClichesConfig: UsedClichesConfig,
+    private readonly usedConceptsConfig: UsedConceptsConfig,
     protected readonly forNode: ElementRef
   ) {
     super();
   }
 
   getConfig(): any {
-    const alias = this.getClicheAlias();
+    const alias = this.getConceptAlias();
 
-    const usedCliche = _.get(this.usedClichesConfig, alias);
-    if (usedCliche === undefined) {
-      throw new Error(`Cliche ${alias} not found`);
+    const usedConcept = _.get(this.usedConceptsConfig, alias);
+    if (usedConcept === undefined) {
+      throw new Error(`Concept ${alias} not found`);
     }
 
-    return usedCliche.config;
+    return usedConcept.config;
   }
 
-  protected getClicheAlias(): string {
-    return NodeUtils.GetClicheAliasOfNode(this.forNode.nativeElement);
+  protected getConceptAlias(): string {
+    return NodeUtils.GetConceptAliasOfNode(this.forNode.nativeElement);
   }
 }
 
 class DesignerConfigService extends AppConfigService {
   constructor(
-    usedClichesConfig: UsedClichesConfig,
+    usedConceptsConfig: UsedConceptsConfig,
     protected readonly forNode: ElementRef,
     private readonly renderer: Renderer2
   ) {
-    super(usedClichesConfig, forNode);
+    super(usedConceptsConfig, forNode);
   }
 
   /**
    * The designer will always set the dvOf attribute on the element
-   * which is an ancestor of the cliche action.
+   * which is an ancestor of the concept component.
    *
-   * Note that this assumes a cliche action that cares about the config
-   *   is never used in another cliche action.
+   * Note that this assumes a concept component that cares about the config
+   *   is never used in another concept component.
    */
-  protected getClicheAlias(): string {
+  protected getConceptAlias(): string {
     let dvOf: string;
     NodeUtils.WalkUpFromNode(
       this.forNode.nativeElement,
@@ -87,8 +87,8 @@ export class ConfigServiceFactory {
   private readonly renderer: Renderer2;
 
   constructor(
-    @Inject(USED_CLICHES_CONFIG)
-      private readonly usedClichesConfig: UsedClichesConfig,
+    @Inject(USED_CONCEPTS_CONFIG)
+      private readonly usedConceptsConfig: UsedConceptsConfig,
     rendererFactory: RendererFactory2
   ) {
     // https://github.com/angular/angular/issues/17824
@@ -108,9 +108,9 @@ export class ConfigServiceFactory {
   createConfigService(forNode: ElementRef): ConfigService {
     if (window['dv-designer']) {
       return new DesignerConfigService(
-        this.usedClichesConfig, forNode, this.renderer);
+        this.usedConceptsConfig, forNode, this.renderer);
     }
 
-    return new AppConfigService(this.usedClichesConfig, forNode);
+    return new AppConfigService(this.usedConceptsConfig, forNode);
   }
 }

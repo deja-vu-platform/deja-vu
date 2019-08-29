@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
   GatewayServiceFactory, OnExecSuccess, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
@@ -31,9 +31,9 @@ export class ChooseObjectComponent implements
    */
   @Input() chooseObjectSelectPlaceholder = 'Choose Object';
   /**
-   * Action to use to render each object
+   * Component to use to render each object
    */
-  @Input() showObject: Action = {
+  @Input() showObject: ComponentValue = {
     type: <Type<Component>> ShowObjectComponent
   };
   /**
@@ -43,23 +43,24 @@ export class ChooseObjectComponent implements
    */
   @Input() showOnly: string[];
   /**
-   * List of property names to pass to showObject actoin
+   * List of property names to pass to showObject component
    * (For the default showObject, this will cause
    * these properties to not be shown)
    */
   @Input() showExclude: string[];
   /**
-   * Passed to showObject action
+   * Passed to showObject component
    * (For the default showObject, this will cause any URL properties
    * to display without the protocol and path)
    */
-  @Input() showBaseUrlsOnly: boolean = false;
+  @Input() showBaseUrlsOnly = false;
   /**
-   * Whether or not the action should execute upon the user selecting an object
+   * Whether or not the component should execute upon the user selecting an
+   * object
    */
   @Input() execOnSelection = true;
   /**
-   * Whether or not the selection should be cleared when the action
+   * Whether or not the selection should be cleared when the component
    * executes sucessfully
    */
   @Input() resetOnExecSuccess = false;

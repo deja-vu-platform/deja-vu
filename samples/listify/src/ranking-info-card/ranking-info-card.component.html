@@ -1,4 +1,4 @@
-<dv.action name="ranking-info-card" listVotes=$listVotes>
+<dv.component name="ranking-info-card">
   <list.show-object id=$list?.id hidden=true />
   <ranking.show-ranking id=$list?.id sourceId=$loggedInUser?.id hidden=true />
 
@@ -6,7 +6,7 @@
     <span>This is the consensus ranking for <list.show-object
         class="inline-block"
         object=list.show-object.loadedObject
-        showOnly=['name'] /> according to {{listVotes}} vote(s).
+        showOnly=['name'] /> according to {{$listVotes}} vote(s).
       <dv.if condition=list.show-object.loadedObject?.locked>
        Voting has finished for this list.
       </dv.if>
@@ -22,10 +22,10 @@
         <dv.tx>
           <dv.button>Submit a Ranking</dv.button>
           <dv.link
-            href="/lists/rankings/edit"
+            href="/lists/rankings/submit"
             params={ id: $list.id } />
         </dv.tx>
       </dv.if>
     </span>
   </div>
-</dv.action>
+</dv.component>

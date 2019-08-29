@@ -9,7 +9,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { ShowScoreComponent } from '../show-score/show-score.component';
@@ -42,7 +42,7 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   @Input() totalLabel = 'Total: ';
   @Input() noScoresText = 'No scores to show';
 
-  @Input() showScore: Action = {
+  @Input() showScore: ComponentValue = {
     type: <Type<Component>> ShowScoreComponent
   };
 

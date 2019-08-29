@@ -63,7 +63,7 @@ OnInit {
               allocationId: this.allocationId
             }
           })
-        },
+        }
       })
       .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
       .subscribe((consumerId) => {

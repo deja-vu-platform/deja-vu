@@ -1,28 +1,16 @@
 {
   "name": "lingua",
-  "usedCliches": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+  "usedConcepts": {
+    "authentication": {},
+    "authorization": {},
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
           "properties": {
             "name": {
-              "type": "string"
-            },
-            "email": {
               "type": "string"
             },
             "aboutMe": {
@@ -36,16 +24,9 @@
         }
       }
     },
-    "chat": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "chat": {},
     "chatGroup": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartUp": false
-      }
+      "name": "group"
     },
     "correction": {
       "name": "property",
@@ -73,24 +54,17 @@
         }
       }
     },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "rating": {},
     "chatTotal": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartUp": false
-      }
+      "name": "group"
     }
   },
   "routes": [
-    { "path": "", "action": "show-chat" },
-    { "path": "login", "action": "login" },
-    { "path": "signup", "action": "signup" },
-    { "path": "profile", "action": "profile" },
-    { "path": "users", "action": "users"},
-    { "path": "chat", "action": "show-chat"}
+    { "path": "", "component": "show-chat" },
+    { "path": "/login", "component": "login" },
+    { "path": "/signup", "component": "signup" },
+    { "path": "/profile", "component": "profile" },
+    { "path": "/users", "component": "users"},
+    { "path": "/chat", "component": "show-chat"}
   ]
 }

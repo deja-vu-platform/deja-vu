@@ -1,10 +1,10 @@
 {
   "name": "themes",
-  "usedCliches": {
+  "usedConcepts": {
     "authentication": {}
   },
   "routes": [
-    { "path": "main", "action": "main" },
-    { "path": "", "action": "main" }
+    { "path": "/main", "component": "main" },
+    { "path": "", "component": "main" }
   ]
 }

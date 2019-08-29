@@ -1,4 +1,4 @@
-<dv.action name="claim-supply">
+<dv.component name="claim-supply">
   <div class="row">
     <div class="col-md-12">
       <potluck.show-supply supplyObj=$supplyObj useIdForObject=true />
@@ -15,17 +15,17 @@
           buttonLabel="Claim"
           newTransferSavedText="Supplies claimed"
           inputAmount=
-            <dv.action amount$=transfer.create-item-count.itemCountAsAmount>
+            <dv.component amount$=transfer.create-item-count.itemCountAsAmount>
               <transfer.create-item-count
                 id=$supplyObj?.id
                 showOptionToCreate=false
                 showOptionToInputItemId=false
                 emitOnRunOnly=false />
-            </dv.action>
+            </dv.component>
           />
 
         <authentication.authenticate id=$loggedInUserId hidden=true />
       </dv.tx>
     </div>
   </div>
-</dv.action>
+</dv.component>

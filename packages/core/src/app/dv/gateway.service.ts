@@ -34,7 +34,7 @@ export enum Method {
 
 export interface BaseParams {
   from: string;
-  fullActionName: string;
+  fullComponentName: string;
   path?: string;
   options?: string;
 }
@@ -62,16 +62,17 @@ const headers = new HttpHeaders({ 'Content-type': 'application/json' });
 /**
  * Class for batching transaction requests.
  */
+// TODO: refactor this class to have a clear sep between tx and non-tx reqs
 export class TxRequest {
-  // info that would have been sent by each action individually
+  // info that would have been sent by each component individually
   private requests: ChildRequest[] = [];
-  // observables given to the actions to post responses to
+  // observables given to the components to post responses to
   private subjects: Subject<any>[] = [];
-  // the number of actions in this transaction that have posted
-  private numActionsDone = 0;
-  // the number of actions in the transaction
+  // the number of components in this transaction that have posted
+  private numComponentsDone = 0;
+  // the number of components in the transaction
   // this is known only in the runService so it must be set after construction
-  private numActionsTotal: number;
+  private numComponentsTotal: number;
 
   constructor(
     private gatewayUrl: string,
@@ -82,11 +83,11 @@ export class TxRequest {
   ) { }
 
   /**
-   * Set the number of actions that are part of the tx
+   * Set the number of components that are part of the tx
    * The tx request will never be sent until this is done
    */
-  setNumActions(numActions: number): void {
-    this.numActionsTotal = numActions;
+  setNumComponents(numComponents: number): void {
+    this.numComponentsTotal = numComponents;
     if (this.isReady()) {
       this.send();
     }
@@ -100,16 +101,20 @@ export class TxRequest {
     const subject = new Subject<T>();
     this.requests.push(chReq);
     this.subjects.push(subject);
-    this.postNoRequest();
+    this.incDoneCountAndMaybeSend();
 
     return subject.asObservable();
   }
 
   /**
-   * Report an action in the tx group as not sending a request
+   * Report a component in the tx group as not sending a request
    */
   postNoRequest(): void {
-    this.numActionsDone += 1;
+    this.incDoneCountAndMaybeSend();
+  }
+
+  private incDoneCountAndMaybeSend(): void {
+    this.numComponentsDone += 1;
     if (this.isReady()) {
       this.send();
     }
@@ -119,37 +124,41 @@ export class TxRequest {
    * Whether or not the request is ready to send
    */
   private isReady(): boolean {
+    console.log(
+      `Checking if req is ready: got ` +
+      `${this.numComponentsDone}/${this.numComponentsTotal}`);
+
     return (
-      this.numActionsTotal !== undefined
-      && this.numActionsDone === this.numActionsTotal
+      this.numComponentsTotal !== undefined
+      && this.numComponentsDone === this.numComponentsTotal
     );
   }
 
   /**
    * Gets the context for this tx request.
-   * The context is a map `field -> value` for all the fields of the app action
-   * containing the tx. Only fields that can be referenced in template exprs
-   * are included (e.g., `ngOnInit` is not part of the context)
+   * The context is a map `field -> value` for all the fields of the app
+   * component containing the tx. Only fields that can be referenced in template
+   * exprs are included (e.g., `ngOnInit` is not part of the context)
    */
   private getContext(): { [field: string]: any } {
-    const appActionNode = NodeUtils
-      .GetAppActionNodeContainingNode(this.fromNode, this.renderer);
-    if (appActionNode === null) {
+    const appComponentNode = NodeUtils
+      .GetAppComponentNodeContainingNode(this.fromNode, this.renderer);
+    if (appComponentNode === null) {
       throw new Error(
         `App node for ${NodeUtils.GetFqTagOfNode(this.fromNode)} not found`);
     }
-    const actionId = NodeUtils.GetActionId(appActionNode);
-    const actionInstance = this.rs.getActionInstance(actionId);
-    if (actionInstance === null) {
+    const componentId = NodeUtils.GetComponentId(appComponentNode);
+    const componentInstance = this.rs.getComponentInstance(componentId);
+    if (componentInstance === null) {
       throw new Error(
-        `Action instance for id ${actionId} not found`);
+        `Component instance for id ${componentId} not found`);
     }
 
     // TODO: get the exact fields of the context that we need from the
     //  source code and send only those (instead of sending everything)
 
     // keys retains only enumerable properties
-    const contextKeys = _.without(_.keys(actionInstance), 'rs', 'elem');
+    const contextKeys = _.without(_.keys(componentInstance), 'rs', 'elem');
 
     const context = _.pickBy(
       // Output fields are implemented with getters and setters, which are not
@@ -159,7 +168,7 @@ export class TxRequest {
       // has the side effect that it will clobber the `EventEmitter` value,
       // which we don't need to send
       _.mapKeys(
-        _.pick(actionInstance, contextKeys),
+        _.pick(componentInstance, contextKeys),
         (_value, key: string) => key.startsWith('___') ? key.slice(1) : key),
       (value) => _.isArray(value) || _.isPlainObject(value) ||
         _.isBoolean(value) || _.isNumber(value) || _.isString(value) ||
@@ -193,6 +202,7 @@ export class TxRequest {
           break;
       }
       const subject = this.subjects[0];
+      console.log('Sending non-tx request');
       obs.subscribe(
         (resBody) => {
           subject.next(resBody);
@@ -204,6 +214,7 @@ export class TxRequest {
         }
       );
     } else {
+      console.log('Sending TX request');
       this.http.post<ChildResponse[]>(
         this.gatewayUrl,
         { context: this.getContext(), requests: this.requests },
@@ -227,12 +238,12 @@ export class TxRequest {
     // this object will never be used again so we can drop the reference
     delete GatewayService.txBatches[NodeUtils.GetRunId(this.fromNode)];
   }
-
 }
 
-
+// Note: this code operates on the assumption that no runId => no tx
 export class GatewayService {
   static txBatches: { [txId: string]: TxRequest } = {};
+  static txPendingNumComponents: { [txId: string]: number } = {};
   fromStr: string;
   private readonly gatewayHttpUrl: string;
 
@@ -249,10 +260,10 @@ export class GatewayService {
   }
 
   /**
-   * An action must call get, post, or noRequest exactly once
+   * A component must call get, post, or noRequest exactly once
    */
 
-  get<T>(path?: string, options?: RequestOptions) {
+  get<T>(path?: string, options?: RequestOptions): Observable<T> {
     return this.request<T>(
       Method.GET,
       path,
@@ -261,7 +272,8 @@ export class GatewayService {
     );
   }
 
-  post<T>(path?: string, body?: string | Object, options?: RequestOptions) {
+  post<T>(path?: string, body?: string | Object, options?: RequestOptions)
+    : Observable<T> {
     return this.request<T>(
       Method.POST,
       path,
@@ -270,7 +282,7 @@ export class GatewayService {
     );
   }
 
-  noRequest() {
+  noRequest(): void {
     const runId = NodeUtils.GetRunId(this.from.nativeElement);
     const txRequest = this.getTxReq(runId);
     txRequest.postNoRequest();
@@ -280,34 +292,23 @@ export class GatewayService {
     return this.ss.subscribe<T>(request, this.buildBaseParams(path));
   }
 
-  protected isAction(node: Element): boolean {
-    return NodeUtils.IsAction(node);
+  protected isComponent(node: Element): boolean {
+    return NodeUtils.IsComponent(node);
   }
 
   /**
-   * Action path.
+   * Component path.
    */
   protected generateFromStr(): string {
-    let node = this.from.nativeElement;
-    const seenActionNodes: string[] = [];
-    while (node && node.getAttribute) {
-      if (this.isAction(node)) {
-        seenActionNodes.push(NodeUtils.GetFqTagOfNode(node));
+    const node = this.from.nativeElement;
+    const seenComponentNodes: string[] = [];
+    NodeUtils.WalkUpFromNode(node, this.renderer, undefined, (vNode) => {
+      if (this.isComponent(vNode)) {
+        seenComponentNodes.push(NodeUtils.GetFqTagOfNode(vNode));
       }
+    });
 
-      let dvClass: string | null = null;
-      for (const cssClass of NodeUtils.GetCssClassesOfNode(node)) {
-        const match = /dv-parent-is-(.*)/i.exec(cssClass);
-        dvClass = match ? match[1] : null;
-      }
-      if (dvClass !== null) {
-        node = this.renderer.selectRootElement('.dv-' + dvClass);
-      } else {
-        node = this.renderer.parentNode(node);
-      }
-    }
-
-    return JSON.stringify(_.reverse(seenActionNodes));
+    return JSON.stringify(_.reverse(seenComponentNodes));
   }
 
   /**
@@ -319,6 +320,13 @@ export class GatewayService {
       txRequest = new TxRequest(
         this.gatewayHttpUrl, this.http, this.from.nativeElement,
         this.renderer, this.rs);
+      const maybeNumComponents = GatewayService
+        .txPendingNumComponents[runId];
+      if (maybeNumComponents) {
+        console.log(`Pulled up pending num components for ${runId}`);
+        txRequest.setNumComponents(maybeNumComponents);
+        delete GatewayService.txPendingNumComponents[runId];
+      }
       if (runId) {
         GatewayService.txBatches[runId] = txRequest;
       }
@@ -333,7 +341,7 @@ export class GatewayService {
     body?: string | Object,
     options?: RequestOptions
   ): Observable<T> {
-    console.log(`Sending ${method} from ${this.getActionName()}`);
+    console.log(`Sending ${method} from ${this.getComponentName()}`);
 
     const params = this.buildRunParams(path, options);
 
@@ -346,7 +354,7 @@ export class GatewayService {
     });
 
     if (!params.runId) {
-      txRequest.setNumActions(1);
+      txRequest.setNumComponents(1);
     }
 
     return individualResponseObservable;
@@ -355,7 +363,7 @@ export class GatewayService {
   private buildBaseParams(path?: string, options?: RequestOptions): BaseParams {
     const params: BaseParams = {
       from: this.fromStr,
-      fullActionName: this.getActionName(),
+      fullComponentName: this.getComponentName()
     };
     if (path) {
       params.path = path;
@@ -374,7 +382,7 @@ export class GatewayService {
     };
   }
 
-  private getActionName(): string {
+  private getComponentName(): string {
     return this.from.nativeElement.nodeName.toLowerCase();
   }
 }
@@ -393,8 +401,8 @@ export class DesignerGatewayService extends GatewayService {
     super(gatewayUrl, http, renderer, rs, ss, from);
   }
 
-  protected isAction(node: Element): boolean {
-    return _.get(node, ['dataset', 'isaction']) === 'true';
+  protected isComponent(node: Element): boolean {
+    return _.get(node, ['dataset', 'iscomponent']) === 'true';
   }
 
   get fromStr() {

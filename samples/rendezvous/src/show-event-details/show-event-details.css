@@ -120,11 +120,11 @@
 }
 
 /* makes labels show as a plain comma-separated list */
-#relevantinterests-show-labels ul {
+#relevantInterests-show-labels ul {
   padding: 0 !important;
   margin: 0;
 }
-#relevantinterests-show-labels li {
+#relevantInterests-show-labels li {
   background: none;
   color: black;
   font-size: 12;
@@ -133,11 +133,11 @@
   margin-right: 2px;
   padding: 0;
 }
-#relevantinterests-show-labels li:after {
+#relevantInterests-show-labels li:after {
   content: ",";
   margin-left: -3px;
 }
-#relevantinterests-show-labels li:last-child:after {
+#relevantInterests-show-labels li:last-child:after {
   content: "";
 }
 

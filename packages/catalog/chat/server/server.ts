@@ -1,15 +1,15 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields,
   isSuccessfulContext,
   Validation
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 import { IResolvers } from 'graphql-tools';
 import {
@@ -47,8 +47,8 @@ class MessageValidation {
   }
 }
 
-// each action should be mapped to its corresponding GraphQl request here
-const actionRequestTable: ActionRequestTable = {
+// each component should be mapped to its corresponding GraphQl request here
+const componentRequestTable: ComponentRequestTable = {
   'create-message': (extraInfo) => `
     mutation CreateMessage($input: CreateMessageInput!) {
       createMessage(input: $input) ${getReturnFields(extraInfo)}
@@ -81,7 +81,7 @@ const actionRequestTable: ActionRequestTable = {
     switch (extraInfo.action) {
       case 'subscribe':
         return `subscription NewChatMessage($chatId: ID!) {
-          newChatMessage(chatId: $chatId) 
+          newChatMessage(chatId: $chatId)
         }`;
       case 'new':
         // note that this is unused, but should potentially be used
@@ -106,7 +106,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
+function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
   const messages: Collection<MessageDoc> = db.collection('messages');
 
   return {
@@ -122,7 +122,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
         }))
         .sort({ timestamp: -1 })
         .limit(limit)
-        .toArray()
+        .toArray();
       },
       newChatMessages: async (_root, { input }: { input: NewChatMessagesInput })
       : Promise<MessageDoc[]> =>
@@ -131,7 +131,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
           timestamp: { $gt: input.lastMessageTimestamp }
         }))
         .sort({ timestamp: 1 })
-        .toArray(),
+        .toArray()
     },
 
     Message: {
@@ -139,7 +139,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
       content: (message: MessageDoc) => message.content,
       timestamp: (message: MessageDoc) => dateToUnixTime(message.timestamp),
       authorId: (message: MessageDoc) => message.authorId,
-      chatId: (message: MessageDoc) => message.chatId,
+      chatId: (message: MessageDoc) => message.chatId
     },
 
     Mutation: {
@@ -160,7 +160,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
             }
 
             return newMessage;
-          })
+          });
       },
 
       updateMessage: async (
@@ -172,7 +172,7 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
           // only because Message authorIds CANNOT be changed.
           // If for some reason editing Message authorIds becomes possible,
           // this functionality will be broken.
-          // Note that the authorization cliché could also be used
+          // Note that the authorization concept could also be used
           // to get the same functionality.
           if (message.authorId !== input.authorId) {
             throw new Error('Only the author of the message can edit it.');
@@ -199,15 +199,15 @@ function resolvers(db: ClicheDb, config: MessageConfig): IResolvers {
         subscribe: withFilter(
           () => pubsub.asyncIterator(NEW_MESSAGE_TOPIC),
           (payload, variables) =>
-            variables.chatId === payload.newMessage.chatId 
-        ),
+            variables.chatId === payload.newMessage.chatId
+        )
       }
     }
   };
 }
 
-const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const chatConcept: ConceptServer = new ConceptServerBuilder('chat')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const messages: Collection<MessageDoc> = db.collection('messages');
 
     return Promise.all([
@@ -215,8 +215,8 @@ const chatCliche: ClicheServer = new ClicheServerBuilder('chat')
       messages.createIndex({ chatId: 1, timestamp: 1 })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-chatCliche.start();
+chatConcept.start();

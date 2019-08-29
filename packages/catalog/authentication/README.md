@@ -2,7 +2,7 @@
 
 Verify the user's identity with a username and password
 
-## Actions
+## Components
 
 - authenticate
 - change-password

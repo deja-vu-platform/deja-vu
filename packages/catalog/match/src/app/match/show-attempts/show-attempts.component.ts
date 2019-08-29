@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -31,7 +31,7 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
   @Input() showSourceId = true;
   @Input() showTargetId = true;
 
-  @Input() showAttempt: Action = {
+  @Input() showAttempt: ComponentValue = {
     type: <Type<Component>> ShowAttemptComponent
   };
   @Input() noAttemptsToShowText = 'No attempts to show';

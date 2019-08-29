@@ -10,7 +10,7 @@ import { MatTable } from '@angular/material';
 
 import * as _ from 'lodash';
 
-import { Action } from '../include/include.component';
+import { ComponentValue } from '../include/include.component';
 import { OnExecSuccess, RunService } from '../run.service';
 
 @Pipe({ name: 'camelToTitleCase'})
@@ -43,9 +43,9 @@ export class StageComponent
   @Input() initialStagedEntities: any[] = [];
   @Output() stagedEntities = new EventEmitter<any[]>();
 
-  @Input() stageHeader: Action | undefined;
-  @Input() stageEntity: Action | undefined;
-  @Input() showEntity: Action | undefined;
+  @Input() stageHeader: ComponentValue | undefined;
+  @Input() stageEntity: ComponentValue | undefined;
+  @Input() showEntity: ComponentValue | undefined;
 
   @Input() filter: string[] | undefined;
   @Output() filteredStagedEntities = new EventEmitter<any[]>();

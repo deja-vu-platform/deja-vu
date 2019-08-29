@@ -1,22 +1,29 @@
 {
+  "private": true,
   "name": "@deja-vu/compiler",
-  "version": "0.0.1",
   "description": "Déjà Vu compiler",
-  "scripts": {
-    "test": "jasmine-ts",
-    "build": "tsc && cp src/action/action.grammar.ohm dist/action && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
-    "package": "npm run clean && npm run build",
-    "lint": "tslint -p . -c tslint.json src/**/*.ts",
-    "clean": "rm -rf ./dist"
+  "license": "MIT",
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "repository": "github:spderosso/dejavu",
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
   },
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc && cp src/component/component.grammar.ohm dist/component && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
+    "clean": "rm -rf ./dist ./pkg",
+    "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/**/*.ts",
+    "package": "npm run clean && npm run build",
+    "test": "jasmine-ts"
+  },
+  "types": "./dist/index.d.ts",
   "dependencies": {
     "fs-extra": "^6.0.1",
     "ohm-js": "^0.14.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.2"
-  },
-  "peerDepencies": {
-    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.2",
@@ -26,20 +33,15 @@
     "@types/prettier": "^1.16.4",
     "@types/rimraf": "^2.0.2",
     "@types/tmp": "^0.0.33",
-    "jasmine": "^3.2.0",
+    "jasmine": "~3.4.0",
     "jasmine-ts": "^0.3.0",
+    "prettier": "^1.18.2",
     "tmp": "^0.0.33",
     "ts-node": "^7.0.1",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
   },
-  "repository": "github:spderosso/dejavu",
-  "license": "MIT",
-  "private": true,
-  "bugs": {
-    "url": "https://github.com/spderosso/dejavu/issues"
-  },
-  "homepage": "https://github.com/spderosso/dejavu#readme",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js"
+  "peerDepencies": {
+    "lodash": "^4.17.4"
+  }
 }

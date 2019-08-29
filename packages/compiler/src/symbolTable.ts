@@ -1,23 +1,23 @@
-export type EntryKind = 'cliche' | 'app' | 'action' | 'output' | 'input' |
+export type EntryKind = 'concept' | 'app' | 'component' | 'output' | 'input' |
   'app-output';
 
-export interface ClicheStEntry {
-  kind: 'cliche';
-  symbolTable?: SymbolTable<ActionStEntry>;
-  clicheName?: string;
+export interface ConceptStEntry {
+  kind: 'concept';
+  symbolTable?: SymbolTable<ComponentStEntry>;
+  conceptName?: string;
 }
 
 export interface AppStEntry {
   kind: 'app';
-  symbolTable?: SymbolTable<ActionStEntry>;
+  symbolTable?: SymbolTable<ComponentStEntry>;
 }
 
-export interface ActionStEntry {
-  kind: 'action';
-  symbolTable?: ActionSymbolTable;
-  // Because actions can be aliased, we always record the cliche and action name
+export interface ComponentStEntry {
+  kind: 'component';
+  symbolTable?: ComponentSymbolTable;
+  // Because components can be aliased, we always record the concept and component name
   of?: string;
-  actionName?: string;
+  componentName?: string;
 }
 
 export interface OutputStEntry {
@@ -40,21 +40,21 @@ export interface InputStEntry {
 }
 
 export type StEntry =
-  ClicheStEntry | AppStEntry | ActionStEntry | OutputStEntry | InputStEntry |
+  ConceptStEntry | AppStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppOutputStEntry;
 
-export type ActionSymbolTableStEntry =
-  ClicheStEntry | ActionStEntry | OutputStEntry | InputStEntry |
+export type ComponentSymbolTableStEntry =
+  ConceptStEntry | ComponentStEntry | OutputStEntry | InputStEntry |
   AppStEntry | AppOutputStEntry;
 
 /**
- * Each action has its own symbol table to keep track of the symbols that can
+ * Each component has its own symbol table to keep track of the symbols that can
  * appear in attribute exprs.
  */
-export type ActionSymbolTable = SymbolTable<ActionSymbolTableStEntry>;
+export type ComponentSymbolTable = SymbolTable<ComponentSymbolTableStEntry>;
 
 
-export interface SymbolTable<T = AppStEntry | ClicheStEntry> {
+export interface SymbolTable<T = AppStEntry | ConceptStEntry> {
   [symbol: string]: T;
 }
 

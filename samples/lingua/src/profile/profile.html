@@ -1,11 +1,21 @@
-<dv.action name="profile">
+<dv.component name="profile">
   <lingua.navbar accessRequired=true />
   <div class="panel">
     <h3>Edit Profile</h3>
-    <userProfile.update-object id=lingua.navbar.loggedInUserId buttonLabel="Update Profile"/>
+    <dv.tx>
+      <authentication.authenticate as auth-profile
+        id=lingua.navbar.user?.id hidden=true />
+      <userProfile.update-object
+        id=lingua.navbar.user?.id
+        buttonLabel="Update Profile" updateObjectSavedText="Profile updated" />
+    </dv.tx>
   </div>
   <div class="panel">
     <h3>Change Password</h3>
-    <authentication.change-password id=lingua.navbar.loggedInUserId />
+    <dv.tx>
+      <authentication.authenticate as auth-password
+        id=lingua.navbar.user?.id hidden=true />
+      <authentication.change-password id=lingua.navbar.user?.id />
+    </dv.tx>
   </div>
-</dv.action>
+</dv.component>

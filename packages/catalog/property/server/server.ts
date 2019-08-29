@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import * as Ajv from 'ajv';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
@@ -41,7 +41,7 @@ const loadSchemaAndObjectsQueries = (extraInfo) => {
 };
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'choose-object': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
   'create-object': (extraInfo) => {
     switch (extraInfo.action) {
@@ -167,6 +167,17 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
+  const fieldMatchingProperties = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .map(([propertyName, _schemaPropertyObject]) => {
+
+      return `${propertyName}: String`;
+    })
+    .value();
+
+  const joinedFieldMatchingProperties = fieldMatchingProperties.join('\n');
+
   const propertyFilters = _
     .chain(config.schema.properties)
     .toPairs()
@@ -204,7 +215,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 
     input FieldMatchingInput {
       id: ID
-      ${joinedNonRequiredProperties}
+      ${joinedFieldMatchingProperties}
     }
 
     input FilterInput {
@@ -237,7 +248,7 @@ function addTimestamp(obj: ObjectDoc) {
   return obj;
 }
 
-function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
+function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
   const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
     Query: {
@@ -256,7 +267,24 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         return _.get(obj, '_pending') ? null : addTimestamp(obj);
       },
       objects: async (_root, { fields }) => {
-        const objs = await objects.find(fields);
+        const query = _.mapValues(fields, (v) => {
+          if (!_.isString(v)) {
+            return v;
+          }
+          let qObj;
+          try {
+            qObj = JSON.parse(v);
+          } catch (e) {
+            return v;
+          }
+
+          return _.mapKeys(qObj, (_v, k: string) => k.startsWith('q_') ?
+            '$' + k.slice(2) : k);
+        });
+        const objsCursor = await objects.findCursor(query);
+        const objs = await objsCursor
+          .sort({ _id: -1 })
+          .toArray();
 
         return _.map(objs, addTimestamp);
       },
@@ -280,7 +308,10 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
           }
         });
 
-        const objs = await objects.find(modifiedFilters);
+        const objsCursor = await objects.findCursor(modifiedFilters);
+        const objs = await objsCursor
+          .sort({ _id: -1 })
+          .toArray();
 
         return _.map(objs, addTimestamp);
       },
@@ -302,6 +333,7 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
     Mutation: {
       createObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
+
         return await objects.insertOne(context, newObject);
       },
 
@@ -312,17 +344,18 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
         // if one insertion fails:
         //  the remaining elements will not be inserted
         //  the elements inserted before will remain inserted
-        return await objDocs[0] ? objects.insertMany(context, objDocs) : [];
+        return objDocs[0] ? await objects.insertMany(context, objDocs) : [];
       },
 
       removeObject: async (_root, { id }, context: Context) => {
-        return await objects.deleteOne(context, {id: id});
+        return await objects.deleteOne(context, { id: id });
       },
 
       updateObject: async (_root, { input }, context: Context) => {
         const newObject: ObjectDoc = createObjectFromInput(config, input);
-        return await objects.updateOne(context, {id: input.id},
-          {$set: newObject}, {upsert: true});
+
+        return await objects.updateOne(context, { id: input.id },
+          { $set: newObject }, { upsert: true });
       },
 
       updateObjects: async (_root, { input }, context: Context) => {
@@ -350,9 +383,9 @@ function resolvers(db: ClicheDb, config: PropertyConfig): IResolvers {
   return resolversObj;
 }
 
-const propertyCliche: ClicheServer<PropertyConfig> =
-  new ClicheServerBuilder<PropertyConfig>('property')
-    .initDb(async (db: ClicheDb, config: PropertyConfig): Promise<any> => {
+const propertyConcept: ConceptServer<PropertyConfig> =
+  new ConceptServerBuilder<PropertyConfig>('property')
+    .initDb(async (db: ConceptDb, config: PropertyConfig): Promise<any> => {
       const objects: Collection<ObjectDoc> = db.collection('objects');
       await objects.createIndex({ id: 1 }, { unique: true, sparse: true });
       if (!_.isEmpty(config.initialObjects)) {
@@ -367,9 +400,9 @@ const propertyCliche: ClicheServer<PropertyConfig> =
 
       return Promise.resolve();
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .dynamicTypeDefs(getDynamicTypeDefs)
     .build();
 
-propertyCliche.start();
+propertyConcept.start();

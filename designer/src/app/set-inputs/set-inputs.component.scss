@@ -7,8 +7,8 @@
 }
 
 $mat-placeholder-color: #757575;
-$action-input-padding: 4px;
-.action-input {
+$component-input-padding: 4px;
+.component-input {
   border: 1px dashed lightgray;
   height: 45.5px; // chosen to be consistent with mat inputs
   // 20px chosen to be consistent with mat inputs
@@ -18,13 +18,13 @@ $action-input-padding: 4px;
   // put a bit of space around the interior button
   // we want the reminder text to disappear on button hover only
   // so we need to use negative position to offset the padding
-  padding: $action-input-padding;
+  padding: $component-input-padding;
   > div {
     position: relative;
     > .reminder {
       position: absolute;
-      top: -$action-input-padding;
-      left: -$action-input-padding;
+      top: -$component-input-padding;
+      left: -$component-input-padding;
       color: $mat-placeholder-color;
       font-size: 75%;
       cursor: default;
@@ -47,7 +47,7 @@ $action-input-padding: 4px;
   .prompt {
     color: $mat-placeholder-color; // mat input placeholder color
     cursor: default;
-    // hide the prompt message when an action is dragged in
+    // hide the prompt message when a component is dragged in
     &:not(:only-child) {
       display: none;
     }

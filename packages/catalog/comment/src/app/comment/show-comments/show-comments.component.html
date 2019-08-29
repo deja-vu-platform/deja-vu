@@ -1,7 +1,7 @@
 <ul *ngIf="comments && comments.length > 0" class="list-group">
   <li *ngFor="let comment of comments" class="list-group-item">
     <dv-include
-      [action]="showComment" default-showComment="{ tag: comment-show-comment }"
+      [component]="showComment" default-showComment="{ tag: comment-show-comment }"
       [inputs]="{
           comment: comment, showId: showId, showAuthor: showAuthor,
           showTarget: showTarget, showContent: showContent

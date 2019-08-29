@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateObjectComponent } from './create-object.component';
 
-import { buildConfig } from '../testing/testbed.config';
+import { buildConfig, testConfig } from '../testing/testbed.config';
 
 
 describe('CreateObjectComponent', () => {
@@ -10,7 +10,8 @@ describe('CreateObjectComponent', () => {
   let fixture: ComponentFixture<CreateObjectComponent>;
 
   beforeEach(async(() => {
-    const config = buildConfig({ data: { properties: [] } }, null, {});
+    const config = buildConfig(
+      { data: { properties: [] } }, null, testConfig);
     TestBed.configureTestingModule(config)
       .compileComponents();
   }));

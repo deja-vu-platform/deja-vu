@@ -1,6 +1,6 @@
 <ul *ngIf="users && users.length > 0" class="list-group">
   <li *ngFor="let user of users" class="list-group-item">
-    <dv-include [action]="showUser" default-showUser="{ tag: authentication-show-user }"
+    <dv-include [component]="showUser" default-showUser="{ tag: authentication-show-user }"
                 [inputs]="{
                   user: user, showId: showId, showUsername: showUsername
                 }"

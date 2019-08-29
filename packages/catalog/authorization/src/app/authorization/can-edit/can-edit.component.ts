@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter,
+  AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
@@ -20,7 +20,8 @@ interface CanEditRes {
   templateUrl: './can-edit.component.html',
   styleUrls: ['./can-edit.component.css']
 })
-export class CanEditComponent implements OnInit, OnChanges, OnExec {
+export class CanEditComponent implements
+  AfterViewInit, OnInit, OnChanges, OnExec {
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canEdit = new EventEmitter<boolean>();
@@ -35,6 +36,9 @@ export class CanEditComponent implements OnInit, OnChanges, OnExec {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -43,6 +47,20 @@ export class CanEditComponent implements OnInit, OnChanges, OnExec {
   }
 
   load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  dvOnEval() {
+    this.doRequest();
+  }
+
+  dvOnExec() {
+    this.doRequest();
+  }
+
+  doRequest() {
     if (!this.gs) {
       return;
     }
@@ -62,7 +80,7 @@ export class CanEditComponent implements OnInit, OnChanges, OnExec {
     });
   }
 
-  dvOnExec() {
-    this.load();
+  canEval() {
+    return this.gs && this.principalId && this.resourceId;
   }
 }

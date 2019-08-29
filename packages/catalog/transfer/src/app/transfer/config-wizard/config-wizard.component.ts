@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 
 /**
- * Config Wizard is used by the Designer to configure the cliche.
+ * Config Wizard is used by the Designer to configure the concept.
  */
 @Component({
   selector: 'transfer-config-wizard',

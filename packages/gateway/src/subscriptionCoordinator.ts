@@ -1,6 +1,6 @@
 import { ExecutionResult } from 'graphql';
 import {
-  SubscriptionClient, OperationOptions, Observable
+  Observable, OperationOptions, SubscriptionClient
 } from 'subscriptions-transport-ws';
 import * as WebSocket from 'ws';
 
@@ -9,7 +9,8 @@ export class SubscriptionCoordinator {
   private readonly wsClientTable: { [url: string]: SubscriptionClient } = {};
 
   forwardRequest(url: string, request: Object): Observable<ExecutionResult> {
-    return this.getClient(url).request(request);
+    return this.getClient(url)
+      .request(request);
   }
 
   unsubscribeAll() {
@@ -37,7 +38,7 @@ export class SubscriptionCoordinator {
       {
         applyMiddleware: (options: OperationOptions, next) => {
           // query is required by SubscriptionClient
-          // but will be set by each cliche based on the action name
+          // but will be set by each concept based on the component name
           if (!options.query) {
             options.query = 'to be set';
           }

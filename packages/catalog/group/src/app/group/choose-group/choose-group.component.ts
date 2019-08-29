@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
 
-import { Action } from '@deja-vu/core';
+import { ComponentValue } from '@deja-vu/core';
 
 import { Group } from '../shared/group.model';
 import { ShowGroupComponent } from '../show-group/show-group.component';
@@ -12,7 +12,7 @@ import { ShowGroupComponent } from '../show-group/show-group.component';
 })
 export class ChooseGroupComponent {
   groups: Group[];
-  @Input() showGroup: Action = {
+  @Input() showGroup: ComponentValue = {
     type: <Type<Component>>ShowGroupComponent,
     inputMap: { entity: 'group' }
   };

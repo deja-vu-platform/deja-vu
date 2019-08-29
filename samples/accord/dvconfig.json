@@ -1,20 +1,11 @@
 {
   "name": "accord",
-  "usedCliches": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+  "usedConcepts": {
+    "authentication": {},
+    "authorization": {},
     "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Profile",
           "type": "object",
@@ -29,15 +20,10 @@
         }
       }
     },
-    "group": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
+    "group": {},
     "groupInfo": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "GroupInfo",
           "type": "object",
@@ -55,7 +41,6 @@
     "setList": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "SetList",
           "type": "object",
@@ -79,7 +64,6 @@
     "proposal": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Proposal",
           "type": "object",
@@ -106,7 +90,6 @@
     "media": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": false,
         "schema": {
           "title": "Media",
           "type": "object",
@@ -124,31 +107,23 @@
         }
       }
     },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": false
-      }
-    }
+    "rating": {},
+    "comment": {}
   },
   "routes": [
-    { "path": "", "action": "groups" },
-    { "path": "sign-in", "action": "sign-in" },
-    { "path": "sign-up", "action": "sign-up" },
-    { "path": "user-profile", "action": "user-profile" },
-    { "path": "about", "action": "about" },
-    { "path": "edit-group", "action": "edit-group" },
-    { "path": "group", "action": "show-group" },
-    { "path": "create-group", "action": "create-group" },
-    { "path": "set-list", "action": "show-set-list" },
-    { "path": "edit-set-list", "action": "edit-set-list" },
-    { "path": "create-set-list", "action": "create-set-list" },
-    { "path": "proposal", "action": "show-proposal" },
-    { "path": "edit-proposal", "action": "edit-proposal" },
-    { "path": "create-proposal", "action": "create-proposal" }
+    { "path": "", "component": "groups" },
+    { "path": "/sign-in", "component": "sign-in" },
+    { "path": "/sign-up", "component": "sign-up" },
+    { "path": "/user-profile", "component": "user-profile" },
+    { "path": "/about", "component": "about" },
+    { "path": "/edit-group", "component": "edit-group" },
+    { "path": "/group", "component": "show-group" },
+    { "path": "/create-group", "component": "create-group" },
+    { "path": "/set-list", "component": "show-set-list" },
+    { "path": "/edit-set-list", "component": "edit-set-list" },
+    { "path": "/create-set-list", "component": "create-set-list" },
+    { "path": "/proposal", "component": "show-proposal" },
+    { "path": "/edit-proposal", "component": "edit-proposal" },
+    { "path": "/create-proposal", "component": "create-proposal" }
   ]
 }

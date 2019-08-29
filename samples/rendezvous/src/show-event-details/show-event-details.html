@@ -1,15 +1,15 @@
-<dv.action name="show-event-details">
+<dv.component name="show-event-details">
   <div class="index">
-    <rendezvous.navbar showProfileButton=true />
-    <eventdetails.show-object id=$eventId hidden=true />
+    <rendezvous.navbar showTitle=true showProfileButton=true />
+    <eventDetails.show-object id=$eventId hidden=true />
     <authorization.show-owner resourceId=$eventId hidden=true />
 
     <div class="new-event">
       <div class="card">
         <div class="card-header event-name">
           <!-- Event Title -->
-          <eventdetails.show-object
-            object=eventdetails.show-object.loadedObject
+          <eventDetails.show-object
+            object=eventDetails.show-object.loadedObject
             showOnly=["title"] />
         </div>
 
@@ -40,14 +40,14 @@
           <div id="interests-panel">
             Relevant Interests
             <div class="card-body" id="interests-body">
-              <relevantinterests.show-labels id="relevant-interests"
+              <relevantInterests.show-labels id="relevant-interests"
                 itemId=$eventId
                 noLabelsToShowText="No interests added for this event" />
             </div>
           </div>
 
           <div class="event-info-table">
-            <p class="bold"> Event Details</p>
+            <p class="bold">Event Details</p>
             <!-- Location -->
             <p class="oblique">Location:
               <span>
@@ -66,34 +66,34 @@
 
           <div class="event-details">
             <!-- Additional Info -->
-            <p> Event Description</p>
+            <p>Event Description</p>
             <div id="show-post">
-              <eventdetails.show-object
-                object=eventdetails.show-object.loadedObject
+              <eventDetails.show-object
+                object=eventDetails.show-object.loadedObject
                   showOnly=["additionalInfo"] />
             </div>
           </div>
 
-          <dv.if condition=rendezvous.navbar.loggedInUserId===authorization.show-owner.ownerId>
-            <!-- TODO: Edit Event -->
-            <div class="inline btn-group form-group" id="edit-event-button">
-              <button class="btn button">Coming Soon: Edit Event</button>
-            </div>
-
+          <dv.if condition=rendezvous.navbar.loggedInUser?.id
+            === authorization.show-owner.ownerId>
             <p id="event-host">
               YOU ARE THE HOST OF THIS EVENT
             </p>
           </dv.if>
 
           <!-- Join Group if already not in it -->
-          <dv.if condition=rendezvous.navbar.loggedInUserId !==authorization.show-owner.ownerId>
+          <dv.if condition=rendezvous.navbar.loggedInUser?.id !==
+              authorization.show-owner.ownerId>
             <div class="inline btn-group form-group" id="join-leave-group">
               <dv.tx>
                 <authorization.add-remove-viewer resourceId=$eventId
-                  viewerId=rendezvous.navbar.loggedInUserId hidden=true />
+                  viewerId=rendezvous.navbar.loggedInUser?.id hidden=true />
 
-                <group.join-leave class="btn button" groupId=$eventId
-                  memberId=rendezvous.navbar.loggedInUserId />
+                <group.join-leave class="btn button"
+                  joinGroupText="Attend Event"
+                  leaveGroupText="Leave Event"
+                  groupId=$eventId
+                  memberId=rendezvous.navbar.loggedInUser?.id />
               </dv.tx>
             </div>
           </dv.if>
@@ -104,18 +104,19 @@
               <dv.tx>
                 <comment.create-comment
                   class="center"
-                  authorId=rendezvous.navbar.loggedInUserId
+                  authorId=rendezvous.navbar.loggedInUser?.id
                   targetId=$eventId
                   inputLabel="Post a new comment"
                   buttonLabel="Post" />
               </dv.tx>
               <comment.show-comments ofTargetId=$eventId
+                includeTimestamp=true
                 showComment=<rendezvous.show-event-comment comment=$comment
-                  loggedInUserId=rendezvous.navbar.loggedInUserId /> />
+                  loggedInUserId=rendezvous.navbar.loggedInUser?.id /> />
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

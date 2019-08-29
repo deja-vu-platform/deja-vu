@@ -1,0 +1,24 @@
+{
+  "name": "<%= dasherize(conceptName) %>",
+  "config": {
+    "wsPort": 3001
+  },
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "components": {
+    "package": {
+      "include": [ "src/app/<%= dasherize(conceptName) %>/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "<%= dasherize(conceptName) %>-root" }
+      ]
+    }
+  },
+  "componentsRequestOptional": [
+    "<%= dasherize(conceptName) %>-show-<%= dasherize(conceptName) %>"
+  ]
+}

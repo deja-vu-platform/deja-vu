@@ -7,8 +7,8 @@
 <div *ngIf="ranking?.targets" class="container">
   <ul class="list-group">
     <li *ngFor="let target of ranking.targets" class="list-group-item">
-      <dv-include 
-        [action]="showTarget" 
+      <dv-include
+        [component]="showTarget"
         [inputs]="{
           id: target.id, target: target, showId: showTargetId,
           showRank: showTargetRank, rankLabel: targetRankLabel

@@ -1,119 +1,129 @@
 /**
- * For determining which actions and their inputs/outputs are referenced by
+ * For determining which components and their inputs/outputs are referenced by
  * expressions.
  */
 
 import * as _ from 'lodash';
-import { ActionInstance, AppActionDefinition, InInput } from './datatypes';
+import {
+  AppComponentDefinition, ComponentInstance, InInput
+} from './datatypes';
 import compileDvExpr from './expression.compiler';
 
 export interface Reference {
-  action: ActionInstance; // from for in, by for out
+  component: ComponentInstance; // from for in, by for out
   ioName: string;
 }
 
 export interface InReferences {
-  [actionID: string]: {
+  [componentID: string]: {
     [ioName: string]: Reference[];
   };
 }
 
 // the dual of InReferences
 export interface OutReferences {
-  [actionID: string]: Reference[];
+  [componentID: string]: Reference[];
 }
 
 export function resolveName(
   name: string,
-  appActionInstance: ActionInstance,
+  appComponentInstance: ComponentInstance,
   inInput?: InInput
 ) {
-  if (!(appActionInstance.of instanceof AppActionDefinition)) {
-    throw new Error('Action is not an app action.');
+  if (!(appComponentInstance.of instanceof AppComponentDefinition)) {
+    throw new Error('Component is not an app component.');
   }
-  const appActionDefinition: AppActionDefinition = appActionInstance.of;
+  const appComponentDefinition: AppComponentDefinition =
+    appComponentInstance.of;
 
   // parse the name
   let ioName: string;
-  let fromAction: ActionInstance;
+  let fromComponent: ComponentInstance;
   if (name[0].startsWith('$')) {
     // getting an input from above
     ioName = name.slice(1); // strip leading '$'
-    if (inInput && inInput.of.of.actionInputs[inInput.name][ioName]) {
-      // getting an input from within an action input
-      fromAction = inInput.of;
-    } else if (appActionDefinition.inputs.includes(ioName)) {
+    if (inInput && inInput.of.of.componentInputs[inInput.name][ioName]) {
+      // getting an input from within a component input
+      fromComponent = inInput.of;
+    } else if (appComponentDefinition.inputs.includes(ioName)) {
       // getting an input from the parent
-      fromAction = appActionInstance;
+      fromComponent = appComponentInstance;
     }
   } else {
     // getting an output from a sibling
-    let clicheN: string;
-    let actionN: string;
-    [clicheN, actionN, ioName] = name.split('.');
-    const maybeFA = appActionDefinition.findChild(clicheN, actionN);
+    let conceptN: string;
+    let componentN: string;
+    [conceptN, componentN, ioName] = name.split('.');
+    const maybeFA = appComponentDefinition.findChild(conceptN, componentN);
     if (maybeFA && maybeFA.of.outputs.includes(ioName)) {
-      fromAction = maybeFA;
+      fromComponent = maybeFA;
     }
   }
 
   return {
-    fromAction,
+    fromComponent,
     ioName
   };
 }
 
-export default function findReferences(appActionInstance: ActionInstance) {
-  if (!(appActionInstance.of instanceof AppActionDefinition)) {
-    throw new Error('Action is not an app action.');
+export default function findReferences(
+  appComponentInstance: ComponentInstance) {
+  if (!(appComponentInstance.of instanceof AppComponentDefinition)) {
+    throw new Error('Component is not an app component.');
   }
-  const appActionDefinition: AppActionDefinition = appActionInstance.of;
+  const appComponentDefinition: AppComponentDefinition =
+    appComponentInstance.of;
 
   const inReferences: InReferences = {};
   const outReferences: OutReferences = {};
-  appActionDefinition
+  appComponentDefinition
     .getChildren(true)
-    .forEach((action: ActionInstance) => {
-      action.walkInputs(true, (inputName, inputValue, ofAction, inInput) => {
-        if (!_.isString(inputValue)) { return; }
+    .forEach((component: ComponentInstance) => {
+      component.walkInputs(true,
+        (inputName, inputValue, ofComponent, inInput) => {
+          if (!_.isString(inputValue)) {
+            return;
+          }
           let compiledDvExpr;
           try {
             compiledDvExpr = compileDvExpr(inputValue);
           } catch (e) {
             console.error(
               `Coulnd't find references for expression "${inputValue}",` +
-              `used in action "${action.of.name}" for input "${inputName}"`);
+              `used in component "${component.of.name}" for input ` +
+              `"${inputName}"`);
             console.error(e);
 
             return;
           }
-        const { names } = compiledDvExpr;
-        names.forEach((name) => {
-          const { fromAction, ioName } = resolveName(
-            name,
-            appActionInstance,
-            inInput
+          const { names } = compiledDvExpr;
+          names.forEach((name) => {
+            const { fromComponent, ioName } = resolveName(
+              name,
+              appComponentInstance,
+              inInput
           );
-          if (fromAction) {
-            let ioInReferences = (inReferences[ofAction.id] || {})[inputName];
+          if (fromComponent) {
+            let ioInReferences = (
+              inReferences[ofComponent.id] || {})[inputName];
             if (!ioInReferences) {
               ioInReferences = [];
-              _.set(inReferences, [ofAction.id, inputName], ioInReferences);
+              _.set(inReferences, [ofComponent.id, inputName], ioInReferences);
             }
             if (!ioInReferences.find((r) =>
-              r.ioName === ioName && r.action.id === fromAction.id
+              r.ioName === ioName && r.component.id === fromComponent.id
             )) {
-              ioInReferences.push({ action: fromAction, ioName });
+              ioInReferences.push({ component: fromComponent, ioName });
             }
-            let actionOutReferences = outReferences[fromAction.id];
-            if (!actionOutReferences) {
-              actionOutReferences = [];
-              outReferences[fromAction.id] = actionOutReferences;
+            let componentOutReferences = outReferences[fromComponent.id];
+            if (!componentOutReferences) {
+              componentOutReferences = [];
+              outReferences[fromComponent.id] = componentOutReferences;
             }
-            if (!actionOutReferences.find((r) => (
-              r.ioName === ioName && r.action.id === ofAction.id
+            if (!componentOutReferences.find((r) => (
+              r.ioName === ioName && r.component.id === ofComponent.id
             ))) {
-              actionOutReferences.push({ ioName, action: ofAction });
+              componentOutReferences.push({ ioName, component: ofComponent });
             }
           }
         });

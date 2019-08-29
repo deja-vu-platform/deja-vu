@@ -1,0 +1,31 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="create<%= classify(conceptName) %>Form"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="new<%= classify(conceptName) %>Saved">
+      <i class="material-icons">done</i>
+        {{new<%= classify(conceptName) %>SavedText}}
+    </div>
+    <mat-error *ngIf="new<%= classify(conceptName) %>Error">
+      <i class="material-icons">report_problem</i>
+      {{new<%= classify(conceptName) %>Error}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputContentLabel}}</mat-label>
+      <textarea matInput required formControlName="contentControl">
+      </textarea>
+    </mat-form-field>
+    <div *ngIf="contentControl.invalid && contentControl.touched">
+      <mat-error *ngIf="contentControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!create<%= classify(conceptName) %>Form.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

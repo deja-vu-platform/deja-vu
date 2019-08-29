@@ -3,7 +3,7 @@ import {
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
@@ -25,7 +25,9 @@ export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
 OnInit, OnChanges {
   @Input() targetId: string;
 
-  @Input() showRating: Action = { type: <Type<Component>>ShowRatingComponent };
+  @Input() showRating: ComponentValue = {
+    type: <Type<Component>>ShowRatingComponent
+  };
 
   @Input() noRatingsToShowText = 'No ratings to show';
   ratings: Rating[] = [];

@@ -1,9 +1,9 @@
 import {
-  AfterViewInit, Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -27,7 +27,7 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() targetRankLabel = 'Rank: ';
   @Input() noTargetsText = 'No targets';
 
-  @Input() showTarget: Action = {
+  @Input() showTarget: ComponentValue = {
     type: <Type<Component>> ShowTargetComponent
   };
 

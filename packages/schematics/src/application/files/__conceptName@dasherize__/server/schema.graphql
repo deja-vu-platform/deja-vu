@@ -1,0 +1,24 @@
+type <%= classify(conceptName) %> {
+  id: ID!
+  content: String!
+}
+
+input Create<%= classify(conceptName) %>Input {
+  id: ID
+  content: String!
+}
+
+input Update<%= classify(conceptName) %>Input {
+  id: ID!
+  content: String!
+}
+
+type Query {
+  <%= camelize(conceptName) %>(id: ID!): <%= classify(conceptName) %>
+}
+
+type Mutation {
+  create<%= classify(conceptName) %>(input: Create<%= classify(conceptName) %>Input!): <%= classify(conceptName) %>
+  delete<%= classify(conceptName) %>(id: ID!): Boolean
+  update<%= classify(conceptName) %>(input: Update<%= classify(conceptName) %>Input!): Boolean
+}

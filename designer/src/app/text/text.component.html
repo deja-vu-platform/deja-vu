@@ -1,7 +1,7 @@
 <quill-editor #editor
-  *ngIf="actionInstance && modules"
+  *ngIf="componentInstance && modules"
   [theme]="readOnly ? 'bubble' : 'snow'"
-  [ngModel]="actionInstance.data"
+  [ngModel]="componentInstance.data"
   [modules]="modules"
   [placeholder]="'Set the content from the I/O menu'"
   (onContentChanged)="onContentChanged($event)"

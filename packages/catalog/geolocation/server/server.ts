@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   CreateMarkerInput,
   MarkerDoc,
@@ -18,7 +18,7 @@ import { IResolvers } from 'graphql-tools';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'show-marker': (extraInfo) => `
     query ShowMarker($id: ID!) {
       marker(id: $id) ${getReturnFields(extraInfo)}
@@ -62,7 +62,7 @@ function milesToRadian(miles: number) {
   return miles / earthRadiusInMiles;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const markers: Collection<MarkerDoc> = db.collection('markers');
 
   return {
@@ -86,6 +86,10 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
               ]
             }
           };
+        }
+
+        if (input.markerIds) {
+          filter['id'] = { $in: input.markerIds };
         }
 
         return await markers.find(filter);
@@ -122,18 +126,19 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
-    const markers: Collection<MarkerDoc> = db.collection('markers');
+const geolocationConcept: ConceptServer =
+  new ConceptServerBuilder('geolocation')
+    .initDb((db: ConceptDb, _config: Config): Promise<any> => {
+      const markers: Collection<MarkerDoc> = db.collection('markers');
 
-    return Promise.all([
-      markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
-      markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
-        { unique: true, sparse: true })
-    ]);
-  })
-  .actionRequestTable(actionRequestTable)
-  .resolvers(resolvers)
-  .build();
+      return Promise.all([
+        markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
+        markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
+          { unique: true, sparse: true })
+      ]);
+    })
+    .componentRequestTable(componentRequestTable)
+    .resolvers(resolvers)
+    .build();
 
-geolocationCliche.start();
+geolocationConcept.start();

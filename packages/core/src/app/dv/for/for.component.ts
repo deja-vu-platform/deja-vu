@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Action } from '../include/include.component';
+import { ComponentValue } from '../include/include.component';
 
 
 @Component({
@@ -8,7 +8,7 @@ import { Action } from '../include/include.component';
   templateUrl: './for.component.html'
 })
 export class ForComponent {
-  @Input() showElem: Action | undefined;
+  @Input() showElem: ComponentValue | undefined;
   @Input() elems;
 
   forComponent = this;

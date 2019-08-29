@@ -1,0 +1,28 @@
+<dv.component name="show-my-events">
+  <mapcampus.navbar />
+
+  <div class="events-container">
+    <div class="events-panel">
+      <div class="events-header-row">
+        <h2 class="my-events-header">My Events</h2>
+        <dv.link href="/create-event" class="btn btn-blue create-event-btn">
+          Create Event</dv.link>
+      </div>
+
+      <div class="container-fluid">
+        <dv.tx>
+          <authentication.authenticate
+            id=mapcampus.navbar.loggedInUser?.id
+            hidden=true/>
+          <eventAuthorization.show-resources
+            noResourcesText="No events to show"
+            createdBy=mapcampus.navbar.loggedInUser?.id
+            waitOn=['createdBy']
+            showResource=<mapcampus.show-event-info
+              id=$id
+              loggedInUserId=mapcampus.navbar.loggedInUser?.id /> />
+        </dv.tx>
+      </div>
+    </div>
+  </div>
+</dv.component>

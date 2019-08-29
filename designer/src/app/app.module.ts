@@ -7,38 +7,40 @@ import { DragulaModule } from 'ng2-dragula';
 import { NgxElectronModule } from 'ngx-electron';
 import { QuillModule } from 'ngx-quill';
 
-import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 
 import { AppRoutingModule } from './app-routing.module';
-import { ClicheModule, dvCoreActions } from './cliche.module';
+import { ConceptModule, dvCoreComponents } from './concept.module';
 import { MatModule } from './mat.module';
 
 import { DynamicComponentDirective } from './dynamic-component.directive';
 
-import { usedClichesConfig } from './datatypes';
+import { usedConceptsConfig } from './datatypes';
 
 import {
-  ActionDefinitionComponent
-} from './action-definition/action-definition.component';
-import {
-  ActionInstanceComponent
-} from './action-instance/action-instance.component';
-import {
-  AddAppActionIoComponent
-} from './add-app-action-io/add-app-action-io.component';
+  AddAppComponentIoComponent
+} from './add-app-component-io/add-app-component-io.component';
 import { AppComponent } from './app.component';
 import {
-  ClicheInstancesComponent
-} from './cliche-instances/cliche-instances.component';
+  ComponentDefinitionComponent
+} from './component-definition/component-definition.component';
 import {
-  ConfigureActionComponent
-} from './configure-action/configure-action.component';
+  ComponentInstanceComponent
+} from './component-instance/component-instance.component';
 import {
-  ConfigureClicheComponent
-} from './configure-cliche/configure-cliche.component';
+  ConceptInstancesComponent
+} from './concept-instances/concept-instances.component';
+import {
+  ConfigureComponentComponent
+} from './configure-component/configure-component.component';
+import {
+  ConfigureConceptComponent
+} from './configure-concept/configure-concept.component';
 import { DesignerComponent } from './designer/designer.component';
 import { FloatingMenuComponent } from './floating-menu/floating-menu.component';
-import { InsertActionComponent } from './insert-action/insert-action.component';
+import {
+  InsertComponentComponent
+} from './insert-component/insert-component.component';
 import {
   SetInputsComponent
 } from './set-inputs/set-inputs.component';
@@ -48,29 +50,29 @@ import { TopBarComponent } from './top-bar/top-bar.component';
 
 import { ChildScopeIO } from './io';
 
-export function getUsedClichesConfig() {
-  return usedClichesConfig;
+export function getUsedConceptsConfig() {
+  return usedConceptsConfig;
 }
 
-ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
+ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
 
 @NgModule({
   declarations: [
     DynamicComponentDirective,
-    ActionDefinitionComponent,
-    ActionInstanceComponent,
+    ComponentDefinitionComponent,
+    ComponentInstanceComponent,
     AppComponent,
-    ClicheInstancesComponent,
-    ConfigureActionComponent,
-    ConfigureClicheComponent,
+    ConceptInstancesComponent,
+    ConfigureComponentComponent,
+    ConfigureConceptComponent,
     DesignerComponent,
     FloatingMenuComponent,
-    InsertActionComponent,
+    InsertComponentComponent,
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
     TopBarComponent,
-    AddAppActionIoComponent
+    AddAppComponentIoComponent
   ],
   imports: [
     BrowserModule,
@@ -82,7 +84,7 @@ ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
     NgxElectronModule,
     QuillModule,
     DvModule,
-    ClicheModule,
+    ConceptModule,
     AppRoutingModule
   ],
   providers: [
@@ -93,17 +95,17 @@ ChildScopeIO.actionInstanceComponent = ActionInstanceComponent;
       useValue: 'localhost:4200/api'
     },
     {
-      provide: USED_CLICHES_CONFIG,
-      useFactory: getUsedClichesConfig
+      provide: USED_CONCEPTS_CONFIG,
+      useFactory: getUsedConceptsConfig
     }
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    ActionInstanceComponent,
-    AddAppActionIoComponent,
-    ConfigureActionComponent,
-    ConfigureClicheComponent,
+    ComponentInstanceComponent,
+    AddAppComponentIoComponent,
+    ConfigureComponentComponent,
+    ConfigureConceptComponent,
     TextComponent
-  ].concat(dvCoreActions)
+  ].concat(dvCoreComponents)
 })
 export class AppModule { }

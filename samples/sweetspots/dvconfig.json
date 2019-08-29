@@ -1,40 +1,18 @@
 {
   "name": "sweetspots",
-  "usedCliches": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+  "usedConcepts": {
+    "authentication": {},
+    "authorization": {},
+    "comment": {},
+    "rating": {},
     "geolocation": {
       "config": {
-        "mapType": "leaflet",
-        "reinitDbOnStartup": true
+        "mapType": "leaflet"
       }
     },
-    "follow": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "follow": {},
     "label": {
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": [
           "bathroom", "nap space", "water fountain", "study space"
         ]
@@ -42,7 +20,6 @@
     },
     "property": {
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "SpotDetails",
           "type": "object",
@@ -68,11 +45,11 @@
     }
   },
   "routes": [
-    { "path": "login", "action": "login" },
-    { "path": "main", "action": "main" },
-    { "path": "profile", "action": "show-user-profile" },
-    { "path": "register", "action": "register" },
-    { "path": "spot-details", "action": "show-spot-details" },
-    { "path": "", "action": "main" }
+    { "path": "/login", "component": "login" },
+    { "path": "/main", "component": "main" },
+    { "path": "/profile", "component": "show-user-profile" },
+    { "path": "/register", "component": "register" },
+    { "path": "/spot-details", "component": "show-spot-details" },
+    { "path": "", "component": "main" }
   ]
 }

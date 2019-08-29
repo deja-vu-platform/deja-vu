@@ -4,41 +4,41 @@
     <div class="logo-designer">Designer</div>
   </div>
   <button
-    class="create-action-button"
+    class="create-component-button"
     mat-button color="primary"
-    (click)="createAction()"
+    (click)="createComponent()"
    >
-    <mat-icon>add_circle</mat-icon> New Action
+    <mat-icon>add_circle</mat-icon> New Component
    </button>
-  <div class="toolbar-app-action">
+  <div class="toolbar-app-component">
     <mat-form-field>
       <mat-select
-        name="action"
-        placeholder="App Action"
-        [(ngModel)]="openAction"
-        (selectionChange)="onSelectAction($event)"
+        name="component"
+        placeholder="App Component"
+        [(ngModel)]="openComponent"
+        (selectionChange)="onSelectComponent($event)"
       >
         <mat-select-trigger>
-          {{openAction.name}}
+          {{openComponent.name}}
         </mat-select-trigger>
         <mat-option
-          *ngFor="let action of app.actions"
-          [value]="action"
+          *ngFor="let component of app.components"
+          [value]="component"
         >
-          <mat-icon class="action-icon">{{getActionIcon(action)}}</mat-icon>
+          <mat-icon class="component-icon">{{getComponentIcon(component)}}</mat-icon>
           <span class="tx-hint"
-            [style.visibility]="isTx(action) ? 'visible' : 'hidden'">
+            [style.visibility]="isTx(component) ? 'visible' : 'hidden'">
             tx
           </span>
-          {{action.name}}
+          {{component.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
     <button
       mat-icon-button
       class="mat-small"
-      (click)="editAction()"
-      matTooltip="Configure Action"
+      (click)="editComponent()"
+      matTooltip="Configure Component"
     >
       <mat-icon>settings</mat-icon>
     </button>
@@ -46,7 +46,7 @@
       #menuTrigger="matMenuTrigger"
       [matMenuTriggerFor]="menu.matMenu"
       class="mat-small"
-      matTooltip="Set Inputs/Outputs of Action"
+      matTooltip="Set Inputs/Outputs of Component"
     >
       <mat-icon>swap_horiz</mat-icon>
     </button>
@@ -130,11 +130,11 @@
 
   <app-floating-menu
     #menu
-    [title]="app.name + '-' + openAction.name"
+    [title]="app.name + '-' + openComponent.name"
     (opened)="clickFirstTab(menuContent)"
     (shouldClose)="closeMenu(menuTrigger)"
   >
-    <mat-tab-group #menuContent class="popup-menu action-menu">
+    <mat-tab-group #menuContent class="popup-menu component-menu">
       <mat-tab label="Inputs">
         <button mat-button color="primary" (click)="addIO('input')" class="add-io">
           <mat-icon>add_circle</mat-icon> New Input
@@ -142,7 +142,7 @@
         <div dragula="expression-io" class="inputtables io-container">
           <div
             class="io-and-button"
-            *ngFor="let input of openAction.inputSettings"
+            *ngFor="let input of openComponent.inputSettings"
             [attr.data-output]="'$' + input.name"
           >
             <div>
@@ -156,9 +156,9 @@
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <div *ngIf="openAction.inputSettings.length === 0"
+          <div *ngIf="openComponent.inputSettings.length === 0"
             class="no-drag" class="no-inputs-hint">
-            This action has no inputs.
+            This component has no inputs.
           </div>
         </div>
       </mat-tab>
@@ -169,7 +169,7 @@
         </button>
         <div class="io-container">
           <div
-            *ngFor="let output of openAction.outputSettings"
+            *ngFor="let output of openComponent.outputSettings"
             class="io-and-button"
           >
             <mat-form-field>
@@ -191,8 +191,8 @@
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <div *ngIf="openAction.outputSettings.length === 0">
-            This action has no outputs.
+          <div *ngIf="openComponent.outputSettings.length === 0">
+            This component has no outputs.
           </div>
         </div>
       </mat-tab>

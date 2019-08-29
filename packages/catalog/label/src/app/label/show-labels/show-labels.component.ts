@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -30,7 +30,7 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
   // Presentation inputs
   @Input() noLabelsToShowText = 'No labels to show';
 
-  @Input() showLabel: Action = {
+  @Input() showLabel: ComponentValue = {
     type: <Type<Component>>ShowLabelComponent
   };
 

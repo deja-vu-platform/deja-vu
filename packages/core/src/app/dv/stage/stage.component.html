@@ -1,5 +1,5 @@
 <div *ngIf="stageEntity" class="dv-stage-stage-entity">
-  <dv-include [action]="stageEntity"
+  <dv-include [component]="stageEntity"
               [outputs]="{ stage: 'stage' }"
               [parent]="stageComponent"
               no-default-stageEntity >
@@ -26,7 +26,7 @@
 
 <div *ngIf="stageHeader" class="row dv-stage-stage-header">
   <div class="col-md-12">
-    <dv-include [action]="stageHeader" no-default-stageHeader
+    <dv-include [component]="stageHeader" no-default-stageHeader
                 [parent]="stageComponent">
     </dv-include>
   </div>
@@ -61,7 +61,7 @@
             <div class="row">
               <div class="col-md-10">
                 <div *ngIf="showEntity">
-                  <dv-include [action]="showEntity" [inputs]="{ entity: entity }"
+                  <dv-include [component]="showEntity" [inputs]="{ entity: entity }"
                               [parent]="stageComponent"
                               default-showEntity="{ tag: dv-show-entity }">
                   </dv-include>

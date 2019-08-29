@@ -1,6 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, Type } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from '@deja-vu/core';
+import {
+  ComponentValue, GatewayService, GatewayServiceFactory
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { map } from 'rxjs/operators';
@@ -36,7 +38,9 @@ export class ChooseAndShowSeriesComponent implements OnInit {
   series: Series[] = [];
   events: Event[] = [];
 
-  @Input() showEvent: Action = { type: <Type<Component>> ShowEventComponent };
+  @Input() showEvent: ComponentValue = {
+    type: <Type<Component>> ShowEventComponent
+  };
 
   chooseAndShowSeries;
   private gs: GatewayService;

@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
@@ -46,10 +46,10 @@ export class ShowTargetsByScoreComponent implements AfterViewInit, OnEval,
   @Input() noScoresText = 'No scores to show';
   @Input() noTargetsText = 'No targets to show';
 
-  @Input() showScore: Action = {
+  @Input() showScore: ComponentValue = {
     type: <Type<Component>> ShowScoreComponent
   };
-  @Input() showTarget: Action = {
+  @Input() showTarget: ComponentValue = {
     type: <Type<Component>> ShowTargetComponent
   };
 

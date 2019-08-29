@@ -17,6 +17,18 @@ describe('GetCurrentLocationComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(GetCurrentLocationComponent);
     component = fixture.componentInstance;
+    window.navigator['__defineGetter__']('geolocation', () => {
+      return {
+        getCurrentPosition: (l) => {
+          l({
+            coords: {
+              latitude: 42,
+              longitude: 71
+            }
+          });
+        }
+      };
+    });
     fixture.detectChanges();
   });
 

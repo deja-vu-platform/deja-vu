@@ -1,4 +1,5 @@
 export interface CommentDoc {
+  _id?: any;
   id: string;
   authorId: string;
   targetId: string;

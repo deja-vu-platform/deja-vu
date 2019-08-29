@@ -1,4 +1,4 @@
-<dv.action name="show-reward">
+<dv.component name="show-reward">
   <div class="row">
     <div class="col-md-4">
       <reward.show-object object=$reward showOnly=['name'] />
@@ -9,15 +9,18 @@
     </div>
     <div class="col-md-4">
       <dv.if condition=$showOptionToPurchase>
-      <!-- TODO: check here -->
-        <transfer.add-to-balance
-          showOptionToInputAccountId=false
-          showOptionToInputBalance=false
-          accountId=$user.id
-          amount=-1 * $reward.cost
-          buttonLabel="Purchase"
-          newTransferSavedText="Reward purchased." />
+        <dv.tx>
+          <childauthentication.authenticate
+            user=$user waitOn=['user'] hidden=true />
+          <transfer.add-to-balance
+            showOptionToInputAccountId=false
+            showOptionToInputBalance=false
+            accountId=$user.id
+            amount=-1 * $reward.cost
+            buttonLabel="Purchase"
+            newTransferSavedText="Reward purchased" />
+        </dv.tx>
       </dv.if>
     </div>
   </div>
-</dv.action>
+</dv.component>

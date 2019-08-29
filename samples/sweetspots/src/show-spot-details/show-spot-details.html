@@ -1,9 +1,9 @@
-<dv.action name="show-spot-details">
+<dv.component name="show-spot-details">
   <sweetspots.navbar showSearch=false accessRequired=true/>
 
   <authorization.show-owner resourceId=$id hidden=true />
   <geolocation.show-marker id=$id hidden=true />
-  <rating.show-rating sourceId=sweetspots.navbar.loggedInUserId targetId=$id
+  <rating.show-rating sourceId=sweetspots.navbar.loggedInUser?.id targetId=$id
     hidden=true />
 
   <div class="container">
@@ -13,7 +13,7 @@
         <h1><geolocation.show-marker marker=geolocation.show-marker.loadedMarker
           showId=false showLatLong=false showMapId=false /></h1>
         <div style="height:400px;width:400px;">
-          <geolocation.display-map id="mainMapId"
+          <geolocation.display-map
             markers=[geolocation.show-marker.loadedMarker]
             showSearchControl=false
             showDirectionsControl=false/>
@@ -38,20 +38,20 @@
 
         <div class="inline-block detail-buttons">
           <!-- Delete Spot -->
-          <!-- TODO: Only delete the spot within a day of being created -->
-          <dv.if condition=sweetspots.navbar.loggedInUserId===authorization.show-owner.ownerId
+          <dv.if condition=sweetspots.navbar.loggedInUser?.id ===
+            authorization.show-owner.ownerId
             class="inline-block">
             <dv.tx>
               <geolocation.delete-marker id=$id hidden=true />
-              <reputation.create-score sourceId=sweetspots.navbar.loggedInUserId
-                targetId=sweetspots.navbar.loggedInUserId
+              <reputation.create-score sourceId=sweetspots.navbar.loggedInUser?.id
+                targetId=sweetspots.navbar.loggedInUser?.id
                 value=-1 hidden=true />
               <authorization.delete-resource id=$id hidden=true />
-              <authentication.authenticate id=sweetspots.navbar.loggedInUserId
+              <authentication.authenticate id=sweetspots.navbar.loggedInUser?.id
                 hidden=true />
                 <!-- TODO: comment.delete-target -->
               <comment.delete-comment class="btn btn-danger delete-spot" id=$id
-                authorId=sweetspots.navbar.loggedInUserId />
+                authorId=sweetspots.navbar.loggedInUser?.id />
               <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
 
               <!-- TODO -->
@@ -66,23 +66,17 @@
             <!-- Favorite/ Unfavorite Spot -->
             <dv.tx>
               <authentication.authenticate as favorite-spot-authenticate
-                id=sweetspots.navbar.loggedInUserId
+                user=sweetspots.navbar.loggedInUser
+                waitOn=['user']
                 hidden=true />
               <follow.follow-unfollow class="btn btn-success favorite-spot"
                 publisherId=$id
-                followerId=sweetspots.navbar.loggedInUserId
+                followerId=sweetspots.navbar.loggedInUser?.id
+                waitOn=['publisherId', 'followerId']
                 followButtonLabel="Favorite"
                 unfollowButtonLabel="Unfavorite"
-                hidden=!sweetspots.navbar.loggedInUserId />
+                hidden=!sweetspots.navbar.loggedInUser?.id />
             </dv.tx>
-
-            <!-- TODO: Report Spot -->
-            <button class="btn btn-danger report-spot"
-              hidden=sweetspots.navbar.loggedInUserId>
-              Coming Soon: Report
-            </button>
-            <!-- Delete spot if reportScore > 10 + numReviews where
-              reportScore = sum(reporters.rep at that time) -->
           </div>
         </div>
       </div>
@@ -94,7 +88,7 @@
         noCommentsToShowText="No reviews for this spot. Write one today!"
         showComment=<sweetspots.show-spot-details-review
           comment=$comment
-          loggedInUserId=sweetspots.navbar.loggedInUserId /> />
+          loggedInUserId=sweetspots.navbar.loggedInUser?.id /> />
 
         <br />
 
@@ -105,17 +99,18 @@
               <dv.gen-id />
               <dv.status savedText="Review created!" />
               <authentication.authenticate as write-review-authenticate
-                id=sweetspots.navbar.loggedInUserId
+                id=sweetspots.navbar.loggedInUser?.id
                 hidden=true />
               <reputation.create-score as write-review-create-score
                 id=dv.gen-id.id
-                sourceId=sweetspots.navbar.loggedInUserId
+                sourceId=sweetspots.navbar.loggedInUser?.id
                 targetId=authorization.show-owner.ownerId
                 value=1
                 hidden=true/>
-              <rating.rate-target sourceId=sweetspots.navbar.loggedInUserId
+              <rating.rate-target sourceId=sweetspots.navbar.loggedInUser?.id
                 targetId=$id execOnClick=false />
-              <comment.create-comment authorId=sweetspots.navbar.loggedInUserId
+              <comment.create-comment
+                authorId=sweetspots.navbar.loggedInUser?.id
                 targetId=$id inputLabel=""
                 showOptionToSubmit=false />
               <dv.button class="btn btn-primary">Submit Review</dv.button>
@@ -127,4 +122,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

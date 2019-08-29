@@ -8,20 +8,26 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from '@deja-vu/core';
 
-// import and export all cliché actions here
+// import and export all concept components here
 import { ShowChatComponent } from './show-chat/show-chat.component';
 export { ShowChatComponent };
-import { CreateMessageComponent } from './create-message/create-message.component';
+import {
+  CreateMessageComponent
+} from './create-message/create-message.component';
 export { CreateMessageComponent };
 import { ShowMessageComponent } from './show-message/show-message.component';
 export { ShowMessageComponent };
-import { DeleteMessageComponent } from './delete-message/delete-message.component';
+import {
+  DeleteMessageComponent
+} from './delete-message/delete-message.component';
 export { DeleteMessageComponent };
-import { UpdateMessageComponent } from './update-message/update-message.component';
+import {
+  UpdateMessageComponent
+} from './update-message/update-message.component';
 export { UpdateMessageComponent };
 
 
-// add all cliché actions here
+// add all concept components here
 const allComponents = [
   ShowChatComponent, CreateMessageComponent, ShowMessageComponent,
   DeleteMessageComponent, UpdateMessageComponent

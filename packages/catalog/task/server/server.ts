@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -20,7 +20,7 @@ import {
 } from './schema';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'approve-task': (extraInfo) => `
     mutation ApproveTask($id: ID!) {
       approveTask (id: $id) ${getReturnFields(extraInfo)}
@@ -94,14 +94,14 @@ async function updateTask(
   return await tasks.updateOne(context, { id }, updateOp);
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const tasks: Collection<TaskDoc> = db.collection('tasks');
 
   return {
     Query: {
       tasks: async (_root, { input }: { input: TasksInput }) => {
         const filterOp = _.omit(input, ['assigned']);
-        if (!input.assigned) {
+        if (input.assigned === false) {
           filterOp['assigneeId'] = null;
         }
 
@@ -169,14 +169,14 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const taskCliche: ClicheServer = new ClicheServerBuilder('task')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const taskConcept: ConceptServer = new ConceptServerBuilder('task')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const tasks: Collection<TaskDoc> = db.collection('tasks');
 
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-taskCliche.start();
+taskConcept.start();

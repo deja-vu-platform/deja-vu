@@ -1,7 +1,9 @@
-<property-show-object [id]="id"
-                      [hidden]="true"
-                      [_config]="config"
-                      (loadedObject)="setInitialValues($event)"></property-show-object>
+<div *ngIf="useObject === undefined">
+  <property-show-object
+    [id]="id" [hidden]="true" [_config]="config"
+    (loadedObject)="setInitialValues($event)">
+  </property-show-object>
+</div>
 
 <form (ngSubmit)="onSubmit()"
       [formGroup]="updateObjectForm"
@@ -17,7 +19,10 @@
     </mat-error>
   </div>
   <div class="form-group" *ngFor="let property of properties">
-    <property-create-property [_config]="config" [name]="property.name" [formControlName]="property.name" [hidden]="showExclude.includes(property.name)">
+    <property-create-property
+      [_config]="config" [name]="property.name"
+      [formControlName]="property.name"
+      [hidden]="showExclude.includes(property.name)">
     </property-create-property>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">

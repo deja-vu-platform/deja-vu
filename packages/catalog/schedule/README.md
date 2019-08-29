@@ -2,7 +2,7 @@
 
 Find times to meet
 
-## Actions
+## Components
 
 - create-schedule
 - delete-schedule
@@ -15,7 +15,7 @@ Find times to meet
 
 ## Notes
 
-To use this cliché in your app you need to add the following
+To use this concept in your app you need to add the following
 to `styles.css`:
 
 ```css

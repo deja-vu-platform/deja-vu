@@ -1,11 +1,19 @@
 {
+  "private": true,
   "name": "@deja-vu/schematics",
-  "version": "0.0.1",
   "description": "Schematics for Déjà Vu",
+  "license": "MIT",
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "repository": "github:spderosso/dejavu",
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "version": "0.0.1",
   "scripts": {
     "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' src/ dist/",
     "clean": "rm -rf ./dist",
     "lint": "tslint -p . -c tslint.json src/**/*.ts",
+    "lint-fix": "tslint --fix -p . -c tslint.json src/**/*.ts",
     "package": "npm run clean && npm run build",
     "prepare": "npm run package",
     "test": "npm run package && jasmine dist/**/*_spec.js"
@@ -15,16 +23,12 @@
     "@angular-devkit/schematics": "^7.3.2",
     "@types/jasmine": "^3.0.0",
     "@types/node": "^8.0.31",
-    "jasmine": "^3.3.0",
+    "jasmine": "~3.4.0",
     "node-html-parser": "^1.1.12",
     "typescript": "~3.2.2"
   },
-  "repository": "github:spderosso/dejavu",
-  "license": "MIT",
-  "private": true,
-  "bugs": {
-    "url": "https://github.com/spderosso/dejavu/issues"
-  },
-  "homepage": "https://github.com/spderosso/dejavu#readme",
-  "schematics": "./dist/collection.json"
+  "schematics": "./dist/collection.json",
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
 }

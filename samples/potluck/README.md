@@ -14,7 +14,7 @@ Team ARMR
 
 [Original App](http://potluck-armr.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Authorization
 - Event
@@ -29,8 +29,8 @@ Team ARMR
 - Guests can decline party invitation (delete user from group)
 - Add how much you paid for what you brought (persisted field, or use `pricePerGood` of market tx?)
 - Party host (inherent to event/group, persisted field, or authorization)
-- Reminder emails (make email cliche work, require email instead of username for login)
-- Only party host can invite, send emails, close party (proably new auth cliche)
+- Reminder emails (make email concept work, require email instead of username for login)
+- Only party host can invite, send emails, close party (proably new auth concept)
 - Invite emails that don't have an account yet (need to rethink how account creation is done)
 
 ## Possible extensions

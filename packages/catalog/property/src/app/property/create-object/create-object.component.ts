@@ -18,7 +18,9 @@ import {
   RunService
 } from '@deja-vu/core';
 
-import { getPropertiesFromConfig, Property } from '../shared/property.model';
+import {
+  getObjectTitleFromConfig, getPropertiesFromConfig, Property
+} from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -66,7 +68,7 @@ export class CreateObjectComponent
   /**
    * Text for the button to create an object
    */
-  @Input() buttonLabel = 'Create Object';
+  @Input() buttonLabel;
   /**
    * Text to show when an object is successfully created
    */
@@ -116,6 +118,11 @@ export class CreateObjectComponent
 
     const cs = this.csf.createConfigService(this.elem);
     this.config = this._config ? this._config : cs.getConfig();
+
+    if (this.buttonLabel === undefined) {
+      const objTitle = getObjectTitleFromConfig(this.config);
+      this.buttonLabel = `Create ${objTitle}`;
+    }
     this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};
     for (const property of this.properties) {

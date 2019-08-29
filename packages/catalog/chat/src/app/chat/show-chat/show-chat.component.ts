@@ -1,12 +1,14 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, Type
+  OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
+
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs/Subscription';
 
 import { API_PATH, SUBSCRIPTIONS_PATH } from '../chat.config';
 import { GraphQlMessage, Message, toMessage } from '../shared/chat.model';
@@ -24,11 +26,11 @@ interface ShowChatRes {
   selector: 'chat-show-chat',
   templateUrl: './show-chat.component.html'
 })
-export class ShowChatComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowChatComponent implements AfterViewInit, OnChanges, OnDestroy,
+  OnEval, OnInit {
   // Provide one of the following: id or chat
   @Input() id: string | undefined;
-  @Input() maxMessageCount: number = 0; // 0 for no limit
+  @Input() maxMessageCount = 0; // 0 for no limit
   @Input() chat: Message[] | undefined;
   @Output() loadedChat = new EventEmitter();
 
@@ -39,7 +41,7 @@ OnInit {
   @Input() showMessageAuthorId = true;
   @Input() showMessageChatId = true;
 
-  @Input() showMessage: Action = {
+  @Input() showMessage: ComponentValue = {
     type: <Type<Component>> ShowMessageComponent
   };
   @Input() noMessagesToShowText = 'No messages yet';
@@ -47,6 +49,7 @@ OnInit {
   showChat;
   private shouldUpdate = false;
   private gs: GatewayService;
+  private sub: Subscription;
 
   constructor(
     private elem: ElementRef,
@@ -89,13 +92,13 @@ OnInit {
           },
           extraInfo: {
             returnFields: `
-              ${this.showMessageId ? 'id' : ''}
+              id
               ${this.showMessageContent ? 'content' : ''}
               ${this.showMessageTimestamp ? 'timestamp' : ''}
               ${this.showMessageAuthorId ? 'authorId' : ''}
             `
           }
-        },
+        }
       })
       .subscribe((res: ShowChatRes) => {
         if (res.data) {
@@ -103,7 +106,7 @@ OnInit {
           this.chat = chat;
           this.loadedChat.emit(chat);
 
-          this.gs.subscribe<any>(this.subscriptionsPath, {
+          this.sub = this.gs.subscribe<any>(this.subscriptionsPath, {
             inputs: { chatId: this.id }
           })
           .subscribe((res) => {
@@ -123,5 +126,9 @@ OnInit {
 
   private canEval(): boolean {
     return !!((!this.chat || this.shouldUpdate) && this.id && this.gs);
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 }

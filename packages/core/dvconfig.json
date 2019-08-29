@@ -5,7 +5,7 @@
       "wsPort": 3000
     }
   },
-  "actions": {
+  "components": {
     "package": {
       "include": [ "src/app/dv/**" ]
     }

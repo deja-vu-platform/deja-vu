@@ -1,7 +1,7 @@
 <ul *ngIf="_groups && _groups.length > 0" class="list-group">
   <li *ngFor="let group of _groups"
     class="list-group-item group-show-groups-group-item">
-    <dv-include [action]="showGroup" default-showGroup="{ tag: group-show-group }"
+    <dv-include [component]="showGroup" default-showGroup="{ tag: group-show-group }"
                 [inputs]="{
                   group: group, showId: showId, showMembers: showMembers
                 }"
@@ -9,6 +9,4 @@
     </dv-include>
   </li>
 </ul>
-<div *ngIf="!_groups || _groups.length === 0">
-  No groups
-</div>
+<div *ngIf="!_groups || _groups.length === 0">{{noGroupsToShowText}}</div>

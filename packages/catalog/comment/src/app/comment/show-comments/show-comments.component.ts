@@ -1,8 +1,10 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type,
-  EventEmitter, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnInit, Output, Type
 } from '@angular/core';
-import { Action, GatewayService, GatewayServiceFactory } from '@deja-vu/core';
+import {
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../comment.config';
@@ -20,7 +22,8 @@ interface CommentsRes {
   templateUrl: './show-comments.component.html',
   styleUrls: ['./show-comments.component.css']
 })
-export class ShowCommentsComponent implements OnInit, OnChanges {
+export class ShowCommentsComponent implements
+OnInit, AfterViewInit, OnChanges, OnEval {
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
   @Input() byAuthorId: string | undefined;
@@ -34,34 +37,46 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
   @Input() showTargetId = true;
   @Input() showContent = true;
 
-  @Input() showComment: Action = {
+  @Input() showComment: ComponentValue = {
     type: <Type<Component>> ShowCommentComponent
   };
   @Input() noCommentsToShowText = 'No comments to show';
+  @Input() includeTimestamp = false;
   comments: Comment[] = [];
   @Output() loadedComments = new EventEmitter<Comment[]>();
 
   showComments;
   private gs: GatewayService;
   loaded = false;
+  inputsOfLoadedComments = { byAuthorId: undefined, ofTargetId: undefined };
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showComments = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchComments();
+    this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
+    this.loadComments();
   }
 
   ngOnChanges() {
-    this.fetchComments();
+    this.loadComments();
   }
 
-  fetchComments() {
-    if (this.gs) {
+  loadComments() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
       this.gs
         .get<CommentsRes>(this.apiPath, {
           params: {
@@ -77,6 +92,7 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
                 ${this.showAuthorId ? 'authorId' : ''}
                 ${this.showTargetId ? 'targetId' : ''}
                 ${this.showContent ? 'content' : ''}
+                ${this.includeTimestamp ? 'timestamp' : ''}
               `
             }
           }
@@ -85,7 +101,22 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
           this.comments = res.data.comments;
           this.loadedComments.emit(this.comments);
           this.loaded = true;
+          this.inputsOfLoadedComments = {
+            byAuthorId: this.byAuthorId,
+            ofTargetId: this.ofTargetId
+          };
         });
+    } else if (this.gs) {
+      this.gs.noRequest();
     }
+  }
+
+  private canEval(): boolean {
+    return this.gs && this.commentsAreOld();
+  }
+
+  private commentsAreOld(): boolean {
+    return this.byAuthorId !== this.inputsOfLoadedComments.byAuthorId  ||
+      this.ofTargetId !== this.inputsOfLoadedComments.ofTargetId;
   }
 }

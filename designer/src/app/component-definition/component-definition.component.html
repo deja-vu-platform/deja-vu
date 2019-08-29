@@ -1,0 +1,224 @@
+<div
+  *ngIf="componentInstance"
+  id="main-view"
+  [attr.data-iscomponent]="true"
+  [attr.dvAlias]="componentInstance.fqtag"
+>
+  <div
+    id="page"
+    [attr.data-iscomponent]="!!componentInstance.of.transaction"
+    [attr.dvAlias]="'dv-tx'"
+    dragula="row"
+  >
+    <div
+      *ngFor="let row of rows; let rowNum = index"
+      class="row-container"
+      [ngClass]="{ 'no-drag': rowNum == rows.length - 1 }"
+      [attr.data-index]="rowNum"
+      (mouseenter)="row.hover = true"
+      (mouseleave)="row.hover = false"
+    >
+      <div class="row-control"
+        [ngClass]="(row.hover && !dragging) ? '' : 'hide-row'">
+        <button
+          mat-icon-button
+          class="mat-small"
+          #rowMenuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="rowMenu.matMenu"
+          (contextmenu)="openMenu(rowMenuTrigger)"
+        >
+          <mat-icon>palette</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="mat-small"
+          (click)="deleteRow(rowNum)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+        <mat-icon
+          [ngClass]="(row.hover && !dragging) ? 'grab' : ''"
+          class="handle">
+          drag_handle
+        </mat-icon>
+      </div>
+      <div
+        class="dvd-row no-drag"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign,
+        (row.hover && !dragging && rowNum < rows.length - 1) ?
+          'hover-row' : '-row']"
+        dragula="component"
+        [attr.data-index]="rowNum"
+        [ngStyle]="componentInstance.of.styles"
+      >
+        <div
+          *ngFor="let component of row.components; let componentNum = index"
+          class="component"
+          [attr.data-index]="componentNum"
+          [ngClass]="component.styles.stretch ? 'stretch' : ''"
+        >
+          <div
+            #instanceContainer
+            class="instance-container"
+            [ngStyle]="{
+              'grid-row': 'span ' + max(ioReferences(component).length, ioReferenced(component).length)
+            }"
+          >
+            <app-component-instance
+              [componentInstance]="component"
+              [parentScopeIO]="scopeIO"
+              [shouldReLink]="component.shouldReLink"
+              (click)="stopPropIfShift($event)"
+              [style.pointerEvents]="keysDown.has('Control') ? 'none' : 'auto'"
+            >
+            </app-component-instance>
+            <div *ngIf="!component.showHiddenHint && component.showNoContentHint"
+              class="hint">
+              {{component.fqtag}}
+            </div>
+            <div *ngIf="component.showHiddenHint" class="hint">
+              Hidden: {{component.fqtag}}
+            </div>
+            <div class="instance-container-buttons">
+              <button
+                *ngIf="component.isAppComponent"
+                mat-icon-button
+                class="mat-small"
+                (click)="editComponent(component)"
+                matTooltip="Edit Component"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="mat-small"
+                #componentMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="componentMenu.matMenu"
+                matTooltip="Set Inputs/Outputs of Component"
+              >
+                <mat-icon>swap_horiz</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="mat-small"
+                (click)="deleteComponent(rowNum, componentNum)"
+                matTooltip="Delete Component"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <app-floating-menu
+              #componentMenu
+              [title]="component.fqtag"
+              (opened)="clickFirstTab(componentMenuContent)"
+              (closed)="onComponentMenuClosed(component)"
+              (shouldClose)="closeMenu(componentMenuTrigger)"
+            >
+              <mat-tab-group #componentMenuContent class="popup-menu component-menu">
+                <mat-tab label="Inputs">
+                  <app-set-inputs
+                    [app]="app"
+                    [componentInstance]="component"
+                    [openComponent]="componentInstance.of"
+                  >
+                  </app-set-inputs>
+                </mat-tab>
+                <mat-tab label="Outputs">
+                  <div *ngIf="component.of.outputs.length > 0"
+                    class="use-outputs-hint">
+                    Drag an output into an input textbox to use it
+                  </div>
+                  <div dragula="expression-io" class="inputtables">
+                    <div
+                      *ngFor="let output of component.of.outputs"
+                      [attr.data-output]="component.from.name + '.' + component.of.name + '.' + output"
+                      [matTooltip]="component.of.ioDescriptions[output]"
+                    >
+                      {{output}}
+                    </div>
+                    <div *ngIf="component.of.outputs.length === 0" class="no-drag">
+                      This component has no outputs.
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </app-floating-menu>
+          </div>
+          <div
+            class="ref-indicator input-ref-indicator hide-on-drag"
+            *ngFor="let ioRef of ioReferences(component); let refNum = index"
+            [hidden]="!showIoHints"
+            [ngStyle]="{
+              'grid-row': 1 + refNum,
+              color: color(ioRef.component, ioRef.ioName)
+            }"
+          >
+            <div class="ref-for-io">{{ioRef.forIO}}</div>
+            <div class="ref-io-name">{{ioRef.ioName}} {{ioRef.forComponentID === component.id ? '→' : '↓'}}</div>
+          </div>
+          <div
+            class="ref-indicator output-ref-indicator hide-on-drag"
+            *ngFor="let ioRef of ioReferenced(component); let refNum = index"
+            [ngStyle]="{
+              'grid-row': 1 + refNum,
+              color: color(component, ioRef.ioName)
+            }"
+          >
+          <div class="ref-io-name"
+            [hidden]="!showIoHints"
+            >{{ioRef.byChild ? '↓' : '→'}} {{ioRef.ioName}}</div>
+          </div>
+        </div>
+      </div>
+      <app-floating-menu
+        #rowMenu="matMenu"
+        [title]="'Row ' + (rowNum + 1)"
+        (shouldClose)="closeMenu(rowMenuTrigger)"
+      >
+        <div class="popup-menu row-menu" (click)="$event.stopPropagation()">
+          <mat-form-field>
+            <mat-select [(value)]="row.hJust" placeholder="Horizontal Justification">
+              <mat-option
+                *ngFor="let entry of flexJustifyEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select [(value)]="row.vAlign" placeholder="Vertical Alignment">
+                <mat-option
+                *ngFor="let entry of flexAlignEntries"
+                [value]="entry[0]"
+              >
+                {{entry[1]}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </app-floating-menu>
+    </div>
+  </div>
+  <div *ngIf="showIoHints" class="parent-refs">
+    <div
+      class="ref-indicator input-ref-indicator hide-on-drag"
+      *ngFor="let ioRef of ioReferences(componentInstance); let refNum = index"
+      [ngStyle]="{
+        color: color(ioRef.component, ioRef.ioName)
+      }"
+    >
+      <div class="ref-for-io">{{ioRef.forIO}}</div>
+      <div class="ref-io-name">{{ioRef.ioName}} →</div>
+    </div>
+    <div
+      class="ref-indicator output-ref-indicator hide-on-drag"
+      *ngFor="let ioRef of ioReferenced(componentInstance); let refNum = index"
+      [ngStyle]="{
+        color: color(componentInstance, ioRef.ioName)
+      }"
+    >
+      <div class="ref-io-name">{{ioRef.ioName}} ←</div>
+    </div>
+  </div>
+</div>

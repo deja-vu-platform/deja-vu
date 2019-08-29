@@ -3,11 +3,11 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 
-import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 
 import { PropertyModule } from './property/property.module';
 
-const usedClichesConfig = {
+const usedConceptsConfig = {
   property: {
     config: {
       initialObjects: [
@@ -47,7 +47,7 @@ const usedClichesConfig = {
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'localhost:3000/api' },
-    { provide: USED_CLICHES_CONFIG, useValue: usedClichesConfig }
+    { provide: USED_CONCEPTS_CONFIG, useValue: usedConceptsConfig }
   ],
   bootstrap: [AppComponent]
 })

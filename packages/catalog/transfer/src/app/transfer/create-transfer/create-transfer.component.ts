@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  Action,
+  ComponentValue,
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
   RunService
 } from '@deja-vu/core';
@@ -39,7 +39,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() showOptionToInputAmount = true;
 
   @Input() save = true;
-  @Input() inputAmount: Action = {
+  @Input() inputAmount: ComponentValue = {
     type: <Type<Component>> InputAmountComponent
   };
 

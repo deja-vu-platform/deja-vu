@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import {
+  MatCheckboxModule,
   MatDialogModule,
   MatIconModule,
   MatMenuModule,
@@ -27,6 +28,7 @@ describe('TopBarComponent', () => {
       declarations: [TopBarComponent, FloatingMenuComponent],
       imports: [
         FormsModule,
+        MatCheckboxModule,
         MatDialogModule,
         MatIconModule,
         MatMenuModule,

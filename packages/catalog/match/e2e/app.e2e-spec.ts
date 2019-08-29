@@ -7,7 +7,7 @@ describe('Match App', () => {
     page = new AppPage();
   });
 
-  it('should display cliché name', () => {
+  it('should display concept name', () => {
     page.navigateTo();
     expect(page.getParagraphText()).toEqual('Match!');
   });

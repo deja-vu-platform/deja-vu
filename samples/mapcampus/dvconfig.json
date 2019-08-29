@@ -1,0 +1,81 @@
+{
+  "name": "mapcampus",
+  "usedConcepts": {
+    "authentication": {},
+    "groupAuthorization": {
+      "name": "authorization"
+    },
+    "eventAuthorization": {
+      "name": "authorization"
+    },
+    "event": {},
+    "eventInfo": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "EventInfo",
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "string"
+            }
+          },
+          "required": ["groupId"]
+        }
+      }
+    },
+    "geolocation": {
+      "config": {
+        "mapType": "leaflet"
+      }
+    },
+    "group": {},
+    "groupInfo": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "GroupInfo",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "property": {
+      "config": {
+        "schema": {
+          "title": "EventInfo",
+          "type": "object",
+          "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "roomNumber": {
+                "type": "string"
+              },
+              "locationDescription": {
+                "type": "string"
+              }
+          },
+          "required": ["title", "description"]
+        }
+      }
+    }
+  },
+  "routes": [
+    { "path": "/home", "component": "home" },
+    { "path": "/signup", "component": "signup" },
+    { "path": "/login", "component": "login" },
+    { "path": "/my-events", "component": "show-my-events" },
+    { "path": "/create-event", "component": "create-event" },
+    { "path": "/my-groups", "component": "show-my-groups" },
+    { "path": "", "component": "home" }
+  ]
+}

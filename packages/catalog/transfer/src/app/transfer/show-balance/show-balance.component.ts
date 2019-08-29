@@ -8,7 +8,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action,
+  ComponentValue,
   ConfigServiceFactory,
   GatewayService,
   GatewayServiceFactory,
@@ -37,7 +37,7 @@ OnInit, OnChanges {
   @Input() accountId: string;
   @Input() balance: Amount;
 
-  @Input() showAmount: Action = {
+  @Input() showAmount: ComponentValue = {
     type: <Type<Component>> ShowAmountComponent
   };
 

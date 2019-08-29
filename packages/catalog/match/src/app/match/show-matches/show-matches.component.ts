@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -28,7 +28,7 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
   @Input() showId = true;
   @Input() showUserIds = true;
 
-  @Input() showMatch: Action = {
+  @Input() showMatch: ComponentValue = {
     type: <Type<Component>> ShowMatchComponent
   };
   @Input() noMatchesToShowText = 'No matches to show';

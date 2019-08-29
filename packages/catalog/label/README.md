@@ -2,7 +2,7 @@
 
 Label items so that they can be found later
 
-## Actions
+## Components
 
 - attach-labels
 - create-label

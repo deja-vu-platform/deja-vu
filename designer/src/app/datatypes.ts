@@ -9,55 +9,55 @@ import { exportDvExpr } from './expression.compiler';
 
 
 /**
- * A named collection of actions
- * Could be App, ClicheDefinition, ClicheInstance, etc.
+ * A named collection of components
+ * Could be App, ConceptDefinition, ConceptInstance, etc.
  */
-export interface ActionCollection {
+export interface ComponentCollection {
   name: string;
-  actions: ActionDefinition[];
+  components: ComponentDefinition[];
 }
 
 /**
- * an input map for each named action input
+ * an input map for each named component input
  */
-export interface ActionInputs {
+export interface ComponentInputs {
   // ioName is what you would put $ in front of to reference
-  // the value is the name of the property set in the included action
+  // the value is the name of the property set in the included component
   [forInput: string]: { [ioName: string]: string };
 }
 
 /**
- * inputs that are present on **every** action
- * cliche actions should already have these
- * these need to be added to app actions
+ * inputs that are present on **every** component
+ * concept components should already have these
+ * these need to be added to app components
  */
 export const OMNIPRESENT_INPUTS = [
   'hidden'
 ];
 
-export const usedClichesConfig = {};
+export const usedConceptsConfig = {};
 
 /**
- * Action Definition
+ * Component Definition
  * Defines the name you use, the inputs you provide,
- * and the outputs and content you get when you instantiate an action
+ * and the outputs and content you get when you instantiate a component
  */
-export interface ActionDefinition {
+export interface ComponentDefinition {
   name: string;
   readonly inputs: string[]; // TODO: input type
   readonly outputs: string[];
-  readonly actionInputs: ActionInputs;
+  readonly componentInputs: ComponentInputs;
   ioDescriptions: { [ioName: string]: string };
 }
 
 
-export interface ClicheActionDefinition extends ActionDefinition {
+export interface ConceptComponentDefinition extends ComponentDefinition {
   readonly component: Component;
   description: string;
 }
 
 /**
- * Definitions of Inputs or Outputs for AppActionDefinition
+ * Definitions of Inputs or Outputs for AppComponentDefinition
  */
 // tslint:disable-next-line interface-name
 export interface IO {
@@ -67,28 +67,28 @@ export interface IO {
 
 export interface InInput {
   name: string;
-  of: ActionInstance;
+  of: ComponentInstance;
 }
 
-export const defaultAppActionStyles = {
+export const defaultAppComponentStyles = {
   backgroundColor: 'transparent',
   borderWidth: '0',
   borderColor: 'black',
   borderStyle: 'solid',
   padding: '8px'
 };
-export type AppActionStyles = typeof defaultAppActionStyles;
+export type AppComponentStyles = typeof defaultAppComponentStyles;
 
-export class AppActionDefinition implements ActionDefinition {
+export class AppComponentDefinition implements ComponentDefinition {
   name: string;
   readonly inputSettings: IO[] = [];
   readonly outputSettings: IO[] = [];
   private _rows: Row[] = [];
   transaction = false;
-  // App Actions cannot have action inputs
-  readonly actionInputs: Readonly<ActionInputs> = {};
+  // App Components cannot have component inputs
+  readonly componentInputs: Readonly<ComponentInputs> = {};
   // TODO: export styles
-  readonly styles = _.cloneDeep(defaultAppActionStyles);
+  readonly styles = _.cloneDeep(defaultAppComponentStyles);
   readonly ioDescriptions = {};
 
   constructor(name: string) {
@@ -108,16 +108,16 @@ export class AppActionDefinition implements ActionDefinition {
   }
 
   get rows(): Row[] {
-    _.remove(this._rows, (row) => row.actions.length === 0);
+    _.remove(this._rows, (row) => row.components.length === 0);
 
     return this._rows;
   }
 
-  getChildren(includeInputs = false): ActionInstance[] {
+  getChildren(includeInputs = false): ComponentInstance[] {
     return this.rows
-      .map((r) => r.actions
+      .map((r) => r.components
         .map((a) => includeInputs
-        ? [a, ...a.getInputtedActions(true)]
+        ? [a, ...a.getInputtedComponents(true)]
         : [a]
         )
         .flat()
@@ -126,34 +126,34 @@ export class AppActionDefinition implements ActionDefinition {
   }
 
   /**
-   * Determines whether or not this contains an instance of an action
+   * Determines whether or not this contains an instance of a component
    * @param deep false: A parent of B; true: A ancestor of B
    */
-  contains(actionDefinition: ActionDefinition, deep = false) {
+  contains(componentDefinition: ComponentDefinition, deep = false) {
     return this.rows.some((r) =>
-      r.actions.some((a) => a.isOrContains(actionDefinition, deep))
+      r.components.some((a) => a.isOrContains(componentDefinition, deep))
     );
   }
 
   /**
-   * Find the child action instance with given cliche and action name
+   * Find the child component instance with given concept and component name
    * Returns undefined if none is found
-   * TODO: stop assuming each cliche x action combo is unique
+   * TODO: stop assuming each concept x component combo is unique
    */
   findChild(
-    clicheName: string,
-    actionName: string
-  ): ActionInstance | undefined {
+    conceptName: string,
+    componentName: string
+  ): ComponentInstance | undefined {
     for (const row of this.rows) {
-      const action = row.actions.find((a) =>
-        a.from.name === clicheName && a.of.name === actionName
+      const component = row.components.find((a) =>
+        a.from.name === conceptName && a.of.name === componentName
       );
-      if (action) { return action; }
+      if (component) { return component; }
     }
   }
 
   toHTML(): string {
-    let html = `<dv.action name="${this.name}"`;
+    let html = `<dv.component name="${this.name}"`;
     const outputs = this.outputSettings.filter(({ value }) => !!value);
     outputs.forEach(({ name, value }) => {
       html += `\n  ${name}$=${value}`;
@@ -165,7 +165,7 @@ export class AppActionDefinition implements ActionDefinition {
     if (this.transaction) {
       html += '<dv.tx>\n';
     }
-    html += `<div class="dvd-action ${this.name}">\n`;
+    html += `<div class="dvd-component ${this.name}">\n`;
     _.forEach(this.rows, (row) => {
       html += row.toHTML() + '\n';
     });
@@ -173,13 +173,13 @@ export class AppActionDefinition implements ActionDefinition {
     if (this.transaction) {
       html += '</dv.tx>\n';
     }
-    html += '</dv.action>';
+    html += '</dv.component>';
 
     return html;
   }
 
   toCSS(): string {
-    let css = `.dvd-action.${this.name} {`;
+    let css = `.dvd-component.${this.name} {`;
     _.forEach(this.styles, (value, property) => {
       css += `\n  ${_.kebabCase(property)}: ${value};`;
     });
@@ -196,7 +196,7 @@ export class AppActionDefinition implements ActionDefinition {
       rows: this.rows.map((row) => row.toJSON()),
       transaction: this.transaction,
       styles: this.styles
-      // app actions do not have action inputs
+      // app components do not have component inputs
     };
   }
 
@@ -226,10 +226,11 @@ export const flexAlign = {
 };
 
 /**
- * Actions in AppActionDefinitions are grouped into rows for stylistic reasons
+ * Components in AppComponentDefinitions are grouped into rows for stylistic
+ * reasons
  */
 export class Row {
-  readonly actions: ActionInstance[] = [];
+  readonly components: ComponentInstance[] = [];
   hJust: keyof typeof flexJustify = 'c';
   vAlign: keyof typeof flexAlign = 's';
 
@@ -238,8 +239,8 @@ export class Row {
   toHTML(): string {
 
     let html = `  <div class="dvd-row j${this.hJust} a${this.vAlign}">\n`;
-    _.forEach(this.actions, (action) => {
-      html += action.toHTML();
+    _.forEach(this.components, (component) => {
+      html += component.toHTML();
     });
     html += `  </div>\n`;
 
@@ -248,7 +249,7 @@ export class Row {
 
   toJSON() {
     return {
-      actions: this.actions.map((action) => action.toJSON()),
+      components: this.components.map((component) => component.toJSON()),
       hJust: this.hJust,
       vAlign: this.vAlign
     };
@@ -256,16 +257,17 @@ export class Row {
 }
 
 /**
- * An Action Instance is a single usage (HTML Tag) of an action
+ * A Component Instance is a single usage (HTML Tag) of a component
  * It has its own input settings and its own outputs
  * But these are defined by its definition
  */
-export class ActionInstance {
+export class ComponentInstance {
   readonly id = uuidv4();
-  readonly of: ActionDefinition;
-  readonly from: ActionCollection;
-  // type is ActionInstance iff inputName in of.actionInputs
-  readonly inputSettings: { [inputName: string]: string | ActionInstance } = {};
+  readonly of: ComponentDefinition;
+  readonly from: ComponentCollection;
+  // type is ComponentInstance iff inputName in of.componentInputs
+  readonly inputSettings: { [inputName: string]: string | ComponentInstance } =
+    {};
   // TODO: export styles
   data?: any; // currently only used for the text widget
   readonly styles = { stretch: false };
@@ -274,19 +276,19 @@ export class ActionInstance {
   readonly shouldReLink: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
-    ofAction: ActionDefinition,
-    from: ActionCollection
+    ofComponent: ComponentDefinition,
+    from: ComponentCollection
   ) {
-    this.of = ofAction;
+    this.of = ofComponent;
     this.from = from;
   }
 
-  // needed for action processing
+  // needed for component processing
   get fqtag(): string {
     return `${this.from.name}-${this.of.name}`;
   }
 
-  get isAppAction(): boolean {
+  get isAppComponent(): boolean {
     return (this.from instanceof App);
   }
 
@@ -297,19 +299,22 @@ export class ActionInstance {
     );
   }
 
-  isOrContains(actionDefinition: ActionDefinition, deep: boolean): boolean {
+  isOrContains(componentDefinition: ComponentDefinition, deep: boolean)
+    : boolean {
     return (
       // is
-      this.of === actionDefinition
-      // contains (content, app action only)
+      this.of === componentDefinition
+      // contains (content, app component only)
       || (
-        this.of instanceof AppActionDefinition
-        && this.of.contains(actionDefinition, deep)
+        this.of instanceof AppComponentDefinition
+        && this.of.contains(componentDefinition, deep)
       )
-      // contains (action input, cliche action only but no need to check this)
+      // contains (component input, concept component only but no need to check
+      // this)
       || _.some(
-          _.pickBy(this.inputSettings, (_v, k) => k in this.of.actionInputs),
-          (a: ActionInstance) => a && a.isOrContains(actionDefinition, deep)
+          _.pickBy(this.inputSettings, (_v, k) => k in this.of.componentInputs),
+          (a: ComponentInstance) =>
+            a && a.isOrContains(componentDefinition, deep)
         )
     );
   }
@@ -351,7 +356,7 @@ export class ActionInstance {
     if (this.inputSettings['*content']) {
       html += '>\n';
       html += '  '.repeat(extraIndents + 1)
-        + (this.inputSettings['*content'] as ActionInstance)
+        + (this.inputSettings['*content'] as ComponentInstance)
           .toHTML(extraIndents + 1);
       html += `${xIdnt}    </${this.from.name}.${this.of.name}>\n`;
     } else {
@@ -378,70 +383,70 @@ export class ActionInstance {
   }
 
   /**
-   * @param deep also walk the inputs of any inputted actions
+   * @param deep also walk the inputs of any inputted components
    * @param callback function called at each input
    * (inInput) is a private arg
    */
   walkInputs(deep: boolean,
     callback: (
       name: string,
-      value: string | ActionInstance,
-      ofAction: ActionInstance,
+      value: string | ComponentInstance,
+      ofComponent: ComponentInstance,
       inInput?: InInput
     ) => void,
     inInput?: InInput
   ): void {
     this.of.inputs.forEach((name) => {
       const value = this.inputSettings[name];
-      if (deep && value instanceof ActionInstance) {
+      if (deep && value instanceof ComponentInstance) {
         value.walkInputs(true, callback, { name, of: this });
       }
       callback(name, value, this, inInput);
     });
   }
 
-  getInputtedActions(deep: boolean): ActionInstance[] {
-    const inputtedActions: ActionInstance[] = [];
+  getInputtedComponents(deep: boolean): ComponentInstance[] {
+    const inputtedComponents: ComponentInstance[] = [];
     this.walkInputs(deep, (name, value) => {
-      if (value instanceof ActionInstance) {
-        inputtedActions.push(value);
+      if (value instanceof ComponentInstance) {
+        inputtedComponents.push(value);
       }
     });
 
-    return inputtedActions;
+    return inputtedComponents;
   }
 }
 
-// AppActionInstance vs ClicheActionInstance isn't relevant
+// AppComponentInstance vs ConceptComponentInstance isn't relevant
 // For the cases when it does matter, inspecting .of is fine
 
 /**
- * A cliche is defined by its names and the actions it has
+ * A concept is defined by its names and the components it has
  */
-export interface ClicheDefinition {
+export interface ConceptDefinition {
   readonly name: string;
-  readonly actions: ClicheActionDefinition[];
+  readonly components: ConceptComponentDefinition[];
   readonly configWizardComponent: any;
   // TODO: config options
 }
 
 /**
- * The same cliche can be instantiated ("included") multiple times
+ * The same concept can be instantiated ("included") multiple times
  * One reason for this is getting a second db
  * Another is to use different config options
  */
-export class ClicheInstance {
+export class ConceptInstance {
   name: string;
-  readonly of: ClicheDefinition;
+  readonly of: ConceptDefinition;
   readonly config: { [s: string]: any } = {};
 
-  constructor(name: string, ofCliche: ClicheDefinition) {
+  constructor(name: string, ofConcept: ConceptDefinition) {
     this.name = name;
-    this.of = ofCliche;
+    this.of = ofConcept;
   }
 
-  get actions() {
-    return this.of.actions;
+  get components() {
+    return this.of.components;
   }
 
   toJSON() {
@@ -457,19 +462,19 @@ export class ClicheInstance {
  * A DV App created with the Designer
  */
 export class App {
-  // populated in cliche.module.ts to avoid circular dependencies
-  static dvCliche: ActionCollection;
-  static clicheDefinitions: ClicheDefinition[];
+  // populated in concept.module.ts to avoid circular dependencies
+  static dvConcept: ComponentCollection;
+  static conceptDefinitions: ConceptDefinition[];
 
   name: string; // no dashes
-  readonly actions: AppActionDefinition[];
-  readonly pages: AppActionDefinition[]; // subset of actions
-  homepage: AppActionDefinition; // member of pages
-  readonly cliches: ClicheInstance[] = [];
+  readonly components: AppComponentDefinition[];
+  readonly pages: AppComponentDefinition[]; // subset of components
+  homepage: AppComponentDefinition; // member of pages
+  readonly concepts: ConceptInstance[] = [];
   readonly ioDescriptions = {};
 
   // need consistent object to return
-  private readonly _actionCollections: ActionCollection[] = [];
+  private readonly _componentCollections: ComponentCollection[] = [];
 
   /**
    * Create an app from a save file
@@ -482,65 +487,65 @@ export class App {
 
     const app = new App(appJSON.name);
 
-    // clear default action
-    app.actions.pop();
+    // clear default component
+    app.components.pop();
     app.pages.pop();
 
-    appJSON.cliches.forEach((ci) => {
-      const ofCliche = App.clicheDefinitions.find((cd) => cd.name === ci.of);
-      const clicheInstance = new ClicheInstance(ci.name, ofCliche);
-      Object.assign(clicheInstance.config, ci.config);
-      usedClichesConfig[ci.name] = { config: clicheInstance.config };
-      app.cliches.push(clicheInstance);
+    appJSON.concepts.forEach((ci) => {
+      const ofConcept = App.conceptDefinitions.find((cd) => cd.name === ci.of);
+      const conceptInstance = new ConceptInstance(ci.name, ofConcept);
+      Object.assign(conceptInstance.config, ci.config);
+      usedConceptsConfig[ci.name] = { config: conceptInstance.config };
+      app.concepts.push(conceptInstance);
     });
 
-    appJSON.actions.forEach((aad) => {
-      const actionDef = new AppActionDefinition(aad.name);
-      actionDef.inputSettings
-        .push.apply(actionDef.inputSettings, aad.inputSettings);
-      actionDef.outputSettings
-        .push.apply(actionDef.outputSettings, aad.outputSettings);
-      actionDef.transaction = aad.transaction;
-      Object.assign(actionDef.styles, aad.styles);
+    appJSON.components.forEach((aad) => {
+      const componentDef = new AppComponentDefinition(aad.name);
+      componentDef.inputSettings
+        .push.apply(componentDef.inputSettings, aad.inputSettings);
+      componentDef.outputSettings
+        .push.apply(componentDef.outputSettings, aad.outputSettings);
+      componentDef.transaction = aad.transaction;
+      Object.assign(componentDef.styles, aad.styles);
       aad.rows.forEach((r) => {
         const row = new Row();
-        r.actions.forEach((ai) => {
-          const actionInst = app.newActionInstanceByName(ai.of, ai.from);
-          Object.assign(actionInst.styles, ai.styles);
-          app.setInputsFromJSON(actionInst, ai);
-          row.actions.push(actionInst);
+        r.components.forEach((ai) => {
+          const componentInst = app.newComponentInstanceByName(ai.of, ai.from);
+          Object.assign(componentInst.styles, ai.styles);
+          app.setInputsFromJSON(componentInst, ai);
+          row.components.push(componentInst);
         });
         row.hJust = r.hJust;
         row.vAlign = r.vAlign;
-        actionDef.rows.push(row);
+        componentDef.rows.push(row);
       });
-      app.actions.push(actionDef);
+      app.components.push(componentDef);
     });
-    app.actions.sort((aad1, aad2) => aad1.name < aad2.name ? -1 : 1);
+    app.components.sort((aad1, aad2) => aad1.name < aad2.name ? -1 : 1);
 
     appJSON.pages.forEach((p) => {
-      const page = app.actions.find((a) => a.name === p);
+      const page = app.components.find((a) => a.name === p);
       app.pages.push(page);
     });
 
-    app.homepage = app.actions.find((a) => a.name === appJSON.homepage);
+    app.homepage = app.components.find((a) => a.name === appJSON.homepage);
 
     return app;
   }
 
   constructor(name: string) {
     this.name = name;
-    this.actions = [new AppActionDefinition('home')];
-    this.pages = [...this.actions];
+    this.components = [new AppComponentDefinition('home')];
+    this.pages = [...this.components];
     this.homepage = this.pages[0];
-    this._actionCollections.push(this);
+    this._componentCollections.push(this);
   }
 
-  private tsortActions(): AppActionDefinition[] {
+  private tsortComponents(): AppComponentDefinition[] {
     const graph = new graphlib.Graph();
-    this.actions.forEach((a) => graph.setNode(a.name));
-    this.actions.forEach((a1) => {
-      this.actions.forEach((a2) => {
+    this.components.forEach((a) => graph.setNode(a.name));
+    this.components.forEach((a1) => {
+      this.components.forEach((a2) => {
         if (a1.contains(a2)) {
           graph.setEdge(a1.name, a2.name);
         }
@@ -549,17 +554,17 @@ export class App {
 
     return graphlib.alg.topsort(graph)
       .reverse()
-      .map((name) => this.actions.find((a) => a.name === name));
+      .map((name) => this.components.find((a) => a.name === name));
   }
 
   toJSON() {
     return {
       name: this.name,
-      actions: this.tsortActions()
-        .map((action) => action.toJSON()),
+      components: this.tsortComponents()
+        .map((component) => component.toJSON()),
       pages: this.pages.map((p) => p.name),
       homepage: this.homepage.name,
-      cliches: this.cliches
+      concepts: this.concepts
     };
   }
 
@@ -592,7 +597,7 @@ export class App {
    */
   toDVConfigJSON() {
     const basePort = 3000;
-    const clichePortOffset = 2;
+    const conceptPortOffset = 2;
 
     return JSON.stringify({
       name: this.name,
@@ -602,19 +607,19 @@ export class App {
           wsPort: basePort
         }
       },
-      usedCliches: _.reduce(this.cliches, (obj, cliche, idx) => (
-        (obj[cliche.name] = {
-          name: cliche.of.name,
+      usedConcepts: _.reduce(this.concepts, (obj, concept, idx) => (
+        (obj[concept.name] = {
+          name: concept.of.name,
           config: {
-            wsPort: basePort + clichePortOffset + idx,
-            ...cliche.config
+            wsPort: basePort + conceptPortOffset + idx,
+            ...concept.config
           }
         }) && obj // mutate and then return obj
       ), {}),
       routes: [
-        { path: '', action: this.homepage.name },
+        { path: '', component: this.homepage.name },
         ..._.map(this.pages, (page) => (
-          { path: page.name, action: page.name }
+          { path: page.name, component: page.name }
         ))
       ]
     }, null, '  ');
@@ -624,77 +629,82 @@ export class App {
     return (
       dvdAppStyles
       + '\n'
-      + this.actions.reduce((css, action) => css + '\n\n' + action.toCSS(), '')
+      + this.components
+        .reduce((css, component) => css + '\n\n' + component.toCSS(), '')
     );
   }
 
   // We need a consistent object to return or Angular freaks out
-  get actionCollections(): ActionCollection[] {
-    this._actionCollections.splice(0);
-    this._actionCollections.push(this);
-    this._actionCollections.push(App.dvCliche);
-    this._actionCollections.push.apply(
-      this._actionCollections,
-      this.cliches
+  get componentCollections(): ComponentCollection[] {
+    this._componentCollections.splice(0);
+    this._componentCollections.push(this);
+    this._componentCollections.push(App.dvConcept);
+    this._componentCollections.push.apply(
+      this._componentCollections,
+      this.concepts
         .sort(({ name: nameA }, { name: nameB }) =>
           nameA === nameB ? 0 : (nameA < nameB ? -1 : 1)
         )
     );
 
-    return this._actionCollections;
+    return this._componentCollections;
   }
 
   /**
-   * @param ofName name of action declared in app, imported cliche, or DV cliche
-   * @param fromName name of cliche instance, or app, or the DV cliche
-   * @return a new action instance or undefined if the names do not resolve
+   * @param ofName name of component declared in app, imported concept, or DV
+   *        concept
+   * @param fromName name of concept instance, or app, or the DV concept
+   * @return a new component instance or undefined if the names do not resolve
    */
-  newActionInstanceByName(ofName: string, fromName: string): ActionInstance {
-    const fromSource = this.actionCollections.find((c) => c.name === fromName);
+  newComponentInstanceByName(
+    ofName: string, fromName: string): ComponentInstance {
+    const fromSource = this.componentCollections
+      .find((c) => c.name === fromName);
 
-    const ofAction = fromSource
-      ? (<ActionDefinition[]>fromSource.actions).find((a) => a.name === ofName)
+    const ofComponent = fromSource ?
+      (<ComponentDefinition[]> fromSource.components)
+        .find((a) => a.name === ofName)
       : undefined;
 
-    return ofAction
-      ? new ActionInstance(ofAction, fromSource)
+    return ofComponent
+      ? new ComponentInstance(ofComponent, fromSource)
       : undefined;
   }
 
-  deleteClicheInstance(ci: ClicheInstance) {
-    this.actions.forEach((ad) => {
+  deleteConceptInstance(ci: ConceptInstance) {
+    this.components.forEach((ad) => {
       ad.rows.forEach((r) => {
-        _.remove(r.actions, (ai) => ai.from === ci);
+        _.remove(r.components, (ai) => ai.from === ci);
       });
     });
-    _.remove(this.cliches, (c) => c === ci);
+    _.remove(this.concepts, (c) => c === ci);
   }
 
   /**
-   * @param actionInstance the action instance to mutate
-   * @param inputSettings JSON form of ActionInstance
+   * @param componentInstance the component instance to mutate
+   * @param inputSettings JSON form of ComponentInstance
    */
   private setInputsFromJSON(
-    actionInstance: ActionInstance,
-    actionInstanceObject: any
+    componentInstance: ComponentInstance,
+    componentInstanceObject: any
   ) {
-    _.forEach(actionInstanceObject.inputSettings, (setting, name) => {
+    _.forEach(componentInstanceObject.inputSettings, (setting, name) => {
       if (_.isString(setting)) {
-        actionInstance.inputSettings[name] = setting;
+        componentInstance.inputSettings[name] = setting;
       } else {
-        const inputtedAction = this.newActionInstanceByName(
+        const inputtedComponent = this.newComponentInstanceByName(
           setting.of,
           setting.from
         );
-        actionInstance.inputSettings[name] = inputtedAction;
+        componentInstance.inputSettings[name] = inputtedComponent;
         this.setInputsFromJSON(
-          inputtedAction,
+          inputtedComponent,
           setting
         );
       }
     });
-    if (actionInstanceObject.data) {
-      actionInstance.data = actionInstanceObject.data;
+    if (componentInstanceObject.data) {
+      componentInstance.data = componentInstanceObject.data;
     }
   }
 }

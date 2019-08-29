@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { DvModule, USED_CLICHES_CONFIG, GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, USED_CONCEPTS_CONFIG, GATEWAY_URL } from '@deja-vu/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -42,7 +42,7 @@ const components = [ AppComponent, @@components ];
   entryComponents: components,
   providers: [
     { provide: GATEWAY_URL, useValue: 'localhost:3000/api' },
-    { provide: USED_CLICHES_CONFIG, useValue: @@usedClichesConfig }
+    { provide: USED_CONCEPTS_CONFIG, useValue: @@usedConceptsConfig }
   ],
   bootstrap: [AppComponent]
 })

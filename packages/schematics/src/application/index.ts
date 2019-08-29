@@ -11,7 +11,7 @@ import {
 } from '@angular-devkit/schematics';
 
 
-export function cliche(options: any): Rule {
+export function concept(options: any): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const templateSource = apply(url('./files'), [
       filter((path) => !path.endsWith('.DS_Store')),

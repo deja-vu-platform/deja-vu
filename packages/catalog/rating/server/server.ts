@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -19,7 +19,7 @@ import {
   SetRatingInput
 } from './schema';
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'rate-target': (extraInfo) => {
     switch (extraInfo.action) {
       case 'load':
@@ -97,7 +97,7 @@ function getRatingFilter(input: RatingsInput) {
   return filter;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const ratings: Collection<RatingDoc> = db.collection('ratings');
 
   return {
@@ -135,29 +135,32 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
         };
       },
 
-      findRatingsHigher: async (_root, { input }) => ( !!input.minimumRating && input.minimumRating > 0 ?
-          ratings.find( { rating: { $gte: input.minimumRating} } ) : ratings.find() ),
+      findRatingsHigher: async (_root, { input }) =>
+        !!input.minimumRating && input.minimumRating > 0 ?
+          ratings.find({ rating: { $gte: input.minimumRating} }) :
+          ratings.find(),
 
-      targetsRatedHigherThan: async (_root, { input }) => (!!input && !!input.minimumAvgRating ?
+      targetsRatedHigherThan: async (_root, { input }) =>
+        (!!input && !!input.minimumAvgRating ?
           ratings.aggregate([
             {
               $group: {
-                _id: "$targetId",
-                targetId: { $first: "$targetId"},
-                rating: {$avg: "$rating"},
+                _id: '$targetId',
+                targetId: { $first: '$targetId'},
+                rating: {$avg: '$rating'},
                 count: {$sum: 1}
               }
             },
             {
-              $match: {"rating": {$gte: input.minimumAvgRating}}
+              $match: {rating: {$gte: input.minimumAvgRating}}
             }
           ]) :
           ratings.aggregate([
             {
               $group: {
-                _id: "$targetId",
-                targetId: { $first: "$targetId"},
-                rating: {$avg: "$rating"},
+                _id: '$targetId',
+                targetId: { $first: '$targetId'},
+                rating: {$avg: '$rating'},
                 count: {$sum: 1}
               }
             }
@@ -195,21 +198,21 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
 
       deleteRatings: async (
         _root, { input }: { input: DeleteRatingsInput }, context: Context) => {
-        return await ratings.deleteMany(context, getRatingFilter(input))
+        return await ratings.deleteMany(context, getRatingFilter(input));
       }
     }
   };
 }
 
-const ratingCliche: ClicheServer = new ClicheServerBuilder('rating')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const ratingConcept: ConceptServer = new ConceptServerBuilder('rating')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const ratings: Collection<RatingDoc> = db.collection('ratings');
 
     return ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-ratingCliche.start();
+ratingConcept.start();

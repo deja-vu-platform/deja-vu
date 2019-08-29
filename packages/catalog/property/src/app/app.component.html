@@ -8,7 +8,7 @@
   </property-show-object>
   include timestamp:
   <property-show-object id="ben" [showOnly]="['lastName']"
-    [showTimestamp]="true">
+    [includeTimestamp]="true">
   </property-show-object>
   <h1>Create Objects</h1>
   <dv-tx>
@@ -20,6 +20,10 @@
     </property-create-objects>
     <dv-button>Create Objects</dv-button>
   </dv-tx>
+  <h1>Create Objects obj1, obj2</h1>
+  <property-create-objects
+      [ids]="['obj1', 'obj2']">
+  </property-create-objects>
   <h1>Show Objects</h1>
   <property-show-objects></property-show-objects>
   <h1>Choose Object</h1>
@@ -34,6 +38,6 @@
     [showOnly]="['lastName']">
   </property-object-autocomplete>
   Select id is: {{autocompleteObjectId}}
-  <h1>Configure Property Cliché</h1>
+  <h1>Configure Property Concept</h1>
   <property-config-wizard></property-config-wizard>
 </div>

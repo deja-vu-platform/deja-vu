@@ -1,4 +1,4 @@
-<dv.action name="register">
+<dv.component name="register">
   <div class="index">
 
     <dv.link href="/login" class="btn button">
@@ -14,11 +14,10 @@
           <div id="registrationForm">
             <dv.tx>
               <dv.gen-id />
-              <userprofile.create-object
+              <userProfile.create-object
                 id=dv.gen-id.id showOptionToSubmit=false />
               <authentication.register-user
                 id=dv.gen-id.id showOptionToSubmit=false />
-              <!-- TODO: Allow users to select a major from a list of majors -->
               <!-- labels-choose-labels -->
               <dv.button class="btn button register-button">
                 Finish
@@ -30,4 +29,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

@@ -13,8 +13,8 @@
   <div *ngIf="showTarget">
     <ul class="list-group" [dragula]="dragContainer" [(dragulaModel)]="targetIds">
       <li *ngFor="let targetId of targetIds; index as i" class="list-group-item">
-        <dv-include 
-          [action]="showTarget" 
+        <dv-include
+          [component]="showTarget"
           [inputs]="{
             id: targetId, showId: showTargetId, showRank: showTargetRank,
             rankLabel: targetRankLabel, target: { id: targetId, rank: i + 1 }

@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  SimpleChanges
 } from '@angular/core';
 
 import {
@@ -7,8 +8,8 @@ import {
   StorageService
 } from '@deja-vu/core';
 
-
 import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 import { API_PATH } from '../authentication.config';
 
@@ -20,7 +21,15 @@ import { User } from '../shared/authentication.model';
   templateUrl: './authenticate.component.html',
   styleUrls: ['./authenticate.component.css']
 })
-export class AuthenticateComponent implements OnExec, OnEval, OnInit {
+export class AuthenticateComponent implements OnExec, OnEval, OnInit,
+  OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
+
   @Input() id: string | undefined;
   @Input() user: User | undefined;
   isAuthenticated = false;
@@ -37,6 +46,14 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit {
     this.rs.register(this.elem, this);
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+  }
+
   dvOnEval() {
     return this.doAuthenticate();
   }
@@ -45,10 +62,20 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit {
     return this.doAuthenticate();
   }
 
-  doAuthenticate() {
-    if (!this.gs || (_.isEmpty(this.id) && _.isEmpty(this.user))) {
+  async doAuthenticate() {
+    if (!this.gs || (
+      _.isEmpty(this.id) && _.isEmpty(this.user) &&
+      _.isEmpty(this.waitOn))) {
       // this is essentialy failing the tx if there is one
       return this.gs.noRequest();
+    }
+    if (!_.isEmpty(this.waitOn)) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => _.isNil(this[field]))
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
     }
     const token = this.ss.getItem(this.elem, 'token');
     this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {

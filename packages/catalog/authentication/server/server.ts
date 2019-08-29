@@ -1,14 +1,14 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields,
   Validation
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import * as bcrypt from 'bcryptjs';
 import { IResolvers } from 'graphql-tools';
 import * as jwt from 'jsonwebtoken';
@@ -105,7 +105,7 @@ class UserValidation {
   }
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   authenticate: (extraInfo) => `
     query Authenticate($input: VerifyInput!) {
       verify(input: $input) ${getReturnFields(extraInfo)}
@@ -193,7 +193,7 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const users: Collection<UserDoc> = db.collection('users');
 
   return {
@@ -201,8 +201,13 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
       users: async () => await users.find(),
       user: async (_root, { username }) => await users.findOne({ username }),
       userById: async (_root, { id }) => await users.findOne({ id: id }),
-      verify: (_root, { input }: { input: VerifyInput }) => verify(
-        input.token, input.id)
+      verify: (_root, { input }: { input: VerifyInput }) => {
+        if (verify(input.token, input.id)) {
+          return true;
+        }
+
+        throw new Error(`Verification for id {input.id} failed`);
+      }
     },
 
     User: {
@@ -262,9 +267,9 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const authenticationCliche: ClicheServer =
-  new ClicheServerBuilder('authentication')
-    .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const authenticationConcept: ConceptServer =
+  new ConceptServerBuilder('authentication')
+    .initDb((db: ConceptDb, _config: Config): Promise<any> => {
       const users: Collection<UserDoc> = db.collection('users');
 
       return Promise.all([
@@ -272,8 +277,8 @@ const authenticationCliche: ClicheServer =
         users.createIndex({ username: 1 }, { unique: true, sparse: true })
       ]);
     })
-    .actionRequestTable(actionRequestTable)
+    .componentRequestTable(componentRequestTable)
     .resolvers(resolvers)
     .build();
 
-authenticationCliche.start();
+authenticationConcept.start();

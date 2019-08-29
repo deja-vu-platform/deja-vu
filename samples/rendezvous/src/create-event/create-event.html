@@ -1,7 +1,7 @@
-<dv.action name="create-event">
+<dv.component name="create-event">
   <div class="index">
     <rendezvous.navbar showTitle=true showProfileButton=true />
-    <relevantinterests.show-labels hidden=true />
+    <relevantInterests.show-labels hidden=true />
 
     <div class="new-event">
       <div class="card">
@@ -13,7 +13,9 @@
             <button type="button" class="display-buttons btn btn-info">
               Hosted By
               <div class="inline" id="host-name">
-                <authentication.show-user id=rendezvous.navbar.loggedInUserId
+                <authentication.show-user
+                  id=rendezvous.navbar.loggedInUser?.id
+                  waitOn=['id']
                   showId=false />
               </div>
             </button>
@@ -30,7 +32,7 @@
 
             <!-- Event Title + Additional Info -->
             <p class="event-title-info">Event Information</p>
-            <eventdetails.create-object id=dv.gen-id.id
+            <eventDetails.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
 
             <table id="event-info" class="table">
@@ -65,8 +67,8 @@
             <div class="categories">
               <p>Tags</p>
               <div id="tags">
-                <relevantinterests.attach-labels itemId=dv.gen-id.id
-                  labels=relevantinterests.show-labels.labels
+                <relevantInterests.attach-labels itemId=dv.gen-id.id
+                  labels=relevantInterests.show-labels.labels
                   inputLabel=""
                   showOptionToSubmit=false />
               </div>
@@ -77,13 +79,13 @@
               id=dv.gen-id.id
               showOptionToAddMembers=false
               showOptionToSubmit=false
-              memberIds= [rendezvous.navbar.loggedInUserId]
+              memberIds=[rendezvous.navbar.loggedInUser?.id]
               hidden=true />
 
             <authorization.create-resource id=dv.gen-id.id
-              ownerId=rendezvous.navbar.loggedInUserId hidden=true />
+              ownerId=rendezvous.navbar.loggedInUser?.id hidden=true />
             <authentication.authenticate
-              id=rendezvous.navbar.loggedInUserId hidden=true />
+              id=rendezvous.navbar.loggedInUser?.id hidden=true />
 
             <!-- Cancel and Create Buttons -->
             <div class="cc-buttons">
@@ -101,4 +103,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

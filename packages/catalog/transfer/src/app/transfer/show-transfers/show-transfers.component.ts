@@ -2,8 +2,8 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, ConfigServiceFactory, GatewayService, GatewayServiceFactory, OnEval,
-  RunService
+  ComponentValue, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
+  OnEval, RunService
 } from '@deja-vu/core';
 
 import { Transfer } from '../shared/transfer.model';
@@ -33,7 +33,7 @@ OnChanges {
   @Input() showToId = true;
   @Input() showAmount = true;
 
-  @Input() showTransfer: Action = {
+  @Input() showTransfer: ComponentValue = {
     type: <Type<Component>> ShowTransferComponent
   };
   @Input() noTransfersToShowText = 'No transfers to show';

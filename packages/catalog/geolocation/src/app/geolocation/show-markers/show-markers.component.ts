@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -29,7 +29,7 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showLatLong = true;
   @Input() showMapId = true;
 
-  @Input() showMarker: Action = {
+  @Input() showMarker: ComponentValue = {
     type: <Type<Component>>ShowMarkerComponent
   };
   @Input() noMarkersToShowText = 'No markers to show';

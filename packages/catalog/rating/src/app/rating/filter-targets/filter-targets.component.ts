@@ -7,9 +7,11 @@ import {
   GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
-import { API_PATH } from '../rating.config';
-import { AverageRatingForInputRes, DEFAULT_RATING_FILTER } from '../shared/rating.model';
 import * as _ from 'lodash';
+import { API_PATH } from '../rating.config';
+import {
+  AverageRatingForInputRes, DEFAULT_RATING_FILTER
+} from '../shared/rating.model';
 
 /**
  * Filter rating targets so that only targets with average rating
@@ -20,8 +22,7 @@ import * as _ from 'lodash';
   templateUrl: './filter-targets.component.html',
   styleUrls: ['./filter-targets.component.css']
 })
-export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit
-{
+export class FilterTargetsComponent implements AfterViewInit, OnEval, OnInit {
   /**
    * A list of choices of minimumAverageRatings that the user can filter with
    * Example:

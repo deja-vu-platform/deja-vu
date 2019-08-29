@@ -1,7 +1,7 @@
 <ul *ngIf="_labels && _labels.length > 0" class="list-group">
   <li *ngFor="let label of _labels" class="list-group-item">
     <dv-include
-      [action]="showLabel"
+      [component]="showLabel"
       default-showLabel="{ tag: label-show-label }"
       [inputs]="{label: label}"
       [parent]="showLabels">

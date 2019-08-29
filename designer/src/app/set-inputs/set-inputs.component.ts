@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { MatDialog, MatMenuTrigger } from '@angular/material';
 import * as _ from 'lodash';
 
-import { ActionInstance, App, AppActionDefinition } from '../datatypes';
+import { App, AppComponentDefinition, ComponentInstance } from '../datatypes';
 import {
   DialogData as TextDialogData,
   TextComponent
@@ -17,14 +17,14 @@ import compileDvExpr from '../expression.compiler';
 })
 export class SetInputsComponent implements OnChanges {
   @Input() app: App;
-  @Input() actionInstance: ActionInstance;
-  @Input() openAction: AppActionDefinition;
+  @Input() componentInstance: ComponentInstance;
+  @Input() openComponent: AppComponentDefinition;
   @Input() context = '';
 
   expressionInputs: string[];
-  actionInputs: string[];
-  actionInputsIODescriptions: {
-    [actionInputName: string]: { [ioName: string]: string }
+  componentInputs: string[];
+  componentInputsIODescriptions: {
+    [componentInputName: string]: { [ioName: string]: string }
   };
 
   errors = {};
@@ -32,41 +32,41 @@ export class SetInputsComponent implements OnChanges {
   constructor(private readonly dialog: MatDialog) { }
 
   ngOnChanges() {
-    // separate out expression and action inputs
-    const [actionInputs, expressionInputs] = _.partition(
-      this.actionInstance.of.inputs,
-      (name) => name in this.actionInstance.of.actionInputs
+    // separate out expression and component inputs
+    const [componentInputs, expressionInputs] = _.partition(
+      this.componentInstance.of.inputs,
+      (name) => name in this.componentInstance.of.componentInputs
     );
     // get the names
     this.expressionInputs = expressionInputs;
-    this.actionInputs = actionInputs;
-    this.actionInputsIODescriptions = _.zipObject(
-      actionInputs,
-      actionInputs.map((ioName) => ioName === '*content'
+    this.componentInputs = componentInputs;
+    this.componentInputsIODescriptions = _.zipObject(
+      componentInputs,
+      componentInputs.map((ioName) => ioName === '*content'
         ? {}
-        : this.app.newActionInstanceByName(
+        : this.app.newComponentInstanceByName(
           _.kebabCase(ioName),
-          this.actionInstance.from.name
+          this.componentInstance.from.name
         ).of['ioDescriptions']
       )
     );
   }
 
-  inputAction(inputName: string, event: CustomEvent) {
-    this.actionInstance.inputSettings[inputName] =
-      this.app.newActionInstanceByName(
-        event.detail.actionName,
+  inputComponent(inputName: string, event: CustomEvent) {
+    this.componentInstance.inputSettings[inputName] =
+      this.app.newComponentInstanceByName(
+        event.detail.componentName,
         event.detail.sourceName
       );
   }
 
-  unInputAction(inputName: string) {
-    this.actionInstance.inputSettings[inputName] = undefined;
+  unInputComponent(inputName: string) {
+    this.componentInstance.inputSettings[inputName] = undefined;
   }
 
   addOutput(inputName: string, event: CustomEvent) {
-    this.actionInstance.inputSettings[inputName] = (
-      (this.actionInstance.inputSettings[inputName] || '')
+    this.componentInstance.inputSettings[inputName] = (
+      (this.componentInstance.inputSettings[inputName] || '')
       + event.detail.output
     );
   }
@@ -77,7 +77,7 @@ export class SetInputsComponent implements OnChanges {
 
   openTextEditor() {
     const data: TextDialogData = {
-      actionInstance: this.actionInstance,
+      componentInstance: this.componentInstance,
       readOnly: false
     };
     this.dialog.open(TextComponent, {
@@ -86,8 +86,8 @@ export class SetInputsComponent implements OnChanges {
     });
   }
 
-  actionInput(name: string) {
-    return Object.keys(this.actionInstance.of.actionInputs[name]);
+  componentInput(name: string) {
+    return Object.keys(this.componentInstance.of.componentInputs[name]);
   }
 
   checkExpr(input, evt) {

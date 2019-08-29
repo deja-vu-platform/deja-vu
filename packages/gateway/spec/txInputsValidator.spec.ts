@@ -16,7 +16,7 @@ describe('TxInputsValidator', () => {
         value: 0
       }
     };
-    const txActions = [
+    const txComponents = [
       {
         fqtag: 'authentication-authenticate', tag: '', inputs: {
           id: '__ngOutput__hackernews__navbar__loggedInUser.id'
@@ -52,7 +52,7 @@ describe('TxInputsValidator', () => {
       },
       __ngOutput__dv__gen_id__id: 'new-post-id'
     };
-    TxInputsValidator.Validate(inputValuesMap, txActions, context);
+    TxInputsValidator.Validate(inputValuesMap, txComponents, context);
   });
 
   it('should fail on invalid value for literal', () => {
@@ -63,7 +63,7 @@ describe('TxInputsValidator', () => {
         value: 10
       }
     };
-    const txActions = [
+    const txComponents = [
       {
         fqtag: 'scoringposts-create-score', tag: '', inputs: {
           '[sourceId]': '__ngOutput__hackernews__navbar__loggedInUser.id',
@@ -78,7 +78,7 @@ describe('TxInputsValidator', () => {
       },
       __ngOutput__dv__gen_id__id: 'new-post-id'
     };
-    expect(() => TxInputsValidator.Validate(inputValuesMap, txActions, context))
+    expect(() => TxInputsValidator.Validate(inputValuesMap, txComponents, context))
       .toThrow();
   });
 
@@ -91,7 +91,7 @@ describe('TxInputsValidator', () => {
         id: 'other-id'
       }
     };
-    const txActions = [
+    const txComponents = [
       {
         fqtag: 'property-create-object', tag: '', inputs: {
           '[id]': '__ngOutput__dv__gen_id__id'
@@ -106,7 +106,7 @@ describe('TxInputsValidator', () => {
     const context = {
       __ngOutput__dv__gen_id__id: 'new-post-id'
     };
-    expect(() => TxInputsValidator.Validate(inputValuesMap, txActions, context))
+    expect(() => TxInputsValidator.Validate(inputValuesMap, txComponents, context))
       .toThrow();
   });
 
@@ -121,7 +121,7 @@ describe('TxInputsValidator', () => {
         targetId: 'new-post-id'
       }
     };
-    const txActions = [
+    const txComponents = [
       {
         fqtag: 'scoringposts-create-score', tag: '', inputs: {
           '[sourceId]': '__ngOutput__hackernews__navbar__loggedInUser?.id',
@@ -141,6 +141,6 @@ describe('TxInputsValidator', () => {
       },
       __ngOutput__dv__gen_id__id: 'new-post-id'
     };
-    TxInputsValidator.Validate(inputValuesMap, txActions, context);
+    TxInputsValidator.Validate(inputValuesMap, txComponents, context);
   });
 });

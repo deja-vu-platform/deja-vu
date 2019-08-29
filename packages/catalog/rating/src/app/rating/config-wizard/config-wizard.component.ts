@@ -2,8 +2,8 @@ import { Component, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 /**
- * Config Wizard is used by the Designer to configure the cliche.
- * This cliche requires no configuration, so an empty component is provided
+ * Config Wizard is used by the Designer to configure the concept.
+ * This concept requires no configuration, so an empty component is provided
  *   to prevent the Designer from rendering a JSON input by default.
  * If that ever changes, you should either update this component (preferred)
  *   or remove it.

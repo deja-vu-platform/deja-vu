@@ -14,7 +14,7 @@ Team No REST for the Wicked
 
 [Original App](https://sweet-spots.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Authorization
 - Comment
@@ -30,4 +30,4 @@ Team No REST for the Wicked
 - Delete spots -> comment-delete-target, label-delete-item, rating-delete-target, follow-delete-publisher, property-delete-object
 - Report spots (If a spot has been reported 10 more than the number of reviews it has (i.e. num(reports) > 10 + num(reviews)), the spot will automatically be deleted.)
 - If there are search results, only display those spots on the map -> let display-map/ show-markers accept markerIds
-- Timestamps -> log cliche
+- Timestamps -> log concept

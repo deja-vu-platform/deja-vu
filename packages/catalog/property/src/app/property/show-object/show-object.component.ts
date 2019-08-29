@@ -1,12 +1,11 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, Type
+  OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  Action, ConfigService, ConfigServiceFactory, GatewayService,
+  ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
   GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import * as _ from 'lodash';
 
 import {
   getFilteredPropertyNames, getFilteredPropertyNamesFromConfig
@@ -15,6 +14,10 @@ import {
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
 import { API_PATH } from '../property.config';
+
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
+
 
 /**
  * Displays an object
@@ -25,11 +28,17 @@ import { API_PATH } from '../property.config';
   styleUrls: ['./show-object.component.css']
 })
 export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   /**
-   * Action to use to show URL properties
+   * component to use to show URL properties
    */
-  @Input() showUrl: Action = {
+  @Input() showUrl: ComponentValue = {
     type: <Type<Component>> ShowUrlComponent
   };
   /**
@@ -63,7 +72,7 @@ OnChanges {
   @Output() loadedObject = new EventEmitter<any>();
   @Output() errors = new EventEmitter<any>();
   /**
-   * Used internally by the cliche for passing the configuration
+   * Used internally by the concept for passing the configuration
    */
   @Input() _config;
 
@@ -71,7 +80,7 @@ OnChanges {
    * List of property names.
    * If given, causes exactly these properties to be shown.
    * Takes precedence over showOnly and showExclude.
-   * Primarily intended for use within the cliché.
+   * Primarily intended for use within the concept.
    * App creators probably want showOnly.
    */
   @Input() properties: string[];
@@ -118,8 +127,23 @@ OnChanges {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
   async load() {
@@ -133,6 +157,19 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
       this.gs
         .get<{data: {object: Object}, errors: any}>(this.apiPath, {
           params: {

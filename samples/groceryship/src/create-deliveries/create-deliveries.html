@@ -1,38 +1,42 @@
-<dv.action name="create-deliveries">
+<dv.component name="create-deliveries">
   <groceryship.navbar accessRequired=true />
   <div class="center-column">
-    <!--Data-->
     <dv.group-by items=$requests key="requesterId" hidden=true />
     <dv.pick as pick-keys
-             entities=dv.group-by.groupedItems keys=["groupById"]
-             newKeyNames=["requesterId"] flatten=false hidden=true />
+      entities=dv.group-by.groupedItems keys=["groupById"]
+      newKeyNames=["requesterId"] flatten=false hidden=true />
     <dv.pick as pick-items
-             entities=dv.group-by.groupedItems keys=["items"]
-             flatten=true hidden=true />
+      entities=dv.group-by.groupedItems keys=["items"]
+      flatten=true hidden=true />
     <dv.pick as pick-requester-ids
-             entities=dv.group-by.groupedItems keys=["groupById"]
-             flatten=true hidden=true />
-    <!--Data Ends-->
+      entities=dv.group-by.groupedItems keys=["groupById"]
+      flatten=true hidden=true />
 
     <div>
       <div class="left-column">
-        <div class="bold">User Name</div>
-        <dv.show-entities entities=pick-requester-ids.pickedEntities
-                          showEntity=<groceryship.create-delivery-user-header userId=$entity />
+        <div class="bold">Delivering to:</div>
+        <dv.show-entities
+          entities=pick-requester-ids.pickedEntities
+          showEntity=<groceryship.create-delivery-user-header userId=$entity />
         />
       </div>
       <div class="right-column">
         <div class="bold">Indicate Pickup Time and Location</div>
         <dv.tx>
           <dv.gen-ids for=pick-keys.pickedEntities hidden=true />
-          <delivery.create-objects initialValue={ delivererId:$requests[0].delivererId, confirmed:false, delivered:false }
-                                   showExclude=["requesterId","delivererId","delivered","confirmed"]
-                                   ids=dv.gen-ids.ids
-                                   initialValues=pick-keys.pickedEntities
-                                   showOptionToSubmit=false
-          />
-          <request.update-objects objectsToUpdate=pick-items.pickedEntities
-                                  initialValues={ deliveryId: dv.gen-ids.ids } />
+          <delivery.create-objects
+            initialValue={
+              delivererId: $requests[0].delivererId,
+              confirmed: false,
+              delivered: false
+            }
+            showExclude=["requesterId", "delivererId", "delivered", "confirmed"]
+            ids=dv.gen-ids.ids
+            initialValues=pick-keys.pickedEntities
+            showOptionToSubmit=false />
+          <request.update-objects
+            objectsToUpdate=pick-items.pickedEntities
+            initialValues={ deliveryId: dv.gen-ids.ids } />
           <dv.button class="theme-button">Confirm</dv.button>
           <dv.redirect href="/" onExecSuccess=true />
         </dv.tx>
@@ -40,4 +44,4 @@
     </div>
 
   </div>
-</dv.action>
+</dv.component>

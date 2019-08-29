@@ -1,4 +1,4 @@
-<dv.action name="show-event-comment">
+<dv.component name="show-event-comment">
   <tr>
     <td class="show-comment">
       <div>
@@ -12,9 +12,8 @@
         </div>
 
         <div class="card-body">
-          <!-- TODO: timestamp -->
           <p id="timestamp">
-            Timestamp coming soon!
+            <dv.show-date date=$comment?.timestamp format='time-ago' />
           </p>
 
           <!-- Show Comment Content -->
@@ -35,4 +34,4 @@
       </div>
     </td>
   </tr>
-</dv.action>
+</dv.component>

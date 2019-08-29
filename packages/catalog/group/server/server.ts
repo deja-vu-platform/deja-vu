@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import {
   CreateGroupInput,
   GroupDoc,
@@ -20,7 +20,7 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'add-to-group': (extraInfo) => `
     mutation AddToGroup($groupId: ID!, $id: ID!) {
       addMember(groupId: $groupId, id: $id) ${getReturnFields(extraInfo)}
@@ -173,7 +173,7 @@ async function addOrRemoveMember(
 }
 
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const groups: Collection<GroupDoc> = db.collection('groups');
 
   return {
@@ -223,14 +223,14 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const groupCliche: ClicheServer = new ClicheServerBuilder('group')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const groupConcept: ConceptServer = new ConceptServerBuilder('group')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const groups: Collection<GroupDoc> = db.collection('groups');
 
     return groups.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-groupCliche.start();
+groupConcept.start();

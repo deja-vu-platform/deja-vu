@@ -8,6 +8,8 @@ export interface Property {
   schema: any;
 }
 
+// note: none of these functions include `id` because it's not part of `schema`
+
 export function filterPropertyNames(only: string[], exclude: string[],
   propertyNames: string[]): string[] {
   if (!_.isEmpty(only)) {
@@ -21,6 +23,10 @@ export function filterPropertyNames(only: string[], exclude: string[],
 
 export function getPropertyNames(cs: ConfigService): string[] {
   return _.keys(cs.getConfig()['schema'].properties);
+}
+
+export function getObjectTitleFromConfig(config: object) {
+  return config['schema'].title;
 }
 
 export function getPropertyNamesFromConfig(config: object): string[] {

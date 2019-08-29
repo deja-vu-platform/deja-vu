@@ -1,4 +1,4 @@
-<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+<dv.component name="navbar" loggedInUser$=authentication.logged-in.user>
   <dv.tx>
     <authentication.logged-in />
     <dv.redirect href="/login" onEvalFailure=true />
@@ -8,14 +8,15 @@
     <div id="return-to-main">R E N D E Z V O U S</div>
     <div class="inline left">
       <dv.link href="/main" id="back" class="btn button btn-info">
-        <i class="material-icons">arrow_back</i>
+        Events
       </dv.link>
     </div>
   </dv.if>
 
   <div class="right center profile-signout-buttons">
     <dv.if condition=$showProfileButton class="inline-block">
-      <dv.link href="/profile" class="btn button profile-button">
+      <dv.link href="/profile" params={ id: authentication.logged-in.user?.id }
+        class="btn button profile-button">
         My Profile
       </dv.link>
     </dv.if>
@@ -25,4 +26,4 @@
       <dv.link href="/login" hidden=true />
     </dv.tx>
   </div>
-</dv.action>
+</dv.component>

@@ -12,10 +12,18 @@ You are going to need [Node.js](https://nodejs.org/en/) v9+ and
 4.0+. Note that you just need the community server version of MongoDB,
 you don't need to register or pay any money to Mongo Inc.
 
-You can install the CLI globally or you
-can create an npm project and install it locally
-as a dependency.
+You can create an npm project and install the CLI locally
+as a dependency (recommended) or you can install the CLI globally.
 
+## project install
+
+1. clone our [template repo]()
+2. in a separate shell, start the mongo deamon with `mongod`
+3. navigate to the root of the project directory (where
+  you put `config.json`)
+4. run `npm i` to install the project dependencies (the CLI)
+5. run `npm start` to start your app locally
+6. visit [http://localhost:3000](http://localhost:3000).
 
 ## global install
 
@@ -28,20 +36,9 @@ as a dependency.
   locally
 5. visit [http://localhost:3000](http://localhost:3000).
 
-## project install
-
-1. clone our [template repo]()
-2. in a separate shell, start the mongo deamon with `mongod`
-3. navigate to the root of the project directory (where
-  you put `config.json`)
-4. run `npm i` to install the project dependencies (the CLI)
-5. run `npm start` to start your app locally
-6. visit [http://localhost:3000](http://localhost:3000).
-
-
 ## uninstall
 
-If you've installed the CLI globally, do `npm rm -g @rehash/cli`.
 If you've installed it locally in your project there's nothing to uninstall.
 Simply removing the project directory will remove the `node_modules`
 folder that contains the CLI package.
+If you've installed the CLI globally, do `npm rm -g @rehash/cli`.

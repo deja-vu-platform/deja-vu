@@ -1,4 +1,4 @@
-<dv.action name="create-list">
+<dv.component name="create-list">
   <listify.navbar />
 
   <dv.tx>
@@ -15,7 +15,10 @@
         <dv.tx>
           <dv.gen-id />
           <authentication.authenticate
-            id=listify.navbar.loggedInUser.id hidden=true />
+            user=listify.navbar.loggedInUser hidden=true />
+          <authorization.create-resource
+            id=dv.gen-id.id ownerId=listify.navbar.loggedInUser.id
+            hidden=true />
 
           <list.create-object
             id=dv.gen-id.id
@@ -25,7 +28,6 @@
             }
             showExclude=['creator', 'locked']
             showOptionToSubmit=false />
-          <!-- TODO: private/public lists; use authorization -->
 
           <dv.stage entityName="Enter a Suggestion" />
           <dv.gen-ids for=dv.stage.stagedEntities />
@@ -38,7 +40,6 @@
             id=dv.gen-id.id
             memberIds=dv.gen-ids.ids
             hidden=true />
-          <!-- TODO: optional properties (info/description and url of photo) -->
 
           <!-- for trending lists -->
           <scoring.create-score
@@ -53,11 +54,11 @@
           </dv.button>
 
           <dv.link
-            href="/lists/rankings/edit"
+            href="/lists/rankings/submit"
             params={ id: dv.gen-id.id }
             hidden=true />
         </dv.tx>
       </dv.if>
     </div>
   </div>
-</dv.action>
+</dv.component>

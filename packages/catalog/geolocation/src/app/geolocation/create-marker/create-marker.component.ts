@@ -15,7 +15,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { Marker } from '../shared/geolocation.model';
+import { DEFAULT_MAP_ID, Marker } from '../shared/geolocation.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 const LATITUDE_LIMIT = 90;
@@ -41,7 +41,7 @@ const LONGITUDE_LIMIT = 180;
 export class CreateMarkerComponent implements
   OnInit, OnChanges, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
-  @Input() mapId: string;
+  @Input() mapId = DEFAULT_MAP_ID;
 
   @Input() set title(label: string | undefined) {
     const markerTitle = label ? label : '';

@@ -1,13 +1,13 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -21,7 +21,7 @@ import {
 } from './schema';
 
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-allocation': (extraInfo) => `
     mutation CreateAllocation($input: CreateAllocationInput!) {
       createAllocation (input: $input) ${getReturnFields(extraInfo)}
@@ -58,7 +58,7 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, _config: Config): IResolvers {
+function resolvers(db: ConceptDb, _config: Config): IResolvers {
   const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
   return {
@@ -143,8 +143,8 @@ function resolvers(db: ClicheDb, _config: Config): IResolvers {
   };
 }
 
-const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
-  .initDb((db: ClicheDb, _config: Config): Promise<any> => {
+const allocatorConcept: ConceptServer = new ConceptServerBuilder('allocator')
+  .initDb((db: ConceptDb, _config: Config): Promise<any> => {
     const allocations: Collection<AllocationDoc> = db.collection('allocations');
 
     return Promise.all([
@@ -153,8 +153,8 @@ const allocatorCliche: ClicheServer = new ClicheServerBuilder('allocator')
         { id: 1, 'assignments.resourceId': 1 }, { unique: true })
     ]);
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-allocatorCliche.start();
+allocatorConcept.start();

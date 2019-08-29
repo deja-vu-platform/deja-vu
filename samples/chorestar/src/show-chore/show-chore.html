@@ -1,4 +1,4 @@
-<dv.action name="show-chore">
+<dv.component name="show-chore">
   <chore.show-object as loadChoreObject
     id=$chore.id
     showOnly=['name', 'stars'] hidden=true />
@@ -36,7 +36,6 @@
 
   <dv.if condition=$showOptionToApprove class="row">
     <dv.tx class="offset-md-4 col-md-4">
-      <!-- TODO: Chore Value -->
       <transfer.add-to-balance
         showOptionToInputAccountId=false
         showOptionToInputBalance=false
@@ -48,4 +47,4 @@
       <dv.button>Approve</dv.button>
     </dv.tx>
   </dv.if>
-</dv.action>
+</dv.component>

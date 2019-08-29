@@ -8,12 +8,12 @@ const yargs = require('yargs'); // tslint:disable-line no-var-requires
 import { AppCompiler } from '@deja-vu/compiler';
 
 import {
-  ACTION_TABLE_FILE_NAME,
-  actionTable,
+  COMPONENT_TABLE_FILE_NAME,
+  componentTable,
   cmd,
   DvConfig,
   DVCONFIG_FILE_PATH,
-  locateClichePackage,
+  locateConceptPackage,
   readFileOrFail,
   startGatewayCmd,
   startServerCmd,
@@ -23,21 +23,21 @@ import {
 
 const CACHE_DIR = '.dv';
 
-function startServerCmdOfCliche() {
+function startServerCmdOfConcept() {
   return startServerCmd(path.join('dist', 'server'), 'config');
 }
 
-function startServerCmdOfUsedCliche(
-  cliche: string | undefined,
+function startServerCmdOfUsedConcept(
+  concept: string | undefined,
   alias: string
 ): string {
-  const clicheFolder = (cliche === undefined) ? alias : cliche;
-  // Cliches specify as a main their typings (so that when apps do `import
-  // 'cliche'` it works) . To get to their folder we need to go up a dir
+  const conceptFolder = (concept === undefined) ? alias : concept;
+  // Concepts specify as a main their typings (so that when apps do `import
+  // 'concept'` it works) . To get to their folder we need to go up a dir
   const serverDistFolder = path
-    .join(path.dirname(locateClichePackage(clicheFolder)), '..', 'server');
-  const configKey = `usedCliches.${alias}.config`;
-  const asFlagValue = (alias !== cliche) ? alias : undefined;
+    .join(path.dirname(locateConceptPackage(conceptFolder)), '..', 'server');
+  const configKey = `usedConcepts.${alias}.config`;
+  const asFlagValue = (alias !== concept) ? alias : undefined;
 
   return startServerCmd(serverDistFolder, configKey, asFlagValue);
 }
@@ -53,25 +53,30 @@ yargs.commandDir('commands')
   .demandCommand(1, 'You must provide a single command to run')
   .command('serve', 'serve the app', {}, () => {
     console.log('Serving');
-
-    const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    let config: DvConfig;
+    try {
+      config = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    } catch (e) {
+      console.error(`Error parsing config file ${e.message}`);
+      throw e;
+    }
     if (!calledFromCatalog()) {
       console.log('Serving app');
       AppCompiler.Compile('.', CACHE_DIR);
       process.chdir(CACHE_DIR);
     }
-    // Serve everything (including all dep cliches)
+    // Serve everything (including all dep concepts)
     cmd('npm', ['run', `dv-build-${config.name}`]);
     writeFileOrFail(
-      path.join('dist', ACTION_TABLE_FILE_NAME),
-      actionTable(config, _.get(config.actions, 'app')));
+      path.join('dist', COMPONENT_TABLE_FILE_NAME),
+      componentTable(config, _.get(config.components, 'app')));
     const startServerOfCurrentProjectCmd =
       (existsSync(path.join('dist', 'server'))) ?
-      [ startServerCmdOfCliche() ] : [];
+      [ startServerCmdOfConcept() ] : [];
     const startServerCmds = _
-      .chain(config.usedCliches)
+      .chain(config.usedConcepts)
       .entries()
-      .map((e) => startServerCmdOfUsedCliche(e[1].name, e[0]))
+      .map((e) => startServerCmdOfUsedConcept(e[1].name, e[0]))
       .concat(startServerOfCurrentProjectCmd)
       .value();
 

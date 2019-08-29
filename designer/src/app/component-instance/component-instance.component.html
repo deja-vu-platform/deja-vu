@@ -1,0 +1,36 @@
+<div
+  *ngIf="componentInstance"
+  class="component-instance"
+  [attr.data-iscomponent]="true"
+  [attr.dvAlias]="componentInstance.fqtag"
+  [attr.dvOf]="componentInstance.from.name"
+  [ngStyle]="componentInstance.of.styles || {}"
+  [hidden]="hidden"
+>
+  <div
+    [attr.data-iscomponent]="!!componentInstance.of.transaction"
+    [attr.dvAlias]="'dv-tx'"
+  >
+    <ng-template *ngIf="componentInstance.of.component" propertyDynamicComponent>
+    </ng-template>
+
+    <div *ngIf="componentInstance.of.rows">
+      <div
+        *ngFor="let row of componentInstance.of.rows"
+        class="dvd-row"
+        [ngClass]="['j' + row.hJust, 'a' + row.vAlign]"
+      >
+        <div
+          *ngFor="let component of row.components"
+          [ngClass]="component.styles.stretch ? 'stretch' : ''"
+        >
+          <app-component-instance
+            [componentInstance]="component"
+            [parentScopeIO]="scopeIO"
+          >
+          </app-component-instance>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

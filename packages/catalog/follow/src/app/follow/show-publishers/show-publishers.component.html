@@ -1,7 +1,7 @@
 <ul *ngIf="publishers && publishers.length > 0" class="list-group">
     <li *ngFor="let publisher of publishers" class="list-group-item">
       <dv-include
-        [action]="showPublisher"
+        [component]="showPublisher"
         default-showPublisher="{ tag: follow-show-publisher }"
         [inputs]="{publisher: publisher}"
         [parent]="showPublishers">

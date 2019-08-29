@@ -1,9 +1,9 @@
-# While this is the chat cliché,
+# While this is the chat concept,
 # it only keeps track of the messages within chats
 # and not as chat objects.
 # Chats are referenced through the field chatId and
 # typically, the participants of a chat
-# can be represented by the group cliché,
+# can be represented by the group concept,
 # so chatId points to the id of the group that contains the participants
 type Message {
   id: ID!

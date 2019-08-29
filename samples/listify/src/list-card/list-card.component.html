@@ -1,26 +1,20 @@
-<dv.action name="list-card">
-  <scoring.show-target
-    id=$id
-    showId=false
-    showScores=false
-    hidden=true />
+<dv.component name="list-card">
+  <dv.tx>
+    <authentication.authenticate
+      user=$loggedInUser waitOn=['user'] hidden=true />
+    <scoring.show-target
+      id=$id target=$target
+      showId=false
+      showScores=false
+      hidden=true />
+  </dv.tx>
 
   <div>
-    <dv.if condition=$listScoring>
-      <listify.list-summary
-        listScoring=$listScoring
-        loggedInUser=$loggedInUser
-        showVote=$showVote
-        showMarkers=true />
-    </dv.if>
-    <dv.if condition=!$listScoring && scoring.show-target.loadedTarget>
-      <listify.list-summary
-        listScoring=scoring.show-target.loadedTarget
-        loggedInUser=$loggedInUser
-        showVote=$showVote
-        showMarkers=true />
-    </dv.if>
-
+    <listify.list-summary
+      id=$id object=$object
+      loggedInUser=$loggedInUser
+      showVote=$showVote
+      showMarkers=true />
     <dv.link href=$gotoOnClick params={ id: $id }>View</dv.link>
   </div>
-</dv.action>
+</dv.component>

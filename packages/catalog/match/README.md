@@ -2,7 +2,7 @@
 
 Connect users after attempting to match with each other
 
-## Actions
+## Components
 
 - attempt-match
 - create-match

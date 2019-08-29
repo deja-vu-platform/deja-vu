@@ -1,14 +1,14 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   EMPTY_CONTEXT,
   getReturnFields
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -29,7 +29,7 @@ function standardizeLabel(id: string): string {
     .toLowerCase();
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'attach-labels': (extraInfo) => `
     mutation AttachLabels($input: AddLabelsToItemInput!) {
       addLabelsToItem(input: $input) ${getReturnFields(extraInfo)}
@@ -135,7 +135,7 @@ function getItemAggregationPipeline(input: ItemsInput, getCount = false) {
   return pipeline;
 }
 
-function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
+function resolvers(db: ConceptDb, _config: LabelConfig): IResolvers {
   const labels: Collection<LabelDoc> = db.collection('labels');
 
   return {
@@ -191,6 +191,7 @@ function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
             return err;
           }
         }));
+
         if (errors.filter((err) => !!err).length === 0) {
           return true;
         }
@@ -215,8 +216,8 @@ function resolvers(db: ClicheDb, _config: LabelConfig): IResolvers {
   };
 }
 
-const labelCliche: ClicheServer = new ClicheServerBuilder('label')
-  .initDb(async (db: ClicheDb, config: LabelConfig): Promise<any> => {
+const labelConcept: ConceptServer = new ConceptServerBuilder('label')
+  .initDb(async (db: ConceptDb, config: LabelConfig): Promise<any> => {
     const labels: Collection<LabelDoc> = db.collection('labels');
     await labels.createIndex({ id: 1 }, { unique: true, sparse: true });
     await labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
@@ -227,8 +228,8 @@ const labelCliche: ClicheServer = new ClicheServerBuilder('label')
 
     return Promise.resolve();
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-labelCliche.start();
+labelConcept.start();

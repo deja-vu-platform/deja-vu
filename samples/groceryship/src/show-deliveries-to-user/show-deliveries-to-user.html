@@ -1,12 +1,17 @@
-<dv.action name="show-deliveries-to-user">
+<dv.component name="show-deliveries-to-user">
   <div class="individual-card">
-    <dv.if condition=delivery.show-objects.objects && delivery.show-objects.objects.length !== 0 >
+    <dv.if condition=delivery.show-objects.objects &&
+      delivery.show-objects.objects.length !== 0 >
       <h3>Shipping To You</h3>
     </dv.if>
-    <delivery.show-objects fieldMatching={ requesterId: $userId, confirmed:false }
-                           noObjectsToShowText=""
-                           showObject=<groceryship.show-delivery delivery=$object
-                           isDeliverer=false />
-    />
+    <delivery.show-objects
+      fieldMatching={
+        requesterId: $userId,
+        confirmed:false,
+        waitOn: ['requesterId']
+      }
+      noObjectsToShowText=""
+      showObject=<groceryship.show-delivery delivery=$object
+        isDeliverer=false /> />
   </div>
-</dv.action>
+</dv.component>

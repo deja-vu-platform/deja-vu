@@ -1,24 +1,40 @@
-<dv.action name="edit-set-list">
+<dv.component name="edit-set-list">
   <accord.navbar accessRequired=true />
-  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <authorization.can-edit
+    resourceId=$groupId principalId=accord.navbar.loggedInUserId
+    hidden=true />
   <div class="left-column">
     <accord.set-list-catalog groupId=$groupId />
   </div>
 
   <div class="right-column">
-    <dv.if condition=authorization.can-view.canView>
+    <dv.if condition=authorization.can-edit.canEdit>
       <h2>Edit Setlist</h2>
-      <setList.update-object id=$setListId showExclude=["groupId"] buttonLabel="Update Setlist"/>
+      <dv.tx>
+        <setList.update-object
+          id=$setListId showExclude=["groupId"]
+          buttonLabel="Update Setlist" />
+        <authorization.can-edit as can-edit-setlist
+          resourceId=$groupId
+          principalId=accord.navbar.loggedInUserId hidden=true />
+        <authentication.authenticate as can-edit-setlist-auth
+          id=accord.navbar.loggedInUserId hidden=true />
+      </dv.tx>
       <dv.tx>
         <setList.remove-object id=$setListId hidden=true />
+        <authorization.can-edit as can-remove-setlist
+          resourceId=$groupId
+          principalId=accord.navbar.loggedInUserId hidden=true />
+        <authentication.authenticate as can-remove-setlist-auth
+          id=accord.navbar.loggedInUserId hidden=true />
         <dv.link href="/group" params={groupId:$groupId} />
         <dv.button>Delete Setlist</dv.button>
       </dv.tx>
     </dv.if>
 
-    <dv.if condition=!authorization.can-view.canView>
-      Only admins can edit the setlist.
+    <dv.if condition=!authorization.can-edit.canEdit>
+      Only admins can edit a setlist
     </dv.if>
   </div>
 
-</dv.action>
+</dv.component>

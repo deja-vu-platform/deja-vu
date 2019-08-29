@@ -25,7 +25,7 @@
   </div>
   <div *ngIf="showOptionToInputAmount" class="form-group">
     <dv-include
-      [action]="inputAmount" default-inputAmount="{ tag: 'transfer-input-amount' }"
+      [component]="inputAmount" default-inputAmount="{ tag: 'transfer-input-amount' }"
       [outputs]="{ amount: 'amount' }"
       [parent]="createTransfer">
     </dv-include>

@@ -1,4 +1,4 @@
-<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id>
+<dv.component name="navbar" loggedInUserId$=authentication.logged-in.user.id>
   <dv.tx>
     <authentication.logged-in />
     <dv.if condition=$accessRequired>
@@ -30,18 +30,13 @@
             </dv.link>
             &nbsp;
             <div class="navbar-right-elem">
-              <mat-expansion-panel class="mat-elevation-z0" >
-                <mat-expansion-panel-header>
-                  <span class="inline-block">Logged In: </span>
-                  <dv.show-entity entity=authentication.logged-in.user.username />
-                </mat-expansion-panel-header>
-                <dv.link href="/profile">Account Setting</dv.link>
-                <br />
-                <dv.tx>
-                  <authentication.sign-out buttonLabel="Logout"/>
-                  <dv.link href="/sign-in" hidden=true />
-                </dv.tx>
-              </mat-expansion-panel>
+              Logged In:
+              <dv.show-entity entity=authentication.logged-in.user.username />
+              <dv.link href="/profile">Settings</dv.link>
+              <dv.tx>
+                <authentication.sign-out buttonLabel="Logout"/>
+                <dv.link href="/sign-in" hidden=true />
+              </dv.tx>
             </div>
           </div>
         </div>
@@ -60,4 +55,4 @@
       </dv.if>
     </div>
   </nav>
-</dv.action>
+</dv.component>

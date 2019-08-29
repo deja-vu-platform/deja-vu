@@ -2,7 +2,7 @@
 
 Distribute resources among consumers
 
-## Actions
+## Components
 
 - create-allocation
 - delete-resource

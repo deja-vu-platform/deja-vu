@@ -14,7 +14,7 @@ Team Phil
 
 [Original App](https://listify-team-phil.herokuapp.com/)
 
-## Cliches Used
+## Concepts Used
 - Authentication
 - Group
 - Property (2x)
@@ -23,7 +23,7 @@ Team Phil
 
 ## Missing Features
 - Private lists, including inviting other users to those private lists and viewing lists a user has been invited to view (use Authorization++)
-- Show lists by time (Log cliché)
+- Show lists by time (Log concept)
 - Add optional description and image url to staged list options, including the UI component to enter the info that can be toggled as shown/hidden
 - Show lists created by a certain user (show objects by a property in Property) and count them
 - Edit list objects so that they are locked (i.e. no one can submit rankings for it anymore)

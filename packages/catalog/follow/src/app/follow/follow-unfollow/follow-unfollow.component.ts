@@ -1,14 +1,18 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, SimpleChanges, Type
 } from '@angular/core';
 
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
 } from '@deja-vu/core';
 
-import * as _ from 'lodash';
 
 import { API_PATH } from '../follow.config';
+
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
+
 
 interface IsFollowingRes {
   data: { isFollowing: boolean };
@@ -25,8 +29,14 @@ interface FollowUnfollowRes {
   templateUrl: './follow-unfollow.component.html',
   styleUrls: ['./follow-unfollow.component.css']
 })
-export class FollowUnfollowComponent implements
-  OnInit, OnChanges, OnExec, OnExecSuccess {
+export class FollowUnfollowComponent implements AfterViewInit, OnInit,
+  OnChanges, OnExec, OnExecSuccess {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   @Input() followerId: string;
   @Input() publisherId: string;
 
@@ -46,33 +56,69 @@ export class FollowUnfollowComponent implements
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.isFollowing();
   }
 
-  ngOnChanges() {
-    this.isFollowing();
+  ngAfterViewInit() {
+    this.load();
   }
 
-  isFollowing() {
-    if (!this.gs || !this.followerId || !this.publisherId) {
-      return;
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
+  }
+
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
+      this.gs
+        .get<IsFollowingRes>(this.apiPath, {
+          params: {
+            inputs: JSON.stringify({
+              input: {
+                followerId: this.followerId,
+                publisherId: this.publisherId
+              }
+            }),
+            extraInfo: { action: 'is-follower' }
+          }
+        })
+        .subscribe((res) => {
+          this.followsPublisher = res.data.isFollowing;
+        });
     }
 
-    this.gs
-      .get<IsFollowingRes>(this.apiPath, {
-        params: {
-          inputs: JSON.stringify({
-            input: {
-              followerId: this.followerId,
-              publisherId: this.publisherId
-            }
-          }),
-          extraInfo: { action: 'is-follower' }
-        }
-      })
-      .subscribe((res) => {
-        this.followsPublisher = res.data.isFollowing;
-      });
   }
 
   follow() {
@@ -107,5 +153,9 @@ export class FollowUnfollowComponent implements
   dvOnExecSuccess() {
     this.followsPublisher = this.queryString === 'follow';
     this.queryString = '';
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 }

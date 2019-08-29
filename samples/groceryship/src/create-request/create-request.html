@@ -1,20 +1,25 @@
-<dv.action name="create-request">
+<dv.component name="create-request">
   <groceryship.navbar accessRequired=true />
   <div class="center-column">
     <dv.stage
-      stageEntity=<dv.action stage$=groceryship.stage-request.stagedRequest>
+      stageEntity=<dv.component stage$=groceryship.stage-request.stagedRequest>
                     <groceryship.stage-request userId=groceryship.navbar.loggedInUserId />
-                  </dv.action>
+                  </dv.component>
       stageHeader=<h3>Requests in List</h3>
       tableView=true
-      filter=["itemName", "quantity", "priceEstimate", "tips", "due", "pickupLocation"]
-    />
-    <dv.if condition=dv.stage.stagedEntities>
+      filter=[
+        "itemName", "quantity", "priceEstimate", "tips", "due",
+        "pickupLocation"
+      ] />
+  <dv.if condition=dv.stage.stagedEntities>
+      <!-- TODO: check user id -->
       <dv.tx class="right-column">
         <request.create-objects objects=dv.stage.stagedEntities />
+        <authentication.authenticate
+          id=groceryship.navbar.loggedInUserId hidden=true />
         <dv.button>Confirm Requests</dv.button>
         <dv.redirect href="/" onExecSuccess=true />
       </dv.tx>
     </dv.if>
   </div>
-</dv.action>
+</dv.component>

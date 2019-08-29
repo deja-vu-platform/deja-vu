@@ -1,6 +1,7 @@
 # Express an opinion or reaction in writing
 type Comment {
   id: ID!
+  timestamp: Float!
   authorId: ID!
   targetId: ID!
   content: String!

@@ -2,7 +2,7 @@
 
 Receive updates from sources
 
-## Actions
+## Components
 
 - create-message
 - create-publisher

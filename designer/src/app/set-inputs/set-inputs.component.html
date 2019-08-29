@@ -1,12 +1,12 @@
-<div class="set-inputs" *ngIf="actionInstance">
+<div class="set-inputs" *ngIf="componentInstance">
 
-  <div *ngIf="actionInstance.styles" class="style-input mat-form-field">
-    <mat-checkbox [(ngModel)]="actionInstance.styles.stretch">
+  <div *ngIf="componentInstance.styles" class="style-input mat-form-field">
+    <mat-checkbox [(ngModel)]="componentInstance.styles.stretch">
       Stretch
     </mat-checkbox>
   </div>
 
-  <div *ngIf="actionInstance.isText" class="text-input mat-form-field">
+  <div *ngIf="componentInstance.isText" class="text-input mat-form-field">
     <button
       mat-button color="primary"
       (click)="openTextEditor()">
@@ -15,57 +15,57 @@
   </div>
 
   <div
-    *ngFor="let input of actionInputs"
-    class="action-input mat-form-field"
-    dragula="action"
-    (inputAction)="inputAction(input, $event)"
-    [matTooltip]="actionInstance.of.ioDescriptions[input]"
+    *ngFor="let input of componentInputs"
+    class="component-input mat-form-field"
+    dragula="component"
+    (inputComponent)="inputComponent(input, $event)"
+    [matTooltip]="componentInstance.of.ioDescriptions[input]"
   >
     <span class="prompt no-drag">Replace {{input}}</span>
     <div
-      *ngIf="actionInstance.inputSettings[input]"
-      dragula="inputted-action"
-      (unInputAction)="unInputAction(input)"
+      *ngIf="componentInstance.inputSettings[input]"
+      dragula="inputted-component"
+      (unInputComponent)="unInputComponent(input)"
     >
       <span class="reminder no-drag">{{input}}</span>
       <button mat-button
-        class="inputted-action"
+        class="inputted-component"
         #menuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="menu.matMenu"
       >
-        {{actionInstance.inputSettings[input].fqtag}}
+        {{componentInstance.inputSettings[input].fqtag}}
       </button>
       <app-floating-menu
         #menu
-        [title]="actionInstance.inputSettings[input].fqtag"
+        [title]="componentInstance.inputSettings[input].fqtag"
         (shouldClose)="closeMenu(menuTrigger)"
       >
         <div class="menu-content">
           <div class="original-inputs">
-            <h3>Inputs to Original Action</h3>
+            <h3>Inputs to Original Component</h3>
             <div
-              *ngIf="actionInput(input).length > 0"
+              *ngIf="componentInput(input).length > 0"
               class="inputtables"
               dragula="expression-io"
-              [attr.data-context]="actionInstance.fqtag + '.' + input"
+              [attr.data-context]="componentInstance.fqtag + '.' + input"
             >
               <div
-                *ngFor="let name of actionInput(input)"
+                *ngFor="let name of componentInput(input)"
                 [attr.data-output]="'$' + name"
-                [matTooltip]="actionInputsIODescriptions[input][name]"
+                [matTooltip]="componentInputsIODescriptions[input][name]"
               >
                 {{name}}
               </div>
             </div>
-            <div *ngIf="actionInput(input).length === 0">
+            <div *ngIf="componentInput(input).length === 0">
               There are none.
             </div>
           </div>
           <app-set-inputs
             [app]="app"
-            [actionInstance]="actionInstance.inputSettings[input]"
-            [openAction]="openAction"
-            [context]="actionInstance.fqtag + '.' + input"
+            [componentInstance]="componentInstance.inputSettings[input]"
+            [openComponent]="openComponent"
+            [context]="componentInstance.fqtag + '.' + input"
           ></app-set-inputs>
         </div>
       </app-floating-menu>
@@ -80,12 +80,12 @@
         class="input-value"
         [placeholder]="input"
         [name]="input"
-        [(ngModel)]="actionInstance.inputSettings[input]"
+        [(ngModel)]="componentInstance.inputSettings[input]"
         dragula="expression-io"
         (addOutput)="addOutput(input, $event)"
         (blur)="checkExpr(input, $event)"
         [attr.data-context]="context"
-        [matTooltip]="actionInstance.of.ioDescriptions[input]"
+        [matTooltip]="componentInstance.of.ioDescriptions[input]"
       >
     </mat-form-field>
     <div *ngIf="errors[input]" class="mat-error error-msg">

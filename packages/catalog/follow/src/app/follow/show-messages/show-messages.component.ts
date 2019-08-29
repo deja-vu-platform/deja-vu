@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -34,7 +34,7 @@ export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
   @Input() showId = true;
   @Input() showContent = true;
 
-  @Input() showMessage: Action = {
+  @Input() showMessage: ComponentValue = {
     type: <Type<Component>> ShowMessageComponent
   };
   @Input() noMessagesToShowText = 'No messages to show';

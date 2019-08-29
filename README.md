@@ -4,16 +4,16 @@ Déjà Vu is an experimental platform for building web apps. It features
 built-in user functionality for rapid construction of apps
 with complex behavior and rich user interfaces.
 
-To build apps using Déjà Vu you configure and compose *clichés*, drawn from a catalog
-developed by experts. A cliché implements a *concept*: a self-contained,
+To build apps using Déjà Vu you configure and compose *concepts*, drawn from a catalog
+developed by experts. A concept is a self-contained,
 reusable, increment of functionality that is motivated by a purpose defined in
 terms of the needs of a user (for example, think of the "comment" functionality
 you can find on Facebook, or the "rating" functionality on Amazon).
-Clichés include all the necessary parts to achieve the required
+Concepts include all the necessary parts to achieve the required
 functionality&mdash;from the front-end GUI to the back-end data
 storage&mdash;and export a collection of "actions"&mdash;composable GUI elements.
 
-Building apps with Déjà Vu boils down to tuning the clichés you need via
+Building apps with Déjà Vu boils down to tuning the concepts you need via
 configuration variables (using JSON) and linking actions to create pages (using
 the Déjà Vu language). You can also use CSS to customize the appearance of your
 app. Read the [tutorial](docs/tutorial.md) for more information.
@@ -50,7 +50,7 @@ assembled with much less effort.
 `http://localhost:3000`.
 You should see a "hello world" page.
 
-You can now start including clichés and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
+You can now start including concepts and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
 server (Ctrl+C and run `npm start` again).
 
 
@@ -78,7 +78,7 @@ create commits and run `git push heroku` again.
 
 In addition to [node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
-Each cliché and sample is its own node project. We use yarn workspaces to make
+Each concept and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. To install and build everything
 do `yarn` (running `yarn` with no command will run `yarn install`). Unfortunately,
 yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
@@ -86,16 +86,16 @@ affects our installation process, so the first `yarn` will fail. After
 the first `yarn` fails, run `yarn --check-files` and everything should work.
 
 Installation will take a while as it downloads dependencies and builds all
-clichés and core libraries. 
+concepts and core libraries. 
 
-To run a cliché or an app start the mongo daemon with `mongod` (all of our clichés
+To run a concept or an app start the mongo daemon with `mongod` (all of our concepts
 and the runtime system use MongoDB) and then in a separate shell `cd` into the
-cliché or app you want to run and do `yarn start`.
+concept or app you want to run and do `yarn start`.
 
-To check the running cliché or app visit `http://localhost:3000`.
+To check the running concept or app visit `http://localhost:3000`.
 
-When a cliché is run it shows a "development" page that is used for testing.
+When a concept is run it shows a "development" page that is used for testing.
 
-Yarn will symlink dependencies so if you make a change to a cliché you are using
-in an app, the only thing you need to do is rebuild the cliche with
+Yarn will symlink dependencies so if you make a change to a concept you are using
+in an app, the only thing you need to do is rebuild the concept with
 `yarn package` and restart your app.

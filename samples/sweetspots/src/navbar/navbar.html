@@ -1,4 +1,4 @@
-<dv.action name="navbar" loggedInUserId$=authentication.logged-in.user.id
+<dv.component name="navbar" loggedInUser$=authentication.logged-in.user
   searchResults$=label.search-items-by-labels.searchResultItems>
 
   <dv.tx>
@@ -50,7 +50,8 @@
               Login
             </dv.link>
             &nbsp;
-            <dv.link href="/register" class="mat-button btn btn-info register-btn">
+            <dv.link href="/register"
+              class="mat-button btn btn-info register-btn">
               Register
             </dv.link>
           </div>
@@ -58,4 +59,4 @@
       </dv.if>
     </div>
   </nav>
-</dv.action>
+</dv.component>

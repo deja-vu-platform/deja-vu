@@ -1,0 +1,60 @@
+#configure-concept {
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.delete-save {
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-only {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save {
+  justify-content: flex-end;
+}
+
+textarea {
+  font-family: monospace;
+  max-height: 320px; /* prevent scrolling on dialog */
+}
+
+mat-divider {
+  $m: 32px;
+  margin-top: $m;
+  margin-bottom: $m;
+}
+
+.options-headers-align .mat-expansion-panel-header-title,
+.options-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.options-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.options-panel {
+  margin-bottom: 5px !important;
+}
+
+.options-panel mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+mat-form-field {
+  margin-bottom: 15px;
+}

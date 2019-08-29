@@ -1,14 +1,14 @@
 import {
-  ActionRequestTable,
-  ClicheDb,
-  ClicheServer,
-  ClicheServerBuilder,
   Collection,
+  ComponentRequestTable,
+  ConceptDb,
+  ConceptServer,
+  ConceptServerBuilder,
   Config,
   Context,
   getReturnFields,
   Validation
-} from '@deja-vu/cliche-server';
+} from '@deja-vu/concept-server';
 import { IResolvers } from 'graphql-tools';
 import * as _ from 'lodash';
 import {
@@ -35,7 +35,7 @@ class CommentValidation {
   }
 }
 
-const actionRequestTable: ActionRequestTable = {
+const componentRequestTable: ComponentRequestTable = {
   'create-comment': (extraInfo) => `
     mutation CreateComment($input: CreateCommentInput!) {
       createComment (input: $input) ${getReturnFields(extraInfo)}
@@ -94,17 +94,29 @@ const actionRequestTable: ActionRequestTable = {
   `
 };
 
-function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
+function addTimestamp(comment: CommentDoc | null) {
+  if (comment === null) {
+    return null;
+  }
+  comment['timestamp'] = new Date(comment._id.getTimestamp())
+    .getTime();
+
+  return comment;
+}
+
+function resolvers(db: ConceptDb, config: CommentConfig): IResolvers {
   const comments: Collection<CommentDoc> = db.collection('comments');
 
   return {
     Query: {
-      comment: async (_root, { id }) => await comments.findOne({ id }),
+      comment: async (_root, { id }) => addTimestamp(
+        await comments.findOne({ id })),
 
       commentByAuthorTarget: async (
-        _root, { input }: { input: CommentInput }) => await comments.findOne({
-          authorId: input.byAuthorId, targetId: input.ofTargetId
-        }),
+        _root, { input }: { input: CommentInput }) => addTimestamp(
+          await comments.findOne({
+            authorId: input.byAuthorId, targetId: input.ofTargetId
+          })),
 
       comments: async (_root, { input }: { input: CommentsInput }) => {
         const filter = {};
@@ -117,7 +129,7 @@ function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
           filter['targetId'] = input.ofTargetId;
         }
 
-        return await comments.find(filter);
+        return _.map(await comments.find(filter), addTimestamp);
       }
     },
 
@@ -150,7 +162,7 @@ function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
             // only because Comment authorIds CANNOT be changed.
             // If for some reason editing Comment authorIds becomes possible,
             // this functionality will be broken.
-            // Note that the authorization cliché could also be used
+            // Note that the authorization concept could also be used
             // to get the same functionality.
             if (comment.authorId !== input.authorId) {
               throw new Error('Only the author of the comment can edit it.');
@@ -179,14 +191,14 @@ function resolvers(db: ClicheDb, config: CommentConfig): IResolvers {
   };
 }
 
-const commentCliche: ClicheServer = new ClicheServerBuilder('comment')
-  .initDb((db: ClicheDb, _config: CommentConfig): Promise<any> => {
+const commentConcept: ConceptServer = new ConceptServerBuilder('comment')
+  .initDb((db: ConceptDb, _config: CommentConfig): Promise<any> => {
     const comments: Collection<CommentDoc> = db.collection('comments');
 
     return comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .actionRequestTable(actionRequestTable)
+  .componentRequestTable(componentRequestTable)
   .resolvers(resolvers)
   .build();
 
-commentCliche.start();
+commentConcept.start();

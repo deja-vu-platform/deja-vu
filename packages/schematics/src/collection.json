@@ -1,14 +1,14 @@
 {
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
-    "action": {
-      "description": "Generate an action for a cliché",
-      "factory": "./action/index#action",
-      "schema": "./action/schema.json"
+    "component": {
+      "description": "Generate a component for a concept",
+      "factory": "./component/index#component",
+      "schema": "./component/schema.json"
     },
     "application": {
-      "description": "Create a new cliché",
-      "factory": "./application/index#cliche",
+      "description": "Create a new concept",
+      "factory": "./application/index#concept",
       "schema": "./application/schema.json"
     }
   }

@@ -1,4 +1,4 @@
-<dv.action name="home">
+<dv.component name="home">
   <listify.navbar />
 
   <dv.tx>
@@ -12,13 +12,7 @@
   <div class="main">
     <div class="container">
       <div class="right-container">
-        <dv.if condition=listify.navbar.loggedInUser>
-          <ranking.show-rankings
-            sourceId=listify.navbar.loggedInUser.id hidden=true />
-          <listify.profile-card
-            username=listify.navbar.loggedInUser.username
-            rankingsSubmitted=ranking.show-rankings.loadedRankings?.length />
-        </dv.if>
+        <listify.profile-card loggedInUser=listify.navbar.loggedInUser />
         <listify.legend />
       </div>
 
@@ -37,19 +31,32 @@
         </dv.tx>
       </h2>
       <dv.if condition=$showTrending>
-        <scoring.show-targets-by-score
-          noTargetsText="No lists yet."
-          showAscending=false
-          showScores=false
-          showTarget=<listify.list-card
-            gotoOnClick="/lists/consensus"
-            listScoring=$target id=$id
-            loggedInUser=listify.navbar.loggedInUser
-            showVote=true /> />
+        <dv.tx>
+          <authentication.authenticate as auth-show-targets
+            user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+          <scoring.show-targets-by-score
+            noTargetsText="No lists yet."
+            showAscending=false
+            showScores=false
+            showTarget=<listify.list-card
+              gotoOnClick="/lists/consensus"
+              id=$id target=$target
+              loggedInUser=listify.navbar.loggedInUser
+              showVote=true /> />
+        </dv.tx>
       </dv.if>
       <dv.if condition=!$showTrending>
-        Showing lists by timestmap not yet supported
-        <!-- TODO: log cliche -->
+        <dv.tx>
+          <authentication.authenticate as auth-show-objects
+            user=listify.navbar.loggedInUser waitOn=['user'] hidden=true />
+          <list.show-objects
+            noObjectsToShowText="No lists yet."
+            showObject=<listify.list-card
+              gotoOnClick="/lists/consensus"
+              id=$id object=$object
+              loggedInUser=listify.navbar.loggedInUser
+              showVote=true /> />
+        </dv.tx>
       </dv.if>
 
       <div>
@@ -63,4 +70,4 @@
       </div>
     </div>
   </div>
-</dv.action>
+</dv.component>

@@ -1,4 +1,4 @@
-<dv.action name="show-group">
+<dv.component name="show-group">
   <accord.navbar accessRequired=true />
   <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
   <div class="left-column">
@@ -9,12 +9,9 @@
     <dv.if condition=groupInfo.show-object.loadedObject class="individual-card">
       <h1>
         <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
-        &nbsp;
         <dv.if condition=authorization.can-view.canView class="inline-block">
           <dv.link href="/edit-group" params={ groupId:$groupId }>
-            <mat-icon>
-              settings
-            </mat-icon>
+            <mat-icon>settings</mat-icon>
           </dv.link>
         </dv.if>
       </h1>
@@ -35,5 +32,5 @@
       />
     </div>
   </div>
-</dv.action>
+</dv.component>
 

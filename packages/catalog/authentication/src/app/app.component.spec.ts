@@ -1,9 +1,10 @@
 import { async, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 
 import { BrowserModule } from '@angular/platform-browser';
 
-import { DvModule, GATEWAY_URL, USED_CLICHES_CONFIG } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 import { AuthenticationModule } from './authentication/authentication.module';
 
 
@@ -16,11 +17,12 @@ describe('AppComponent', () => {
       imports: [
         BrowserModule,
         AuthenticationModule,
+        RouterTestingModule,
         DvModule
       ],
       providers: [
         { provide: GATEWAY_URL, useValue: 'test' },
-        { provide: USED_CLICHES_CONFIG, useValue: {} }
+        { provide: USED_CONCEPTS_CONFIG, useValue: {} }
       ]
     })
       .compileComponents();

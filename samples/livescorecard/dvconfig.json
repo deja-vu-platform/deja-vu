@@ -1,6 +1,6 @@
 {
   "name": "livescorecard",
-  "usedCliches": {
+  "usedConcepts": {
     "hostauthentication": {
       "name": "authentication",
       "config": {
@@ -137,29 +137,29 @@
     }
   },
   "routes": [
-    { "path": "climber", "action": "show-scorecard" },
-    { "path": "climber/leaderboard", "action": "show-leaderboard" },
-    { "path": "climber/rules", "action": "show-rules" },
+    { "path": "/climber", "component": "show-scorecard" },
+    { "path": "/climber/leaderboard", "component": "show-leaderboard" },
+    { "path": "/climber/rules", "component": "show-rules" },
 
-    { "path": "host", "action": "show-competitions" },
-    { "path": "host/competition-participants", "action": "show-climbers" },
-    { "path": "host/competition-climbs", "action": "show-climbs" },
-    { "path": "host/competition-leaderboard", "action": "show-leaderboard" },
-    { "path": "host/competition-hosts", "action": "show-hosts" },
-    { "path": "host/competition-rules", "action": "show-rules" },
-    { "path": "host/edit-competition", "action": "edit-competition" },
-    { "path": "host/edit-participant", "action": "edit-participant" },
-    { "path": "host/edit-climb", "action": "edit-climb" },
+    { "path": "/host", "component": "show-competitions" },
+    { "path": "/host/competition-participants", "component": "show-climbers" },
+    { "path": "/host/competition-climbs", "component": "show-climbs" },
+    { "path": "/host/competition-leaderboard", "component": "show-leaderboard" },
+    { "path": "/host/competition-hosts", "component": "show-hosts" },
+    { "path": "/host/competition-rules", "component": "show-rules" },
+    { "path": "/host/edit-competition", "component": "edit-competition" },
+    { "path": "/host/edit-participant", "component": "edit-participant" },
+    { "path": "/host/edit-climb", "component": "edit-climb" },
 
-    { "path": "register", "action": "register" },
+    { "path": "/register", "component": "register" },
 
-    { "path": "spectator", "action": "show-leaderboard" },
-    { "path": "spectator/rules", "action": "show-rules" },
+    { "path": "/spectator", "component": "show-leaderboard" },
+    { "path": "/spectator/rules", "component": "show-rules" },
 
-    { "path": "login/climber", "action": "climber-login" },
-    { "path": "login/host", "action": "host-login" },
-    { "path": "login/spectator", "action": "spectator-login" },
+    { "path": "/login/climber", "component": "climber-login" },
+    { "path": "/login/host", "component": "host-login" },
+    { "path": "/login/spectator", "component": "spectator-login" },
 
-    { "path": "", "action": "climber-login" }
+    { "path": "", "component": "climber-login" }
   ]
 }

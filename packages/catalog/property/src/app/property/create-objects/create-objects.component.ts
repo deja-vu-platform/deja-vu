@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, ViewChildren, QueryList
+  OnInit, QueryList, ViewChildren
 } from '@angular/core';
 
 import {
@@ -8,23 +8,29 @@ import {
   OnExec, RunService
 } from '@deja-vu/core';
 
-import { CreateObjectComponent } from '../create-object/create-object.component';
+import {
+  CreateObjectComponent
+} from '../create-object/create-object.component';
 
 import * as _ from 'lodash';
 
-import { getPropertyNames } from '../shared/property.model';
+import {
+  getObjectTitleFromConfig, getPropertyNamesFromConfig
+} from '../shared/property.model';
 
 import { API_PATH } from '../property.config';
 
 /**
  * Create objects in bulk
- * There are two ways to use this action:
+ * There are two ways to use this component:
  *  1. if `objects` is inputted:
- *      the action will not display anything.
- *      the data for the objects must come from another action.
- *      the action's execution must be triggered by another action (in a transaction)
+ *      the component will not display anything.
+ *      the data for the objects must come from another component.
+ *      the component's execution must be triggered by another component (in a
+ *      transaction)
  *  2. if `objects` is not inputted:
- *      the action works similar to when multiple `create-object` actions are stacked.
+ *      the component works similar to when multiple `create-object` components
+ *      are stacked.
  *      there must be a list of `ids` for the objects that will be created.
  */
 @Component({
@@ -65,7 +71,7 @@ export class CreateObjectsComponent implements OnInit, OnExec {
    * The label that shows on the button that triggers
    * the object creation
    */
-  @Input() buttonLabel = 'Create Objects';
+  @Input() buttonLabel;
 
   /**
    * Only used when there is no objects
@@ -92,17 +98,31 @@ export class CreateObjectsComponent implements OnInit, OnExec {
 
     const cs = this.csf.createConfigService(this.elem);
     this.config = cs.getConfig();
-    this.properties = getPropertyNames(cs);
+
+    if (this.buttonLabel === undefined) {
+      const objTitle = getObjectTitleFromConfig(this.config);
+      this.buttonLabel = `Create ${objTitle}s`;
+    }
+    this.properties = getPropertyNamesFromConfig(this.config);
 
     if (this.objects) {
       return;
     }
+    if (!this.ids) {
+      throw new Error('One of objects or ids must be given');
+    }
 
     this.showInputForms = true;
 
+    this.objects = [];
     for (const index of Object.keys(this.ids)) {
-      if (this.initialValues && this.initialValues[index] && this.initialValue) {
-        this.mergedInitialValues[index] = {...this.initialValues[index], ...this.initialValue};
+      if (this.initialValues &&
+        this.initialValues[index] &&
+        this.initialValue) {
+        this.mergedInitialValues[index] = {
+          ...this.initialValues[index],
+          ...this.initialValue
+        };
       } else {
         this.mergedInitialValues[index] = this.initialValue;
       }

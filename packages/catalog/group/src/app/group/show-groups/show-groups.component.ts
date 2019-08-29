@@ -1,15 +1,17 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, Type
+  Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import * as _ from 'lodash';
 
 import { ShowGroupComponent } from '../show-group/show-group.component';
 
 import { Group } from '../shared/group.model';
+
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 
 @Component({
@@ -18,7 +20,13 @@ import { Group } from '../shared/group.model';
   styleUrls: ['./show-groups.component.css']
 })
 export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+  OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
   @Input() withMemberId = '';
@@ -28,11 +36,13 @@ OnChanges {
   @Input() showMembers = true;
   @Input() loadMembers = true;
 
-  @Input() showGroup: Action = {
+  @Input() showGroup: ComponentValue = {
     type: <Type<Component>> ShowGroupComponent
   };
+  @Input() noGroupsToShowText = 'No groups to show';
   _groups: Group[] = [];
   @Output() groups = new EventEmitter<Group[]>();
+  @Output() groupIds = new EventEmitter<string[]>();
 
   showGroups;
   private gs: GatewayService;
@@ -52,8 +62,23 @@ OnChanges {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
   load() {
@@ -64,6 +89,19 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
       this.gs
         .get<{data: {groups: Group[]}}>('/graphql', {
           params: {
@@ -83,6 +121,7 @@ OnChanges {
         .subscribe((res) => {
           this._groups = res.data.groups;
           this.groups.emit(this._groups);
+          this.groupIds.emit(_.map(this._groups, 'id'));
         });
     } else if (this.gs) {
       this.gs.noRequest();
