@@ -149,19 +149,27 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
       },
 
       canView: async (_root, { input }: { input: PrincipalResourceInput }) => {
-        const resource = await resources
-          .findOne({ id: input.resourceId, viewerIds: input.principalId },
-            { projection: { _id: 1 } });
+        try {
+          const resource = await resources
+            .findOne({ id: input.resourceId, viewerIds: input.principalId },
+              { projection: { _id: 1 } });
 
-        return !_.isNil(resource);
+          return !_.isNil(resource);
+        } catch (e) {
+          return false;
+        }
       },
 
       canEdit: async (_root, { input }: { input: PrincipalResourceInput }) => {
-        const resource = await resources
-          .findOne({ id: input.resourceId, ownerId: input.principalId },
-            { projection: { _id: 1 } });
+        try {
+          const resource = await resources
+            .findOne({ id: input.resourceId, ownerId: input.principalId },
+              { projection: { _id: 1 } });
 
-        return !_.isNil(resource);
+          return !_.isNil(resource);
+        } catch (e) {
+          return false;
+        }
       },
 
       verifyCanEdit: async (

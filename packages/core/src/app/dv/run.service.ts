@@ -208,7 +208,13 @@ export class RunService {
         runs.push(
           Promise
             .resolve(componentInfo.component[dvOnRun]())
-            .then((result) => ({[componentId]: result})));
+          .then((result) => ({[componentId]: result}))
+          .catch((e) => {
+            console.error(
+              `Error in ` +
+              `${NodeUtils.GetFqTagOfNode(componentInfo.node)}: ${e.message}`);
+            throw e;
+          }));
       }
     });
 

@@ -1,12 +1,12 @@
 <dv.component name="show-event-summary">
-  <eventdetails.show-object id=$id hidden=true />
+  <eventDetails.show-object id=$id hidden=true />
 
   <div class="card">
     <div class="card-header">
       <!-- Event Title -->
       <!-- TODO: remove link once visible in marker popup -->
-      <eventdetails.show-object class="inline-block"
-        object=eventdetails.show-object.loadedObject
+      <eventDetails.show-object class="inline-block"
+        object=eventDetails.show-object.loadedObject
         showOnly=["title"] /> |
       <dv.link class="inline-block" href="/event-details"
         params={ eventId: $id }>

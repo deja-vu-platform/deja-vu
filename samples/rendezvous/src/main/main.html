@@ -8,7 +8,6 @@
         </dv.link>
       </div>
 
-      <!-- TODO: Dropdown or something to show only one set of results -->
       <h4>All Events</h4>
       <event.show-events id="all-events"
         showEvent=<rendezvous.show-event-summary id=$event.id /> />
@@ -16,13 +15,13 @@
       <h4>Events You are Hosting</h4>
       <div id="events-by-host">
         <rendezvous.show-events-by-host
-          loggedInUserId=rendezvous.navbar.loggedInUserId />
+          loggedInUserId=rendezvous.navbar.loggedInUser?.id />
       </div>
 
       <h4>Events You are Attending</h4>
       <div id="events-by-attendee">
         <rendezvous.show-events-by-attendee
-          loggedInUserId=rendezvous.navbar.loggedInUserId />
+          loggedInUserId=rendezvous.navbar.loggedInUser?.id />
       </div>
     </div>
 

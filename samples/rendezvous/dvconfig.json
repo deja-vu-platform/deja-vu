@@ -1,51 +1,28 @@
 {
   "name": "rendezvous",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "event": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "authentication": {},
+    "authorization": {},
+    "comment": {},
+    "event": {},
     "geolocation": {
       "config": {
-        "mapType": "leaflet",
-        "reinitDbOnStartup": true
+        "mapType": "leaflet"
       }
     },
-    "group": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "relevantinterests": {
+    "group": {},
+    "relevantInterests": {
       "name": "label",
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": [
           "Sports", "Music", "Food & Drink", "Outdoor", "Theatre",
           "Culture & History"
         ]
       }
     },
-    "eventdetails": {
+    "eventDetails": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "EventDetails",
           "type": "object",
@@ -60,10 +37,9 @@
         }
       }
     },
-    "userprofile": {
+    "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "UserProfile",
           "type": "object",
@@ -103,7 +79,6 @@
     { "path": "/event-details", "component": "show-event-details" },
     { "path": "/create-event", "component": "create-event" },
     { "path": "/profile", "component": "show-user-profile" },
-    { "path": "/edit-profile", "component": "edit-user-profile" },
     { "path": "", "component": "main" }
   ]
 }

@@ -191,6 +191,7 @@ function resolvers(db: ConceptDb, _config: LabelConfig): IResolvers {
             return err;
           }
         }));
+
         if (errors.filter((err) => !!err).length === 0) {
           return true;
         }

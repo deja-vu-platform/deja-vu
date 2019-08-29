@@ -1,12 +1,16 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import {
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  SimpleChanges, Type
+} from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
 } from '@deja-vu/core';
 
-import * as _ from 'lodash';
-
 import { Group } from '../shared/group.model';
+
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 
 @Component({
@@ -14,7 +18,14 @@ import { Group } from '../shared/group.model';
   templateUrl: './join-leave.component.html',
   styleUrls: ['./join-leave.component.css']
 })
-export class JoinLeaveComponent implements OnExec, OnInit {
+export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
+  OnInit, OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   @Input() memberId: string;
   // One of `group` or `groupId` is required
   @Input() group: Group;
@@ -33,7 +44,79 @@ export class JoinLeaveComponent implements OnExec, OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+  }
+
+  ngAfterViewInit() {
     this.load();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
+  }
+
+  load() {
+    if (this.canEval() && !this.group) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      if (this.group) {
+        this.inGroup = this.groupContains(this.group, this.memberId);
+
+        this.gs.noRequest();
+
+        return;
+      }
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
+      this.gs.get<{ data: any }>('/graphql', {
+        params: {
+          inputs: { id: this.groupId },
+          extraInfo: {
+            action: 'is-in-group',
+            returnFields: `
+              id
+              memberIds
+            `
+          }
+        }
+      })
+        .subscribe((res) => {
+          this.group = res.data.group;
+          this.inGroup = this.groupContains(this.group, this.memberId);
+        });
+
+    } else if (this.gs) {
+      this.gs.noRequest();
+    }
   }
 
   joinGroup() {
@@ -42,30 +125,6 @@ export class JoinLeaveComponent implements OnExec, OnInit {
 
   leaveGroup() {
     this.rs.exec(this.elem);
-  }
-
-  load() {
-    if (!this.gs || this.group) {
-      this.inGroup = this.groupContains(this.group, this.memberId);
-
-      return;
-    }
-    this.gs.get<{ data: any }>('/graphql', {
-      params: {
-        inputs: { id: this.groupId },
-        extraInfo: {
-          action: 'is-in-group',
-          returnFields: `
-            id
-            memberIds
-          `
-        }
-      }
-    })
-      .subscribe((res) => {
-        this.group = res.data.group;
-        this.inGroup = this.groupContains(this.group, this.memberId);
-      });
   }
 
   async dvOnExec(): Promise<void> {
@@ -94,6 +153,10 @@ export class JoinLeaveComponent implements OnExec, OnInit {
 
   dvOnExecFailure(reason: Error) {
     console.log(reason.message);
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs);
   }
 
   private groupContains(group: Group, memberId: string) {

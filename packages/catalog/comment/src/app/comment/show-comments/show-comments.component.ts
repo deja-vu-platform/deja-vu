@@ -41,6 +41,7 @@ OnInit, AfterViewInit, OnChanges, OnEval {
     type: <Type<Component>> ShowCommentComponent
   };
   @Input() noCommentsToShowText = 'No comments to show';
+  @Input() includeTimestamp = false;
   comments: Comment[] = [];
   @Output() loadedComments = new EventEmitter<Comment[]>();
 
@@ -91,6 +92,7 @@ OnInit, AfterViewInit, OnChanges, OnEval {
                 ${this.showAuthorId ? 'authorId' : ''}
                 ${this.showTargetId ? 'targetId' : ''}
                 ${this.showContent ? 'content' : ''}
+                ${this.includeTimestamp ? 'timestamp' : ''}
               `
             }
           }

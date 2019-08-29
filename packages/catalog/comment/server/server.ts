@@ -94,17 +94,29 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
+function addTimestamp(comment: CommentDoc | null) {
+  if (comment === null) {
+    return null;
+  }
+  comment['timestamp'] = new Date(comment._id.getTimestamp())
+    .getTime();
+
+  return comment;
+}
+
 function resolvers(db: ConceptDb, config: CommentConfig): IResolvers {
   const comments: Collection<CommentDoc> = db.collection('comments');
 
   return {
     Query: {
-      comment: async (_root, { id }) => await comments.findOne({ id }),
+      comment: async (_root, { id }) => addTimestamp(
+        await comments.findOne({ id })),
 
       commentByAuthorTarget: async (
-        _root, { input }: { input: CommentInput }) => await comments.findOne({
-          authorId: input.byAuthorId, targetId: input.ofTargetId
-        }),
+        _root, { input }: { input: CommentInput }) => addTimestamp(
+          await comments.findOne({
+            authorId: input.byAuthorId, targetId: input.ofTargetId
+          })),
 
       comments: async (_root, { input }: { input: CommentsInput }) => {
         const filter = {};
@@ -117,7 +129,7 @@ function resolvers(db: ConceptDb, config: CommentConfig): IResolvers {
           filter['targetId'] = input.ofTargetId;
         }
 
-        return await comments.find(filter);
+        return _.map(await comments.find(filter), addTimestamp);
       }
     },
 
