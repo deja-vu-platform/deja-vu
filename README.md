@@ -11,7 +11,7 @@ terms of the needs of a user (for example, think of the "comment" functionality
 you can find on Facebook, or the "rating" functionality on Amazon).
 Concepts include all the necessary parts to achieve the required
 functionality&mdash;from the front-end GUI to the back-end data
-storage&mdash;and export a collection of "actions"&mdash;composable GUI elements.
+storage&mdash;and export a collection of "components"&mdash;composable GUI elements.
 
 Building apps with Déjà Vu boils down to tuning the concepts you need via
 configuration variables (using JSON) and linking actions to create pages (using
@@ -55,6 +55,8 @@ server (Ctrl+C and run `npm start` again).
 
 
 ## Deploying DV Apps
+
+(This won't work until the npm packages are public)
 
 A compiled DV app is a regular MEAN app
 (MongoDB-Express-Angular-Node.js). Since a compiled DV app uses popular,
