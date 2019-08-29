@@ -1,30 +1,25 @@
 <dv.component name="show-group">
-  <authorization.show-owner resourceId=$group?.id hidden=true />
+  <groupAuthorization.show-owner resourceId=$group?.id hidden=true />
 
   <div class="group-im-in">
     <div class="group-im-in-container">
 
-      <dv.if condition=$createdByUser &&
-        $loggedInUserId === authorization.show-owner.ownerId>
-        <group.show-group group=$group
+      <!-- group I own -->
+      <dv.if condition=$createdByUser && $groupId>
+        <groupInfo.show-object id=$groupId />
+        <group.show-members inGroupId=$groupId
           showMember=<authentication.show-user id=$id /> />
 
-        <dv.tx>
-          <group.join-leave as group-owned-by-user-join-leave
-            class="btn btn-default remove-from-group-btn"
-            group=$group memberId=$loggedInUserId />
-        </dv.tx>
-
+        <!-- add a member to the group -->
         <h5>Add User</h5>
           <authentication.choose-user class="add-member-input"
             showChooseButton=false />
-
         <dv.tx>
           <dv.status savedText="Member added to group" />
-          <group.add-to-group id=$group?.id showInput=false hidden=true
-            member=authentication.choose-user.selectedUser />
-          <authorization.add-viewer id=$group?.id hidden=true
-            viewer=authentication.choose-user.selectedUser />
+          <group.add-to-group id=$groupId showInput=false
+            member=authentication.choose-user.selectedUser hidden=true />
+          <groupAuthorization.verify-can-edit resourceId=$groupId
+            principalId=$loggedInUserId hidden=true />
           <authentication.authenticate id=$loggedInUserId hidden=true />
           <dv.button class="btn btn-blue add-member-btn vertical-align-top">
             Add Member to Group
@@ -32,19 +27,17 @@
         </dv.tx>
       </dv.if>
 
-      <dv.if condition=$isMemberOf>
-        <group.show-group group=$group showMembers=false />
-        <dv.tx>
+      <!-- group I am member of but don't own -->
+      <dv.if condition=!$createdByUser && $group>
+        <groupInfo.show-object waitOn=['id'] id=$group.id />
+        <dv.tx> <!-- leave the group -->
           <authentication.authenticate
             as group-user-is-member-of-authenticate
             id=$loggedInUserId hidden=true />
-          <authorization.add-remove-viewer resourceId=$group?.id
-            viewerId=$loggedInUserId hidden=true/>
           <group.join-leave class="btn btn-default remove-from-group-btn"
             group=$group memberId=$loggedInUserId />
         </dv.tx>
       </dv.if>
-
     </div>
   </div>
 </dv.component>

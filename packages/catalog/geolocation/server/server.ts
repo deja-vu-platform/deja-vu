@@ -88,6 +88,10 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
           };
         }
 
+        if (input.markerIds) {
+          filter['id'] = { $in: input.markerIds };
+        }
+
         return await markers.find(filter);
       }
     },

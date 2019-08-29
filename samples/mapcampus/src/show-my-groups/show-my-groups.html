@@ -1,33 +1,71 @@
 <dv.component name="show-my-groups">
   <mapcampus.navbar />
 
-  <div id="my-groups-column-container">
-    <div class="my-groups-column" id="my-groups-column-left">
-      <!-- Show groups owned by user -->
+  <div class="my-groups-column-container">
+    <div class="my-groups-column my-groups-column-left">
+      <!-- show groups owned by user -->
       <div class="card">
         <div class="card-body groups-panel-body">
           <h2>Groups I Own</h2>
-          <group.show-groups
-            withMemberId=mapcampus.navbar.loggedInUserId
-            showGroup=<mapcampus.show-group
-              group=$group
-              loggedInUserId=mapcampus.navbar.loggedInUserId
-              createdByUser=mapcampus.navbar.loggedInUserId /> />
+          <dv.tx>
+            <authentication.authenticate as auth-groups-own
+              user=mapcampus.navbar.loggedInUser waitOn=['user']
+              hidden=true />
+            <groupAuthorization.show-resources
+              createdBy=mapcampus.navbar.loggedInUser?.id
+              noResourcesText='No groups to show'
+              showResource=<mapcampus.show-group
+                groupId=$id
+                loggedInUserId=mapcampus.navbar.loggedInUser?.id
+                createdByUser=true /> />
+          </dv.tx>
         </div>
       </div>
     </div>
 
-      <!-- Show groups for which the user is a member -->
-    <div class="my-groups-column" id="my-groups-column-right">
+    <!-- show groups for which the user is a member -->
+    <div class="my-groups-column my-groups-column-right">
       <div class="card">
         <div class="card-body groups-panel-body">
           <h2>Groups I'm In</h2>
-          <group.show-groups
-            withMemberId=mapcampus.navbar.loggedInUserId
-            showGroup=<mapcampus.show-group
-              group=$group
-              loggedInUserId=mapcampus.navbar.loggedInUserId
-              isMemberOf=mapcampus.navbar.loggedInUserId /> />
+          <dv.tx>
+            <authentication.authenticate as auth-groups-in
+              id=mapcampus.navbar.loggedInUser?.id waitOn=['id']
+              hidden=true />
+            <group.show-groups as show-groups-in
+              withMemberId=mapcampus.navbar.loggedInUser?.id
+              waitOn=['withMemberId']
+              showGroup=<mapcampus.show-group
+                group=$group
+                loggedInUserId=mapcampus.navbar.loggedInUser?.id /> />
+          </dv.tx>
+        </div>
+      </div>
+    </div>
+
+    <!-- create a group -->
+    <div class="my-groups-column my-groups-column-left">
+      <div class="card">
+        <div class="card-body groups-panel-body">
+          <h2>Create Group</h2>
+          <dv.tx>
+            <dv.gen-id />
+            <authentication.authenticate as auth-create-group
+              user=mapcampus.navbar.loggedInUser waitOn=['user']
+              hidden=true />
+            <groupAuthorization.create-resource id=dv.gen-id.id
+              waitOn=['ownerId']
+              ownerId=mapcampus.navbar.loggedInUser?.id hidden=true />
+            <group.create-group id=dv.gen-id.id
+              memberIds=mapcampus.navbar.loggedInUser?.id ?
+                [mapcampus.navbar.loggedInUser?.id] :
+                mapcampus.navbar.loggedInUser?.id
+              resetOnExecSuccess=false
+              waitOn=['memberIds']
+              hidden=true />
+            <groupInfo.create-object id=dv.gen-id.id
+              buttonLabel='Create Group' />
+          </dv.tx>
         </div>
       </div>
     </div>

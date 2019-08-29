@@ -5,8 +5,8 @@
     <div class="events-panel card">
       <div class="events-panel-body card-body">
         <h2 class="create-event-header">Create an Event!</h2>
-        <geolocation.display-map id="homeMapId"
-           showLoadedMarkers=false showDirectionsControl=false />
+        <geolocation.display-map
+          showLoadedMarkers=false showDirectionsControl=false />
 
         <dv.tx>
           <dv.gen-id />
@@ -22,7 +22,6 @@
               title=geolocation.display-map.newMarker?.title
               latitude=geolocation.display-map.newMarker?.latitude
               longitude=geolocation.display-map.newMarker?.longitude
-              mapId="homeMapId"
               showOptionToSubmit=false />
           </div>
 
@@ -32,14 +31,10 @@
               showOptionToSubmit=false />
           </div>
 
-          <!-- Choose Group widget works but need to figure out how to
-                     add allow people to view resource if eventId isn't given
-                     and a group may be used for multiple events -->
-          <!-- Instead, we will assume a 1-1 mapping between group and event -->
-          <group.create-group id=dv.gen-id.id
-            memberIds=[mapcampus.navbar.loggedInUserId]
-            showOptionToAddMembers=false
-            showOptionToSubmit=false hidden=true />
+          <div class="create-event-input">
+            <mapcampus.choose-group
+              loggedInUserId=mapcampus.navbar.loggedInUser?.id />
+          </div>
 
           <div class="event-btn-container">
             <div class="cancel-button">
@@ -48,10 +43,17 @@
               </dv.link>
             </div>
             <div class="save-button">
-              <authorization.create-resource id=dv.gen-id.id
-                ownerId=mapcampus.navbar.loggedInUserId hidden=true />
-              <authentication.authenticate id=mapcampus.navbar.loggedInUserId
+              <authentication.authenticate as auth-create
+                id=mapcampus.navbar.loggedInUser?.id
                 hidden=true />
+              <eventInfo.create-object id=dv.gen-id.id
+                initialValue={
+                  groupId: mapcampus.choose-group.selectedGroup?.id
+                }
+                hidden=true />
+              <eventAuthorization.create-resource id=dv.gen-id.id
+                ownerId=mapcampus.navbar.loggedInUser?.id
+                waitOn=['ownerId'] hidden=true />
               <dv.button class='btn btn-default btn-blue event-submit-btn'>
                 Save Event
               </dv.button>

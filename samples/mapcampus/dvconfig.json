@@ -1,35 +1,52 @@
 {
   "name": "mapcampus",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "authentication": {},
+    "groupAuthorization": {
+      "name": "authorization"
     },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "eventAuthorization": {
+      "name": "authorization"
     },
-    "event": {
+    "event": {},
+    "eventInfo": {
+      "name": "property",
       "config": {
-        "reinitDbOnStartup": true
+        "schema": {
+          "title": "EventInfo",
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "string"
+            }
+          },
+          "required": ["groupId"]
+        }
       }
     },
     "geolocation": {
       "config": {
-        "reinitDbOnStartup": true,
         "mapType": "leaflet"
       }
     },
-    "group": {
+    "group": {},
+    "groupInfo": {
+      "name": "property",
       "config": {
-        "reinitDbOnStartup": true
+        "schema": {
+          "title": "GroupInfo",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
       }
     },
     "property": {
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "EventInfo",
           "type": "object",

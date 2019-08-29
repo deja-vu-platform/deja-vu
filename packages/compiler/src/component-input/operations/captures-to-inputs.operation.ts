@@ -124,7 +124,7 @@ export function capturesToInputs(
       }
     },
     PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) =>
-      `${e1.captursToInputs()}[${e2.captursToInputs()}]`,
+      `${e1.capturesToInputs()}[${e2.capturesToInputs()}]`,
     PropExpr_static: (e, nav, name) =>
       e.capturesToInputs() + nav.capturesToInputs() +
       name.capturesToInputs(),
@@ -153,6 +153,9 @@ export function capturesToInputs(
       closeSb.sourceString,
     Content_element: (element) => element.capturesToInputs(),
     Content_text: (text) => text.sourceString,
+    Content_interpolation: (interpolation) => interpolation.capturesToInputs(),
+    Interpolation: (m1, e, m2) => m1.sourceString +
+      e.capturesToInputs() + m2.sourceString,
     input: (ds, input) => ds.sourceString + input.sourceString
   };
 }

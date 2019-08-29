@@ -4,17 +4,17 @@
   vertical-align: top;
 }
 
-#my-groups-column-left {
+.my-groups-column-left {
   padding-right: 1%;
   width: 33%;
 }
 
-#my-groups-column-right {
+.my-groups-column-right {
   padding-left: 1%;
   width: 65%;
 }
 
-#my-groups-column-container {
+.my-groups-column-container {
   margin-left: 30px;
   margin-right: 30px;
 }

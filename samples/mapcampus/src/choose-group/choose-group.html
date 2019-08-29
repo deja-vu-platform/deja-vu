@@ -1,0 +1,25 @@
+<dv.component name="choose-group" selectedGroup$=dv.choose.selectedEntity>
+  <!-- get the groups I own -->
+  <dv.tx>
+    <authentication.authenticate as auth-get-groups
+      id=$loggedInUserId waitOn=['id'] hidden=true />
+    <groupAuthorization.show-resources
+      createdBy=$loggedInUserId waitOn=['createdBy'] hidden=true />
+  </dv.tx>
+  <dv.tx>
+    <authentication.authenticate as auth-get-objs
+      id=$loggedInUserId waitOn=['id'] hidden=true />
+    <groupInfo.show-objects
+      fieldMatching={
+        id: { q_in: groupAuthorization.show-resources.resourceIds },
+        waitOn: ['id']
+      }
+      showOnly=['name']
+      hidden=true />
+  </dv.tx>
+
+  <!-- choose group -->
+  <dv.choose entities=groupInfo.show-objects.objects
+    showChooseButton=false
+    showEntity=<span>{{$entity.name}}</span> />
+</dv.component>

@@ -20,8 +20,10 @@ import {
 import * as assert from 'assert';
 
 import * as _ from 'lodash';
-import { ComponentInputCompiler } from '../../component-input/component-input.compiler';
-import { ComponentCompiler, CompiledComponent } from '../component.compiler';
+import {
+  ComponentInputCompiler
+} from '../../component-input/component-input.compiler';
+import { CompiledComponent, ComponentCompiler } from '../component.compiler';
 
 
 // Some HTML attributes don't have corresponding properties. For these,
@@ -97,8 +99,8 @@ export function toNgTemplate(
         throw new Error(`dv.tx can't be aliased`);
       }
 
-      const componentEntry: ComponentStEntry | undefined = getStEntryForNgComponent(
-        transformedComponentName, symbolTable, alias);
+      const componentEntry: ComponentStEntry | undefined =
+        getStEntryForNgComponent(transformedComponentName, symbolTable, alias);
       if (componentEntry === undefined) {
         assert.fail(
           `No entries for ${transformedComponentName}, alias ${alias}` +
@@ -113,9 +115,11 @@ export function toNgTemplate(
               `Expected entry ${pretty(componentEntry)} to have an "of"`);
             assert.ok(
               componentEntry.componentName !== undefined,
-              `Expected entry ${pretty(componentEntry)} to have a "componentName"`);
+              `Expected entry ${pretty(componentEntry)} to ` +
+              `have a "componentName"`);
             const ngOutputField = outputToNgField(
-              componentEntry.of, componentEntry.componentName, outputKey, alias);
+              componentEntry.of, componentEntry.componentName, outputKey,
+              alias);
 
             outputEntry.ngOutputField = ngOutputField;
 
@@ -199,7 +203,8 @@ export function toNgTemplate(
           assert.ok(conceptContextEntry.kind === 'concept',
             `Unexpected entry type ${conceptContextEntry.kind} ` +
             `for concept ${conceptAlias}`);
-          const conceptName = (<ConceptStEntry> conceptContextEntry).conceptName;
+          const conceptName = (<ConceptStEntry> conceptContextEntry)
+            .conceptName;
           if (conceptName !== conceptAlias) {
             const rest = elementName
               .slice(elementName.indexOf('-'));

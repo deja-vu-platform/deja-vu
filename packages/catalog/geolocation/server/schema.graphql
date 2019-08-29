@@ -19,6 +19,7 @@ input MarkersInput {
   centerLat: Float
   centerLng: Float
   radius: Float
+  markerIds: [String]
 }
 
 type Query {

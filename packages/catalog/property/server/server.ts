@@ -167,6 +167,17 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 
   const joinedNonRequiredProperties = nonRequiredProperties.join('\n');
 
+  const fieldMatchingProperties = _
+    .chain(config.schema.properties)
+    .toPairs()
+    .map(([propertyName, _schemaPropertyObject]) => {
+
+      return `${propertyName}: String`;
+    })
+    .value();
+
+  const joinedFieldMatchingProperties = fieldMatchingProperties.join('\n');
+
   const propertyFilters = _
     .chain(config.schema.properties)
     .toPairs()
@@ -204,7 +215,7 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
 
     input FieldMatchingInput {
       id: ID
-      ${joinedNonRequiredProperties}
+      ${joinedFieldMatchingProperties}
     }
 
     input FilterInput {
@@ -256,7 +267,21 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
         return _.get(obj, '_pending') ? null : addTimestamp(obj);
       },
       objects: async (_root, { fields }) => {
-        const objsCursor = await objects.findCursor(fields);
+        const query = _.mapValues(fields, (v) => {
+          if (!_.isString(v)) {
+            return v;
+          }
+          let qObj;
+          try {
+            qObj = JSON.parse(v);
+          } catch (e) {
+            return v;
+          }
+
+          return _.mapKeys(qObj, (_v, k: string) => k.startsWith('q_') ?
+            '$' + k.slice(2) : k);
+        });
+        const objsCursor = await objects.findCursor(query);
         const objs = await objsCursor
           .sort({ _id: -1 })
           .toArray();

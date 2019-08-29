@@ -10,12 +10,18 @@
       </div>
 
       <div class="container-fluid">
-        <authorization.show-resources
-          noResourcesText="No events to show"
-          viewableBy=mapcampus.navbar.loggedInUserId
-          showResource=<mapcampus.show-event-info
-            id=$id
-            loggedInUserId=mapcampus.navbar.loggedInUserId /> />
+        <dv.tx>
+          <authentication.authenticate
+            id=mapcampus.navbar.loggedInUser?.id
+            hidden=true/>
+          <eventAuthorization.show-resources
+            noResourcesText="No events to show"
+            createdBy=mapcampus.navbar.loggedInUser?.id
+            waitOn=['createdBy']
+            showResource=<mapcampus.show-event-info
+              id=$id
+              loggedInUserId=mapcampus.navbar.loggedInUser?.id /> />
+        </dv.tx>
       </div>
     </div>
   </div>

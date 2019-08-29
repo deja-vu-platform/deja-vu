@@ -53,8 +53,13 @@ yargs.commandDir('commands')
   .demandCommand(1, 'You must provide a single command to run')
   .command('serve', 'serve the app', {}, () => {
     console.log('Serving');
-
-    const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    let config: DvConfig;
+    try {
+      config = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    } catch (e) {
+      console.error(`Error parsing config file ${e.message}`);
+      throw e;
+    }
     if (!calledFromCatalog()) {
       console.log('Serving app');
       AppCompiler.Compile('.', CACHE_DIR);

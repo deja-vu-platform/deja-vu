@@ -1,17 +1,18 @@
 import {
   Component, ElementRef, EventEmitter,
-  Inject, Input, OnInit, Output
+  Inject, Input, OnChanges, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
   OnExecSuccess, RunService
 } from '@deja-vu/core';
 
-import * as _ from 'lodash';
-
 import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';
+
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 
 interface CreateResourceRes {
@@ -26,7 +27,14 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-resource.component.css']
 })
 export class CreateResourceComponent implements
-  OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  OnInit, OnChanges, OnExec, OnExecSuccess, OnExecFailure {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
+
   @Input() id: string;
   @Input() ownerId: string;
   @Input() viewerIds?: string[];
@@ -60,11 +68,32 @@ export class CreateResourceComponent implements
     this.rs.register(this.elem, this);
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+  }
+
   onSubmit() {
     this.rs.exec(this.elem);
   }
 
   async dvOnExec(): Promise<void> {
+    if (!_.isEmpty(this.waitOn)) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => _.isNil(this[field]))
+        .tap((fs) => {
+          this.activeWaits = new Set(fs);
+
+          return fs;
+        })
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
+    }
     const resource: Resource = {
       id: this.id,
       ownerId: this.ownerId,

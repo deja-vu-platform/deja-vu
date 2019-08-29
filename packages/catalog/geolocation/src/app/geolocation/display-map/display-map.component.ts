@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, NgZone,
-  OnChanges, OnInit, Output
+  OnChanges, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   ConfigServiceFactory,
@@ -23,6 +23,7 @@ import {
 } from '../shared/geolocation.model';
 
 import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 
 @Component({
@@ -32,12 +33,20 @@ import * as _ from 'lodash';
 })
 export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
+
   public options: L.MapOptions;
   public bounds: L.LatLngBounds;
   public layers: L.Layer[];
   public mapType: 'gmap' | 'leaflet' | undefined;
 
   private _markers: Marker[];
+  private _markerIds: string[];
   private _map: L.Map;
   private _geocoder: any;
   private _geocodeMarker: L.Marker;
@@ -49,12 +58,16 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   });
 
   @Input() id = DEFAULT_MAP_ID;
-  @Input() waitOnId = false;
 
   // If not provided, all markers associated with `id` will be loaded
   get markers() { return this._markers; }
   @Input() set markers(markers: Marker[]) {
     this._markers = markers;
+  }
+
+  get markersIds() { return this._markerIds; }
+  @Input() set markerIds(markerIds: string[]) {
+    this._markerIds = markerIds;
   }
 
   // Filter points by radius in miles
@@ -111,8 +124,23 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
   load() {
@@ -258,16 +286,32 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const filter = { ofMapId: this.id };
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
+      const f = { ofMapId: this.id };
       if (this.center && this.radius) {
-        filter['centerLat'] = this.center.latitude;
-        filter['centerLng'] = this.center.longitude;
-        filter['radius'] = this.radius;
+        f['centerLat'] = this.center.latitude;
+        f['centerLng'] = this.center.longitude;
+        f['radius'] = this.radius;
+      }
+      if (!_.isNil(this._markerIds)) {
+        f['markerIds'] = this._markerIds;
       }
       this.gs
         .get<{ data: { markers: Marker[] } }>(this.apiPath, {
           params: {
-            inputs: JSON.stringify({ input: filter }),
+            inputs: JSON.stringify({ input: f }),
             extraInfo: {
               returnFields: `
                 title
@@ -292,10 +336,5 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     } else {
       return !!(this.id && this.gs);
     }
-  }
-
-  private idIsReady(): boolean {
-    return this.id !== DEFAULT_MAP_ID ||
-      (this.id === DEFAULT_MAP_ID && !this.waitOnId);
   }
 }

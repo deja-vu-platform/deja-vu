@@ -43,7 +43,7 @@ export class ChooseObjectComponent implements
    */
   @Input() showOnly: string[];
   /**
-   * List of property names to pass to showObject actoin
+   * List of property names to pass to showObject component
    * (For the default showObject, this will cause
    * these properties to not be shown)
    */

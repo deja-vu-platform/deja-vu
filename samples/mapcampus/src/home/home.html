@@ -1,25 +1,51 @@
 <dv.component name="home">
   <mapcampus.navbar />
 
+  <dv.tx>
+    <authentication.authenticate as auth-show-groups
+      user=mapcampus.navbar.loggedInUser waitOn=['user']
+      hidden=true />
+    <group.show-groups
+      withMemberId=mapcampus.navbar.loggedInUser?.id
+      waitOn=['withMemberId']
+      hidden=true />
+  </dv.tx>
+  <dv.tx>
+    <authentication.authenticate as auth-objects
+      user=mapcampus.navbar.loggedInUser waitOn=['user'] hidden=true />
+    <eventInfo.show-objects
+      fieldMatching={
+        groupId: { q_in: group.show-groups.groupIds },
+        waitOn: ['groupId.q_in']
+      }
+      hidden=true />
+  </dv.tx>
+  <dv.pick
+    entities=eventInfo.show-objects.objects keys=['id']
+    flatten=true hidden=true />
+
   <div id="homepage-container">
-    <div id="homepage-left">
-      <!-- TODO: Search by Location, Time, Private/ Public -->
-      <h2>Coming Soon: Search for events!</h2>
-    </div>
-    <div id="homepage-right">
-      <div class="card">
-        <div class="card-body">
+    <div class="card">
+      <div class="card-body">
+        <dv.tx>
+          <authentication.authenticate as auth-show-objects
+            user=mapcampus.navbar.loggedInUser
+            waitOn=['user']
+            hidden=true />
           <geolocation.display-map
-            id="homeMapId"
+            markerIds=dv.pick.pickedEntities
+            waitOn=['markerIds']
             lat=42.3589
             lng=-71.0935
             zoom=15
             showSearchControl=false
             showDirectionsControl=false />
-
-          <div class="container-fluid event-card-container">
-            <event.show-events showEvent=<mapcampus.show-event-info id=$event?.id /> />
-          </div>
+        </dv.tx>
+        <div class="container-fluid event-card-container">
+          <dv.show-entities
+            entities=dv.pick.pickedEntities
+            noEntitiesToShowText='No events yet. Check again later'
+            showEntity=<mapcampus.show-event-info id=$entity /> />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
-  ViewChild
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  SimpleChanges, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -15,6 +15,7 @@ import {
 import { ShowMemberComponent } from '../show-member/show-member.component';
 
 import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -24,8 +25,13 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-group.component.html',
   styleUrls: ['./create-group.component.css']
 })
-export class CreateGroupComponent
-implements OnInit, OnExecSuccess, OnExecFailure {
+export class CreateGroupComponent implements OnInit, OnExecSuccess,
+  OnExecFailure, OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
   @Input() id: string | undefined;
 
   @Input()
@@ -49,6 +55,7 @@ implements OnInit, OnExecSuccess, OnExecFailure {
   };
 
   @Input() stageHeader: ComponentValue | undefined;
+  @Input() resetOnExecSuccess = true;
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';
@@ -83,11 +90,33 @@ implements OnInit, OnExecSuccess, OnExecFailure {
     this.rs.register(this.elem, this);
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+  }
+
   onSubmit() {
     this.rs.exec(this.elem);
   }
 
   async dvOnExec(): Promise<void> {
+    if (!_.isEmpty(this.waitOn)) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => {
+          if (field === 'members' || field === 'memberIds') {
+            return _.isNil(this.membersAutocomplete.value);
+          } else {
+            return _.isNil(this[field]);
+          }
+        })
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
+    }
     const res = await this.gs.post<{data: any}>('/graphql', {
       inputs: {
         input: {
@@ -110,7 +139,7 @@ implements OnInit, OnExecSuccess, OnExecFailure {
     }
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
-    if (this.form) {
+    if (this.resetOnExecSuccess && this.form) {
       this.form.resetForm();
     }
   }

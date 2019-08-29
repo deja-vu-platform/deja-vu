@@ -1,8 +1,9 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 /**
@@ -34,7 +35,7 @@ export class PickComponent implements OnInit, OnChanges {
    * and make the value stand on its own
    * When flatten is set to true, keys.length() must be 1.
    */
-  @Input() flatten: false;
+  @Input() flatten = false;
 
   /**
    * The list of entities with the picked fields

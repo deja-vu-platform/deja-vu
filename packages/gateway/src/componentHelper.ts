@@ -169,6 +169,7 @@ export class ComponentHelper {
    *  @returns the included component tag or `null` if there is no included tag.
    *    It is `null` if there is no default component and the user hasn't
    *    provided one as input
+   *  @throws Error if it can't figure out the included component tag
    */
   private static GetIncludedComponentTag(includeComponentTag: ComponentTag)
     : ComponentTag | null {
@@ -462,6 +463,7 @@ export class ComponentHelper {
 
   /**
    * @returns true if the given component path is expected
+   * @throws error if an include component cannot be determined
    */
   componentPathIsValid(componentPath: ComponentPath): boolean {
     return !_.isEmpty(this.getMatchingComponents(componentPath));
@@ -470,6 +472,7 @@ export class ComponentHelper {
   /**
    * @returns the `ComponentTag`s corresponding to the last node of the
    * component path
+   * @throws error if an include component cannot be determined
    */
   getMatchingComponents(componentPath: ComponentPath): ComponentTag[] {
     return <ComponentTag[]> _.map(this.getMatchingPaths(componentPath), _.last);
@@ -477,6 +480,7 @@ export class ComponentHelper {
 
   /**
    * @returns the `ComponentTag`s corresponding to the given component path
+   * @throws error if an include component cannot be determined
    */
   getMatchingPaths(componentPath: ComponentPath): ComponentTagPath[] {
     // We assume here that the first tag in the component path is a simple tag
@@ -506,6 +510,9 @@ export class ComponentHelper {
       .map((matchingPath) => [ matchingNode, ...matchingPath ]);
   }
 
+  /**
+   * @throws error if an include component cannot be determined
+   */
   private _getMatchingPaths(
     componentPath: ComponentPath,
     componentAst: ComponentAst | undefined
@@ -538,6 +545,7 @@ export class ComponentHelper {
   /**
    *  @param componentTag - the component tag to get the content from
    *  @returns the content for the given component tag
+   *  @throws error if there's an include tag that cannot be determined
    */
   private getContent(componentTag: ComponentTag)
     : ComponentAst | undefined {

@@ -103,6 +103,9 @@ OnChanges {
     if (fieldMatching && schema) {
       const adjustedFields = _.mapValues(fieldMatching,
         (value, key) => {
+        if (key === 'id') {
+          return _.isPlainObject(value) ? JSON.stringify(value) : value;
+        }
         const schemaObjects = _.filter(schema, _.matches({name: key}));
         if (!schemaObjects || schemaObjects.length === 0) {
           throw new Error ('field ' + key + ' in fieldMatching ' +
@@ -112,7 +115,7 @@ OnChanges {
         if (schemaObject.type === 'boolean' && !value) {
           return null;
         } else {
-          return value;
+          return _.isPlainObject(value) ? JSON.stringify(value) : value;
         }
       });
 
@@ -146,7 +149,7 @@ OnChanges {
       const fmChanges = changes['fieldMatching'];
       if (fmChanges) {
         for (const field of this.fieldMatching['waitOn']) {
-          if (!_.isNil(this.fieldMatching[field])) {
+          if (!_.isNil(_.get(this.fieldMatching, field))) {
             this.fieldChange.emit(field);
           }
         }
@@ -167,7 +170,7 @@ OnChanges {
       const fmWaitOn = _.get(this.fieldMatching, 'waitOn');
       if (!_.isEmpty(fmWaitOn)) {
         await Promise.all(_.chain(fmWaitOn)
-          .filter((field) => _.isNil(this.fieldMatching[field]))
+          .filter((field) => _.isNil(_.get(this.fieldMatching, field)))
           .map((fieldToWaitFor) => this.fieldChange
             .pipe(filter((field) => field === fieldToWaitFor), take(1))
             .toPromise())

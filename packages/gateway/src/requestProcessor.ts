@@ -523,6 +523,7 @@ export abstract class RequestProcessor {
 
 export class AppRequestProcessor extends RequestProcessor {
   private readonly componentHelper: ComponentHelper;
+  private readonly dvConfig: DvConfig | undefined;
 
   constructor(
     config: GatewayConfig,
@@ -530,6 +531,7 @@ export class AppRequestProcessor extends RequestProcessor {
     appComponentTable?: ComponentTable
   ) {
     super(config);
+    this.dvConfig = dvConfig;
 
     _.forEach(dvConfig.usedConcepts, (conceptConfig, name) => {
       this.dstTable[name] = conceptConfig.config.wsPort;
@@ -554,13 +556,23 @@ export class AppRequestProcessor extends RequestProcessor {
   }
 
   protected getComponentFromPath(componentPath: ComponentPath): ComponentTag {
-    return this.componentHelper.getMatchingComponents(componentPath)[0];
+    try {
+      return this.componentHelper.getMatchingComponents(componentPath)[0];
+    } catch (e) {
+      e.message = `Error in component path ${componentPath}: ${e.message}`;
+      throw e;
+    }
   }
 
   protected getCohortComponents(
     componentPath: ComponentPath, dvTxNodeIndex: number) {
-    const paths: ComponentTagPath[] = this.componentHelper
-      .getMatchingPaths(componentPath);
+    let paths: ComponentTagPath[];
+    try {
+      paths = this.componentHelper.getMatchingPaths(componentPath);
+    } catch (e) {
+      e.message = `Error in component path ${componentPath}: ${e.message}`;
+      throw e;
+    }
     // We know that the component path is a valid one because if otherwise the
     // tx would have never been initiated in the first place
     const debugPaths = _.map(
@@ -611,7 +623,8 @@ export class AppRequestProcessor extends RequestProcessor {
       const componentRequestExists = fqTagsSet.has(component.fqtag);
 
       if (!componentRequestExists &&
-        !this.componentHelper.isRequestOptional(component.tag)) {
+        !this.componentHelper.isRequestOptional(component.tag) &&
+        !this.isAppComponent(component)) {
         throw new RequestInvalidError(`Did not get any requests from ` +
         `${component.fqtag} and ${component.tag}'s request is not optional`);
       }
@@ -627,6 +640,10 @@ export class AppRequestProcessor extends RequestProcessor {
     }
 
     return prunedCohortComponents;
+    }
+
+  private isAppComponent(componentTag: ComponentTag): boolean {
+    return this.dvConfig.name === componentTag.tag.split('-')[0];
   }
 }
 
