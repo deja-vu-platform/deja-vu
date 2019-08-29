@@ -3,11 +3,10 @@
 
   <dv.if condition=$id>
     <sweetspots.show-user-profile-details id=$id
-      loggedInUserId=sweetspots.navbar.loggedInUserId/>
+      loggedInUserId=sweetspots.navbar.loggedInUser?.id/>
   </dv.if>
   <dv.if condition=!$id>
-    <sweetspots.show-user-profile-details id=sweetspots.navbar.loggedInUserId
-      loggedInUserId=sweetspots.navbar.loggedInUserId />
+    <sweetspots.show-user-profile-details id=sweetspots.navbar.loggedInUser?.id
+      loggedInUserId=sweetspots.navbar.loggedInUser?.id />
   </dv.if>
-
 </dv.component>

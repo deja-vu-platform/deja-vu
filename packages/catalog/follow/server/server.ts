@@ -49,11 +49,11 @@ const componentRequestTable: ComponentRequestTable = {
           }
         `;
       default:
-        throw new Error('Need to specify extraInfo.component');
+        throw new Error('Need to specify extraInfo.action');
     }
   },
   'follow-unfollow': (extraInfo) => {
-    switch (extraInfo.component) {
+    switch (extraInfo.action) {
       case 'follow':
         return `
           mutation FollowUnfollow($input: FollowUnfollowInput!) {
@@ -73,7 +73,7 @@ const componentRequestTable: ComponentRequestTable = {
           }
         `;
       default:
-        throw new Error('Need to specify extraInfo.component');
+        throw new Error('Need to specify extraInfo.action');
     }
   },
   'show-followers': (extraInfo) => `

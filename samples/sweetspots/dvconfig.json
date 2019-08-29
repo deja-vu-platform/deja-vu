@@ -1,40 +1,18 @@
 {
   "name": "sweetspots",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "rating": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "authentication": {},
+    "authorization": {},
+    "comment": {},
+    "rating": {},
     "geolocation": {
       "config": {
-        "mapType": "leaflet",
-        "reinitDbOnStartup": true
+        "mapType": "leaflet"
       }
     },
-    "follow": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "follow": {},
     "label": {
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": [
           "bathroom", "nap space", "water fountain", "study space"
         ]
@@ -42,7 +20,6 @@
     },
     "property": {
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "SpotDetails",
           "type": "object",

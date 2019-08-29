@@ -2,19 +2,20 @@
   <sweetspots.navbar showSearch=true accessRequired=false />
 
   <div id="left-main-div">
-    <dv.if condition=sweetspots.navbar.loggedInUserId && !sweetspots.navbar.searchResults>
+    <dv.if condition=sweetspots.navbar.loggedInUser?.id &&
+      !sweetspots.navbar.searchResults>
       <dv.if condition=!geolocation.display-map.newMarker>
         <sweetspots.add-a-spot />
       </dv.if>
 
       <dv.if condition=geolocation.display-map.newMarker>
         <sweetspots.add-a-spot-form
-          loggedInUserId=sweetspots.navbar.loggedInUserId
+          loggedInUserId=sweetspots.navbar.loggedInUser?.id
           marker=geolocation.display-map.newMarker/>
       </dv.if>
     </dv.if>
 
-    <dv.if condition=!sweetspots.navbar.loggedInUserId>
+    <dv.if condition=!sweetspots.navbar.loggedInUser?.id>
         To create spots, please sign in or register.
     </dv.if>
 
@@ -28,11 +29,13 @@
       </div>
     </dv.if>
   </div>
+  <dv.pick entities=sweetspots.navbar.searchResults keys=['id']
+    flatten=true hidden=true />
 
   <div id="map-div">
-    <!-- TODO: Only show spots from search results - need to provide markerIds -->
-    <geolocation.display-map id="mainMapId"
+    <geolocation.display-map
+      markerIds=dv.pick.pickedEntities
+      waitOn=['markerIds']
       showDirectionsControl=false />
   </div>
-
 </dv.component>
