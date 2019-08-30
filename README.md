@@ -43,7 +43,9 @@ assembled with much less effort.
 
 ## Create an App
 
-- If you haven't done so already, install [Node.js](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+
+- If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
+users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352)
+- If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
 - In a separate terminal, start MongoDB locally with `mongod`
 - On the root directory of your new repo, run `npm start` and visit
@@ -78,7 +80,7 @@ create commits and run `git push heroku` again.
 
 ## Contributing
 
-In addition to [node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
+In addition to [node](https://nodejs.org) v9-11 ([not v12](https://github.com/spderosso/deja-vu/issues/352)) and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
 Note: If you see errors of the kind `npm` not found, it means
 that you don't have `npm`. Usually, npm is distributed with node, but depending on how you
