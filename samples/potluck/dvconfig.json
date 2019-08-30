@@ -1,36 +1,18 @@
 {
   "name": "potluck",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "authentication": {},
+    "authorization": {},
     "transfer": {
       "config": {
-        "reinitDbOnStartup": true,
         "balanceType": "items"
       }
     },
-    "event": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "group": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "event": {},
+    "group": {},
     "party": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Party",
           "type": "object",
@@ -52,7 +34,6 @@
     "supply": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Good",
           "type": "object",

@@ -13,11 +13,17 @@
 
       <div class="col-md-9">
         <div>
-          <authorization.show-resources
-            viewableBy=potluck.navbar.loggedInUserId
-            noResourcesText="No parties to show"
-            showResource=<potluck.show-party partyId=$id
-              loggedInUserId=potluck.navbar.loggedInUserId /> />
+          <dv.tx>
+            <authentication.authenticate
+              user=potluck.navbar.loggedInUser
+              waitOn=['user'] hidden=true />
+            <authorization.show-resources
+              viewableBy=potluck.navbar.loggedInUser?.id
+              waitOn=['viewableBy']
+              noResourcesText="No parties to show"
+              showResource=<potluck.show-party partyId=$id
+                loggedInUserId=potluck.navbar.loggedInUser?.id /> />
+          </dv.tx>
         </div>
       </div>
     </div>
