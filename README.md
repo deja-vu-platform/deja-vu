@@ -80,10 +80,17 @@ create commits and run `git push heroku` again.
 
 In addition to [node](https://nodejs.org) v9+ and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
+Note: If you see errors of the kind `npm` not found, it means
+that you don't have `npm`. Usually, npm is distributed with node, but depending on how you
+installed node you might have to additionally install npm.
+
 Each concept and sample is its own node project. We use yarn workspaces to make
-it easier to build and install all packages. To install and build everything
-do `yarn` (running `yarn` with no command will run `yarn install`). Unfortunately,
-yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
+it easier to build and install all packages. First,
+[clone](https://help.github.com/en/articles/cloning-a-repository) this github repo.
+Then, `cd` into the project source directory. 
+Once you are there, run `yarn` to install and build everything
+(running `yarn` with no command will run `yarn install`).
+Unfortunately, yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
 affects our installation process, so the first `yarn` will fail. After
 the first `yarn` fails, run `yarn --check-files` and everything should work.
 
