@@ -7,8 +7,7 @@
   },
   "private": true,
   "devDependencies": {
-    "@deja-vu/cli": "0.0.1",
-    "prettier": "^1.18.2"
+    "@deja-vu/cli": "0.0.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",

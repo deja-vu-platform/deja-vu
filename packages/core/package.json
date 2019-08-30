@@ -9,7 +9,9 @@
     "dv-package-dv": "ng-packagr -p ng-package.json",
     "lint": "tslint -p . -c tslint.json src/*.ts",
     "lint-fix": "tslint --fix -p . -c tslint.json src/*.ts",
-    "clean": "rm -rf ./dist ./pkg"
+    "clean": "rm -rf ./dist ./pkg",
+    "dv": "dv",
+    "tsc": "tsc"
   },
   "peerDependencies": {
     "@angular/common": "^5.2.0",
