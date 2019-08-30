@@ -5,36 +5,25 @@
       <authentication.show-user id=$targetId showId=false />
     </div>
 
-    <!-- TODO: Connection Opened -->
-    <div class="col-md-2">coming soon</div>
-
-    <!-- TODO: Connection Ended -->
-    <div class="col-md-2">coming soon</div>
-
-    <!-- Connect again? -->
-    <div class="col-md-2">
-      <dv.tx>
-        <match.create-match userAId=$sourceId userBId=$targetId hidden=true />
-        <authentication.authenticate id=$sourceId hidden=true />
-        <dv.button>Connect Again?</dv.button>
-        <dv.callback defaultHref="/dashboard" onExecSuccess=true hidden=true />
-      </dv.tx>
-    </div>
-
     <!-- Notes -->
     <div class="col-md-4">
       <dv.tx>
-        <!-- TODO: Limit message length -->
-        <comment.create-comment authorId=$sourceId
+        <authentication.authenticate as auth-create-note
+          user=$loggedInUserId waitOn=['id'] hidden=true />
+        <comment.create-comment authorId=$loggedInUserId
           targetId=$targetId
           buttonLabel="Add Note"
           inputLabel=""
           newCommentSavedText="Note added" />
       </dv.tx>
 
-      <comment.show-comments byAuthorId=$sourceId
-        showId=false showAuthorId=false showTargetId=false
-        noCommentsToShowText=""/>
+      <dv.tx>
+        <authentication.authenticate as auth-show-notes
+          user=$loggedInUserId waitOn=['id'] hidden=true />
+        <comment.show-comments byAuthorId=$loggedInUserId
+          showId=false showAuthorId=false showTargetId=false
+          noCommentsToShowText=""/>
+      </dv.tx>
     </div>
   </div>
 </dv.component>

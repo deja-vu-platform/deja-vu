@@ -1,5 +1,8 @@
 <dv.component name="show-suggestion">
-  <match.show-match userAId=$loggedInUserId userBId=$id hidden=true />
+  <match.show-match
+    userAId=$loggedInUserId userBId=$id
+    waitOn=['userAId', 'userBId']
+    hidden=true />
 
   <!-- Only show other people, not oneself; shouldn't be matched -->
   <dv.if condition=$loggedInUserId !== $id && !match.show-match.loadedMatch
@@ -7,15 +10,19 @@
     <phoenix.show-user-info userId=$id />
 
     <div class="interest">
-      <match.show-attempts sourceId=$loggedInUserId targetId=$id hidden=true />
+      <match.show-attempts
+        sourceId=$loggedInUserId targetId=$id
+        waitOn=['sourceId', 'targetId'] hidden=true />
 
       <!-- The current user already has indicated interest -->
-      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length !== 0>
+      <dv.if condition=match.show-attempts.loadedAttempts &&
+        match.show-attempts.loadedAttempts.length !== 0>
         Indicated interest!
       </dv.if>
 
       <!-- The current user has not indicated interest -->
-      <dv.if condition=match.show-attempts.loadedAttempts && match.show-attempts.loadedAttempts.length === 0>
+      <dv.if condition=match.show-attempts.loadedAttempts &&
+        match.show-attempts.loadedAttempts.length === 0>
         <dv.tx>
           <dv.status savedText="Indicated interest!" />
           <match.attempt-match sourceId=$loggedInUserId targetId=$id

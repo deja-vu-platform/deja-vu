@@ -1,25 +1,12 @@
 {
   "name": "phoenix",
   "usedConcepts": {
-    "authentication": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "comment": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "authentication": {},
+    "authorization": {},
+    "comment": {},
     "topic": {
       "name": "label",
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": [
           "sexuality", "gender", "body image", "politics", "family"
         ]
@@ -27,18 +14,19 @@
     },
     "geolocation": {
       "config": {
-        "mapType": "leaflet",
-        "reinitDbOnStartup": true
+        "mapType": "leaflet"
       }
     },
     "personalinfo": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "PersonalInfo",
           "type": "object",
           "properties": {
+            "email": {
+              "type": "string"
+            },
             "description": {
               "type": "string",
               "maxLength": 250
@@ -51,18 +39,13 @@
             }
           }
         },
-        "required": ["description", "zipCode", "locationRadius"]
+        "required": ["email", "description", "zipCode", "locationRadius"]
       }
     },
-    "match": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
+    "match": {},
     "connectionhistory": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Connection History",
           "type": "object",
@@ -75,11 +58,7 @@
         }
       }
     },
-    "schedule": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    }
+    "schedule": {}
   },
   "routes": [
     { "path": "/dashboard", "component": "show-dashboard" },

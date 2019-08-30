@@ -1,6 +1,6 @@
 import {
-  AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, Input,
-  OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, SimpleChanges, Type
 } from '@angular/core';
 
 import { Subject } from 'rxjs/Subject';
@@ -26,9 +26,11 @@ import {
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
 import { Schedule } from '../shared/schedule.model';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 const DRAG_TIMEOUT = 1000;
@@ -60,6 +62,12 @@ interface UpdateScheduleRes {
 })
 export class UpdateScheduleComponent implements AfterViewInit,
   OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   @Input() id: string;
   @Input() showOptionToSubmit = true;
 
@@ -94,43 +102,74 @@ export class UpdateScheduleComponent implements AfterViewInit,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private cd: ChangeDetectorRef,
-    @Inject(API_PATH) private apiPath) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadSchedule();
-  }
-
-  ngOnChanges() {
-    this.loadSchedule();
   }
 
   ngAfterViewInit() {
-    this.cd.detectChanges();
+    this.load();
   }
 
-  loadSchedule() {
-    if (!this.gs || !this.id) {
-      return;
-    }
-
-    this.gs.get<ScheduleRes>(this.apiPath, {
-      params: {
-        inputs: { id: this.id },
-        extraInfo: {
-          action: 'load',
-          returnFields: 'id, availability { id, startDate, endDate }'
-        }
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
       }
-    })
-      .subscribe((res) => {
-        if (!_.isNil(res.data.schedule)) {
-          this.schedule = res.data.schedule;
-          this.events = slotsToCalendarEvents(this.schedule.availability, true);
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
+  }
+
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
+      this.gs.get<ScheduleRes>(this.apiPath, {
+        params: {
+          inputs: { id: this.id },
+          extraInfo: {
+            action: 'load',
+            returnFields: 'id, availability { id, startDate, endDate }'
+          }
         }
-      });
+      })
+        .subscribe((res) => {
+          if (!_.isNil(res.data.schedule)) {
+            this.schedule = res.data.schedule;
+            this.events = slotsToCalendarEvents(
+              this.schedule.availability, true);
+          }
+        });
+    }
   }
 
   handleEvent(event: CalendarEvent): void {
@@ -222,5 +261,9 @@ export class UpdateScheduleComponent implements AfterViewInit,
 
   dvOnExecFailure(reason: Error) {
     this.updateScheduleError = reason.message;
+  }
+
+  private canEval(): boolean {
+    return !!(this.gs && this.id);
   }
 }

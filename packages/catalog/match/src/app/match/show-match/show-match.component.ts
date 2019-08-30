@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output
+  OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -14,6 +14,9 @@ interface ShowMatchRes {
   data: { match: Match };
 }
 
+import * as _ from 'lodash';
+import { filter, take } from 'rxjs/operators';
+
 
 @Component({
   selector: 'match-show-match',
@@ -21,6 +24,12 @@ interface ShowMatchRes {
 })
 export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
   OnInit {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   // Provide one of the following: id, (userAId and userBId) or match
   @Input() id: string | undefined;
   @Input() userAId: string | undefined;
@@ -48,8 +57,23 @@ export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
   load() {
@@ -60,6 +84,19 @@ export class ShowMatchComponent implements AfterViewInit, OnChanges, OnEval,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
       this.gs.get<ShowMatchRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
