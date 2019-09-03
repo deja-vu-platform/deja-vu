@@ -10,7 +10,7 @@
         <div class="row">
           <div class="offset-1 col-3">
             <!-- Participant Name -->
-            <userprofile.create-object id=dv.gen-id.id
+            <userProfile.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
           <div class="col-2">
@@ -28,18 +28,18 @@
               showOptionToSubmit=false />
           </div>
           <div class="col-2 center">
-            <climberscore.create-score targetId=dv.gen-id.id
+            <climberScore.create-score targetId=dv.gen-id.id
               sourceId=$competitionId
               value=0
               hidden=true />
-            <climbercode.create-passkey id=dv.gen-id.id
+            <climberCode.create-passkey id=dv.gen-id.id
               randomPassword=true
               signIn=false
               showOptionToSubmit=false />
-            <competitionclimbers.add-to-group id=$competitionId
+            <competitionClimbers.add-to-group id=$competitionId
               memberId=dv.gen-id.id
               hidden=true />
-            <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+            <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 
             <dv.button class="add">
               <img src="assets/add.png" />

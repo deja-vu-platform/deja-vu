@@ -1,6 +1,6 @@
 <dv.component name="create-climb">
   <category.show-labels hidden=true />
-  <competitionclimbers.show-members inGroupId=$competitionId hidden=true />
+  <competitionClimbers.show-members inGroupId=$competitionId hidden=true />
 
   <div class="card">
     <div class="card-body">
@@ -19,13 +19,13 @@
               showOptionToSubmit=false />
           </div>
 
-          <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+          <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 
           <task.create-tasks-for-assignees showOptionToInputDueDate=false
-            assigneeIds=competitionclimbers.show-members.loadedMemberIds
+            assigneeIds=competitionClimbers.show-members.loadedMemberIds
             assignerId=dv.gen-id.id
             hidden=true />
-          <competitionclimbs.add-to-group id=$competitionId
+          <competitionClimbs.add-to-group id=$competitionId
             memberId=dv.gen-id.id
             hidden=true />
           <dv.button class="add">

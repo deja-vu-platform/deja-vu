@@ -1,5 +1,5 @@
 <dv.component name="show-leaderboard-entry">
-  <userprofile.show-object id=$climber.id hidden=true />
+  <userProfile.show-object id=$climber.id hidden=true />
 
   <div class="card">
     <div class="card-body entry-card-body">
@@ -7,7 +7,7 @@
         <div class="col-3 center">
           <h2 class="teal">
             <!-- Climber Rank -->
-            <climberscore.show-target target=$climber
+            <climberScore.show-target target=$climber
               index=$rank+1
               showIndex=true
               showId=false
@@ -19,18 +19,18 @@
         <div class="col-6">
           <!-- Climber Name -->
           <h2 class="status">
-            <userprofile.show-object class="inline-block"
-              object=userprofile.show-object.loadedObject
+            <userProfile.show-object class="inline-block"
+              object=userProfile.show-object.loadedObject
               showOnly=['firstName'] />
-            <userprofile.show-object class="inline-block"
-              object=userprofile.show-object.loadedObject
+            <userProfile.show-object class="inline-block"
+              object=userProfile.show-object.loadedObject
               showOnly=['lastName'] />
           </h2>
         </div>
 
         <div class="col-3 center">
           <!-- Climber Score -->
-          <climberscore.show-target target=$climber
+          <climberScore.show-target target=$climber
             showIndex=false
             showId=false
             showScores=false

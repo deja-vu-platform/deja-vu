@@ -1,75 +1,42 @@
 {
   "name": "livescorecard",
   "usedConcepts": {
-    "hostauthentication": {
-      "name": "authentication",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "hostAuthentication": {
+      "name": "authentication"
     },
-    "climbercode": {
-      "name": "passkey",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "climberCode": {
+      "name": "passkey"
     },
-    "competitioncode": {
-      "name": "passkey",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionCode": {
+      "name": "passkey"
     },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "authorization": {},
+    "event": {},
+    "task": {},
+    "competitionHosts": {
+      "name": "group"
     },
-    "event": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionClimbers": {
+      "name": "group"
     },
-    "task": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "competitionhosts": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "competitionclimbers": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "competitionclimbs": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionClimbs": {
+      "name": "group"
     },
     "sex": {
       "name": "label",
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": ["female", "male"]
       }
     },
     "category": {
       "name": "label",
       "config": {
-        "reinitDbOnStartup": true,
         "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
       }
     },
-    "userprofile": {
+    "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "UserProfile",
           "type": "object",
@@ -88,7 +55,6 @@
     "climb": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Climb",
           "type": "object",
@@ -107,7 +73,6 @@
     "competition": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Competition",
           "type": "object",
@@ -123,7 +88,7 @@
         }
       }
     },
-    "climberscore" : {
+    "climberScore" : {
       "name": "scoring",
       "config": {
         "oneToOneScoring": false

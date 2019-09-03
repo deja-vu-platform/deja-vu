@@ -21,7 +21,7 @@
                 <!-- TODO: get rid of success text? -->
                 <dv.status savedText="Climb completed!" />
                 <task.complete-task id=$task.id hidden=true />
-                <climberscore.create-score
+                <climberScore.create-score
                   sourceId=$competitionId
                   targetId=$climber?.id
                   value=climb.show-object.loadedObject?.score - falls.show-target.loadedTarget?.total
@@ -41,7 +41,7 @@
                 <task.complete-task as complete-climb-no-falls-task
                   id=$task.id hidden=true />
 
-                <climberscore.create-score as record-score-no-falls-scoring
+                <climberScore.create-score as record-score-no-falls-scoring
                   sourceId=$competitionId
                   targetId=$climber?.id
                   value=climb.show-object.loadedObject?.score

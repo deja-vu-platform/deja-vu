@@ -1,7 +1,7 @@
 <dv.component name="spectator-navbar"
-  competitionId$=competitioncode.logged-in.passkey.id>
+  competitionId$=competitionCode.logged-in.passkey.id>
   <dv.tx>
-    <competitioncode.logged-in hidden=true />
+    <competitionCode.logged-in hidden=true />
     <dv.redirect href="/login/spectator" onEvalFailure=true />
   </dv.tx>
 
@@ -18,7 +18,7 @@
         <div class="nav-item">
           <dv.link class="nav-link" href="/spectator/rules"
             params={
-              competitionId: competitioncode.logged-in.passkey?.id,
+              competitionId: competitionCode.logged-in.passkey?.id,
               isSpectator: true
             }>
             Rules
@@ -26,7 +26,7 @@
         </div>
         <div class="nav-item">
           <dv.tx>
-            <competitioncode.sign-out hidden=true />
+            <competitionCode.sign-out hidden=true />
             <dv.link class="nav-link" href="/login/spectator">Log Out</dv.link>
           </dv.tx>
         </div>

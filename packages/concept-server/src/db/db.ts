@@ -19,7 +19,7 @@ export const EMPTY_CONTEXT: Context = {
 };
 
 export function isSuccessfulContext(context: Context): boolean {
-  return context.reqType == undefined || context.reqType == 'commit';
+  return context.reqType === undefined || context.reqType === 'commit';
 }
 
 export class ConceptDbError extends Error {

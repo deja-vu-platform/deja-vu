@@ -1,6 +1,5 @@
 <dv.component name="show-hosts">
   <livescorecard.host-navbar />
-
   <div class="container below-navbar">
     <div class="row">
       <div class="col-4">
@@ -13,14 +12,10 @@
         Email
       </div>
     </div>
-
     <br />
-
     <livescorecard.create-host competitionId=$competitionId
       loggedInUserId=livescorecard.host-navbar.loggedInUserId />
-
-    <competitionhosts.show-members inGroupId=$competitionId
+    <competitionHosts.show-members inGroupId=$competitionId
       showMember=<livescorecard.show-host id=$id /> />
-
   </div>
 </dv.component>

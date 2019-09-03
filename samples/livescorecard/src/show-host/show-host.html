@@ -1,5 +1,5 @@
 <dv.component name="show-host">
-  <userprofile.show-object id=$id hidden=true />
+  <userProfile.show-object id=$id hidden=true />
 
   <div class="card">
     <div class="card-body">
@@ -7,23 +7,23 @@
         <div class="col-4">
           <p>
             <!-- First Name -->
-            <userprofile.show-object
-              object=userprofile.show-object.loadedObject
+            <userProfile.show-object
+              object=userProfile.show-object.loadedObject
               showOnly=['firstName'] />
           </p>
         </div>
         <div class="col-4">
           <p>
             <!-- Last Name -->
-            <userprofile.show-object
-              object=userprofile.show-object.loadedObject
+            <userProfile.show-object
+              object=userProfile.show-object.loadedObject
               showOnly=['lastName'] />
           </p>
         </div>
         <div class="col-4">
           <p>
             <!-- Username -->
-            <hostauthentication.show-user id=$id showId=false />
+            <hostAuthentication.show-user id=$id showId=false />
           </p>
         </div>
       </div>
