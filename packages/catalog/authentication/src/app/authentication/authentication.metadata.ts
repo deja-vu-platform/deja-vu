@@ -33,15 +33,13 @@ import {
   ShowUserCountComponent
 } from './show-user-count/show-user-count.component';
 export { ShowUserCountComponent };
-import { AuthenticateUsernameComponent } from './authenticate-username/authenticate-username.component';
-export { AuthenticateUsernameComponent };
 
 
 const allComponents = [
   AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
   RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
   ShowUsersComponent, ChooseUserComponent, ShowUserCountComponent,
-  ConfigWizardComponent, AuthenticateUsernameComponent
+  ConfigWizardComponent
 ];
 
 const metadata = {

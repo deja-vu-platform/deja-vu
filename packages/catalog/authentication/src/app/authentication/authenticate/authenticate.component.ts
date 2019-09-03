@@ -31,6 +31,7 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
   activeWaits = new Set<string>();
 
   @Input() id: string | undefined;
+  @Input() username: string | undefined;
   @Input() user: User | undefined;
   isAuthenticated = false;
 
@@ -64,7 +65,7 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
 
   async doAuthenticate() {
     if (!this.gs || (
-      _.isEmpty(this.id) && _.isEmpty(this.user) &&
+      _.isEmpty(this.id) && _.isEmpty(this.username) && _.isEmpty(this.user) &&
       _.isEmpty(this.waitOn))) {
       // this is essentialy failing the tx if there is one
       return this.gs.noRequest();
@@ -82,7 +83,8 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
       params: {
         inputs: {
           input: {
-            id: this.id ? this.id : this.user.id,
+            id: this.id ||  _.get(this.user, 'id'),
+            username: this.username || _.get(this.user, 'username'),
             token: token
           }
         }

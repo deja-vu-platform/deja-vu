@@ -4,8 +4,8 @@
       <scoreposts.show-score hidden=true
         sourceId=$user?.username targetId=$id />
       <dv.tx>
-        <authentication.authenticate-username as upvote-post-authenticate
-          user=$user hidden=true />
+        <authentication.authenticate as upvote-post-authenticate
+          username=$user?.username hidden=true />
         <scoreposts.create-score as upvote-post-create-score
           buttonDisabled=$disabled || !$user ||
             !scoreposts.show-score.errors
@@ -24,8 +24,8 @@
       <scorecomments.show-score hidden=true
         sourceId=$user?.username targetId=$id />
       <dv.tx>
-        <authentication.authenticate-username
-          user=$user hidden=true />
+        <authentication.authenticate
+          username=$user?.username hidden=true />
         <scorecomments.create-score
           buttonDisabled=$disabled || !$user ||
             !scorecomments.show-score.errors
