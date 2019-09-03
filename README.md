@@ -96,6 +96,11 @@ Unfortunately, yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) tha
 affects our installation process, so the first `yarn` will fail. After
 the first `yarn` fails, run `yarn --check-files` and everything should work.
 
+If `yarn --check-files` fails, try the following:
+- `cd packages/compiler` and `yarn package`
+- `cd ../cli` and `yarn package`
+- then `yarn --check-files` again
+
 Installation will take a while as it downloads dependencies and builds all
 concepts and core libraries. 
 
