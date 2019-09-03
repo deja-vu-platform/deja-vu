@@ -35,12 +35,18 @@ input VerifyInput {
   token: String!
 }
 
+input VerifyUsernameInput {
+  username: String!
+  token: String!
+}
+
 type Query {
   user(username: String!): User
   userById(id: String!): User
   userCount: Int
   users(input: UsersInput!): [User!]
   verify(input: VerifyInput!): Boolean
+  verifyUsername(input: VerifyUsernameInput!): Boolean
 }
 
 type Mutation {

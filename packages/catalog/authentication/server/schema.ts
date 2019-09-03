@@ -36,3 +36,8 @@ export interface VerifyInput {
   id: string;
   token: string;
 }
+
+export interface VerifyUsernameInput {
+  username: string;
+  token: string;
+}

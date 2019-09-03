@@ -13,8 +13,8 @@
         <h1>Submit</h1>
         <dv.tx>
           <dv.gen-id />
-          <authentication.authenticate
-            id=sn.navbar.user.id hidden=true />
+          <authentication.authenticate-username
+            user=sn.navbar.user hidden=true />
           <post.create-object
             id=dv.gen-id.id
             initialValue={ author: sn.navbar.user.username }

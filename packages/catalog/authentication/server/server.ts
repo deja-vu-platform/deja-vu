@@ -21,7 +21,8 @@ import {
   SignInOutput,
   User,
   UserDoc,
-  VerifyInput
+  VerifyInput,
+  VerifyUsernameInput
 } from './schema';
 
 
@@ -109,6 +110,11 @@ const componentRequestTable: ComponentRequestTable = {
   authenticate: (extraInfo) => `
     query Authenticate($input: VerifyInput!) {
       verify(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'authenticate-username': (extraInfo) => `
+    query AuthenticateUsername($input: VerifyUsernameInput!) {
+      verifyUsername(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'change-password': (extraInfo) => `
@@ -207,6 +213,15 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
         }
 
         throw new Error(`Verification for id {input.id} failed`);
+      },
+      verifyUsername: async (
+        _root, { input }: { input: VerifyUsernameInput }) => {
+        const user = await users.findOne({ username: input.username });
+        if (verify(input.token, user.id)) {
+          return true;
+        }
+
+        throw new Error(`Verification for username {input.username} failed`);
       }
     },
 
