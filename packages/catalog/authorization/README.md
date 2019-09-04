@@ -20,3 +20,4 @@ not edit).
 - show-resource
 - show-resource-count
 - show-resources
+- verify-can-edit
