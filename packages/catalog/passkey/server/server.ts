@@ -110,13 +110,21 @@ async function getRandomPasscode(passkeys: Collection<PasskeyDoc>) {
   return results[0].code;
 }
 
+const pendingGivenCodes = {};
+
 async function createPasskey(passkeys: Collection<PasskeyDoc>,
   input: CreatePasskeyInput, context: Context): Promise<PasskeyDoc> {
   let code;
   if (_.isEmpty(input.code)) {
-    code = await getRandomPasscode(passkeys);
     const updateOp = { $set: { used: true } };
     if (!_.isEmpty(input.id)) { _.set(updateOp, '$set.id', input.id); }
+    if (context.reqType === 'vote') {
+      code = await getRandomPasscode(passkeys);
+      pendingGivenCodes[context.runId] = code;
+    } else {
+      code = pendingGivenCodes[context.runId];
+      delete pendingGivenCodes[context.runId];
+    }
     await passkeys.updateOne(context, { code: code }, updateOp);
   } else {
     PasskeyValidation.isCodeValid(input.code);
@@ -197,6 +205,7 @@ const passkeyConcept: ConceptServer = new ConceptServerBuilder('passkey')
       passkeys.createIndex({ used: 1 }, { sparse: true })
     ]);
 
+    // TODO: don't save all possible passkeys
     await passkeys.insertMany(EMPTY_CONTEXT, _.map(WORDS, (code) => {
       return { id: code, code: code, used: false };
     }));

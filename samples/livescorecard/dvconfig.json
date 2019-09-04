@@ -1,75 +1,30 @@
 {
   "name": "livescorecard",
   "usedConcepts": {
-    "hostauthentication": {
-      "name": "authentication",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "hostAuthentication": {
+      "name": "authentication"
     },
-    "climbercode": {
-      "name": "passkey",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "climberCode": {
+      "name": "passkey"
     },
-    "competitioncode": {
-      "name": "passkey",
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionCode": {
+      "name": "passkey"
     },
-    "authorization": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "authorization": {},
+    "event": {},
+    "task": {},
+    "competitionHosts": {
+      "name": "group"
     },
-    "event": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionClimbers": {
+      "name": "group"
     },
-    "task": {
-      "config": {
-        "reinitDbOnStartup": true
-      }
+    "competitionClimbs": {
+      "name": "group"
     },
-    "competitionhosts": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "competitionclimbers": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "competitionclimbs": {
-      "name": "group",
-      "config": {
-        "reinitDbOnStartup": true
-      }
-    },
-    "sex": {
-      "name": "label",
-      "config": {
-        "reinitDbOnStartup": true,
-        "initialLabelIds": ["female", "male"]
-      }
-    },
-    "category": {
-      "name": "label",
-      "config": {
-        "reinitDbOnStartup": true,
-        "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
-      }
-    },
-    "userprofile": {
+    "userProfile": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "UserProfile",
           "type": "object",
@@ -85,10 +40,29 @@
         }
       }
     },
+    "climberProfile": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "ClimberProfile",
+          "type": "object",
+          "properties": {
+            "sex": {
+              "type": "string",
+              "enum": ["female", "male"]
+            },
+            "category": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "open"]
+            }
+          },
+          "required": ["sex", "category"]
+        }
+      }
+    },
     "climb": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Climb",
           "type": "object",
@@ -98,16 +72,19 @@
             },
             "score": {
               "type": "number"
+            },
+            "category": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "open"]
             }
           },
-          "required": ["climbNumber", "score"]
+          "required": ["climbNumber", "score", "category"]
         }
       }
     },
     "competition": {
       "name": "property",
       "config": {
-        "reinitDbOnStartup": true,
         "schema": {
           "title": "Competition",
           "type": "object",
@@ -123,7 +100,7 @@
         }
       }
     },
-    "climberscore" : {
+    "climberScore" : {
       "name": "scoring",
       "config": {
         "oneToOneScoring": false

@@ -76,11 +76,11 @@
 
 
                   <authorization.create-resource id=dv.gen-id.id
-                    ownerId=potluck.navbar.loggedInUserId
+                    ownerId=potluck.navbar.loggedInUser?.id
                     viewerIds=group.create-group.stagedMemberIds
                     hidden=true />
 
-                  <authentication.authenticate id=potluck.navbar.loggedInUserId
+                  <authentication.authenticate id=potluck.navbar.loggedInUser?.id
                     hidden=true />
 
                   <div class="row justify-content-center" id="party-form-footer">

@@ -1,4 +1,4 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="createPasskeyForm" 
+<form (ngSubmit)="onSubmit()" [formGroup]="createPasskeyForm"
   class="form-horizontal">
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newPasskeyCreated">
@@ -22,7 +22,7 @@
         This field is <strong>required</strong>.
       </mat-error>
       <mat-error *ngIf="passkeyControl.hasError('incorrectLength')">
-        Passkey codes must be 
+        Passkey codes must be
         <strong>{{passkeyControl.errors.incorrectLength.minlength}}-
           {{passkeyControl.errors.incorrectLength.maxlength}} characters long
         </strong>.
@@ -31,15 +31,15 @@
   </div>
 
   <div *ngIf="!randomPassword && showOptionToSubmit" class="form-group">
-    <button mat-button 
-      type="submit" 
+    <button mat-button
+      type="submit"
       [disabled]="!createPasskeyForm.valid">
       {{buttonLabel}}
     </button>
   </div>
 
   <div *ngIf="randomPassword && showOptionToSubmit" class="form-group">
-      <button mat-button 
+      <button mat-button
         type="submit" >
         {{buttonLabel}}
       </button>

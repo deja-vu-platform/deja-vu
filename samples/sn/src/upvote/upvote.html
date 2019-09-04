@@ -5,7 +5,7 @@
         sourceId=$user?.username targetId=$id />
       <dv.tx>
         <authentication.authenticate as upvote-post-authenticate
-          id=$user?.id hidden=true />
+          username=$user?.username hidden=true />
         <scoreposts.create-score as upvote-post-create-score
           buttonDisabled=$disabled || !$user ||
             !scoreposts.show-score.errors
@@ -25,7 +25,7 @@
         sourceId=$user?.username targetId=$id />
       <dv.tx>
         <authentication.authenticate
-          id=$user?.id hidden=true />
+          username=$user?.username hidden=true />
         <scorecomments.create-score
           buttonDisabled=$disabled || !$user ||
             !scorecomments.show-score.errors

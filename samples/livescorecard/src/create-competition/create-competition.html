@@ -20,7 +20,7 @@
           </div>
           <div class="col-2 col-2-input-fields">
             <!-- Comeptition Code -->
-            <competitioncode.create-passkey
+            <competitionCode.create-passkey
               id=dv.gen-id.id
               inputLabel="comp code"
               signIn=false
@@ -44,16 +44,16 @@
               }
               hidden=true /> -->
 
-            <competitionhosts.create-group id=dv.gen-id.id
+            <competitionHosts.create-group id=dv.gen-id.id
               memberIds=[$loggedInUserId] hidden=true />
-            <competitionclimbers.create-group id=dv.gen-id.id hidden=true />
-            <competitionclimbs.create-group id=dv.gen-id.id hidden=true />
+            <competitionClimbers.create-group id=dv.gen-id.id hidden=true />
+            <competitionClimbs.create-group id=dv.gen-id.id hidden=true />
             <authorization.create-resource
               id=dv.gen-id.id
               ownerId=$loggedInUserId
               viewerIds=[dv.gen-id.id]
               hidden=true />
-            <hostauthentication.authenticate id=$loggedInUserId hidden=true />
+            <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 
             <dv.button class="add">
               <img src="assets/add.png" />

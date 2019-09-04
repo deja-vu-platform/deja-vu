@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, QueryList, ViewChildren
+  OnChanges, OnInit, QueryList, ViewChildren
 } from '@angular/core';
 
 import {
@@ -38,7 +38,7 @@ import { API_PATH } from '../property.config';
   templateUrl: './create-objects.component.html',
   styleUrls: ['./create-objects.component.css']
 })
-export class CreateObjectsComponent implements OnInit, OnExec {
+export class CreateObjectsComponent implements OnInit, OnChanges, OnExec {
   /**
    * List of objects to save to the database as new entities
    */
@@ -105,11 +105,14 @@ export class CreateObjectsComponent implements OnInit, OnExec {
     }
     this.properties = getPropertyNamesFromConfig(this.config);
 
+  }
+
+  ngOnChanges() {
     if (this.objects) {
       return;
     }
     if (!this.ids) {
-      throw new Error('One of objects or ids must be given');
+      return;
     }
 
     this.showInputForms = true;

@@ -12,7 +12,7 @@ import {
   MatTooltipModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Ng5SliderModule }  from 'ng5-slider';
+import { Ng5SliderModule } from 'ng5-slider';
 
 import { DvModule } from '@deja-vu/core';
 
@@ -36,8 +36,8 @@ import {
   ObjectAutocompleteComponent
 } from './object-autocomplete/object-autocomplete.component';
 export { ObjectAutocompleteComponent };
-import { RemoveObjectComponent } from './remove-object/remove-object.component';
-export { RemoveObjectComponent };
+import { DeleteObjectComponent } from './delete-object/delete-object.component';
+export { DeleteObjectComponent };
 import { ShowObjectComponent } from './show-object/show-object.component';
 export { ShowObjectComponent };
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
@@ -60,7 +60,7 @@ const publicComponents = [
   CreatePropertyComponent,
   FilterObjectsComponent,
   ObjectAutocompleteComponent,
-  RemoveObjectComponent,
+  DeleteObjectComponent,
   ShowObjectComponent,
   ShowObjectsComponent,
   ShowUrlComponent,

@@ -33,6 +33,7 @@ export interface SignInOutput {
 }
 
 export interface VerifyInput {
-  id: string;
+  id?: string;
+  username?: string;
   token: string;
 }

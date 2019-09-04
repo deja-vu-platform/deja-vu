@@ -7,27 +7,39 @@
   </dv.if>
 
   <div class="write-email-container">
-    <!-- TODO: send email using template -->
-    Coming Soon: Send an email to your match!
+    Send an email to your match:
+    <personalinfo.show-object class="inline-block about-me"
+      id=$connection.userAId === $loggedInUserId ?
+        $connection.userBId : $connection.userAId
+      showOnly=['email'] />
   </div>
 
   <div class="matching-time-and-connection-options">
-    <!-- TODO: show earliest overlaps in schedules -->
-
     <div class="connection-options">
       <!-- TODO: closing a connection should delete match + create connectionhistory
         Unfortunately, these two components wrapped in one tx somehow doesn't allow
         both to happen at the same time -->
       <dv.tx>
+        <authentication.authenticate as auth-archive
+          user=$loggedInUserId waitOn=['id'] hidden=true />
         <connectionhistory.create-object
           initialValue={
-            pastConnection: $connection.userAId === $loggedInUserId ? $connection.userBId : $connection.userAId
+          pastConnection: $connection.userAId ===
+            $loggedInUserId ? $connection.userBId : $connection.userAId
           }
           showExclude=['pastConnection']
-          newObjectSavedText="Connection arhived in journal!"
-          buttonLabel="Archive Connection" />
+          newObjectSavedText="Entry added to journal!"
+          buttonLabel="Create Journal Entry" />
       </dv.tx>
       <dv.tx>
+        <authentication.authenticate as auth-close
+          user=$loggedInUserId waitOn=['id'] hidden=true />
+        <connectionhistory.create-object as history-delete
+          initialValue={
+          pastConnection: $connection.userAId ===
+            $loggedInUserId ? $connection.userBId : $connection.userAId
+          }
+          hidden=true />
         <match.delete-match id=$connection?.id hidden=true />
         <dv.button id="close-connection-btn" class="btn">
           Close Connection

@@ -1,7 +1,9 @@
 <dv.component name="show-scorecard-entry">
-
-  <climb.show-object id=$task.assignerId hidden=true />
-  <falls.show-target id=$task.id sourceId=$climber?.id hidden=true />
+  <climb.show-object as climb-obj
+    id=$task.assignerId waitOn=['id'] hidden=true />
+  <falls.show-target as falls-target
+    id=$task.id sourceId=$climber?.id waitOn=['id', 'sourceId']
+    hidden=true />
 
   <div class="card">
     <div class="card-body entry-card-body">
@@ -16,15 +18,14 @@
           </dv.if>
 
           <dv.if condition=!$task.completed>
-            <dv.if condition=falls.show-target.loadedTarget>
+            <dv.if condition=falls-target.loadedTarget>
               <dv.tx>
-                <!-- TODO: get rid of success text? -->
                 <dv.status savedText="Climb completed!" />
                 <task.complete-task id=$task.id hidden=true />
-                <climberscore.create-score
+                <climberScore.create-score
                   sourceId=$competitionId
                   targetId=$climber?.id
-                  value=climb.show-object.loadedObject?.score - falls.show-target.loadedTarget?.total
+                  value=climb-obj.loadedObject?.score - falls-target.loadedTarget?.total
                   hidden=true />
 
                 <dv.button>
@@ -34,17 +35,16 @@
               </dv.tx>
             </dv.if>
 
-            <dv.if condition=!falls.show-target.loadedTarget>
+            <dv.if condition=!falls-target.loadedTarget>
               <dv.tx>
-                <!-- TODO: get rid of success text? -->
                 <dv.status savedText="Climb completed!" />
                 <task.complete-task as complete-climb-no-falls-task
                   id=$task.id hidden=true />
 
-                <climberscore.create-score as record-score-no-falls-scoring
+                <climberScore.create-score as record-score-no-falls-scoring
                   sourceId=$competitionId
                   targetId=$climber?.id
-                  value=climb.show-object.loadedObject?.score
+                  value=climb-obj.loadedObject?.score
                   hidden=true />
                 <dv.button>
                   <img class="check" src="assets/pendingCheck.png" />
@@ -59,39 +59,39 @@
           <!-- climb number -->
           <span class="inline-block">#</span>
           <climb.show-object class="inline-block"
-            object=climb.show-object.loadedObject
+            object=climb-obj.loadedObject
             showOnly=['climbNumber'] />
         </div>
 
         <div class="col-3">
-          <category.show-labels itemId=$task.assignerId
-            class="scorecard-category"/>
+          <climb.show-object class="inline-block"
+            object=climb-obj.loadedObject
+            showOnly=['category'] />
         </div>
 
         <div class="col-2 center">
           <!-- climb score -->
           <climb.show-object class="inline-block"
-            object=climb.show-object.loadedObject
+            object=climb-obj.loadedObject
             showOnly=['score'] />
         </div>
         <div class="col-3 center">
             <!-- falls -->
-          <dv.if condition=falls.show-target.loadedTarget class="inline-block">
+          <dv.if condition=falls-target.loadedTarget class="inline-block">
             <falls.show-target
-              target=falls.show-target.loadedTarget
+              target=falls-target.loadedTarget
               showIndex=false
               showId=false
               showScores=false
               totalLabel="" />
           </dv.if>
-          <dv.if condition=!falls.show-target.loadedTarget class="inline-block">
+          <dv.if condition=!falls-target.loadedTarget class="inline-block">
             <span>0</span>
           </dv.if>
 
           <!-- increment falls if not completed -->
           <dv.if condition=!$task.completed class="inline-block falls">
             <dv.tx>
-              <!-- TODO: get rid of success text? -->
               <falls.create-score
                 sourceId=$climber?.id
                 targetId=$task.id

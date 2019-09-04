@@ -10,19 +10,23 @@
           </div>
 
           <div class="white-box">
+            <h2>Add a New Reward</h2>
             <dv.tx>
-              <h2>Add a New Reward</h2>
               <dv.gen-id />
               <dv.status savedText="Reward created" />
               <reward.create-object
+                initialValue={ parentId: chorestar.parent-navbar.user?.id }
+                showExclude=['parentId']
                 id=dv.gen-id.id showOptionToSubmit=false />
+              <authorization.create-resource id=dv.gen-id.id
+                ownerId=chorestar.parent-navbar.user?.id hidden=true />
               <dv.button>Create Reward</dv.button>
             </dv.tx>
           </div>
 
           <div class="white-box">
+            <h2>Add a New Child</h2>
             <dv.tx>
-              <h2>Add a New Child</h2>
               <dv.gen-id />
               <dv.status savedText="Child created" />
               <parentauthentication.authenticate as new-child-auth
@@ -78,7 +82,13 @@
           <div class="white-box">
             <h2>Offered Rewards</h2>
             <reward.show-objects
-              showObject=<chorestar.show-reward reward=$object /> />
+              fieldMatching={
+                parentId: chorestar.parent-navbar.user?.id,
+                waitOn: ['parentId']
+              }
+              showObject=<chorestar.show-reward
+                reward=$object showOptionToDelete=true
+                parentId=chorestar.parent-navbar.user?.id /> />
           </div>
         </div>
       </div>

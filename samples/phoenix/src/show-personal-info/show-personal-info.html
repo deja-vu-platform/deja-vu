@@ -1,11 +1,21 @@
 <dv.component name="show-personal-info">
   <phoenix.show-sidebar isPersonalInfo=true />
 
-  <personalinfo.show-object id=phoenix.show-sidebar.loggedInUser?.id
-    hidden=true />
+  <dv.tx>
+    <authentication.authenticate as auth-obj
+      user=phoenix.show-sidebar.loggedInUser waitOn=['user'] hidden=true />
+    <personalinfo.show-object
+      id=phoenix.show-sidebar.loggedInUser?.id
+      waitOn=['id']
+      hidden=true />
+  </dv.tx>
   <topic.show-labels hidden=true />
-  <schedule.show-schedule id=phoenix.show-sidebar.loggedInUser?.id
-    hidden=true />
+  <dv.tx>
+    <authentication.authenticate as auth-schedule
+      user=phoenix.show-sidebar.loggedInUser waitOn=['user'] hidden=true />
+    <schedule.show-schedule id=phoenix.show-sidebar.loggedInUser?.id
+      hidden=true />
+  </dv.tx>
 
   <div id="personal-and-calendar-container">
     <div class="row">
@@ -16,6 +26,9 @@
         <div id="calendar-container">
           <dv.if condition=schedule.show-schedule.loadedSchedule>
             <dv.tx>
+              <authentication.authenticate as auth-update-schedule
+                user=phoenix.show-sidebar.loggedInUser waitOn=['user']
+                hidden=true />
               <schedule.update-schedule
                 id=phoenix.show-sidebar.loggedInUser?.id
                 dayStartHour=0
@@ -24,6 +37,9 @@
           </dv.if>
           <dv.if condition=!schedule.show-schedule.loadedSchedule>
             <dv.tx>
+              <authentication.authenticate as auth-create-schedule
+                user=phoenix.show-sidebar.loggedInUser waitOn=['user']
+                hidden=true />
               <schedule.create-schedule
                 id=phoenix.show-sidebar.loggedInUser?.id
                 dayStartHour=0
@@ -47,20 +63,27 @@
             clear out availabilities for the times you are unavailable
             and set your range again.
           </p>
-          <div id="bounds-input">
-            <!-- TODO: Update bounds -->
-          </div>
         </div>
       </div>
 
       <div id="personal-container" class="col-md-6">
         <!-- About User -->
         <h3 class="inline-block">About
-          <authentication.show-user user=phoenix.show-sidebar.loggedInUser
-            showId=false class="inline-block"/>
+          <dv.tx>
+            <authentication.authenticate as auth-show-user
+              user=phoenix.show-sidebar.loggedInUser waitOn=['user']
+              hidden=true />
+            <authentication.show-user
+              user=phoenix.show-sidebar.loggedInUser
+              waitOn=['user']
+              showId=false class="inline-block"/>
+          </dv.tx>
         </h3>
         <div id="about-me">
           <dv.tx>
+            <authentication.authenticate as auth-update-object
+              user=phoenix.show-sidebar.loggedInUser waitOn=['user']
+              hidden=true />
             <personalinfo.update-object
               id=phoenix.show-sidebar.loggedInUser?.id
               buttonLabel="Save Personal Info"
@@ -80,7 +103,7 @@
               <!-- TODO: Update labels for item -->
               <topic.attach-labels itemId=phoenix.show-sidebar.loggedInUser?.id
                 labels=topic.show-labels.labels
-                buttonLabel="Submit"
+                buttonLabel="Update Topics"
                 inputLabel="Choose Topics"
                 labelsAttachedSavedText="Topics saved!"/>
             </dv.tx>
@@ -88,9 +111,5 @@
         </div>
       </div>
     </div>
-
-    <div id="topics-info">
-        <!-- TODO: Offer users ways to get suggestions -->
-      </div>
   </div>
 </dv.component>

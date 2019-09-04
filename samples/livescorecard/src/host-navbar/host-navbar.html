@@ -1,7 +1,7 @@
 <dv.component name="host-navbar"
-  loggedInUserId$=hostauthentication.logged-in.user.id>
+  loggedInUserId$=hostAuthentication.logged-in.user.id>
   <dv.tx>
-    <hostauthentication.logged-in />
+    <hostAuthentication.logged-in />
     <dv.redirect href="/login/host" onEvalFailure=true />
   </dv.tx>
 
@@ -17,7 +17,7 @@
         <span class="space-filler"></span>
 
         <dv.tx>
-          <hostauthentication.sign-out hidden=true />
+          <hostAuthentication.sign-out hidden=true />
           <dv.link href="/login/host">Log Out</dv.link>
         </dv.tx>
       </div>

@@ -5,7 +5,7 @@
       <dv.link
         href="/comment"
         params={ id: dv.gen-id.id } hidden=true />
-      <authentication.authenticate user=$user hidden=true />
+      <authentication.authenticate username=$user.username hidden=true />
       <comment.create-comment
         id=dv.gen-id.id
         authorId=$user.username

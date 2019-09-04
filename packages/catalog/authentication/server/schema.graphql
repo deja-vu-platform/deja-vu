@@ -31,7 +31,8 @@ input UsersInput {
 }
 
 input VerifyInput {
-  id: ID!
+  id: ID
+  username: String
   token: String!
 }
 

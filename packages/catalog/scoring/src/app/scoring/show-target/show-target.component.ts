@@ -1,11 +1,11 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
-  OnChanges, OnDestroy, OnInit, Output, Type
+  OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import {
@@ -17,6 +17,8 @@ import { ShowScoreComponent } from '../show-score/show-score.component';
 import { API_PATH } from '../scoring.config';
 import { Target } from '../shared/scoring.model';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'scoring-show-target',
@@ -25,6 +27,12 @@ import { Target } from '../shared/scoring.model';
 })
 export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges, OnDestroy {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+  activeWaits = new Set<string>();
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() target: Target | undefined;
@@ -81,14 +89,29 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngAfterViewInit() {
-    this.loadTarget();
+    this.load();
   }
 
-  ngOnChanges() {
-    this.loadTarget();
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field] && !_.isNil(changes[field].currentValue)) {
+        this.fieldChange.emit(field);
+      }
+    }
+    // We should only reload iif what changed is something we are not
+    // waiting on (because if ow we would send a double request)
+    let shouldLoad = false;
+    for (const fieldThatChanged of _.keys(changes)) {
+      if (!this.activeWaits.has(fieldThatChanged)) {
+        shouldLoad = true;
+      }
+    }
+    if (shouldLoad) {
+      this.load();
+    }
   }
 
-  loadTarget() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -96,6 +119,19 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      if (!_.isEmpty(this.waitOn)) {
+        await Promise.all(_.chain(this.waitOn)
+          .filter((field) => _.isNil(this[field]))
+          .tap((fs) => {
+            this.activeWaits = new Set(fs);
+
+            return fs;
+          })
+          .map((fieldToWaitFor) => this.fieldChange
+            .pipe(filter((field) => field === fieldToWaitFor), take(1))
+            .toPromise())
+          .value());
+      }
       this.gs.get<{ data: { target: Target } }>(this.apiPath, {
         params: {
           inputs: {

@@ -201,12 +201,23 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
       users: async () => await users.find(),
       user: async (_root, { username }) => await users.findOne({ username }),
       userById: async (_root, { id }) => await users.findOne({ id: id }),
-      verify: (_root, { input }: { input: VerifyInput }) => {
-        if (verify(input.token, input.id)) {
+      verify: async (_root, { input }: { input: VerifyInput }) => {
+        let id;
+        if (_.isNil(input.id)) {
+          if (_.isNil(input.username)) {
+            throw new Error(`Verification failed, no id or username given`);
+          }
+          const user = await users.findOne({ username: input.username });
+          id = user.id;
+        } else {
+          id = input.id;
+        }
+        if (verify(input.token, id)) {
           return true;
         }
 
-        throw new Error(`Verification for id {input.id} failed`);
+        throw new Error(
+          `Verification for id ${input.id}, username ${input.username} failed`);
       }
     },
 
