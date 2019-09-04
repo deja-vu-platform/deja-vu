@@ -1,7 +1,4 @@
 <dv.component name="create-climber">
-  <sex.show-labels hidden=true />
-  <category.show-labels hidden=true />
-
   <div class="card">
     <div class="card-body">
       <dv.tx>
@@ -13,18 +10,8 @@
             <userProfile.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
-          <div class="col-2">
-            <!-- Participant Sex -->
-            <sex.attach-labels itemId=dv.gen-id.id
-              inputLabel=""
-              labels=sex.show-labels.labels
-              showOptionToSubmit=false />
-          </div>
-          <div class="col-2">
-            <!-- Participant Skill Level -->
-            <category.attach-labels itemId=dv.gen-id.id
-              inputLabel=""
-              labels=category.show-labels.labels
+          <div class="col-4">
+            <climberProfile.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
           <div class="col-2 center">

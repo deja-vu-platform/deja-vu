@@ -21,11 +21,11 @@
           id=accord.navbar.loggedInUserId hidden=true />
       </dv.tx>
       <dv.tx>
-        <setList.remove-object id=$setListId hidden=true />
-        <authorization.can-edit as can-remove-setlist
+        <setList.delete-object id=$setListId hidden=true />
+        <authorization.can-edit as can-delete-setlist
           resourceId=$groupId
           principalId=accord.navbar.loggedInUserId hidden=true />
-        <authentication.authenticate as can-remove-setlist-auth
+        <authentication.authenticate as can-delete-setlist-auth
           id=accord.navbar.loggedInUserId hidden=true />
         <dv.link href="/group" params={groupId:$groupId} />
         <dv.button>Delete Setlist</dv.button>

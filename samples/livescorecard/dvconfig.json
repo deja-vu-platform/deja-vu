@@ -22,18 +22,6 @@
     "competitionClimbs": {
       "name": "group"
     },
-    "sex": {
-      "name": "label",
-      "config": {
-        "initialLabelIds": ["female", "male"]
-      }
-    },
-    "category": {
-      "name": "label",
-      "config": {
-        "initialLabelIds": ["beginner", "intermediate", "advanced", "open"]
-      }
-    },
     "userProfile": {
       "name": "property",
       "config": {
@@ -52,6 +40,26 @@
         }
       }
     },
+    "climberProfile": {
+      "name": "property",
+      "config": {
+        "schema": {
+          "title": "ClimberProfile",
+          "type": "object",
+          "properties": {
+            "sex": {
+              "type": "string",
+              "enum": ["female", "male"]
+            },
+            "category": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "open"]
+            }
+          },
+          "required": ["sex", "category"]
+        }
+      }
+    },
     "climb": {
       "name": "property",
       "config": {
@@ -64,9 +72,13 @@
             },
             "score": {
               "type": "number"
+            },
+            "category": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "open"]
             }
           },
-          "required": ["climbNumber", "score"]
+          "required": ["climbNumber", "score", "category"]
         }
       }
     },

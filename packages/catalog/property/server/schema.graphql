@@ -20,7 +20,7 @@ type Mutation {
   createObjects(input: [CreateObjectInput!]): [Object]
   updateObject(input: UpdateObjectInput!): Boolean
   updateObjects(input: [UpdateObjectInput!]): Boolean
-  removeObject(id: ID!): Boolean
+  deleteObject(id: ID!): Boolean
 }
 
 input RangeFilterInput {
@@ -43,4 +43,3 @@ input NumberEnumFilterInput {
 input StringEnumFilterInput {
   matchValues: [String!]
 }
-

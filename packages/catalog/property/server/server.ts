@@ -82,9 +82,9 @@ const componentRequestTable: ComponentRequestTable = {
     }
   `,
   'object-autocomplete': (extraInfo) => loadSchemaAndObjectsQueries(extraInfo),
-  'remove-object': (extraInfo) => `
-    mutation RemoveObject($id: ID!) {
-      removeObject(id: $id) ${getReturnFields(extraInfo)}
+  'delete-object': (extraInfo) => `
+    mutation DeleteObject($id: ID!) {
+      deleteObject(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
   'show-object': (extraInfo) => {
@@ -347,7 +347,7 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
         return objDocs[0] ? await objects.insertMany(context, objDocs) : [];
       },
 
-      removeObject: async (_root, { id }, context: Context) => {
+      deleteObject: async (_root, { id }, context: Context) => {
         return await objects.deleteOne(context, { id: id });
       },
 

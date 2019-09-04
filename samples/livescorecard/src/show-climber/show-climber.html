@@ -1,5 +1,6 @@
 <dv.component name="show-climber">
-  <userProfile.show-object id=$id  hidden=true />
+  <userProfile.show-object id=$id hidden=true />
+  <climberProfile.show-object id=$id hidden=true />
   <div class="card">
     <div class="card-body">
       <div class="row">
@@ -12,10 +13,14 @@
             object=userProfile.show-object.loadedObject />
         </div>
         <div class="col-2">
-          <sex.show-labels itemId=$id class="participant-label"/>
+          <climberProfile.show-object class="inline-block"
+            showOnly=['sex']
+            object=climberProfile.show-object.loadedObject />
         </div>
         <div class="col-2">
-          <category.show-labels itemId=$id class="participant-label"/>
+          <climberProfile.show-object class="inline-block"
+            showOnly=['category']
+            object=climberProfile.show-object.loadedObject />
         </div>
         <div class="col-2 center">
           <climberCode.show-passkey id=$id showId=false />

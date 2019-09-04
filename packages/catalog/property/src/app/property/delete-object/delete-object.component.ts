@@ -14,14 +14,14 @@ import { API_PATH } from '../property.config';
 const SAVED_MSG_TIMEOUT = 3000;
 
 /**
- * Remove an object from the database
+ * Delete an object from the database
  */
 @Component({
-  selector: 'property-remove-object',
-  templateUrl: './remove-object.component.html',
-  styleUrls: ['./remove-object.component.css']
+  selector: 'property-delete-object',
+  templateUrl: './delete-object.component.html',
+  styleUrls: ['./delete-object.component.css']
 })
-export class RemoveObjectComponent implements
+export class DeleteObjectComponent implements
   OnInit, OnExec, OnExecSuccess, OnExecFailure {
   /**
    * id of the object to delete
@@ -59,7 +59,7 @@ export class RemoveObjectComponent implements
     this.objectDeleted = false;
   }
 
-  removeObject() {
+  deleteObject() {
     if (this.showOptionToDelete) {
       this.rs.exec(this.elem);
     }

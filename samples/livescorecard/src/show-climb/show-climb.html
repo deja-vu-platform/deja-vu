@@ -1,5 +1,5 @@
 <dv.component name="show-climb">
-  <climb.show-object id=$climbId hidden=true />
+  <climb.show-object id=$climbId waitOn=['id'] hidden=true />
 
   <div class="card">
     <div class="card-body">
@@ -13,12 +13,8 @@
             showOnly=['score'] />
         </div>
         <div class="col-3">
-          <category.show-labels itemId=$climbId class="climb-label"/>
-        </div>
-        <div class="col-2">
-          <dv.link href="/host/edit-climb" params={ id: $climbId }>
-            <img src="assets/edit.png" class="edit" />
-          </dv.link>
+          <climb.show-object object=climb.show-object.loadedObject
+            showOnly=['category'] />
         </div>
       </div>
     </div>
