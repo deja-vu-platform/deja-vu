@@ -8,10 +8,14 @@ Describe an object with properties that have values
 - create-object
 - create-objects
 - create-property
+- delete-object
+- filter-objects
 - object-autocomplete
 - show-object
 - show-objects
 - show-url
+- update-object
+- updated-objects
 
 ## Configuration Options
 
