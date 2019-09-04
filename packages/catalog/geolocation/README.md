@@ -4,6 +4,7 @@ Locate points of interest
 
 ## Components
 
+- create-marker-from-map
 - create-marker
 - delete-marker
 - display-map
