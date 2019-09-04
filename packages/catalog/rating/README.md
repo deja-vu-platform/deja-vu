@@ -6,6 +6,8 @@ Crowdsource evaluation of items
 
 - delete-rating
 - delete-ratings
+- filter-ratings
+- filter-rating
 - rate-target
 - show-average-rating
 - show-rating
