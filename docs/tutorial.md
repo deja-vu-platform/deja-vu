@@ -1,7 +1,7 @@
 ---
 ---
 
-# tutorial: building apps with re#
+# tutorial: building apps with Déjà Vu
 {:.no_toc}
 
 This tutorial covers the fundamentals of Déjà Vu through

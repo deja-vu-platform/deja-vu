@@ -1,6 +1,6 @@
 ---
 ---
-If you want to learn more about the research behind re# take a look
+If you want to learn more about the research behind Déjà Vu take a look
 at our paper:
 
-- Assembling Web Applications from Concepts [pdf]() [doi/cite]()
+- Declarative Assembly of Web Applications from Predefined Concepts [pdf]() [doi/cite]()

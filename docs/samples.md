@@ -3,8 +3,8 @@
 
 # samples
 
-Here's a set of sample apps built using re#. If you
-built an app using re#, [let's us know](./)
+Here's a set of sample apps built using Déjà Vu. If you
+built an app using Déjà Vu, [let's us know](./)
 so we can add it to the list.
 
 {: .tiles-sample}

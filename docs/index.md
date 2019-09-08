@@ -4,20 +4,20 @@ layout: default
 
 # about
 
-Rehash (re#) is a **platform for building web apps**. 
+Déjà Vu is a **platform for building web apps**. 
 It features a catalog of
 [full-stack functionality](./catalog)
 and an [HTML-like language](./intro) for
 assembling web apps using the catalog.
-With re# you can build [complex apps](./samples) fast, without writing any
+With Déjà Vu you can build [complex apps](./samples) fast, without writing any
 client- or server-side procedural code.
 
-Re# implements [a new approach to app development](./research). In this approach,
+Déjà Vu implements [a new approach to app development](./research). In this approach,
 you build apps by synchronizing, in a declarative fashion, GUI components of
 granular, full-stack modules that implement end-user behavior.
 
-- **batteries included** In re#, a web app is constructed
-by composing concepts.
+- **batteries included** In Déjà Vu, a web app is constructed
+by combining concepts.
 A concept is a self-contained, reusable,
 increment of functionality that is motivated by a purpose defined in terms of
 the needs of a user. For example, think of the "comment" functionality
@@ -33,14 +33,14 @@ determine which user interface widgets from which concepts
 are used, and how they are placed on the page. Concepts
 are configured in JSON and you can style your app with CSS.
 
-- **conventional output** A compiled re# app is a standard MEAN
+- **conventional output** A compiled Déjà Vu app is a standard MEAN
 (MongoDB-Express-Angular-Node.js) app, which can be
 easily deployed with popular cloud providers.
 If you don't have a preferred cloud provider, you can 
 follow our guide to [deploy]() to Heroku.
 
 
-**Re# is a research prototype and you shouldn't rely on it for anything
+**Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we'd love to hear what you think!
 You can play around with it and email us or create an issue with your
 feedback or questions.
