@@ -44,10 +44,10 @@ assembled with much less effort.
 ## Create an App
 
 - If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
-users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help]().
+users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
-- In a separate terminal, start MongoDB locally with `mongod`. See [help]()
+- In a separate terminal, start MongoDB locally with `mongod`. See [help](#installation-helptips)
 - On the root directory of your new repo, run `npm start` and visit
 `http://localhost:3000`.
 You should see a "hello world" page.
@@ -101,7 +101,7 @@ Installation will take a while as it downloads dependencies and builds all
 concepts and core libraries. 
 
 All of our concepts and the runtime system use MongoDB.
-To run a concept or an app start the mongo daemon with `mongod` (see [help]()). Then,
+To run a concept or an app start the mongo daemon with `mongod` (see [help](#installation-helptips)). Then,
 in a separate shell `cd` into the concept or app you want to run and do `yarn start`.
 
 To check the running concept or app visit `http://localhost:3000`.
