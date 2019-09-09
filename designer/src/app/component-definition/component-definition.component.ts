@@ -164,7 +164,7 @@ implements AfterViewInit, OnChanges, OnInit {
     return this._rows;
   }
 
-  onActionMenuClosed(forComponent: ComponentInstance) {
+  onComponentMenuClosed(forComponent: ComponentInstance) {
     forComponent.shouldReLink.emit();
     this.updateReferences();
     // need to wait for values to propogate

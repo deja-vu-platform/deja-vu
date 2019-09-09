@@ -44,7 +44,8 @@
                     "stretch": false
                   },
                   "data": "<p>Show Spots</p>"
-                }
+                },
+                "href": "\"/home\""
               },
               "styles": {
                 "stretch": false
@@ -63,7 +64,7 @@
                   },
                   "data": "<p>Add a Spot</p>"
                 },
-                "href": "\"create-spot\""
+                "href": "\"/create-spot\""
               },
               "styles": {
                 "stretch": false
@@ -122,7 +123,10 @@
               "of": "show-markers",
               "from": "geolocation",
               "inputSettings": {
-                "noMarkersToShowText": "\"No spots to show. Create one!\""
+                "noMarkersToShowText": "\"No spots to show. Create one!\"",
+                "showId": "false",
+                "showLatLong": "",
+                "showMapId": "false"
               },
               "styles": {
                 "stretch": false

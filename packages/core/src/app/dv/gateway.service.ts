@@ -292,10 +292,6 @@ export class GatewayService {
     return this.ss.subscribe<T>(request, this.buildBaseParams(path));
   }
 
-  protected isComponent(node: Element): boolean {
-    return NodeUtils.IsComponent(node);
-  }
-
   /**
    * Component path.
    */
@@ -303,7 +299,7 @@ export class GatewayService {
     const node = this.from.nativeElement;
     const seenComponentNodes: string[] = [];
     NodeUtils.WalkUpFromNode(node, this.renderer, undefined, (vNode) => {
-      if (this.isComponent(vNode)) {
+      if (NodeUtils.IsComponent(vNode)) {
         seenComponentNodes.push(NodeUtils.GetFqTagOfNode(vNode));
       }
     });
@@ -399,10 +395,6 @@ export class DesignerGatewayService extends GatewayService {
     from: ElementRef
   ) {
     super(gatewayUrl, http, renderer, rs, ss, from);
-  }
-
-  protected isComponent(node: Element): boolean {
-    return _.get(node, ['dataset', 'iscomponent']) === 'true';
   }
 
   get fromStr() {

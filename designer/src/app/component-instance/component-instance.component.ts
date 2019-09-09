@@ -34,11 +34,15 @@ import { ChildScopeIO, fullyQualifyName, ScopeIO } from '../io';
 export class ComponentInstanceComponent
 implements OnInit, AfterViewInit, OnDestroy {
 
+  // https://angular.io/guide/dynamic-component-loader
   @ViewChild(DynamicComponentDirective)
-    private readonly componentHost: DynamicComponentDirective;
+  private readonly componentHost: DynamicComponentDirective;
+
+  @ViewChild('templateElem')
+  private readonly templateElem: ElementRef;
 
   @Input() componentInstance: ComponentInstance;
-  // default exists because component instance is top-level in preivew mode
+  // default exists because component instance is top-level in preview mode
   @Input() parentScopeIO: ScopeIO = new ScopeIO();
   // not passed to children because their inputs are not editable in this
   //   context (but it is passed to inputted components because theirs are)
@@ -141,6 +145,7 @@ implements OnInit, AfterViewInit, OnDestroy {
       this.injector
     );
 
+
     // subscribe to outputs, storing last outputted value
     if (!this.extraInputs) { // inputted components don't expose outputs
       componentDefinition.outputs.forEach((output) => {
@@ -227,5 +232,12 @@ implements OnInit, AfterViewInit, OnDestroy {
 
     // necessary since this may have been instantiated dynamically
     this.ref.detectChanges();
+
+    // we need to set the dvOf attr of the inserted component
+    if (this.templateElem.nativeElement &&
+        !_.isEmpty(this.templateElem.nativeElement.children)) {
+      this.templateElem.nativeElement.children[0]
+        .setAttribute('dvOf', this.componentInstance.from.name);
+    }
   }
 }

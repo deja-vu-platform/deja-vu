@@ -21,10 +21,6 @@ export class NodeUtils {
     return tag.substring(tag.indexOf('-') + 1);
   }
 
-  private static GetTag(node): string {
-    return node.nodeName.toLowerCase();
-  }
-
   private static GetFqTag(tag: string, dvAlias: string, dvOf: string): string {
     if (!_.isEmpty(dvAlias)) {
       return dvAlias;
@@ -33,6 +29,10 @@ export class NodeUtils {
     } else {
       return tag;
     }
+  }
+
+  static GetTag(node): string {
+    return node.nodeName.toLowerCase();
   }
 
   static GetAttribute(node, attribute: string): string | undefined {
@@ -68,8 +68,30 @@ export class NodeUtils {
     node.removeAttribute(RUN_ID_ATTR);
   }
 
+  static IsDvTx(node: Element) {
+    return (
+      node.nodeName.toLowerCase() === 'dv-tx'
+      || (
+        window['dv-designer'] &&
+        NodeUtils.GetFqTagOfNode(node) === 'dv-tx'
+      )
+    );
+  }
+
   static IsComponent(node): boolean {
     // No HTML tag has a hyphen
+    if (window['dv-designer']) {
+      return NodeUtils.GetFqTagOfNode(node) === 'dv-tx' ||
+        NodeUtils.GetFqTagOfNode(node) === 'user-component' ||
+        ( _.includes(NodeUtils.GetTag(node), '-') &&
+          !NodeUtils.GetTag(node)
+            .startsWith('mat-') &&
+          !NodeUtils.GetTag(node)
+            .startsWith('app-') &&
+          !NodeUtils.GetTag(node)
+            .startsWith('designer-'));
+    }
+
     return _.includes(NodeUtils.GetTag(node), '-') &&
       !NodeUtils.GetTag(node)
         .startsWith('mat-');

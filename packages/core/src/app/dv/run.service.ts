@@ -70,17 +70,6 @@ export class RunService {
   private renderer: Renderer2;
   private componentTable: {[id: string]: ComponentInfo} = {};
 
-  private static IsDvTx(node: Element) {
-    return (
-      node.nodeName.toLowerCase() === 'dv-tx'
-      || (
-        window['dv-designer']
-        && _.get(node, ['dataset', 'iscomponent']) === 'true'
-        && node.getAttribute('dvAlias') === 'dv-tx'
-      )
-    );
-  }
-
   constructor(
     rendererFactory: RendererFactory2) {
     // https://github.com/angular/angular/issues/17824
@@ -126,6 +115,7 @@ export class RunService {
     this.run('eval', elem);
   }
 
+  // has to be consistent with the way the gateway service finds nodes.
   private getTargetComponent(initialNode) {
     let pComponent = this.renderer.parentNode(initialNode);
     NodeUtils.WalkUpFromNode(pComponent, this.renderer,
@@ -139,7 +129,7 @@ export class RunService {
         return false;
       });
 
-    return RunService.IsDvTx(pComponent) ? pComponent : initialNode;
+    return NodeUtils.IsDvTx(pComponent) ? pComponent : initialNode;
   }
 
   private async run(runType: RunType, elem: ElementRef) {
@@ -154,7 +144,7 @@ export class RunService {
       return;
     }
     let id;
-    if (RunService.IsDvTx(targetComponent)) {
+    if (NodeUtils.IsDvTx(targetComponent)) {
       id = uuid();
       NodeUtils.SetRunId(targetComponent, id);
     }

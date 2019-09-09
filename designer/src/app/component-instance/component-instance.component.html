@@ -1,20 +1,20 @@
 <div
   *ngIf="componentInstance"
   class="component-instance"
-  [attr.data-iscomponent]="true"
-  [attr.dvAlias]="componentInstance.fqtag"
   [attr.dvOf]="componentInstance.from.name"
   [ngStyle]="componentInstance.of.styles || {}"
   [hidden]="hidden"
 >
-  <div
-    [attr.data-iscomponent]="!!componentInstance.of.transaction"
-    [attr.dvAlias]="'dv-tx'"
-  >
-    <ng-template *ngIf="componentInstance.of.component" propertyDynamicComponent>
-    </ng-template>
+  <div>
+    <div #templateElem>
+      <ng-template *ngIf="componentInstance.of.component"
+        propertyDynamicComponent>
+      </ng-template>
+    </div>
 
-    <div *ngIf="componentInstance.of.rows">
+    <!-- if you have rows, it's an app component -->
+    <div *ngIf="componentInstance.of.rows"
+      [attr.dvAlias]="componentInstance.of.transaction ? 'dv-tx' : 'user-component'">
       <div
         *ngFor="let row of componentInstance.of.rows"
         class="dvd-row"

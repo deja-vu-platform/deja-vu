@@ -1,14 +1,11 @@
 <div
   *ngIf="componentInstance"
   id="main-view"
-  [attr.data-iscomponent]="true"
-  [attr.dvAlias]="componentInstance.fqtag"
 >
   <div
     id="page"
-    [attr.data-iscomponent]="!!componentInstance.of.transaction"
-    [attr.dvAlias]="'dv-tx'"
     dragula="row"
+    [attr.dvAlias]="componentInstance.of.transaction ? 'dv-tx' : 'user-component'"
   >
     <div
       *ngFor="let row of rows; let rowNum = index"
