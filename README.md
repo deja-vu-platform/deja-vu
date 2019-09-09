@@ -44,10 +44,10 @@ assembled with much less effort.
 ## Create an App
 
 - If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
-users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352)
+users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help]().
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
-- In a separate terminal, start MongoDB locally with `mongod`
+- In a separate terminal, start MongoDB locally with `mongod`. See [help]()
 - On the root directory of your new repo, run `npm start` and visit
 `http://localhost:3000`.
 You should see a "hello world" page.
@@ -82,10 +82,6 @@ create commits and run `git push heroku` again.
 
 In addition to [node](https://nodejs.org) v9-11 ([not v12](https://github.com/spderosso/deja-vu/issues/352)) and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
-Note: If you see errors of the kind `npm` not found, it means
-that you don't have `npm`. Usually, npm is distributed with node, but depending on how you
-installed node you might have to additionally install npm.
-
 Each concept and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. First,
 [clone](https://help.github.com/en/articles/cloning-a-repository) this github repo.
@@ -104,9 +100,9 @@ If `yarn --check-files` fails, try the following:
 Installation will take a while as it downloads dependencies and builds all
 concepts and core libraries. 
 
-To run a concept or an app start the mongo daemon with `mongod` (all of our concepts
-and the runtime system use MongoDB) and then in a separate shell `cd` into the
-concept or app you want to run and do `yarn start`.
+All of our concepts and the runtime system use MongoDB.
+To run a concept or an app start the mongo daemon with `mongod` (see [help]()). Then,
+in a separate shell `cd` into the concept or app you want to run and do `yarn start`.
 
 To check the running concept or app visit `http://localhost:3000`.
 
@@ -115,3 +111,22 @@ When a concept is run it shows a "development" page that is used for testing.
 Yarn will symlink dependencies so if you make a change to a concept you are using
 in an app, the only thing you need to do is rebuild the concept with
 `yarn package` and restart your app.
+
+## Installation Help/Tips
+
+### Node
+
+- If you see errors of the kind "npm not found", it means
+that you don't have `npm`. Usually, npm is distributed with node, but if you've installed
+a very old version of node then you won't have `npm`. If you are on Linux, see the note
+below.
+- Note to linux users: to install `node` you should follow the
+[official Nodejs instructions](https://nodejs.org/en/download/package-manager/).
+Don't do `sudo apt install nodejs`, it will install a very old version of node (v8)
+that we don't support.
+
+### MongoDB
+
+- The first time you run `mongod`, it will fail because there's no
+`/data/db` directory. You can create `/data/db`, or you tell mongo to use
+a different directory.
