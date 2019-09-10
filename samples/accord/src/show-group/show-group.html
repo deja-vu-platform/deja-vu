@@ -1,16 +1,20 @@
 <dv.component name="show-group">
   <accord.navbar accessRequired=true />
-  <authorization.can-view resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+  <authorization.can-view
+    resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
+    waitOn=['resourceId', 'principalId']
+    hidden=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId currentUserId=accord.navbar.loggedInUserId />
+    <accord.set-list-catalog
+      groupId=$groupId currentUserId=accord.navbar.loggedInUser?.id />
   </div>
   <div class="right-column">
-    <groupInfo.show-object id=$groupId hidden=true />
+    <groupInfo.show-object id=$groupId waitOn=['id'] hidden=true />
     <dv.if condition=groupInfo.show-object.loadedObject class="individual-card">
       <h1>
         <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
         <dv.if condition=authorization.can-view.canView class="inline-block">
-          <dv.link href="/edit-group" params={ groupId:$groupId }>
+          <dv.link href="/edit-group" params={ groupId: $groupId }>
             <mat-icon>settings</mat-icon>
           </dv.link>
         </dv.if>
@@ -22,14 +26,14 @@
 
     <div class="individual-card">
       <h2>Members</h2>
-      <group.show-group id=$groupId
-                        showMembers=true
-                        showGroupId=false
-                        showMember=<accord.show-user-info userId=$id
-                        groupId=$groupId
-                        allowEdit=false
-                        currentUserId=accord.navbar.loggedInUserId />
-      />
+      <group.show-group
+        id=$groupId waitOn=['id']
+        showMembers=true
+        showGroupId=false
+        showMember=<accord.show-user-info userId=$id
+          groupId=$groupId
+          allowEdit=false
+          currentUserId=accord.navbar.loggedInUser?.id /> />
     </div>
   </div>
 </dv.component>

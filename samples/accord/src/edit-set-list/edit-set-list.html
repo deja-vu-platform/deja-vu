@@ -1,7 +1,7 @@
 <dv.component name="edit-set-list">
   <accord.navbar accessRequired=true />
   <authorization.can-edit
-    resourceId=$groupId principalId=accord.navbar.loggedInUserId
+    resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
     hidden=true />
   <div class="left-column">
     <accord.set-list-catalog groupId=$groupId />
@@ -16,17 +16,17 @@
           buttonLabel="Update Setlist" />
         <authorization.can-edit as can-edit-setlist
           resourceId=$groupId
-          principalId=accord.navbar.loggedInUserId hidden=true />
+          principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-setlist-auth
-          id=accord.navbar.loggedInUserId hidden=true />
+          id=accord.navbar.loggedInUser?.id hidden=true />
       </dv.tx>
       <dv.tx>
         <setList.delete-object id=$setListId hidden=true />
         <authorization.can-edit as can-delete-setlist
           resourceId=$groupId
-          principalId=accord.navbar.loggedInUserId hidden=true />
+          principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-delete-setlist-auth
-          id=accord.navbar.loggedInUserId hidden=true />
+          id=accord.navbar.loggedInUser?.id hidden=true />
         <dv.link href="/group" params={groupId:$groupId} />
         <dv.button>Delete Setlist</dv.button>
       </dv.tx>

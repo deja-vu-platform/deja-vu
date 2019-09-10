@@ -10,7 +10,7 @@
       <div class="individual-card">
         <h1>
           <dv.show-entity entity=proposal.show-object.loadedObject.songTitle />
-          <dv.if class="inline-block" condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
+          <dv.if class="inline-block" condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUser?.id>
             <dv.link class="plain" href="/edit-proposal" params={ groupId:$groupId, proposalId:$proposalId }>
               <mat-icon>
                 edit
@@ -36,9 +36,9 @@
     <div class="individual-card">
       <h3>Comments</h3>
       <comment.show-comments ofTargetId=$proposalId
-                             showComment=<accord.show-comment comment=$comment userId=accord.navbar.loggedInUserId />
+                             showComment=<accord.show-comment comment=$comment userId=accord.navbar.loggedInUser?.id />
       />
-      <comment.create-comment authorId=accord.navbar.loggedInUserId targetId=$proposalId />
+      <comment.create-comment authorId=accord.navbar.loggedInUser?.id targetId=$proposalId />
     </div>
 
   </div>
@@ -50,7 +50,7 @@
       </dv.if>
     </div>
     <div>
-      Your Rating: <rating.rate-target sourceId=accord.navbar.loggedInUserId
+      Your Rating: <rating.rate-target sourceId=accord.navbar.loggedInUser?.id
                                        targetId=$proposalId />
     </div>
     <div>

@@ -14,6 +14,7 @@ import { ButtonLastComponent } from './button-last/button-last.component';
 import { ButtonComponent } from './button/button.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
+import { CamelToTitleCasePipe } from './stage/stage.component';
 import { ChooseComponent } from './choose/choose.component';
 import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
@@ -44,13 +45,13 @@ import { SumComponent } from './sum/sum.component';
 import { TableComponent } from './table/table.component';
 import { TxComponent } from './tx/tx.component';
 import { UnionComponent } from './union/union.component';
+import { WaiterServiceFactory } from './waiter.service';
 import { ZipComponent } from './zip/zip.component';
 
 import { ConfigServiceFactory } from './config.service';
 import { OfDirective } from './of.directive';
 import { StorageService } from './storage.service';
 import { SubscriptionService } from './subscription.service';
-import { CamelToTitleCasePipe } from './stage/stage.component';
 
 
 const allComponents = [
@@ -83,7 +84,7 @@ const allComponents = [
   ],
   providers: [
     GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
-    SubscriptionService
+    SubscriptionService, WaiterServiceFactory
   ],
   entryComponents: [ShowEntityComponent],
   exports: [...allComponents, OfDirective, CamelToTitleCasePipe]

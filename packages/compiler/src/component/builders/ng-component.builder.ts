@@ -51,15 +51,18 @@ export class NgComponentBuilder {
     componentImports: { componentName: string, className: string }[])
     : NgComponentBuilder {
     for (const componentImport of componentImports) {
-      this.withComponentImport(componentImport.componentName, componentImport.className);
+      this.withComponentImport(
+        componentImport.componentName, componentImport.className);
     }
 
     return this;
   }
 
-  withComponentImport(componentName: string, className: string): NgComponentBuilder {
+  withComponentImport(componentName: string, className: string)
+    : NgComponentBuilder {
     const from = `../${componentName}/${componentName}.component`;
-    this.componentImportStatements.push(`import { ${className} } from '${from}'`);
+    this.componentImportStatements
+      .push(`import { ${className} } from '${from}'`);
 
     return this;
   }

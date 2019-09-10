@@ -30,7 +30,6 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
   // Watcher of changes to fields specified in `waitOn`
   // Emits the field name that changes
   fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
 
   @Input() resourceId: string;
   @Input() principalId: string;
@@ -54,6 +53,7 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
       }
     }
   }
+
   dvOnEval() {
     return this.doAuthorize();
   }

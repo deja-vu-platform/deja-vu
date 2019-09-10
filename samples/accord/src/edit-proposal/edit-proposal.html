@@ -7,7 +7,7 @@
 
   <div class="right-column">
     <dv.if condition=proposal.show-object.loadedObject>
-      <dv.if condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
+      <dv.if condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUser?.id>
         <h2>Edit Proposal</h2>
         <proposal.update-object id=$proposalId showExclude=["addedBy","setListId"] buttonLabel="Update Proposal"/>
         <media.show-objects fieldMatching={proposalId:$proposalId}
@@ -20,7 +20,7 @@
                              newObjectSavedText="New Link Saved!"
                              />
       </dv.if>
-      <dv.if condition=proposal.show-object.loadedObject.addedBy!==accord.navbar.loggedInUserId>
+      <dv.if condition=proposal.show-object.loadedObject.addedBy!==accord.navbar.loggedInUser?.id>
         Only the creator can edit the proposal.
       </dv.if>
     </dv.if>

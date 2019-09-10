@@ -6,11 +6,11 @@
       <dv.gen-id />
       <group.create-group
         id=dv.gen-id.id
-        memberIds=[accord.navbar.loggedInUserId]
+        memberIds=[accord.navbar.loggedInUser?.id]
         showOptionToSubmit=false showOptionToAddMembers=false />
       <authorization.create-resource
-        id=dv.gen-id.id ownerId=accord.navbar.loggedInUserId
-        viewerIds=[accord.navbar.loggedInUserId] hidden=true />
+        id=dv.gen-id.id ownerId=accord.navbar.loggedInUser?.id
+        viewerIds=[accord.navbar.loggedInUser?.id] hidden=true />
       <groupInfo.create-object
         id=dv.gen-id.id showOptionToSubmit=false />
       <dv.button class="theme-button">Create Group</dv.button>

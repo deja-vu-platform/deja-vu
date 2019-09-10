@@ -1,10 +1,10 @@
 <dv.component name="show-set-list">
   <accord.navbar accessRequired=true />
   <authorization.can-view
-    resourceId=$groupId principalId=accord.navbar.loggedInUserId hidden=true />
+    resourceId=$groupId principalId=accord.navbar.loggedInUser?.id hidden=true />
   <div class="left-column">
     <accord.set-list-catalog
-      groupId=$groupId currentUserId=accord.navbar.loggedInUserId />
+      groupId=$groupId currentUserId=accord.navbar.loggedInUser?.id />
   </div>
   <div class="right-column">
     <h1>
@@ -27,7 +27,7 @@
         noObjectsToShowText="No proposals yet"
         showObject=<accord.show-proposal-preview
           proposal=$object groupId=$groupId
-          loggedInUserId=accord.navbar.loggedInUserId />
+          loggedInUserId=accord.navbar.loggedInUser?.id />
       />
       &nbsp;
       <dv.tx>
