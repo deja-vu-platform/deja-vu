@@ -11,10 +11,11 @@ Run `yarn prod` build the app and open it in Electron. Currently the production 
 
 ## Samples
 The [`designer/samples/`](https://github.com/spderosso/deja-vu/tree/master/designer/samples) directory contains apps built with the 
-designer. Note that you won't be able to open the sample apps under [`samples/`](https://github.com/spderosso/deja-vu/tree/master/samples) 
+designer. You can open any of these in the designer and play around with them.
+Note that you won't be able to open the sample apps under [`samples/`](https://github.com/spderosso/deja-vu/tree/master/samples) 
 in the designer. These were built using the HTML language.
 
-The designer save apps in a JSON files. You can load the JSON file for an app and modify it and/or export the app.
+When you save a project, the designer save a JSON file. You can load the JSON file for an app and modify it and/or export the app.
 If you choose to export the app,
 you can then run `yarn` in its directory to install its dependencies and `yarn start` to run the app at [http://localhost:3000](http://localhost:3000).
 
