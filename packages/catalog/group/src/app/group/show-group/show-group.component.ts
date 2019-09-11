@@ -1,17 +1,20 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 
 import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import { Group } from '../shared/group.model';
 import { ShowMemberComponent } from '../show-member/show-member.component';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -39,17 +42,26 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
   };
   @Output() loadedGroup = new EventEmitter<Group>();
 
+  destroyed = new Subject<any>();
   showGroup;
   private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-              private rs: RunService) {
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private router: Router, private rs: RunService) {
     this.showGroup = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -117,6 +129,11 @@ export class ShowGroupComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

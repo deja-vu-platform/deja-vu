@@ -1,11 +1,16 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
-  OnChanges, OnInit, Output, Type
+  OnChanges, OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 import * as _ from 'lodash';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs/Subject';
 
 import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
@@ -23,7 +28,8 @@ interface CommentsRes {
   styleUrls: ['./show-comments.component.css']
 })
 export class ShowCommentsComponent implements
-OnInit, AfterViewInit, OnChanges, OnEval {
+  AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval {
+  @Input() waitOn: string[];
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
   @Input() byAuthorId: string | undefined;
@@ -45,31 +51,48 @@ OnInit, AfterViewInit, OnChanges, OnEval {
   comments: Comment[] = [];
   @Output() loadedComments = new EventEmitter<Comment[]>();
 
+  destroyed = new Subject<any>();
+
   showComments;
   private gs: GatewayService;
+  private ws: WaiterService;
   loaded = false;
+  refresh = false;
   inputsOfLoadedComments = { byAuthorId: undefined, ofTargetId: undefined };
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private wsf: WaiterServiceFactory,
+    private router: Router, private rs: RunService,
+    @Inject(API_PATH) private apiPath) {
     this.showComments = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.refresh = true;
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
-    this.loadComments();
+    this.load();
   }
 
-  ngOnChanges() {
-    this.loadComments();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
-  loadComments() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -77,6 +100,7 @@ OnInit, AfterViewInit, OnChanges, OnEval {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs
         .get<CommentsRes>(this.apiPath, {
           params: {
@@ -101,6 +125,7 @@ OnInit, AfterViewInit, OnChanges, OnEval {
           this.comments = res.data.comments;
           this.loadedComments.emit(this.comments);
           this.loaded = true;
+          this.refresh = false;
           this.inputsOfLoadedComments = {
             byAuthorId: this.byAuthorId,
             ofTargetId: this.ofTargetId
@@ -111,8 +136,13 @@ OnInit, AfterViewInit, OnChanges, OnEval {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
   private canEval(): boolean {
-    return this.gs && this.commentsAreOld();
+    return this.gs && (this.refresh || this.commentsAreOld());
   }
 
   private commentsAreOld(): boolean {
