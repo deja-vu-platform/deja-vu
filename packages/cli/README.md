@@ -52,7 +52,7 @@ in the concept. Each `conceptname` object starts out with an `id` field to
 uniquely identify each object, and an editable `content` field.
 Of course, all of the above can and should be updated.
 
-Navigate to ()[http://localhost:3000/] and see the four concept components in component.
+Navigate to [http://localhost:3000/](http://localhost:3000/) and see the four concept components in component.
 All the CRUD operations they represent should already work.
 
 ### Create components in a concept
@@ -123,7 +123,7 @@ of components to include can be customized with properties "include" and
 "exclude".
 
 The "include" and "exclude" properties take a list of
-(glob-like file patterns)[https://www.npmjs.com/package/glob#glob-primer].
+[glob-like file patterns](https://www.npmjs.com/package/glob#glob-primer).
 If "include" is left unspecified, the cli defaults to
 including all `.html` files in the containing directory and subdirectories
 except those excluded using the "exclude" property.
