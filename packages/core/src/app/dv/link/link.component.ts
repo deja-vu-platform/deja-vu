@@ -28,6 +28,7 @@ export class LinkComponent implements OnInit, OnExecSuccess {
     this.setHref();
   }
 
+  // should match dv.redirect
   ngOnChanges() {
     this.setHref();
   }

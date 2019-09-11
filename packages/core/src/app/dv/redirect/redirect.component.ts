@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RunService, OnEvalFailure, OnExecFailure } from '../run.service';
+import { OnEvalFailure, OnExecFailure, RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 
@@ -10,12 +11,15 @@ import * as _ from 'lodash';
 })
 export class RedirectComponent
 implements OnInit, OnEvalFailure, OnExecFailure {
+  // TODO: rename this to path
   @Input() href: string;
   @Input() params;
-  @Input() onEvalSuccess: boolean = false;
-  @Input() onEvalFailure: boolean = false;
-  @Input() onExecSuccess: boolean = false;
-  @Input() onExecFailure: boolean = false;
+  @Input() onEvalSuccess = false;
+  @Input() onEvalFailure = false;
+  @Input() onExecSuccess = false;
+  @Input() onExecFailure = false;
+
+  aHref: string;
 
   constructor(
     private elem: ElementRef, private rs: RunService,
@@ -23,6 +27,23 @@ implements OnInit, OnEvalFailure, OnExecFailure {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
+    this.setHref();
+  }
+
+  // should match dv.link
+  ngOnChanges() {
+    this.setHref();
+  }
+
+  setHref() {
+    if (this.href === undefined) {
+      this.aHref = this.router.url.toString();
+    } else {
+      const newParams = _.mapValues(this.params, JSON.stringify);
+      const url = this.router
+        .createUrlTree([this.href], { queryParams: newParams });
+      this.aHref = url.toString();
+    }
   }
 
   dvOnEvalFailure() {
@@ -50,8 +71,6 @@ implements OnInit, OnEvalFailure, OnExecFailure {
   }
 
   private redirect() {
-    this.params = this.params ?
-      _.mapValues(this.params, (value) => JSON.stringify(value)) : null;
-    this.router.navigate([this.href, ...(this.params ? [this.params] : []) ]);
+    this.router.navigateByUrl(this.aHref);
   }
 }

@@ -3,7 +3,8 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -22,28 +23,34 @@ interface CanViewRes {
 })
 export class CanViewComponent implements
   AfterViewInit, OnInit, OnChanges, OnExec {
+  @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
   _canView = false;
 
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
   }
 
   ngAfterViewInit() {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
   load() {
@@ -53,17 +60,18 @@ export class CanViewComponent implements
   }
 
   dvOnEval() {
-    this.doRequest();
+    return this.doRequest();
   }
 
   dvOnExec() {
-    this.doRequest();
+    return this.doRequest();
   }
 
-  doRequest() {
+  async doRequest() {
     if (!this.canEval()) {
       return;
     }
+    await this.ws.maybeWait();
     this.gs.get<CanViewRes>(this.apiPath, {
       params: {
         inputs: {

@@ -88,7 +88,7 @@ export class ConfigServiceFactory {
 
   constructor(
     @Inject(USED_CONCEPTS_CONFIG)
-      private readonly usedConceptsConfig: UsedConceptsConfig,
+    private readonly usedConceptsConfig: UsedConceptsConfig,
     rendererFactory: RendererFactory2
   ) {
     // https://github.com/angular/angular/issues/17824
@@ -104,7 +104,6 @@ export class ConfigServiceFactory {
   // Calling `for` in before onInit can cause problems because the component
   // might not be attached to the dom (thus making it impossible to find the
   // parents of the from element).
-  // TODO: I think this is the problem but I should investigate more
   createConfigService(forNode: ElementRef): ConfigService {
     if (window['dv-designer']) {
       return new DesignerConfigService(

@@ -1,6 +1,6 @@
 import { ElementRef, Injectable } from '@angular/core';
-import * as _ from 'lodash';
 import { NodeUtils } from './node.utils';
+
 
 @Injectable()
 export class StorageService {
@@ -24,5 +24,4 @@ export class StorageService {
     const itemKey = `${this.getConceptAlias(elem)}-${key}`;
     localStorage.removeItem(itemKey);
   }
-
 }

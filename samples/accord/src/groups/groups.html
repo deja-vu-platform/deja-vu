@@ -3,9 +3,9 @@
   <div class="center-column">
     <h2>My Groups</h2>
     <div class="individual-card">
-      <group.show-groups withMemberId=accord.navbar.loggedInUserId
-                         showGroup=<accord.show-group-info group=$group />
-      />
+      <group.show-groups
+        withMemberId=accord.navbar.loggedInUser?.id
+        showGroup=<accord.show-group-info group=$group /> />
     </div>
     <dv.tx>
       <dv.button class="theme-button">

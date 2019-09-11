@@ -1,7 +1,7 @@
 <dv.component name="edit-group">
   <accord.navbar accessRequired=true />
   <authorization.can-edit
-    resourceId=$groupId principalId=accord.navbar.loggedInUserId
+    resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
     hidden=true />
   <div class="center-column">
     <dv.if condition=authorization.can-edit.canEdit>
@@ -12,9 +12,9 @@
           updateObjectSavedText="Changes saved" />
         <authorization.can-edit as can-edit-group
           resourceId=$groupId
-          principalId=accord.navbar.loggedInUserId hidden=true />
+          principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-group-auth
-          id=accord.navbar.loggedInUserId hidden=true />
+          id=accord.navbar.loggedInUser?.id hidden=true />
       </dv.tx>
       <h3>Members</h3>
       <userProfile.choose-object
@@ -29,9 +29,10 @@
             id=$groupId />
           <authorization.can-edit as can-add-member
             resourceId=$groupId
-            principalId=accord.navbar.loggedInUserId hidden=true />
+            principalId=accord.navbar.loggedInUser?.id hidden=true />
           <authentication.authenticate as can-add-member-auth
-            id=accord.navbar.loggedInUserId hidden=true />
+            id=accord.navbar.loggedInUser?.id hidden=true />
+          <dv.link hidden=true />
         </dv.tx>
       </dv.if>
       <h3>Current Members</h3>
@@ -40,12 +41,12 @@
           id=$groupId showMembers=true showGroupId=false
           showMember=<accord.show-user-info
             userId=$id groupId=$groupId allowEdit=true
-            currentUserId=accord.navbar.loggedInUserId /> />
+            currentUserId=accord.navbar.loggedInUser?.id /> />
         <authorization.can-edit as can-edit-members
           resourceId=$groupId
-          principalId=accord.navbar.loggedInUserId hidden=true />
+          principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-members-auth
-          id=accord.navbar.loggedInUserId hidden=true />
+          id=accord.navbar.loggedInUser?.id hidden=true />
       </dv.tx>
     </dv.if>
 

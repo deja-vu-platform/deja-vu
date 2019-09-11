@@ -10,15 +10,17 @@
       <div class="individual-card">
         <h1>
           <dv.show-entity entity=proposal.show-object.loadedObject.songTitle />
-          <dv.if class="inline-block" condition=proposal.show-object.loadedObject.addedBy===accord.navbar.loggedInUserId>
-            <dv.link class="plain" href="/edit-proposal" params={ groupId:$groupId, proposalId:$proposalId }>
-              <mat-icon>
-                edit
-              </mat-icon>
+          <dv.if class="inline-block"
+            condition=proposal.show-object.loadedObject.addedBy ===
+              accord.navbar.loggedInUser?.id>
+            <dv.link class="plain" href="/edit-proposal"
+              params={ groupId:$groupId, proposalId:$proposalId }>
+              <mat-icon>edit</mat-icon>
             </dv.link>
           </dv.if>
         </h1>
-        by <dv.show-entity entity=proposal.show-object.loadedObject.songArtist />
+        by
+        <dv.show-entity entity=proposal.show-object.loadedObject.songArtist />
       </div>
 
       <div class="individual-card">
@@ -29,32 +31,45 @@
 
     <div class="individual-card">
       <h3>Media</h3>
-      <media.show-objects showObject=<accord.show-media media=$object deletable=false />
-                          fieldMatching={proposalId:$proposalId} />
+      <media.show-objects
+        showObject=<accord.show-media media=$object deletable=false />
+        fieldMatching={ proposalId: $proposalId } />
     </div>
 
     <div class="individual-card">
       <h3>Comments</h3>
-      <comment.show-comments ofTargetId=$proposalId
-                             showComment=<accord.show-comment comment=$comment userId=accord.navbar.loggedInUserId />
-      />
-      <comment.create-comment authorId=accord.navbar.loggedInUserId targetId=$proposalId />
+      <comment.show-comments
+        ofTargetId=$proposalId
+        waitOn=['ofTargetId']
+        showComment=<accord.show-comment
+          comment=$comment userId=accord.navbar.loggedInUser?.id /> />
+      <dv.tx>
+        <comment.create-comment
+          authorId=accord.navbar.loggedInUser?.id targetId=$proposalId />
+        <dv.link hidden=true />
+      </dv.tx>
     </div>
 
   </div>
   <div class="left-column">
     <div>
       <dv.if condition=!!proposal.show-object.loadedObject>
-        Added By <userProfile.show-object id=proposal.show-object.loadedObject.addedBy
-                                          showOnly=["firstName"] />
+        Added By
+        <userProfile.show-object
+          id=proposal.show-object.loadedObject.addedBy showOnly=["firstName"] />
       </dv.if>
     </div>
     <div>
-      Your Rating: <rating.rate-target sourceId=accord.navbar.loggedInUserId
-                                       targetId=$proposalId />
+      Your Rating:
+      <dv.tx>
+        <rating.rate-target
+          sourceId=accord.navbar.loggedInUser?.id targetId=$proposalId />
+        <dv.link hidden=true />
+      </dv.tx>
     </div>
     <div>
-      Average Rating: <rating.show-average-rating targetId=$proposalId />
+      Average Rating: <rating.show-average-rating
+        targetId=$proposalId waitOn=['targetId'] />
     </div>
   </div>
 </dv.component>
