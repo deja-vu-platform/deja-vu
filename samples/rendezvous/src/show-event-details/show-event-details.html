@@ -102,12 +102,15 @@
             <tbody>
               <th>Comments</th>
               <dv.tx>
+                <authentication.authenticate
+                  id=rendezvous.navbar.loggedInUser?.id hidden=true />
                 <comment.create-comment
                   class="center"
                   authorId=rendezvous.navbar.loggedInUser?.id
                   targetId=$eventId
                   inputLabel="Post a new comment"
                   buttonLabel="Post" />
+                <dv.link hidden=true />
               </dv.tx>
               <comment.show-comments ofTargetId=$eventId
                 includeTimestamp=true
