@@ -1,17 +1,20 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges,
+  OnDestroy, OnInit, SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 
 import { Task } from '../shared/task.model';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -19,8 +22,8 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './show-tasks.component.html',
   styleUrls: ['./show-tasks.component.css']
 })
-export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowTasksComponent implements
+  AfterViewInit, OnEval, OnInit, OnChanges, OnDestroy {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -59,18 +62,26 @@ export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
   @Input() noTasksToShowText = 'No tasks to show';
   tasks: Task[] = [];
 
+  private destroyed = new Subject<any>();
   showTasks;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {
+    private router: Router, private rs: RunService) {
     this.showTasks = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -147,6 +158,11 @@ export class ShowTasksComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

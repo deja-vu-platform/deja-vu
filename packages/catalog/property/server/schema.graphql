@@ -7,22 +7,6 @@ type Property {
   required: Boolean!
 }
 
-type Query {
-  property(name: String): Property
-  object(id: ID!): Object
-  properties: [Property]
-  objects(fields: FieldMatchingInput): [Object]
-  filteredObjects(filters: FilterInput): [Object]
-}
-
-type Mutation {
-  createObject(input: CreateObjectInput!): Object
-  createObjects(input: [CreateObjectInput!]): [Object]
-  updateObject(input: UpdateObjectInput!): Boolean
-  updateObjects(input: [UpdateObjectInput!]): Boolean
-  deleteObject(id: ID!): Boolean
-}
-
 input RangeFilterInput {
   maxValue: Float
   minValue: Float
@@ -42,4 +26,21 @@ input NumberEnumFilterInput {
 
 input StringEnumFilterInput {
   matchValues: [String!]
+}
+
+type Query {
+  property(name: String): Property
+  object(id: ID!): Object
+  properties: [Property]
+  objects(fields: FieldMatchingInput): [Object]
+  filteredObjects(filters: FilterInput): [Object]
+  verifyObjectMatches(fields: VerifyObjectMatchesInput!): Boolean
+}
+
+type Mutation {
+  createObject(input: CreateObjectInput!): Object
+  createObjects(input: [CreateObjectInput!]): [Object]
+  updateObject(input: UpdateObjectInput!): Boolean
+  updateObjects(input: [UpdateObjectInput!]): Boolean
+  deleteObject(id: ID!): Boolean
 }

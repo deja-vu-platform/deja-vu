@@ -34,8 +34,8 @@
                     assigneeId=chorestar.child-navbar.user?.id
                     waitOn=['assigneeId']
                     completed=false
-                    showOptionToComplete=true
-                    showTask=<chorestar.show-chore chore=$task view="child" /> />
+                    showTask=<chorestar.show-chore
+                      chore=$task showOptionToComplete=true view="child" /> />
                 </dv.tx>
               </div>
             </div>
@@ -105,7 +105,7 @@
               <div class="col-md-12">
                 <h3>Rewards You Cannot Buy Yet</h3>
                 <dv.for elems=reward.show-objects.objects
-                  showElem= <dv.if
+                  showElem=<dv.if
                   condition=$elem.cost gt transfer.show-balance.fetchedBalance>
                     <chorestar.show-reward
                       reward=$elem showOptionToPurchase=false />

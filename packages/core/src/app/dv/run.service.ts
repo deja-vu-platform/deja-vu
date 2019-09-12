@@ -191,20 +191,23 @@ export class RunService {
 
     // run the component, or each component in tx with the same RUN ID
     this.walkComponents(node, (componentInfo, componentId) => {
+      const fqTag = NodeUtils.GetFqTagOfNode(componentInfo.node);
       if (componentInfo.component[dvOnRun]) {
         if (id !== undefined) {
           NodeUtils.SetRunId(componentInfo.node, id);
         }
+        console.log(`Calling ${dvOnRun} on ${fqTag}`);
         runs.push(
           Promise
             .resolve(componentInfo.component[dvOnRun]())
           .then((result) => ({[componentId]: result}))
           .catch((e) => {
-            console.error(
-              `Error in ` +
-              `${NodeUtils.GetFqTagOfNode(componentInfo.node)}: ${e.message}`);
+            console.error(`Error in ${fqTag}: ${e.message}`);
             throw e;
           }));
+      } else {
+        console.log(
+          `Skipped calling ${dvOnRun} on ${fqTag}: there's no method`);
       }
     });
 

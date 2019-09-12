@@ -21,12 +21,18 @@ input CreateMemberInput {
   inGroupId: ID
 }
 
+input VerifyIsMemberInput {
+  groupId: ID
+  memberId: ID
+}
+
 type Query {
   group(id: ID!): Group
   groups(input: GroupsInput!): [Group!]
   groupCount(input: GroupsInput!): Int
   members(input: MembersInput!): [ID!]
   memberCount(input: MembersInput!): Int
+  verifyIsMember(input: VerifyIsMemberInput!): Boolean
 }
 
 type Mutation {

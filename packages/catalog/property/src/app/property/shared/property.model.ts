@@ -61,3 +61,35 @@ export function getFilteredPropertyNamesFromConfig(only: string[],
   return filterPropertyNames (only, exclude,
     getPropertyNamesFromConfig(config));
 }
+
+/**
+ * When a boolean field gets input "false",
+ * it becomes "true" in the server.
+ * It will only be false if the input is null.
+ * This method changes all false boolean fields to null
+ */
+export function adjustFieldMatching(fieldMatching, schema) {
+  if (fieldMatching && schema) {
+    const adjustedFields = _.mapValues(fieldMatching,
+      (value, key) => {
+      if (key === 'id') {
+        return _.isPlainObject(value) ? JSON.stringify(value) : value;
+      }
+      const schemaObjects = _.filter(schema, _.matches({name: key}));
+      if (!schemaObjects || schemaObjects.length === 0) {
+        throw new Error ('field ' + key + ' in fieldMatching ' +
+          'does not match any field name of the schema');
+      }
+      const schemaObject = schemaObjects[0].schema;
+      if (schemaObject.type === 'boolean' && !value) {
+        return null;
+      } else {
+        return _.isPlainObject(value) ? JSON.stringify(value) : value;
+      }
+    });
+
+    return adjustedFields;
+  } else {
+    return fieldMatching;
+  }
+}

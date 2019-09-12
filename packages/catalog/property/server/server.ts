@@ -138,7 +138,12 @@ const componentRequestTable: ComponentRequestTable = {
       default:
         throw new Error('extraInfo.action can only be update');
     }
-  }
+  },
+  'verify-object-matches': (extraInfo) => `
+    query VerifyObjectMatches($fields: VerifyObjectMatchesInput!) {
+      verifyObjectMatches(fields: $fields) ${getReturnFields(extraInfo)}
+    }
+  `
 };
 
 function getDynamicTypeDefs(config: PropertyConfig): string[] {
@@ -218,6 +223,11 @@ function getDynamicTypeDefs(config: PropertyConfig): string[] {
       ${joinedFieldMatchingProperties}
     }
 
+    input VerifyObjectMatchesInput {
+      id: ID
+      ${joinedFieldMatchingProperties}
+    }
+
     input FilterInput {
       # filtering by id is currently not implemented
       # the id field is included to prevent having an empty type
@@ -248,6 +258,25 @@ function addTimestamp(obj: ObjectDoc) {
   return obj;
 }
 
+function fieldsInputToQuery(fields) {
+  const query = _.mapValues(fields, (v) => {
+    if (!_.isString(v)) {
+      return v;
+    }
+    let qObj;
+    try {
+      qObj = JSON.parse(v);
+    } catch (e) {
+      return v;
+    }
+
+    return _.mapKeys(qObj, (_v, k: string) => k.startsWith('q_') ?
+      '$' + k.slice(2) : k);
+  });
+
+  return query;
+}
+
 function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
   const objects: Collection<ObjectDoc> = db.collection('objects');
   const resolversObj = {
@@ -261,26 +290,15 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
           required: _.includes(config.schema.required, name)
         };
       },
+
       object: async (_root, { id }) => {
         const obj: ObjectDoc | null = await objects.findOne({ id: id });
 
         return _.get(obj, '_pending') ? null : addTimestamp(obj);
       },
-      objects: async (_root, { fields }) => {
-        const query = _.mapValues(fields, (v) => {
-          if (!_.isString(v)) {
-            return v;
-          }
-          let qObj;
-          try {
-            qObj = JSON.parse(v);
-          } catch (e) {
-            return v;
-          }
 
-          return _.mapKeys(qObj, (_v, k: string) => k.startsWith('q_') ?
-            '$' + k.slice(2) : k);
-        });
+      objects: async (_root, { fields }) => {
+        const query = fieldsInputToQuery(fields);
         const objsCursor = await objects.findCursor(query);
         const objs = await objsCursor
           .sort({ _id: -1 })
@@ -288,6 +306,7 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
 
         return _.map(objs, addTimestamp);
       },
+
       filteredObjects: async (_root, { filters } ) => {
         // it serves two purposes:
         // (1) get rid of null fields
@@ -315,6 +334,7 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
 
         return _.map(objs, addTimestamp);
       },
+
       properties: (_root) => _
         .chain(config['schema'].properties)
         .toPairs()
@@ -323,7 +343,14 @@ function resolvers(db: ConceptDb, config: PropertyConfig): IResolvers {
           schema: JSON.stringify(propertyInfo),
           required: _.includes(config.schema.required, name)
         }))
-        .value()
+        .value(),
+
+      verifyObjectMatches: async (_root, { fields }) => {
+        const query = fieldsInputToQuery(fields);
+        await objects.findOne(query);
+
+        return true;
+      }
     },
     Property: {
       name: (root) => root.name,

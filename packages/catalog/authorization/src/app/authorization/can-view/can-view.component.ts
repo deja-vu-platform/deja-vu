@@ -3,7 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService,
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
   WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
@@ -22,7 +22,7 @@ interface CanViewRes {
   styleUrls: ['./can-view.component.css']
 })
 export class CanViewComponent implements
-  AfterViewInit, OnInit, OnChanges, OnExec {
+  AfterViewInit, OnInit, OnChanges, OnEval, OnExec {
   @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() principalId: string;

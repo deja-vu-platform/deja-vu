@@ -12,7 +12,8 @@ import {
   CreateGroupInput,
   GroupDoc,
   GroupsInput,
-  MembersInput
+  MembersInput,
+  VerifyIsMemberInput
 } from './schema';
 
 import { IResolvers } from 'graphql-tools';
@@ -28,12 +29,12 @@ const componentRequestTable: ComponentRequestTable = {
   `,
   'create-group': (extraInfo) => `
     mutation CreateGroup($input: CreateGroupInput!) {
-      createGroup (input: $input) ${getReturnFields(extraInfo)}
+      createGroup(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'delete-group': (extraInfo) => `
     mutation DeleteGroup($id: ID!) {
-      deleteGroup (id: $id) ${getReturnFields(extraInfo)}
+      deleteGroup(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
   'join-leave': (extraInfo) => {
@@ -84,6 +85,11 @@ const componentRequestTable: ComponentRequestTable = {
   'show-member-count': (extraInfo) => `
     query ShowMemberCount($input: MembersInput!) {
       memberCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'verify-is-member': (extraInfo) => `
+    query VerifyIsMember($input: VerifyIsMemberInput!) {
+      verifyIsMember(input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -194,6 +200,14 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
 
       memberCount:  async (_root, { input }: { input: MembersInput }) => {
         return getMemberCount(groups, input);
+      },
+
+      verifyIsMember:  async (
+        _root, { input }: { input: VerifyIsMemberInput }) => {
+          await groups
+            .findOne({ id: input.groupId, memberIds: input.memberId });
+
+          return true;
       }
     },
     Group: {
