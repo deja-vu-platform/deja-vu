@@ -19,7 +19,9 @@
       showOptionToInputAssignee=false
       showOptionToSubmit=false />
 
-    <!-- TODO: check that assignee is member -->
+    <child.verify-object-matches id=dv.choose.selectedEntity?.id
+      fieldMatching={ parentId: $parent?.id, waitOn: ['parentId'] }
+      hidden=true />
     <div>
       <dv.choose
         entities=child.show-objects.objects
@@ -29,5 +31,6 @@
         showEntity=<child.show-object object=$entity showOnly=['name'] /> />
     </div>
     <dv.button>Create Chore</dv.button>
+    <dv.link hidden=true />
   </dv.tx>
 </dv.component>

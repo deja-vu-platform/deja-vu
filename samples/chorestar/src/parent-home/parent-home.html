@@ -21,6 +21,7 @@
               <authorization.create-resource id=dv.gen-id.id
                 ownerId=chorestar.parent-navbar.user?.id hidden=true />
               <dv.button>Create Reward</dv.button>
+              <dv.link hidden=true />
             </dv.tx>
           </div>
 
@@ -41,6 +42,7 @@
                 signIn=false
                 showOptionToSubmit=false />
               <dv.button>Create Child</dv.button>
+              <dv.link hidden=true />
             </dv.tx>
           </div>
         </div>
@@ -86,6 +88,7 @@
                 parentId: chorestar.parent-navbar.user?.id,
                 waitOn: ['parentId']
               }
+              noObjectsToShowText='No offered rewards'
               showObject=<chorestar.show-reward
                 reward=$object showOptionToDelete=true
                 parentId=chorestar.parent-navbar.user?.id /> />

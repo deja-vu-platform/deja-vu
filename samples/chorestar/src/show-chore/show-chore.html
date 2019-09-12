@@ -17,6 +17,7 @@
         showAssignee=false
         showCompleted=false
         showApproved=false />
+
     </div>
   </div>
 
@@ -45,6 +46,13 @@
         newTransferSavedText="Chore completion approved." />
       <task.approve-task id=$chore.id hidden=true />
       <dv.button>Approve</dv.button>
+      <dv.link hidden=true />
+    </dv.tx>
+  </dv.if>
+  <dv.if condition=$showOptionToComplete class="row">
+    <dv.tx>
+      <task.complete-task id=$chore?.id />
+      <dv.link hidden=true />
     </dv.tx>
   </dv.if>
 </dv.component>

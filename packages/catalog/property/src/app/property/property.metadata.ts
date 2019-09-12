@@ -52,6 +52,10 @@ import { UpdateObjectComponent } from './update-object/update-object.component';
 import {
   UpdateObjectsComponent
 } from './update-objects/update-objects.component';
+import {
+  VerifyObjectMatchesComponent
+} from './verify-object-matches/verify-object-matches.component';
+export { VerifyObjectMatchesComponent };
 
 const publicComponents = [
   ChooseObjectComponent,
@@ -66,6 +70,7 @@ const publicComponents = [
   ShowUrlComponent,
   UpdateObjectComponent,
   UpdateObjectsComponent,
+  VerifyObjectMatchesComponent,
   ConfigWizardComponent
 ];
 

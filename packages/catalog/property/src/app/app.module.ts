@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 
@@ -43,7 +44,8 @@ const usedConceptsConfig = {
   imports: [
     BrowserModule,
     DvModule,
-    PropertyModule
+    PropertyModule,
+    RouterModule.forRoot([])
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'localhost:3000/api' },

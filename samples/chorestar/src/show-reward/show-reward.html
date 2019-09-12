@@ -19,15 +19,17 @@
             amount=-1 * $reward.cost
             buttonLabel="Purchase"
             newTransferSavedText="Reward purchased" />
+          <dv.link hidden=true />
         </dv.tx>
       </dv.if>
       <dv.if condition=$showOptionToDelete>
         <dv.tx>
           <reward.delete-object id=$reward?.id hidden=true />
-          <authorization.can-edit resourceId=$reward?.id
+          <authorization.verify-can-edit resourceId=$reward?.id
             principalId=$parentId hidden=true />
           <authorization.delete-resource id=$reward?.id hidden=true />
           <dv.button>Stop Offering</dv.button>
+          <dv.link hidden=true />
         </dv.tx>
       </dv.if>
     </div>

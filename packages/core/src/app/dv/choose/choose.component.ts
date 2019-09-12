@@ -57,6 +57,7 @@ export class ChooseComponent {
 
   dvOnExecSuccess() {
     if (this.resetOnExecSuccess) {
+      this.selectedEntity.emit(undefined);
       this.entityIndex = undefined;
     }
   }

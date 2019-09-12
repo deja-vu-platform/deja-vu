@@ -1,6 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue,
@@ -11,8 +11,11 @@ import {
   RunService
 } from '@deja-vu/core';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import {
-  getFilteredPropertyNames, getPropertiesFromConfig
+  adjustFieldMatching, getFilteredPropertyNames, getPropertiesFromConfig
 } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
@@ -20,7 +23,7 @@ import { ShowObjectComponent } from '../show-object/show-object.component';
 import { API_PATH } from '../property.config';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 /**
@@ -31,8 +34,8 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './show-objects.component.html',
   styleUrls: ['./show-objects.component.css']
 })
-export class ShowObjectsComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowObjectsComponent implements
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   /**
    * Text to display when there are no objects
    */
@@ -84,6 +87,8 @@ OnChanges {
 
   @Input() includeTimestamp = false;
 
+  destroyed = new Subject<any>();
+
   properties: string[];
   showObjects;
   loaded = false;
@@ -93,42 +98,11 @@ OnChanges {
   private gs: GatewayService;
   private cs: ConfigService;
 
-  /**
-   * When a boolean field gets input "false",
-   * it becomes "true" in the server.
-   * It will only be false if the input is null.
-   * This method changes all false boolean fields to null
-   */
-  private static AdjustFieldMatching(fieldMatching, schema) {
-    if (fieldMatching && schema) {
-      const adjustedFields = _.mapValues(fieldMatching,
-        (value, key) => {
-        if (key === 'id') {
-          return _.isPlainObject(value) ? JSON.stringify(value) : value;
-        }
-        const schemaObjects = _.filter(schema, _.matches({name: key}));
-        if (!schemaObjects || schemaObjects.length === 0) {
-          throw new Error ('field ' + key + ' in fieldMatching ' +
-            'does not match any field name of the schema');
-        }
-        const schemaObject = schemaObjects[0].schema;
-        if (schemaObject.type === 'boolean' && !value) {
-          return null;
-        } else {
-          return _.isPlainObject(value) ? JSON.stringify(value) : value;
-        }
-      });
-
-      return adjustedFields;
-    } else {
-      return fieldMatching;
-    }
-  }
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private csf: ConfigServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private router: Router, @Inject(API_PATH) private apiPath) {
     this.showObjects = this;
   }
 
@@ -138,6 +112,13 @@ OnChanges {
     this.cs = this.csf.createConfigService(this.elem);
     this.config = this.cs.getConfig();
     this.schema = getPropertiesFromConfig(this.config);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -178,8 +159,8 @@ OnChanges {
       }
       this.properties = getFilteredPropertyNames(
         this.showOnly, this.showExclude, this.cs);
-      const adjustedFields = ShowObjectsComponent
-        .AdjustFieldMatching(_.omit(this.fieldMatching, 'waitOn'), this.schema);
+      const adjustedFields = adjustFieldMatching(
+        _.omit(this.fieldMatching, 'waitOn'), this.schema);
       this.gs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
@@ -203,6 +184,11 @@ OnChanges {
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

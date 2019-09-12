@@ -5,6 +5,7 @@ import {
   Inject,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit, Output, Type
 } from '@angular/core';
 import {
@@ -20,6 +21,12 @@ import { API_PATH, TransferConfig } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
+import * as _ from 'lodash';
+import { filter, take, takeUntil } from 'rxjs/operators';
+
 
 interface BalanceRes {
   data: { balance: any };
@@ -32,8 +39,8 @@ interface BalanceRes {
   styleUrls: ['./show-balance.component.css'],
   entryComponents: [ ShowAmountComponent ]
 })
-export class ShowBalanceComponent implements AfterViewInit, OnEval,
-OnInit, OnChanges {
+export class ShowBalanceComponent implements
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   @Input() accountId: string;
   @Input() balance: Amount;
 
@@ -48,11 +55,13 @@ OnInit, OnChanges {
   balanceType: 'money' | 'items';
 
   private gs: GatewayService;
+  destroyed = new Subject<any>();
+  refresh = false;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath,
-    private csf: ConfigServiceFactory) { }
+    private rs: RunService, private csf: ConfigServiceFactory,
+    private router: Router, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -60,17 +69,25 @@ OnInit, OnChanges {
 
     this.balanceType = this.csf.createConfigService(this.elem)
       .getConfig().balanceType;
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.refresh = true;
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
-    this.loadBalance();
+    this.load();
   }
 
   ngOnChanges() {
-    this.loadBalance();
+    this.load();
   }
 
-  loadBalance() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -89,6 +106,7 @@ OnInit, OnChanges {
       })
       .subscribe((res) => {
         this.balance = res.data.balance;
+        this.refresh = false;
         this.fetchedBalance.emit(this.balance);
       });
     } else if (this.gs) {
@@ -96,7 +114,13 @@ OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
   private canEval(): boolean {
-    return !!(this.gs && !this.balance && this.accountId);
+    return this.gs &&
+      (this.refresh || (!this.balance && !!this.accountId));
   }
 }

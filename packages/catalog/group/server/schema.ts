@@ -15,3 +15,8 @@ export interface CreateGroupInput {
   id: string | undefined;
   initialMemberIds: string[] | undefined;
 }
+
+export interface VerifyIsMemberInput {
+  groupId: string;
+  memberId: string;
+}

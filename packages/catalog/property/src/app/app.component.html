@@ -21,23 +21,26 @@
     <dv-button>Create Objects</dv-button>
   </dv-tx>
   <h1>Create Objects obj1, obj2</h1>
-  <property-create-objects
-      [ids]="['obj1', 'obj2']">
+  <property-create-objects [ids]="['obj1', 'obj2']">
   </property-create-objects>
   <h1>Show Objects</h1>
   <property-show-objects></property-show-objects>
   <h1>Choose Object</h1>
-  <property-choose-object
-    (selectedObjectId)="chooseObjectId=$event"
+  <property-choose-object (selectedObjectId)="chooseObjectId=$event"
     [showOnly]="['lastName']">
   </property-choose-object>
   Select id is: {{chooseObjectId}}
   <h1>Choose Object from autocomplete</h1>
-  <property-object-autocomplete
-    (selectedObjectId)="autocompleteObjectId=$event"
+  <property-object-autocomplete (selectedObjectId)="autocompleteObjectId=$event"
     [showOnly]="['lastName']">
   </property-object-autocomplete>
   Select id is: {{autocompleteObjectId}}
   <h1>Configure Property Concept</h1>
   <property-config-wizard></property-config-wizard>
+  <!-- check for simple errors: -->
+  <property-verify-object-matches
+    [id]="'obj1'"
+    [fieldMatching]="{ firstName: 'foo' }"
+    [hidden]="true">
+  </property-verify-object-matches>
 </div>
