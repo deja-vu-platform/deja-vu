@@ -128,5 +128,5 @@ that we don't support.
 ### MongoDB
 
 - The first time you run `mongod`, it will fail because there's no
-`/data/db` directory. You can create `/data/db`, or you tell mongo to use
+`/data/db` directory. You can create `/data/db`, or you can ask mongo to use
 a different directory.
