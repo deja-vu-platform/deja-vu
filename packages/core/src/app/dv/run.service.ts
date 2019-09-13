@@ -184,6 +184,7 @@ export class RunService {
     onComponent(target, componentId);
   }
 
+  // returns after all runs finish
   private async callDvOnRun(
     runType: RunType, node, id: string | undefined): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
