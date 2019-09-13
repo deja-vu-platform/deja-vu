@@ -5,6 +5,7 @@
     <scoring.show-score
       sourceId=$loggedInUser?.id
       targetId=$listId
+      waitOn=['sourceId', 'targetId']
       hidden=true />
   </dv.tx>
 

@@ -5,6 +5,7 @@
   <geolocation.show-marker id=$id hidden=true />
   <rating.show-rating sourceId=sweetspots.navbar.loggedInUser?.id targetId=$id
     hidden=true />
+  <property.show-object id=$id includeTimestamp=true hidden=true />
 
   <div class="container">
     <div class="row">
@@ -25,7 +26,6 @@
             showNumRatings=false/>
         </h5>
 
-        <!-- Location -->
         <h6>
           <label>Location:</label>
           <geolocation.show-marker
@@ -33,8 +33,16 @@
             showId=false showTitle=false showMapId=false />
         </h6>
 
-          <!-- TODO: Timestamp -->
-        <h6 class="timestamp">Created on: Coming Soon</h6>
+        <h6>
+          <label>Floor:</label>
+          {{property.show-object.loadedObject?.floor}}
+        </h6>
+
+        <h6 class="timestamp">
+          Created on:
+          <dv.show-date
+            date=property.show-object.loadedObject?.timestamp />
+        </h6>
 
         <div class="inline-block detail-buttons">
           <!-- Delete Spot -->
@@ -43,9 +51,6 @@
             class="inline-block">
             <dv.tx>
               <geolocation.delete-marker id=$id hidden=true />
-              <reputation.create-score sourceId=sweetspots.navbar.loggedInUser?.id
-                targetId=sweetspots.navbar.loggedInUser?.id
-                value=-1 hidden=true />
               <authorization.delete-resource id=$id hidden=true />
               <authentication.authenticate id=sweetspots.navbar.loggedInUser?.id
                 hidden=true />
@@ -85,10 +90,11 @@
         <h2>Reviews</h2>
         <hr />
         <comment.show-comments ofTargetId=$id
-        noCommentsToShowText="No reviews for this spot. Write one today!"
-        showComment=<sweetspots.show-spot-details-review
-          comment=$comment
-          loggedInUserId=sweetspots.navbar.loggedInUser?.id /> />
+          waitOn=['ofTargetId']
+          noCommentsToShowText="No reviews for this spot. Write one today!"
+          showComment=<sweetspots.show-spot-details-review
+            comment=$comment
+            loggedInUserId=sweetspots.navbar.loggedInUser?.id /> />
 
         <br />
 
@@ -114,8 +120,7 @@
                 targetId=$id inputLabel=""
                 showOptionToSubmit=false />
               <dv.button class="btn btn-primary">Submit Review</dv.button>
-              <dv.callback defaultHref="/spot-details" params={ id: $id }
-                onExecSuccess=true hidden=true />
+              <dv.link hidden=true />
             </dv.tx>
           </div>
         </dv.if>

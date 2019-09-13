@@ -1,15 +1,21 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnInit, Output, SimpleChanges
+  Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
-import * as _ from 'lodash';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
 
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
+
+import * as _ from 'lodash';
+import { filter, take, takeUntil } from 'rxjs/operators';
+
 
 interface RatingRes {
   data: { rating: Rating };
@@ -22,7 +28,7 @@ interface RatingRes {
   styleUrls: ['./show-rating.component.css']
 })
 export class ShowRatingComponent implements
-  AfterViewInit, OnEval, OnInit, OnChanges {
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // Either (`sourceId`, `targetId`), `rating` or `ratingIn` must be given.
   // If `rating` or `ratingIn` is given, this rating is displayed
   @Input() sourceId: string;
@@ -37,29 +43,39 @@ export class ShowRatingComponent implements
 
   @Output() loadedRating = new EventEmitter<Rating>();
 
+  destroyed = new Subject<any>();
   ratingValue: number;
   private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, private router: Router,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
-    this.loadRating();
+    this.load();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.loadRating();
+    this.load();
   }
 
   /**
    * Load a rating from the server (if any), and set the value of the widget.
    */
-  loadRating() {
+  load() {
     if (this.ratingIn) {
       setTimeout(() => this.ratingValue = this.ratingIn);
     } else if (this.rating) {
@@ -94,6 +110,11 @@ export class ShowRatingComponent implements
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

@@ -34,7 +34,7 @@
     "reputation" : {
       "name": "scoring",
       "config": {
-        "oneToOneScoring": true
+        "oneToOneScoring": false
       }
     },
     "reviewscore" : {

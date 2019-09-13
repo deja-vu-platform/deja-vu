@@ -2,7 +2,8 @@
   <dv.if condition=$id>
     <dv.if condition=$isPost>
       <scoreposts.show-score hidden=true
-        sourceId=$user?.username targetId=$id />
+        sourceId=$user?.username targetId=$id
+        waitOn=['sourceId', 'targetId'] />
       <dv.tx>
         <authentication.authenticate as upvote-post-authenticate
           username=$user?.username hidden=true />
@@ -22,7 +23,8 @@
     <!-- duplicating code because dvOf doesn't support dynamic value (yet) -->
     <dv.if condition=!$isPost>
       <scorecomments.show-score hidden=true
-        sourceId=$user?.username targetId=$id />
+        sourceId=$user?.username targetId=$id
+        waitOn=['sourceId', 'targetId'] />
       <dv.tx>
         <authentication.authenticate
           username=$user?.username hidden=true />
