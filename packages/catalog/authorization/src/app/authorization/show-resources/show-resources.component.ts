@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter,
-  Inject, Input, OnChanges, OnInit, Output, SimpleChanges, Type
+  Inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
@@ -10,8 +10,11 @@ import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 import {
@@ -28,8 +31,8 @@ interface ResourcesRes {
   templateUrl: './show-resources.component.html',
   styleUrls: ['./show-resources.component.css']
 })
-export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowResourcesComponent implements
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -48,15 +51,24 @@ export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
   showResources = this;
   _resourceIds: string[];
 
+  destroyed = new Subject<any>();
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private router: Router, private rs: RunService,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -121,6 +133,11 @@ export class ShowResourcesComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

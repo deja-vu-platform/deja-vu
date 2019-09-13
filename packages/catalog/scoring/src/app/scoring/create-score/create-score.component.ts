@@ -29,7 +29,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-score.component.css']
 })
 export class CreateScoreComponent
-    implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
   @Input() id: string | undefined;
   @Input() sourceId: string;
   @Input() targetId: string;

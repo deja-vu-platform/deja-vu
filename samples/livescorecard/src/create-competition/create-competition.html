@@ -7,8 +7,6 @@
         <div class="row">
           <div class="col-3">
             <!-- Competition Name -->
-            <!-- <competition.create-property as livescorecard-competition-name
-              name="name" /> -->
             <competition.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
@@ -19,7 +17,7 @@
               showOptionToSubmit=false />
           </div>
           <div class="col-2 col-2-input-fields">
-            <!-- Comeptition Code -->
+            <!-- Competition Code -->
             <competitionCode.create-passkey
               id=dv.gen-id.id
               inputLabel="comp code"
@@ -27,23 +25,10 @@
               showOptionToSubmit=false />
           </div>
           <div class="col-1 col-1-input-fields">
-            <!-- Rules should actually be created after the competition,
-              but since there is currently no way to edit property/ objects,
-              we will add the rules here -->
-              <!-- <competition.create-property as livescorecard-competition-rules
-                name="rules" /> -->
           </div>
           <div class="col-1"></div>
           <div class="col-1"></div>
           <div class="col-2">
-            <!-- <competition.create-object
-              id=dv.gen-id.id
-              initialValue={
-                name: livescorecard-competition-name.value,
-                rules: livescorecard-competition-rules.value
-              }
-              hidden=true /> -->
-
             <competitionHosts.create-group id=dv.gen-id.id
               memberIds=[$loggedInUserId] hidden=true />
             <competitionClimbers.create-group id=dv.gen-id.id hidden=true />
@@ -58,7 +43,7 @@
             <dv.button class="add">
               <img src="assets/add.png" />
             </dv.button>
-            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+            <dv.link hidden=true />
           </div>
         </div>
       </dv.tx>
