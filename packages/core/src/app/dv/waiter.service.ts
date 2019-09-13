@@ -43,6 +43,9 @@ export class WaiterService {
         .filter((field) => _.isNil(this.fieldContainer[field]))
         .tap((fs) => {
           this.activeWaits = new Set(fs);
+          if (!_.isEmpty(fs)) {
+            console.log(`Waiter service waiting for: ${JSON.stringify(fs)}`);
+          }
 
           return fs;
         })

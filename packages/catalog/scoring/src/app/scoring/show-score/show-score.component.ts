@@ -4,7 +4,8 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
@@ -25,6 +26,7 @@ import { Score } from '../shared/scoring.model';
 })
 export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
   OnChanges, OnDestroy {
+  @Input() waitOn: string[];
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() targetId: string | undefined;
@@ -43,19 +45,20 @@ export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
   @Output() errors = new EventEmitter<any>();
 
   private gs: GatewayService;
+  private ws: WaiterService;
 
   private destroyed = new Subject<any>();
   private shouldReload = false;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private router: Router,
+    private wsf: WaiterServiceFactory, private router: Router,
     private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-
+    this.ws = this.wsf.for(this, this.waitOn);
     this.router.events
       .pipe(
         filter((e: RouterEvent) => e instanceof NavigationEnd),
@@ -72,14 +75,16 @@ export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngAfterViewInit() {
-    this.loadScore();
+    this.load();
   }
 
-  ngOnChanges() {
-    this.loadScore();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
-  loadScore() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -87,6 +92,7 @@ export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<{ data: { score: Score }, errors: any }>(this.apiPath, {
         params: {
           inputs: {
@@ -124,8 +130,6 @@ export class ShowScoreComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   private canEval(): boolean {
-    const hasRightInputs = !!(this.id || (this.sourceId && this.targetId));
-
-    return this.gs && (!this.score || this.shouldReload) && hasRightInputs;
+    return this.gs && (!this.score || this.shouldReload);
   }
 }

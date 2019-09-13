@@ -11,7 +11,7 @@
   <br />
 
   By <authentication.show-user class="inline-block" id=$comment.authorId /> |
-  <dv.link href="/profile" params={ id: $comment.authorId }>Profile</dv.link> |
+  <dv.link href="/profile" params={ userId: $comment.authorId }>Profile</dv.link> |
   <reputation.show-target class="inline-block" id=$comment.authorId
     showId=false
     showScores=false
@@ -27,8 +27,10 @@
   <br />
 
   <div class="btn-toolbar toolbar">
-    <!-- TODO: Do not show if already voted on the review (scoring.has-voted) -->
-    <dv.if condition=$loggedInUserId !== $comment.authorId>
+    <reviewscore.show-score sourceId=$loggedInUserId targetId=$comment.id
+      waitOn=['sourceId', 'targetId'] hidden=true />
+    <dv.if condition=reviewscore.show-score.errors &&
+      $loggedInUserId !== $comment.authorId>
       <dv.tx>
         <authentication.authenticate as upvote-review-authenticate
           id=$loggedInUserId hidden=true />
