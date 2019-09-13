@@ -3,7 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -18,7 +19,8 @@ import { TargetRank } from '../shared/ranking.model';
   styleUrls: ['./show-fractional-ranking.component.css']
 })
 export class ShowFractionalRankingComponent
-implements AfterViewInit, OnEval, OnInit, OnChanges {
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
+  @Input() waitOn: string[];
   @Input() targetIds: string[];
 
   @Input() showTargetId = true;
@@ -35,9 +37,11 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   showTargetRankings;
 
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory,
     private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showTargetRankings = this;
   }
@@ -45,17 +49,20 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
   }
 
   ngAfterViewInit() {
-    this.loadTargetRankings();
+    this.load();
   }
 
-  ngOnChanges() {
-    this.loadTargetRankings();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
-  loadTargetRankings() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -63,6 +70,7 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<{data: {fractionalRanking: TargetRank[]}}>(this.apiPath, {
         params: {
           inputs: {
@@ -85,6 +93,6 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.targetIds);
+    return !!this.gs;
   }
 }
