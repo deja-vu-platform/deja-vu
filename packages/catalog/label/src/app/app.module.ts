@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 
 import { LabelModule } from './label/label.module';
 
@@ -15,6 +16,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     LabelModule,
+    RouterModule.forRoot([]),
     DvModule
   ],
   providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],

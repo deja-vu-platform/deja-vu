@@ -13,7 +13,9 @@
   <dv.tx>
     <authentication.authenticate as auth-schedule
       user=phoenix.show-sidebar.loggedInUser waitOn=['user'] hidden=true />
-    <schedule.show-schedule id=phoenix.show-sidebar.loggedInUser?.id
+    <schedule.show-schedule
+      id=phoenix.show-sidebar.loggedInUser?.id
+      waitOn=['id']
       hidden=true />
   </dv.tx>
 
@@ -31,6 +33,7 @@
                 hidden=true />
               <schedule.update-schedule
                 id=phoenix.show-sidebar.loggedInUser?.id
+                waitOn=['id']
                 dayStartHour=0
                 dayEndHour=23 />
             </dv.tx>
@@ -44,6 +47,7 @@
                 id=phoenix.show-sidebar.loggedInUser?.id
                 dayStartHour=0
                 dayEndHour=23 />
+              <dv.link hidden=true />
             </dv.tx>
           </dv.if>
         </div>
@@ -97,15 +101,16 @@
             <h4>Already Chosen Topics</h4>
             <topic.show-labels as current-item-labels
               itemId=phoenix.show-sidebar.loggedInUser?.id
+              waitOn=['itemId']
               noLabelsToShowText="No topics selected"/>
 
             <dv.tx>
-              <!-- TODO: Update labels for item -->
-              <topic.attach-labels itemId=phoenix.show-sidebar.loggedInUser?.id
+              <topic.set-labels itemId=phoenix.show-sidebar.loggedInUser?.id
                 labels=topic.show-labels.labels
                 buttonLabel="Update Topics"
                 inputLabel="Choose Topics"
-                labelsAttachedSavedText="Topics saved!"/>
+                labelsSetSavedText="Topics saved!"/>
+              <dv.link hidden=true />
             </dv.tx>
           </div>
         </div>

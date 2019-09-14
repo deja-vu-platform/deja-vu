@@ -1,12 +1,13 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnDestroy, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
-import { map } from 'rxjs/operators';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 
 import {
@@ -22,6 +23,7 @@ import { API_PATH } from '../schedule.config';
 import { Schedule } from '../shared/schedule.model';
 
 import * as _ from 'lodash';
+import { filter, map, takeUntil } from 'rxjs/operators';
 
 interface ShowScheduleRes {
   data: { schedule: Schedule };
@@ -43,14 +45,17 @@ interface ShowScheduleRes {
     }
   ]
 })
-export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
-  OnInit {
+export class ShowScheduleComponent implements
+  AfterViewInit, OnChanges, OnDestroy, OnEval, OnInit {
+  @Input() waitOn: string[];
   // Provide one of the following: id or schedule
   @Input() id: string | undefined;
 
   get schedule() { return this._schedule; }
+  scheduleWasGiven = false;
   @Input() set schedule(value: Schedule | undefined) {
     if (!_.isNil(value)) {
+      this.scheduleWasGiven = true;
       this.events = slotsToCalendarEvents(value.availability, false);
       this._schedule = value;
     }
@@ -77,25 +82,40 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
   refresh: Subject<any> = new Subject();
   events: CalendarEvent[] = [];
 
+  destroyed = new Subject<any>();
+
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory,
     private rs: RunService,
+    private router: Router,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
   load() {
@@ -106,6 +126,7 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<ShowScheduleRes>(this.apiPath, {
         params: {
           inputs: {
@@ -122,7 +143,9 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
       })
         .pipe(map((res: ShowScheduleRes) => res.data.schedule))
         .subscribe((schedule) => {
-          this.schedule = schedule;
+          this.events = slotsToCalendarEvents(schedule.availability, false);
+          this._schedule = schedule;
+
           this.loadedSchedule.emit(schedule);
         });
     } else if (this.gs) {
@@ -130,7 +153,12 @@ export class ShowScheduleComponent implements AfterViewInit, OnChanges, OnEval,
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
   private canEval(): boolean {
-    return !!(!this.schedule && this.id && this.gs);
+    return !!(this.gs && !this.scheduleWasGiven);
   }
 }

@@ -15,3 +15,8 @@ export interface AddLabelsToItemInput {
   itemId: string;
   labelIds: string[];
 }
+
+export interface SetLabelsOfItemInput {
+  itemId: string;
+  labelIds: string[];
+}

@@ -9,18 +9,20 @@
     <div class="col-md-4">
       <dv.tx>
         <authentication.authenticate as auth-create-note
-          user=$loggedInUserId waitOn=['id'] hidden=true />
+          id=$loggedInUserId waitOn=['id'] hidden=true />
         <comment.create-comment authorId=$loggedInUserId
           targetId=$targetId
           buttonLabel="Add Note"
           inputLabel=""
           newCommentSavedText="Note added" />
+        <dv.link hidden=true />
       </dv.tx>
 
       <dv.tx>
         <authentication.authenticate as auth-show-notes
-          user=$loggedInUserId waitOn=['id'] hidden=true />
+          id=$loggedInUserId waitOn=['id'] hidden=true />
         <comment.show-comments byAuthorId=$loggedInUserId
+          waitOn=['byAuthorId']
           showId=false showAuthorId=false showTargetId=false
           noCommentsToShowText=""/>
       </dv.tx>

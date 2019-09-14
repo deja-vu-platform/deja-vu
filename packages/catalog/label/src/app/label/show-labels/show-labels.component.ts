@@ -1,16 +1,24 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnDestroy,
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
-import * as _ from 'lodash';
 
 import { ShowLabelComponent } from '../show-label/show-label.component';
 
 import { API_PATH } from '../label.config';
 import { Label } from '../shared/label.model';
+
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
+import * as _ from 'lodash';
+import { filter, take, takeUntil } from 'rxjs/operators';
+
 
 interface LabelsRes {
   data: { labels: Label[] };
@@ -22,8 +30,9 @@ interface LabelsRes {
   templateUrl: './show-labels.component.html',
   styleUrls: ['./show-labels.component.css']
 })
-export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowLabelsComponent implements
+  AfterViewInit, OnEval, OnInit, OnChanges, OnDestroy {
+  @Input() waitOn: string[];
   // Fetch rules
   @Input() itemId: string | undefined;
 
@@ -38,11 +47,14 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
 
   _labels: Label[] = [];
 
+  destroyed = new Subject<any>();
   showLabels;
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory, private router: Router,
     private rs: RunService, @Inject(API_PATH) private apiPath) {
     this.showLabels = this;
   }
@@ -50,14 +62,25 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
+
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
   load() {
@@ -68,6 +91,7 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<LabelsRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
@@ -85,6 +109,11 @@ export class ShowLabelsComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {
