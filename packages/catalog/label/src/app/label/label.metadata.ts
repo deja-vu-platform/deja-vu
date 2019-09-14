@@ -17,6 +17,8 @@ import {
   SearchItemsByLabelsComponent
 } from './search-items-by-labels/search-items-by-labels.component';
 export { SearchItemsByLabelsComponent };
+import { SetLabelsComponent } from './set-labels/set-labels.component';
+export { SetLabelsComponent };
 import { ShowItemComponent } from './show-item/show-item.component';
 export { ShowItemComponent };
 import { ShowItemsComponent } from './show-items/show-items.component';
@@ -38,7 +40,8 @@ export { ShowLabelCountComponent };
 const allComponents = [
   CreateLabelComponent, SearchItemsByLabelsComponent,
   ShowItemComponent, ShowItemsComponent, ShowLabelComponent,
-  ShowLabelsComponent, AttachLabelsComponent, ShowItemCountComponent, ShowLabelCountComponent
+  ShowLabelsComponent, AttachLabelsComponent, ShowItemCountComponent,
+  ShowLabelCountComponent, SetLabelsComponent
 ];
 
 const metadata = {

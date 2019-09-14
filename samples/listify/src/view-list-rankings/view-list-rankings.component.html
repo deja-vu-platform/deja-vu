@@ -37,7 +37,7 @@
       <listify.list-summary
         id=$id
         loggedInUser=listify.navbar.loggedInUser
-        showMarkers=true />
+        showMarkers=true showOptionToClose=true />
 
       <dv.tx>
         <authentication.authenticate as auth-show-fractional-ranking
@@ -45,6 +45,7 @@
         <ranking.show-fractional-ranking
           noTargetsText="No rankings submitted yet."
           targetIds=group.show-members.loadedMemberIds
+          waitOn=['targetIds']
           showTarget=<listify.list-option
             listOption=$target
             loggedInUser=listify.navbar.loggedInUser /> />

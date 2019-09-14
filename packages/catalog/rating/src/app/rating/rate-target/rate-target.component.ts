@@ -11,6 +11,8 @@ import { take } from 'rxjs/operators';
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
 
+import * as _ from 'lodash';
+
 interface SetRatingRes {
   data: { setRating: boolean };
   errors: { message: string }[];
@@ -86,7 +88,7 @@ export class RateTargetComponent implements
         .toPromise();
     }
 
-    this.gs.post<SetRatingRes>(this.apiPath, {
+    const res = await this.gs.post<SetRatingRes>(this.apiPath, {
       inputs: {
         input: {
           sourceId: this.sourceId,
@@ -96,9 +98,14 @@ export class RateTargetComponent implements
       },
       extraInfo: { action: 'set' }
     })
-      .subscribe((res) => {
-        this.rating.emit(this.ratingValue);
-      });
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    } else {
+      this.rating.emit(this.ratingValue);
+    }
   }
 
   dvOnExecFailure() {

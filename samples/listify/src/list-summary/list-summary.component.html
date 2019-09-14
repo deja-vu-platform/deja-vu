@@ -48,9 +48,9 @@
       </dv.if>
 
       <dv.if class="inline-block"
-        condition=($object ?
+        condition=$showOptionToClose && (($object ?
           $object.creator :
-          list.show-object.loadedObject.creator) === $loggedInUser?.id>
+          list.show-object.loadedObject.creator) === $loggedInUser?.id)>
         <dv.tx>
           <authentication.authenticate
             user=$loggedInUser waitOn=['user'] hidden=true />
@@ -64,6 +64,7 @@
             !list.show-object.loadedObject.locked>
             Close Voting
           </dv.button>
+          <dv.link hidden=true />
         </dv.tx>
       </dv.if>
     </div>

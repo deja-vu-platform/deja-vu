@@ -17,12 +17,15 @@
       <mat-expansion-panel-header>
         <mat-panel-title>Correct Words</mat-panel-title>
       </mat-expansion-panel-header>
-      <correction.create-object showExclude=["authorId","chatId"]
-                                newObjectSavedText="New Correction Added"
-                                buttonLabel="Add Correction"
-                                initialValue={ authorId: $userId, chatId: $chatId }
-      />
+      <dv.tx>
+        <authentication.authenticate id=$userId hidden=true />
+        <correction.create-object
+          showExclude=["authorId","chatId"]
+          newObjectSavedText="New Correction Added"
+          buttonLabel="Add Correction"
+          initialValue={ authorId: $userId, chatId: $chatId } />
+        <dv.link hidden=true />
+      </dv.tx>
     </mat-expansion-panel>
-
   </div>
 </dv.component>

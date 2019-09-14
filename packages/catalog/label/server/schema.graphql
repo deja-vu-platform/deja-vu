@@ -22,6 +22,11 @@ input AddLabelsToItemInput {
   labelIds: [ID!]
 }
 
+input SetLabelsOfItemInput {
+  itemId: ID!
+  labelIds: [ID!]
+}
+
 type Query {
   label(id: ID!): Label
   labels(input: LabelsInput!): [Label]
@@ -33,4 +38,5 @@ type Query {
 type Mutation {
   createLabel(id: ID!): Label
   addLabelsToItem(input: AddLabelsToItemInput!): Boolean
+  setLabelsOfItem(input: SetLabelsOfItemInput!): Boolean
 }

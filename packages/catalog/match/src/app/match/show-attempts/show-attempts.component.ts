@@ -1,30 +1,33 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnDestroy,
   OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
-import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../match.config';
 import { Attempt } from '../shared/match.model';
 import { ShowAttemptComponent } from '../show-attempt/show-attempt.component';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
+import * as _ from 'lodash';
+import { filter, map, take, takeUntil } from 'rxjs/operators';
+
+
 interface AttemptsRes {
   data: { attempts: Attempt[] };
 }
-
-import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
-
 
 @Component({
   selector: 'match-show-attempts',
   templateUrl: './show-attempts.component.html'
 })
-export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
-  OnInit {
+export class ShowAttemptsComponent implements
+  AfterViewInit, OnChanges, OnEval, OnInit, OnDestroy {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -48,12 +51,14 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
 
   showAttempts;
 
+  destroyed = new Subject<any>();
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService,
+    private router: Router,
     @Inject(API_PATH) private apiPath) {
     this.showAttempts = this;
   }
@@ -61,6 +66,13 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -132,6 +144,11 @@ export class ShowAttemptsComponent implements AfterViewInit, OnChanges, OnEval,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

@@ -16,12 +16,10 @@
 
   <div class="matching-time-and-connection-options">
     <div class="connection-options">
-      <!-- TODO: closing a connection should delete match + create connectionhistory
-        Unfortunately, these two components wrapped in one tx somehow doesn't allow
-        both to happen at the same time -->
+      <!-- TODO: closing a connection should delete match + create connectionhistory -->
       <dv.tx>
         <authentication.authenticate as auth-archive
-          user=$loggedInUserId waitOn=['id'] hidden=true />
+          id=$loggedInUserId waitOn=['id'] hidden=true />
         <connectionhistory.create-object
           initialValue={
           pastConnection: $connection.userAId ===
@@ -30,10 +28,11 @@
           showExclude=['pastConnection']
           newObjectSavedText="Entry added to journal!"
           buttonLabel="Create Journal Entry" />
+        <dv.link href="/journal" hidden=true />
       </dv.tx>
       <dv.tx>
         <authentication.authenticate as auth-close
-          user=$loggedInUserId waitOn=['id'] hidden=true />
+          id=$loggedInUserId waitOn=['id'] hidden=true />
         <connectionhistory.create-object as history-delete
           initialValue={
           pastConnection: $connection.userAId ===
@@ -44,7 +43,7 @@
         <dv.button id="close-connection-btn" class="btn">
           Close Connection
         </dv.button>
-        <dv.callback defaultHref="/journal" onExecSuccess=true hidden=true />
+        <dv.link href="/journal" hidden=true />
       </dv.tx>
     </div>
   </div>

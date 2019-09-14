@@ -1,7 +1,9 @@
 <dv.component name="show-dashboard">
   <phoenix.show-sidebar isDashboard=true />
 
-  <topic.show-labels itemId=phoenix.show-sidebar.loggedInUser?.id
+  <topic.show-labels
+    itemId=phoenix.show-sidebar.loggedInUser?.id
+    waitOn=['itemId']
     hidden=true/>
   <dv.if condition=topic.show-labels.labels &&
     topic.show-labels.labels.length !== 0>

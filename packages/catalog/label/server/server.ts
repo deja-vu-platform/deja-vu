@@ -15,7 +15,8 @@ import {
   AddLabelsToItemInput,
   ItemsInput,
   LabelDoc,
-  LabelsInput
+  LabelsInput,
+  SetLabelsOfItemInput
 } from './schema';
 
 import { v4 as uuid } from 'uuid';
@@ -35,6 +36,11 @@ const componentRequestTable: ComponentRequestTable = {
       addLabelsToItem(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'set-labels': (extraInfo) => `
+    mutation SetLabels($input: SetLabelsOfItemInput!) {
+      setLabelsOfItem(input: $input) ${getReturnFields(extraInfo)}
+    }
+   `,
   'create-label': (extraInfo) => `
     mutation CreateLabel($id: ID!) {
       createLabel(id: $id) ${getReturnFields(extraInfo)}
@@ -135,6 +141,38 @@ function getItemAggregationPipeline(input: ItemsInput, getCount = false) {
   return pipeline;
 }
 
+async function attachLabels(
+  itemId: string, labelIds: string[], labels, context) {
+  const standardLabelIds = _.map(labelIds, standardizeLabel);
+  const updateOp = { $push: { itemIds: itemId } };
+  const errors = await Promise.all(_.map(standardLabelIds, async (id) => {
+    try {
+      // cannot use updateMany because we need to upsert labels
+      await labels.updateOne(context, { id }, updateOp, { upsert: true });
+
+      return undefined;
+    } catch (err) {
+      console.error(err);
+
+      return err;
+    }
+  }));
+
+  if (errors.filter((err) => !!err).length === 0) {
+    return true;
+  }
+  const errMsg = _.reduce(errors, (prev, curr, index) => {
+    if (!curr) {
+      return prev;
+    }
+    const delimiter = index ? ', ' : '';
+
+    return `${prev}${delimiter}${standardLabelIds[index]}`;
+  }, 'Could not add the following labels to the item: ');
+  throw new Error(errMsg);
+}
+
+
 function resolvers(db: ConceptDb, _config: LabelConfig): IResolvers {
   const labels: Collection<LabelDoc> = db.collection('labels');
 
@@ -177,33 +215,41 @@ function resolvers(db: ConceptDb, _config: LabelConfig): IResolvers {
       addLabelsToItem: async (
         _root, { input }: { input: AddLabelsToItemInput },
         context: Context) => {
-        const labelIds = _.map(input.labelIds, standardizeLabel);
-        const updateOp = { $push: { itemIds: input.itemId } };
-        const errors = await Promise.all(_.map(labelIds, async (id) => {
-          try {
-            // cannot use updateMany because we need to upsert labels
-            await labels.updateOne(context, { id }, updateOp, { upsert: true });
+        await attachLabels(input.itemId, input.labelIds, labels, context);
+      },
 
-            return undefined;
-          } catch (err) {
-            console.error(err);
-
-            return err;
+      setLabelsOfItem: async (
+        _root, { input }: { input: SetLabelsOfItemInput },
+        context: Context) => {
+        const currentLabels = await labels.find({ itemIds: input.itemId });
+        const currentLabelSet = new Set(_.map(currentLabels, 'id'));
+        const inputLabelSet = new Set(input.labelIds);
+        const labelsToRemove = [];
+        const labelsToAdd = [];
+        for (const labelId of input.labelIds) {
+          if (!currentLabelSet.has(labelId)) {
+            labelsToAdd.push(labelId);
           }
-        }));
-
-        if (errors.filter((err) => !!err).length === 0) {
-          return true;
         }
-        const errMsg = _.reduce(errors, (prev, curr, index) => {
-          if (!curr) {
-            return prev;
+        currentLabelSet.forEach((currentLabelId: string) => {
+          if (!inputLabelSet.has(currentLabelId)) {
+            labelsToRemove.push(currentLabelId);
           }
-          const delimiter = index ? ', ' : '';
+        });
 
-          return `${prev}${delimiter}${labelIds[index]}`;
-        }, 'Could not add the following labels to the item: ');
-        throw new Error(errMsg);
+        await db.inTransaction(async () => {
+          if (!_.isEmpty(labelsToRemove)) {
+            await labels.updateMany(
+              context,
+              { id: { $in: labelsToRemove } },
+              { $pull: { itemIds: input.itemId } });
+            console.log('Done deleting item');
+          }
+          if (!_.isEmpty(labelsToAdd)) {
+            await attachLabels(input.itemId, labelsToAdd, labels, context);
+            console.log('Done attaching item');
+          }
+        });
       },
 
       createLabel: async (_root, { id }, context: Context) => {

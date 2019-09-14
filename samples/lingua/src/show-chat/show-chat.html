@@ -24,9 +24,11 @@
           <div>
             <userProfile.show-object
               id=chatGroup.show-group.loadedGroup.memberIds[0]
+              waitOn=['id']
               showOnly=["name"] /> Avg Rating:
             <rating.show-average-rating
               targetId=chatGroup.show-group.loadedGroup.memberIds[0]
+              waitOn=['targetId']
               showNumRatings=false />
           </div>
           <div>
@@ -35,16 +37,22 @@
               showOnly=["name"] /> Avg Rating:
             <rating.show-average-rating
               targetId=chatGroup.show-group.loadedGroup.memberIds[1]
+              waitOn=['targetId']
               showNumRatings=false />
           </div>
           <div>
             Rate Your Conversation:
-            <rating.rate-target
-              sourceId=lingua.navbar.user?.id
-              targetId=chatGroup.show-group.loadedGroup.memberIds[0] === lingua.navbar.user?.id ?
-                chatGroup.show-group.loadedGroup.memberIds[1] :
-                chatGroup.show-group.loadedGroup.memberIds[0]
-            />
+            <dv.tx>
+              <authentication.authenticate id=lingua.navbar.user?.id
+                hidden=true />
+              <rating.rate-target
+                sourceId=lingua.navbar.user?.id
+                targetId=chatGroup.show-group.loadedGroup.memberIds[0] === lingua.navbar.user?.id ?
+                  chatGroup.show-group.loadedGroup.memberIds[1] :
+                  chatGroup.show-group.loadedGroup.memberIds[0]
+              />
+              <dv.link hidden=true />
+            </dv.tx>
           </div>
         </div>
         <chat.show-chat

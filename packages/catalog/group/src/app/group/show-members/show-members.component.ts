@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -14,10 +15,13 @@ import {
   ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
 } from '@deja-vu/core';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import { ShowMemberComponent } from '../show-member/show-member.component';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -25,8 +29,8 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './show-members.component.html',
   styleUrls: ['./show-members.component.css']
 })
-export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowMembersComponent implements
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -46,19 +50,27 @@ export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
   @Output() loadedMemberIds = new EventEmitter<string[]>();
 
   memberIds: string[] = [];
+  destroyed = new Subject<any>();
 
   showMembers;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {
+    private rs: RunService, private router: Router) {
     this.showMembers = this;
   }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -122,6 +134,11 @@ export class ShowMembersComponent implements AfterViewInit, OnEval, OnInit,
     } else if (this.gs) {
       this.gs.noRequest();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

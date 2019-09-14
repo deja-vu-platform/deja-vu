@@ -32,6 +32,7 @@
                   <img class="check" src="assets/pendingCheck.png" />
                   <div class="roundCheckBox"></div>
                 </dv.button>
+                <dv.link hidden=true />
               </dv.tx>
             </dv.if>
 
@@ -50,6 +51,7 @@
                   <img class="check" src="assets/pendingCheck.png" />
                   <div class="roundCheckBox"></div>
                 </dv.button>
+                <dv.link hidden=true />
               </dv.tx>
             </dv.if>
           </dv.if>
@@ -97,9 +99,10 @@
                 targetId=$task.id
                 value=1
                 class="upvote-button"
-                newScoreSavedText=""
+                showDoneMessage=false
                 showOptionToInputValue=false
                 submitMatIconName="arrow_drop_up" />
+              <dv.link hidden=true />
             </dv.tx>
           </dv.if>
         </div>

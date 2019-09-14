@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, SimpleChanges, Type
+  OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
   ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
@@ -11,12 +11,15 @@ import {
   getFilteredPropertyNames, getFilteredPropertyNamesFromConfig
 } from '../shared/property.model';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
 import { API_PATH } from '../property.config';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 /**
@@ -27,8 +30,8 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './show-object.component.html',
   styleUrls: ['./show-object.component.css']
 })
-export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowObjectComponent implements
+  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -88,7 +91,9 @@ export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
 
   @Input() includeTimestamp = false;
 
+  destroyed = new Subject<any>();
   showObject;
+  refresh = false;
   private gs: GatewayService;
   private cs: ConfigService;
 
@@ -97,7 +102,7 @@ export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private csf: ConfigServiceFactory,
-    @Inject(API_PATH) private apiPath) {
+    private router: Router, @Inject(API_PATH) private apiPath) {
     this.showObject = this;
   }
 
@@ -121,6 +126,15 @@ export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
       .keys()
       .value()
     ]);
+
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.refresh = true;
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -196,6 +210,7 @@ export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
             this.loadedObject.emit(this.object);
             this.errors.emit(null);
           }
+          this.refresh = false;
         });
     } else if (this.gs) {
       this.gs.noRequest();
@@ -206,10 +221,15 @@ export class ShowObjectComponent implements AfterViewInit, OnEval, OnInit,
     return this.urlProps.has(propName);
   }
 
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
   private canEval(): boolean {
     return !!(
       this.gs &&
-      (!this.object || this.objectByIdIsOld()) &&
+      (!this.object || this.objectByIdIsOld() || this.refresh) &&
       this.id);
   }
 
