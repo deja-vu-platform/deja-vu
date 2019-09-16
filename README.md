@@ -112,6 +112,10 @@ Yarn will symlink dependencies so if you make a change to a concept you are usin
 in an app, the only thing you need to do is rebuild the concept with
 `yarn package` and restart your app.
 
+If you want to make changes to the website, you can test them by
+running `bundle exec jekyll serve` under
+[docs/](https://github.com/spderosso/deja-vu/tree/master/docs).
+
 ## Installation Help/Tips
 
 ### Node
