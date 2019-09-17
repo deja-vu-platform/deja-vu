@@ -41,6 +41,7 @@ export class AddToGroupComponent implements OnExec, OnExecFailure,
 
   // Presentation inputs
   @Input() buttonLabel = `Add member`;
+  @Input() showDoneMessage = true;
   @Input() addSavedText = `Member added to group`;
 
   @ViewChild(FormGroupDirective) form;

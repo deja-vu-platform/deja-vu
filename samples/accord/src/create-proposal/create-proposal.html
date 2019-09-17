@@ -3,11 +3,10 @@
   <div class="left-column">
     <accord.set-list-catalog groupId=$groupId />
   </div>
-  <div class="right-column">
+  <div class="right-column pad-top">
     <h1>Create Proposal</h1>
     <dv.tx>
       <dv.gen-id />
-      <div class="bold">Basic Information</div>
       <proposal.create-object
         initialValue={
           setListId: $setListId,
@@ -16,11 +15,16 @@
         showExclude=["setListId","addedBy"]
         showOptionToSubmit=false
         id=dv.gen-id.id />
-      <div class="bold">Add Media Links (Optional)</div>
+      <div class="bold">Media (Optional)</div>
+      <p class="hint">
+        Any changes made to media are updated in the table below, but only
+        pushed when "Create Proposal" is clicked
+      </p>
       <dv.stage
-        stageEntity=<dv.component stage$=accord.stage-proposal.stage>
-                      <accord.stage-proposal id=dv.gen-id.id />
-                    </dv.component>
+        stageEntity=<dv.component
+          stage$=accord.stage-proposal.stage>
+            <accord.stage-proposal id=dv.gen-id.id />
+          </dv.component>
         showEntity=<accord.show-media media=$entity deletable=false /> />
       <media.create-objects
         objects=dv.stage.stagedEntities ?
@@ -29,7 +33,7 @@
         Create Proposal
       </dv.button>
       <dv.redirect href="/proposal"
-        params={ proposalId:dv.gen-id.id, groupId:$groupId }
+        params={ proposalId: dv.gen-id.id, groupId: $groupId }
         onExecSuccess=true />
     </dv.tx>
   </div>

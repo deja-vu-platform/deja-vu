@@ -28,6 +28,7 @@ export class AddViewerComponent implements
   @Input() viewerInputLabel = 'Viewer Id';
   @Input() buttonLabel = 'Add Viewer to Resource';
   @Input() viewerAddedSuccessText = 'Viewer added to resource';
+  @Input() showDoneMessage = true;
   @Input() showResourceInputField = true;
   @Input() showViewerInputField = true;
 

@@ -2,16 +2,22 @@
   <accord.navbar accessRequired=true />
   <div class="center-column">
     <h2>My Groups</h2>
-    <div class="individual-card">
-      <group.show-groups
-        withMemberId=accord.navbar.loggedInUser?.id
-        showGroup=<accord.show-group-info group=$group /> />
-    </div>
     <dv.tx>
       <dv.button class="theme-button">
         Create Group
       </dv.button>
       <dv.link href="/create-group" hidden=true />
     </dv.tx>
+    <div class="individual-card">
+      <dv.tx>
+        <authentication.authenticate id=accord.navbar.loggedInUser?.id
+          waitOn=['id'] hidden=true />
+        <group.show-groups
+          withMemberId=accord.navbar.loggedInUser?.id
+          waitOn=["withMemberId"]
+          noGroupsToShowText=""
+          showGroup=<accord.show-group-info group=$group /> />
+      </dv.tx>
+    </div>
   </div>
 </dv.component>

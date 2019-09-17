@@ -1,14 +1,20 @@
 <dv.component name="show-comment">
-  <div class="left-column-80-thin-padding">
-    <dv.show-entity entity=$comment.content />
+  <div class="comment">
+    <div><dv.show-entity entity=$comment.content /></div>
+    <div class="comment-info">
+      <dv.if condition=$comment.authorId===$userId>
+        <dv.tx>
+          <comment.delete-comment id=$comment.id authorId=$comment.authorId />
+          <dv.link hidden=true />
+        </dv.tx>
+      </dv.if>
+    <div class="comment-data">
+      <div class="added-by">
+        Added by:
+        <userProfile.show-object showOnly=["firstName"] id=$comment.authorId />
+      </div>
+      <div><dv.show-date date=$comment.timestamp format="m/d y, h:mm a"/></div>
+    </div>
+    </div>
   </div>
-  <div class="left-column-20-thin-padding">
-    Posted by:
-    <userProfile.show-object showOnly=["firstName"] id=$comment.authorId />
-    <dv.if condition=$comment.authorId===$userId>
-      <comment.delete-comment id=$comment.id authorId=$comment.authorId />
-    </dv.if>
-  </div>
-
-
 </dv.component>
