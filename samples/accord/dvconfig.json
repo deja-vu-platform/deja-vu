@@ -51,9 +51,6 @@
             "description": {
               "type": "string"
             },
-            "publicRating": {
-              "type": "boolean"
-            },
             "groupId": {
               "type": "string"
             }

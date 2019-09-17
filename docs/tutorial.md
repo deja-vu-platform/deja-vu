@@ -12,15 +12,15 @@ which can then be voted up by other members.
 Users can also comment on a post or comment and upvote comments.
 The code of the app can be found in [samples/sn](../samples/sn).
 
-## Contents
+## contents
 {:.no_toc}
 
 - This is replaced
 {:toc}
 
-## Including and Configuring Concepts
+## including and configuring concepts
 
-### Choosing Concepts
+### choosing concepts
 
 The process of building a Déjà Vu app begins by navigating the
 [catalog of concepts](../packages/catalog/README) to find 
@@ -42,51 +42,15 @@ It also uses [Property](../packages/catalog/property/README.md) to save a post's
 a data-model-defining facility for simple CRUD behavior.
 
 
-### Including Concepts
+### including concepts
 
 The concepts used by the app are specified in
-the app's JSON config file (dvconfig.json). An excerpt of
+the app's JSON config file (dvconfig.json). The code for
 [*SN*'s config file](../samples/sn/dvconfig.json) is shown below:
 
-```json
-{
-  "name": "sn",
-  "usedConcepts": {
-    "authentication": {},
-    "comment": {},
-    "property": {
-      "config": {
-        "schema": {
-          "title": "Post",
-          "type": "object",
-          "properties": {
-            "author": { "type": "string" },
-            "title": { "type": "string" },
-            "url": {
-              "type": "string",
-              "format": "url"
-            }
-          },
-          "required": ["author", "title", "url"]
-        }
-      }
-    },
-    "scoringposts": {
-      "name": "scoring"
-    },
-    "scoringcomments": {
-      "name": "scoring"
-    }
-  },
-  "routes": [
-    { "path": "/item", "component": "show-post-details" },
-    { "path": "/login", "component": "login" },
-    { "path": "/news", "component": "home" },
-    { "path": "/submit", "component": "submit-post" },
-    { "path": "", "component": "home" }
-  ]
-}
-```
+{% raw %}
+<script src="https://gist.github.com/spderosso/1015c853960b02ec59815869508719d3.js?file=dvconfig.json"></script>
+{% endraw %}
 
 The `usedConcepts` object has one key-value pair per concept instance. The key
 (e.g., `post` on line 6)
@@ -110,7 +74,7 @@ for that concept is used.
 The format of the values of configuration options
 is also JSON.
 
-### Configuring Concepts
+### configuring concepts
 
 In *SN*, we only have to configure Property.
 Property accepts a configuration variable (`schema`) that expects a
@@ -135,7 +99,7 @@ doesn't provide a value for each field or
 the value for url is invalid, `create-object` will show an
 error message.
 
-### Routes
+### routes
 
 In the app's config file, we also define the
 name (line 2) and
@@ -152,47 +116,27 @@ will be shown (line 25) and if they navigate to "/item", the
 `show-post-details`
 component will be shown (line 26).
 
-## Linking Components
+## linking components
 
 Each app
 component is written in a separate HTML file.
 Excerpts
-of the code for [*SN*'s `submit-post`]()
-and [`show-post`]() components, together with a
+of the code for [*SN*'s `submit-post`](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/submit-post/submit-post.html)
+and [`show-post`](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/show-post/show-post.html) components, together with a
 screenshot
 of how they appear to users, are shown below:
 
-```html
-<dv.component name="submit-post">
-  <sn.navbar /> ...
-  <div class="main">
-    <div class="container">
-      <dv.if condition=sn.navbar.loggedInUser>
-        <dv.tx>
-          <dv.gen-id />
-          <authentication.authenticate
-            id=sn.navbar.loggedInUser.id hidden=true />
-          <property.create-object
-            buttonLabel="Submit"
-            id=dv.gen-id.id
-            initialValue={ author: sn.navbar.loggedInUser.username }
-            newObjectSavedText="Post submitted"
-            showExclude=['author']
-            showOptionToSubmit=sn.navbar.loggedInUser />
-            
-          <scoringposts.create-score
-            sourceId=sn.navbar.loggedInUser.username
-            targetId=dv.gen-id.id
-            value=0
-            hidden=true />
+{% raw %}
+<script src="https://gist.github.com/spderosso/1015c853960b02ec59815869508719d3.js?file=submit-post.html"></script>
+{% endraw %}
 
-          <dv.link href="/item" params={ id: dv.gen-id.id } hidden=true />
-        </dv.tx>
-      </dv.if>
-    </div>
-  </div>
-</dv.component>
-```
+![submit-post](/assets/submit-post-labeled.png)
+
+{% raw %}
+<script src="https://gist.github.com/spderosso/1015c853960b02ec59815869508719d3.js?file=show-post.html"></script>
+{% endraw %}
+
+![show-post](/assets/show-post-labeled.png)
 
 Our template language looks, by design,
 similar to other template languages. To create an app
@@ -201,7 +145,7 @@ components and
 synchronize them to implement
 the desired functionality.
 
-### Including Components
+### including components
 
 App components can contain other components, which can be
 concept components (i.e., components defined by concepts) or app components (i.e., components that
@@ -222,7 +166,7 @@ which generates a unique ID
 (built-in components
 can be regarded as free-standing concept components).
 
-#### I/O Binding
+#### I/O binding
 
 Inputs to a component are bound with the syntax `property=expr`.
 Template expressions can include
@@ -265,7 +209,7 @@ the user to `show-post-details` with its
 input `id`
 set to the given ID.
 
-#### ID Sharing
+#### ID sharing
 
 To bind entities in different concepts we use a common identifier.
 In `submit-post`, for example,
@@ -281,9 +225,9 @@ displays its own
 view of the post entity; the effect when put together is to
 display a *SN* post object.
 
-### Synchronizing Components
+### synchronizing components
 
-#### Action Types
+#### action types
 
 Concept components have two actions: an
 *evaluation* action (eval) and an
@@ -322,7 +266,7 @@ be built, without requiring the modification
 or creation of a concept.
 
 
-#### Synchronizing Actions
+#### synchronizing actions
 
 There are two kinds of app component: a regular component and
 a transaction (tx) component.

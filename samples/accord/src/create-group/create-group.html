@@ -4,6 +4,8 @@
     <h1>Create Group</h1>
     <dv.tx>
       <dv.gen-id />
+      <authentication.authenticate
+        id=accord.navbar.loggedInUser?.id hidden=true />
       <group.create-group
         id=dv.gen-id.id
         memberIds=[accord.navbar.loggedInUser?.id]

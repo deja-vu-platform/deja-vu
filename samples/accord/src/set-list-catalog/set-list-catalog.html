@@ -10,14 +10,6 @@
       </dv.link>
     </dv.if>
   </h2>
-  <div class="individual-card">
-    <setList.show-objects
-      fieldMatching={ groupId: $groupId, waitOn: ['groupId'] }
-      showOnly=["name"]
-      noObjectsToShowText="No setlists yet"
-      showObject=<accord.show-set-list-info
-        setList=$object groupId=$groupId /> />
-  </div>
   <div>
     <dv.if condition=authorization.can-view.canView>
       <dv.tx>
@@ -26,5 +18,14 @@
           params={ groupId:$groupId } hidden=true />
       </dv.tx>
     </dv.if>
+  </div>
+  <div class="individual-card">
+    <p>Setlists:</p>
+    <setList.show-objects
+      fieldMatching={ groupId: $groupId, waitOn: ['groupId'] }
+      showOnly=["name"]
+      noObjectsToShowText="No setlists yet"
+      showObject=<accord.show-set-list-info
+        setList=$object groupId=$groupId /> />
   </div>
 </dv.component>

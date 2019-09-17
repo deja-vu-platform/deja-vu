@@ -1,20 +1,17 @@
 <dv.component name="show-media">
-  <div>
-    <a href="//"+$media.sourceLink>
-      <dv.show-entity entity=$media.sourceLink />
-    </a>
+  <div class="media">
+    <div>
+      <a href="//"+$media.sourceLink>
+        <dv.show-entity entity=$media.sourceLink />
+      </a>
+      <dv.show-entity entity=$media.linkDescription />
+    </div>
+    <dv.if condition=$deletable>
+      <dv.tx>
+        <media.delete-object id=$media.id hidden=true />
+        <dv.button><mat-icon>delete</mat-icon></dv.button>
+        <dv.link hidden=true />
+      </dv.tx>
+    </dv.if>
   </div>
-  <div>
-    <dv.show-entity entity=$media.linkDescription />
-  </div>
-  <dv.if condition=$deletable>
-    <dv.tx>
-      <media.delete-object id=$media.id hidden=true />
-      <dv.button>
-        <mat-icon>
-          delete
-        </mat-icon>
-      </dv.button>
-    </dv.tx>
-  </dv.if>
 </dv.component>

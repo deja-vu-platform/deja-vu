@@ -1,6 +1,6 @@
 <form (ngSubmit)="onSubmit()" class="form-horizontal">
   <div class="form-group add-viewer-form-group">
-    <div *ngIf="viewerAddedSuccess" class="add-viewer-success">
+    <div *ngIf="viewerAddedSuccess && showDoneMessage" class="add-viewer-success">
       <i class="material-icons">done</i>
       {{viewerAddedSuccessText}}
     </div>

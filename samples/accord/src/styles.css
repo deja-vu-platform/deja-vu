@@ -4,7 +4,8 @@
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Mogra');
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
 md-icon {
   font-family: 'Material Icons' !important;
 }
@@ -12,7 +13,7 @@ md-icon {
 /* Basics */
 p {
   white-space: pre-wrap;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Raleway', sans-serif;
 }
 
 a {
@@ -24,25 +25,24 @@ a:hover {
 }
 
 h1 {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
+  font-size: 36px;
   color: #28bdb1;
-  margin:0;
 }
 
 h2 {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
   color: #28bdb1;
-  margin:0;
 }
 
 h3 {
-  font-family: 'Lato', sans-serif;
-  color: #28bdb1;
-  margin: 0;
+  font-family: 'Raleway', sans-serif;
 }
 
 div {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Raleway', sans-serif;
 }
 
 ul {
@@ -58,27 +58,32 @@ main {
   background-color: #ffffff !important;
 }
 
+.logo {
+  height: 50px;
+}
+
 /* Layouts */
 .center-column {
-  margin: 30px 70px;
+  padding-top: 20px;
+  margin: 0px 70px;
 }
 
 .center-column-dynamic-thin {
-  padding-top: 40px;
+  padding-top: 20px;
   margin: auto;
   width: 25%;
 }
 
 .center-column-dynamic-medium {
-  padding-top: 40px;
+  padding-top: 20px;
   margin: auto;
   width: 35%;
 }
 
 .center-column-dynamic-auth {
   margin: auto;
-  padding-top: 40px;
-  width: 280px;
+  padding-top: 20px;
+  width: 290px;
 }
 
 .auth-form {
@@ -89,13 +94,13 @@ main {
 .left-column {
   float: left;
   width: 25%;
-  padding: 30px 50px;
+  padding: 20px 50px;
 }
 
 .left-column-50 {
   float: left;
   width: 50%;
-  padding: 30px 50px;
+  padding: 0px 50px;
 }
 
 .left-column-80-thin-padding {
@@ -113,7 +118,7 @@ main {
 .fourth-column {
   float: left;
   width: 25%;
-  padding: 30px 50px;
+  padding: 20px 50px;
 }
 
 .left-column-50-thin-padding {
@@ -122,14 +127,22 @@ main {
   padding: 10px 10px;
 }
 
-.right-column{
+.right-column {
   float: right;
   width: 75%;
-  padding: 30px 50px;
+  padding: 0px 50px;
 }
 
-.individual-card {
-  margin: 30px 0;
+.pad-top {
+  padding-top: 20px;
+}
+
+.pad-10 {
+  padding-top: 10px;
+}
+
+.added-by {
+  height: 34px;
 }
 
 .inline-block {
@@ -140,60 +153,38 @@ main {
   margin: 10px 0;
 }
 
-/* Auth Related */
-.theme-button button.mat-button,
-authentication-sign-in button.mat-button,
-property-create-object button.mat-button,
-property-update-object button.mat-button,
-property-delete-object button.mat-button {
-  background-color: #28bdb1;
-  color: #FFFFFF !important;
-  border: 2px solid white;
-  font-size: 20px;
-  line-height: 20px;
-  transition: all 250ms ease;
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 25px;
-  display: block;
+.individual-card {
+  margin: 20px 0;
 }
 
-.theme-button button.mat-button:hover, .sign-up-btn button.mat-button:hover,
-authentication-sign-in button.mat-button:hover
-property-create-object button.mat-button:hover,
-property-update-object button.mat-button:hover,
-property-delete-object button.mat-button:hover {
-  color: #28bdb1 !important;
-  background-color: white;
-  border: 2px solid #28bdb1;
+.hint {
+  font-size: 12px;
+  white-space: normal;
 }
+
 
 /* Navbar */
-.navbar a {
-  color: #FFFFFF;
-  display: inline-block;
-  text-align:center;
-  vertical-align: middle;
-  margin:5px;
+.navbar {
+  background-color: #28bdb1;
+  height: 60px;
+}
+
+.navbar-right, .navbar-right-elem {
+  margin-bottom: 10px;
+}
+
+.navbar a, .navbar-right-elem {
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .navbar a:hover {
   text-decoration: none;
   color: #054575;
-}
-
-.navbar-right a, .navbar-right-elem {
-  vertical-align: middle;
-  margin:5px;
-  text-align: center;
-  display: inline-block;
-  color: white;
-}
-
-.navbar {
-  background-color: #28bdb1;
-  height: 70px;
 }
 
 .login-btn a,

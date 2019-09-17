@@ -41,10 +41,13 @@
       <comment.show-comments
         ofTargetId=$proposalId
         waitOn=['ofTargetId']
+        noCommentsToShowText=""
+        includeTimestamp=true
         showComment=<accord.show-comment
           comment=$comment userId=accord.navbar.loggedInUser?.id /> />
       <dv.tx>
         <comment.create-comment
+          showDoneMessage=false
           authorId=accord.navbar.loggedInUser?.id targetId=$proposalId />
         <dv.link hidden=true />
       </dv.tx>
@@ -52,15 +55,15 @@
 
   </div>
   <div class="left-column">
-    <div>
+    <div class="added-by">
       <dv.if condition=!!proposal.show-object.loadedObject>
-        Added By
+        Added by:
         <userProfile.show-object
           id=proposal.show-object.loadedObject.addedBy showOnly=["firstName"] />
       </dv.if>
     </div>
     <div>
-      Your Rating:
+      Your rating:
       <dv.tx>
         <rating.rate-target
           sourceId=accord.navbar.loggedInUser?.id targetId=$proposalId />

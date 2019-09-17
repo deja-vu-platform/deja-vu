@@ -1,0 +1,12 @@
+.comment {
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-data {
+  margin-top: -10px;
+}
+
+.comment-info {
+  display: flex;
+}

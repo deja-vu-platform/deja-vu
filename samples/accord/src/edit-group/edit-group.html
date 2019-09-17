@@ -16,7 +16,7 @@
         <authentication.authenticate as can-edit-group-auth
           id=accord.navbar.loggedInUser?.id hidden=true />
       </dv.tx>
-      <h3>Members</h3>
+      <h2>Members</h2>
       <userProfile.choose-object
         chooseObjectSelectPlaceholder="Select user to invite"
         showOnly=["firstName","lastName"] />
@@ -40,13 +40,19 @@
         <group.show-group
           id=$groupId showMembers=true showGroupId=false
           showMember=<accord.show-user-info
-            userId=$id groupId=$groupId allowEdit=true
-            currentUserId=accord.navbar.loggedInUser?.id /> />
+            userId=$id groupId=$groupId allowEdit=true /> />
         <authorization.can-edit as can-edit-members
           resourceId=$groupId
           principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-members-auth
           id=accord.navbar.loggedInUser?.id hidden=true />
+      </dv.tx>
+      <dv.tx>
+        <group.delete-group id=$groupId hidden=true />
+        <authorization.delete-resource id=$groupId hidden=true />
+        <groupInfo.delete-object id=$groupId hidden=true />
+        <dv.button>Delete Group</dv.button>
+        <dv.link href="/" hidden=true />
       </dv.tx>
     </dv.if>
 

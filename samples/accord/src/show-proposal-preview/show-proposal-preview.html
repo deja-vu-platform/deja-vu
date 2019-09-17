@@ -4,18 +4,18 @@
       <dv.show-entity entity=$proposal.songTitle />
     </h3>
     <div>
-      By <dv.show-entity entity=$proposal.songArtist />
+      by <dv.show-entity entity=$proposal.songArtist />
     </div>
     <dv.link href="/proposal"
       params={ proposalId: $proposal.id, groupId: $groupId }>View</dv.link>
   </div>
   <div class="left-column-50-thin-padding">
-    <div>
-      Added By
+    <div class="added-by">
+      Added by:
       <userProfile.show-object id=$proposal.addedBy showOnly=["firstName"] />
     </div>
     <div>
-      You Rating:
+      Your rating:
       <dv.tx>
         <rating.rate-target
           sourceId=$loggedInUserId targetId=$proposal.id />
@@ -23,7 +23,7 @@
       </dv.tx>
     </div>
     <div>
-      Average Rating: <rating.show-average-rating targetId=$proposal.id />
+      Average rating: <rating.show-average-rating targetId=$proposal.id />
     </div>
   </div>
 </dv.component>

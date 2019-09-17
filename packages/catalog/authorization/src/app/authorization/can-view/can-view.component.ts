@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter,
-  Inject, Input, OnChanges, OnInit, Output
+  Inject, Input, OnChanges, OnDestroy, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
@@ -9,7 +9,12 @@ import {
 
 import * as _ from 'lodash';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import { API_PATH } from '../authorization.config';
+
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 interface CanViewRes {
@@ -22,25 +27,34 @@ interface CanViewRes {
   styleUrls: ['./can-view.component.css']
 })
 export class CanViewComponent implements
-  AfterViewInit, OnInit, OnChanges, OnEval, OnExec {
+  AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval, OnExec {
   @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
   _canView = false;
 
+  destroyed = new Subject<any>();
+
   private gs: GatewayService;
   private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
+    private wsf: WaiterServiceFactory, private router: Router,
     private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.ws = this.wsf.for(this, this.waitOn);
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -88,7 +102,12 @@ export class CanViewComponent implements
     });
   }
 
-  canEval() {
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
+  private canEval() {
     return this.gs && this.principalId && this.resourceId;
   }
 }
