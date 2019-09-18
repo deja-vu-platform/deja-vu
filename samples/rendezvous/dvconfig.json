@@ -30,10 +30,11 @@
             "title": {
               "type": "string"
             },
-            "additionalInfo": {
+            "eventDetails": {
               "type": "string"
             }
-          }
+          },
+          "required": ["title"]
         }
       }
     },
