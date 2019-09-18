@@ -636,7 +636,10 @@ export class AppRequestProcessor extends RequestProcessor {
 
     if (prunedCohortComponents.length < receivedRequestFqTags.length) {
       throw new RequestInvalidError(
-        'Received requests include components that are not part of the cohort');
+        'Received requests include components that are not part of the cohort' +
+        `. Received: ${JSON.stringify(receivedRequestFqTags)}` +
+        `. Expected cohort: ${JSON.stringify(
+          _.map(prunedCohortComponents, 'fqtag'))}`);
     }
 
     return prunedCohortComponents;
