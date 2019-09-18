@@ -47,7 +47,7 @@ assembled with much less effort.
 users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
-- In a separate terminal, start MongoDB locally with `mongod`. See [help](#installation-helptips)
+- In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
 - On the root directory of your new repo, run `npm start` and visit
 `http://localhost:3000`.
 You should see a "hello world" page.
@@ -91,13 +91,13 @@ Once you are there, run `yarn` to install and build everything
 Unfortunately, yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
 affects our installation process, so the first `yarn` will fail. After
 the first `yarn` fails, run `yarn --check-files` and everything should work.
-If it fails, follow [these instructions](##the-manual-approach).
+If it fails, follow [these instructions](#the-manual-approach).
 
 Installation will take a while as it downloads dependencies and builds all
 concepts and core libraries.
 
 All of our concepts and the runtime system use MongoDB.
-To run a concept or an app start the mongo daemon with `mongod` (see [help](#installation-helptips)). Then,
+To run a concept or an app start the mongo daemon with `mongod` (see [help](#mongodb)). Then,
 in a separate shell `cd` into the concept or app you want to run and do `yarn start`.
 
 To check the running concept or app visit `http://localhost:3000`.
