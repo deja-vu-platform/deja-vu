@@ -1,0 +1,8 @@
+<dv.component name="show-host">
+  <authentication.show-user id=$id waitOn=['id'] hidden=true />
+  <dv.link class="display-buttons btn host-name"
+    href="/profile" params={ id: $id }>
+    Hosted By
+    {{ authentication.show-user.loadedUser?.username }}
+  </dv.link>
+</dv.component>

@@ -1,7 +1,3 @@
-table, th, td {
-  border: 1px solid #CC9088;
-}
-
 #num-attendees {
   width: 100%;
 }
@@ -12,6 +8,14 @@ table, th, td {
 }
 
 #event-summary-table {
-  margin-top: 10px;
-  margin-bottom: 0px;
+  margin-top: -45px;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.details {
+  margin-top: -20px;
 }

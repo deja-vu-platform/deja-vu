@@ -4,16 +4,18 @@
   <div class="card">
     <div class="card-header">
       <!-- Event Title -->
-      <!-- TODO: remove link once visible in marker popup -->
-      <eventDetails.show-object class="inline-block"
-        object=eventDetails.show-object.loadedObject
-        showOnly=["title"] /> |
-      <dv.link class="inline-block" href="/event-details"
-        params={ eventId: $id }>
-        Details
-      </dv.link>
+      <div class="event-header">
+        <eventDetails.show-object class="inline-block"
+          object=eventDetails.show-object.loadedObject
+          showOnly=["title"] />
+        <div class="details">
+          <dv.link class="btn button" href="/event-details"
+            params={ eventId: $id }>
+            Details
+          </dv.link>
+        </div>
+      </div>
     </div>
-
     <div class="card-body">
       <!-- Number of attendees -->
       <button class="display-buttons btn btn-info" id="num-attendees">
@@ -22,25 +24,9 @@
           <group.show-member-count inGroupId=$id />
         </span>
       </button>
-
-      <table class="event-info event-display table" id="event-summary-table">
-
-        <!-- Location -->
-        <tr>
-          <th>Location</th>
-          <td>
-            <geolocation.show-marker id=$id showId=false showMapId=false />
-          </td>
-        </tr>
-
-        <!-- Date + Time -->
-        <tr>
-          <th>Date + Time</th>
-          <td>
-            <event.show-event id=$id />
-          </td>
-        </tr>
-      </table>
+      <div id="event-summary-table">
+        <rendezvous.show-event-table id=$id />
+      </div>
     </div>
   </div>
 </dv.component>

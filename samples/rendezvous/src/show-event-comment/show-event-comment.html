@@ -1,25 +1,22 @@
 <dv.component name="show-event-comment">
-  <tr>
-    <td class="show-comment">
+  <div class="event-comment">
+    <!-- Show Comment Author -->
+    <div>
+      <button class="display-buttons inline btn btn info">
+        <span class="badge">
+          <rendezvous.show-member-name id=$comment?.authorId />
+        </span>
+      </button>
+    </div>
+
+    <div class="card-body">
       <div>
-        <!-- Show Comment Author -->
         <div>
-          <button class="display-buttons inline btn btn info" type="button">
-            <span class="badge">
-              <rendezvous.show-member-name id=$comment?.authorId />
-            </span>
-          </button>
-        </div>
-
-        <div class="card-body">
           <p id="timestamp">
-            <dv.show-date date=$comment?.timestamp format='time-ago' />
+            <dv.show-date date=$comment?.timestamp format='m/d/y @ hh:mm a' />
           </p>
-
-          <!-- Show Comment Content -->
-          <comment.show-comment comment=$comment
-            showId=false showAuthorId=false showTargetId=false />
-
+        </div>
+        <div>
           <!-- Delete Comment -->
           <dv.if condition=$comment?.authorId === $loggedInUserId>
             <dv.tx>
@@ -32,6 +29,10 @@
           </dv.if>
         </div>
       </div>
-    </td>
-  </tr>
+
+      <!-- Show Comment Content -->
+      <comment.show-comment comment=$comment
+        showId=false showAuthorId=false showTargetId=false />
+    </div>
+  </div>
 </dv.component>

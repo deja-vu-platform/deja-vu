@@ -15,12 +15,14 @@
 }
 
 #timestamp {
-  white-space:pre;
-  margin-left: 15px;
   color: #6b6b6b;
 }
 
 #delete-comment-button {
   text-align: right;
-  margin-top: -30px;
+  margin-top: -45px;
+}
+
+.event-comment {
+  display: flex;
 }

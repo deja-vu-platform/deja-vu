@@ -131,7 +131,7 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
     if (!this.gs) {
       return;
     }
-    this.gs.post<{ data: { groups: Group } }>('/graphql', {
+    await this.gs.post<{ data: { groups: Group } }>('/graphql', {
       inputs: {
         groupId: this.group.id,
         id: this.memberId

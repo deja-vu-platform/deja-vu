@@ -1,0 +1,17 @@
+<dv.component name="show-event-table">
+  <table class="event-info event-display table" id="event-summary-table">
+    <tr>
+      <th>Location</th>
+      <td>
+        <geolocation.show-marker id=$id showId=false showMapId=false
+          showLatLong=false />
+      </td>
+    </tr>
+    <tr>
+      <th>Date + Time</th>
+      <td>
+        <event.show-event id=$id />
+      </td>
+    </tr>
+  </table>
+</dv.component>

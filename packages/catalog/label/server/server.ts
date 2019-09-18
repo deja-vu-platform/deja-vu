@@ -269,7 +269,7 @@ const labelConcept: ConceptServer = new ConceptServerBuilder('label')
     await labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
     if (!_.isEmpty(config.initialLabelIds)) {
       return labels.insertMany(EMPTY_CONTEXT,
-        _.map(config.initialLabelIds, (id) => ({ id: id })));
+        _.map(config.initialLabelIds, (id) => ({ id: standardizeLabel(id) })));
     }
 
     return Promise.resolve();
