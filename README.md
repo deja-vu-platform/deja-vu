@@ -91,14 +91,10 @@ Once you are there, run `yarn` to install and build everything
 Unfortunately, yarn has a [bug](https://github.com/yarnpkg/yarn/issues/3421) that
 affects our installation process, so the first `yarn` will fail. After
 the first `yarn` fails, run `yarn --check-files` and everything should work.
-
-If `yarn --check-files` fails, try the following:
-- `cd packages/compiler` and `yarn package`
-- `cd ../cli` and `yarn package`
-- then `yarn --check-files` again
+If it fails, follow [these instructions](##the-manual-approach).
 
 Installation will take a while as it downloads dependencies and builds all
-concepts and core libraries. 
+concepts and core libraries.
 
 All of our concepts and the runtime system use MongoDB.
 To run a concept or an app start the mongo daemon with `mongod` (see [help](#installation-helptips)). Then,
@@ -112,11 +108,37 @@ Yarn will symlink dependencies so if you make a change to a concept you are usin
 in an app, the only thing you need to do is rebuild the concept with
 `yarn package` and restart your app.
 
+### Creating New Samples
+
+If you are planning on contributing a new sample app, or you simply want to write
+a temporary app to test changes to concepts, you should add your new app under `samples/`.
+It is important that you put it under `samples/` so that you can run it like
+you run any of the other sample apps. Also, before you do `yarn start`
+to run your app, run `yarn` to install dependencies.
+
+### Creating New Concepts
+
+If you are creating a new concept, it is important that you put it under
+`packages/catalog`.
+
+### Website
+
 If you want to make changes to the website, you can test them by
 running `bundle exec jekyll serve` under
 [docs/](https://github.com/spderosso/deja-vu/tree/master/docs).
 
 ## Installation Help/Tips
+
+### The Manual Approach
+
+If `yarn --check-files` fails, try the following:
+- `cd packages/compiler` and `yarn package`
+- `cd ../cli` and `yarn package`
+- then `yarn --check-files` again
+
+If it still doesn't work, double check that you are running node v9-11
+by running `node --version` in the same shell in which you are running
+the `yarn` commands.
 
 ### Node
 
@@ -128,6 +150,10 @@ below.
 [official Nodejs instructions](https://nodejs.org/en/download/package-manager/).
 Don't do `sudo apt install nodejs`, it will install a very old version of node (v8)
 that we don't support.
+- If you are running an old version of node you'll get errors during the installation
+process. But the error is not going to say "your version of node is too old" so if
+you see errors check that the version of node you have is v9-11 by running
+`node --version` in the same shell in which you are running the `yarn` commands.
 
 ### MongoDB
 
