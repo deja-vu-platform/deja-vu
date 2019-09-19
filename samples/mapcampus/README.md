@@ -1,33 +1,32 @@
-# mapcampus
+# MapCampus
 
-*A clone of a 6.170 project built with Deja Vu.*
+Allow members to plan events on campus
 
-## Overview
-Allows members of the MIT community to plan events on campus, with a map showing where they will be held.
-Events can be made public or private to a group of other users.
+## Uses
 
-## Design Credit
-Team RECD
-- Dora Tzeng
-- Elysa Kohrs
-- Jisoo Hong
-- Rena Liu
+Uses [Authentication][authentication], [Authorization][authorization],
+[Event][event], [Group][group], and [Property][property]
 
+> *Acknowledgments*. This sample application replicates the core functionality
+> of a project built for a web programming course at MIT. The students that
+> designed the original app are Rena, Elysa, Casey, and Dora.
 
-## Concepts Used
-- Authentication
-- Authorization
-- Geolocation
-- Event
-- Group
-- Property
+[authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
+[authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization
+[chat]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/chat
+[comment]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/comment
+[event]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/event
+[follow]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/follow
+[geolocation]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/geolocation
+[group]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/group
+[label]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/label
+[match]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/match
+[passkey]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/passkey
+[property]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/property
+[ranking]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/ranking
+[rating]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/rating
+[schedule]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/schedule
+[scoring]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/scoring
+[task]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/task
+[transfer]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/transfer
 
-## Missing Features
-*In parenthesis is what's needed for the feature.*
-- Filter events by time (search events by time widget)
-- Pick location from list of MIT buildings (location from list widget…if we want to support this)
-- Search for events by location (show markers by location widget, but should probably move away from lat+lng)
-- Ability to edit events (edit event concept)
-- Only the event host can edit the event (edit event concept and authorization can edit concept)
-- Restrict mapcampus to the a university community (authentication concept - add regex to sign up)
-- Filter events by public/group (depends on how group visibility is done)

@@ -1,17 +1,17 @@
-# Rendezvous
+# Chorestar 
 
-Plan public events on campus
+Make it easy for parents to assign chores to children
 
 ## Uses
 
-Uses [Authentication][authentication], [Authorization][authorization],
-[Comment][comment], [Event][event], [Geolocation][geolocation],
-[Group][group], [Label][label], and [Property][property] (x2)
+Uses [Authentication][authentication] (x2),
+[Authorization][authorization] (x2), [Group][group],
+[Property][Property] (x3), [Task][task], and [Transfer][transfer]
 
 > *Acknowledgments*. This sample application replicates the core functionality
 > of a project built for a web programming course at MIT. The students that
-> designed the original app are Hannah Chen, Yoeal Efrem, Alisha Saxena, and
-> Saron Teklezgi
+> designed the original app are Caitlin Cassidy, Katie Marlowe, Rachel Hausmann,
+> and Sean Soni.
 
 [authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
 [authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization

@@ -105,18 +105,19 @@ you run any of the other sample apps. Also, before you do `yarn start`
 to run your app, run `yarn` to install dependencies.
 
 Any app under `samples/` is automatically part of the monorepo. Note that there can't
-be more than one app with the same name. Thus, if you are starting your new app
-by copy+pasting another app you should change the package name in the new app's
-package.json file.
+be more than one app with the same package name. Thus, if you are starting your
+new app by copy+pasting another app you should change the package name in the
+new app's package.json file.
 
 ### Creating New Concepts
 
 If you are creating a new concept, it is important that you put it under
 `packages/catalog`. Any concept under `packages/catalog` is automatically
-part of the monorepo and can be locally by apps under `samples/`.
+part of the monorepo and can be used locally by apps under `samples/`.
 If you'd like your new concept to appear in the designer, see the
 designer's [readme file](https://github.com/spderosso/deja-vu/tree/master/designer#how-to-add-a-concept)
 for instructions.
+Note that a concept must have a unique name.
 
 ### Website
 
