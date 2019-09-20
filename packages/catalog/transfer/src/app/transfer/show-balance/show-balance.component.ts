@@ -14,7 +14,8 @@ import {
   GatewayService,
   GatewayServiceFactory,
   OnEval,
-  RunService
+  RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH, TransferConfig } from '../transfer.config';
@@ -39,8 +40,9 @@ interface BalanceRes {
   styleUrls: ['./show-balance.component.css'],
   entryComponents: [ ShowAmountComponent ]
 })
-export class ShowBalanceComponent implements
-  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+export class ShowBalanceComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+  @Input() waitOn: string[];
   @Input() accountId: string;
   @Input() balance: Amount;
 
@@ -54,6 +56,7 @@ export class ShowBalanceComponent implements
 
   balanceType: 'money' | 'items';
 
+  private ws: WaiterService;
   private gs: GatewayService;
   destroyed = new Subject<any>();
   refresh = false;
@@ -61,11 +64,13 @@ export class ShowBalanceComponent implements
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private csf: ConfigServiceFactory,
+    private wsf: WaiterServiceFactory,
     private router: Router, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
 
     this.balanceType = this.csf.createConfigService(this.elem)
       .getConfig().balanceType;
@@ -95,6 +100,7 @@ export class ShowBalanceComponent implements
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       const selection = this.balanceType === 'money' ? '' : 'id, count';
       this.gs.get<BalanceRes>(this.apiPath, {
         params: {

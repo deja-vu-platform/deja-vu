@@ -23,6 +23,7 @@ export class CamelToTitleCasePipe implements PipeTransform {
 @Component({
   selector: 'dv-stage',
   templateUrl: './stage.component.html',
+  styleUrls: ['./stage.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

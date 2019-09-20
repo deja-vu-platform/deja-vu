@@ -42,8 +42,11 @@ th {
   margin-bottom: 0px;
 }
 
-.btn {
+.btn,
+.btn:hover {
   border-radius: 3px;
+  background-color: #3774b5;
+  border-color: #3774b5;
 }
 
 .btn a {
@@ -75,6 +78,7 @@ th {
 .navbar {
   background-color: #f8f8f8;
   border-color: #e7e7e7;
+  color: gray;
 }
 
 .navbar-brand a {
@@ -174,13 +178,12 @@ th {
   float: right;
 }
 
-#box {
+.box {
   border: 1px solid #ccc;
   border-radius: 3px;
   padding-top: 25px;
   padding-bottom: 25px;
   background-color: #fff;
-  max-height: 150px;
 }
 
 #padding {

@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-md-12">
       <dv.tx>
-        <transfer.create-transfer id=$partyId
+        <transfer.create-transfer
           fromId=$partyId
           toId=$loggedInUserId
           showOptionToInputFromId=false
@@ -23,8 +23,8 @@
                 emitOnRunOnly=false />
             </dv.component>
           />
-
         <authentication.authenticate id=$loggedInUserId hidden=true />
+        <dv.link hidden=true />
       </dv.tx>
     </div>
   </div>
