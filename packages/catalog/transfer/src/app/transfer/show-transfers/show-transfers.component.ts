@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {
   ComponentValue, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
-  OnEval, RunService
+  OnEval, RunService, WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 import { Transfer } from '../shared/transfer.model';
@@ -18,8 +18,9 @@ import { API_PATH } from '../transfer.config';
   templateUrl: './show-transfers.component.html',
   styleUrls: ['./show-transfers.component.css']
 })
-export class ShowTransfersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowTransfersComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
+  @Input() waitOn: string[];
   // Fetch rules
   // If undefined then the fetched transfers are not filtered by that property
   @Input() fromId: string | undefined;
@@ -42,11 +43,13 @@ OnChanges {
   balanceType: 'money' | 'items';
 
   showTransfers;
+  private ws: WaiterService;
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private csf: ConfigServiceFactory,
+    private wsf: WaiterServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.showTransfers = this;
   }
@@ -54,6 +57,7 @@ OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
 
     this.balanceType = this.csf.createConfigService(this.elem)
       .getConfig().balanceType;
@@ -75,6 +79,7 @@ OnChanges {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       const selection = this.balanceType === 'money' ?
         '' : ' { id, count }';
       this.gs

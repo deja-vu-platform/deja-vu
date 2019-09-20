@@ -6,7 +6,8 @@ import {
   GatewayService,
   GatewayServiceFactory,
   OnEval,
-  RunService
+  RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 import { Event, fromUnixTime } from '../../../../shared/data';
 
@@ -18,6 +19,7 @@ import { Event, fromUnixTime } from '../../../../shared/data';
 })
 export class ShowEventComponent implements AfterViewInit, OnChanges, OnEval,
 OnInit {
+  @Input() waitOn: string[];
   // One is required
   @Input() event: Event | undefined;
   @Input() id: string | undefined;
@@ -29,23 +31,26 @@ OnInit {
   sameDayEvent = false;
 
   private gs: GatewayService;
+  private ws: WaiterService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory, private rs: RunService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
   }
 
   ngAfterViewInit() {
     this.load();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes) {
     if (this.event && this.event.startDate && this.event.endDate) {
       this.sameDayEvent = this.isSameDayEvent(this.event);
-    } else {
+    } else if (this.ws && this.ws.processChanges(changes)) {
       this.load();
     }
   }
@@ -58,6 +63,7 @@ OnInit {
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<{
         data: {event: { startDate: number, endDate: number }}}>('/graphql', {
         params: {

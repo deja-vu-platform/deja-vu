@@ -1,7 +1,7 @@
 <dv.component name="show-party">
-  <party.show-object id=$partyId hidden=true />
-  <authorization.show-resource id=$partyId hidden=true />
-  <transfer.show-balance accountId=$partyId hidden=true />
+  <party.show-object id=$partyId waitOn=['id'] hidden=true />
+  <authorization.show-resource id=$partyId waitOn=['id'] hidden=true />
+  <transfer.show-balance accountId=$partyId waitOn=['accountId'] hidden=true />
 
   <div class="panel panel-default">
     <div class="panel-body">
@@ -14,13 +14,14 @@
           <div class="top-space">
             <p>
               <i class="material-icons icon">event</i> Date:
-              <event.show-event id=$partyId class="inline-block" />
+              <event.show-event id=$partyId waitOn=['id']
+                class="inline-block" />
             </p>
             <p>
               <i class="material-icons icon">person</i> Host:
               <authentication.show-user
                 id=authorization.show-resource.fetchedResource?.ownerId
-                class="inline-block" />
+                waitOn=['id'] class="inline-block" />
             </p>
             <p>
               <i class="material-icons icon">location_on</i> Location:
@@ -41,32 +42,35 @@
         <div class="col-md-4">
           <div class="row">
             <div class="col-md-12">
-              <h4>Invited List</h4>
+              <h4>Guest List</h4>
               <group.show-members inGroupId=$partyId
+                waitOn=['inGroupId']
                 showMember=<authentication.show-user id=$id showId=false /> />
             </div>
           </div>
           <div class="row top-space">
-            <dv.if condition=authorization.show-resource.fetchedResource?.ownerId===$loggedInUserId>
-              <authentication.choose-user showChooseButton=false
-                chooseSelectPlaceholder="Choose Guest"
-                addButtonLabel="Add to Guest List" />
-              <dv.tx class="col-md-12">
+            <dv.if condition=authorization.show-resource.fetchedResource?.ownerId === $loggedInUserId>
+              <div class="col-md-12">
                 <h4>Add Guest</h4>
-                <dv.status savedText="Guest added to list" />
-                <group.add-to-group id=$partyId
-                  member=authentication.choose-user.selectedUser
-                  hidden=true />
-                <authorization.can-view principalId=$loggedInUserId
-                  resourceId=$partyId hidden=true />
-                <authorization.add-viewer id=$partyId
-                  viewer=authentication.choose-user.selectedUser
-                  hidden=true />
-                <authentication.authenticate id=$loggedInUserId hidden=true />
-                <dv.button>Add to Guest List</dv.button>
-              </dv.tx>
+                <authentication.choose-user showChooseButton=false
+                  chooseSelectPlaceholder="Choose Guest"
+                  addButtonLabel="Add to Guest List" />
+                <dv.tx>
+                  <dv.status savedText="Guest added to list" />
+                  <group.add-to-group id=$partyId
+                    member=authentication.choose-user.selectedUser
+                    hidden=true />
+                  <authorization.can-view principalId=$loggedInUserId
+                    resourceId=$partyId hidden=true />
+                  <authorization.add-viewer id=$partyId
+                    viewer=authentication.choose-user.selectedUser
+                    hidden=true />
+                  <authentication.authenticate id=$loggedInUserId hidden=true />
+                  <dv.button>Add to Guest List</dv.button>
+                  <dv.link hidden=true />
+                </dv.tx>
+              </div>
             </dv.if>
-
           </div>
         </div>
         <div class="col-md-1"></div>
@@ -94,6 +98,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <transfer.show-transfers fromId=$partyId
+                      waitOn=['fromId']
                       noTransfersToShowText="No claims"
                       showTransfer=<potluck.show-claim transfer=$transfer /> />
                   </div>
