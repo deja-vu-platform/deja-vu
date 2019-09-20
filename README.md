@@ -29,6 +29,8 @@ For documentation and more information see
 
 ## Create an App
 
+(This won't work until the npm packages are public, see "Contributing" instructions to create an app)
+
 - If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
 users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
