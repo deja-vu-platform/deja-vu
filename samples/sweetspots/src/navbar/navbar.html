@@ -12,17 +12,23 @@
     <div class="container-fluid">
 
       <div class="navbar-header">
-        <dv.link class="sweet-spots-heading navbar-brand" href="/main">
+        <dv.link class="sweet-spots-heading navbar-brand" href="/">
           Sweet Spots
         </dv.link>
       </div>
 
       <div class="form-inline navbar-left search">
-        <label.search-items-by-labels hidden=!$showSearch />
+        <label.search-items-by-labels searchPlaceholder="Choose Category"
+          hidden=!$showSearch />
       </div>
 
       <dv.if condition=authentication.logged-in.user>
-        <div class="form-inline navbar-right inline-block">
+        <div class="form-inline">
+          <p class="navbar-text navbar-right inline-block">
+            Hello, <authentication.show-user class="inline-block"
+              user=authentication.logged-in.user
+              showId=false />! &nbsp;
+          </p>
           <div class="btn-toolbar toolbar">
             <dv.tx>
               <authentication.sign-out class="btn btn-danger"
@@ -33,15 +39,10 @@
             <dv.link href="/profile"
               params={ userId: authentication.logged-in.user?.id }
               class="mat-button btn btn-info profile-btn">
-              My Profile
+              Profile
             </dv.link>
           </div>
         </div>
-        <p class="navbar-text navbar-right inline-block">
-          Hello, <authentication.show-user class="inline-block"
-            user=authentication.logged-in.user
-            showId=false />! &nbsp;
-        </p>
       </dv.if>
 
       <dv.if condition=!authentication.logged-in.user>

@@ -1,0 +1,8 @@
+<dv.component name="show-spot-name">
+  <h4>
+    <property.show-object id=$id waitOn=['id'] showOnly=['name'] hidden=true />
+    <dv.link href="/spot-details" params={ id: $id } class="inline-block">
+      {{property.show-object.loadedObject?.name}}
+    </dv.link>
+  </h4>
+</dv.component>

@@ -3,19 +3,20 @@
 
   <authorization.show-owner resourceId=$id hidden=true />
   <geolocation.show-marker id=$id hidden=true />
-  <rating.show-rating sourceId=sweetspots.navbar.loggedInUser?.id targetId=$id
+  <rating.show-rating
+    sourceId=sweetspots.navbar.loggedInUser?.id targetId=$id
+    waitOn=['sourceId', 'targetId']
     hidden=true />
   <property.show-object id=$id includeTimestamp=true hidden=true />
 
   <div class="container">
     <div class="row">
       <div class="col-md-6">
-        <!-- Spot Name and Location on Map -->
-        <h1><geolocation.show-marker marker=geolocation.show-marker.loadedMarker
-          showId=false showLatLong=false showMapId=false /></h1>
+        <h1>{{property.show-object.loadedObject?.name}}</h1>
         <div style="height:400px;width:400px;">
           <geolocation.display-map
             markers=[geolocation.show-marker.loadedMarker]
+            expectMarkers=true
             showSearchControl=false
             showDirectionsControl=false/>
         </div>
@@ -45,28 +46,6 @@
         </h6>
 
         <div class="inline-block detail-buttons">
-          <!-- Delete Spot -->
-          <dv.if condition=sweetspots.navbar.loggedInUser?.id ===
-            authorization.show-owner.ownerId
-            class="inline-block">
-            <dv.tx>
-              <geolocation.delete-marker id=$id hidden=true />
-              <authorization.delete-resource id=$id hidden=true />
-              <authentication.authenticate id=sweetspots.navbar.loggedInUser?.id
-                hidden=true />
-                <!-- TODO: comment.delete-target -->
-              <comment.delete-comment class="btn btn-danger delete-spot" id=$id
-                authorId=sweetspots.navbar.loggedInUser?.id />
-              <dv.callback defaultHref="/main" onExecSuccess=true hidden=true />
-
-              <!-- TODO -->
-              <!-- <label.delete-item />
-              <rating.delete-target />
-              <follow.delete-publisher />
-              <property.delete-object /> -->
-            </dv.tx>
-          </dv.if>
-
           <div class="btn-toolbar toolbar inline-block">
             <!-- Favorite/ Unfavorite Spot -->
             <dv.tx>
@@ -95,10 +74,8 @@
           showComment=<sweetspots.show-spot-details-review
             comment=$comment
             loggedInUserId=sweetspots.navbar.loggedInUser?.id /> />
-
         <br />
-
-        <dv.if condition=!rating.show-rating.loadedRating>
+        <dv.if condition=!!rating.show-rating.errors>
           <div>
             <h4>Write a review:</h4>
             <dv.tx>

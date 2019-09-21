@@ -10,13 +10,12 @@
 
   <br />
 
-  By <authentication.show-user class="inline-block" id=$comment.authorId /> |
-  <dv.link href="/profile" params={ userId: $comment.authorId }>Profile</dv.link> |
-  <reputation.show-target class="inline-block" id=$comment.authorId
-    showId=false
-    showScores=false
-    totalLabel="Rep: " />
-
+  <authentication.show-user  id=$comment.authorId hidden=true />
+  By
+  <dv.link href="/profile" params={ userId: $comment.authorId }>
+    {{ authentication.show-user.loadedUser?.username }}
+  </dv.link>
+  <sweetspots.show-reputation userId=$comment.authorId />
   <br />
 
   <reviewscore.show-target id=$comment.id

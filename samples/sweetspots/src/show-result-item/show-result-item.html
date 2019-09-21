@@ -1,14 +1,7 @@
 <dv.component name="show-result-item">
   <div class="card resultPanel">
     <div class="card-header">
-      <geolocation.show-marker class="inline-block"
-        id=$id
-        showId=false
-        showLatLong=false
-        showMapId=false /> |
-      <dv.link class="inline-block" href="/spot-details" params={ id: $id }>
-        Details
-      </dv.link>
+      <sweetspots.show-spot-name id=$id />
     </div>
 
     <div class="card-body">
