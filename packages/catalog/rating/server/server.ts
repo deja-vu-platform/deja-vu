@@ -80,6 +80,9 @@ const componentRequestTable: ComponentRequestTable = {
   `
 };
 
+const MIN_RATING = 0;
+const MAX_RATING = 5;
+
 function getRatingFilter(input: RatingsInput) {
   const filter = {};
   if (!_.isNil(input)) {
@@ -180,6 +183,10 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
           sourceId: input.sourceId,
           targetId: input.targetId
         };
+        if (!_.isNumber(input.newRating) ||
+          input.newRating < MIN_RATING || input.newRating > MAX_RATING) {
+          throw new Error(`Invalid rating value ${input.newRating}`);
+        }
 
         return await ratings.updateOne(
           context,

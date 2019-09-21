@@ -35,6 +35,7 @@ export class RateTargetComponent implements
   sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
   targetIdChange = new EventEmitter<void>();
+  //  todo: rename to execOnRatingChange
   @Input() execOnClick = true;
 
   @Output() rating = new EventEmitter<number>();
