@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
-  OnInit, Output, ViewChild
+  OnDestroy, OnInit, Output, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -12,6 +12,9 @@ import {
   GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
 } from '@deja-vu/core';
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import {
   ShowLabelComponent
 } from '../show-label/show-label.component';
@@ -20,6 +23,8 @@ import { API_PATH } from '../label.config';
 import { Label } from '../shared/label.model';
 
 import * as _ from 'lodash';
+import { filter, take, takeUntil } from 'rxjs/operators';
+
 
 interface ItemsRes {
   data: { items: string[] };
@@ -48,8 +53,9 @@ interface LabelsRes {
     }
   ]
 })
-export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
-  OnExec, OnInit, OnChanges, ControlValueAccessor, Validator {
+export class SearchItemsByLabelsComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnExec, OnInit, OnChanges,
+    ControlValueAccessor, Validator {
   @Input() initialValue;
   @Input() showLabel = {
     type: ShowLabelComponent
@@ -70,12 +76,13 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
   labels: Label[] = [];
   selectedLabelIds: string[] | undefined;
   searchItemsByLabels = this;
+  destroyed = new Subject<any>();
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private router: Router, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -83,13 +90,20 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
     if (!_.isNil(this.initialValue)) {
       this.selectedLabelIds = _.map(this.initialValue, 'id');
     }
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
     if (!_.isNil(this.initialValue)) {
       this.search();
     } else {
-      this.loadLabels();
+      this.load();
     }
   }
 
@@ -123,7 +137,7 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
       });
   }
 
-  loadLabels() {
+  load() {
     if (this.canEval()) {
       this.rs.eval(this.elem);
     }
@@ -166,6 +180,11 @@ export class SearchItemsByLabelsComponent implements AfterViewInit, OnEval,
     }
 
     return null;
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
   }
 
   private canEval(): boolean {

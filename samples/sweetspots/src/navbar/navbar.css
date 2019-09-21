@@ -1,8 +1,9 @@
 p.navbar-text {
   color: #FFFFFF !important;
-  padding-left: 1em;
+  padding-top: 20px;
 }
 
 #nav-bar {
   background-color: #f62459 !important;
+  padding: 0 !important;
 }

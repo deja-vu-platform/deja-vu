@@ -21,7 +21,7 @@
 
     <dv.if condition=sweetspots.navbar.searchResults>
       <div id="search-results">
-        <h3>Top Spots</h3>
+        <h3>Spots</h3>
         <label.show-items waitOn=['itemIds']
           itemIds=sweetspots.navbar.searchResults
           noItemsToShowText="No spots found. Try searching for something else."
@@ -29,12 +29,10 @@
       </div>
     </dv.if>
   </div>
-  <dv.pick entities=sweetspots.navbar.searchResults keys=['id']
-    flatten=true hidden=true />
 
   <div id="map-div">
     <geolocation.display-map
-      markerIds=dv.pick.pickedEntities
+      markerIds=sweetspots.navbar.searchResults
       waitOn=['markerIds']
       showDirectionsControl=false />
   </div>

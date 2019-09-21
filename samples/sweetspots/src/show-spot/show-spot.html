@@ -1,14 +1,5 @@
 <dv.component name="show-spot">
-  <h4>
-    <geolocation.show-marker class="inline-block"
-      id=$id
-      showId=false
-      showLatLong=false
-      showMapId=false /> |
-    <dv.link href="/spot-details" params={ id: $id } class="inline-block">
-      Details
-    </dv.link>
-  </h4>
+  <sweetspots.show-spot-name id=$id />
   <p>Average Rating: <rating.show-average-rating class="inline-block"
     targetId=$id
     showStars=false

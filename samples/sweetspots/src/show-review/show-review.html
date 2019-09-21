@@ -1,14 +1,5 @@
 <dv.component name="show-review">
-  <h4>
-    <geolocation.show-marker class="inline-block"
-      id=$comment.targetId
-      showId=false
-      showLatLong=false
-      showMapId=false /> |
-    <dv.link href="/spot-details" params={ id: $id } class="inline-block">
-      Details
-    </dv.link>
-  </h4>
+  <sweetspots.show-spot-name id=$comment?.targetId />
   <span>
     <rating.show-rating targetId=$comment.targetId sourceId=$comment.authorId />
   </span>

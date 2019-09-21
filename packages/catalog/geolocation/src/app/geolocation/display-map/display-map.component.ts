@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, NgZone,
-  OnChanges, OnInit, Output, SimpleChanges
+  OnChanges, OnDestroy, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
   ConfigServiceFactory,
@@ -17,13 +17,16 @@ import 'leaflet-control-geocoder';
 import 'leaflet-routing-machine';
 declare let L;
 
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
+
 import { API_PATH } from '../geolocation.config';
 import {
   DEFAULT_MAP_ID, Location, Marker
 } from '../shared/geolocation.model';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -31,8 +34,8 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './display-map.component.html',
   styleUrls: ['./display-map.component.css']
 })
-export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class DisplayMapComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -59,10 +62,19 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
 
   @Input() id = DEFAULT_MAP_ID;
 
+  @Input() expectMarkers = false;
   // If not provided, all markers associated with `id` will be loaded
   get markers() { return this._markers; }
   @Input() set markers(markers: Marker[]) {
-    this._markers = markers;
+    if (!_.isEmpty(markers)) {
+      const filtered = _.filter(markers, (m) => !_.isNil(m));
+      if (!_.isEmpty(filtered)) {
+        this._markers = filtered;
+        if (this.mapType !== 'gmap') {
+          this.setLeafletMarkers();
+        }
+      }
+    }
   }
 
   get markersIds() { return this._markerIds; }
@@ -101,12 +113,13 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   @Output() newMarker: EventEmitter<Marker> = new EventEmitter<Marker>();
 
   private gs: GatewayService;
+  destroyed = new Subject<any>();
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private csf: ConfigServiceFactory,
     private rs: RunService, private zone: NgZone,
-    @Inject(API_PATH) private apiPath) {
+    private router: Router, @Inject(API_PATH) private apiPath) {
   }
 
   ngOnInit() {
@@ -118,6 +131,17 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
     if (this.mapType !== 'gmap') {
       this.setUpLeafletMap();
     }
+    this.router.events
+      .pipe(
+        filter((e: RouterEvent) => e instanceof NavigationEnd),
+        takeUntil(this.destroyed))
+      .subscribe(() => {
+        this.newMarker.emit(null);
+        if (this.mapType !== 'gmap') {
+          this.setUpLeafletMap();
+        }
+        this.load();
+      });
   }
 
   ngAfterViewInit() {
@@ -167,7 +191,7 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   setLeafletMarkers() {
-    if (!_.isEmpty(this.markers) && this.showLoadedMarkers) {
+    if (this.showLoadedMarkers) {
       this.layers = this.markers.map((m: Marker) => {
         const popupText = m.title ? m.title : `${m.latitude}, ${m.longitude}`;
 
@@ -246,7 +270,6 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   onMapClick(e) {
-
     if (this.mapType !== 'gmap') {
       const event: L.LeafletMouseEvent = e;
       const coords = event.latlng;
@@ -323,15 +346,19 @@ export class DisplayMapComponent implements AfterViewInit, OnEval, OnInit,
         })
         .subscribe((res) => {
           this.markers = res.data.markers;
-          if (this.mapType !== 'gmap') {
-            this.setLeafletMarkers();
-          }
         });
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+  }
+
   private canEval(): boolean {
-    if (this.center || this.radius) {
+    if (this.expectMarkers) {
+      return false;
+    } else if (this.center || this.radius) {
       return !!(this.id && this.gs && this.center && this.radius);
     } else {
       return !!(this.id && this.gs);

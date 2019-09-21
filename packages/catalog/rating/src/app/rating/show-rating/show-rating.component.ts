@@ -3,7 +3,8 @@ import {
   Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  GatewayService, GatewayServiceFactory, OnEval, RunService,
+  WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 
@@ -27,8 +28,9 @@ interface RatingRes {
   templateUrl: './show-rating.component.html',
   styleUrls: ['./show-rating.component.css']
 })
-export class ShowRatingComponent implements
-  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+export class ShowRatingComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+  @Input() waitOn: string[];
   // Either (`sourceId`, `targetId`), `rating` or `ratingIn` must be given.
   // If `rating` or `ratingIn` is given, this rating is displayed
   @Input() sourceId: string;
@@ -42,19 +44,23 @@ export class ShowRatingComponent implements
   @Input() showStars = true;
 
   @Output() loadedRating = new EventEmitter<Rating>();
+  @Output() errors = new EventEmitter<any>();
 
   destroyed = new Subject<any>();
   ratingValue: number;
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private wsf: WaiterServiceFactory,
     private rs: RunService, private router: Router,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.ws = this.wsf.for(this, this.waitOn);
     this.router.events
       .pipe(
         filter((e: RouterEvent) => e instanceof NavigationEnd),
@@ -69,7 +75,9 @@ export class ShowRatingComponent implements
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.load();
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
+    }
   }
 
   /**
@@ -90,6 +98,7 @@ export class ShowRatingComponent implements
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
+      await this.ws.maybeWait();
       this.gs.get<RatingRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
@@ -102,9 +111,14 @@ export class ShowRatingComponent implements
         }
       })
         .subscribe((res) => {
-          if (res.data.rating) {
+          if (!_.isEmpty(res.errors)) {
+            this.ratingValue = undefined;
+            this.loadedRating.emit(null);
+            this.errors.emit(res.errors);
+          } else if (res.data.rating) {
             this.ratingValue = res.data.rating.rating;
             this.loadedRating.emit(res.data.rating);
+            this.errors.emit(null);
           }
         });
     } else if (this.gs) {

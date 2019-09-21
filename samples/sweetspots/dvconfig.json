@@ -24,10 +24,14 @@
           "title": "SpotDetails",
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string"
+            },
             "floor": {
               "type": "string"
             }
-          }
+          },
+          "required": ["name"]
         }
       }
     },
@@ -46,7 +50,6 @@
   },
   "routes": [
     { "path": "/login", "component": "login" },
-    { "path": "/main", "component": "main" },
     { "path": "/profile", "component": "show-user-profile" },
     { "path": "/register", "component": "register" },
     { "path": "/spot-details", "component": "show-spot-details" },

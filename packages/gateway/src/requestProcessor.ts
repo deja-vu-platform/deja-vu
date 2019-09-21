@@ -264,7 +264,10 @@ export abstract class RequestProcessor {
     res: express.Response
   ): Promise<void> {
     const context = req.body.context;
-    const childRequests: ChildRequest[] = req.body.requests;
+    const childRequests: ChildRequest[] | undefined = req.body.requests;
+    if (_.isNil(childRequests)) {
+      throw new Error(`Got undefined child requests for tx req ${req}`);
+    }
     const resBatch = new ResponseBatch(res, childRequests.length);
 
     let gatewayToConceptRequests: GatewayToConceptRequest[];
@@ -294,15 +297,15 @@ export abstract class RequestProcessor {
             'params.inputs.input') :
           _.get(childRequest, 'body.inputs.input');
 
-        console.log(`Got inputs ${JSON.stringify(inputs)}`);
+        console.log(`Got inputs ${stringify(inputs)}`);
         _.forEach(inputs, (value: any, inputName: string) => {
           _.set(inputValuesMap, [componentFqtag, inputName], value);
         });
       }
 
       console.log(
-        `Checking with context ${JSON.stringify(context)}` +
-        `Input values map ${JSON.stringify(inputValuesMap)}`);
+        `Checking with context ${stringify(context)}` +
+        `Input values map ${stringify(inputValuesMap)}`);
       TxInputsValidator.Validate(
         inputValuesMap, prunedCohortComponents, context);
     } catch (e) {
@@ -579,7 +582,7 @@ export class AppRequestProcessor extends RequestProcessor {
       paths, (p) => ComponentHelper.PickComponentTagPath(p, ['fqtag']));
     assert.ok(paths.length === 1,
       `Expected 1 path but got ${paths.length} for ` +
-      `${componentPath.serialize()}: ${JSON.stringify(debugPaths)}`);
+      `${componentPath.serialize()}: ${stringify(debugPaths)}`);
     const componentTagPath: ComponentTagPath = paths[0];
     assert.ok(componentTagPath.length === componentPath.length(),
       'Expected the length of the path to match the component path ' +
@@ -637,8 +640,8 @@ export class AppRequestProcessor extends RequestProcessor {
     if (prunedCohortComponents.length < receivedRequestFqTags.length) {
       throw new RequestInvalidError(
         'Received requests include components that are not part of the cohort' +
-        `. Received: ${JSON.stringify(receivedRequestFqTags)}` +
-        `. Expected cohort: ${JSON.stringify(
+        `. Received: ${stringify(receivedRequestFqTags)}` +
+        `. Expected cohort: ${stringify(
           _.map(prunedCohortComponents, 'fqtag'))}`);
     }
 

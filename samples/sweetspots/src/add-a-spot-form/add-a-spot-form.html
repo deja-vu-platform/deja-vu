@@ -11,12 +11,11 @@
       title=$marker?.title
       latitude=$marker?.latitude
       longitude=$marker?.longitude
-      titleLabel="Name"
+      hidden=true />
+    <property.create-object id=dv.gen-id.id
       showOptionToSubmit=false />
     <label.attach-labels itemId=dv.gen-id.id
       inputLabel="Category"
-      showOptionToSubmit=false />
-    <property.create-object id=dv.gen-id.id
       showOptionToSubmit=false />
     <p>Review</p>
     <rating.rate-target sourceId=$loggedInUserId targetId=dv.gen-id.id
@@ -33,7 +32,7 @@
     <authorization.create-resource id=dv.gen-id.id
       ownerId=$loggedInUserId hidden=true />
     <authentication.authenticate id=$loggedInUserId hidden=true />
-    <dv.button class="btn btn-primary">Submit spot</dv.button>
-    <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+    <dv.button class="btn btn-primary">Submit Spot</dv.button>
+    <dv.link href="/spot-details" params={ id: dv.gen-id.id } hidden=true />
   </dv.tx>
 </dv.component>

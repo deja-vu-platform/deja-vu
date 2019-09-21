@@ -7,12 +7,8 @@
         <h1>
           <authentication.show-user class="inline-block"
             id=$userId
-            showId=false />&#39;s Profile (<reputation.show-target
-              class="inline-block"
-              id=$userId
-              showId=false
-              showScores=false
-              totalLabel="Current Rep: " />)
+            showId=false />&#39;s Profile
+            <sweetspots.show-reputation userId=$userId />
         </h1>
       </div>
     </div>
@@ -23,7 +19,7 @@
         </div>
         <authorization.show-resources
           createdBy=$userId
-          noResourcesText="You haven't created any spots yet."
+          noResourcesText="You haven't created any spots yet"
           showResource=<sweetspots.show-spot id=$id /> />
       </div>
       <div class="col-md-4">
@@ -31,7 +27,7 @@
           <h3>Your Reviews</h3>
         </div>
         <comment.show-comments byAuthorId=$userId
-          noCommentsToShowText="You haven't reviewed any spots yet."
+          noCommentsToShowText="You haven't reviewed any spots yet"
           showComment=<sweetspots.show-review comment=$comment /> />
       </div>
       <div class="col-md-4">
@@ -39,8 +35,8 @@
           <h3>Favorite Spots</h3>
         </div>
         <follow.show-publishers followedById=$userId
-          noPublishersToShowText="You have no favorite spots yet."
-          showPublisher=<sweetspots.show-favorite-spot id=$publisher.id /> />
+          noPublishersToShowText="You have no favorites"
+          showPublisher=<sweetspots.show-spot-name id=$publisher.id /> />
       </div>
     </div>
   </div>

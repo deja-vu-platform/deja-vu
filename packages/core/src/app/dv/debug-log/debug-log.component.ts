@@ -8,6 +8,6 @@ export class DebugLogComponent implements OnChanges {
   @Input() entity: any;
 
   ngOnChanges() {
-    console.log(this.entity);
+    console.log(JSON.stringify(this.entity));
   }
 }
