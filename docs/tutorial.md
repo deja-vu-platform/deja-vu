@@ -23,7 +23,7 @@ The code of the app can be found in [samples/sn](../samples/sn).
 ### choosing concepts
 
 The process of building a Déjà Vu app begins by navigating the
-[catalog of concepts](../packages/catalog/README) to find 
+[catalog of concepts](../packages/catalog/README.md) to find 
 the concepts that provide the functionality you need for your app.
 The
 documentation accompanying a concept includes information about the configuration options
