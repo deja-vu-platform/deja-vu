@@ -126,8 +126,7 @@ export function capturesToInputs(
     PropExpr_dynamic: (e1, _sqb1, e2, _s1b2) =>
       `${e1.capturesToInputs()}[${e2.capturesToInputs()}]`,
     PropExpr_static: (e, nav, name) =>
-      e.capturesToInputs() + nav.capturesToInputs() +
-      name.capturesToInputs(),
+      e.capturesToInputs() + nav.sourceString + name.sourceString,
     Literal_number: (num) => num.sourceString,
     Literal_text: (stringLiteral) => stringLiteral.sourceString,
     Literal_true: (trueNode) => trueNode.sourceString,
