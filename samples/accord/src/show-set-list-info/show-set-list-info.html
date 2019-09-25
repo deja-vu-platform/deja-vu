@@ -1,11 +1,10 @@
 <dv.component name="show-set-list-info">
-  <setList.show-object id=$setList.id
-                       showOnly=["name"]
-                       hidden=true
-  />
+  <setList.show-object
+    id=$setList.id showOnly=["name"] hidden=true />
   <dv.if condition=setList.show-object.loadedObject>
     <dv.show-entity entity=setList.show-object.loadedObject.name />
-    <dv.link href="set-list" params={ groupId:$groupId, setListId:$setList.id }>
+    <dv.link href="set-list" params={
+      groupId: $groupId, setListId: $setList.id }>
       View
     </dv.link>
   </dv.if>

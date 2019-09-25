@@ -18,16 +18,6 @@
         groupId=$groupId
         joinGroupText="Add back"
         leaveGroupText="Remove" />
-      <dv.tx>
-        <authorization.add-viewer class="inline-block"
-          id=$groupId
-          viewerId=$userId
-          buttonLabel="Make Admin"
-          viewerAddedSuccessText="Admin Added!"
-          showResourceInputField=false
-          showViewerInputField=false/>
-        <dv.link hidden=true />
-      </dv.tx>
     </dv.if>
   </dv.if>
 </dv.component>

@@ -1,6 +1,6 @@
 <dv.component name="show-set-list">
   <accord.navbar accessRequired=true />
-  <authorization.can-view
+  <authorization.can-edit
     resourceId=$groupId principalId=accord.navbar.loggedInUser?.id hidden=true />
   <div class="left-column">
     <accord.set-list-catalog
@@ -9,10 +9,10 @@
   <div class="right-column pad-10">
     <h1>
       <setList.show-object id=$setListId showOnly=["name"] />
-      <dv.if condition=authorization.can-view.canView class="inline-block">
+      <dv.if condition=authorization.can-edit.canEdit class="inline-block">
         <dv.link
           href="/edit-set-list"
-          params={ groupId:$groupId, setListId:$setListId }>
+          params={ groupId: $groupId, setListId: $setListId }>
           <mat-icon>settings</mat-icon>
         </dv.link>
       </dv.if>
@@ -25,17 +25,24 @@
       <dv.tx>
         <dv.link
           href="/create-proposal"
-          params={ groupId:$groupId, setListId:$setListId } hidden=true />
+          params={ groupId: $groupId, setListId: $setListId } hidden=true />
         <dv.button class="theme-button">Add Proposal</dv.button>
       </dv.tx>
       &nbsp;
-      <proposal.show-objects
-        fieldMatching={ setListId: $setListId }
-        noObjectsToShowText="No proposals yet"
-        showObject=<accord.show-proposal-preview
-          proposal=$object groupId=$groupId
-          loggedInUserId=accord.navbar.loggedInUser?.id /> />
+      <dv.tx>
+        <authentication.authenticate
+          id=accord.navbar.loggedInUser?.id waitOn=['id'] hidden=true />
+        <authorization.verify-can-view
+          resourceId=$setListId principalId=accord.navbar.loggedInUser?.id
+          waitOn=['resourceId', 'principalId']
+          hidden=true />
+        <proposal.show-objects
+          fieldMatching={ setListId: $setListId }
+          noObjectsToShowText="No proposals yet"
+          showObject=<accord.show-proposal-preview
+            proposal=$object groupId=$groupId
+            loggedInUserId=accord.navbar.loggedInUser?.id /> />
+      </dv.tx>
     </div>
   </div>
 </dv.component>
-

@@ -38,7 +38,10 @@ export class RateTargetComponent implements
   sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
   targetIdChange = new EventEmitter<void>();
-  // TODO: rename to execOnRatingChange
+  // TODO: support the user selecting a rating with the keyboard. The problem
+  // is that triggering the exec onRatingChange can cause problematic behavior.
+  // For example, if the user wraps this component in a dv.tx with a dv.redirect
+  // to the same page.
   @Input() execOnClick = true;
 
   @Output() rating = new EventEmitter<number>();

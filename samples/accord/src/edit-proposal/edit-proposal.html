@@ -2,7 +2,8 @@
   <accord.navbar accessRequired=true />
   <proposal.show-object id=$proposalId hidden=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId />
+    <accord.set-list-catalog
+      groupId=$groupId currentUserId=accord.navbar.loggedInUser?.id />
   </div>
 
   <div class="right-column pad-top">

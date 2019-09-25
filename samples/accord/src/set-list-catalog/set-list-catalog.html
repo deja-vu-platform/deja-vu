@@ -1,5 +1,5 @@
 <dv.component name="set-list-catalog">
-  <authorization.can-view
+  <authorization.can-edit
     resourceId=$groupId principalId=$currentUserId hidden=true
     waitOn=['resourceId', 'principalId'] />
   <h2>
@@ -11,21 +11,29 @@
     </dv.if>
   </h2>
   <div>
-    <dv.if condition=authorization.can-view.canView>
+    <dv.if condition=authorization.can-edit.canEdit>
       <dv.tx>
         <dv.button class="theme-button">Add Setlist</dv.button>
         <dv.link href="/create-set-list"
-          params={ groupId:$groupId } hidden=true />
+          params={ groupId: $groupId } hidden=true />
       </dv.tx>
     </dv.if>
   </div>
   <div class="individual-card">
     <p>Setlists:</p>
-    <setList.show-objects
-      fieldMatching={ groupId: $groupId, waitOn: ['groupId'] }
-      showOnly=["name"]
-      noObjectsToShowText="No setlists yet"
-      showObject=<accord.show-set-list-info
-        setList=$object groupId=$groupId /> />
+    <dv.tx>
+      <authentication.authenticate
+        id=$currentUserId waitOn=['id'] hidden=true />
+      <authorization.verify-can-view
+        resourceId=$groupId principalId=$currentUserId
+        waitOn=['resourceId', 'principalId']
+        hidden=true />
+      <setList.show-objects
+        fieldMatching={ groupId: $groupId, waitOn: ['groupId'] }
+        showOnly=["name"]
+        noObjectsToShowText="No setlists yet"
+        showObject=<accord.show-set-list-info
+          setList=$object groupId=$groupId /> />
+    </dv.tx>
   </div>
 </dv.component>

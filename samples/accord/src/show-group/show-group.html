@@ -1,6 +1,6 @@
 <dv.component name="show-group">
   <accord.navbar accessRequired=true />
-  <authorization.can-view
+  <authorization.can-edit
     resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
     waitOn=['resourceId', 'principalId']
     hidden=true />
@@ -13,7 +13,7 @@
     <dv.if condition=groupInfo.show-object.loadedObject class="individual-card">
       <h1>
         <dv.show-entity entity=groupInfo.show-object.loadedObject.name />
-        <dv.if condition=authorization.can-view.canView class="inline-block">
+        <dv.if condition=authorization.can-edit.canEdit class="inline-block">
           <dv.link href="/edit-group" params={ groupId: $groupId }>
             <mat-icon>settings</mat-icon>
           </dv.link>
@@ -26,13 +26,21 @@
 
     <div class="individual-card">
       <h2>Members</h2>
-      <group.show-group
-        id=$groupId waitOn=['id']
-        showMembers=true
-        showGroupId=false
-        showMember=<accord.show-user-info userId=$id
-          groupId=$groupId
-          allowEdit=false /> />
+      <dv.tx>
+        <authentication.authenticate
+          id=accord.navbar.loggedInUser?.id waitOn=['id'] hidden=true />
+        <authorization.verify-can-view
+          resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
+          waitOn=['resourceId', 'principalId']
+          hidden=true />
+        <group.show-group
+          id=$groupId waitOn=['id']
+          showMembers=true
+          showGroupId=false
+          showMember=<accord.show-user-info userId=$id
+            groupId=$groupId
+            allowEdit=false /> />
+      </dv.tx>
     </div>
   </div>
 </dv.component>
