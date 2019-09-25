@@ -135,6 +135,9 @@ export class RunService {
   }
 
   private async run(runType: RunType, elem: ElementRef) {
+    console.log(
+      `Running ${runType} request from ` +
+      NodeUtils.GetFqTagOfNode(elem.nativeElement));
     const targetComponent = this.getTargetComponent(elem.nativeElement);
     const targetComponentFqTag = NodeUtils.GetFqTagOfNode(targetComponent);
     const runId = NodeUtils.GetRunId(targetComponent);

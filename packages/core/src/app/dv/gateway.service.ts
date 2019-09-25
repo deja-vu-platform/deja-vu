@@ -125,8 +125,8 @@ export class TxRequest {
    */
   private isReady(): boolean {
     console.log(
-      `Checking if req is ready: got ` +
-      `${this.numComponentsDone}/${this.numComponentsTotal}`);
+      `Checking if req is ready (run id ${NodeUtils.GetRunId(this.fromNode)})` +
+      `: got ${this.numComponentsDone}/${this.numComponentsTotal}`);
 
     return (
       this.numComponentsTotal !== undefined
