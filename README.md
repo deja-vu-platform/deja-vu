@@ -31,8 +31,8 @@ For documentation and more information see
 
 (This won't work until the npm packages are public, see "Contributing" instructions to create an app)
 
-- If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
-users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
+- If you haven't done so already, install [Node.js](https://nodejs.org) v10.
+  [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
 - In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
@@ -138,7 +138,7 @@ If `yarn --check-files` fails, try the following:
 - `cd ../cli` and `yarn package`
 - then `yarn --check-files` again
 
-If it still doesn't work, double check that you are running node v9-11
+If it still doesn't work, double check that you are running node v10
 by running `node --version` in the same shell in which you are running
 the `yarn` commands.
 
@@ -154,7 +154,7 @@ Don't do `sudo apt install nodejs`, it will install a very old version of node (
 that we don't support.
 - If you are running an old version of node you'll get errors during the installation
 process. But the error is not going to say "your version of node is too old", so if
-you see errors check that the version of node you have is v9-11 by running
+you see errors check that the version of node you have is v10 by running
 `node --version` in the same shell in which you are running the `yarn` commands.
 
 ### MongoDB
