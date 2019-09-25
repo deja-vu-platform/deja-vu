@@ -68,7 +68,7 @@ create commits and run `git push heroku` again.
 
 ## Contributing
 
-In addition to [node](https://nodejs.org) v9-11 ([not v12](https://github.com/spderosso/deja-vu/issues/352)) and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
+In addition to [node](https://nodejs.org) v10 ([not v12](https://github.com/spderosso/deja-vu/issues/352)) and [MongoDB](https://www.mongodb.com/) 4.0+, you are going to need [yarn](https://yarnpkg.com) v1.10+.
 
 Each concept and sample is its own node project. We use yarn workspaces to make
 it easier to build and install all packages. First,
