@@ -59,8 +59,10 @@ export class LinkComponent implements OnInit, OnExecSuccess {
 
   dvOnExecSuccess() {
     if (this.hardRefresh) {
+      console.log(`dv.link causing a hard redirect to ${this.aHref}`);
       window.location.href = this.aHref;
     } else {
+      console.log(`dv.link causing a redirect to ${this.aHref}`);
       this.router.navigateByUrl(this.aHref);
     }
   }
