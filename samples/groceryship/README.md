@@ -1,17 +1,16 @@
-# Rendezvous
+# GroceryShip
 
-Plan public events on campus
+Facilitate peer grocery delivery between students
 
 ## Uses
 
 Uses [Authentication][authentication], [Authorization][authorization],
-[Comment][comment], [Event][event], [Geolocation][geolocation],
-[Group][group], [Label][label], and [Property][property] (x2)
+[Property][property] (x3), and [Rating][rating]
 
 > *Acknowledgments*. This sample application replicates the core functionality
 > of a project built for a web programming course at MIT. The students that
-> designed the original app are Hannah Chen, Yoeal Efrem, Alisha Saxena, and
-> Saron Teklezgi
+> designed the original app are Chien-Hsun Chang, Joseph Kuan, Czarina Lao, and
+> Cheahuychou Mao.
 
 [authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
 [authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization

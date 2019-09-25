@@ -1,17 +1,17 @@
-# Rendezvous
+# Lingua
 
-Plan public events on campus
+Develop language skills by chatting with native speakers
 
 ## Uses
 
 Uses [Authentication][authentication], [Authorization][authorization],
-[Comment][comment], [Event][event], [Geolocation][geolocation],
-[Group][group], [Label][label], and [Property][property] (x2)
+[Chat][chat], [Group][group] (x2), [Property][property] (x3), and
+[Rating][rating]
 
 > *Acknowledgments*. This sample application replicates the core functionality
 > of a project built for a web programming course at MIT. The students that
-> designed the original app are Hannah Chen, Yoeal Efrem, Alisha Saxena, and
-> Saron Teklezgi
+> designed the original app are Cattalyya Nuengsigkapian, Emily Giurleo,
+> Laura Eckman, and Megan Gebhard.
 
 [authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
 [authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization

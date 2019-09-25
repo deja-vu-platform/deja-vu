@@ -1,43 +1,34 @@
 # LiveScorecard
 
-*A clone of a 6.170 application built with Deja Vu.*
+Provide a live leaderboard for redpoint-format climbing competitions
 
-## Overview
-Enables climbers to log their climbs and for others to view the results in real-time.
+## Uses
 
-## Design Credit
-Team Reach
-- Charlie Andrews
-- Michelle Lauer
-- Ruth Park
-- Chandler Squires
+Uses [Authentication][authentication], [Authorization][authorization],
+[Event][event], [Group][group] (x3), [Label][label] (x2), [Passkey][passkey]
+(x2), [Property][property] (x3), [Scoring][scoring] (x2), and [Task][task]
 
-[Original App](http://livescorecard.herokuapp.com)
+> *Acknowledgments*. This sample application replicates the core functionality
+> of a project built for a web programming course at MIT. The students that
+> designed the original app are Rue Park, Michelle Lauer, Chandler Squires, and
+> Charlie Andrews.
 
-## Concepts Used
-- Authorization
-- Authentication
-- Passkey (x2)
-- Event
-- Task
-- Group (x3)
-- Label (x2)
-- Property (x3)
-- Scoring (x2)
+[authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
+[authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization
+[chat]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/chat
+[comment]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/comment
+[event]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/event
+[follow]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/follow
+[geolocation]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/geolocation
+[group]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/group
+[label]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/label
+[match]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/match
+[passkey]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/passkey
+[property]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/property
+[ranking]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/ranking
+[rating]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/rating
+[schedule]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/schedule
+[scoring]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/scoring
+[task]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/task
+[transfer]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/transfer
 
-## Missing Features
-### Host
-- Edit competition info -> Event, Property
-- Delete competition info -> Property, Passkey
-- Edit participant info ->  Property, Label
-- Delete participant info ->  Property, Passkey, Label
-- Edit climb info ->  Property, Scoring, Label
-- Delete climb info -> Property, Scoring, Label
-- Sort climbers in alphabetical order -> Needs a Sort or Filter concept
-
-### Climber
-- Sort climbs by number -> Needs a Sort concept
-- Filter climbers by sex and category (also filter climbs by categoery) ->
-Use `search-items-by label` component, but need to add `waitOn` input to
-`show-tasks` component.
-- Give approval by entering credentials -> Needs new widget in the Task concept

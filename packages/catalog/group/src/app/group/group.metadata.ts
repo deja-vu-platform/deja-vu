@@ -38,8 +38,6 @@ import {
   ShowMemberCountComponent
 } from './show-member-count/show-member-count.component';
 export { ShowMemberCountComponent };
-import { VerifyIsMemberComponent } from './verify-is-member/verify-is-member.component';
-export { VerifyIsMemberComponent };
 
 
 const allComponents = [
@@ -47,7 +45,7 @@ const allComponents = [
   DeleteGroupComponent, InputMemberComponent, JoinLeaveComponent,
   ShowGroupComponent, ShowGroupsComponent, ShowMemberComponent,
   ShowMembersComponent, StageComponent, ShowGroupCountComponent,
-  ShowMemberCountComponent, ConfigWizardComponent, VerifyIsMemberComponent
+  ShowMemberCountComponent, ConfigWizardComponent
 ];
 
 

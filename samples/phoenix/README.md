@@ -1,37 +1,33 @@
 # Phoenix
 
-*A clone of a 6.170 application built with Deja Vu.*
+Assist people with depression in finding and meeting others
 
-## Overview
-Assists people afflicted with depression to find and meet others.
+## Uses
 
-## Design Credit
-Team invalids
-- Casie Chen
-- Kimberly Dauber
-- Shinjini Saha
+Uses [Authentication][authentication], [Authorization][authorization],
+[Comment][comment], [Geolocation][geolocation], [Label][label],
+[Match][match], [Property][property] (x2), [Schedule][schedule]
 
-[Original App](https://dtt-phoenix.herokuapp.com/)
+> *Acknowledgments*. This sample application replicates the core functionality
+> of a project built for a web programming course at MIT. The students that
+> designed the original app are shinjini, chencs, and kadauber.
 
-## Concepts Used
-- Authentication
-- Authorization
-- Comment
-- Geolocaiton
-- Match
-- Property (x2)
-- Schedule
+[authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
+[authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization
+[chat]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/chat
+[comment]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/comment
+[event]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/event
+[follow]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/follow
+[geolocation]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/geolocation
+[group]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/group
+[label]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/label
+[match]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/match
+[passkey]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/passkey
+[property]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/property
+[ranking]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/ranking
+[rating]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/rating
+[schedule]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/schedule
+[scoring]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/scoring
+[task]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/task
+[transfer]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/transfer
 
-## Missing Features
-*In parenthesis is what's needed for the feature.*
-- Send email to connection (email concept)
-- Indicate when you are ready to make connections
-- Suggestions should be based on some choice of topics and/ positions, location and availability (filter concept)
-- Positions (possibly label concept or property containing topics and positions)
-- Do not show a suggestion for someone whom you've already matched with
-- Filter journal entries by username (filter concept)
-- Sort journal entries by username, when connection was made (sort/ log concept)
-- Show when the connection was made and ended (log concept)
-- Limit input length (general)
-- Update personal information (property-update-object)
-- Update topics (labels-update-labels)

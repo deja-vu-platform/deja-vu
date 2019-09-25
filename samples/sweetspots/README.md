@@ -1,33 +1,34 @@
-# Sweet Spots
+# SweetSpots
 
-*A clone of a 6.170 application built with Deja Vu.*
+Mark spots on a map and review spots added by others
 
-## Overview
-Allows users to mark points of interest on a map and review spots added by others.
+## Uses
 
-## Design Credit
-Team No REST for the Wicked
-- Maryam Archie
-- Nishchal Bhandari
-- Bob Liang
-- Isaac Rosado
+Uses [Authentication][authentication], [Authorization][authorization],
+[Comment][comment], [Follow][follow], [Geolocation][geolocation],
+[Property][property], [Rating][rating], and [Scoring][scoring] (x2)
 
-[Original App](https://sweet-spots.herokuapp.com/)
+> *Acknowledgments*. This sample application replicates the core functionality
+> of a project built for a web programming course at MIT. The students that
+> designed the original app are Maryam Archie, Nishchal Bhandari, Bob Liang,
+> and Isaac Rosado.
 
-## Concepts Used
-- Authentication
-- Authorization
-- Comment
-- Follow
-- Geolocation
-- Label
-- Property
-- Rating
-- Scoring (x2)
+[authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
+[authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization
+[chat]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/chat
+[comment]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/comment
+[event]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/event
+[follow]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/follow
+[geolocation]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/geolocation
+[group]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/group
+[label]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/label
+[match]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/match
+[passkey]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/passkey
+[property]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/property
+[ranking]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/ranking
+[rating]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/rating
+[schedule]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/schedule
+[scoring]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/scoring
+[task]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/task
+[transfer]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/transfer
 
-## Missing Features
-*In parenthesis is what's needed for the feature.*
-- Delete spots -> comment-delete-target, label-delete-item, rating-delete-target, follow-delete-publisher, property-delete-object
-- Report spots (If a spot has been reported 10 more than the number of reviews it has (i.e. num(reports) > 10 + num(reviews)), the spot will automatically be deleted.)
-- If there are search results, only display those spots on the map -> let display-map/ show-markers accept markerIds
-- Timestamps -> log concept
