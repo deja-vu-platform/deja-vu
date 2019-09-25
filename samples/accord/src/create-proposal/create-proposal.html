@@ -1,7 +1,8 @@
 <dv.component name="create-proposal">
   <accord.navbar accessRequired=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId />
+    <accord.set-list-catalog
+      groupId=$groupId currentUserId=accord.navbar.loggedInUser?.id />
   </div>
   <div class="right-column pad-top">
     <h1>Create Proposal</h1>

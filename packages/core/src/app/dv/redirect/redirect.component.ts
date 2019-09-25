@@ -71,6 +71,7 @@ implements OnInit, OnEvalFailure, OnExecFailure {
   }
 
   private redirect() {
+    console.log(`dv.redirect causing a redirect to ${this.aHref}`);
     this.router.navigateByUrl(this.aHref);
   }
 }

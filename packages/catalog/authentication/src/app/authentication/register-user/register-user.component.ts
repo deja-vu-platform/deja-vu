@@ -80,6 +80,11 @@ export class RegisterUserComponent
     this.passwordControl.setValue(password);
   }
 
+  private static ErrorsToMsg(errors: { message: string }[])  {
+    return _.map(errors, 'message')
+      .join();
+  }
+
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
@@ -95,9 +100,8 @@ export class RegisterUserComponent
     this.rs.exec(this.elem);
   }
 
-  private throwErrors(errors: any) {
-    throw new Error(_.map(errors, 'message')
-      .join());
+  private throwErrors(errors: { message: string }[]) {
+    throw new Error(RegisterUserComponent.ErrorsToMsg(errors));
   }
 
   async dvOnExec(): Promise<void> {
@@ -167,6 +171,12 @@ export class RegisterUserComponent
   }
 
   dvOnExecFailure(reason: Error) {
-    this.newUserRegisteredError = reason.message;
+    try {
+      const msg = JSON.parse(reason.message);
+      this.newUserRegisteredError = RegisterUserComponent
+        .ErrorsToMsg(_.get(msg, 'errors'));
+    } catch (e) {
+      this.newUserRegisteredError = reason.message;
+    }
   }
 }

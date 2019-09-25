@@ -79,19 +79,18 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
         .value());
     }
     const token = this.ss.getItem(this.elem, 'token');
-    this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
-      params: {
-        inputs: {
-          input: {
-            id: this.id ||  _.get(this.user, 'id'),
-            username: this.username || _.get(this.user, 'username'),
-            token: token
+    const res = await this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
+        params: {
+          inputs: {
+            input: {
+              id: this.id || _.get(this.user, 'id'),
+              username: this.username || _.get(this.user, 'username'),
+              token: token
+            }
           }
         }
-      }
-    })
-      .subscribe((res) => {
-        this.isAuthenticated = res.data.verify;
-      });
+      })
+      .toPromise();
+    this.isAuthenticated = res.data.verify;
   }
 }

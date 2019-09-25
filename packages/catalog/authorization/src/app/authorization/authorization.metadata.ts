@@ -53,8 +53,14 @@ import {
   ShowResourceCountComponent
 } from './show-resource-count/show-resource-count.component';
 export { ShowResourceCountComponent };
-import { VerifyCanEditComponent } from './verify-can-edit/verify-can-edit.component';
+import {
+  VerifyCanEditComponent
+} from './verify-can-edit/verify-can-edit.component';
 export { VerifyCanEditComponent };
+import {
+  VerifyCanViewComponent
+} from './verify-can-view/verify-can-view.component';
+export { VerifyCanViewComponent };
 
 
 const allComponents = [
@@ -63,7 +69,7 @@ const allComponents = [
   CreateResourceComponent, DeleteResourceComponent,
   RemoveViewerComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent, ShowResourceCountComponent,
-  ConfigWizardComponent, VerifyCanEditComponent
+  ConfigWizardComponent, VerifyCanEditComponent, VerifyCanViewComponent
 ];
 
 const metadata = {

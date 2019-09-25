@@ -69,6 +69,11 @@ const componentRequestTable: ComponentRequestTable = {
       canView(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
+  'verify-can-view': (extraInfo) => `
+    query VerifyCanView($input: PrincipalResourceInput!) {
+      canView(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
   'create-resource': (extraInfo) => `
     mutation CreateResource($input: CreateResourceInput!) {
       createResource (input: $input) ${getReturnFields(extraInfo)}

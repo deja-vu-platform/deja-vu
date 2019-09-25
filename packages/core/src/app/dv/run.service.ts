@@ -8,13 +8,15 @@ import { GatewayService } from './gateway.service';
 
 import { NodeUtils } from './node.utils';
 
+import * as assert from 'assert';
+
 
 // To indicate run failure, return a rejected promise
 export type onRun = () => Promise<any> | any;
 // res is the value the promise returned in `dvOnExec` or `dvOnEval` resolved to
-export type onSuccess = (res?: any) => void;
+export type onSuccess = (res?: any, allRes?: RunResultMap) => void;
 // reason is the error that caused the failure
-export type onFailure = (reason: Error) => void;
+export type onFailure = (reason: Error, allReasons?: RunResultMap) => void;
 
 export interface OnExec {
   dvOnExec: onRun;
@@ -45,7 +47,7 @@ interface ComponentInfo {
   node: any;
 }
 
-interface RunResultMap {
+export interface RunResultMap {
   [componentId: string]: any;
 }
 
@@ -133,6 +135,9 @@ export class RunService {
   }
 
   private async run(runType: RunType, elem: ElementRef) {
+    console.log(
+      `Running ${runType} request from ` +
+      NodeUtils.GetFqTagOfNode(elem.nativeElement));
     const targetComponent = this.getTargetComponent(elem.nativeElement);
     const targetComponentFqTag = NodeUtils.GetFqTagOfNode(targetComponent);
     const runId = NodeUtils.GetRunId(targetComponent);
@@ -154,16 +159,20 @@ export class RunService {
     let runResultMap: RunResultMap | undefined;
     try {
       runResultMap = await this.callDvOnRun(runType, targetComponent, id);
-    } catch (error) {
-      console.error(
-        `Got error on ${runType} ${id} ` +
-        `(${targetComponentFqTag}): ${error.message}`);
-      this.removeRunIds(runType, targetComponent);
-      this.callDvOnRunFailure(runType, targetComponent, error);
+    } catch (error) { // shouldn't happen
+      throw error;
     }
-    if (runResultMap) { // no error
-      this.removeRunIds(runType, targetComponent);
-      this.callDvOnRunSuccess(runType, targetComponent, runResultMap);
+    const runFailed = _.filter(_.values(runResultMap), _.isError).length > 0;
+    if (runFailed) {
+      console.error(`Got error on ${runType} ${id} (${targetComponentFqTag})`);
+      // Note: you can't use JSON.stringify because errors objects would just
+      // output `{}`
+      console.error(runResultMap);
+      this.removeRunIds(targetComponent);
+      this.callDvOnRunX('onFailure', runType, targetComponent, runResultMap);
+    } else { // no error
+      this.removeRunIds(targetComponent);
+      this.callDvOnRunX('onSuccess', runType, targetComponent, runResultMap);
     }
   }
 
@@ -184,7 +193,9 @@ export class RunService {
     onComponent(target, componentId);
   }
 
-  // returns after all runs finish
+  // returns after all runs finish either successfuly or with an error.
+  // The returned promise will never be a rejected promise but it could
+  // have run results of type Error.
   private async callDvOnRun(
     runType: RunType, node, id: string | undefined): Promise<RunResultMap> {
     const dvOnRun = runFunctionNames[runType].onRun;
@@ -201,11 +212,16 @@ export class RunService {
         runs.push(
           Promise
             .resolve(componentInfo.component[dvOnRun]())
-          .then((result) => ({[componentId]: result}))
-          .catch((e) => {
-            console.error(`Error in ${fqTag}: ${e.message}`);
-            throw e;
-          }));
+            .then((result) => ({[componentId]: result}))
+            .catch((e) => {
+              console.error(`Error in ${fqTag}: ${e}`);
+              // Turn a rejected promise into a succesfull one with an error
+              // result
+              assert.ok(!_.isNil(e));
+              assert.ok(_.isError(e));
+
+              return {[componentId]: e};
+            }));
       } else {
         console.log(
           `Skipped calling ${dvOnRun} on ${fqTag}: there's no method`);
@@ -228,31 +244,21 @@ export class RunService {
     return _.assign({}, ...resultMaps);
   }
 
-  private removeRunIds(runType: RunType, node): void {
+  private removeRunIds(node): void {
     NodeUtils.RemoveRunId(node);
-    const dvOnRun = runFunctionNames[runType].onRun;
     this.walkComponents(node, (componentInfo) => {
-      if (componentInfo.component[dvOnRun]) {
-        NodeUtils.RemoveRunId(componentInfo.node);
-      }
+      NodeUtils.RemoveRunId(componentInfo.node);
     });
   }
 
-  private callDvOnRunSuccess(
-    runType: RunType, node, runResultMap: RunResultMap): void {
-    const dvOnSuccess = runFunctionNames[runType].onSuccess;
+  private callDvOnRunX(
+    x: 'onSuccess' | 'onFailure', runType: RunType, node,
+    runResultMap: RunResultMap): void {
+    const dvOnX = runFunctionNames[runType][x];
     this.walkComponents(node, (componentInfo, componentId) => {
-      if (componentInfo.component[dvOnSuccess]) {
-        componentInfo.component[dvOnSuccess](runResultMap[componentId]);
-      }
-    });
-  }
-
-  private callDvOnRunFailure(runType: RunType, node, reason): void {
-    this.walkComponents(node, (componentInfo) => {
-      const dvOnFailure = runFunctionNames[runType].onFailure;
-      if (componentInfo.component[dvOnFailure]) {
-        componentInfo.component[dvOnFailure](reason);
+      if (componentInfo.component[dvOnX]) {
+        componentInfo.component[dvOnX](
+          runResultMap[componentId], runResultMap);
       }
     });
   }

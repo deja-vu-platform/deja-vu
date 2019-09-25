@@ -58,7 +58,6 @@ export class ShowAverageRatingComponent implements
       .subscribe(() => {
         this.load();
       });
-    this.load();
   }
 
   ngAfterViewInit() {
@@ -99,6 +98,11 @@ export class ShowAverageRatingComponent implements
           this.averageRatingValue = res.data.averageRatingForTarget.rating;
           this.averageRating.emit(this.averageRatingValue);
           this.ratingCountValue = res.data.averageRatingForTarget.count;
+          this.ratingCount.emit(this.ratingCountValue);
+        } else if (res.errors) {
+          this.averageRatingValue = 0;
+          this.averageRating.emit(this.averageRatingValue);
+          this.ratingCountValue = 0;
           this.ratingCount.emit(this.ratingCountValue);
         }
       });
