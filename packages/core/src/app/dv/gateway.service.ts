@@ -209,7 +209,7 @@ export class TxRequest {
           subject.complete();
         },
         (error) => {
-          subject.error(error);
+          subject.error(new Error(JSON.stringify(error)));
           subject.complete();
         }
       );
@@ -226,11 +226,14 @@ export class TxRequest {
               if (status === SUCCESS) {
                 this.subjects[i].next(body);
               } else {
-                this.subjects[i].error({
-                  status,
-                  error: body
-                });
+                this.subjects[i].error(new Error(JSON.stringify(body)));
               }
+              this.subjects[i].complete();
+            });
+          },
+          (errors) => {
+            errors.error.forEach(({ unused_status, body }, i) => {
+              this.subjects[i].error(new Error(JSON.stringify(body)));
               this.subjects[i].complete();
             });
           });
