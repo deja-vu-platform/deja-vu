@@ -4,84 +4,20 @@
     <h3>Pen Pals</h3>
     <chatGroup.show-groups
       withMemberId=lingua.navbar.user?.id
+      waitOn=['withMemberId']
       noGroupsToShowText="No pen pals to show"
-      showGroup=<lingua.show-chat-info
-        group=$group userId=lingua.navbar.user?.id /> />
+      showGroup=<lingua.show-chat-link
+        group=$group chatId=$chatId userId=lingua.navbar.user?.id /> />
   </div>
 
-  <dv.if condition=chatGroup.show-groups.groups && chatGroup.show-groups.groups[0]>
-    <chatGroup.show-group
-      id=$chatId ? $chatId : chatGroup.show-groups.groups[0].id
-      hidden=true />
-
-    <dv.if condition=chatGroup.show-group.loadedGroup
-           && chatGroup.show-group.loadedGroup.memberIds
-           && chatGroup.show-group.loadedGroup.memberIds[1]
-           class="bold">
-      <div class="left-column-50">
-        <h3>Conversation</h3>
-        <div class="small-vertical-margin">
-          <div>
-            <userProfile.show-object
-              id=chatGroup.show-group.loadedGroup.memberIds[0]
-              waitOn=['id']
-              showOnly=["name"] /> Avg Rating:
-            <rating.show-average-rating
-              targetId=chatGroup.show-group.loadedGroup.memberIds[0]
-              waitOn=['targetId']
-              showNumRatings=false />
-          </div>
-          <div>
-            <userProfile.show-object
-              id=chatGroup.show-group.loadedGroup.memberIds[1]
-              showOnly=["name"] /> Avg Rating:
-            <rating.show-average-rating
-              targetId=chatGroup.show-group.loadedGroup.memberIds[1]
-              waitOn=['targetId']
-              showNumRatings=false />
-          </div>
-          <div>
-            Rate Your Conversation:
-            <dv.tx>
-              <authentication.authenticate id=lingua.navbar.user?.id
-                hidden=true />
-              <rating.rate-target
-                sourceId=lingua.navbar.user?.id
-                targetId=chatGroup.show-group.loadedGroup.memberIds[0] === lingua.navbar.user?.id ?
-                  chatGroup.show-group.loadedGroup.memberIds[1] :
-                  chatGroup.show-group.loadedGroup.memberIds[0]
-              />
-              <dv.link hidden=true />
-            </dv.tx>
-          </div>
-        </div>
-        <chat.show-chat
-          id=chatGroup.show-group.loadedGroup.id
-          showId=false
-          noMessagesToShowText="Send a message in the field below!"
-          showMessage=<lingua.show-message
-            message=$message chatId=chatGroup.show-group.loadedGroup.id
-            userId=lingua.navbar.user?.id /> />
-        <chat.create-message
-          showMessageSavedText=false
-          authorId=lingua.navbar.user?.id
-          chatId=chatGroup.show-group.loadedGroup.id />
-      </div>
-      <div class="left-column">
-        <h3>Corrections</h3>
-        <correction.show-objects
-          fieldMatching={ chatId: chatGroup.show-group.loadedGroup.id }
-          noObjectsToShowText="No Corrections"
-          showObject=<lingua.show-correction correction=$object /> />
-      </div>
-    </dv.if>
+  <dv.if condition=$chatId>
+    <lingua.show-chat-info chatId=$chatId userId=lingua.navbar.user?.id />
   </dv.if>
 
-  <dv.if condition=!chatGroup.show-groups.groups || !chatGroup.show-groups.groups[0]>
+  <dv.if condition=!$chatId>
     <div class="right-column">
-      You don't have any chats yet. Go to
-      <dv.link href="/users">this page</dv.link>
-      to find a pen pal!
+      No chat selected. If you want a pen pal, go to
+      <dv.link href="/users">this page</dv.link>!
     </div>
   </dv.if>
 </dv.component>

@@ -5,16 +5,13 @@
       <dv.redirect href="/login" onEvalFailure=true />
     </dv.if>
   </dv.tx>
-
   <nav class="navbar">
-    <div class="navbar-header">
-      <dv.link href="/chat">Lingua</dv.link>
-    </div>
+    <div class="navbar-header">Lingua</div>
 
     <dv.if condition=authentication.logged-in.user>
       <div>
         <dv.link href="/chat">Chats</dv.link>
-        <dv.link href="/users">Pen Pals</dv.link>
+        <dv.link href="/users">Find Pen Pals</dv.link>
         &nbsp;
         <dv.link href="/profile">
           <dv.show-entity entity=authentication.logged-in.user.username />
@@ -29,7 +26,7 @@
 
     <dv.if condition=!authentication.logged-in.user>
       <dv.link href="/login">Login</dv.link>
-      <dv.link href="/signup">Register</dv.link>
+      <dv.link href="/signup">Sign Up</dv.link>
     </dv.if>
   </nav>
 </dv.component>

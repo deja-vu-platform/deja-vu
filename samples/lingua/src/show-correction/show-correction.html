@@ -1,15 +1,15 @@
 <dv.component name="show-correction">
   <div class="small-margin">
-    <div>
+    <div class="bold">
       <userProfile.show-object id=$correction.authorId
-                             showOnly=["name"] /> says:
+        showOnly=["name"] /> says:
     </div>
     <div>
       <dv.show-entity entity=$correction.originalText />
       should be
       <dv.show-entity entity=$correction.revisedText />
       <br />
-      Comments:
+      <span class="bold">Comments:</span>
       <dv.show-entity entity=$correction.comment />
     </div>
   </div>

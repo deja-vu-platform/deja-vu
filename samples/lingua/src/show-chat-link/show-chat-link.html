@@ -1,0 +1,18 @@
+<dv.component name="show-chat-link">
+  <dv.if condition=!!$userId class="small-margin">
+    <userProfile.show-object id=$group.memberIds[0] === $userId ?
+      $group.memberIds[1] :
+      $group.memberIds[0] showOnly=["name"] hidden=true />
+    <dv.if condition=$chatId === $group.id>
+      <dv.link href="/chat" class="chat-selected"
+        params={ chatId: $group.id }>
+        {{userProfile.show-object.loadedObject?.name}}
+      </dv.link>
+    </dv.if>
+    <dv.if condition=$chatId !== $group.id>
+      <dv.link href="/chat" params={ chatId: $group.id }>
+        {{userProfile.show-object.loadedObject?.name}}
+      </dv.link>
+    </dv.if>
+  </dv.if >
+</dv.component>
