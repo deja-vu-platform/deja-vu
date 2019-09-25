@@ -8,7 +8,9 @@
         id=lingua.navbar.user?.id waitOn=['id'] hidden=true />
       <userProfile.show-objects hidden=true />
     </dv.tx>
-    <!-- filter out the users that are already pen pals -->
+    <!-- filter out the users, whom I've already initiated a chat with -->
+    <!-- TODO: should I filter everyone I have a chat with, regardless
+        of who initiated it? -->
     <dv.if condition=chatTotal.show-group.loadedGroup>
       <dv.filter
         entitiesToFilter=userProfile.show-objects.objects
