@@ -17,13 +17,13 @@
       "tsconfig": "tsconfig.json",
       "prefix": "@@name",
       "styles": [
-        "styles.css"
+        "styles.scss"
       ],
       "scripts": []
     }
   ],
   "defaults": {
-    "styleExt": "css",
+    "styleExt": "scss",
     "component": {
     },
     "build": {
