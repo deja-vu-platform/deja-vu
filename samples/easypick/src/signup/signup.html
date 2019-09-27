@@ -1,19 +1,20 @@
 <dv.component name="signup">
   <easypick.navbar accessRequired=false />
   <div class="center-column-dynamic-auth">
-    <h2>Sign Up</h2>
+    <img src="/assets/logo.png" class="logo" />
+    <h2>EasyPick</h2>
     <dv.tx>
       <dv.gen-id />
-      <userProfile.create-object id=dv.gen-id.id
-                                 showExclude=["major","minor","graduationYear"]
-                                 showOptionToSubmit=false />
-      <authentication.register-user id=dv.gen-id.id
-                                    showOptionToSubmit=false />
+      <dv.status />
+      <userProfile.create-object
+        id=dv.gen-id.id
+        showExclude=["major","minor","graduationYear"]
+        showOptionToSubmit=false />
+      <authentication.register-user
+        id=dv.gen-id.id
+        showOptionToSubmit=false />
       <dv.button class="theme-button">Sign Up</dv.button>
       <dv.redirect href="/" onExecSuccess=true />
     </dv.tx>
-    <div>
-      Already have an account? <dv.link href="/login">Login</dv.link>
-    </div>
   </div>
 </dv.component>

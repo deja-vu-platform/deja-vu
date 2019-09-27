@@ -1,32 +1,35 @@
 <dv.component name="main">
   <easypick.navbar accessRequired=true/>
   <dv.if condition= easypick.navbar.loggedInUserId>
-    <div class="center-column-dynamic-thin">
+    <div class="center-column-dynamic-medium">
       <userProfile.show-object id=easypick.navbar.loggedInUserId hidden=true />
       <dv.if condition=userProfile.show-object.loadedObject>
-        <h3>
-          <dv.show-entity entity=userProfile.show-object.loadedObject.name />
-        </h3>
+        <h3>{{userProfile.show-object.loadedObject.name}}</h3>
         <div>
-          Email: <dv.show-entity entity=userProfile.show-object.loadedObject.email />
+          <img src="/assets/email.png" class="profile-icon" />
+          {{userProfile.show-object.loadedObject.email}}
         </div>
         <div>
-          Major: <dv.show-entity entity=userProfile.show-object.loadedObject.major />
+          <img src="/assets/major.png" class="profile-icon" />
+          {{userProfile.show-object.loadedObject.major || "No major"}}
         </div>
         <div>
-          Minor: <dv.show-entity entity=userProfile.show-object.loadedObject.minor />
+          <img src="/assets/minor.png" class="profile-icon" />
+          {{userProfile.show-object.loadedObject.minor || "No minor"}}
         </div>
         <div>
-          Graduation Year: <dv.show-entity entity=userProfile.show-object.loadedObject.graduationYear />
+          <img src="/assets/year.png" class="profile-icon" />
+          {{userProfile.show-object.loadedObject.graduationYear ||
+            "No graduation year"}}
         </div>
         <dv.tx>
-          <dv.button class="theme-button">Edit Profile</dv.button>
+          <dv.button class="theme-button">Edit</dv.button>
           <dv.link href="/profile" hidden=true />
         </dv.tx>
       </dv.if>
     </div>
     <div class="center-column-dynamic-medium">
-      <hr width="80%"/>
+      <hr/>
       <h3>Courses/Reviews:</h3>
       <easypick.show-reviews userId=easypick.navbar.loggedInUserId />
       <dv.tx class="individual-card">

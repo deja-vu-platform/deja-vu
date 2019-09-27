@@ -23,6 +23,19 @@ a:hover {
   cursor: pointer;
 }
 
+.rating-box {
+  display: flex;
+}
+
+.logo {
+  height: 200px;
+}
+
+.profile-icon {
+  width: 25px;
+  margin-right: 10px;
+}
+
 h1 {
   font-family: 'Lato', sans-serif;
   font-weight: bold;
@@ -37,7 +50,6 @@ h2 {
 
 h3 {
   font-family: 'Lato', sans-serif;
-  margin: 10px;
 }
 
 div {
@@ -60,12 +72,6 @@ main {
 /* Layouts */
 .center-column {
   margin: 30px 70px;
-}
-
-.center-column-dynamic-thin {
-  padding-top: 40px;
-  margin: auto;
-  width: 25%;
 }
 
 .center-column-dynamic-medium {

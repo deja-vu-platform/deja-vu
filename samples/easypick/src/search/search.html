@@ -6,39 +6,46 @@
       <h3>Filters</h3>
       <class.filter-objects />
       <div>
-        <div class="fourth-column">
+        <dv.tx class="fourth-column">
           <div>Grading</div>
+          <authentication.authenticate as grading-auth
+            id=easypick.navbar.loggedInUserId waitOn=['id'] hidden=true />
           <gradingFair.filter-targets />
-        </div>
-        <div class="fourth-column">
+        </dv.tx>
+        <dv.tx class="fourth-column">
           <div>Pace</div>
+          <authentication.authenticate as pace-auth
+            id=easypick.navbar.loggedInUserId waitOn=['id'] hidden=true />
           <paceReasonable.filter-targets />
-        </div>
-        <div class="fourth-column">
+        </dv.tx>
+        <dv.tx class="fourth-column">
           <div>Contents</div>
+          <authentication.authenticate as contents-auth
+            id=easypick.navbar.loggedInUserId waitOn=['id'] hidden=true />
           <contentsManageable.filter-targets />
-        </div>
-        <div class="fourth-column">
+        </dv.tx>
+        <dv.tx class="fourth-column">
           <div>Overall</div>
+          <authentication.authenticate as ratings-auth
+            id=easypick.navbar.loggedInUserId waitOn=['id'] hidden=true />
           <overallRating.filter-targets />
-        </div>
+        </dv.tx>
       </div>
     </div>
 
     <div>
       <h3>Classes</h3>
-      <dv.intersect lists=[gradingFair.filter-targets.loadedTargetIds,
-                    paceReasonable.filter-targets.loadedTargetIds,
-                    contentsManageable.filter-targets.loadedTargetIds,
-                    overallRating.filter-targets.loadedTargetIds,
-                    class.filter-objects.loadedObjectIds]
-      />
+      <dv.intersect lists=[
+        gradingFair.filter-targets.loadedTargetIds,
+        paceReasonable.filter-targets.loadedTargetIds,
+        contentsManageable.filter-targets.loadedTargetIds,
+        overallRating.filter-targets.loadedTargetIds,
+        class.filter-objects.loadedObjectIds] />
       <dv.show-entities
         entities=dv.intersect.intersectList
-        noEntitiesToShowText="No class in this filter."
-        showEntity=<easypick.show-class classId=$entity />
-      />
+        noEntitiesToShowText="No classes match this filter"
+        showEntity=<easypick.show-class
+          classId=$entity userId=easypick.navbar.loggedInUserId /> />
     </div>
-
   </div>
 </dv.component>
