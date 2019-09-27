@@ -1,52 +1,57 @@
 <dv.component name="show-review" >
   <mat-expansion-panel class="mat-elevation-z0">
     <mat-expansion-panel-header>
-      <class.show-object id=$review.targetId
-                         showOnly=["classNumber","className"]
-      />
+      <dv.tx>
+        <authentication.authenticate as show-obj-auth
+          id=$review.sourceId hidden=true />
+        <class.show-object
+          id=$review.targetId
+          showOnly=["classNumber","className"] />
+      </dv.tx>
     </mat-expansion-panel-header>
-    <div>
+    <dv.tx class="rating-box">
+      <authentication.authenticate as review-auth
+        id=$review.sourceId hidden=true />
       <reviewInfo.show-object
-        id=$review.id
-        showOnly=["year","term"]
-      />
-    </div>
-    <div>
-      <a> Pace: </a>
+        id=$review.id showOnly=["year","term"] />
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Pace:</p>
+      <authentication.authenticate as pace-auth
+        id=$review.sourceId hidden=true />
       <paceReasonable.rate-target
-        sourceId=$review.sourceId
-        targetId=$review.targetId
-      />
-    </div>
-    <div>
-      <a> Grading: </a>
+        sourceId=$review.sourceId targetId=$review.targetId />
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Grading:</p>
+      <authentication.authenticate as grading-auth
+        id=$review.sourceId hidden=true />
       <gradingFair.rate-target
-        sourceId=$review.sourceId
-        targetId=$review.targetId
-      />
-    </div>
-    <div>
-      <a> Contents: </a>
+        sourceId=$review.sourceId targetId=$review.targetId />
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Contents:</p>
+      <authentication.authenticate as contents-auth
+        id=$review.sourceId hidden=true />
       <contentsManageable.rate-target
-        sourceId=$review.sourceId
-        targetId=$review.targetId
-      />
-    </div>
-    <div>
-      <a> Overall: </a>
+        sourceId=$review.sourceId targetId=$review.targetId />
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Overall:</p>
+      <authentication.authenticate as rating-auth
+        id=$review.sourceId hidden=true />
       <overallRating.rate-target
-        sourceId=$review.sourceId
-        targetId=$review.targetId
-      />
-    </div>
-    <div>
-      <a> Your Comments: </a>
+        sourceId=$review.sourceId targetId=$review.targetId />
+    </dv.tx>
+    <dv.tx>
+      <p>Your Comment:</p>
+      <authentication.authenticate as comments-auth
+        id=$review.sourceId waitOn=['id'] hidden=true />
       <comment.edit-comment
         id=$review.id
         authorId=$review.sourceId
-        resetWhenSaved=false
-        collapsible=false
-      />
-    </div>
+        waitOn=['id', 'authorId']
+        resetWhenSaved=false collapsible=false />
+    </dv.tx>
   </mat-expansion-panel>
 </dv.component>

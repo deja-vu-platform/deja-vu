@@ -127,11 +127,11 @@
             "targetId": {
               "type": "string"
             },
-            "term": {
+            "termTaken": {
               "type": "string",
               "enum": ["Fall", "Spring", "IAP"]
             },
-            "year": {
+            "yearTaken": {
               "type": "string",
               "enum": ["2019", "2018", "2017", "2016", "2015"]
             }

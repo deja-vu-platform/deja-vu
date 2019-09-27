@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
-  ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  GatewayService, GatewayServiceFactory, OnEval, OnExec, OnExecFailure,
+  OnExecSuccess, RunService, WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -48,7 +48,9 @@ interface EditCommentRes {
   ]
 })
 export class EditCommentComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
+  AfterViewInit, OnEval, OnInit, OnExec, OnExecFailure, OnExecSuccess,
+  OnChanges {
+  @Input() waitOn: string[];
   @Input() id: string;
   @Input() authorId: string;
 
@@ -72,43 +74,56 @@ export class EditCommentComponent implements
   editCommentError: string;
 
   private gs: GatewayService;
+  private ws: WaiterService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private wsf: WaiterServiceFactory, private rs: RunService,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.loadComment();
+    this.ws = this.wsf.for(this, this.waitOn);
   }
 
-  ngOnChanges() {
-    this.loadComment();
+  ngAfterViewInit() {
+    this.load();
   }
 
-  loadComment() {
-    if (!this.gs || !this.id) {
-      return;
+  ngOnChanges(changes) {
+    if (this.ws && this.ws.processChanges(changes)) {
+      this.load();
     }
+  }
 
-    this.gs.get<CommentRes>(this.apiPath, {
-      params: {
-        inputs: { id: this.id },
-        extraInfo: {
-          action: 'load',
-          returnFields: 'id, content'
+  load() {
+    if (this.canEval()) {
+      this.rs.eval(this.elem);
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      await this.ws.maybeWait();
+      this.gs.get<CommentRes>(this.apiPath, {
+        params: {
+          inputs: { id: this.id },
+          extraInfo: {
+            action: 'load',
+            returnFields: 'id, content'
+          }
         }
-      }
-    })
-    .subscribe((res) => {
-      const comment = res.data.comment;
-      if (comment) {
-        this.contentControl.setValue(comment.content);
-      }
-    });
-
+      })
+      .subscribe((res) => {
+        const comment = res.data.comment;
+        if (comment) {
+          this.contentControl.setValue(comment.content);
+        }
+      });
+    } else if (this.gs) {
+      this.gs.noRequest();
+    }
   }
 
   startEditing() {
@@ -161,5 +176,9 @@ export class EditCommentComponent implements
 
   dvOnExecFailure(reason: Error) {
     this.editCommentError = reason.message;
+  }
+
+  private canEval(): boolean {
+    return !!this.gs;
   }
 }
