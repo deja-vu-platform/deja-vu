@@ -5,7 +5,7 @@
     <authentication.logged-in />
     <dv.redirect
       href="/login"
-      params={ callback: '/' }
+      params={ callback: "/" }
       onEvalFailure=true />
   </dv.tx>
 
@@ -13,19 +13,22 @@
     <div class="container">
       <div class="right-container">
         <listify.profile-card loggedInUser=listify.navbar.loggedInUser />
-        <listify.legend />
+        <div class="card-container legend">
+          <div><div class="locked-list-marker"></div>Voting Closed</div>
+          <div><div class="contributed-marker"></div>Ranking Submitted</div>
+        </div>
       </div>
 
       <h2 class="tabs">
         <dv.tx>
           <dv.button>
-            <span className=$showTrending ? 'selected-tab' : ''>Trending</span>
+            <span class=$showTrending ? 'selected-tab' : ''>Trending</span>
           </dv.button>
           <dv.link href="/home/trending" />
         </dv.tx>|
         <dv.tx>
           <dv.button>
-            <span className=!$showTrending ? 'selected-tab' : ''>Most Recent</span>
+            <span class=!$showTrending ? 'selected-tab' : ''>Most Recent</span>
           </dv.button>
           <dv.link href="/home/recent" />
         </dv.tx>

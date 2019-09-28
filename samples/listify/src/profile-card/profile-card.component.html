@@ -18,9 +18,7 @@
   <div class="card-container">
     <div class="profile-card-filler"></div>
     <img src="assets/profile-icon.svg" class="profile-image" />
-    <dv.if condition=$username>
-      <p class="username">@{{$loggedInUser?.username}}</p>
-    </dv.if>
+    <p class="username">@{{$loggedInUser?.username}}</p>
     <div class="stats-container">
       <dv.if condition=list-count.objects?.length gt= 0>
         <p class="stats-header">Lists Created</p>
