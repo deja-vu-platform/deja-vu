@@ -1,22 +1,29 @@
 <dv.component name="show-climbers">
   <livescorecard.host-navbar />
-
   <div class="container below-navbar">
     <br />
     <div class="row">
-      <div class="offset-1 col-3 center white">name</div>
-      <div class="col-2 center white">sex</div>
+      <div class="offset-1 col-3 white">name</div>
+      <div class="col-2 white">sex</div>
       <div class="col-2 white">category</div>
       <div class="col-2 white">code</div>
     </div>
-
     <livescorecard.create-climber
       loggedInUserId=livescorecard.host-navbar.loggedInUserId
       competitionId=$competitionId />
-
-    <competitionClimbers.show-members
-      inGroupId=$competitionId
-      noMembersText=""
-      showMember=<livescorecard.show-climber id=$id /> />
+    <dv.tx>
+      <hostAuthentication.authenticate
+        id=livescorecard.host-navbar.loggedInUserId waitOn=['id'] hidden=true />
+      <authorization.verify-can-view
+        resourceId=$competitionId
+        principalId=livescorecard.host-navbar.loggedInUserId
+        waitOn=['resourceId', 'principalId']
+        hidden=true />
+      <competitionClimbers.show-members
+        inGroupId=$competitionId
+        waitOn=['inGroupId']
+        noMembersText=""
+        showMember=<livescorecard.show-climber id=$id /> />
+    </dv.tx>
   </div>
 </dv.component>

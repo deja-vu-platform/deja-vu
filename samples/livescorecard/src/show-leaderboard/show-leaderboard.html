@@ -11,33 +11,22 @@
 
   <div class="container below-navbar">
     <div class="row">
-      <div class="offset-lg-4 col-lg-4">
-        <h1>LEADERBOARD</h1>
-        <hr />
-      </div>
-      <div class="col-lg-4"></div>
+      <h1>Leaderboard</h1>
     </div>
 
     <div class="row">
-      <div class="col-lg-9">
-        <!-- Leaderboard Header -->
-        <div class="row">
-          <div class="col-3 center">rank</div>
-          <div class="col-6">climber name</div>
-          <div class="col-3 center">score</div>
-        </div>
-
-        <!-- Leaderboard -->
-        <!-- show all climbs -->
-        <climberScore.show-targets-by-score
-          class="leaderboard-items"
-          sourceId=$competitionId
-          showAscending=false
-          showScores=false
-          noTargetsText=""
-          showTarget=<livescorecard.show-leaderboard-entry
-            climber=$target rank=$index /> />
-      </div>
+      <div class="col-3 white center">rank</div>
+      <div class="col-6 white">climber name</div>
+      <div class="col-3 white center">score</div>
     </div>
+
+    <climberScore.show-targets-by-score
+      class="leaderboard-items"
+      sourceId=$competitionId
+      showAscending=false
+      showScores=false
+      noTargetsText=""
+      showTarget=<livescorecard.show-leaderboard-entry
+        climber=$target rank=$index /> />
   </div>
 </dv.component>
