@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <dv.tx>
-        <dv.status savedText="Participant added to competition!" />
+        <dv.status showSavedText=false />
         <dv.gen-id />
         <div class="row">
           <div class="offset-1 col-3">
@@ -10,11 +10,17 @@
             <userProfile.create-object id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
-          <div class="col-4">
-            <climberProfile.create-object id=dv.gen-id.id
-              showOptionToSubmit=false />
+          <div class="col-2">
+            <climberProfile.create-property as sex class="prop" name="sex" />
           </div>
-          <div class="col-2 center">
+          <div class="col-2">
+            <climberProfile.create-property as category class="prop"
+              name="category" />
+          </div>
+          <div class="offset-2 col-2">
+            <climberProfile.create-object id=dv.gen-id.id
+              initialValue={ sex: sex.value, category: category.value }
+              hidden=true />
             <climberScore.create-score targetId=dv.gen-id.id
               sourceId=$competitionId
               value=0
@@ -25,6 +31,9 @@
               showOptionToSubmit=false />
             <competitionClimbers.add-to-group id=$competitionId
               memberId=dv.gen-id.id
+              hidden=true />
+            <authorization.verify-can-view
+              resourceId=$competitionId principalId=$loggedInUserId
               hidden=true />
             <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 

@@ -4,7 +4,7 @@
       <hostAuthentication.choose-user showChooseButton=false
         chooseSelectPlaceholder="Choose Host" />
       <dv.tx>
-        <dv.status savedText="New host added to the competition" />
+        <dv.status showSavedText=false />
         <div class="row inline-block">
           <competitionHosts.add-to-group id=$competitionId
             memberId=hostAuthentication.choose-user.selectedUser?.id
@@ -12,13 +12,15 @@
           <authorization.add-viewer id=$competitionId
             viewerId=hostAuthentication.choose-user.selectedUser?.id
             hidden=true />
+          <authorization.verify-can-view
+            resourceId=$competitionId principalId=$loggedInUserId hidden=true />
           <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 
           <dv.button class="add right-shift">
             <img src="assets/add.png" />
           </dv.button>
-          <dv.callback defaultHref="/host/competition-hosts"
-            onExecSuccess=true hidden=true />
+          <dv.link href="/host/competition-hosts"
+            params={ competitionId: $competitionId } hidden=true />
         </div>
       </dv.tx>
     </div>

@@ -1,6 +1,6 @@
 <dv.component name="register">
   <div class="host-register white-back">
-    <livescorecard.banner />
+    <livescorecard.banner hostLogin=true />
     <div class="container text-center">
       <div class="row">
         <div class="offset-lg-4 col-lg-4 offset-lg-4">
@@ -11,12 +11,9 @@
               showOptionToSubmit=false />
 
             <hostAuthentication.register-user id=dv.gen-id.id
-              inputLabel="username"
-              passwordLabel="password"
-              retypePasswordLabel="confirm password"
               showOptionToSubmit=false />
             <dv.button class="btn btn-success full">REGISTER</dv.button>
-            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+            <dv.link href="/host" hidden=true />
           </dv.tx>
 
           <p class="register-sign-in">Already have an account? Sign in

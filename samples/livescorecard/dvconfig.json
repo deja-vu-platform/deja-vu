@@ -70,7 +70,7 @@
             "climbNumber": {
               "type": "number"
             },
-            "score": {
+            "points": {
               "type": "number"
             },
             "category": {
@@ -78,7 +78,7 @@
               "enum": ["beginner", "intermediate", "advanced", "open"]
             }
           },
-          "required": ["climbNumber", "score", "category"]
+          "required": ["climbNumber", "points", "category"]
         }
       }
     },
@@ -124,9 +124,6 @@
     { "path": "/host/competition-leaderboard", "component": "show-leaderboard" },
     { "path": "/host/competition-hosts", "component": "show-hosts" },
     { "path": "/host/competition-rules", "component": "show-rules" },
-    { "path": "/host/edit-competition", "component": "edit-competition" },
-    { "path": "/host/edit-participant", "component": "edit-participant" },
-    { "path": "/host/edit-climb", "component": "edit-climb" },
 
     { "path": "/register", "component": "register" },
 

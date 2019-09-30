@@ -5,13 +5,27 @@
   <div class="card">
     <div class="card-body">
       <dv.tx>
-        <dv.status savedText="New climb created" />
+        <dv.status showSavedText=false />
         <dv.gen-id />
         <div class="row">
-          <div class="col-5 col-3-input-fields">
-            <climb.create-object id=dv.gen-id.id
-              showOptionToSubmit=false />
+          <div class="col-3">
+            <climb.create-property as climbNumber name="climbNumber" />
           </div>
+          <div class="col-3">
+            <climb.create-property as points name="points" />
+          </div>
+          <div class="col-3">
+            <climb.create-property as category name="category" />
+          </div>
+          <climb.create-object id=dv.gen-id.id
+            initialValue={
+              climbNumber: climbNumber.value,
+              points: points.value,
+              category: category.value
+            }
+            hidden=true />
+          <authorization.verify-can-view
+            resourceId=$competitionId principalId=$loggedInUserId hidden=true />
           <hostAuthentication.authenticate id=$loggedInUserId hidden=true />
 
           <task.create-tasks-for-assignees showOptionToInputDueDate=false

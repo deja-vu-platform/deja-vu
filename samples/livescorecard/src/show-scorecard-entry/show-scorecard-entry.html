@@ -20,12 +20,12 @@
           <dv.if condition=!$task.completed>
             <dv.if condition=falls-target.loadedTarget>
               <dv.tx>
-                <dv.status savedText="Climb completed!" />
+                <dv.status showSavedText=false />
                 <task.complete-task id=$task.id hidden=true />
                 <climberScore.create-score
                   sourceId=$competitionId
                   targetId=$climber?.id
-                  value=climb-obj.loadedObject?.score - falls-target.loadedTarget?.total
+                  value=climb-obj.loadedObject?.points - falls-target.loadedTarget?.total
                   hidden=true />
 
                 <dv.button>
@@ -38,14 +38,14 @@
 
             <dv.if condition=!falls-target.loadedTarget>
               <dv.tx>
-                <dv.status savedText="Climb completed!" />
+                <dv.status showSavedText=false />
                 <task.complete-task as complete-climb-no-falls-task
                   id=$task.id hidden=true />
 
                 <climberScore.create-score as record-score-no-falls-scoring
                   sourceId=$competitionId
                   targetId=$climber?.id
-                  value=climb-obj.loadedObject?.score
+                  value=climb-obj.loadedObject?.points
                   hidden=true />
                 <dv.button>
                   <img class="check" src="assets/pendingCheck.png" />
@@ -75,7 +75,7 @@
           <!-- climb score -->
           <climb.show-object class="inline-block"
             object=climb-obj.loadedObject
-            showOnly=['score'] />
+            showOnly=['points'] />
         </div>
         <div class="col-3 center">
             <!-- falls -->
