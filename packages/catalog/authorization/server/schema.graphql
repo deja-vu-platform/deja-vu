@@ -36,9 +36,8 @@ type Query {
   resourceCount(input: ResourcesInput!): Int
   owner(resourceId: ID!): ID
   resources(input: ResourcesInput!): [Resource!]
-  canView(input: PrincipalResourceInput!): Boolean
-  canEdit(input: PrincipalResourceInput!): Boolean
-  verifyCanEdit(input: PrincipalResourceInput!): Boolean
+  canDo(input: PrincipalResourceInput!, action: String): Boolean
+  verifyCanDo(input: PrincipalResourceInput!, action: String): Boolean
 }
 
 type Mutation {

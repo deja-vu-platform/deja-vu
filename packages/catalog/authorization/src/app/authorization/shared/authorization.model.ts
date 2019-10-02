@@ -3,3 +3,7 @@ export interface Resource {
   ownerId: string;
   viewerIds: string[];
 }
+
+export interface CanDoRes {
+  data: { canDo: boolean; };
+}

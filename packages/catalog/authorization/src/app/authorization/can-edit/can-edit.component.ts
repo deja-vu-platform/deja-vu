@@ -11,10 +11,8 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../authorization.config';
 
+import { CanDoRes } from '../shared/authorization.model';
 
-interface CanEditRes {
-  data: { canEdit: boolean };
-}
 
 @Component({
   selector: 'authorization-can-edit',
@@ -72,7 +70,7 @@ export class CanEditComponent implements
       return;
     }
     await this.ws.maybeWait();
-    this.gs.get<CanEditRes>(this.apiPath, {
+    this.gs.get<CanDoRes>(this.apiPath, {
       params: {
         inputs: JSON.stringify({
           input: {
@@ -83,7 +81,7 @@ export class CanEditComponent implements
       }
     })
     .subscribe((res) => {
-      this._canEdit = res.data.canEdit;
+      this._canEdit = res.data.canDo;
       this.canEdit.emit(this._canEdit);
     });
   }
