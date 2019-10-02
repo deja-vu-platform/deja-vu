@@ -1,6 +1,129 @@
-$primaryColor: #eeffcc;
+@import "~@angular/material/theming";
+@import "~bootstrap/dist/css/bootstrap.min.css";
 
+@include mat-core();
 
-body {
-  background: $primaryColor;
+// user input
+// might be grouped with other username displays
+.authentication-show-user-username {
+  display: inline;
 }
+
+.inline-block {
+  display: inline-block;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.score {
+  margin-right: 2px;
+}
+
+.subtext {
+  color: grey;
+  font-size: 9pt; /* hacker news subtext font size */
+  display: inline-flex;
+}
+
+.sep {
+  border-left: 1px solid gray;
+  width: 1px;
+  height: 12px;
+  margin-top: 3px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.black-sep {
+  border-left: 1px solid black;
+  width: 1px;
+  height: 15px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.write-comment-container {
+  margin: 20px;
+  margin-top: 0px;
+  margin-left: 45px;
+}
+
+.write-comment-container textarea {
+  width: 300px !important;
+  height: 4rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+
+$primaryColor: #ff6600;
+$textColor: #000000;
+$linkColor: #002002;
+$backgroundColor: #f6f6ef;
+$errorMessageColor: #f44336;
+
+
+$navbarBackgroundColor: $primaryColor !default;
+$navbarTextColor: black;
+$navbarHeight: 56px;
+$navbarButtonPadding: 0 10px;
+
+
+$mainFont: 'Arial', san-serif;
+
+$pagePadding: 15px 40px;
+
+
+
+
+// theming doc starts
+// TODO: costomizable font size for h1, h2, h3...
+a:root, a:root:hover, div:root, p:root, h1:root, h2:root, h3:root {
+  color: $textColor;
+  font-family: $mainFont;
+}
+
+nav {
+  background: $navbarBackgroundColor;
+  height: $navbarHeight;
+  align-content: center;
+
+  a, div, p, h1, h2, h3 {
+    color: $navbarTextColor;
+    padding: $navbarButtonPadding;
+  }
+}
+
+html,
+body{
+  background: $backgroundColor;
+}
+
+.main {
+  background-color: $backgroundColor;
+  margin-top: $navbarHeight;
+  padding: $pagePadding;
+}
+
+
+// Material UI related:
+// TODO: make a palette and use the material UI import
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+.mat-error {
+  color: $errorMessageColor;
+  font-size: 12px;
+}
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: $errorMessageColor;
+}
+
+.mat-input-element {
+  caret-color: $textColor;
+}
+
+
