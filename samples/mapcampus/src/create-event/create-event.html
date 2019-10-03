@@ -5,10 +5,8 @@
     <div class="events-panel card">
       <div class="events-panel-body card-body">
         <h2 class="create-event-header">Create an Event!</h2>
-        <geolocation.display-map
-          showLoadedMarkers=false showDirectionsControl=false />
-
         <dv.tx>
+
           <dv.gen-id />
           <dv.status savedText="Event created" />
           <!-- Title, Description, Room Number, Location Description -->
@@ -18,22 +16,17 @@
 
           <!-- Location -->
           <div class="create-event-input">
-            <geolocation.create-marker id=dv.gen-id.id
-              title=geolocation.display-map.newMarker?.title
-              latitude=geolocation.display-map.newMarker?.latitude
-              longitude=geolocation.display-map.newMarker?.longitude
+            <geolocation.create-marker-from-map id=dv.gen-id.id
               showOptionToSubmit=false />
           </div>
 
           <!-- Time + Date -->
           <div class="create-event-input">
-            <event.create-event id=dv.gen-id.id
-              showOptionToSubmit=false />
+            <event.create-event id=dv.gen-id.id showOptionToSubmit=false />
           </div>
 
           <div class="create-event-input">
             <mapcampus.choose-group
-              chooseSelectPlaceholder="Choose a group you own"
               loggedInUserId=mapcampus.navbar.loggedInUser?.id />
           </div>
 

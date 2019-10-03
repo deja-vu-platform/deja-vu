@@ -72,6 +72,8 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
   load() {
     if (this.canEval() && !this.group) {
       this.rs.eval(this.elem);
+    } else if (this.group) {
+      this.inGroup = this.groupContains(this.group, this.memberId);
     }
   }
 

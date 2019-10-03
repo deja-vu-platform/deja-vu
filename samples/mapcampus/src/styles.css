@@ -85,7 +85,9 @@ h2 {
 }
 
 authentication-register-user button.mat-button,
-authentication-register-user button.mat-button:hover {
+authentication-register-user button.mat-button:hover,
+authentication-sign-in button.mat-button,
+authentication-sign-in button.mat-button:hover {
   background-color: #1FB8CC;
   border-color: white;
   width: 80%;
@@ -93,11 +95,13 @@ authentication-register-user button.mat-button:hover {
   margin-top: 10px;
 }
 
-authentication-register-user button.mat-button:disabled {
+authentication-register-user button.mat-button:disabled,
+authentication-sign-in button.mat-button:disabled {
   background-color: lightgrey;
 }
 
-authentication-register-user span.mat-button-wrapper {
+authentication-register-user span.mat-button-wrapper,
+authentication-sign-in span.mat-button-wrapper {
   color: white;
 }
 
@@ -132,4 +136,8 @@ authorization-show-resources li {
 .cancel-event-btn button.mat-button {
   background-color: #ff392e;
   color: white;
+}
+
+.list-group-item {
+  width: 100%;
 }

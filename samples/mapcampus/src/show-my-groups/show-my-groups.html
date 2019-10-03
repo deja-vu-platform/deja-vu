@@ -13,11 +13,11 @@
               hidden=true />
             <groupAuthorization.show-resources
               createdBy=mapcampus.navbar.loggedInUser?.id
-              noResourcesText='No groups to show'
+              waitOn=["createdBy"]
+              noResourcesText="No groups to show"
               showResource=<mapcampus.show-group
                 groupId=$id
-                loggedInUserId=mapcampus.navbar.loggedInUser?.id
-                createdByUser=true /> />
+                loggedInUserId=mapcampus.navbar.loggedInUser?.id /> />
           </dv.tx>
         </div>
       </div>
@@ -54,17 +54,14 @@
               user=mapcampus.navbar.loggedInUser waitOn=['user']
               hidden=true />
             <groupAuthorization.create-resource id=dv.gen-id.id
-              waitOn=['ownerId']
               ownerId=mapcampus.navbar.loggedInUser?.id hidden=true />
             <group.create-group id=dv.gen-id.id
-              memberIds=mapcampus.navbar.loggedInUser?.id ?
-                [mapcampus.navbar.loggedInUser?.id] :
-                mapcampus.navbar.loggedInUser?.id
-              resetOnExecSuccess=false
-              waitOn=['memberIds']
-              hidden=true />
+              memberIds=[mapcampus.navbar.loggedInUser?.id]
+              resetOnExecSuccess=false hidden=true />
             <groupInfo.create-object id=dv.gen-id.id
-              buttonLabel='Create Group' />
+              newObjectSavedText="New Group Saved"
+              buttonLabel="Create Group" />
+            <dv.link hidden=true />
           </dv.tx>
         </div>
       </div>

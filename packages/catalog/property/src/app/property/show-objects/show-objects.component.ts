@@ -130,7 +130,7 @@ export class ShowObjectsComponent implements
       const fmChanges = changes['fieldMatching'];
       if (fmChanges) {
         for (const field of this.fieldMatching['waitOn']) {
-          if (!_.isNil(_.get(this.fieldMatching, field))) {
+          if (!this.waitOnFieldIsNil(field)) {
             this.fieldChange.emit(field);
           }
         }
@@ -151,7 +151,7 @@ export class ShowObjectsComponent implements
       const fmWaitOn = _.get(this.fieldMatching, 'waitOn');
       if (!_.isEmpty(fmWaitOn)) {
         await Promise.all(_.chain(fmWaitOn)
-          .filter((field) => _.isNil(_.get(this.fieldMatching, field)))
+          .filter((field) => this.waitOnFieldIsNil(field))
           .map((fieldToWaitFor) => this.fieldChange
             .pipe(filter((field) => field === fieldToWaitFor), take(1))
             .toPromise())
@@ -193,5 +193,20 @@ export class ShowObjectsComponent implements
 
   private canEval(): boolean {
     return !!(this.gs);
+  }
+
+  private waitOnFieldIsNil(field) {
+    const fValue = _.get(this.fieldMatching, field);
+    if (_.isNil(fValue)) {
+      return true;
+    }
+    if (_.isPlainObject(fValue)) {
+      const qValuesUndefined = _.filter(_.keys(fValue),
+        (k) => k.startsWith('q_') && fValue[k] === undefined);
+
+      return qValuesUndefined.length > 0;
+    }
+
+    return false;
   }
 }

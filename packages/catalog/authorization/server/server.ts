@@ -22,6 +22,17 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 
+function canDoQuery(action: 'view' | 'edit', throwOnError: boolean) {
+  const qWrap = throwOnError ? 'VerifyCanDo' : 'CanDo';
+  const q = throwOnError ? 'verifyCanDo' : 'canDo';
+
+  return (extraInfo) => `
+    query ${qWrap}($input: PrincipalResourceInput!) {
+      ${q}(input: $input, action: "${action}") ${getReturnFields(extraInfo)}
+    }
+  `;
+}
+
 const componentRequestTable: ComponentRequestTable = {
   'add-remove-viewer': (extraInfo) => {
     switch (extraInfo.action) {
@@ -40,11 +51,7 @@ const componentRequestTable: ComponentRequestTable = {
           }
         `;
       case 'view':
-        return `
-          query CanView($input: PrincipalResourceInput!) {
-            canView(input: $input) ${getReturnFields(extraInfo)}
-          }
-        `;
+        return canDoQuery('view', false)(extraInfo);
       default:
         throw new Error('Need to specify extraInfo.action');
     }
@@ -54,34 +61,18 @@ const componentRequestTable: ComponentRequestTable = {
       addViewerToResource(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
-  'can-edit': (extraInfo) => `
-    query CanEdit($input: PrincipalResourceInput!) {
-      canEdit(input: $input) ${getReturnFields(extraInfo)}
-    }
-  `,
-  'verify-can-edit': (extraInfo) => `
-    query VerifyCanEdit($input: PrincipalResourceInput!) {
-      verifyCanEdit(input: $input) ${getReturnFields(extraInfo)}
-    }
-  `,
-  'can-view': (extraInfo) => `
-    query CanView($input: PrincipalResourceInput!) {
-      canView(input: $input) ${getReturnFields(extraInfo)}
-    }
-  `,
-  'verify-can-view': (extraInfo) => `
-    query VerifyCanView($input: PrincipalResourceInput!) {
-      canView(input: $input) ${getReturnFields(extraInfo)}
-    }
-  `,
+  'can-edit': canDoQuery('edit', false),
+  'verify-can-edit': canDoQuery('edit', true),
+  'can-view': canDoQuery('view', false),
+  'verify-can-view': canDoQuery('view', true),
   'create-resource': (extraInfo) => `
     mutation CreateResource($input: CreateResourceInput!) {
-      createResource (input: $input) ${getReturnFields(extraInfo)}
+      createResource(input: $input) ${getReturnFields(extraInfo)}
     }
   `,
   'delete-resource': (extraInfo) => `
     mutation DeleteResource($id: ID!) {
-      deleteResource (id: $id) ${getReturnFields(extraInfo)}
+      deleteResource(id: $id) ${getReturnFields(extraInfo)}
     }
   `,
   'remove-viewer': (extraInfo) => `
@@ -110,6 +101,27 @@ const componentRequestTable: ComponentRequestTable = {
     }
   `
 };
+
+async function canDo(
+  resources, input: PrincipalResourceInput, action: 'view' | 'edit',
+  throwOnError: boolean): Promise<boolean> {
+  try {
+    const field = action === 'view' ? 'viewerIds' : 'ownerId';
+    const resource = await resources
+      .findOne({ id: input.resourceId, [field]: input.principalId },
+        { projection: { _id: 1 } });
+
+    return !_.isNil(resource);
+  } catch (e) {
+    if (throwOnError) {
+      throw new Error(
+        `Principal ${input.principalId} can't ${action} ` +
+        `resource ${input.resourceId}`);
+    }
+
+    return false;
+  }
+}
 
 function getResourceFilter(input: ResourcesInput) {
   const filter = { pending: { $exists: false } };
@@ -153,44 +165,11 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
         return resource!.ownerId;
       },
 
-      canView: async (_root, { input }: { input: PrincipalResourceInput }) => {
-        try {
-          const resource = await resources
-            .findOne({ id: input.resourceId, viewerIds: input.principalId },
-              { projection: { _id: 1 } });
+      canDo: async (_root, { input, action }) =>
+        canDo(resources, input, action, false),
 
-          return !_.isNil(resource);
-        } catch (e) {
-          return false;
-        }
-      },
-
-      canEdit: async (_root, { input }: { input: PrincipalResourceInput }) => {
-        try {
-          const resource = await resources
-            .findOne({ id: input.resourceId, ownerId: input.principalId },
-              { projection: { _id: 1 } });
-
-          return !_.isNil(resource);
-        } catch (e) {
-          return false;
-        }
-      },
-
-      verifyCanEdit: async (
-        _root, { input }: { input: PrincipalResourceInput }) => {
-        const resource = await resources
-          .findOne({ id: input.resourceId, ownerId: input.principalId },
-            { projection: { _id: 1 } });
-
-        if (!_.isNil(resource)) {
-          return true;
-        }
-
-        throw new Error(
-          `Principal ${input.principalId} can't edit ` +
-          `resource ${input.resourceId}`);
-      }
+      verifyCanDo: async (_root, { input, action }) =>
+        canDo(resources, input, action, true)
     },
 
     Resource: {
@@ -218,22 +197,19 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
         context: Context) => {
         const updateOp = { $push: { viewerIds: input.viewerId } };
 
-        return await resources
-              .updateOne(context, { id: input.id }, updateOp);
+        return await resources.updateOne(context, { id: input.id }, updateOp);
       },
 
       removeViewerFromResource: async (
-        _root,
-        { input }: { input: RemoveViewerFromResourceInput },
+        _root, { input }: { input: RemoveViewerFromResourceInput },
         context: Context) => {
         const updateOp = { $pull: { viewerIds: input.viewerId } };
 
-        return await resources
-              .updateOne(context, { id: input.id }, updateOp);
+        return await resources.updateOne(context, { id: input.id }, updateOp);
       },
 
-      deleteResource: async (_root, { id }, context: Context) => await
-        resources.deleteOne(context, { id })
+      deleteResource: async (_root, { id }, context: Context) =>
+        await resources.deleteOne(context, { id })
     }
   };
 }
