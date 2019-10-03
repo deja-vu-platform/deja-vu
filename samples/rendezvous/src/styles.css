@@ -344,3 +344,7 @@ comment-create-comment button.mat-button {
 .edit-button {
   margin: 20px;
 }
+
+.filter-selector {
+  margin: 10px 15px;
+}

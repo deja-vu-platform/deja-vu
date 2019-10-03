@@ -8,21 +8,43 @@
         </dv.link>
       </div>
 
+      <dv.choose chooseSelectPlaceholder="Filter"
+                 class="filter-selector"
+                 showChooseButton=false
+                 entities=["All Events", "Events I'm hosting", "Events I'm attending"]
+                />
+
+      <dv.if condition=dv.choose.selectedEntity!=="All Events"
+                  && dv.choose.selectedEntity!=="Events I'm hosting"
+                  && dv.choose.selectedEntity!=="Events I'm attending"
+        >
       <h4>All Events</h4>
       <event.show-events id="all-events"
-        showEvent=<rendezvous.show-event-summary id=$event.id /> />
+                         showEvent=<rendezvous.show-event-summary id=$event.id /> />
+      </dv.if>
 
+      <dv.if condition=dv.choose.selectedEntity==="All Events">
+        <h4>All Events</h4>
+        <event.show-events id="all-events"
+                         showEvent=<rendezvous.show-event-summary id=$event.id /> />
+      </dv.if>
+
+      <dv.if condition=dv.choose.selectedEntity==="Events I'm hosting">
       <h4>Events I'm Hosting</h4>
       <div id="events-by-host">
         <rendezvous.show-events-by-host
           loggedInUserId=rendezvous.navbar.loggedInUser?.id />
       </div>
+      </dv.if>
 
+      <dv.if condition=dv.choose.selectedEntity==="Events I'm attending">
       <h4>Events I'm Attending</h4>
       <div id="events-by-attendee">
         <rendezvous.show-events-by-attendee
           loggedInUserId=rendezvous.navbar.loggedInUser?.id />
       </div>
+      </dv.if>
+
     </div>
 
     <div class="col-2-3 map">
