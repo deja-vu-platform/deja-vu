@@ -32,6 +32,13 @@
               <party.show-object object=party.show-object.loadedObject
                 showOnly=['description'] class="inline-block" />
             </p>
+            <dv.tx>
+              <party.delete-object id=$partyId hidden=true />
+              <event.delete-event id=$partyId hidden=true />
+              <authorization.delete-resource id=$partyId hidden=true />
+              <dv.redirect href="/parties" onExecSuccess=true />
+              <dv.button>Delete Party</dv.button>
+            </dv.tx>
           </div>
         </div>
       </div>
