@@ -91,7 +91,9 @@ export class ConceptServer<C extends Config = Config> {
     if (this._componentRequestTable[componentName]) {
       return this._componentRequestTable[componentName](extraInfo);
     }
-    throw new Error(`Component ${componentName} request not defined`);
+    throw new Error(
+      `Component ${componentName} request not defined in component table ` +
+      JSON.stringify(this._componentRequestTable));
   }
 
   private setGraphqlQueryAndVariables(

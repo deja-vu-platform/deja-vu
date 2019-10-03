@@ -9,25 +9,25 @@
       <!-- "group I own" view -->
       <dv.if condition=$groupId>
         <groupInfo.show-object id=$groupId />
+        <!-- add a member to the group -->
+        <div class="add">
+          <authentication.choose-user class="add-member-input"
+            showChooseButton=false />
+          <dv.tx>
+            <dv.status savedText="Member added to group" />
+            <group.add-to-group id=$groupId showInput=false
+              member=authentication.choose-user.selectedUser hidden=true />
+            <groupAuthorization.verify-can-edit resourceId=$groupId
+              principalId=$loggedInUserId hidden=true />
+            <authentication.authenticate id=$loggedInUserId hidden=true />
+            <dv.button class="btn btn-blue add-member-btn vertical-align-top">
+              Add
+            </dv.button>
+            <dv.link hidden=true />
+          </dv.tx>
+        </div>
         <group.show-members inGroupId=$groupId
           showMember=<authentication.show-user id=$id /> />
-
-        <!-- add a member to the group -->
-        <h5>Add User</h5>
-        <authentication.choose-user class="add-member-input"
-          showChooseButton=false />
-        <dv.tx>
-          <dv.status savedText="Member added to group" />
-          <group.add-to-group id=$groupId showInput=false
-            member=authentication.choose-user.selectedUser hidden=true />
-          <groupAuthorization.verify-can-edit resourceId=$groupId
-            principalId=$loggedInUserId hidden=true />
-          <authentication.authenticate id=$loggedInUserId hidden=true />
-          <dv.button class="btn btn-blue add-member-btn vertical-align-top">
-            Add Member to Group
-          </dv.button>
-          <dv.link hidden=true />
-        </dv.tx>
       </dv.if>
 
       <!-- "group I am member of" view -->

@@ -137,3 +137,7 @@ authorization-show-resources li {
   background-color: #ff392e;
   color: white;
 }
+
+.list-group-item {
+  width: 100%;
+}
