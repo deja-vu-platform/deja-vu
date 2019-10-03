@@ -37,6 +37,7 @@ export class AttachLabelsComponent implements
   @Input() addOnBlur = true;
 
   @Input() showOptionToSubmit = true;
+  @Input() clearLabelsOnSave = true;
 
   // Presentation inputs
   @Input() inputLabel = 'Add label...';
@@ -111,7 +112,9 @@ export class AttachLabelsComponent implements
   dvOnExecSuccess() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
-    this.labels = [];
+    if (this.clearLabelsOnSave) {
+      this.labels = [];
+    }
     window.setTimeout(() => {
       this.labelsAttached = false;
     }, SAVED_MSG_TIMEOUT);

@@ -35,6 +35,8 @@ import {
   ShowMarkerCountComponent
 } from './show-marker-count/show-marker-count.component';
 export { ShowMarkerCountComponent };
+import { UpdateMarkerFromMapComponent } from './update-marker-from-map/update-marker-from-map.component';
+export { UpdateMarkerFromMapComponent };
 
 import { GOOGLE_MAPS_API_KEY } from './geolocation.config';
 
@@ -47,6 +49,7 @@ const allComponents = [
   ShowMarkerComponent,
   ShowMarkersComponent,
   ShowMarkerCountComponent,
+  UpdateMarkerFromMapComponent,
   ConfigWizardComponent
 ];
 

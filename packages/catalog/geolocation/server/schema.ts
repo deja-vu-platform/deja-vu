@@ -31,3 +31,11 @@ export interface MarkersInput {
   radius?: number; // in miles
   markerIds?: string[];
 }
+
+export interface UpdateMarkerInput {
+  id: string;
+  title?: string;
+  latitude: number;
+  longitude: number;
+  mapId: string;
+}

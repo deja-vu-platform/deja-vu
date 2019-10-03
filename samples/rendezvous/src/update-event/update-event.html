@@ -28,27 +28,27 @@
                     <relevantInterests.attach-labels itemId=$eventId
                                                      labels=relevantInterests.show-labels.labels
                                                      inputLabel=""
+                                                     clearLabelsOnSave=false
                                                      showOptionToSubmit=true />
                   </div>
                 </td>
               </tr>
             </table>
-            <!--<table class="event-info table">-->
-              <!--<tr>-->
-                <!-- Location -->
-                <!--<td rowspan="2">-->
-                  <!--<div class="form-group">-->
-                    <!--<p>Location</p>-->
-                    <!--<div id="map_new-event">-->
-                      <!--<geolocation.create-marker-from-map-->
-                        <!--id=$eventId-->
-                        <!--buttonLabel="Update Location"-->
-                        <!--loadOriginalMarker=true-->
-                        <!--newMarkerSavedText="Location Updated!"-->
-                        <!--showOptionToSubmit=true />-->
-                    <!--</div>-->
-                  <!--</div>-->
-                <!--</td>-->
+            <table class="event-info table">
+              <tr>
+                 Location
+                <td rowspan="2">
+                  <div class="form-group">
+                    <p>Location</p>
+                    <div id="map_new-event">
+                      <geolocation.update-marker-from-map
+                        id=$eventId
+                        buttonLabel="Update Location"
+                        updateMarkerSavedText="Location Updated!"
+                        showOptionToSubmit=true />
+                    </div>
+                  </div>
+                </td>
 
                 <!-- Event -->
                 <!--<td>-->
@@ -56,8 +56,8 @@
                   <!--<event.create-event id=dv.gen-id.id-->
                                       <!--showOptionToSubmit=false />-->
                 <!--</td>-->
-              <!--</tr>-->
-            <!--</table>-->
+              </tr>
+            </table>
 
             <authentication.authenticate
               id=rendezvous.navbar.loggedInUser?.id hidden=true />
