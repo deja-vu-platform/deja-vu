@@ -331,3 +331,16 @@ comment-create-comment button.mat-button {
 .host-name .dvlink:hover {
   text-decoration: none;
 }
+
+.theme-button button.mat-button{
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+  margin-right: 30px;
+}
+
+.edit-button {
+  margin: 20px;
+}

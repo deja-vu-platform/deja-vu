@@ -80,6 +80,7 @@
     { "path": "/event-details", "component": "show-event-details" },
     { "path": "/create-event", "component": "create-event" },
     { "path": "/profile", "component": "show-user-profile" },
+    { "path": "/update-profile", "component": "update-user-profile" },
     { "path": "", "component": "main" }
   ]
 }
