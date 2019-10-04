@@ -22,7 +22,7 @@
   <div id="personal-and-calendar-container">
     <div class="row">
       <!-- Availability -->
-      <div id="calendar-and-bounds-container" class="col-md-6">
+      <div id="calendar-and-bounds-container" class="col-md-7">
         <h3>Availability</h3>
 
         <div id="calendar-container">
@@ -33,6 +33,7 @@
                 hidden=true />
               <schedule.update-schedule
                 id=phoenix.show-sidebar.loggedInUser?.id
+                showOptionToChangeView=false
                 waitOn=['id']
                 dayStartHour=0
                 dayEndHour=23 />
@@ -45,6 +46,7 @@
                 hidden=true />
               <schedule.create-schedule
                 id=phoenix.show-sidebar.loggedInUser?.id
+                showOptionToChangeView=false
                 dayStartHour=0
                 dayEndHour=23 />
               <dv.link hidden=true />
@@ -70,7 +72,7 @@
         </div>
       </div>
 
-      <div id="personal-container" class="col-md-6">
+      <div id="personal-container" class="col-md-4">
         <!-- About User -->
         <h3 class="inline-block">About
           <dv.tx>
