@@ -61,8 +61,6 @@ export class VerifyObjectMatchesComponent implements
       this.fieldMatching, _.get(this.fieldMatching, 'waitOn'));
     this.config = this.cs.getConfig();
     this.schema = getPropertiesFromConfig(this.config);
-
-    this.rs.eval(this.elem);
   }
 
   ngOnChanges(changes) {

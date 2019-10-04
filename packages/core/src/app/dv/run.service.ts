@@ -168,9 +168,11 @@ export class RunService {
       // Note: you can't use JSON.stringify because errors objects would just
       // output `{}`
       console.error(runResultMap);
+      console.log(`Finalizing ${runType} ${id} (${targetComponentFqTag})`);
       this.removeRunIds(targetComponent);
       this.callDvOnRunX('onFailure', runType, targetComponent, runResultMap);
     } else { // no error
+      console.log(`Finalizing ${runType} ${id} (${targetComponentFqTag})`);
       this.removeRunIds(targetComponent);
       this.callDvOnRunX('onSuccess', runType, targetComponent, runResultMap);
     }
