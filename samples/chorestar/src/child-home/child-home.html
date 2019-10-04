@@ -6,16 +6,17 @@
       <div id="child-heading" class="col-md-12">
         <div class="row">
           <div class="offset-md-4 col-md-4">
+            <dv.tx>
+             <childauthentication.authenticate as bank-auth
+                user=chorestar.child-navbar.user waitOn=['user']
+                hidden=true />
+              <transfer.show-balance
+                accountId=chorestar.child-navbar.user?.id hidden=true />
+            </dv.tx>
             <h3>
               StarBank Total:
+              {{transfer.show-balance.fetchedBalance}}
               <i class="material-icons icon">star_rate</i>
-              <dv.tx>
-               <childauthentication.authenticate as bank-auth
-                  user=chorestar.child-navbar.user waitOn=['user']
-                  hidden=true />
-                <transfer.show-balance
-                  accountId=chorestar.child-navbar.user?.id />
-              </dv.tx>
             </h3>
           </div>
         </div>
@@ -90,8 +91,8 @@
             <div class="row section">
               <div class="col-md-12">
                 <h3>Rewards You Can Buy</h3>
-                <dv.for elems=reward.show-objects.objects
-                  showElem=<dv.if
+                <dv.for elems=reward.show-objects.objects class="list-group"
+                  showElem=<dv.if class="list-group-item"
                   condition=$elem.cost lt= transfer.show-balance.fetchedBalance>
                     <chorestar.show-reward
                       reward=$elem
@@ -104,8 +105,8 @@
             <div class="row section">
               <div class="col-md-12">
                 <h3>Rewards You Cannot Buy Yet</h3>
-                <dv.for elems=reward.show-objects.objects
-                  showElem=<dv.if
+                <dv.for elems=reward.show-objects.objects class="list-group"
+                  showElem=<dv.if class="list-group-item"
                   condition=$elem.cost gt transfer.show-balance.fetchedBalance>
                     <chorestar.show-reward
                       reward=$elem showOptionToPurchase=false />

@@ -4,8 +4,8 @@
       <reward.show-object object=$reward showOnly=['name'] />
     </div>
     <div class="col-md-4">
+      {{$reward.cost}}
       <i class="material-icons icon">star_rate</i>
-      <reward.show-object object=$reward showOnly=['cost'] />
     </div>
     <div class="col-md-4">
       <dv.if condition=$showOptionToPurchase>

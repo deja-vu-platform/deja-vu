@@ -1,6 +1,8 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
+@import url('https://fonts.googleapis.com/css?family=Fruktur&display=swap');
+
 md-icon {
   font-family: 'Material Icons' !important;
 }
@@ -30,6 +32,7 @@ body {
 .navbar-brand {
   font-size: 20pt;
   font-family: 'Fruktur', sans-serif;
+  color: gray !important;
 }
 
 div.scroll {
@@ -49,4 +52,13 @@ div.scroll {
 h3 .icon {
   vertical-align: baseline;
   width: 25px;
+}
+
+.username {
+  line-height: 35px;
+  margin-right: 10px;
+}
+
+transfer-add-to-balance .form-group {
+  margin-bottom: 0;
 }

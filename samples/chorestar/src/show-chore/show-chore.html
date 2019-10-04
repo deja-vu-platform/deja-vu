@@ -5,11 +5,10 @@
 
   <div class="row">
     <div class="col-md-4">
-      <chore.show-object
-        object=loadChoreObject.loadedObject showOnly=['name'] />
+      {{loadChoreObject.loadedObject?.name}}
     </div>
 
-    <div class="offset-md-1 col-md-7">
+    <div class="col-md-6">
       <task.show-task
         task=$chore
         showId=false
@@ -17,23 +16,20 @@
         showAssignee=false
         showCompleted=false
         showApproved=false />
-
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-md-4">
-      <dv.if condition=$view === 'parent'>
-        <childauthentication.show-user
-          id=$chore.assigneeId />
-      </dv.if>
-    </div>
-    <div class="offset-md-1 col-md-7">
+    <div class="col-md-2">
+      {{loadChoreObject.loadedObject?.stars}}
       <i class="material-icons icon">star_rate</i>
-      <chore.show-object
-        object=loadChoreObject.loadedObject showOnly=['stars'] />
     </div>
   </div>
+
+  <dv.if condition=$view === 'parent' class="row">
+    <childauthentication.show-user id=$chore.assigneeId hidden=true />
+    <div class="col-md-12">
+      assigned to {{childauthentication.show-user.loadedUser?.username}}
+    </div>
+  </dv.if>
 
   <dv.if condition=$showOptionToApprove class="row">
     <dv.tx class="offset-md-4 col-md-4">
