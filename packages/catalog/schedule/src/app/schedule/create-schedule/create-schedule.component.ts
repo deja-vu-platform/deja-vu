@@ -55,6 +55,7 @@ export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
   OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() showOptionToSubmit = true;
+  @Input() showOptionToChangeView = true;
 
   // Presentation inputs
   @Input() buttonLabel = 'Create Schedule';
