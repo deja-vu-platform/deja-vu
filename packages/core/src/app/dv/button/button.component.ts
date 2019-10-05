@@ -9,6 +9,8 @@ import { RunService } from '../run.service';
 export class ButtonComponent implements OnInit {
   @Input() valid = true;
   @Input() value: string | undefined;
+  // see https://material.angular.io/components/button/examples
+  @Input() color: 'basic' | 'primary' | 'accent' | 'warn' = 'basic';
 
   constructor(private elem: ElementRef, private rs: RunService) {}
 
