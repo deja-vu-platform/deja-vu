@@ -12,6 +12,7 @@ import { TimeAgoPipe } from 'time-ago-pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonLastComponent } from './button-last/button-last.component';
 import { ButtonComponent } from './button/button.component';
+import { ButtonLinkComponent } from './button-link/button-link.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { CamelToTitleCasePipe } from './stage/stage.component';
@@ -56,7 +57,8 @@ import { SubscriptionService } from './subscription.service';
 
 const allComponents = [
   GenIdComponent, GenIdsComponent, TxComponent, IncludeComponent,
-  IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
+  IncludeDirective, ButtonLastComponent, ButtonComponent, ButtonLinkComponent,
+  LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent, ShowDateComponent,
