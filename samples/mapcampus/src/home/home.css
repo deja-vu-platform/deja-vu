@@ -20,3 +20,7 @@
 #homepage-left .card .card-body {
   min-height: 430px;
 }
+
+.evts ul {
+  list-style: none;
+}

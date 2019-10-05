@@ -31,12 +31,10 @@
           </div>
 
           <div class="event-btn-container">
-            <div class="cancel-button">
-              <dv.link href="/home" class="btn btn-default event-cancel-btn">
-                Cancel
-              </dv.link>
+            <div class="cancel-btn">
+              <dv.button-link href="/home">Cancel</dv.button-link>
             </div>
-            <div class="save-button">
+            <div>
               <authentication.authenticate as auth-create
                 id=mapcampus.navbar.loggedInUser?.id
                 hidden=true />
@@ -48,11 +46,7 @@
               <eventAuthorization.create-resource id=dv.gen-id.id
                 ownerId=mapcampus.navbar.loggedInUser?.id
                 waitOn=['ownerId'] hidden=true />
-              <dv.button class='btn btn-default btn-blue event-submit-btn'>
-                Save Event
-              </dv.button>
-              <dv.callback defaultHref="/my-events"
-                onExecSuccess=true hidden=true />
+              <dv.button-link href="/my-events">Save Event</dv.button-link>
             </div>
           </div>
         </dv.tx>

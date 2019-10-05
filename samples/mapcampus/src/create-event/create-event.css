@@ -5,3 +5,8 @@
 .create-event-input {
   margin-bottom: 10px;
 }
+
+.event-btn-container {
+  float: right;
+  display: flex;
+}
