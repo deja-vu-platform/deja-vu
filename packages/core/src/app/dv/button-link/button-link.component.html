@@ -1,0 +1,5 @@
+<button mat-button color="color"
+  [disabled]="!valid" (click)="onClick()">
+  <span *ngIf="value">{{value}}</span>
+  <ng-content></ng-content>
+</button>
