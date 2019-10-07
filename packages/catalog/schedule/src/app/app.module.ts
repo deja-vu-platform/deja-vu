@@ -14,7 +14,7 @@ import { ScheduleModule } from './schedule/schedule.module';
   imports: [
     BrowserModule,
     ScheduleModule,
-    RouterModule
+    RouterModule.forRoot([]),
     DvModule
   ],
   providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],

@@ -2,11 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 
-import { AppComponent } from './app.component';
-
 import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
-
+import { AppComponent } from './app.component';
 import { PropertyModule } from './property/property.module';
+
 
 const usedConceptsConfig = {
   property: {

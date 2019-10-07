@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { GeolocationModule } from './geolocation/geolocation.module';
+import { RouterModule } from '@angular/router';
 
 import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
-
 import { AppComponent } from './app.component';
+import { GeolocationModule } from './geolocation/geolocation.module';
+
 
 const usedConceptsConfig = {
   geolocation: {
@@ -22,6 +22,7 @@ const usedConceptsConfig = {
   imports: [
     BrowserModule,
     GeolocationModule,
+    RouterModule.forRoot([]),
     DvModule
   ],
   providers: [
