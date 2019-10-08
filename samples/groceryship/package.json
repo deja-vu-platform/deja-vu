@@ -6,7 +6,7 @@
     "clean": "rm -rf .dv/"
   },
   "devDependencies": {
-    "@deja-vu/cli": "0.0.1"
+    "@deja-vu/cli": "^0.0.1"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
