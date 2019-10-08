@@ -1,11 +1,10 @@
 {
-  "name": "listify",
+  "name": "@deja-vu/sample-listify",
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
-  "private": true,
   "devDependencies": {
     "@deja-vu/cli": "0.0.1"
   },

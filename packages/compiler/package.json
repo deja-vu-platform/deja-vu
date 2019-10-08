@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/compiler",
   "description": "Déjà Vu compiler",
   "license": "MIT",

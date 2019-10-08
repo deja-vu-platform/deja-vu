@@ -12,7 +12,6 @@
     "lint-fix": "ng lint --fix --type-check --fix",
     "e2e": "ng e2e"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/cdk": "^5.2.1",

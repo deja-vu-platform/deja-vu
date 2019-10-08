@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/gateway",
   "description": "Gateway server for Déjà Vu",
   "license": "MIT",

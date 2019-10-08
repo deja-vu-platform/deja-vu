@@ -12,7 +12,6 @@
     "clean": "lerna clean && lerna run clean && rm -rf node_modules",
     "lint": "lerna run --no-bail lint --stream",
     "lint-fix": "lerna run --no-bail lint-fix --stream",
-    "release": "lerna publish",
     "start": "echo \"This monorepo has multiple packages. To start a concept or app, you must navigate to the concept or app directory and then do 'yarn start'\""
   },
   "devDependencies": {

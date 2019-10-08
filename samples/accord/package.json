@@ -1,5 +1,5 @@
 {
-  "name": "accord",
+  "name": "@deja-vu/sample-accord",
   "version": "0.0.1",
   "scripts": {
     "start": "dv serve",
@@ -10,7 +10,6 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },

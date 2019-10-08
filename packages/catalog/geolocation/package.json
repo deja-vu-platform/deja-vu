@@ -104,7 +104,6 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
