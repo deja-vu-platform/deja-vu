@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/schematics",
   "description": "Schematics for Déjà Vu",
   "license": "MIT",
