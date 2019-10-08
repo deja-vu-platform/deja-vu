@@ -118,7 +118,7 @@ async function createPasskey(passkeys: Collection<PasskeyDoc>,
   if (_.isEmpty(input.code)) {
     const updateOp = { $set: { used: true } };
     if (!_.isEmpty(input.id)) { _.set(updateOp, '$set.id', input.id); }
-    if (context.reqType === 'vote') {
+    if (context.reqType === undefined || context.reqType === 'vote') {
       code = await getRandomPasscode(passkeys);
       pendingGivenCodes[context.runId] = code;
     } else {
