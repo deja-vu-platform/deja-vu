@@ -1,9 +1,11 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
+
 
 /**
  * Filter an array
@@ -17,14 +19,15 @@ export class FilterComponent implements OnInit, OnChanges {
   @Input() entitiesToFilter: any[];
 
   /**
-   * follows the definition of lodash:
+   * The function invoked per iteration. Follows the definition of lodash:
    * https://lodash.com/docs/4.17.15#filter
    */
   @Input() filter: any;
 
   /**
-   * Input an object with key : value[] pairs to get the entities
-   * with the key in the corresponding lists. Multple keys connect with `and` logic
+   * Input an object with { key: value[] } pairs to retain those entities in
+   * `entitiesToFilter` that have a key in the corresponding lists. Multiple
+   * keys connect with `and` logic.
    * Example:
    *    {
    *      id: [2, 3, 5, 7, 11],

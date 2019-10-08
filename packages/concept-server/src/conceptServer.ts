@@ -207,8 +207,8 @@ export class ConceptServer<C extends Config = Config> {
    * Start this concept server.
    */
   async start(): Promise<void> {
-    // TODO: make connecting to mongo optional since there will be concepts that
-    // don't require a db, e.g. email concept
+    // TODO: make connecting to mongo optional since there might be concepts
+    // that don't require a db
     const mongoServer = `${this._config.dbHost}:${this._config.dbPort}`;
     console.log(`Connecting to mongo server ${mongoServer}`);
     const client: mongodb.MongoClient = await mongodb.MongoClient.connect(

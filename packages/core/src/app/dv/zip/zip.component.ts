@@ -1,5 +1,5 @@
 import {
-  Component, Input, OnChanges, Output, EventEmitter
+  Component, EventEmitter, Input, OnChanges, Output
 } from '@angular/core';
 
 import * as _ from 'lodash';
@@ -10,7 +10,7 @@ import * as _ from 'lodash';
  * Requires: inputs.length === fieldNames.length
  * and inputs[i].length === inputs[j].length === n for every pair i, j
  * so that the emitted objects.length === n
- * 
+ *
  * For example, if inputs=[[1,2], [a,b], [x,y]]
  * and fieldNames=['id', 'letter1', 'letter2'],
  * The objects emitted will be
@@ -28,8 +28,8 @@ export class ZipComponent implements OnChanges {
   ngOnChanges() {
     if (!_.isEmpty(this.inputs) &&
       this.inputs.length === this.fieldNames.length) {
-      this.objects.emit(_.zip(...this.inputs).map(objVals =>
-        _.zipObject(this.fieldNames, objVals)));
+      this.objects.emit(_.zip(...this.inputs)
+        .map((objVals) => _.zipObject(this.fieldNames, objVals)));
     }
   }
 }

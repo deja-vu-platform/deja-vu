@@ -1,13 +1,15 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as momentImported from 'moment';
 
+
 /**
- * Formats an input date string
- * Both displays the string and outputs the formatted string
+ * Formats an input date string.
+ * It both displays and outputs the formatted string.
  */
 @Component({
   selector: 'dv-format-date',
@@ -26,7 +28,7 @@ export class FormatDateComponent implements OnInit, OnChanges {
   @Input() format: string;
 
   /**
-   * The list of entities after being unioned
+   * The date formatted according to `format`
    */
   @Output() formattedDate = new EventEmitter<string>();
   _formattedDate = '';
