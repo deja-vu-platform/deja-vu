@@ -4,14 +4,16 @@
       <event.show-event event=$groupMeeting showId=false />
     </div>
     <div class="col-md-4">
+      <property.show-objects hidden=true />
       <dv.tx>
-        <property.choose-object
-          chooseObjectSelectPlaceholder="Champion"
-          initialObjectId=allocator.edit-consumer.currentConsumerId />
+        <dv.choose entities=property.show-objects.objects
+          showChooseButton=false execOnSelection=true
+          initialEntityId=allocator.edit-consumer.currentConsumerId
+          showEntity=<span>{{$entity.name}}</span> />
         <allocator.edit-consumer hidden=true
           resourceId=$groupMeeting.id
           allocationId=$groupMeeting.seriesId
-          newConsumerId=property.choose-object.selectedObjectId />
+          newConsumerId=dv.choose.selectedEntity?.id />
       </dv.tx>
     </div>
     <div class="col-md-2">
