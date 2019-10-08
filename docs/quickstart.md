@@ -7,7 +7,7 @@ To start, you only need to download and
 install the Déjà Vu CLI. The CLI will take care of running your
 Déjà Vu app and installing other Déjà Vu packages if necessary.
 
-You are going to need [Node.js](https://nodejs.org/en/) v9+ and
+You are going to need [Node.js](https://nodejs.org/en/) v10 and
 [MongoDB](https://www.mongodb.com/download-center/community)
 4.0+. Note that you just need the community server version of MongoDB,
 you don't need to register or pay any money to Mongo Inc.

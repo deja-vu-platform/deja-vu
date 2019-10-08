@@ -23,8 +23,8 @@ For documentation and more information see
 
 > **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 > important at this point**, but we would love to hear what you think!
-> You can play around with it and shoot us an email or create an issue with your
-> feedback or questions.
+> You can play around with it and create an issue with your feedback or
+> questions.
 
 
 ## Create an App
