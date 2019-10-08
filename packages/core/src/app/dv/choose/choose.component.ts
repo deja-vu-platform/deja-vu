@@ -8,6 +8,8 @@ import { ComponentValue } from '../include/include.component';
 import { RunService } from '../run.service';
 import { ShowEntityComponent } from '../show-entity/show-entity.component';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'dv-choose',
@@ -26,9 +28,12 @@ export class ChooseComponent {
    * executes sucessfully
    */
   @Input() resetOnExecSuccess = false;
+  @Input() execOnSelection = false;
 
   @Input() entities: any[] = [];
   entityIndex: number | undefined;
+
+  @Input() initialEntityId;
 
   @Output() selectedEntity = new EventEmitter<any>();
 
@@ -44,9 +49,19 @@ export class ChooseComponent {
     this.rs.register(this.elem, this);
   }
 
+  ngOnChanges(changes) {
+    if (changes['entities'] || changes['initialEntityId']) {
+      this.entityIndex = _.indexOf(
+        _.map(this.entities, 'id'), this.initialEntityId);
+    }
+  }
+
   entitySelected() {
     if (!this.showChooseButton) {
       this.selectedEntity.emit(this.entities[this.entityIndex!]);
+    }
+    if (this.execOnSelection) {
+      setTimeout(() => this.rs.exec(this.elem));
     }
   }
 

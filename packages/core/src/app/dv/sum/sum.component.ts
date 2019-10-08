@@ -1,8 +1,9 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 
@@ -12,19 +13,16 @@ import * as _ from 'lodash';
 })
 export class SumComponent implements OnInit, OnChanges {
   /**
-   * A list where the objects will be sumed
+   * The array containing the values to sum
    */
   @Input() arrayToSum: any[];
 
   /**
-   * If the passed in entity is not a number
-   * A key can be used to inditae the field to sum
+   * If the passed in entity is not a number, a key can be used to indicate the
+   * field to sum
    */
   @Input() key: string;
 
-  /**
-   * The list of entities after being unioned
-   */
   @Output() sum = new EventEmitter<number>();
 
   constructor(

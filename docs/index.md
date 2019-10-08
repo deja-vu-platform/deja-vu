@@ -35,14 +35,16 @@ are configured in JSON and you can style your app with CSS.
 
 - **conventional output** A compiled Déjà Vu app is a standard MEAN
 (MongoDB-Express-Angular-Node.js) app, which can be
-easily deployed with popular cloud providers.
+easily deployed using popular cloud providers.
 If you don't have a preferred cloud provider, you can 
 follow our guide to [deploy]() to Heroku.
 
 
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we'd love to hear what you think!
-You can play around with it and email us or create an issue with your
+You can play around with it and create an
+[issue](https://github.com/spderosso/deja-vu/issues)
+(or [email me](https://spderosso.github.io)) with your
 feedback or questions.
 
 ## why
@@ -60,15 +62,10 @@ and server-side components/libraries together. In many cases,
 this requires writing complicated server-side code to deal with
 HTTP requests and databases.
 
-- **plug-ins of CMSes are hard to compose** With a CMSs you
-can, through plug-ins, easily incorporate full-stack behavior to your
-app. If plug-ins don't
-need to talk to each other you can quickly build an app,
-but 
-gettting different
-plugins to work together to achieve a greater purpose
-can be a lot of work that often requires
-writing advanced server-side code.
+- **plug-ins of CMSes are hard to compose** In a CMS you can easily incorporate
+full-stack behavior to your website using a plug-in. But getting different
+plugins to work together to achieve a greater purpose can be a lot of work and
+often requires writing advanced server-side code.
 
 - **low-code platforms still require you to write
 most of the end-user behavior** Low-code platforms

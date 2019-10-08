@@ -1,13 +1,14 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
+
 /**
- * Outputs an array of objects grouped by having the
- * same field specified by a key
+ * Outputs an array of objects grouped by the given key
  * Output structure:
  * [
  *   { groupedById: 'key1', items: [list of items with groupById=key1] },
@@ -23,7 +24,7 @@ export class GroupByComponent implements OnInit, OnChanges {
   /** A list of entities to be grouped */
   @Input() items: any[];
 
-  /** The name of the key to group with */
+  /** The name of the field to group by */
   @Input() key: string;
 
   /** The output list */

@@ -33,7 +33,7 @@
         <authentication.authenticate
           id=accord.navbar.loggedInUser?.id waitOn=['id'] hidden=true />
         <authorization.verify-can-view
-          resourceId=$setListId principalId=accord.navbar.loggedInUser?.id
+          resourceId=$groupId principalId=accord.navbar.loggedInUser?.id
           waitOn=['resourceId', 'principalId']
           hidden=true />
         <proposal.show-objects

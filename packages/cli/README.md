@@ -1,8 +1,7 @@
 Déjà Vu CLI
 ===========
 
-The Déjà Vu CLI is a tool to initialize, develop, and deploy Déjà Vu
-applications.
+The Déjà Vu CLI is a tool to initialize and develop Déjà Vu concepts and apps.
 
 Install
 -------
@@ -18,7 +17,7 @@ yarn global add @deja-vu/cli
 Interface
 ---------
 
-  - `dv new <type> <name>` - create a new concept or component, must be run outside of the dv repo
+  - `dv new <type> <name>` - create a new concept or component
   - `dv serve` - build the app or concept in the current directory and run it locally
   - `dv package` - package the concept so that it can be used in other projects
   - `dv --help` - show the list of dv commands
@@ -132,9 +131,9 @@ The `node_modules`, `dist` and `pkg` directories are always excluded. So is
 Any component referenced in an `.html` file must be included.
 
 The name of the component is given by the value of `name` in the dvconfig.json and
-the name of the html file up to the first `.` (e.g., for a file named
+the name of the html file up to the first `.` For example, for a file named
 `show-groups.component.html` or `show-groups.html` and `name: 'group'` the
-component name is `group-show-groups`). This default behavior can be overriden
+component name is `group-show-groups`. This default behavior can be overriden
 with the "names" property that accepts a list of objects with "for" and "use"
 properties. For example, if the "names" list contains
 `{ "for": "src/app/app.component.hml", "use": "allocator-root" }` then

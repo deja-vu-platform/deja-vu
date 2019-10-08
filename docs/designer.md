@@ -12,4 +12,4 @@ have binary releases yet. But if you
 want to give it a try, follow
 [the instructions to install the Déjà Vu
 repo source](https://github.com/spderosso/deja-vu#contributing)
-and then [run it locally](https://github.com/spderosso/deja-vu/tree/master/designer).
+and then [run the designer locally](https://github.com/spderosso/deja-vu/tree/master/designer#development).

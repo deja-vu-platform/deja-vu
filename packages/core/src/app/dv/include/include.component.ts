@@ -24,11 +24,14 @@ export interface ValueMap {
 }
 
 /**
- *  Represents a DV component to include with `dv-include`
+ *  Represents a DV component to include with `dv-include`.
  *
- *  The component given in `type` can be curried and wrapped with an adapter that
- *  allows the interface of the component (input/output names) to be used as
- *  another interface.
+ *  Note: this component is for concept components. Do not use dv-include in
+ *  your apps.
+ *
+ *  The component given in `type` can be curried and wrapped with an adapter
+ *  that allows the interface of the component (input/output names) to be used
+ *  as another interface.
  *
  *  For example:
  *  The component given by type=f(fi_1) -> fo_1,
@@ -98,6 +101,7 @@ export class IncludeComponent implements AfterViewInit {
     if (fieldMap === undefined) {
       return _.mapValues(valueMap, ({}, key) => key);
     }
+
     return fieldMap;
   }
 
@@ -183,7 +187,7 @@ export class IncludeComponent implements AfterViewInit {
           `output map ${JSON.stringify(this.component.outputMap)} is wrong`);
       }
       this.componentRef.instance[componentField]
-        .subscribe(newVal => {
+        .subscribe((newVal) => {
           const propertyName: string = this.outputs![outputKey];
           if (!_.isString(propertyName)) {
             throw new Error(
@@ -207,5 +211,4 @@ export class IncludeComponent implements AfterViewInit {
       this.changeDetectorRef.detectChanges();
     }
   }
-
 }

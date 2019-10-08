@@ -30,6 +30,9 @@
           <authorization.verify-can-edit as can-add-member
             resourceId=$groupId
             principalId=accord.navbar.loggedInUser?.id hidden=true />
+          <authorization.add-viewer
+            id=$groupId viewerId=userProfile.choose-object.selectedObjectId
+            hidden=true />
           <authentication.authenticate as can-add-member-auth
             id=accord.navbar.loggedInUser?.id hidden=true />
           <dv.link hidden=true />

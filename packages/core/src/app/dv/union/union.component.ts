@@ -1,8 +1,9 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { RunService } from '../run.service';
+
 import * as _ from 'lodash';
 
 
@@ -13,22 +14,18 @@ import * as _ from 'lodash';
 export class UnionComponent implements OnInit, OnChanges {
   private static readonly MINIMUM_UNION_LISTS = 2;
   /**
-   * A list of lists that is going to be unioned
+   * A list of lists to union
    */
   @Input() lists: any[][];
 
   /**
-   * If the passed in entity is not a primitive value
-   * A key can be used to signal their comparison field
-   * If no key is passed in, the objects will all be identified as unique
-   * More spec see documentation of Lodash at:
-   *  https://lodash.com/docs/4.17.10#unionBy
+   * If the passed in entity is not a primitive value a key can be used
+   * for comparisons. If no key is passed in, SameValueZero is used for
+   * equality comparisons.
+   * See https://lodash.com/docs/4.17.10#unionBy
    */
   @Input() key: string;
 
-  /**
-   * The list of entities after being unioned
-   */
   @Output() unionList = new EventEmitter<any[]>();
   _unionList = [];
 
@@ -42,7 +39,8 @@ export class UnionComponent implements OnInit, OnChanges {
   ngOnChanges() {
     // this.lists[0] added to avoid tslint error
     // issue thread: https://github.com/microsoft/TypeScript/issues/4130
-    if ( !!this.lists && this.lists.length >= UnionComponent.MINIMUM_UNION_LISTS ) {
+    if (!!this.lists &&
+        this.lists.length >= UnionComponent.MINIMUM_UNION_LISTS) {
       this.unionList.emit(_.unionBy(this.lists[0], ...this.lists, this.key));
     } else {
       throw new Error('pass in at least two lists for union');
