@@ -31,11 +31,12 @@
     "relaxed-json": "^1.0.1",
     "superagent": "^3.8.2",
     "uuid": "^3.2.1",
-    "vm2": "^3.8.2"
+    "vm2": "^3.8.2",
+    "ws": "^7.1.2"
   },
   "peerDependencies": {
     "lodash": "^4.17.5",
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.1.8"
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.0",
@@ -44,6 +45,7 @@
     "@types/lodash": "ts2.5",
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^3.1.8",
+    "mongodb": "^3.1.8",
     "@types/node": "^11.13.4",
     "@types/relaxed-json": "^1.0.0",
     "@types/superagent": "^3.5.7",
