@@ -53,8 +53,7 @@ export function toSeries(graphQlSeries: GraphQlSeries): Series {
 export function toUnixTime(date: moment.Moment, time: string): number {
   const [hh, mm] = time.split(':');
   const ret = date.clone();
-  ret.add(hh, 'h')
-    .add(mm, 'm');
+  ret.set({hour: Number(hh), minute: Number(mm)});
 
   return ret.unix();
 }

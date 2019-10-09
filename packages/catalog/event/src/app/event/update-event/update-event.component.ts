@@ -64,9 +64,6 @@ export class UpdateEventComponent
   }
 
   onSubmit() {
-    console.log("on exec");
-    console.log(this.startsOnControl.value);
-    console.log(this.startTimeControl.value);
     this.rs.exec(this.elem);
   }
 
@@ -88,18 +85,10 @@ export class UpdateEventComponent
   }
 
   setInitialValues(value) {
-    console.log("set initial values");
-    console.log(this.id);
-    console.log(value);
-    console.log(value.startDate);
-    console.log((value.startDate));
-    if (!value) {
-      console.log('value is empty');
-    }
     this.startsOnControl.setValue(value.startDate);
-    this.startTimeControl.setValue(value.startDate.format('hh:mm'));
+    this.startTimeControl.setValue(value.startDate.format('HH:mm'));
     this.endsOnControl.setValue(value.endDate);
-    this.endTimeControl.setValue(value.endDate.format('hh:mm'));
+    this.endTimeControl.setValue(value.endDate.format('HH:mm'));
   }
 
   dvOnExecSuccess() {
@@ -115,9 +104,6 @@ export class UpdateEventComponent
   }
 
   dvOnExecFailure(reason: Error) {
-    console.log("on exec");
-    console.log(this.startsOnControl.value);
-    console.log(this.startTimeControl.value);
     if (this.showOptionToSubmit) {
       this.updateEventError = reason.message;
     }
