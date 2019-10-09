@@ -137,6 +137,7 @@ export class NgAppBuilder {
 
   constructor(
     private readonly appName: string,
+    private readonly dvVersion: string,
     private readonly dvConfigContents: string) { }
 
   addDependency(name: string, version: string): NgAppBuilder {
@@ -234,6 +235,7 @@ export class NgAppBuilder {
 
     const replaceMap = {
       name: this.appName,
+      version: this.dvVersion,
       dependencies: _
         .map(
           this.dependencies,

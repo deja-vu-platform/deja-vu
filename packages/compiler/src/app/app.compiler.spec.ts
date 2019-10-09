@@ -10,12 +10,35 @@ import * as path from 'path';
 class Morg {
   static WriteTo(projectDir: string) {
     writeFileSync(path.join(projectDir, 'dvconfig.json'), Morg.DvConfig());
+    writeFileSync(path.join(projectDir, 'package.json'), Morg.PackageJson());
     const srcDir = path.join(projectDir, 'src');
     mkdirSync(srcDir);
     for (const component of Morg.Components()) {
       writeFileSync(
         path.join(srcDir, `${component.name}.html`), component.contents);
     }
+  }
+
+  private static PackageJson(): string {
+    return `
+      {
+        "name": "my-sample-morg",
+        "version": "0.0.1",
+        "scripts": {
+          "start": "dv serve",
+          "clean": "rm -rf .dv"
+        },
+        "devDependencies": {
+          "@deja-vu/cli": "^0.0.1"
+        },
+        "repository": "github:spderosso/dejavu",
+        "license": "MIT",
+        "bugs": {
+          "url": "https://github.com/spderosso/dejavu/issues"
+        },
+        "homepage": "https://github.com/spderosso/dejavu#readme"
+      }
+    `;
   }
 
   private static DvConfig(): string {
