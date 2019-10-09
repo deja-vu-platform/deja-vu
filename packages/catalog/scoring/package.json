@@ -101,5 +101,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-scoring.d.ts",
-  "main": "pkg/bundles/deja-vu-scoring.umd.js"
+  "main": "pkg/bundles/deja-vu-scoring.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

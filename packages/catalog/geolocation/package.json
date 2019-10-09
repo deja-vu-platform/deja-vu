@@ -109,5 +109,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-geolocation.d.ts",
-  "main": "pkg/bundles/deja-vu-geolocation.umd.js"
+  "main": "pkg/bundles/deja-vu-geolocation.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -102,5 +102,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-label.d.ts",
-  "main": "pkg/bundles/deja-vu-label.umd.js"
+  "main": "pkg/bundles/deja-vu-label.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

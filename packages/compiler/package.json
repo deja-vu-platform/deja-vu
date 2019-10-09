@@ -42,5 +42,8 @@
   },
   "peerDepencies": {
     "lodash": "^4.17.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

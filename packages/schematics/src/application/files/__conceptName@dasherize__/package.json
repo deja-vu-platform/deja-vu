@@ -102,5 +102,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-<%= dasherize(conceptName) %>.d.ts",
-  "main": "pkg/bundles/deja-vu-<%= dasherize(conceptName) %>.umd.js"
+  "main": "pkg/bundles/deja-vu-<%= dasherize(conceptName) %>.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

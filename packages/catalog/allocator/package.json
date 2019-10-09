@@ -101,5 +101,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-allocator.d.ts",
-  "main": "pkg/bundles/deja-vu-allocator.umd.js"
+  "main": "pkg/bundles/deja-vu-allocator.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

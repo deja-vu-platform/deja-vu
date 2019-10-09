@@ -101,5 +101,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-passkey.d.ts",
-  "main": "pkg/bundles/deja-vu-passkey.umd.js"
+  "main": "pkg/bundles/deja-vu-passkey.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

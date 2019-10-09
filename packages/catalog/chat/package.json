@@ -103,5 +103,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-chat.d.ts",
-  "main": "pkg/bundles/deja-vu-chat.umd.js"
+  "main": "pkg/bundles/deja-vu-chat.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

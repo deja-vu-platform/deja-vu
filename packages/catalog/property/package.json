@@ -103,5 +103,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-property.d.ts",
-  "main": "pkg/bundles/deja-vu-property.umd.js"
+  "main": "pkg/bundles/deja-vu-property.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

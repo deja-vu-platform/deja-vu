@@ -99,5 +99,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-transfer.d.ts",
-  "main": "pkg/bundles/deja-vu-transfer.umd.js"
+  "main": "pkg/bundles/deja-vu-transfer.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

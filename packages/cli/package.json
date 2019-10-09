@@ -40,5 +40,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "./dist/dv.d.ts",
-  "main": "./dist/dv.js"
+  "main": "./dist/dv.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

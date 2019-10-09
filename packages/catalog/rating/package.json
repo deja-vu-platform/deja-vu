@@ -103,5 +103,8 @@
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-rating.d.ts",
-  "main": "pkg/bundles/deja-vu-rating.umd.js"
+  "main": "pkg/bundles/deja-vu-rating.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }
