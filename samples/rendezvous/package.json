@@ -1,12 +1,12 @@
 {
   "name": "@deja-vu/sample-rendezvous",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
   "devDependencies": {
-    "@deja-vu/cli": "^0.0.2"
+    "@deja-vu/cli": "^0.0.3"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
