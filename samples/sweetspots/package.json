@@ -1,12 +1,12 @@
 {
   "name": "@deja-vu/sample-sweetspots",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv/"
   },
   "devDependencies": {
-    "@deja-vu/cli": "^0.0.1"
+    "@deja-vu/cli": "^0.0.2"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",

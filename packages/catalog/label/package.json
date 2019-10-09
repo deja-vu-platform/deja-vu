@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/label",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-label",
@@ -63,9 +63,9 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.0.1",
+    "@deja-vu/cli": "^0.0.2",
     "@deja-vu/concept-server": "^0.0.1",
-    "@deja-vu/core": "^0.0.1",
+    "@deja-vu/core": "^0.0.2",
     "@deja-vu/gateway": "^0.0.1",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
