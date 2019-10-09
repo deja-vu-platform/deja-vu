@@ -35,6 +35,7 @@ For documentation and more information see
   [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
 - If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
 - Clone the app-starter-repo
+- do `npm i` to install dependencies
 - In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
 - On the root directory of your new repo, run `npm start` and visit
 `http://localhost:3000`.
