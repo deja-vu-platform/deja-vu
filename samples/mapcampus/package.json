@@ -1,12 +1,12 @@
 {
   "name": "@deja-vu/sample-mapcampus",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
   "devDependencies": {
-    "@deja-vu/cli": "^0.0.5"
+    "@deja-vu/cli": "^0.0.6"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",

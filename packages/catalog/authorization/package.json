@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/authorization",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-authorization",
@@ -62,10 +62,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.0.5",
-    "@deja-vu/concept-server": "^0.0.5",
-    "@deja-vu/core": "^0.0.5",
-    "@deja-vu/gateway": "^0.0.5",
+    "@deja-vu/cli": "^0.0.6",
+    "@deja-vu/concept-server": "^0.0.6",
+    "@deja-vu/core": "^0.0.6",
+    "@deja-vu/gateway": "^0.0.6",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",
