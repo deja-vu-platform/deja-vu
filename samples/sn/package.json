@@ -1,12 +1,12 @@
 {
   "name": "@deja-vu/sample-sn",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
   "devDependencies": {
-    "@deja-vu/cli": "^0.0.3"
+    "@deja-vu/cli": "^0.0.4"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",

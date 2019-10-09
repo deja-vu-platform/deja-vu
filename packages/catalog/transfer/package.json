@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/transfer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-transfer",
@@ -61,10 +61,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.0.3",
-    "@deja-vu/concept-server": "^0.0.3",
-    "@deja-vu/core": "^0.0.3",
-    "@deja-vu/gateway": "^0.0.3",
+    "@deja-vu/cli": "^0.0.4",
+    "@deja-vu/concept-server": "^0.0.4",
+    "@deja-vu/core": "^0.0.4",
+    "@deja-vu/gateway": "^0.0.4",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",
