@@ -24,19 +24,17 @@
                 <td>
                   <p>Relevant Interests</p>
                   <div id="tags">
-                    <!--TODO: load the previous-->
-                    <relevantInterests.attach-labels itemId=$eventId
-                                                     labels=relevantInterests.show-labels.labels
-                                                     inputLabel=""
-                                                     clearLabelsOnSave=false
-                                                     showOptionToSubmit=true />
+                    <relevantInterests.set-labels itemId=$eventId
+                                                  labels=relevantInterests.show-labels.labels
+                                                  inputLabel=""
+                                                  clearLabelsOnSave=false
+                                                  showOptionToSubmit=true />
                   </div>
                 </td>
               </tr>
             </table>
             <table class="event-info table">
               <tr>
-                 Location
                 <td rowspan="2">
                   <div class="form-group">
                     <p>Location</p>
@@ -51,11 +49,10 @@
                 </td>
 
                 <!-- Event -->
-                <!--<td>-->
-                  <!--<p>Date & Time</p>-->
-                  <!--<event.create-event id=dv.gen-id.id-->
-                                      <!--showOptionToSubmit=false />-->
-                <!--</td>-->
+                <td>
+                  <p>Date & Time</p>
+                  <event.update-event id=$eventId />
+                </td>
               </tr>
             </table>
 
