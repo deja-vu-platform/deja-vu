@@ -90,7 +90,7 @@ const componentRequestTable: ComponentRequestTable = {
     }
   `,
   'update-event': (extraInfo) => `
-    mutation UpdateEvent($input: UpdateEventInput) {
+    mutation UpdateEvent($input: UpdateEventInput!) {
       updateEvent(input: $input) ${getReturnFields(extraInfo)}
     }
   `

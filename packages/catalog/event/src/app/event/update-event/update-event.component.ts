@@ -96,9 +96,9 @@ export class UpdateEventComponent
     if (!value) {
       console.log('value is empty');
     }
-    this.startsOnControl.setValue(value.startDate.toDate());
+    this.startsOnControl.setValue(value.startDate);
     this.startTimeControl.setValue(value.startDate.format('hh:mm'));
-    this.endsOnControl.setValue(value.endDate.toDate());
+    this.endsOnControl.setValue(value.endDate);
     this.endTimeControl.setValue(value.endDate.format('hh:mm'));
   }
 
