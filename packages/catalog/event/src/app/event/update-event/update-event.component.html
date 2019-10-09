@@ -1,3 +1,7 @@
+<event-show-event [id]="id"
+                  [hidden]="true"
+                  (loadedEvent)="setInitialValues($event)">
+</event-show-event>
 <form (ngSubmit)="onSubmit()"
       [formGroup]="updateEventForm"
       class="form-horizontal">

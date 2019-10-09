@@ -37,6 +37,7 @@ export class SetLabelsComponent implements
   @Input() addOnBlur = true;
 
   @Input() showOptionToSubmit = true;
+  @Input() clearLabelsOnSave = true;
 
   // Presentation inputs
   @Input() inputLabel = 'Add label...';
@@ -111,7 +112,9 @@ export class SetLabelsComponent implements
   dvOnExecSuccess() {
     this.labelsSet = true;
     this.labelsSetError = '';
-    this.labels = [];
+    if (this.clearLabelsOnSave) {
+      this.labels = [];
+    }
     window.setTimeout(() => {
       this.labelsSet = false;
     }, SAVED_MSG_TIMEOUT);

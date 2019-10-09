@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import {
-  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService,
@@ -27,6 +27,8 @@ OnInit {
   @Input() showId = true;
   @Input() showStartDate = true;
   @Input() showEndDate = true;
+
+  @Output() loadedEvent = new EventEmitter<Event>();
 
   sameDayEvent = false;
 
@@ -82,6 +84,7 @@ OnInit {
             startDate: fromUnixTime(obj.data.event.startDate),
             endDate: fromUnixTime(obj.data.event.endDate)
           };
+          this.loadedEvent.emit(this.event);
           this.sameDayEvent = this.isSameDayEvent(this.event);
         }
       });

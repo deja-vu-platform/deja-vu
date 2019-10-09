@@ -13,25 +13,24 @@ import {
 
 import * as _ from 'lodash';
 
-import { Event, toUnixTime } from '../../../../shared/data';
+import { Event, fromUnixTime, toUnixTime } from '../../../../shared/data';
 import { endTimeValidator } from '../shared/time.validator';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: 'update-create-event',
-  templateUrl: './update-event.component.html',
-  styleUrls: ['./update-event.component.css']
+  selector: 'event-update-event',
+  templateUrl: './update-event.component.html'
 })
 export class UpdateEventComponent
   implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
-  @Input() id: string | undefined = '';
+  @Input() id: string;
   @Input() showOptionToSubmit = true;
 
   // Presentation inputs
-  @Input() buttonLabel = 'Create Event';
-  @Input() updateEventSavedText = 'New event saved';
+  @Input() buttonLabel = 'Update Event';
+  @Input() updateEventSavedText = 'Event updated';
 
   @ViewChild(FormGroupDirective) form;
 
@@ -65,6 +64,9 @@ export class UpdateEventComponent
   }
 
   onSubmit() {
+    console.log("on exec");
+    console.log(this.startsOnControl.value);
+    console.log(this.startTimeControl.value);
     this.rs.exec(this.elem);
   }
 
@@ -80,26 +82,42 @@ export class UpdateEventComponent
               this.endsOnControl.value, this.endTimeControl.value)
           }
         },
-        extraInfo: { returnFields: 'id' }
+        extraInfo: { returnFields: ''}
       })
       .toPromise();
   }
 
+  setInitialValues(value) {
+    console.log("set initial values");
+    console.log(this.id);
+    console.log(value);
+    console.log(value.startDate);
+    console.log((value.startDate));
+    if (!value) {
+      console.log('value is empty');
+    }
+    this.startsOnControl.setValue(value.startDate.toDate());
+    this.startTimeControl.setValue(value.startDate.format('hh:mm'));
+    this.endsOnControl.setValue(value.endDate.toDate());
+    this.endTimeControl.setValue(value.endDate.format('hh:mm'));
+  }
+
   dvOnExecSuccess() {
+    console.log("on exec");
+    console.log(this.startsOnControl.value);
+    console.log(this.startTimeControl.value);
     if (this.showOptionToSubmit) {
       this.updateEventSaved = true;
       window.setTimeout(() => {
         this.updateEventSaved = false;
       }, SAVED_MSG_TIMEOUT);
     }
-    // Can't do `this.updateEventForm.reset();`
-    // See https://github.com/angular/material2/issues/4190
-    if (this.form) {
-      this.form.resetForm();
-    }
   }
 
   dvOnExecFailure(reason: Error) {
+    console.log("on exec");
+    console.log(this.startsOnControl.value);
+    console.log(this.startTimeControl.value);
     if (this.showOptionToSubmit) {
       this.updateEventError = reason.message;
     }

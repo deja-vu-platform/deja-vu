@@ -49,6 +49,8 @@ export class UpdateMarkerFromMapComponent implements
   }
 
   updateMarker(marker: Marker) {
+    console.log("update marker");
+    console.log(marker);
     this.marker = marker;
   }
 

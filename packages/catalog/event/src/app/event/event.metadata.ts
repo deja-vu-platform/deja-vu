@@ -32,12 +32,14 @@ import {
   ShowEventCountComponent
 } from './show-event-count/show-event-count.component';
 export { ShowEventCountComponent };
+import { UpdateEventComponent } from './update-event/update-event.component';
+export { UpdateEventComponent };
 
 
 const allComponents = [
   ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
   CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent,
-  ShowEventsComponent, ShowEventCountComponent, ConfigWizardComponent
+  ShowEventsComponent, ShowEventCountComponent, ConfigWizardComponent, UpdateEventComponent
 ];
 
 const metadata = {

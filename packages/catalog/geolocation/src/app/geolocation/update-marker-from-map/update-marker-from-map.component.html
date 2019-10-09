@@ -1,10 +1,12 @@
-<geolocation-show-marker id="id"
+<geolocation-show-marker [id]="id"
+                         [hidden]="true"
                          (loadedMarker)="updateMarker($event)">
 </geolocation-show-marker>
 <div class="form-group">
   <geolocation-display-map id="default"
                            [showDirectionsControl]="false"
                            [showLoadedMarkers]="false"
+                           [markers]="[marker]"
                            (newMarker)="updateMarker($event)">
   </geolocation-display-map>
 </div>
