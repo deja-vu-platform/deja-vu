@@ -141,7 +141,7 @@ export class NgAppBuilder {
 
     // TODO: Remove `shell: true` hack
     const c = spawnSync(
-      cmd, [], { stdio: 'inherit', cwd: cacheDir, shell: true });
+      cmd, ['install'], { stdio: 'inherit', cwd: cacheDir, shell: true });
     if (c.error) {
       throw new Error(`Failed to install dependencies: ${c.error}`);
     }
