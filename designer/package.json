@@ -31,7 +31,7 @@
     "@deja-vu/core": "^0.0.2",
     "@deja-vu/event": "^0.0.2",
     "@deja-vu/follow": "^0.0.2",
-    "@deja-vu/gateway": "^0.0.1",
+    "@deja-vu/gateway": "^0.0.2",
     "@deja-vu/geolocation": "^0.0.2",
     "@deja-vu/group": "^0.0.2",
     "@deja-vu/passkey": "^0.0.2",
