@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "./dist/gateway.js",
   "scripts": {
     "build": "tsc && chmod +x ./dist/gateway.js",
@@ -45,12 +45,12 @@
     "@types/lodash": "ts2.5",
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^3.1.8",
-    "mongodb": "^3.1.8",
     "@types/node": "^11.13.4",
     "@types/relaxed-json": "^1.0.0",
     "@types/superagent": "^3.5.7",
     "@types/uuid": "^3.4.3",
     "jasmine": "~3.4.0",
+    "mongodb": "^3.1.8",
     "prettier": "^1.18.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",

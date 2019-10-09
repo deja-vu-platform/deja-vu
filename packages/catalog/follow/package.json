@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/follow",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-follow",
@@ -62,10 +62,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.0.4",
-    "@deja-vu/concept-server": "^0.0.4",
-    "@deja-vu/core": "^0.0.4",
-    "@deja-vu/gateway": "^0.0.4",
+    "@deja-vu/cli": "^0.0.5",
+    "@deja-vu/concept-server": "^0.0.5",
+    "@deja-vu/core": "^0.0.5",
+    "@deja-vu/gateway": "^0.0.5",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",
