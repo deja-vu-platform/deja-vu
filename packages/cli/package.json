@@ -31,7 +31,7 @@
     "typescript": "~2.5.3"
   },
   "peerDependencies": {
-    "@deja-vu/compiler": "^0.0.7"
+    "@deja-vu/compiler": "^0.0.8"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
