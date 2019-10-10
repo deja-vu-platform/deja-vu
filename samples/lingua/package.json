@@ -1,13 +1,13 @@
 {
   "name": "@deja-vu/sample-lingua",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv/"
   },
   "dependencies": {
-    "@deja-vu/cli": "^0.0.6",
-    "@deja-vu/compiler": "^0.0.6"
+    "@deja-vu/cli": "^0.0.7",
+    "@deja-vu/compiler": "^0.0.7"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
