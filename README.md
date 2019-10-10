@@ -19,7 +19,7 @@ our template language). You can also use CSS to customize the appearance of your
 app.
 
 For documentation and more information see
-[dejavu-platform.com](https://dejavu-platform.com).
+[deja-vu-platform.com](https://deja-vu-platform.com).
 
 > **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 > important at this point**, but we would love to hear what you think!
