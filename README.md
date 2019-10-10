@@ -29,43 +29,8 @@ For documentation and more information see
 
 ## Create an App
 
-- If you haven't done so already, install [Node.js](https://nodejs.org) v10.
-  [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
-- If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
-- Clone the app-starter-repo
-- do `npm i` to install dependencies
-- In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
-- On the root directory of your new repo, run `npm start` and visit
-`http://localhost:3000`.
-You should see a "hello world" page.
 
-You can now start including concepts and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
-server (Ctrl+C and run `npm start` again).
-
-
-## Deploying DV Apps
-
-A compiled DV app is a regular MEAN app
-(MongoDB-Express-Angular-Node.js). Since a compiled DV app uses popular,
-well-supported technologies, it shouldn't be too much work to find out
-how to deploy a DV app using your favorite cloud provider.
-
-But, if you don't want to spend too much time on this,
-here's how to deploy your app using
-Heroku, a popular PaaS:
-
-- Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-- `cd` to your app directory
-- Run `git init` to initialize the git repo for your app if you haven't done so already
-- Run `git commit` to commit your source files. Note: don't commit the node_modules folder or the .dv cache folder
-- Run `heroku create myapp` to create a new heroku app. (Replace `myapp` with the name of your app)
-- Run `heroku addons:create mongolab --app myapp` to provision a MongoDB instance.
-  This step might require you to add a credit card to your account for
-  verification purposes.
-- Deploy your changes by running `git push heroku master`
-
-Your new changes should be live. To deploy new changes,
-create commits and run `git push heroku master` again.
+To create an app, follow [these instructions](docs/quickstart.md).
 
 
 ## Contributing
