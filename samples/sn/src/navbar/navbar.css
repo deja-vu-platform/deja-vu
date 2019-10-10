@@ -1,18 +1,18 @@
-nav {
-  /* hacker news navbar bg color */
-  background-color: #ff6600;
-}
+/*nav {*/
+  /*!* hacker news navbar bg color *!*/
+  /*background-color: #ff6600;*/
+/*}*/
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
+/*ul {*/
+  /*list-style-type: none;*/
+  /*margin: 0;*/
+  /*padding: 0;*/
+/*}*/
 
-.space-filler {
-  flex: 1 1 auto;
-}
+/*.space-filler {*/
+  /*flex: 1 1 auto;*/
+/*}*/
 
-.navbar-brand {
-  font-weight: bold;
-}
+/*.navbar-brand {*/
+  /*font-weight: bold;*/
+/*}*/

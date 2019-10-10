@@ -1,7 +1,6 @@
-@import "~@angular/material/theming";
+@import "~@deja-vu/themes/scss/sn.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
-@include mat-core();
 
 // user input
 // might be grouped with other username displays
@@ -59,71 +58,20 @@ h1 {
   font-size: 1.5rem;
 }
 
-
-$primaryColor: #ff6600;
-$textColor: #000000;
-$linkColor: #002002;
-$backgroundColor: #f6f6ef;
-$errorMessageColor: #f44336;
-
-
-$navbarBackgroundColor: $primaryColor !default;
-$navbarTextColor: black;
-$navbarHeight: 56px;
-$navbarButtonPadding: 0 10px;
-
-
-$mainFont: 'Arial', san-serif;
-
-$pagePadding: 15px 40px;
-
-
-
-
-// theming doc starts
-// TODO: costomizable font size for h1, h2, h3...
-a:root, a:root:hover, div:root, p:root, h1:root, h2:root, h3:root {
-  color: $textColor;
-  font-family: $mainFont;
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
-nav {
-  background: $navbarBackgroundColor;
-  height: $navbarHeight;
-  align-content: center;
-
-  a, div, p, h1, h2, h3 {
-    color: $navbarTextColor;
-    padding: $navbarButtonPadding;
-  }
+.space-filler {
+  flex: 1 1 auto;
 }
 
-html,
-body{
-  background: $backgroundColor;
-}
-
-.main {
-  background-color: $backgroundColor;
-  margin-top: $navbarHeight;
-  padding: $pagePadding;
+.navbar-brand {
+  font-weight: bold;
 }
 
 
-// Material UI related:
-// TODO: make a palette and use the material UI import
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-.mat-error {
-  color: $errorMessageColor;
-  font-size: 12px;
-}
-
-.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
-  caret-color: $errorMessageColor;
-}
-
-.mat-input-element {
-  caret-color: $textColor;
-}
 
 
