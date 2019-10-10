@@ -259,7 +259,7 @@ export class NgAppBuilder {
           this.dependencies,
           (d: Dependency) =>
             `"${NgAppBuilder.DepToPackage(d.name)}": "${d.version}"`)
-        .join(',\n'),
+      .join(',\n') + (_.isEmpty(this.dependencies) ? '' : ','),
       componentImports: _
         .map(
           this.components,
