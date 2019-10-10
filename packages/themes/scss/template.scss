@@ -52,6 +52,8 @@ body{
 // TODO: make a palette and use the material UI import
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@include mat-core();
+
 .mat-error {
   color: $errorMessageColor;
   font-size: 12px;
