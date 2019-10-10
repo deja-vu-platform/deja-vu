@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "./dist/gateway.js",
   "scripts": {
     "build": "tsc && chmod +x ./dist/gateway.js",
