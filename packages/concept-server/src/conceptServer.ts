@@ -120,6 +120,13 @@ export class ConceptServer<C extends Config = Config> {
     };
   }
 
+  private getPort(portValue: string | number): number {
+    return _.isString(portValue) && portValue.startsWith('$') ?
+      // it's an env variable
+      _.toNumber(process.env[portValue.slice(1)]) :
+      <number> portValue;
+  }
+
   private startApp(schema) {
     const app = express();
 
@@ -176,11 +183,11 @@ export class ConceptServer<C extends Config = Config> {
     app.use('/graphiql', graphiqlExpress({
       endpointURL: '/graphql',
       subscriptionsEndpoint:
-        `ws://localhost:${this._config.wsPort}/subscriptions`
+        `ws://localhost:${this.getPort(this._config.wsPort)}/subscriptions`
     }));
 
     const server = createServer(app);
-    server.listen(this._config.wsPort, () => {
+    server.listen(this.getPort(this._config.wsPort), () => {
       console.log(`Running ${this._name} with config
         ${JSON.stringify(this._config)}`);
       SubscriptionServer.create({

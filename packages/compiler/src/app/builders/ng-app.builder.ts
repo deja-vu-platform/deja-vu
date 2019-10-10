@@ -251,6 +251,9 @@ export class NgAppBuilder {
     const replaceMap = {
       name: this.appName,
       version: this.dvVersion,
+      gatewayUrl: _.get(
+        JSON.parse(this.dvConfigContents),
+        'gateway.config.url', 'localhost:3000') + '/api',
       dependencies: _
         .map(
           this.dependencies,
