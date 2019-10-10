@@ -580,8 +580,9 @@ export class App {
         start: 'dv serve'
       },
       private: true,
-      devDependencies: {
-        '@deja-vu/cli': '0.0.1'
+      dependencies: {
+        '@deja-vu/cli': '0.0.6',
+        '@deja-vu/compiler': '0.0.6'
       },
       repository: 'github:spderosso/dejavu',
       license: 'MIT',

@@ -88,7 +88,13 @@ export class AppCompiler {
       .join(this.projectDir, AppCompiler.PACKAGEJSON_FILE_PATH);
     const packageJsonContents = JSON.parse(
       readFileSync(packageJsonPath, 'utf8'));
-    const version = packageJsonContents['devDependencies']['@deja-vu/cli'];
+    const version = _.get(
+      packageJsonContents, ['dependencies', '@deja-vu/cli']);
+    if (version === undefined) {
+      throw new Error(
+        `Couldn't figure out what verion of DV to use. Your ` +
+        `package.json should have @deja-vu/cli under dependencies`);
+    }
 
     const dvConfigPath: string = path
       .join(this.projectDir, AppCompiler.DVCONFIG_FILE_PATH);

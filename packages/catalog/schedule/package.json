@@ -40,6 +40,7 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@deja-vu/cli": "^0.0.6",
     "@deja-vu/concept-server": "^0.0.6",
     "@deja-vu/core": "^0.0.6",
     "@deja-vu/gateway": "^0.0.6",

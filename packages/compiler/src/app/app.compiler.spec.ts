@@ -28,8 +28,9 @@ class Morg {
           "start": "dv serve",
           "clean": "rm -rf .dv"
         },
-        "devDependencies": {
-          "@deja-vu/cli": "^0.0.1"
+        "dependencies": {
+          "@deja-vu/cli": "^0.0.1",
+          "@deja-vu/compiler": "^0.0.1"
         },
         "repository": "github:spderosso/dejavu",
         "license": "MIT",
