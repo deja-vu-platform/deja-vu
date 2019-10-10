@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/core",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Core libraries of Déjà Vu",
   "scripts": {
     "build": "tsc",
@@ -34,7 +34,7 @@
     "@angular/material": "^5.2.1",
     "@angular/platform-browser": "^5.2.0",
     "@angular/router": "^5.2.9",
-    "@deja-vu/cli": "^0.0.7",
+    "@deja-vu/cli": "^0.0.8",
     "@types/graphql": "^0.12.3",
     "@types/lodash": "ts2.5",
     "@types/uuid": "^3.4.3",
