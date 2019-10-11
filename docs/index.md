@@ -7,7 +7,7 @@ layout: default
 Déjà Vu is a **platform for building web apps**. 
 It features a catalog of
 [full-stack functionality](./catalog)
-and an [HTML-like language](./intro) for
+and an [HTML-like language](./tutorial) for
 assembling web apps using the catalog.
 With Déjà Vu you can build [complex apps](./samples) fast, without writing any
 client- or server-side procedural code.
@@ -25,7 +25,7 @@ on Facebook or "rating" on Amazon. We have a growing [catalog of
 concepts](./catalog) you can use to build your app.
 
 - **assemble with HTML** The assembly requires no traditional
-code: concepts are [glued together by declarative bindings](./intro)
+code: concepts are [glued together by declarative bindings](./tutorial)
 that ensure appropriate synchronization and dataflow. These
 bindings are expressed in an HTML-like 
 language, augmenting conventional layout declarations that
