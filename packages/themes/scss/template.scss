@@ -1,6 +1,4 @@
 
-
-
 // default color palatte when nothing is overwritten
 $primaryColor: #00237d !default;
 $textColor: #000000 !default;
@@ -17,8 +15,8 @@ $mainFont: 'Arial', san-serif !default;
 
 $pagePadding: 15px 40px !default;
 
+
 // theming doc starts
-// TODO: costomizable font size for h1, h2, h3...
 a:root, a:root:hover, div:root, p:root, h1:root, h2:root, h3:root {
   color: $textColor;
   font-family: $mainFont;
@@ -61,12 +59,38 @@ main {
   caret-color: $textColor;
 }
 
+// About mat-button
+// there are three ways to overwrite the button information
+//  1. Have a wrapper class called "dv-mat-button" on every
+//     in any cliche [CHOOSED]
+//  2. Put an important tag after class "mat-button"
+//  3. Not use mat-button
 
-// here we are using !important tags
-// this is bad programming practice
-// it requires the user to add !important tags too
-// an alternative way is to overwrite mat-button by going into each cliche
-// it can be very unscalable
+//
+.dv-mat-button button.mat-button {
+  background: $primaryColor;
+  color: $textColor;
+  padding: 0 6px 0 6px;
+  margin: 6px 8px 6px 8px;
+  min-width: 88px;
+  border-radius: 3px;
+  font-size: 14px;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration:none;
+  border: 1px solid black;
+  outline: none;
+  @if mixin-exists(mat-button) {@include mat-button};
+
+
+}
+
+// Option 2: Overwrite mat-button by putting important tag
+// it requires the user to also put an important tag
+// which is not ideal, but can be used as a back up
+// approach, such as when the cliche button is not properly
+// wrapped by the "dv-mat-button" class
+/*
 .mat-button {
   background: $primaryColor !important;
   color: $textColor !important;
@@ -82,6 +106,7 @@ main {
   outline: none !important;
   @if mixin-exists(mat-button) {@include mat-button};
 }
+*/
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
