@@ -59,6 +59,10 @@ main {
   caret-color: $textColor;
 }
 
+.dv-mat-button {
+  display: inline;
+}
+
 // About mat-button
 // there are three ways to overwrite the button information
 //  1. Have a wrapper class called "dv-mat-button" on every
@@ -66,7 +70,8 @@ main {
 //  2. Put an important tag after class "mat-button"
 //  3. Not use mat-button
 
-//
+// Option 1: Overwrite mat-button by wrapping each
+//           instance of the mat-button in a different class
 .dv-mat-button button.mat-button {
   background: $primaryColor;
   color: $textColor;
@@ -81,8 +86,6 @@ main {
   border: 1px solid black;
   outline: none;
   @if mixin-exists(mat-button) {@include mat-button};
-
-
 }
 
 // Option 2: Overwrite mat-button by putting important tag
