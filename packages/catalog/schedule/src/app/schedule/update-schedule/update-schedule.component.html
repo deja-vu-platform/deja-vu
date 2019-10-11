@@ -102,9 +102,11 @@
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <br />
-    <button mat-raised-button class="update-schedule-submit-button"
-      type="submit" (click)="onSubmit()">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-raised-button class="update-schedule-submit-button"
+        type="submit" (click)="onSubmit()">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </div>

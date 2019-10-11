@@ -15,8 +15,10 @@
     </mat-error>
   </mat-form-field>
   <div *ngIf="showOptionToCreate" class="form-group">
-    <button mat-button type="submit" [disabled]="!createItemCountForm.valid">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button type="submit" [disabled]="!createItemCountForm.valid">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </form>

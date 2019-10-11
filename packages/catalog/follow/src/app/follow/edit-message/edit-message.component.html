@@ -2,7 +2,7 @@
   <button mat-button (click)="startEditing()" type="submit" *ngIf="!isEditing">
     {{startEditButtonLabel}}
   </button>
-  <form (ngSubmit)="onSubmit()" [formGroup]="editMessageForm" 
+  <form (ngSubmit)="onSubmit()" [formGroup]="editMessageForm"
     class="form-horizontal" *ngIf="isEditing">
     <div class="form-group">
       <div *ngIf="editMessageSaved" class="edit-message-success">
@@ -33,9 +33,11 @@
       </button>
     </div>
     <div class="form-group">
-      <button mat-button (click)="stopEditing()" type="button">
-        {{stopEditButtonLabel}}
-      </button>
+      <div class="dv-mat-button">
+        <button mat-button (click)="stopEditing()" type="button">
+          {{stopEditButtonLabel}}
+        </button>
+      </div>
     </div>
   </form>
 </div>

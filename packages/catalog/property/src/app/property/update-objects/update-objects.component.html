@@ -9,8 +9,10 @@
     </property-update-object>
   </div>
   <div *ngIf="showOptionToSubmit">
-    <button mat-button (click)="submit()">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button (click)="submit()">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </div>

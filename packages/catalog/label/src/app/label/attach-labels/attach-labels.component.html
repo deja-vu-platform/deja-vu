@@ -29,7 +29,9 @@
     </mat-form-field>
   </div>
 
-  <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit">{{buttonLabel}}</button>
+  <div class="dv-mat-button">
+    <div *ngIf="showOptionToSubmit" class="form-group">
+      <button mat-button type="submit">{{buttonLabel}}</button>
+    </div>
   </div>
 </form>

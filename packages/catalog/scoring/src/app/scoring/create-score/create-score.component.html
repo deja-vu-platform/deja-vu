@@ -32,9 +32,11 @@
       </button>
     </div>
     <div *ngIf="!submitMatIconName">
-      <button mat-button type="submit" [disabled]="!canSubmit()">
+      <div class="dv-mat-button">
+        <button mat-button type="submit" [disabled]="!canSubmit()">
         {{buttonLabel}}
-      </button>
+        </button>
+      </div>
     </div>
   </div>
 </form>

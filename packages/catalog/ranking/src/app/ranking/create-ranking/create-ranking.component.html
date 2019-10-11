@@ -27,8 +27,10 @@
   </div>
 
   <div *ngIf="showOptionToSubmit">
-    <button mat-button type="submit" (click)="onSubmit()">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button type="submit" (click)="onSubmit()">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </div>

@@ -17,9 +17,11 @@
           formControlName="entityControl"
         ></dv-input-id>
       </div>
-      <button mat-button type="submit" [disabled]="!stageForm.valid">
-        {{stageButtonLabel}}
-      </button>
+      <div class="dv-mat-button">
+        <button mat-button type="submit" [disabled]="!stageForm.valid">
+          {{stageButtonLabel}}
+        </button>
+      </div>
     </form>
   </div>
 </div>
@@ -45,9 +47,11 @@
           <ng-container matColumnDef="rowButton">
             <mat-header-cell *matHeaderCellDef>Delete</mat-header-cell>
             <mat-cell *matCellDef="let element; let i = index">
-              <button mat-button (click)="unstage(i)" class="eject">
-                <i class="material-icons icon">eject</i>
-              </button>
+              <div class="dv-mat-button">
+                <button mat-button (click)="unstage(i)" class="eject">
+                  <i class="material-icons icon">eject</i>
+                </button>
+              </div>
             </mat-cell>
           </ng-container>
           <mat-header-row *matHeaderRowDef="(filter ? filter : Object.keys(staged[0])).concat(['rowButton'])"></mat-header-row>
@@ -71,9 +75,11 @@
                 </div>
               </div>
               <div class="col-md-2">
-                <button mat-button (click)="unstage(i)" class="eject">
-                  <i class="material-icons icon">eject</i>
-                </button>
+                <div class="dv-mat-button">
+                  <button mat-button (click)="unstage(i)" class="eject">
+                    <i class="material-icons icon">eject</i>
+                  </button>
+                </div>
               </div>
             </div>
           </li>
