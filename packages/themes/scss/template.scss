@@ -1,5 +1,7 @@
-// ultimate default color: blue
 
+
+
+// default color palatte when nothing is overwritten
 $primaryColor: #00237d !default;
 $textColor: #000000 !default;
 $linkColor: #000000 !default;
@@ -14,9 +16,6 @@ $navbarButtonPadding: 0 10px !default;
 $mainFont: 'Arial', san-serif !default;
 
 $pagePadding: 15px 40px !default;
-
-
-
 
 // theming doc starts
 // TODO: costomizable font size for h1, h2, h3...
@@ -41,19 +40,14 @@ body{
   background: $backgroundColor;
 }
 
-.main {
+main {
   background-color: $backgroundColor;
   margin-top: $navbarHeight;
   padding: $pagePadding;
 }
 
 
-// Material UI related:
-// TODO: make a palette and use the material UI import
-@import "~@angular/material/theming";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@include mat-core();
-
+// Material UI
 .mat-error {
   color: $errorMessageColor;
   font-size: 12px;
@@ -66,3 +60,29 @@ body{
 .mat-input-element {
   caret-color: $textColor;
 }
+
+
+// here we are using !important tags
+// this is bad programming practice
+// it requires the user to add !important tags too
+// an alternative way is to overwrite mat-button by going into each cliche
+// it can be very unscalable
+.mat-button {
+  background: $primaryColor !important;
+  color: $textColor !important;
+  padding: 0 6px 0 6px !important;
+  margin: 6px 8px 6px 8px !important;
+  min-width: 88px !important;
+  border-radius: 3px !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  text-decoration:none !important;
+  border: none !important;
+  outline: none !important;
+  @if mixin-exists(mat-button) {@include mat-button};
+}
+
+@import "~@angular/material/theming";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@include mat-core();

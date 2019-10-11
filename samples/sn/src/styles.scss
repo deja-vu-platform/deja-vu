@@ -1,5 +1,20 @@
 // overwrite values should be written here
 
+@mixin mat-button {
+  background: #1FB8CC !important;
+  color: $textColor !important;
+  padding: 0 6px 0 6px !important;
+  margin: 6px 8px 6px 8px !important;
+  min-width: 88px !important;
+  border-radius: 3px !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  text-decoration:none !important;
+  border: none !important;
+  outline: none !important;
+}
+
 @import "~@deja-vu/themes/scss/sn.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
