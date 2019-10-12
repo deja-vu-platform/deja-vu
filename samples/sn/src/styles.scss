@@ -1,6 +1,9 @@
 // overwrite values should be written here
 
-@mixin mat-button {
+$textColor: blue;
+$navbarBackgroundColor: pink;
+
+@mixin dv-button {
   background: #1FB8CC;
   color: $textColor;
   padding: 0 6px 0 6px;
@@ -14,7 +17,7 @@
   outline: none;
 }
 
-@import "~@deja-vu/themes/scss/pink.scss";
+@import "~@deja-vu/themes/scss/orange-and-black.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
 // user input
@@ -86,7 +89,3 @@ ul {
 .navbar-brand {
   font-weight: bold;
 }
-
-
-
-

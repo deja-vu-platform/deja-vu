@@ -65,7 +65,7 @@ main {
 // About mat-button
 // there are three ways to overwrite the button information
 //  1. Have a wrapper class called "dv-mat-button" on every
-//     in any cliche [CHOOSED]
+//     in any concept [CHOSEN]
 //  2. Put an important tag after class "mat-button"
 //  3. Not use mat-button
 
@@ -84,31 +84,8 @@ main {
   text-decoration:none;
   border: 1px solid black;
   outline: none;
-  @if mixin-exists(mat-button) {@include mat-button};
+  @if mixin-exists(dv-button) {@include dv-button};
 }
-
-// Option 2: Overwrite mat-button by putting important tag
-// it requires the user to also put an important tag
-// which is not ideal, but can be used as a back up
-// approach, such as when the cliche button is not properly
-// wrapped by the "dv-mat-button" class
-/*
-.mat-button {
-  background: $primaryColor !important;
-  color: $textColor !important;
-  padding: 0 6px 0 6px !important;
-  margin: 6px 8px 6px 8px !important;
-  min-width: 88px !important;
-  border-radius: 3px !important;
-  font-size: 14px !important;
-  text-align: center !important;
-  text-transform: uppercase !important;
-  text-decoration:none !important;
-  border: none !important;
-  outline: none !important;
-  @if mixin-exists(mat-button) {@include mat-button};
-}
-*/
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
