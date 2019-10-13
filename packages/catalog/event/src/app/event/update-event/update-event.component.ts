@@ -92,9 +92,6 @@ export class UpdateEventComponent
   }
 
   dvOnExecSuccess() {
-    console.log("on exec");
-    console.log(this.startsOnControl.value);
-    console.log(this.startTimeControl.value);
     if (this.showOptionToSubmit) {
       this.updateEventSaved = true;
       window.setTimeout(() => {

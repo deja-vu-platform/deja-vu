@@ -56,10 +56,11 @@
                 </td>
               </tr>
             </table>
-            <dv.tx>
-              <dv.button class="edit-button">Edit Profile</dv.button>
-              <dv.redirect href="/update-profile" params={id: $id} onExecSuccess=true />
-            </dv.tx>
+            <dv.button-link
+              value="Edit Profile"
+              href="/update-profile"
+              params={id: $id}
+            />
           </div>
         </div>
       </div>
