@@ -19,51 +19,18 @@ our template language). You can also use CSS to customize the appearance of your
 app.
 
 For documentation and more information see
-[dejavu-platform.com](https://dejavu-platform.com).
+[deja-vu-platform.com](https://deja-vu-platform.com).
 
 > **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 > important at this point**, but we would love to hear what you think!
-> You can play around with it and shoot us an email or create an issue with your
-> feedback or questions.
+> You can play around with it and create an issue with your feedback or
+> questions.
 
 
 ## Create an App
 
-(This won't work until the npm packages are public, see "Contributing" instructions to create an app)
 
-- If you haven't done so already, install [Node.js](https://nodejs.org) v10.
-  [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
-- If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
-- Clone the app-starter-repo
-- In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
-- On the root directory of your new repo, run `npm start` and visit
-`http://localhost:3000`.
-You should see a "hello world" page.
-
-You can now start including concepts and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
-server (Ctrl+C and run `npm start` again).
-
-
-## Deploying DV Apps
-
-(This won't work until the npm packages are public)
-
-A compiled DV app is a regular MEAN app
-(MongoDB-Express-Angular-Node.js). Since a compiled DV app uses popular,
-well-supported technologies, it shouldn't be too much work to find out
-how to deploy a DV app using your favorite cloud provider.
-
-But, if you don't want to spend too much time on this,
-here's how to deploy your app using
-Heroku, a popular PaaS:
-
-- Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-- Run `heroku create myapp` to create a new heroku app. (Replace `myapp` with the name of your app)
-- Run `heroku addons:create mongolab` to provision a MongoDB instance
-- Deploy your changes by running `git push heroku`
-
-Your new changes should be live. To deploy new changes,
-create commits and run `git push heroku` again.
+To create an app, follow [these instructions](docs/quickstart.md).
 
 
 ## Contributing

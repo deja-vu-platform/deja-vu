@@ -31,9 +31,9 @@ export class PickComponent implements OnInit, OnChanges {
   @Input() newKeyNames: string[];
 
   /**
-   * If set to true, the function will flatten the object
+   * If set to `true`, the function will flatten the object
    * and make the value stand on its own
-   * When flatten is set to true, keys.length() must be 1.
+   * When flatten is set to true, `keys.length()` must be `1`.
    */
   @Input() flatten = false;
 

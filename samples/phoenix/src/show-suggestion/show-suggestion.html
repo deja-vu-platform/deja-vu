@@ -17,14 +17,13 @@
       <!-- The current user already has indicated interest -->
       <dv.if condition=match.show-attempts.loadedAttempts &&
         match.show-attempts.loadedAttempts.length !== 0>
-        Indicated interest!
+        Interested? Yes!
       </dv.if>
 
       <!-- The current user has not indicated interest -->
       <dv.if condition=match.show-attempts.loadedAttempts &&
         match.show-attempts.loadedAttempts.length === 0>
         <dv.tx>
-          <dv.status savedText="Indicated interest!" />
           <match.attempt-match sourceId=$loggedInUserId targetId=$id
             hidden=true/>
           <dv.button class="btn-interested">Interested?</dv.button>

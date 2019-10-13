@@ -16,10 +16,8 @@ import { API_PATH } from '../authorization.config';
 
 import { filter, take, takeUntil } from 'rxjs/operators';
 
+import { CanDoRes } from '../shared/authorization.model';
 
-interface CanViewRes {
-  data: { canView: boolean; };
-}
 
 @Component({
   selector: 'authorization-can-view',
@@ -86,7 +84,7 @@ export class CanViewComponent implements
       return;
     }
     await this.ws.maybeWait();
-    this.gs.get<CanViewRes>(this.apiPath, {
+    this.gs.get<CanDoRes>(this.apiPath, {
       params: {
         inputs: {
           input: {
@@ -97,7 +95,7 @@ export class CanViewComponent implements
       }
     })
     .subscribe((res) => {
-      this._canView = res.data.canView;
+      this._canView = res.data.canDo;
       this.canView.emit(this._canView);
     });
   }

@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-
-import { AppComponent } from './app.component';
-import { GroupModule } from './group/group.module';
+import { RouterModule } from '@angular/router';
 
 import { DvModule, GATEWAY_URL } from '@deja-vu/core';
+import { AppComponent } from './app.component';
+import { GroupModule } from './group/group.module';
 
 
 @NgModule({
@@ -15,6 +14,7 @@ import { DvModule, GATEWAY_URL } from '@deja-vu/core';
   imports: [
     BrowserModule,
     GroupModule,
+    RouterModule.forRoot([]),
     DvModule
   ],
   providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],

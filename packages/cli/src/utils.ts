@@ -140,7 +140,10 @@ function buildCmd(cmdS: string, projectFolder?: string): string {
  * @return the main file of the given package or its folder if it has no 'main'
  */
 export function locatePackage(pkg: string) {
-  return require.resolve(pkg);
+  const paths = require.resolve.paths(pkg);
+  paths.push(path.join(process.cwd(), '.dv', 'node_modules'));
+
+  return require.resolve(pkg, { paths: paths });
 }
 
 export function locateConceptPackage(pkg: string) {

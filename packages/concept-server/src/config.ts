@@ -1,5 +1,5 @@
 export interface Config {
-  wsPort: number;
+  wsPort: number | string;
   dbHost: string;
   dbPort: number;
   dbName: string;

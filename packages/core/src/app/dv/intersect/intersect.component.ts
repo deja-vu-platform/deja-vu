@@ -1,10 +1,10 @@
 import {
-  Component, OnInit, Input, Output, EventEmitter, ElementRef, OnChanges
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
-import { RunService, OnExecSuccess } from '../run.service';
-import * as _ from 'lodash';
+import { RunService } from '../run.service';
 
+import * as _ from 'lodash';
 
 
 @Component({
@@ -14,27 +14,22 @@ import * as _ from 'lodash';
 export class IntersectComponent implements OnInit, OnChanges {
   private static readonly MINIMUM_INTERSECTION_LISTS = 2;
   /**
-   * A list of lists that is going to be intersected
+   * A list of lists to intersect
    */
   @Input() lists: any[][];
 
   /**
-   * If the passed in entity is not a primitive value
-   * A key can be used to signal their comparison field
-   * If no key is passed in, the objects will all be identified as unique
-   * More spec see documentation of Lodash at:
-   *  https://lodash.com/docs/4.17.10#intersectionBy
+   * If the passed in entity is not a primitive value a key can be used
+   * for comparisons. If no key is passed in, SameValueZero is used for
+   * equality comparisons.
+   * See https://lodash.com/docs/4.17.10#intersectionBy
    */
   @Input() key: string;
 
-  /**
-   * The list of entities after union
-   */
   @Output() intersectList = new EventEmitter<any[]>();
 
 
-  constructor(
-    private elem: ElementRef, private rs: RunService) {}
+  constructor(private elem: ElementRef, private rs: RunService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -51,6 +46,5 @@ export class IntersectComponent implements OnInit, OnChanges {
     } else {
       throw new Error ('pass in at least two lists for intersection');
     }
-
   }
 }

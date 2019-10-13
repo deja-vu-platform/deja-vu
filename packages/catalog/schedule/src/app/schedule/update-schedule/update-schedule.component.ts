@@ -70,6 +70,7 @@ export class UpdateScheduleComponent implements AfterViewInit,
   activeWaits = new Set<string>();
   @Input() id: string;
   @Input() showOptionToSubmit = true;
+  @Input() showOptionToChangeView = true;
 
   // Presentation inputs
   @Input() buttonLabel = 'Update Schedule';

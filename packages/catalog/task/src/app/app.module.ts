@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { TaskModule } from './task/task.module';
+import { RouterModule } from '@angular/router';
 
 import { DvModule, GATEWAY_URL } from '@deja-vu/core';
-
 import { AppComponent } from './app.component';
+import { TaskModule } from './task/task.module';
 
 
 @NgModule({
@@ -15,6 +14,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     TaskModule,
+    RouterModule.forRoot([]),
     DvModule
   ],
   providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],

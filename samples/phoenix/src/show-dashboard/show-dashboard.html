@@ -48,7 +48,7 @@
           Suggestions are users who are interested on the same topics as you
           <!-- Suggestions that aren't connections -->
           <dv.if condition=topic.search-items-by-labels.searchResultItems &&
-            topic.search-items-by-labels.searchResultItems.length !== 0>
+            topic.search-items-by-labels.searchResultItems.length gt 1>
             <topic.show-items
               itemIds=topic.search-items-by-labels.searchResultItems
               showItem=<phoenix.show-suggestion id=$id
@@ -57,7 +57,7 @@
 
           <!-- No Suggestions -->
           <dv.if condition=!topic.search-items-by-labels.searchResultItems ||
-            topic.search-items-by-labels.searchResultItems.length !== 0>
+            topic.search-items-by-labels.searchResultItems.length === 1>
             <p id="empty-suggestion" class="inline-block">
               Looks like you don't have any suggestions yet.
               Try going to your

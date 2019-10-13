@@ -12,10 +12,7 @@ import { filter, take } from 'rxjs/operators';
 
 import { API_PATH } from '../authorization.config';
 
-
-interface CanEditRes {
-  data: { canEdit: boolean };
-}
+import { CanDoRes } from '../shared/authorization.model';
 
 
 @Component({
@@ -77,7 +74,7 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
           .toPromise())
         .value());
     }
-    this.gs.get<CanEditRes>(this.apiPath, {
+    this.gs.get<CanDoRes>(this.apiPath, {
       params: {
         inputs: JSON.stringify({
           input: {
@@ -88,7 +85,7 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
       }
     })
     .subscribe((res) => {
-      this.canEdit = res.data.canEdit;
+      this.canEdit = res.data.canDo;
     });
   }
 }

@@ -12,7 +12,6 @@
     "clean": "lerna clean && lerna run clean && rm -rf node_modules",
     "lint": "lerna run --no-bail lint --stream",
     "lint-fix": "lerna run --no-bail lint-fix --stream",
-    "release": "lerna publish",
     "start": "echo \"This monorepo has multiple packages. To start a concept or app, you must navigate to the concept or app directory and then do 'yarn start'\""
   },
   "devDependencies": {
@@ -48,7 +47,7 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "lerna": "^3.4.3",
+    "lerna": "^3.16.5",
     "lodash": "^4.17.5",
     "mongodb": "^3.0.4",
     "ng-packagr": "^2.2.0",

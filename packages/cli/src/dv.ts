@@ -46,6 +46,10 @@ function calledFromCatalog(): boolean {
   return path.basename(path.dirname(process.cwd())) === 'catalog';
 }
 
+function calledFromNgApp(): boolean {
+  return path.basename(process.cwd()) === '.dv';
+}
+
 // tslint:disable no-unused-expression
 yargs.commandDir('commands')
   .completion('completion', 'generate the bash completion script')
@@ -60,10 +64,13 @@ yargs.commandDir('commands')
       console.error(`Error parsing config file ${e.message}`);
       throw e;
     }
-    if (!calledFromCatalog()) {
+    if (!calledFromCatalog() && !calledFromNgApp()) {
       console.log('Serving app');
       AppCompiler.Compile('.', CACHE_DIR);
       process.chdir(CACHE_DIR);
+    }
+    if (calledFromNgApp()) {
+      console.log('Called from a .dv directory. Serving DV compiled app');
     }
     // Serve everything (including all dep concepts)
     cmd('npm', ['run', `dv-build-${config.name}`]);

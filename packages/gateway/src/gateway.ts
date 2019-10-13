@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as WebSocket from 'ws';
 
 import { ComponentTable } from './componentHelper';
-import { DvConfig, GatewayConfig } from './gateway.model';
+import { DvConfig, GatewayConfig, getPort } from './gateway.model';
 import {
   AppRequestProcessor,
   DesignerRequestProcessor,
@@ -42,7 +42,7 @@ export interface AppInfo {
 export interface GatewayConfigOptions {
   readonly dbHost?: string;
   readonly dbPort?: number;
-  readonly wsPort?: number;
+  readonly wsPort?: number | string;
   readonly dbName?: string;
   readonly reinitDbOnStartup?: boolean;
 }
@@ -124,7 +124,7 @@ export function startGateway(
   }
 
   // Listen
-  const port = gatewayConfig.wsPort;
+  const port = getPort(gatewayConfig.wsPort);
   requestProcessor.start()
     .then(() => {
       server.listen(port, async () => {

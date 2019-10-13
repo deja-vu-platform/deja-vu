@@ -1,6 +1,8 @@
 # Designer
 *A WYSIWYG application builder for Déjà Vu*
 
+[Demo Video](https://youtu.be/10IexBI5v-A)
+
 ## Development
 Run `yarn start` to host the app at `localhost:4200` and open it in Electron. If you'd rather use a browser, run `yarn serve` to host the app without starting Electron (some features will be disabled).
 

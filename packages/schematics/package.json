@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/schematics",
   "description": "Schematics for Déjà Vu",
   "license": "MIT",
@@ -8,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.1",
+  "version": "0.0.9",
   "scripts": {
     "build": "tsc -p tsconfig.json && rsync -r --include '*/files/' src/ dist/",
     "clean": "rm -rf ./dist",
@@ -30,5 +29,8 @@
   "schematics": "./dist/collection.json",
   "devDependencies": {
     "prettier": "^1.18.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

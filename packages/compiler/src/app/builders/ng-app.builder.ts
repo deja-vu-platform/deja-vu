@@ -100,9 +100,11 @@ export class NgAppBuilder {
   }
 
   private static FindPackage(dep: string) {
-    return path.dirname(
-      require.resolve(
-        path.join(NgAppBuilder.DepToPackage(dep), 'package.json')));
+    const req = path.join(NgAppBuilder.DepToPackage(dep), 'package.json');
+    const paths = require.resolve.paths(req);
+    paths.push(path.join(process.cwd(), '.dv', 'node_modules'));
+
+    return path.dirname(require.resolve(req, { paths: paths }));
   }
 
   private static DiffCacheRecord(
@@ -124,9 +126,22 @@ export class NgAppBuilder {
   }
 
   private static InstallDependencies(cacheDir: string) {
+    // Detect if we are running from within the monorepo or not
+    const cwd = process.cwd();
+    const parentDirIsSamples = cwd.split(path.sep)
+      .slice(-2)[0];
+    const rootHasLernaFile = existsSync(
+      path.join(cwd, '..', '..', 'lerna.json'));
+    let cmd = 'npm';
+    if (parentDirIsSamples && rootHasLernaFile) {
+      console.log('Detected that sample is running from monorepo. ' +
+        'Will use yarn instead of npm to install dependencies.');
+      cmd = 'yarn';
+    }
+
     // TODO: Remove `shell: true` hack
     const c = spawnSync(
-      'yarn', [], { stdio: 'inherit', cwd: cacheDir, shell: true });
+      cmd, ['install'], { stdio: 'inherit', cwd: cacheDir, shell: true });
     if (c.error) {
       throw new Error(`Failed to install dependencies: ${c.error}`);
     }
@@ -137,6 +152,7 @@ export class NgAppBuilder {
 
   constructor(
     private readonly appName: string,
+    private readonly dvVersion: string,
     private readonly dvConfigContents: string) { }
 
   addDependency(name: string, version: string): NgAppBuilder {
@@ -234,12 +250,16 @@ export class NgAppBuilder {
 
     const replaceMap = {
       name: this.appName,
+      version: this.dvVersion,
+      gatewayUrl: _.get(
+        JSON.parse(this.dvConfigContents),
+        'gateway.config.url', 'localhost:3000') + '/api',
       dependencies: _
         .map(
           this.dependencies,
           (d: Dependency) =>
             `"${NgAppBuilder.DepToPackage(d.name)}": "${d.version}"`)
-        .join(',\n'),
+      .join(',\n') + (_.isEmpty(this.dependencies) ? '' : ','),
       componentImports: _
         .map(
           this.components,
@@ -354,6 +374,10 @@ export class NgAppBuilder {
       copyFileSync(this.faviconPath, path.join(srcDir, 'favicon.ico'));
     }
 
+    if (installDependencies && diff.dependenciesChanged) {
+      NgAppBuilder.InstallDependencies(cacheDir);
+    }
+
     // | assets/
     for (const d of this.dependencies) {
       const conceptPackageLocation = NgAppBuilder.FindPackage(d.name);
@@ -372,10 +396,6 @@ export class NgAppBuilder {
       if (existsSync(conceptAssets)) {
         copySync(conceptAssets, appAssetsDir);
       }
-    }
-
-    if (installDependencies && diff.dependenciesChanged) {
-      NgAppBuilder.InstallDependencies(cacheDir);
     }
   }
 

@@ -18,7 +18,7 @@ import { SubscriptionCoordinator } from './subscriptionCoordinator';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 import { ComponentPath } from './componentPath';
-import { DvConfig, GatewayConfig } from './gateway.model';
+import { DvConfig, GatewayConfig, getPort } from './gateway.model';
 
 import { InputValuesMap, TxInputsValidator } from './txInputsValidator';
 
@@ -542,10 +542,10 @@ export class AppRequestProcessor extends RequestProcessor {
     this.dvConfig = dvConfig;
 
     _.forEach(dvConfig.usedConcepts, (conceptConfig, name) => {
-      this.dstTable[name] = conceptConfig.config.wsPort;
+      this.dstTable[name] = getPort(conceptConfig.config.wsPort);
     });
     if (dvConfig.config) {
-      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
+      this.dstTable[dvConfig.name] = getPort(dvConfig.config.wsPort);
     }
     console.log(`Using dst table ${stringify(this.dstTable)}`);
 

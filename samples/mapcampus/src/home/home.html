@@ -41,12 +41,10 @@
             showSearchControl=false
             showDirectionsControl=false />
         </dv.tx>
-        <div class="container-fluid event-card-container">
-          <dv.show-entities
-            entities=dv.pick.pickedEntities
-            noEntitiesToShowText='No events yet. Check again later'
-            showEntity=<mapcampus.show-event-info id=$entity /> />
-        </div>
+        <dv.show-entities class="evts"
+          entities=dv.pick.pickedEntities
+          noEntitiesToShowText='No events yet. Check again later'
+          showEntity=<mapcampus.show-event-info id=$entity /> />
       </div>
     </div>
   </div>

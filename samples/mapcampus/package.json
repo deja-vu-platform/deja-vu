@@ -1,18 +1,21 @@
 {
-  "name": "mapcampus",
-  "version": "0.0.1",
+  "name": "@deja-vu/sample-mapcampus",
+  "version": "0.0.9",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
-  "devDependencies": {
-    "@deja-vu/cli": "0.0.1"
+  "dependencies": {
+    "@deja-vu/cli": "^0.0.9",
+    "@deja-vu/compiler": "^0.0.9"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

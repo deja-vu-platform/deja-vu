@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/themes",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "Themes for Déjà Vu",
   "scripts": {
     "build": "mkdir dist && cp -r css ./dist",
@@ -19,12 +19,14 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "devDependencies": {
     "prettier": "^1.18.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

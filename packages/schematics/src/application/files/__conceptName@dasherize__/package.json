@@ -38,9 +38,10 @@
     "@angular/router": "^5.2.0",
     "bootstrap": "^4.0.0",
     "core-js": "^2.4.1",
-    "@deja-vu/concept-server": "0.0.1",
-    "@deja-vu/core": "0.0.1",
-    "@deja-vu/gateway": "0.0.1",
+    "@deja-vu/cli": "^0.0.9",
+    "@deja-vu/concept-server": "^0.0.9",
+    "@deja-vu/core": "^0.0.9",
+    "@deja-vu/gateway": "^0.0.9",
     "lodash": "^4.17.5",
     "moment": "^2.22.1",
     "rxjs": "5.5.6",
@@ -73,10 +74,10 @@
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
-    "@deja-vu/concept-server": "0.0.1",
-    "@deja-vu/cli": "0.0.1",
-    "@deja-vu/core": "0.0.1",
-    "@deja-vu/gateway": "0.0.1",
+    "@deja-vu/concept-server": "^0.0.9",
+    "@deja-vu/cli": "^0.0.9",
+    "@deja-vu/core": "^0.0.9",
+    "@deja-vu/gateway": "^0.0.9",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",
@@ -97,11 +98,13 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-<%= dasherize(conceptName) %>.d.ts",
-  "main": "pkg/bundles/deja-vu-<%= dasherize(conceptName) %>.umd.js"
+  "main": "pkg/bundles/deja-vu-<%= dasherize(conceptName) %>.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

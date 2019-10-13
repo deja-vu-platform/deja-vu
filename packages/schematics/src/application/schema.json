@@ -6,8 +6,11 @@
   "properties": {
     "conceptName": {
       "type": "string"
+    },
+    "dvVersion": {
+      "type": "string"
     }
   },
-  "required": [ "conceptName" ],
+  "required": [ "conceptName", "dvVersion" ],
   "additionalProperties": false
 }
