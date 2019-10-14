@@ -88,6 +88,11 @@ const componentRequestTable: ComponentRequestTable = {
     query ShowEventCount($input: EventsInput!) {
       eventCount(input: $input) ${getReturnFields(extraInfo)}
     }
+  `,
+  'update-event': (extraInfo) => `
+    mutation UpdateEvent($input: UpdateEventInput!) {
+      updateEvent(input: $input) ${getReturnFields(extraInfo)}
+    }
   `
 };
 

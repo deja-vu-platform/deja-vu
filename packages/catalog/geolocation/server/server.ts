@@ -11,7 +11,8 @@ import {
 import {
   CreateMarkerInput,
   MarkerDoc,
-  MarkersInput
+  MarkersInput,
+  UpdateMarkerInput
 } from './schema';
 
 import { IResolvers } from 'graphql-tools';
@@ -52,6 +53,11 @@ const componentRequestTable: ComponentRequestTable = {
   'show-marker-count': (extraInfo) => `
     query ShowMarkerCount($input: MarkersInput!) {
       markerCount(input: $input) ${getReturnFields(extraInfo)}
+    }
+  `,
+  'update-marker-from-map': (extraInfo) => `
+    mutation UpdateMarker($input: UpdateMarkerInput!) {
+      updateMarker (input: $input) ${getReturnFields(extraInfo)}
     }
   `
 };
@@ -122,6 +128,22 @@ function resolvers(db: ConceptDb, _config: Config): IResolvers {
 
       deleteMarker: async (_root, { id }, context: Context) =>
         await markers.deleteOne(context, { id })
+      ,
+      updateMarker: async (
+        _root, { input }: { input: UpdateMarkerInput }, context: Context) => {
+        const newMarker: MarkerDoc = {
+          id: input.id,
+          title: input.title ? input.title : '',
+          location: {
+            type: 'Point',
+            coordinates: [input.longitude, input.latitude]
+          },
+          mapId: input.mapId
+        };
+
+        return await markers.updateOne(context, {id: newMarker.id},
+          {$set: newMarker}, {upsert: true});
+      }
     }
   };
 }

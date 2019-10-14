@@ -14,6 +14,14 @@ input CreateMarkerInput {
   mapId: ID!
 }
 
+input UpdateMarkerInput {
+  id: ID!
+  title: String
+  latitude: Float!
+  longitude: Float!
+  mapId: ID!
+}
+
 input MarkersInput {
   ofMapId: ID
   centerLat: Float
@@ -31,4 +39,5 @@ type Query {
 type Mutation {
   createMarker(input: CreateMarkerInput!): Marker
   deleteMarker(id: ID!): Boolean
+  updateMarker(input: UpdateMarkerInput!): Boolean
 }

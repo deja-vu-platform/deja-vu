@@ -1,0 +1,27 @@
+<dv.component name="update-user-profile">
+  <div class="index">
+    <rendezvous.navbar showTitle=true showProfileButton=false />
+
+    <dv.if condition=$id>
+
+      <userProfile.show-object id=$id hidden=true />
+
+      <div class="reset-password">
+        <div class="card message-panel">
+          <div class="card-header panel-heading-background">
+            <!-- Username -->
+            <div id="username-body">
+              <h4 id="username-text">
+                <rendezvous.show-member-name id=$id />
+              </h4>
+            </div>
+          </div>
+          <div class="card-body panel-heading-background" id="profile-panel">
+            <userProfile.update-object id=$id buttonLabel="Update Profile" />
+            <authentication.change-password id=$id />
+          </div>
+        </div>
+      </div>
+    </dv.if>
+  </div>
+</dv.component>

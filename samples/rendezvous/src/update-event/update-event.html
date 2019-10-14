@@ -1,0 +1,67 @@
+<dv.component name="update-event">
+  <div class="index">
+    <rendezvous.navbar showTitle=true showProfileButton=true />
+    <relevantInterests.show-labels itemId=$eventId hidden=true />
+
+    <div class="new-event">
+      <div class="card">
+        <div class="card-header" id="update-event-heading">
+          Update Event
+        </div>
+        <div class="card-body">
+          <div id="host-display">
+            <rendezvous.show-host id=rendezvous.navbar.loggedInUser?.id />
+          </div>
+            <!-- Event Title + Details -->
+            <table class="event-info table">
+              <tr>
+                <td rowspan="2">
+                  <div class="form-group">
+                    <p>Event Information</p>
+                    <eventDetails.update-object id=$eventId buttonLabel="Update Event Info" />
+                  </div>
+                </td>
+                <td>
+                  <p>Relevant Interests</p>
+                  <div id="tags">
+                    <relevantInterests.set-labels itemId=$eventId
+                                                  labels=relevantInterests.show-labels.labels
+                                                  inputLabel=""
+                                                  clearLabelsOnSave=false
+                                                  showOptionToSubmit=true />
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <table class="event-info table">
+              <tr>
+                <!--Location-->
+                <td rowspan="2">
+                  <div class="form-group">
+                    <p>Location</p>
+                    <div id="map_new-event">
+                      <geolocation.update-marker-from-map
+                        id=$eventId
+                        buttonLabel="Update Location"
+                        updateMarkerSavedText="Location Updated!"
+                        showOptionToSubmit=true />
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Event -->
+                <td>
+                  <p>Date & Time</p>
+                  <event.update-event id=$eventId />
+                </td>
+              </tr>
+            </table>
+
+            <authentication.authenticate
+              id=rendezvous.navbar.loggedInUser?.id hidden=true />
+
+        </div>
+      </div>
+    </div>
+  </div>
+</dv.component>

@@ -1,0 +1,25 @@
+<geolocation-show-marker [id]="id"
+                         [hidden]="true"
+                         (loadedMarker)="updateMarker($event)">
+</geolocation-show-marker>
+<div class="form-group">
+  <geolocation-display-map id="default"
+                           [showDirectionsControl]="false"
+                           [showLoadedMarkers]="false"
+                           [markers]="[marker]"
+                           (newMarker)="updateMarker($event)">
+  </geolocation-display-map>
+</div>
+<div *ngIf="showOptionToSubmit" class="form-group">
+  <div *ngIf="updateMarkerSaved" class="create-marker-success">
+    <mat-icon class="inline-icon">done</mat-icon>
+    {{updateMarkerSavedText}}
+  </div>
+  <mat-error *ngIf="updateMarkerError">
+    <mat-icon class="inline-icon">report_problem</mat-icon>
+    {{updateMarkerError}}
+  </mat-error>
+  <button mat-button type="submit" [disabled]="!marker" (click)="onSubmit()">
+    {{buttonLabel}}
+  </button>
+</div>
