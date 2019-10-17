@@ -14,7 +14,7 @@ To contribute a new concept, see the
 
   Distribute resources among consumers
 
-  {% include concept-btns.html name="property" %}
+  {% include concept-btns.html name="allocator" %}
 - Authentication
 
   Verify the user's identity with a username and password
