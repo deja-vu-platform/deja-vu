@@ -4,7 +4,7 @@
 # designer
 
 Together with the development of the platform, we have
-been developing a live programming environment to
+been developing a programming environment to
 allow you to build Déjà Vu apps graphically.
 
 The Déjà Vu designer is still in alpha and we don't

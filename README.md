@@ -90,9 +90,18 @@ Note that a concept must have a unique name.
 
 ### Website
 
-If you want to make changes to the website, you can test them by
-running `bundle exec jekyll serve` under
+The source of the website is under
 [docs/](https://github.com/spderosso/deja-vu/tree/master/docs).
+For small content changes, you can edit the markdown files directly and create
+a pull request. Once the changes are merged to master, the live website at
+[deja-vu-platform.com](https://deja-vu-platform.com) will update.
+
+If you'd like to run the website locally, do the following:
+- install [Jekyll](https://jekyllrb.com/)
+- `cd` to `docs`
+- run `bundle install`
+- run `bundle exec jekyll serve`
+
 The website with your local changes will be served at
 [http://localhost:4000](http://localhost:4000).
 
