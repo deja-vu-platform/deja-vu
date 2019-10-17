@@ -37,7 +37,7 @@ are configured in JSON and you can style your app with CSS.
 (MongoDB-Express-Angular-Node.js) app, which can be
 deployed using popular cloud providers. We are actively working on guides
 and tooling for deploying. In the meantime, you can follow our
-[quickstart guide](./quickstart) to create an app and run it locally in
+[quickstart guide](./quickstart) to create an app and run it locally on
 your machine.
 
 
