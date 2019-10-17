@@ -36,7 +36,9 @@ are configured in JSON and you can style your app with CSS.
 - **conventional output** A compiled Déjà Vu app is a standard MEAN
 (MongoDB-Express-Angular-Node.js) app, which can be
 deployed using popular cloud providers. We are actively working on guides
-and tooling for deploying.
+and tooling for deploying. In the meantime, you can follow our
+[quickstart guide](./quickstart) to create an app and run it locally in
+your machine.
 
 
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
