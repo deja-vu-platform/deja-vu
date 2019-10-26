@@ -1,16 +1,9 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
-  OnChanges, OnDestroy, OnInit, Output, Type
+  OnChanges, OnInit, Output, Type
 } from '@angular/core';
-import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { ComponentValue, DvService, OnEval } from '@deja-vu/core';
 import * as _ from 'lodash';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
@@ -28,7 +21,7 @@ interface CommentsRes {
   styleUrls: ['./show-comments.component.css']
 })
 export class ShowCommentsComponent implements
-  AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval {
+  AfterViewInit, OnInit, OnChanges, OnEval {
   @Input() waitOn: string[];
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
@@ -51,35 +44,22 @@ export class ShowCommentsComponent implements
   comments: Comment[] = [];
   @Output() loadedComments = new EventEmitter<Comment[]>();
 
-  destroyed = new Subject<any>();
-
   showComments;
-  private gs: GatewayService;
-  private ws: WaiterService;
   loaded = false;
   refresh = false;
   inputsOfLoadedComments = { byAuthorId: undefined, ofTargetId: undefined };
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private router: Router, private rs: RunService,
-    @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvs: DvService,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showComments = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.refresh = true;
-        this.load();
-      });
+    this.dvs.register(this.elem, this, this.waitOn, () => {
+      this.refresh = true;
+      this.load();
+    });
   }
 
   ngAfterViewInit() {
@@ -87,21 +67,21 @@ export class ShowCommentsComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs.waiter && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.run.eval(this.elem);
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs
+      await this.dvs.waiter.maybeWait();
+      this.dvs.gateway
         .get<CommentsRes>(this.apiPath, {
           params: {
             inputs: JSON.stringify({
@@ -131,18 +111,13 @@ export class ShowCommentsComponent implements
             ofTargetId: this.ofTargetId
           };
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+    } else if (this.dvs.gateway) {
+      this.dvs.gateway.noRequest();
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
-  }
-
   private canEval(): boolean {
-    return this.gs && (this.refresh || this.commentsAreOld());
+    return this.dvs.gateway && (this.refresh || this.commentsAreOld());
   }
 
   private commentsAreOld(): boolean {

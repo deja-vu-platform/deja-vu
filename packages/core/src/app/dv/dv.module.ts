@@ -19,6 +19,7 @@ import { CamelToTitleCasePipe } from './stage/stage.component';
 import { ChooseComponent } from './choose/choose.component';
 import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
+import { DvService } from './dv.service';
 import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
 import { FormatDateComponent } from './format-date/format-date.component';
@@ -35,6 +36,7 @@ import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
 import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import { RefreshService } from './refresh.service';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
 import { ShowDateComponent } from './show-date/show-date.component';
@@ -85,8 +87,9 @@ const allComponents = [
     CamelToTitleCasePipe
   ],
   providers: [
-    GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
-    SubscriptionService, WaiterServiceFactory
+    DvService, GatewayServiceFactory, RefreshService, RunService,
+    ConfigServiceFactory, StorageService, SubscriptionService,
+    WaiterServiceFactory
   ],
   entryComponents: [ShowEntityComponent],
   exports: [...allComponents, OfDirective, CamelToTitleCasePipe]
