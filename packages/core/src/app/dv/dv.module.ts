@@ -19,7 +19,7 @@ import { CamelToTitleCasePipe } from './stage/stage.component';
 import { ChooseComponent } from './choose/choose.component';
 import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
-import { DvService } from './dv.service';
+import { DvServiceFactory } from './dv.service';
 import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
 import { FormatDateComponent } from './format-date/format-date.component';
@@ -87,7 +87,7 @@ const allComponents = [
     CamelToTitleCasePipe
   ],
   providers: [
-    DvService, GatewayServiceFactory, RefreshService, RunService,
+    DvServiceFactory, GatewayServiceFactory, RefreshService, RunService,
     ConfigServiceFactory, StorageService, SubscriptionService,
     WaiterServiceFactory
   ],

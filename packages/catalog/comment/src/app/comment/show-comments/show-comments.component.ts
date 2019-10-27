@@ -1,8 +1,10 @@
 import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
-  OnChanges, OnInit, Output, Type
+  OnChanges, OnDestroy, OnInit, Output, Type
 } from '@angular/core';
-import { ComponentValue, DvService, OnEval } from '@deja-vu/core';
+import {
+  ComponentValue, DvService, DvServiceFactory, OnEval
+} from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../comment.config';
@@ -20,8 +22,8 @@ interface CommentsRes {
   templateUrl: './show-comments.component.html',
   styleUrls: ['./show-comments.component.css']
 })
-export class ShowCommentsComponent implements
-  AfterViewInit, OnInit, OnChanges, OnEval {
+export class ShowCommentsComponent
+  implements AfterViewInit, OnInit, OnChanges, OnEval, OnDestroy {
   @Input() waitOn: string[];
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
@@ -49,17 +51,22 @@ export class ShowCommentsComponent implements
   refresh = false;
   inputsOfLoadedComments = { byAuthorId: undefined, ofTargetId: undefined };
 
+  private dvs: DvService;
+
   constructor(
-    private readonly elem: ElementRef, private readonly dvs: DvService,
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
     @Inject(API_PATH) private readonly apiPath) {
     this.showComments = this;
   }
 
   ngOnInit() {
-    this.dvs.register(this.elem, this, this.waitOn, () => {
-      this.refresh = true;
-      this.load();
-    });
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
+        this.refresh = true;
+        this.load();
+      })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -67,57 +74,57 @@ export class ShowCommentsComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.dvs.waiter && this.dvs.waiter.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.dvs.run.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.dvs.waiter.maybeWait();
-      this.dvs.gateway
-        .get<CommentsRes>(this.apiPath, {
-          params: {
-            inputs: JSON.stringify({
-              input: {
-                byAuthorId: this.byAuthorId,
-                ofTargetId: this.ofTargetId
-              }
-            }),
-            extraInfo: {
-              returnFields: `
-                ${this.showId ? 'id' : ''}
-                ${this.showAuthorId ? 'authorId' : ''}
-                ${this.showTargetId ? 'targetId' : ''}
-                ${this.showContent ? 'content' : ''}
-                ${this.includeTimestamp ? 'timestamp' : ''}
-              `
+      const res = await this.dvs.waitAndGet<CommentsRes>(this.apiPath, {
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              byAuthorId: this.byAuthorId,
+              ofTargetId: this.ofTargetId
             }
+          }),
+          extraInfo: {
+            returnFields: `
+              ${this.showId ? 'id' : ''}
+              ${this.showAuthorId ? 'authorId' : ''}
+              ${this.showTargetId ? 'targetId' : ''}
+              ${this.showContent ? 'content' : ''}
+              ${this.includeTimestamp ? 'timestamp' : ''}
+            `
           }
-        })
-        .subscribe((res) => {
-          this.comments = res.data.comments;
-          this.loadedComments.emit(this.comments);
-          this.loaded = true;
-          this.refresh = false;
-          this.inputsOfLoadedComments = {
-            byAuthorId: this.byAuthorId,
-            ofTargetId: this.ofTargetId
-          };
-        });
-    } else if (this.dvs.gateway) {
+        }
+      });
+      this.comments = res.data.comments;
+      this.loadedComments.emit(this.comments);
+      this.loaded = true;
+      this.refresh = false;
+      this.inputsOfLoadedComments = {
+        byAuthorId: this.byAuthorId,
+        ofTargetId: this.ofTargetId
+      };
+    } else if (this.dvs) {
       this.dvs.gateway.noRequest();
     }
   }
 
+  ngOnDestroy() {
+    this.dvs.onDestroy();
+  }
+
   private canEval(): boolean {
-    return this.dvs.gateway && (this.refresh || this.commentsAreOld());
+    return this.dvs && (this.refresh || this.commentsAreOld());
   }
 
   private commentsAreOld(): boolean {

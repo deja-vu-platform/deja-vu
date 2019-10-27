@@ -8,18 +8,17 @@ import { Subject } from 'rxjs/Subject';
 export class RefreshService {
   constructor(private readonly router: Router) {}
 
-  register(component, refresh: () => void): void {
+  register(refresh: () => void): () => void {
     const destroyed = new Subject<any>();
-    const oldDestroy = component.ngOnDestroy;
-    component.ngOnDestroy = () => {
-      destroyed.next();
-      destroyed.complete();
-      oldDestroy();
-    };
     this.router.events
       .pipe(
         filter((e: RouterEvent) => e instanceof NavigationEnd),
         takeUntil(destroyed))
       .subscribe(refresh);
+
+    return () => {
+      destroyed.next();
+      destroyed.complete();
+    };
   }
 }

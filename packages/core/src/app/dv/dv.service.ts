@@ -1,7 +1,9 @@
 import { ElementRef, Injectable } from '@angular/core';
 
 import { ConfigService, ConfigServiceFactory } from './config.service';
-import { GatewayService, GatewayServiceFactory } from './gateway.service';
+import {
+  GatewayService, GatewayServiceFactory, RequestOptions
+} from './gateway.service';
 import { RefreshService } from './refresh.service';
 import { RunService } from './run.service';
 import { StorageService } from './storage.service';
@@ -13,28 +15,128 @@ import { WaiterService, WaiterServiceFactory } from './waiter.service';
  * Service aggregator
  */
 @Injectable()
-export class DvService {
-  public gateway: GatewayService;
-  public waiter: WaiterService;
-  public config: ConfigService;
-
+export class DvServiceFactory {
   constructor(
-    private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private csf: ConfigServiceFactory,
-    public readonly run: RunService,
-    public readonly storage: StorageService,
-    public readonly sub: SubscriptionService,
-    public readonly refresh: RefreshService) {
+    private readonly gsf: GatewayServiceFactory,
+    private readonly wsf: WaiterServiceFactory,
+    private readonly csf: ConfigServiceFactory,
+    private readonly run: RunService,
+    private readonly storage: StorageService,
+    private readonly sub: SubscriptionService,
+    private readonly refresh: RefreshService) {
   }
 
-  register(elem: ElementRef, component, waitOn, refresh?: () => void) {
-    this.gateway = this.gsf.for(elem);
-    this.waiter = this.wsf.for(component, waitOn);
-    this.config = this.csf.createConfigService(elem);
-    this.run.register(elem, component);
-    if (this.refresh) {
-      this.refresh.register(component, refresh);
+  forComponent(component): DvServiceBuilder {
+    return new DvServiceBuilder(
+      component, this.gsf, this.wsf, this.csf, this.run, this.storage, this.sub,
+      this.refresh);
+  }
+}
+
+export class DvServiceBuilder {
+  private defaultWaiter = false;
+  private refreshCallback: (() => void) | undefined;
+
+  constructor(
+    private readonly component,
+    private readonly gsf: GatewayServiceFactory,
+    private readonly wsf: WaiterServiceFactory,
+    private readonly csf: ConfigServiceFactory,
+    private readonly run: RunService,
+    private readonly storage: StorageService,
+    private readonly sub: SubscriptionService,
+    private readonly refresh: RefreshService) {
+  }
+
+  withDefaultWaiter(): DvServiceBuilder {
+    this.defaultWaiter = true;
+
+    return this;
+  }
+
+  // you must call onDestroy on ngOnDestroy if you register a refresh callback
+  withRefreshCallback(refreshFn: () => void): DvServiceBuilder {
+    this.refreshCallback = refreshFn;
+
+    return this;
+  }
+
+  build(): DvService {
+    const elem = this.component.elem;
+    if (elem === undefined) {
+      throw new Error(
+        'Missing elem: add `elem: ElementRef` to your constructor');
     }
+    const gateway = this.gsf.for(elem);
+    const waiter = this.defaultWaiter ?
+      this.wsf.for(this.component, this.component.waitOn) : undefined;
+    const config = this.csf.createConfigService(elem);
+    this.run.register(elem, this.component);
+    const destroyFn = this.refreshCallback ?
+      this.refresh.register(this.refreshCallback) : undefined;
+
+    return new DvService(
+      gateway, waiter, config, this.sub, elem, this.run, this.storage,
+      destroyFn);
+  }
+}
+
+export class DvService {
+  constructor(
+    public readonly gateway: GatewayService,
+    public readonly waiter: WaiterService,
+    public readonly config: ConfigService,
+    public readonly sub: SubscriptionService,
+    private readonly elem: ElementRef,
+    private readonly run: RunService,
+    private readonly storage: StorageService,
+    private readonly destroyFn: () => void) {}
+
+  onDestroy() {
+    if (this.destroyFn) {
+      this.destroyFn();
+    }
+  }
+
+  exec(): void {
+    this.run.exec(this.elem);
+  }
+
+  eval(): void {
+    this.run.eval(this.elem);
+  }
+
+  setItem(key: string, value: any): void {
+    this.storage.setItem(this.elem, key, value);
+  }
+
+  getItem(key: string): any {
+    return this.storage.getItem(this.elem, key);
+  }
+
+  removeItem(key: string): void {
+    this.storage.removeItem(this.elem, key);
+  }
+
+  removeItems(...keys: string[]): void {
+    for (const key of keys) {
+      this.storage.removeItem(this.elem, key);
+    }
+  }
+
+  async waitAndGet<T>(path?: string, options?: RequestOptions): Promise<T> {
+    await this.waiter.maybeWait();
+
+    return await this.gateway.get<T>(path, options)
+      .toPromise();
+  }
+
+  async waitAndPost<T>(
+    path?: string, body?: string | Object, options?: RequestOptions)
+    : Promise<T> {
+    await this.waiter.maybeWait();
+
+    return await this.gateway.post<T>(path, body, options)
+      .toPromise();
   }
 }

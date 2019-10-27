@@ -3,10 +3,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 
-import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
-  StorageService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 import { filter, take } from 'rxjs/operators';
@@ -21,8 +18,8 @@ import { User } from '../shared/authentication.model';
   templateUrl: './authenticate.component.html',
   styleUrls: ['./authenticate.component.css']
 })
-export class AuthenticateComponent implements OnExec, OnEval, OnInit,
-  OnChanges {
+export class AuthenticateComponent
+  implements OnExec, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
   // Watcher of changes to fields specified in `waitOn`
@@ -35,23 +32,21 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
   @Input() user: User | undefined;
   isAuthenticated = false;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath,
-    private ss: StorageService) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
@@ -64,22 +59,15 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
   }
 
   async doAuthenticate() {
-    if (!this.gs || (
+    if (!this.dvs || (
       _.isEmpty(this.id) && _.isEmpty(this.username) && _.isEmpty(this.user) &&
       _.isEmpty(this.waitOn))) {
       // this is essentialy failing the tx if there is one
-      return this.gs.noRequest();
+      return this.dvs.gateway.noRequest();
     }
-    if (!_.isEmpty(this.waitOn)) {
-      await Promise.all(_.chain(this.waitOn)
-        .filter((field) => _.isNil(this[field]))
-        .map((fieldToWaitFor) => this.fieldChange
-          .pipe(filter((field) => field === fieldToWaitFor), take(1))
-          .toPromise())
-        .value());
-    }
-    const token = this.ss.getItem(this.elem, 'token');
-    const res = await this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
+    const token = this.dvs.getItem('token');
+    const res = await this.dvs.waitAndGet<{ data: { verify: boolean } }>(
+      this.apiPath, {
         params: {
           inputs: {
             input: {
@@ -89,8 +77,7 @@ export class AuthenticateComponent implements OnExec, OnEval, OnInit,
             }
           }
         }
-      })
-      .toPromise();
+      });
     this.isAuthenticated = res.data.verify;
   }
 }
