@@ -2,8 +2,8 @@
   <dv.if condition=!$request.claimed >
     <dv.tx>
       <authentication.authenticate id=$requesterId hidden=true />
-      <dv.link hidden=true />
       <request.delete-object id=$request.id buttonLabel="Cancel" />
+      <dv.link hidden=true />
     </dv.tx>
   </dv.if>
   <dv.if condition=$request.claimed >
