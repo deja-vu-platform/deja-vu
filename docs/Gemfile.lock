@@ -246,6 +246,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-sitemap
   jekyll-theme-tactile
   tzinfo (~> 1.2)
   tzinfo-data

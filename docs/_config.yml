@@ -2,7 +2,7 @@ title: Déjà Vu
 description: assemble web apps from concepts using HTML
 # email: your-email@example.com
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://deja-vu-platform.com" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 # github_username:  jekyll
 show_downloads: false
@@ -10,3 +10,6 @@ show_downloads: false
 # Build settings
 markdown: kramdown
 theme: jekyll-theme-tactile
+
+plugins:
+  - jekyll-sitemap
