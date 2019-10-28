@@ -11,5 +11,8 @@ show_downloads: false
 markdown: kramdown
 theme: jekyll-theme-tactile
 
+google_site_verification: "f5oum4ohVAl9wkC0jU3W0anZgXtugloaY-QyCp1RRSg"
+
 plugins:
   - jekyll-sitemap
+  - jekyll-seo-tag

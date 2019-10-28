@@ -19,3 +19,4 @@ gem "wdm", "~> 0.1.0", :install_if => Gem.win_platform?
 
 # Silently generate a sitemaps.org compliant sitemap
 gem 'jekyll-sitemap'
+gem 'jekyll-seo-tag'
