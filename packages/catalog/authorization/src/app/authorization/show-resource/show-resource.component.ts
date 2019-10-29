@@ -3,10 +3,7 @@ import {
   OnInit, Output
 } from '@angular/core';
 
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';
@@ -28,18 +25,16 @@ export class ShowResourceComponent
   @Input() id: string | undefined;
   @Output() fetchedResource = new EventEmitter<Resource>();
 
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dsf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dsf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -52,14 +47,13 @@ export class ShowResourceComponent
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs.get<ResourceRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<ResourceRes>(this.apiPath, {
         params: {
           inputs: { id: this.id },
           extraInfo: {
@@ -70,17 +64,15 @@ export class ShowResourceComponent
             `
           }
         }
-      })
-      .subscribe((res) => {
-        this.resource = res.data.resource;
-        this.fetchedResource.emit(this.resource);
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.resource = res.data.resource;
+      this.fetchedResource.emit(this.resource);
+    } else if (this.dvs) {
+      this.dvs.gateway.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && !this.resource && this.id);
+    return !!(this.dvs && !this.resource && this.id);
   }
 }

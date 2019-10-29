@@ -139,4 +139,20 @@ export class DvService {
     return await this.gateway.post<T>(path, body, options)
       .toPromise();
   }
+
+  async get<T>(path?: string, options?: RequestOptions): Promise<T> {
+    return await this.gateway.get<T>(path, options)
+      .toPromise();
+  }
+
+  async post<T>(
+    path?: string, body?: string | Object, options?: RequestOptions)
+    : Promise<T> {
+    return await this.gateway.post<T>(path, body, options)
+      .toPromise();
+  }
+
+  noRequest(): void {
+    this.gateway.noRequest();
+  }
 }

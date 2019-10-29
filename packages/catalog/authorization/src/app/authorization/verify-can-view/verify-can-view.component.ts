@@ -2,19 +2,11 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnDestroy, OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
-
 import { API_PATH } from '../authorization.config';
-
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 import { CanDoRes } from '../shared/authorization.model';
 
@@ -32,23 +24,21 @@ export class VerifyCanViewComponent implements
   @Output() canView = new EventEmitter<boolean>();
   _canView = false;
 
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private router: Router,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes) {
-    if (this.ws) {
-      this.ws.processChanges(changes);
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
@@ -61,12 +51,11 @@ export class VerifyCanViewComponent implements
   }
 
   async doAuthorize() {
-    if (!this.gs) {
+    if (!this.dvs) {
       // this is essentialy failing the tx if there is one
-      return this.gs.noRequest();
+      return this.dvs.noRequest();
     }
-    await this.ws.maybeWait();
-    this.gs.get<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, {
       params: {
         inputs: {
           input: {
@@ -75,10 +64,8 @@ export class VerifyCanViewComponent implements
           }
         }
       }
-    })
-    .subscribe((res) => {
-      this._canView = res.data.canDo;
-      this.canView.emit(this._canView);
     });
+    this._canView = res.data.canDo;
+    this.canView.emit(this._canView);
   }
 }
