@@ -3,7 +3,7 @@ import {
   OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { Observable } from 'rxjs/Observable';
@@ -51,21 +51,19 @@ export class ShowChatComponent
   showChat;
   private shouldUpdate = false;
   private idOfLoadedChat;
-  private gs: GatewayService;
+  private dvs: DvService;
   private sub: Subscription;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath,
     @Inject(SUBSCRIPTIONS_PATH) private subscriptionsPath) {
     this.showChat = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     // Note: there's no need for this component to subscribe to router updates
     // to refresh because it already reloads every time data changes on the
     // server.
@@ -84,7 +82,7 @@ export class ShowChatComponent
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -94,7 +92,7 @@ export class ShowChatComponent
       if (this.sub) {
         this.sub.unsubscribe();
       }
-      this.gs.get<ShowChatRes>(this.apiPath, {
+      const res = await this.dvs.get<ShowChatRes>(this.apiPath, {
         params: {
           inputs: {
             input: {
@@ -111,34 +109,32 @@ export class ShowChatComponent
             `
           }
         }
-      })
-      .subscribe((res: ShowChatRes) => {
-        if (res.data) {
-          const chat: Message[] = res.data.chatMessages.map(toMessage);
-          this.chat = chat;
-          this.loadedChat.emit(chat);
-          this.idOfLoadedChat = this.id;
-
-          this.sub = this.gs.subscribe<any>(this.subscriptionsPath, {
-            inputs: { chatId: this.id }
-          })
-          .subscribe((res) => {
-            if (res.errors) {
-              throw new Error(_.map(res.errors, 'message')
-                .join());
-            }
-            this.shouldUpdate = true;
-            this.load();
-          });
-        }
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      if (res.data) {
+        const chat: Message[] = res.data.chatMessages.map(toMessage);
+        this.chat = chat;
+        this.loadedChat.emit(chat);
+        this.idOfLoadedChat = this.id;
+
+        this.sub = this.dvs.subscribe<any>(this.subscriptionsPath, {
+          inputs: { chatId: this.id }
+        })
+        .subscribe((subRes) => {
+          if (subRes.errors) {
+            throw new Error(_.map(subRes.errors, 'message')
+              .join());
+          }
+          this.shouldUpdate = true;
+          this.load();
+        });
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!((!this.chat || this.shouldUpdate) && this.id && this.gs);
+    return !!((!this.chat || this.shouldUpdate) && this.id && this.dvs);
   }
 
   ngOnDestroy() {

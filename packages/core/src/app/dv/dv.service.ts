@@ -1,5 +1,7 @@
 import { ElementRef, Injectable } from '@angular/core';
 
+import { Observable } from 'rxjs/Observable';
+
 import { ConfigService, ConfigServiceFactory } from './config.service';
 import {
   GatewayService, GatewayServiceFactory, RequestOptions
@@ -166,5 +168,9 @@ export class DvService {
 
   noRequest(): void {
     this.gateway.noRequest();
+  }
+
+  subscribe<T>(path?: string, request: Object = {}): Observable<T> {
+    return this.gateway.subscribe(path, request);
   }
 }

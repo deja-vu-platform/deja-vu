@@ -2,9 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
@@ -20,8 +18,8 @@ interface MessageRes {
   selector: 'chat-show-message',
   templateUrl: './show-message.component.html'
 })
-export class ShowMessageComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowMessageComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   // Provide one of the following: id or message
   @Input() id: string | undefined;
   @Input() message: Message | undefined;
@@ -33,17 +31,15 @@ OnInit {
   @Input() showAuthorId = true;
   @Input() showChatId = true;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -56,13 +52,13 @@ OnInit {
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<MessageRes>(this.apiPath, {
+      const res = await this.dvs.get<MessageRes>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -77,20 +73,18 @@ OnInit {
             `
           }
         }
-      })
-      .subscribe((res: MessageRes) => {
-        if (res.data) {
-          const message: Message = toMessage(res.data.message);
-          this.message = message;
-          this.loadedMessage.emit(message);
-        }
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      if (res.data) {
+        const message: Message = toMessage(res.data.message);
+        this.message = message;
+        this.loadedMessage.emit(message);
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.message && this.id && this.gs);
+    return !!(!this.message && this.id && this.dvs);
   }
 }
