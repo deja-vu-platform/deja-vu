@@ -67,7 +67,7 @@ export class AddRemoveViewerComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const res = await this.dvs.waitAndGet<CanViewRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<CanViewRes>(this.apiPath, () => ({
         params: {
           inputs: {
             input: {
@@ -77,7 +77,7 @@ export class AddRemoveViewerComponent
           },
           extraInfo: { action: 'view' }
         }
-      });
+      }));
       this.canViewResource = res.data.canView;
     }
 
@@ -95,7 +95,7 @@ export class AddRemoveViewerComponent
     if (!this.dvs) {
       return;
     }
-    await this.dvs.waitAndPost<{ data: any }>(this.apiPath, {
+    await this.dvs.waitAndPost<{ data: any }>(this.apiPath, () => ({
       inputs: {
         input: {
           id: this.resourceId,
@@ -103,7 +103,7 @@ export class AddRemoveViewerComponent
         }
       },
       extraInfo: { action: this.getActionToTake() }
-    });
+    }));
   }
 
   dvOnExecSuccess() {

@@ -71,17 +71,18 @@ export class FollowUnfollowComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const res = await this.dvs.waitAndGet<IsFollowingRes>(this.apiPath, {
-        params: {
-          inputs: JSON.stringify({
-            input: {
-              followerId: this.followerId,
-              publisherId: this.publisherId
-            }
-          }),
-          extraInfo: { action: 'is-follower' }
-        }
-      });
+      const res = await this.dvs.waitAndGet<IsFollowingRes>(
+        this.apiPath, () => ({
+          params: {
+            inputs: JSON.stringify({
+              input: {
+                followerId: this.followerId,
+                publisherId: this.publisherId
+              }
+            }),
+            extraInfo: { action: 'is-follower' }
+          }
+        }));
       this.followsPublisher = res.data.isFollowing;
     }
   }

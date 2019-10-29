@@ -64,7 +64,7 @@ export class ShowUserComponent
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       const res = await this.dvs.waitAndGet<{ data: any }>(
-        this.apiPath, {
+        this.apiPath, () => ({
           params: {
             inputs: { id: this.id },
             extraInfo: {
@@ -74,7 +74,7 @@ export class ShowUserComponent
               `
             }
           }
-        });
+        }));
      const userById = res.data.userById;
      if (userById) {
       this.user = res.data.userById;

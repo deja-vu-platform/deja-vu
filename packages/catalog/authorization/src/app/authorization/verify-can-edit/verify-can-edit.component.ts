@@ -59,7 +59,7 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
       // this is essentialy failing the tx if there is one
       return this.dvs.noRequest();
     }
-    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: JSON.stringify({
           input: {
@@ -68,7 +68,7 @@ export class VerifyCanEditComponent implements OnExec, OnEval, OnInit,
           }
         })
       }
-    });
+    }));
     this.canEdit = res.data.canDo;
   }
 }

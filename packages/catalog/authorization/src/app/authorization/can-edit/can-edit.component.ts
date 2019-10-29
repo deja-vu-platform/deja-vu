@@ -64,7 +64,7 @@ export class CanEditComponent implements
     if (!this.dvs) {
       return;
     }
-    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: JSON.stringify({
           input: {
@@ -73,7 +73,7 @@ export class CanEditComponent implements
           }
         })
       }
-    });
+    }));
     this._canEdit = res.data.canDo;
     this.canEdit.emit(this._canEdit);
   }

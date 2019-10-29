@@ -87,7 +87,7 @@ export class ShowCommentsComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const res = await this.dvs.waitAndGet<CommentsRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<CommentsRes>(this.apiPath, () => ({
         params: {
           inputs: JSON.stringify({
             input: {
@@ -105,7 +105,7 @@ export class ShowCommentsComponent
             `
           }
         }
-      });
+      }));
       this.comments = res.data.comments;
       this.loadedComments.emit(this.comments);
       this.loaded = true;

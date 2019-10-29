@@ -22,10 +22,6 @@ export class AuthenticateComponent
   implements OnExec, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
 
   @Input() id: string | undefined;
   @Input() username: string | undefined;
@@ -67,7 +63,7 @@ export class AuthenticateComponent
     }
     const token = this.dvs.getItem('token');
     const res = await this.dvs.waitAndGet<{ data: { verify: boolean } }>(
-      this.apiPath, {
+      this.apiPath, () => ({
         params: {
           inputs: {
             input: {
@@ -77,7 +73,7 @@ export class AuthenticateComponent
             }
           }
         }
-      });
+      }));
     this.isAuthenticated = res.data.verify;
   }
 }

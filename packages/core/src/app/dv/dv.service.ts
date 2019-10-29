@@ -84,13 +84,13 @@ export class DvServiceBuilder {
 export class DvService {
   constructor(
     public readonly gateway: GatewayService,
-    public readonly waiter: WaiterService,
+    public readonly waiter: WaiterService | undefined,
     public readonly config: ConfigService,
     public readonly sub: SubscriptionService,
     private readonly elem: ElementRef,
     private readonly run: RunService,
     private readonly storage: StorageService,
-    private readonly destroyFn: () => void) {}
+    private readonly destroyFn: (() => void) | undefined) {}
 
   onDestroy() {
     if (this.destroyFn) {
@@ -124,19 +124,28 @@ export class DvService {
     }
   }
 
-  async waitAndGet<T>(path?: string, options?: RequestOptions): Promise<T> {
+  async waitAndGet<T>(path?: string, optionsFn?: () => RequestOptions)
+      : Promise<T> {
+    if (this.waiter === undefined) {
+      throw new Error(`You called waitAndGet but there's no waiter.` +
+        `You must add withDefaultWaiter to the dv service`);
+    }
     await this.waiter.maybeWait();
 
-    return await this.gateway.get<T>(path, options)
+    return await this.gateway.get<T>(path, optionsFn())
       .toPromise();
   }
 
   async waitAndPost<T>(
-    path?: string, body?: string | Object, options?: RequestOptions)
-    : Promise<T> {
+    path?: string, bodyFn?: () => string | Object,
+    optionsFn?: () => RequestOptions): Promise<T> {
+    if (this.waiter === undefined) {
+      throw new Error(`You called waitAndPost but there's no waiter.` +
+        `You must add withDefaultWaiter to the dv service`);
+    }
     await this.waiter.maybeWait();
 
-    return await this.gateway.post<T>(path, body, options)
+    return await this.gateway.post<T>(path, bodyFn(), optionsFn())
       .toPromise();
   }
 

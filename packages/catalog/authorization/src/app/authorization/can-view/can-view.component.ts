@@ -65,7 +65,7 @@ export class CanViewComponent
     if (!this.canEval()) {
       return;
     }
-    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: {
           input: {
@@ -74,7 +74,7 @@ export class CanViewComponent
           }
         }
       }
-    });
+    }));
     this._canView = res.data.canDo;
     this.canView.emit(this._canView);
   }

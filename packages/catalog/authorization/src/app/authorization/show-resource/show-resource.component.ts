@@ -53,7 +53,7 @@ export class ShowResourceComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const res = await this.dvs.waitAndGet<ResourceRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<ResourceRes>(this.apiPath, () => ({
         params: {
           inputs: { id: this.id },
           extraInfo: {
@@ -64,7 +64,7 @@ export class ShowResourceComponent
             `
           }
         }
-      });
+      }));
       this.resource = res.data.resource;
       this.fetchedResource.emit(this.resource);
     } else if (this.dvs) {

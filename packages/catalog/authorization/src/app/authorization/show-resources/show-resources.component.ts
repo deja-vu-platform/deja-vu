@@ -73,7 +73,7 @@ export class ShowResourcesComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      const res = await this.dvs.waitAndGet<ResourcesRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<ResourcesRes>(this.apiPath, () => ({
         params: {
           inputs: JSON.stringify({
             input: {
@@ -83,7 +83,7 @@ export class ShowResourcesComponent
           }),
           extraInfo: { returnFields: 'id' }
         }
-      });
+      }));
       this._resourceIds = _.map(res.data.resources, 'id');
       this.resourceIds.emit(this._resourceIds);
     } else if (this.dvs) {

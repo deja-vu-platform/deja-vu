@@ -55,7 +55,7 @@ export class VerifyCanViewComponent implements
       // this is essentialy failing the tx if there is one
       return this.dvs.noRequest();
     }
-    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: {
           input: {
@@ -64,7 +64,7 @@ export class VerifyCanViewComponent implements
           }
         }
       }
-    });
+    }));
     this._canView = res.data.canDo;
     this.canView.emit(this._canView);
   }
