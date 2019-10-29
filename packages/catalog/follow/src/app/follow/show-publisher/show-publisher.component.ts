@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Publisher } from '../shared/follow.model';
 
 @Component({
@@ -6,12 +6,6 @@ import { Publisher } from '../shared/follow.model';
   templateUrl: './show-publisher.component.html',
   styleUrls: ['./show-publisher.component.css']
 })
-export class ShowPublisherComponent implements OnInit {
+export class ShowPublisherComponent {
   @Input() publisher: Publisher;
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
 }
