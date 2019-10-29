@@ -131,8 +131,9 @@ export class DvService {
         `You must add withDefaultWaiter to the dv service`);
     }
     await this.waiter.maybeWait();
+    const options = optionsFn ? optionsFn() : undefined;
 
-    return await this.gateway.get<T>(path, optionsFn())
+    return await this.gateway.get<T>(path, options)
       .toPromise();
   }
 
@@ -144,8 +145,10 @@ export class DvService {
         `You must add withDefaultWaiter to the dv service`);
     }
     await this.waiter.maybeWait();
+    const body = bodyFn ? bodyFn() : undefined;
+    const options = optionsFn ? optionsFn() : undefined;
 
-    return await this.gateway.post<T>(path, bodyFn(), optionsFn())
+    return await this.gateway.post<T>(path, body, options)
       .toPromise();
   }
 
