@@ -31,7 +31,7 @@ import { startWith } from 'rxjs/operators';
   ]
 })
 export class InputMemberComponent
-implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
+  implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
   memberIdControl = new FormControl('', [Validators.required]);
   @Output() memberId = new EventEmitter<string>();
 

@@ -8,10 +8,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-
-import {
-  ComponentValue, GatewayService, GatewayServiceFactory, RunService
-} from '@deja-vu/core';
+import { ComponentValue, DvService, DvServiceFactory } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -38,7 +35,7 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
   entryComponents: [ InputMemberComponent, ShowMemberComponent ]
 })
 export class StageComponent
-implements OnInit, ControlValueAccessor, Validator {
+  implements OnInit, ControlValueAccessor, Validator {
   @Input() initialStageIds: string[] = [];
   @Output() stagedIds = new EventEmitter<string[]>();
 
@@ -56,18 +53,18 @@ implements OnInit, ControlValueAccessor, Validator {
   // Presentation inputs
   @Input() buttonLabel = 'Add member';
 
-  private gs: GatewayService;
+  private dvs: DvService;
   staged: string[] = [];
 
   stageComponent = this;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     this.staged = this.initialStageIds;
   }
 
