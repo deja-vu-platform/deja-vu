@@ -20,11 +20,11 @@
           <!-- Delete Comment -->
           <dv.if condition=$comment?.authorId === $loggedInUserId>
             <dv.tx>
-              <dv.status savedText="Comment deleted" />
               <p id="delete-comment-button">
                 <comment.delete-comment id=$comment?.id authorId=$loggedInUserId />
                 <authentication.authenticate id=$loggedInUserId hidden=true />
               </p>
+              <dv.link hidden=true />
             </dv.tx>
           </dv.if>
         </div>
