@@ -3,7 +3,7 @@ import {
   OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -21,8 +21,8 @@ interface NextAvailabilityRes {
   templateUrl: './show-next-availability.component.html',
   styleUrls: ['./show-next-availability.component.css']
 })
-export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowNextAvailabilityComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   @Input() scheduleIds: string[];
   @Output() loadedNextAvailability = new EventEmitter();
 
@@ -40,16 +40,17 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
   nextAvailability: Slot;
 
   showNextAvailability;
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+  constructor(
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showNextAvailability = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -62,13 +63,13 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<NextAvailabilityRes>(this.apiPath, {
+      const res = await this.dvs.get<NextAvailabilityRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -83,18 +84,15 @@ export class ShowNextAvailabilityComponent implements AfterViewInit, OnChanges,
             `
           }
         }
-      })
-        .pipe(map((res: NextAvailabilityRes) => res.data.nextAvailability))
-        .subscribe((nextAvailability) => {
-          this.nextAvailability = nextAvailability;
-          this.loadedNextAvailability.emit(nextAvailability);
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.nextAvailability = res.data.nextAvailability;
+      this.loadedNextAvailability.emit(this.nextAvailability);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.nextAvailability && this.scheduleIds && this.gs);
+    return !!(!this.nextAvailability && this.scheduleIds && this.dvs);
   }
 }

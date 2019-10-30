@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -37,8 +37,8 @@ interface AllAvailabilityRes {
   templateUrl: './show-all-availability.component.html',
   styleUrls: ['./show-all-availability.component.css']
 })
-export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowAllAvailabilityComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   @Input() scheduleIds: string[];
   @Input() showDateTimePicker = true;
 
@@ -120,17 +120,17 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
 
   showAllAvailability;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {
+  constructor(
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) {
     this.showAllAvailability = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -143,12 +143,12 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   filterSlots() {
-    this.rs.eval(this.elem);
+    this.dvs.eval();
   }
 
   async dvOnEval(): Promise<void> {
@@ -158,7 +158,7 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
       const endDate = this.endDateControl.value ?
         this.endDateControl.value.format('YYYY-MM-DD') : '';
 
-      this.gs.get<AllAvailabilityRes>(this.apiPath, {
+      const res = await this.dvs.get<AllAvailabilityRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -173,22 +173,19 @@ export class ShowAllAvailabilityComponent implements AfterViewInit, OnChanges,
           }),
           extraInfo: { returnFields: 'id, startDate, endDate' }
         }
-      })
-        .pipe(map((res: AllAvailabilityRes) => res.data.allAvailability))
-        .subscribe((allAvailability) => {
-          this.allAvailability = allAvailability;
-          this.schedule = {
-            id: 'all-availability',
-            availability: this.allAvailability
-          };
-          this.loadedAllAvailability.emit(allAvailability);
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.allAvailability = res.data.allAvailability;
+      this.schedule = {
+        id: 'all-availability',
+        availability: this.allAvailability
+      };
+      this.loadedAllAvailability.emit(this.allAvailability);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.allAvailability && this.scheduleIds && this.gs);
+    return !!(!this.allAvailability && this.scheduleIds && this.dvs);
   }
 }

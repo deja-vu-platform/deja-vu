@@ -21,12 +21,10 @@ import {
 } from '../shared/schedule.utils';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
 
 import { API_PATH } from '../schedule.config';
 import { Schedule } from '../shared/schedule.model';
@@ -60,14 +58,11 @@ interface UpdateScheduleRes {
     }
   ]
 })
-export class UpdateScheduleComponent implements AfterViewInit,
-  OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
+export class UpdateScheduleComponent
+  implements AfterViewInit, OnInit, OnExec, OnExecFailure, OnExecSuccess,
+    OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   @Input() id: string;
   @Input() showOptionToSubmit = true;
   @Input() showOptionToChangeView = true;
@@ -99,15 +94,16 @@ export class UpdateScheduleComponent implements AfterViewInit,
   newEvents: CalendarEvent[] = [];
   deletedEventIds: string[] = [];
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -115,46 +111,20 @@ export class UpdateScheduleComponent implements AfterViewInit,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs.get<ScheduleRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<ScheduleRes>(this.apiPath, () => ({
         params: {
           inputs: { id: this.id },
           extraInfo: {
@@ -162,14 +132,11 @@ export class UpdateScheduleComponent implements AfterViewInit,
             returnFields: 'id, availability { id, startDate, endDate }'
           }
         }
-      })
-        .subscribe((res) => {
-          if (!_.isNil(res.data.schedule)) {
-            this.schedule = res.data.schedule;
-            this.events = slotsToCalendarEvents(
-              this.schedule.availability, true);
-          }
-        });
+      }));
+      if (!_.isNil(res.data.schedule)) {
+        this.schedule = res.data.schedule;
+        this.events = slotsToCalendarEvents(this.schedule.availability, true);
+      }
     }
   }
 
@@ -226,11 +193,11 @@ export class UpdateScheduleComponent implements AfterViewInit,
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<boolean> {
-    const res = await this.gs.post<UpdateScheduleRes>(this.apiPath, {
+    const res = await this.dvs.post<UpdateScheduleRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -241,8 +208,7 @@ export class UpdateScheduleComponent implements AfterViewInit,
       extraInfo: {
         action: 'update'
       }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -265,6 +231,6 @@ export class UpdateScheduleComponent implements AfterViewInit,
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.id);
+    return !!(this.dvs && this.id);
   }
 }
