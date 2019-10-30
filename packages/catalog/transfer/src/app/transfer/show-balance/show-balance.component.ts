@@ -1,32 +1,16 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef, EventEmitter,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit, Output, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue,
-  ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService,
-  WaiterService, WaiterServiceFactory
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH, TransferConfig } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
-
 import * as _ from 'lodash';
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 interface BalanceRes {
@@ -56,32 +40,24 @@ export class ShowBalanceComponent
 
   balanceType: 'money' | 'items';
 
-  private ws: WaiterService;
-  private gs: GatewayService;
-  destroyed = new Subject<any>();
+  private dvs: DvService;
   refresh = false;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private router: Router, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-
-    this.balanceType = this.csf.createConfigService(this.elem)
-      .getConfig().balanceType;
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
         this.refresh = true;
         this.load();
-      });
+      })
+      .build();
+
+    this.balanceType = this.dvs.config
+      .getConfig().balanceType;
   }
 
   ngAfterViewInit() {
@@ -94,39 +70,38 @@ export class ShowBalanceComponent
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      const selection = this.balanceType === 'money' ? '' : 'id, count';
-      this.gs.get<BalanceRes>(this.apiPath, {
-        params: {
-          inputs: {
-            accountId: this.accountId
-          },
-          extraInfo: { returnFields: selection }
-        }
-      })
-      .subscribe((res) => {
-        this.balance = res.data.balance;
-        this.refresh = false;
-        this.fetchedBalance.emit(this.balance);
+      const res = await this.dvs.waitAndGet<BalanceRes>(this.apiPath, () => {
+        const selection = this.balanceType === 'money' ? '' : 'id, count';
+
+        return {
+          params: {
+            inputs: {
+              accountId: this.accountId
+            },
+            extraInfo: { returnFields: selection }
+          }
+        };
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.balance = res.data.balance;
+      this.refresh = false;
+      this.fetchedBalance.emit(this.balance);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return this.gs &&
+    return this.dvs &&
       (this.refresh || (!this.balance && !!this.accountId));
   }
 }

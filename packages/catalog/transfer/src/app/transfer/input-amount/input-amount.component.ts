@@ -6,7 +6,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { ConfigServiceFactory, OnExecSuccess, RunService } from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExecSuccess } from '@deja-vu/core';
 
 import { startWith } from 'rxjs/operators';
 
@@ -43,13 +43,14 @@ export class InputAmountComponent
   @Input() inputPlaceholder: string | undefined;
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private csf: ConfigServiceFactory) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.rs.register(this.elem, this);
+    const dvs = this.dvf.forComponent(this)
+      .build();
 
-    this.balanceType = this.csf.createConfigService(this.elem)
+    this.balanceType = dvs.config
       .getConfig().balanceType;
 
     this.amountControl.valueChanges.subscribe((value: Amount) => {
