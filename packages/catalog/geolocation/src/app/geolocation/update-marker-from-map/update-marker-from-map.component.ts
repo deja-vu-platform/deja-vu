@@ -3,8 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -17,8 +16,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   selector: 'geolocation-update-marker-from-map',
   templateUrl: './update-marker-from-map.component.html'
 })
-export class UpdateMarkerFromMapComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess {
+export class UpdateMarkerFromMapComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() mapId = DEFAULT_MAP_ID;
 
@@ -32,20 +31,19 @@ export class UpdateMarkerFromMapComponent implements
   updateMarkerSaved = false;
   updateMarkerError: string;
 
-  private gs: GatewayService;
-
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   updateMarker(marker: Marker) {
@@ -53,7 +51,7 @@ export class UpdateMarkerFromMapComponent implements
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
+    const res = await this.dvs
       .post<{ data: any, errors: { message: string }[] }>('/graphql', {
         inputs: {
           input: {
@@ -67,8 +65,7 @@ export class UpdateMarkerFromMapComponent implements
         extraInfo: {
           returnFields: ''
         }
-      })
-      .toPromise();
+      });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

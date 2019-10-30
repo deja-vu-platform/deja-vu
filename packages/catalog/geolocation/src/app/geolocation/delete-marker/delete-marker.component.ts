@@ -1,8 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -14,8 +13,8 @@ const DELETED_MSG_TIMEOUT = 3000;
   templateUrl: './delete-marker.component.html',
   styleUrls: ['./delete-marker.component.css']
 })
-export class DeleteMarkerComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess {
+export class DeleteMarkerComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string;
   @Input() markerDeletedText = 'Marker deleted';
   @Input() buttonLabel = 'Delete Marker';
@@ -23,28 +22,27 @@ export class DeleteMarkerComponent implements
   markerDeleted = false;
   markerDeletedError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   deleteMarker() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{
+    const res = await this.dvs.post<{
       data: { deleteMarker: { id: string } }, errors: { message: string }[]
     }>('/graphql', {
       inputs: { id: this.id }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

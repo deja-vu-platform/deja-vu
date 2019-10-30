@@ -11,10 +11,10 @@ import { Location } from '../shared/geolocation.model';
   styleUrls: ['./get-current-location.component.css']
 })
 export class GetCurrentLocationComponent implements OnInit, AfterViewInit {
-
   @Output() location: EventEmitter<Location> = new EventEmitter<Location>();
 
-  constructor(private elem: ElementRef, private rs: RunService) { }
+  constructor(
+    private readonly elem: ElementRef, private readonly rs: RunService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
