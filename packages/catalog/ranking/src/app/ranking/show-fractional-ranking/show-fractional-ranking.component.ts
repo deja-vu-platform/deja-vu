@@ -3,8 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { ShowTargetComponent } from '../show-target/show-target.component';
@@ -36,20 +35,18 @@ export class ShowFractionalRankingComponent
   targets: TargetRank[];
   showTargetRankings;
 
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showTargetRankings = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -57,42 +54,42 @@ export class ShowFractionalRankingComponent
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs.get<{data: {fractionalRanking: TargetRank[]}}>(this.apiPath, {
-        params: {
-          inputs: {
-            targetIds: this.targetIds
-          },
-          extraInfo: {
-            returnFields: `
-              ${this.showTargetId ? 'id' : ''}
-              ${this.showTargetRank ? 'rank' : ''}
-            `
-          }
-        }
-      })
-      .subscribe((res) => {
-        this.targets = res.data.fractionalRanking;
-      });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      const res = await this.dvs
+        .waitAndGet<{data: {fractionalRanking: TargetRank[]}}>(
+          this.apiPath,
+          () => ({
+            params: {
+              inputs: {
+                targetIds: this.targetIds
+              },
+              extraInfo: {
+                returnFields: `
+                  ${this.showTargetId ? 'id' : ''}
+                  ${this.showTargetRank ? 'rank' : ''}
+                `
+              }
+            }
+          }));
+      this.targets = res.data.fractionalRanking;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!this.gs;
+    return !!this.dvs;
   }
 }
