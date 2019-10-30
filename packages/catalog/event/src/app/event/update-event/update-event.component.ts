@@ -7,8 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -52,36 +51,34 @@ export class UpdateEventComponent
   updateEventSaved = false;
   updateEventError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
-      .post<{data: any}>('/graphql', {
-        inputs: {
-          input: {
-            id: this.id,
-            startDate: toUnixTime(
-              this.startsOnControl.value, this.startTimeControl.value),
-            endDate: toUnixTime(
-              this.endsOnControl.value, this.endTimeControl.value)
-          }
-        },
-        extraInfo: { returnFields: ''}
-      })
-      .toPromise();
+    const res = await this.dvs.post<{data: any}>('/graphql', {
+      inputs: {
+        input: {
+          id: this.id,
+          startDate: toUnixTime(
+            this.startsOnControl.value, this.startTimeControl.value),
+          endDate: toUnixTime(
+            this.endsOnControl.value, this.endTimeControl.value)
+        }
+      },
+      extraInfo: { returnFields: ''}
+    });
   }
 
   setInitialValues(value) {

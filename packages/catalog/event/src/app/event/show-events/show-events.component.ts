@@ -1,10 +1,10 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnInit, Output, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { Event, GraphQlEvent, toEvent } from '../../../../shared/data';
@@ -20,8 +20,8 @@ import * as _ from 'lodash';
   templateUrl: './show-events.component.html',
   styleUrls: ['./show-events.component.css']
 })
-export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowEventsComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // TODO
   @Input() startDateFilter: any;
   @Input() endDateFilter: any;
@@ -39,17 +39,17 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
   @Output() fetchedEvents = new EventEmitter<Event[]>();
 
   showEvents;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showEvents = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -62,13 +62,13 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
+      const res = await this.dvs
         .get<{ data: { events: GraphQlEvent[] } }>(this.apiPath, {
           params: {
             inputs: JSON.stringify({
@@ -85,17 +85,15 @@ export class ShowEventsComponent implements AfterViewInit, OnEval, OnInit,
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this.events = _.map(res.data.events, (event) => toEvent(event));
-          this.fetchedEvents.emit(this.events);
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        this.events = _.map(res.data.events, (event) => toEvent(event));
+        this.fetchedEvents.emit(this.events);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Input, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecSuccess
 } from '@deja-vu/core';
 import { Event } from '../../../../shared/data';
 
@@ -18,23 +18,21 @@ export class DeleteEventComponent implements OnInit, OnExec, OnExecSuccess {
   @Input() id;
   // Optional list of events to delete itself from after exec success
   @Input() events: Event[];
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
-  dvOnExec() {
-    this.gs
-      .post('/graphql', {
-        inputs: { id: this.id }
-      })
-      .toPromise();
+  async dvOnExec() {
+    await this.dvs.post('/graphql', {
+      inputs: { id: this.id }
+    });
   }
 
   dvOnExecSuccess() {
@@ -42,6 +40,6 @@ export class DeleteEventComponent implements OnInit, OnExec, OnExecSuccess {
   }
 
   deleteEvent() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 }
