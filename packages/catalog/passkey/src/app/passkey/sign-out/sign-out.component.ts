@@ -13,8 +13,8 @@ export class SignOutComponent implements OnInit, OnExec {
   @Input() buttonLabel = 'Sign Out';
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private ss: StorageService) { }
+    private readonly elem: ElementRef, private readonly rs: RunService,
+    private readonly ss: StorageService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
