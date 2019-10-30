@@ -3,23 +3,18 @@ import {
   OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
-  GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import {
   getFilteredPropertyNames, getFilteredPropertyNamesFromConfig
 } from '../shared/property.model';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
-
 import { ShowUrlComponent } from '../show-url/show-url.component';
 
 import { API_PATH } from '../property.config';
 
 import * as _ from 'lodash';
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 /**
@@ -30,14 +25,10 @@ import { filter, take, takeUntil } from 'rxjs/operators';
   templateUrl: './show-object.component.html',
   styleUrls: ['./show-object.component.css']
 })
-export class ShowObjectComponent implements
-  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+export class ShowObjectComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   /**
    * component to use to show URL properties
    */
@@ -91,50 +82,42 @@ export class ShowObjectComponent implements
 
   @Input() includeTimestamp = false;
 
-  destroyed = new Subject<any>();
   showObject;
   refresh = false;
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
 
   private idOfLoadedObject: string | undefined;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    private router: Router, @Inject(API_PATH) private apiPath) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showObject = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
+        this.refresh = true;
+        this.load();
+      })
+      .build();
 
     this.properties = this._config ?
       getFilteredPropertyNamesFromConfig(
         this.showOnly, this.showExclude, this._config) :
       getFilteredPropertyNames(
-      this.showOnly, this.showExclude, this.cs);
+      this.showOnly, this.showExclude, this.dvs.config);
 
     const schema = this._config ?
       this._config['schema'] :
-      this.cs.getConfig()['schema'];
+      this.dvs.config.getConfig()['schema'];
     this.urlProps = new Set([ ..._
       .chain(schema.properties)
       .pickBy((p) => p.type === 'string' && p.format === 'url')
       .keys()
       .value()
     ]);
-
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.refresh = true;
-        this.load();
-      });
   }
 
   ngAfterViewInit() {
@@ -142,78 +125,52 @@ export class ShowObjectComponent implements
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   async load() {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs
-        .get<{data: {object: Object}, errors: any}>(this.apiPath, {
-          params: {
-            inputs: { id: this.id },
-            extraInfo: {
-              action: 'object',
-              returnFields: `
-                id
-                ${this.properties.join('\n')}
-                ${this.includeTimestamp ? 'timestamp' : ''}
-              `
+      const res = await this.dvs
+        .waitAndGet<{data: {object: Object}, errors: any}>(
+          this.apiPath,
+          () => ({
+            params: {
+              inputs: { id: this.id },
+              extraInfo: {
+                action: 'object',
+                returnFields: `
+                  id
+                  ${this.properties.join('\n')}
+                  ${this.includeTimestamp ? 'timestamp' : ''}
+                `
+              }
             }
-          }
-        })
-        .subscribe((res) => {
-          if (!_.isEmpty(res.errors)) {
-            this.idOfLoadedObject = undefined;
-            this.object = null;
-            this.loadedObject.emit(null);
-            this.errors.emit(res.errors);
-          } else {
-            this.idOfLoadedObject = this.id;
-            this.object = res.data.object;
-            this.loadedObject.emit(this.object);
-            this.errors.emit(null);
-          }
-          this.refresh = false;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+          }));
+      if (!_.isEmpty(res.errors)) {
+        this.idOfLoadedObject = undefined;
+        this.object = null;
+        this.loadedObject.emit(null);
+        this.errors.emit(res.errors);
+      } else {
+        this.idOfLoadedObject = this.id;
+        this.object = res.data.object;
+        this.loadedObject.emit(this.object);
+        this.errors.emit(null);
+      }
+      this.refresh = false;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
@@ -222,13 +179,12 @@ export class ShowObjectComponent implements
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
     return !!(
-      this.gs &&
+      this.dvs &&
       (!this.object || this.objectByIdIsOld() || this.refresh) &&
       this.id);
   }
