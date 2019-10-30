@@ -8,12 +8,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
-} from '@deja-vu/core';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
+import { DvService, DvServiceFactory, OnEval, OnExec } from '@deja-vu/core';
 
 import {
   ShowLabelComponent
@@ -23,7 +18,6 @@ import { API_PATH } from '../label.config';
 import { Label } from '../shared/label.model';
 
 import * as _ from 'lodash';
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 interface ItemsRes {
@@ -76,27 +70,19 @@ export class SearchItemsByLabelsComponent
   labels: Label[] = [];
   selectedLabelIds: string[] | undefined;
   searchItemsByLabels = this;
-  destroyed = new Subject<any>();
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    private router: Router, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withRefreshCallback(() => { this.load(); })
+      .build();
     if (!_.isNil(this.initialValue)) {
       this.selectedLabelIds = _.map(this.initialValue, 'id');
     }
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
   }
 
   ngAfterViewInit() {
@@ -118,11 +104,11 @@ export class SearchItemsByLabelsComponent
   }
 
   search() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    this.gs.get<ItemsRes>(this.apiPath, {
+    const res = await this.dvs.get<ItemsRes>(this.apiPath, {
       params: {
         inputs: JSON.stringify({
           input: {
@@ -131,21 +117,19 @@ export class SearchItemsByLabelsComponent
         }),
         extraInfo: { action: 'items' }
       }
-    })
-      .subscribe((res) => {
-        this.searchResultItems.emit(res.data.items);
-      });
+    });
+    this.searchResultItems.emit(res.data.items);
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<LabelsRes>(this.apiPath, {
+      const res = await this.dvs.get<LabelsRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({ input: {} }),
           extraInfo: {
@@ -153,10 +137,8 @@ export class SearchItemsByLabelsComponent
             returnFields: 'id'
           }
         }
-      })
-        .subscribe((res) => {
-          this.labels = res.data.labels;
-        });
+      });
+      this.labels = res.data.labels;
     }
   }
 
@@ -183,11 +165,10 @@ export class SearchItemsByLabelsComponent
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }
