@@ -1,9 +1,7 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService, StorageService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -19,21 +17,24 @@ interface VerifyRes {
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.css']
 })
-export class ValidateComponent implements OnExec, OnInit, OnChanges {
+export class ValidateComponent
+  implements AfterViewInit, OnExec, OnInit, OnChanges {
   @Input() code: string;
 
   isValidated = false;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private ss: StorageService,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+  }
+
+  ngAfterViewInit() {
     this.load();
   }
 
@@ -45,18 +46,18 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
     this.doRequest();
   }
 
-  dvOnExec() {
-    this.doRequest();
+  async dvOnExec() {
+    await this.doRequest();
   }
 
-  doRequest() {
-    if (!this.gs || _.isEmpty(this.code)) {
+  async doRequest() {
+    if (!this.dvs || _.isEmpty(this.code)) {
       return;
     }
 
-    const token = this.ss.getItem(this.elem, 'token');
+    const token = this.dvs.getItem('token');
 
-    this.gs.get<VerifyRes>(this.apiPath, {
+    const res = await this.dvs.get<VerifyRes>(this.apiPath, {
       params: {
         inputs: JSON.stringify({
           input: {
@@ -65,9 +66,7 @@ export class ValidateComponent implements OnExec, OnInit, OnChanges {
           }
         })
       }
-    })
-    .subscribe((res) => {
-      this.isValidated = res.data.verify;
     });
+    this.isValidated = res.data.verify;
   }
 }

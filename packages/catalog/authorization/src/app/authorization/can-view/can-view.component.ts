@@ -2,19 +2,11 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnDestroy, OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
-
 import { API_PATH } from '../authorization.config';
-
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 import { CanDoRes } from '../shared/authorization.model';
 
@@ -24,35 +16,25 @@ import { CanDoRes } from '../shared/authorization.model';
   templateUrl: './can-view.component.html',
   styleUrls: ['./can-view.component.css']
 })
-export class CanViewComponent implements
-  AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval, OnExec {
+export class CanViewComponent
+  implements AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval, OnExec {
   @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
   _canView = false;
 
-  destroyed = new Subject<any>();
-
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private router: Router,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => { this.load(); })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -60,14 +42,14 @@ export class CanViewComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -83,8 +65,7 @@ export class CanViewComponent implements
     if (!this.canEval()) {
       return;
     }
-    await this.ws.maybeWait();
-    this.gs.get<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: {
           input: {
@@ -93,19 +74,16 @@ export class CanViewComponent implements
           }
         }
       }
-    })
-    .subscribe((res) => {
-      this._canView = res.data.canDo;
-      this.canView.emit(this._canView);
-    });
+    }));
+    this._canView = res.data.canDo;
+    this.canView.emit(this._canView);
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval() {
-    return this.gs && this.principalId && this.resourceId;
+    return this.dvs && this.principalId && this.resourceId;
   }
 }

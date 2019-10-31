@@ -2,10 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -27,18 +24,16 @@ export class CanEditComponent implements
   @Output() canEdit = new EventEmitter<boolean>();
   _canEdit = false;
 
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -46,14 +41,14 @@ export class CanEditComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -66,11 +61,10 @@ export class CanEditComponent implements
   }
 
   async doRequest() {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
-    await this.ws.maybeWait();
-    this.gs.get<CanDoRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: JSON.stringify({
           input: {
@@ -79,14 +73,12 @@ export class CanEditComponent implements
           }
         })
       }
-    })
-    .subscribe((res) => {
-      this._canEdit = res.data.canDo;
-      this.canEdit.emit(this._canEdit);
-    });
+    }));
+    this._canEdit = res.data.canDo;
+    this.canEdit.emit(this._canEdit);
   }
 
   canEval() {
-    return this.gs && this.principalId && this.resourceId;
+    return this.dvs && this.principalId && this.resourceId;
   }
 }

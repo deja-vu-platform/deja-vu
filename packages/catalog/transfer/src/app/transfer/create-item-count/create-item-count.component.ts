@@ -6,7 +6,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecSuccess
 } from '@deja-vu/core';
 
 import { ItemCount } from '../shared/transfer.model';
@@ -49,12 +49,11 @@ export class CreateItemCountComponent
   });
 
   thisItemCount: ItemCount | undefined;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder) {
     this.idControl.valueChanges.subscribe((value: string) => {
       if (this.thisItemCount === undefined) {
         this.thisItemCount = { id: undefined, count: undefined };
@@ -76,12 +75,12 @@ export class CreateItemCountComponent
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   emit() {
@@ -92,7 +91,7 @@ export class CreateItemCountComponent
 
   dvOnExec() {
     this.emit();
-    this.gs.noRequest();
+    this.dvs.noRequest();
   }
 
   dvOnExecSuccess() {

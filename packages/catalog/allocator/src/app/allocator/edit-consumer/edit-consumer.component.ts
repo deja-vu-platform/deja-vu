@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
-  SimpleChanges, ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnInit, Output, SimpleChanges, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
@@ -8,18 +8,12 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService,
-  GatewayServiceFactory,
-  OnExec,
-  OnExecFailure,
-  OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
-import { Observable } from 'rxjs/Observable';
-import { map, take } from 'rxjs/operators';
-
 import { API_PATH } from '../allocator.config';
+
+import * as _ from 'lodash';
 
 
 interface ConsumerOfResourceRes {
@@ -37,8 +31,10 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './edit-consumer.component.html',
   styleUrls: ['./edit-consumer.component.css']
 })
-export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
-  OnExecSuccess, OnInit {
+export class EditConsumerComponent
+  implements AfterViewInit, OnChanges, OnExec, OnExecFailure, OnExecSuccess,
+    OnInit {
+  @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Input() buttonLabel = 'Save';
@@ -71,29 +67,39 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
   editConsumerSaved = false;
   editConsumerError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.update();
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.resourceId || changes.allocationId) {
-      this.update();
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
+      if (!_.isEmpty(_.omit(changes, 'newConsumerId'))) {
+        this.load();
+      }
     }
   }
 
-  update() {
-    if (this.gs && this.resourceId && this.allocationId) {
-      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
+  load() {
+    if (this.canEval()) {
+      this.dvs.eval();
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    const res = await this.dvs.waitAndGet<ConsumerOfResourceRes>(this.apiPath,
+      () => ({
         params: {
           inputs: JSON.stringify({
             input: {
@@ -103,18 +109,19 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
           }),
           extraInfo: { action: 'consumer' }
         }
-      })
-        .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
-        .subscribe((consumerId) => {
-          this.currentConsumerId.emit(consumerId);
-          this._currentConsumerId = consumerId;
-          this.newConsumerControl.setValue(consumerId);
-        });
-    }
+      }));
+    const consumerId =  res.data.consumerOfResource;
+    this.currentConsumerId.emit(consumerId);
+    this._currentConsumerId = consumerId;
+    this.newConsumerControl.setValue(consumerId);
+  }
+
+  private canEval(): boolean {
+    return !!(this.dvs);
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec() {
@@ -122,17 +129,17 @@ export class EditConsumerComponent implements OnChanges, OnExec, OnExecFailure,
       return;
     }
     const newConsumerId = this.newConsumerControl.value;
-    const res = await this.gs.post<EditConsumerOfResourceRes>(this.apiPath, {
-      inputs: {
-        input: {
-          resourceId: this.resourceId,
-          allocationId: this.allocationId,
-          newConsumerId: newConsumerId
-        }
-      },
-      extraInfo: { action: 'edit' }
-    })
-      .toPromise();
+    const res = await this.dvs.waitAndPost<EditConsumerOfResourceRes>(
+      this.apiPath, () => ({
+        inputs: {
+          input: {
+            resourceId: this.resourceId,
+            allocationId: this.allocationId,
+            newConsumerId: newConsumerId
+          }
+        },
+        extraInfo: { action: 'edit' }
+      }));
     if (res.data.editConsumerOfResource) {
       this._currentConsumerId = newConsumerId;
     }

@@ -1,16 +1,11 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
-import {
-  FormControl,
-  FormGroupDirective,
-  NgForm
-} from '@angular/forms';
+import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  jsonSchemaTypeToGraphQlType,
-  Schema
+  jsonSchemaTypeToGraphQlType, Schema
 } from '../../../../server/config-types';
 
 export interface Config {

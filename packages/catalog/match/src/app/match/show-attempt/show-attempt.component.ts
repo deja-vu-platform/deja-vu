@@ -2,25 +2,22 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
-import { map } from 'rxjs/operators';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../match.config';
 import { Attempt } from '../shared/match.model';
+
 
 interface AttemptRes {
   data: { attempt: Attempt };
 }
 
-
 @Component({
   selector: 'match-show-attempt',
   templateUrl: './show-attempt.component.html'
 })
-export class ShowAttemptComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowAttemptComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   // Provide one of the following: id or attempt
   @Input() id: string | undefined;
   @Input() attempt: Attempt | undefined;
@@ -30,17 +27,15 @@ OnInit {
   @Input() showSourceId = true;
   @Input() showTargetId = true;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -53,13 +48,13 @@ OnInit {
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<AttemptRes>(this.apiPath, {
+      const res = await this.dvs.get<AttemptRes>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -72,18 +67,15 @@ OnInit {
             `
           }
         }
-      })
-      .pipe(map((res: AttemptRes) => res.data.attempt))
-      .subscribe((attempt) => {
-        this.attempt = attempt;
-        this.loadedAttempt.emit(attempt);
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.attempt = res.data.attempt;
+      this.loadedAttempt.emit(this.attempt);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.attempt && this.id && this.gs);
+    return !!(!this.attempt && this.id && this.dvs);
   }
 }

@@ -5,8 +5,7 @@ import {
 import { MatChipInputEvent } from '@angular/material';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -26,8 +25,8 @@ interface SetLabelsOfItemRes {
   templateUrl: './set-labels.component.html',
   styleUrls: ['./set-labels.component.css']
 })
-export class SetLabelsComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess {
+export class SetLabelsComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() itemId: string;
   @Input() labels: Label[] | undefined;
 
@@ -50,15 +49,15 @@ export class SetLabelsComponent implements
   // Enter, comma
   separatorKeysCodes = [ENTER, COMMA];
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
 
     if (_.isEmpty(this.labels)) {
       this.labels = [];
@@ -66,7 +65,7 @@ export class SetLabelsComponent implements
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   add(event: MatChipInputEvent): void {
@@ -93,15 +92,14 @@ export class SetLabelsComponent implements
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<SetLabelsOfItemRes>(this.apiPath, {
+    const res = await this.dvs.post<SetLabelsOfItemRes>(this.apiPath, {
       inputs: {
         input: {
           itemId: this.itemId,
           labelIds: _.map(this.labels, 'id')
         }
       }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

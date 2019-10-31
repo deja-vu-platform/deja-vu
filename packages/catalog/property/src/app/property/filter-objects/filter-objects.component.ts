@@ -2,10 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output, Type
 } from '@angular/core';
-import {
-  ConfigService, ConfigServiceFactory, GatewayService,
-  GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import * as _ from 'lodash';
 
 import {
@@ -37,9 +34,8 @@ export const DEFAULT_NUMBER_OPTIONS: Options = {
   templateUrl: './filter-objects.component.html',
   styleUrls: ['./filter-objects.component.css']
 })
-export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
-
+export class FilterObjectsComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   /**
    * The configueration options of the filters
    * for numbers:
@@ -77,20 +73,17 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   propertyValues = {};
   properties;
   propertiesToShow;
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.filterObjects = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     this.initializePropertiesToInclude();
     this.initializePropertyOptions();
     this.initializePropertyValues();
@@ -105,17 +98,17 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   async load() {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
+      const res = await this.dvs
         .get<{data: {filteredObjects: Object[]}}>(this.apiPath, {
           params: {
             inputs: { filters: this.propertyValues },
@@ -123,25 +116,24 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
               action: 'objects',
               returnFields: `
                 id
-                ${ getPropertyNames(this.cs).join('\n')}
+                ${ getPropertyNames(this.dvs.config)
+                     .join('\n')}
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._loadedObjects = res.data.filteredObjects;
-          this.loadedObjects.emit(this._loadedObjects);
-          this.loadedObjectIds.emit(_.map(this._loadedObjects, 'id'));
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        this._loadedObjects = res.data.filteredObjects;
+        this.loadedObjects.emit(this._loadedObjects);
+        this.loadedObjectIds.emit(_.map(this._loadedObjects, 'id'));
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   initializePropertiesToInclude() {
-    const propertiesInfo = getProperties(this.cs);
+    const propertiesInfo = getProperties(this.dvs.config);
     this.propertiesToShow = getFilteredPropertyNames(
-      this.showOnly, this.showExclude, this.cs);
+      this.showOnly, this.showExclude, this.dvs.config);
     this.properties = _.filter(propertiesInfo,
       (property) => _.includes(
         _.union(this.propertiesToShow, Object.keys(this.initialValue)),
@@ -155,14 +147,20 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
         case 'integer': {
           this.propertyOptions[property.name] =
             this.propertyOptions[property.name] ?
-              { ...DEFAULT_INTEGER_OPTIONS, ...this.propertyOptions[property.name]} :
+              {
+                ...DEFAULT_INTEGER_OPTIONS,
+                ...this.propertyOptions[property.name]
+              } :
               DEFAULT_INTEGER_OPTIONS;
           break;
         }
         case 'number': {
           this.propertyOptions[property.name] =
             this.propertyOptions[property.name] ?
-              { ...DEFAULT_NUMBER_OPTIONS, ...this.propertyOptions[property.name]} :
+              {
+                ...DEFAULT_NUMBER_OPTIONS,
+                ...this.propertyOptions[property.name]
+              } :
               DEFAULT_NUMBER_OPTIONS;
           break;
         }
@@ -181,8 +179,8 @@ export class FilterObjectsComponent implements AfterViewInit, OnEval, OnInit,
       } else {
         switch (property.schema.type) {
           case 'boolean': {
-            this.propertyValues[property.name] = this.initialValue[property.name] ?
-              this.initialValue[property.name] : null;
+            this.propertyValues[property.name] = this.initialValue[
+              property.name] ? this.initialValue[property.name] : null;
             break;
           }
           case 'integer': {

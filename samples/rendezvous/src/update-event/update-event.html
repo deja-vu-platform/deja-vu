@@ -24,11 +24,12 @@
                 <td>
                   <p>Relevant Interests</p>
                   <div id="tags">
-                    <relevantInterests.set-labels itemId=$eventId
-                                                  labels=relevantInterests.show-labels.labels
-                                                  inputLabel=""
-                                                  clearLabelsOnSave=false
-                                                  showOptionToSubmit=true />
+                    <relevantInterests.set-labels
+                      itemId=$eventId
+                      labels=relevantInterests.show-labels.labels
+                      inputLabel=""
+                      clearLabelsOnSave=false
+                      showOptionToSubmit=true />
                   </div>
                 </td>
               </tr>
@@ -51,7 +52,7 @@
 
                 <!-- Event -->
                 <td>
-                  <p>Date & Time</p>
+                  <p>Date &amp; Time</p>
                   <event.update-event id=$eventId />
                 </td>
               </tr>
@@ -59,7 +60,6 @@
 
             <authentication.authenticate
               id=rendezvous.navbar.loggedInUser?.id hidden=true />
-
         </div>
       </div>
     </div>

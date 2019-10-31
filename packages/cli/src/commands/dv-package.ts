@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import {
   cmd,
-  componentTable,
   COMPONENT_TABLE_FILE_NAME,
+  componentTable,
   DvConfig,
   DVCONFIG_FILE_PATH, NG_PACKAGR,
   readFileOrFail,

@@ -14,8 +14,8 @@ export class LoggedInComponent implements OnInit, AfterViewInit, OnEval {
   @Output() passkey = new EventEmitter<Passkey>();
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private ss: StorageService) { }
+    private readonly elem: ElementRef, private readonly rs: RunService,
+    private readonly ss: StorageService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);

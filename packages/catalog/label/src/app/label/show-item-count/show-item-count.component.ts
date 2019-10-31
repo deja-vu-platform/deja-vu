@@ -2,10 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges,
   OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
-import { map } from 'rxjs/operators';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../label.config';
 
@@ -19,21 +16,19 @@ interface ItemCountRes {
   selector: 'label-show-item-count',
   templateUrl: './show-item-count.component.html'
 })
-export class ShowItemCountComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowItemCountComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   itemCount: number;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -46,27 +41,24 @@ export class ShowItemCountComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<ItemCountRes>(this.apiPath, {
+      const res = await this.dvs.get<ItemCountRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({ input: {} })
         }
-      })
-        .pipe(map((res: ItemCountRes) => res.data.itemCount))
-        .subscribe((itemCount) => {
-          this.itemCount = itemCount;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.itemCount = res.data.itemCount;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

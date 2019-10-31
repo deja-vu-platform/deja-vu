@@ -2,14 +2,12 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges,
   OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
-import { map } from 'rxjs/operators';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../group.config';
 
 import * as _ from 'lodash';
+
 
 interface MemberCountRes {
   data: { memberCount: number };
@@ -19,23 +17,21 @@ interface MemberCountRes {
   selector: 'group-show-member-count',
   templateUrl: './show-member-count.component.html'
 })
-export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowMemberCountComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   memberCount: number;
 
   @Input() inGroupId: string | undefined;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -48,13 +44,13 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<MemberCountRes>(this.apiPath, {
+      const res = await this.dvs.get<MemberCountRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -62,17 +58,14 @@ export class ShowMemberCountComponent implements AfterViewInit, OnChanges,
             }
           })
         }
-      })
-        .pipe(map((res: MemberCountRes) => res.data.memberCount))
-        .subscribe((memberCount) => {
-          this.memberCount = memberCount;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.memberCount = res.data.memberCount;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

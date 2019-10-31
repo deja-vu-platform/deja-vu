@@ -6,10 +6,7 @@ import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
   Validators
 } from '@angular/forms';
-import {
-  GatewayService, GatewayServiceFactory, OnExec,
-  RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -28,33 +25,31 @@ export class CreateSeriesComponent implements OnExec, OnInit {
   @Input() seriesEvents: Event[] = [];
   @Input() seriesEventsIds: string[] = [];
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
-      .post<{data: any}>('/graphql', {
-        inputs: {
-          input: {
-            id: this.id,
-            events: _.zipWith(
-              this.seriesEvents, this.seriesEventsIds, (evt, id) => {
-              evt.id = id;
+    await this.dvs.post<{data: any}>('/graphql', {
+      inputs: {
+        input: {
+          id: this.id,
+          events: _.zipWith(
+            this.seriesEvents, this.seriesEventsIds, (evt, id) => {
+            evt.id = id;
 
-              return evt;
-            })
-          }
-        },
-        extraInfo: { returnFields: 'id' }
-      })
-     .toPromise();
+            return evt;
+          })
+        }
+      },
+      extraInfo: { returnFields: 'id' }
+    });
   }
 }

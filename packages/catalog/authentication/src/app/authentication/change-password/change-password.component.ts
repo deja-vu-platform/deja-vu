@@ -8,8 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec,
-  OnExecFailure, OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 
@@ -43,7 +42,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   ]
 })
 export class ChangePasswordComponent
-implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -72,27 +71,28 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
     this.passwordControl.setValue(password);
   }
 
+  private dvs: DvService;
+
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   newPasswordSaved = false;
   newPasswordSavedError: string;
 
-  private gs: GatewayService;
-
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
+    const res = await this.dvs.gateway.post<{ data: any, errors: any }>(
+      this.apiPath, {
         inputs: {
           input: {
             id: this.id,

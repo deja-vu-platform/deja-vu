@@ -7,8 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -25,7 +24,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-event.component.css']
 })
 export class CreateEventComponent
-implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
+  implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
 
@@ -53,23 +52,23 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
   createEventSaved = false;
   createEventError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
+    const res = await this.dvs
       .post<{data: any}>('/graphql', {
         inputs: {
           input: {
@@ -81,8 +80,7 @@ implements OnExec, OnExecSuccess, OnExecFailure, OnInit {
           }
         },
         extraInfo: { returnFields: 'id' }
-      })
-     .toPromise();
+      });
   }
 
   dvOnExecSuccess() {

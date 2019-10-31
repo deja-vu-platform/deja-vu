@@ -1,11 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, Type } from '@angular/core';
-import {
-  ComponentValue, GatewayService, GatewayServiceFactory
-} from '@deja-vu/core';
+import { ComponentValue, DvService, DvServiceFactory } from '@deja-vu/core';
 import * as _ from 'lodash';
-
-import { map } from 'rxjs/operators';
 
 import {
   Event, GraphQlEvent, GraphQlSeries, Series, toEvent, toSeries
@@ -23,7 +19,6 @@ interface OneSeriesRes {
     oneSeries: { events: GraphQlEvent[] }
   };
 }
-
 
 @Component({
   selector: 'event-choose-and-show-series',
@@ -43,20 +38,21 @@ export class ChooseAndShowSeriesComponent implements OnInit {
   };
 
   chooseAndShowSeries;
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {
+  constructor(private elem: ElementRef, private dvf: DvServiceFactory) {
     this.chooseAndShowSeries = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   // TODO: should instead make this reactive with Apollo
-  maybeFetchEvents(toggle: boolean) {
+  async maybeFetchEvents(toggle: boolean) {
     if (toggle) {
-      this.gs
+      const res = await this.dvs
         .get<SeriesRes>('/graphql', {
           params: {
             extraInfo: {
@@ -68,21 +64,18 @@ export class ChooseAndShowSeriesComponent implements OnInit {
               `
             }
           }
-        })
-        .pipe(map((res: SeriesRes) => res.data.series))
-        .subscribe((series: GraphQlSeries[]) => {
-          this.series = _.map(series, toSeries);
         });
+        this.series = _.map(res.data.series, toSeries);
     }
   }
 
-  updateEvents(selectedSeries: Series) {
+  async updateEvents(selectedSeries: Series) {
     this.selectedSeries = selectedSeries;
     this.events = [];
     if (!selectedSeries) {
       return;
     }
-    this.gs
+    const res = await this.dvs
       .get<OneSeriesRes>('/graphql', {
         params: {
           inputs: { id: selectedSeries.id },
@@ -98,10 +91,7 @@ export class ChooseAndShowSeriesComponent implements OnInit {
             `
           }
         }
-      })
-      .pipe(map((res: OneSeriesRes) => res.data.oneSeries.events))
-      .subscribe((events: GraphQlEvent[]) => {
-        this.events = _.map(events, toEvent);
       });
+      this.events = _.map(res.data.oneSeries.events, toEvent);
   }
 }

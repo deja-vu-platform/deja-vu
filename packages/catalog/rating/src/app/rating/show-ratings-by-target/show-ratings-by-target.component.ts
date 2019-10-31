@@ -3,7 +3,7 @@ import {
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
@@ -21,8 +21,8 @@ interface RatingsRes {
   templateUrl: './show-ratings-by-target.component.html',
   styleUrls: ['./show-ratings-by-target.component.css']
 })
-export class ShowRatingsByTargetComponent implements AfterViewInit, OnEval,
-OnInit, OnChanges {
+export class ShowRatingsByTargetComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() targetId: string;
 
   @Input() showRating: ComponentValue = {
@@ -33,35 +33,36 @@ OnInit, OnChanges {
   ratings: Rating[] = [];
 
   showRatingsByTarget;
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+  constructor(
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showRatingsByTarget = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
-    this.loadRatings();
+    this.load();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.loadRatings();
+    this.load();
   }
 
-  async loadRatings() {
+  async load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<RatingsRes>(this.apiPath, {
+      const res = await this.dvs.get<RatingsRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -76,16 +77,14 @@ OnInit, OnChanges {
             `
           }
         }
-      })
-      .subscribe((res) => {
-        this.ratings = res.data.ratings;
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.ratings = res.data.ratings;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.targetId);
+    return !!(this.dvs && this.targetId);
   }
 }

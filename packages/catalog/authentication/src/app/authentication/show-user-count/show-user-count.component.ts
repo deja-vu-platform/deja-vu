@@ -1,10 +1,8 @@
 import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges,
-  OnInit} from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
-import { map } from 'rxjs/operators';
+  OnInit
+} from '@angular/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../authentication.config';
 
@@ -18,21 +16,19 @@ interface UserCountRes {
   selector: 'authentication-show-user-count',
   templateUrl: './show-user-count.component.html'
 })
-export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
-  OnInit {
+export class ShowUserCountComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   userCount: number;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -45,23 +41,21 @@ export class ShowUserCountComponent implements AfterViewInit, OnChanges, OnEval,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<UserCountRes>(this.apiPath)
-        .pipe(map((res: UserCountRes) => res.data.userCount))
-        .subscribe((userCount) => {
-          this.userCount = userCount;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      const res = await this.dvs.gateway.get<UserCountRes>(this.apiPath)
+        .toPromise();
+      this.userCount = res.data.userCount;
+    } else if (this.dvs) {
+      this.dvs.gateway.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

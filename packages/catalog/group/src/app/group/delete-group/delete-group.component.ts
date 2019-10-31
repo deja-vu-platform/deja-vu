@@ -1,7 +1,5 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec, RunService } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -13,27 +11,26 @@ import * as _ from 'lodash';
 export class DeleteGroupComponent implements OnInit, OnExec {
   @Input() id: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   deleteGroup() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
+    const res = await this.dvs
       .post<{ data: any, errors: { message: string }[] }>('/graphql', {
         inputs: { id: this.id }
-      })
-      .toPromise();
+      });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

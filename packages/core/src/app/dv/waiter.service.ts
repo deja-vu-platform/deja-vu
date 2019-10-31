@@ -22,6 +22,8 @@ export class WaiterService {
     if (!_.isEmpty(this.waitOn)) {
       for (const field of this.waitOn) {
         if (changes[field] && !_.isNil(changes[field].currentValue)) {
+          console.log(`Waiter service done waiting for: ${field} ` +
+            `(value ${JSON.stringify(this.fieldContainer[field])})`);
           this.fieldChange.emit(field);
         }
       }

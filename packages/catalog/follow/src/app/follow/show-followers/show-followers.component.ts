@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -22,8 +22,8 @@ interface FollowersRes {
   templateUrl: './show-followers.component.html',
   styleUrls: ['./show-followers.component.css']
 })
-export class ShowFollowersComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowFollowersComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // Fetch rules
   // If undefined, fetch all followers.
   // Else, fetch the followers of the given publisher.
@@ -39,17 +39,17 @@ OnChanges {
   followers: string[] = [];
 
   showFollowers;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showFollowers = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -62,31 +62,28 @@ OnChanges {
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
-        .get<FollowersRes>(this.apiPath, {
-          params: {
-            inputs: JSON.stringify({
-              input: {
-                ofPublisherId: this.ofPublisherId
-              }
-            })
-          }
-        })
-        .subscribe((res) => {
-          this.followers = res.data.followers;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      const res = await this.dvs.get<FollowersRes>(this.apiPath, {
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              ofPublisherId: this.ofPublisherId
+            }
+          })
+        }
+      });
+      this.followers = res.data.followers;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

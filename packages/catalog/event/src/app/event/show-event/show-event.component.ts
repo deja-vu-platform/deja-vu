@@ -1,14 +1,9 @@
 import { DatePipe } from '@angular/common';
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Output
 } from '@angular/core';
-import {
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Event, fromUnixTime } from '../../../../shared/data';
 
 
@@ -17,8 +12,8 @@ import { Event, fromUnixTime } from '../../../../shared/data';
   templateUrl: './show-event.component.html',
   providers: [ DatePipe ]
 })
-export class ShowEventComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowEventComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   @Input() waitOn: string[];
   // One is required
   @Input() event: Event | undefined;
@@ -32,17 +27,16 @@ OnInit {
 
   sameDayEvent = false;
 
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private rs: RunService) {}
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -52,44 +46,42 @@ OnInit {
   ngOnChanges(changes) {
     if (this.event && this.event.startDate && this.event.endDate) {
       this.sameDayEvent = this.isSameDayEvent(this.event);
-    } else if (this.ws && this.ws.processChanges(changes)) {
+    } else if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs.get<{
-        data: {event: { startDate: number, endDate: number }}}>('/graphql', {
-        params: {
-          inputs: { id: this.id },
-          extraInfo: {
-            returnFields: `
-              startDate
-              endDate
-            `
-          }
-        }
-      })
-      .subscribe((obj) => {
-        if (obj.data.event) {
-          this.event = {
-            startDate: fromUnixTime(obj.data.event.startDate),
-            endDate: fromUnixTime(obj.data.event.endDate)
-          };
-          this.loadedEvent.emit(this.event);
-          this.sameDayEvent = this.isSameDayEvent(this.event);
-        }
-      });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      const res = await this.dvs
+        .waitAndGet<{data: {event: { startDate: number, endDate: number }}}>(
+          '/graphql', () => ({
+            params: {
+              inputs: { id: this.id },
+              extraInfo: {
+                returnFields: `
+                  startDate
+                  endDate
+                `
+              }
+            }
+          }));
+      if (res.data.event) {
+        this.event = {
+          startDate: fromUnixTime(res.data.event.startDate),
+          endDate: fromUnixTime(res.data.event.endDate)
+        };
+        this.loadedEvent.emit(this.event);
+        this.sameDayEvent = this.isSameDayEvent(this.event);
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
@@ -102,6 +94,6 @@ OnInit {
   }
 
   private canEval(): boolean {
-    return !!(!this.event && this.id && this.gs);
+    return !!(!this.event && this.id && this.dvs);
   }
 }

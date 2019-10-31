@@ -1,15 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'task-show-assignee',
   templateUrl: './show-assignee.component.html',
   styleUrls: ['./show-assignee.component.css']
 })
-export class ShowAssigneeComponent implements OnInit {
+export class ShowAssigneeComponent {
   @Input() id: string;
-
-  constructor() { }
-
-  ngOnInit() {
-  }
 }

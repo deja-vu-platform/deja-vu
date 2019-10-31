@@ -6,8 +6,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -19,8 +18,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './add-to-group.component.html',
   styleUrls: ['./add-to-group.component.css']
 })
-export class AddToGroupComponent implements OnExec, OnExecFailure,
-  OnExecSuccess, OnInit {
+export class AddToGroupComponent
+  implements OnExec, OnExecFailure, OnExecSuccess, OnInit {
   @Input() id: string;
 
   @Input() set memberId(value: string | undefined) {
@@ -51,33 +50,31 @@ export class AddToGroupComponent implements OnExec, OnExecFailure,
     memberId: this.memberIdControl
   });
 
-
   addSaved = false;
   addError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<{ data: any }>('/graphql', {
+    const res = await this.dvs.post<{ data: any }>('/graphql', {
       inputs: {
         groupId: this.id,
         id: this.memberIdControl.value
       }
-    })
-      .toPromise();
+    });
   }
 
   dvOnExecSuccess() {

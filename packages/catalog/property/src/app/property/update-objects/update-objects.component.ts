@@ -4,13 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnExec,
-  OnExecFailure,
-  OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -29,8 +23,7 @@ import {
   selector: 'property-update-objects',
   templateUrl: './update-objects.component.html'
 })
-export class UpdateObjectsComponent
-  implements OnInit, OnExec {
+export class UpdateObjectsComponent implements OnInit, OnExec {
   /**
    * A nested list of objects that will be updated
    */
@@ -63,22 +56,20 @@ export class UpdateObjectsComponent
   @ViewChildren(UpdateObjectComponent) updateObjectComponents:
     QueryList<UpdateObjectComponent>;
 
-  private gs: GatewayService;
+  private dvs: DvService;
   config;
   showInputForms = false;
   updateObjectsList: any[] | undefined;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
 
-    const cs = this.csf.createConfigService(this.elem);
-    this.config = cs.getConfig();
+    this.config = this.dvs.config.getConfig();
     if (!this.objectsToUpdate && this.ids) {
       this.showInputForms = true;
       this.updateObjectsList = _.map(this.ids,
@@ -89,7 +80,7 @@ export class UpdateObjectsComponent
   async dvOnExec(): Promise<void> {
     if (_.isEmpty(this.objectsToUpdate)
       && (_.isEmpty(this.updateObjectsList))) {
-      this.gs.noRequest();
+      this.dvs.noRequest();
 
       return;
     }
@@ -108,15 +99,14 @@ export class UpdateObjectsComponent
       updateInputs = this.updateObjectsList;
     }
 
-    const res = await this.gs
+    const res = await this.dvs
       .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
         inputs: { input: updateInputs },
         extraInfo: {
           action: 'update',
           returnFields: ''
         }
-      })
-      .toPromise();
+      });
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
         .join());
@@ -124,7 +114,7 @@ export class UpdateObjectsComponent
   }
 
   submit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   updateIndexedObject(object, index) {

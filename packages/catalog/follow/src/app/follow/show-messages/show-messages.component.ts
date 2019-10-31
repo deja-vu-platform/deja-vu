@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -21,8 +21,8 @@ interface MessagesRes {
   templateUrl: './show-messages.component.html',
   styleUrls: ['./show-messages.component.css']
 })
-export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowMessagesComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched messages are not filtered by that property
   @Input() ofPublishersFollowedById: string | undefined;
@@ -41,17 +41,17 @@ export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
   messages: Message[] = [];
 
   showMessages;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showMessages = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -64,38 +64,35 @@ export class ShowMessagesComponent implements AfterViewInit, OnEval, OnInit,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
-        .get<MessagesRes>(this.apiPath, {
-          params: {
-            inputs: JSON.stringify({
-              input: {
-                ofPublishersFollowedById: this.ofPublishersFollowedById,
-                byPublisherId: this.byPublisherId
-              }
-            }),
-            extraInfo: {
-              returnFields: `
-                ${this.showId ? 'id' : ''}
-                ${this.showContent ? 'content' : ''}
-              `
+      const res = await this.dvs.get<MessagesRes>(this.apiPath, {
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              ofPublishersFollowedById: this.ofPublishersFollowedById,
+              byPublisherId: this.byPublisherId
             }
+          }),
+          extraInfo: {
+            returnFields: `
+              ${this.showId ? 'id' : ''}
+              ${this.showContent ? 'content' : ''}
+            `
           }
-        })
-        .subscribe((res) => {
-          this.messages = res.data.messages;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }
+      });
+      this.messages = res.data.messages;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

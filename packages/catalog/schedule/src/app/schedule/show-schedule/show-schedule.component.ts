@@ -2,13 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
   OnChanges, OnDestroy, OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import {
   CalendarDateFormatter, CalendarEvent, CalendarEventTitleFormatter
@@ -23,7 +17,6 @@ import { API_PATH } from '../schedule.config';
 import { Schedule } from '../shared/schedule.model';
 
 import * as _ from 'lodash';
-import { filter, map, takeUntil } from 'rxjs/operators';
 
 interface ShowScheduleRes {
   data: { schedule: Schedule };
@@ -45,8 +38,8 @@ interface ShowScheduleRes {
     }
   ]
 })
-export class ShowScheduleComponent implements
-  AfterViewInit, OnChanges, OnDestroy, OnEval, OnInit {
+export class ShowScheduleComponent
+  implements AfterViewInit, OnChanges, OnDestroy, OnEval, OnInit {
   @Input() waitOn: string[];
   // Provide one of the following: id or schedule
   @Input() id: string | undefined;
@@ -79,33 +72,19 @@ export class ShowScheduleComponent implements
 
   _schedule: Schedule;
   viewDate: Date = new Date();
-  refresh: Subject<any> = new Subject();
   events: CalendarEvent[] = [];
 
-  destroyed = new Subject<any>();
-
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private rs: RunService,
-    private router: Router,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => { this.load(); })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -113,52 +92,49 @@ export class ShowScheduleComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs.get<ShowScheduleRes>(this.apiPath, {
-        params: {
-          inputs: {
-            id: this.id
-          },
-          extraInfo: {
-            returnFields: `
-              ${this.showId ? 'id' : ''}
-              ${this.showAvailability ? 'availability { startDate, endDate }'
-                : ''}
-            `
+      const res = await this.dvs.waitAndGet<ShowScheduleRes>(
+        this.apiPath, () => ({
+          params: {
+            inputs: {
+              id: this.id
+            },
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showAvailability ? 'availability { startDate, endDate }'
+                  : ''}
+              `
+            }
           }
-        }
-      })
-        .pipe(map((res: ShowScheduleRes) => res.data.schedule))
-        .subscribe((schedule) => {
-          this.events = slotsToCalendarEvents(schedule.availability, false);
-          this._schedule = schedule;
+        }));
+      const schedule =  res.data.schedule;
+      this.events = slotsToCalendarEvents(schedule.availability, false);
+      this._schedule = schedule;
 
-          this.loadedSchedule.emit(schedule);
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.loadedSchedule.emit(schedule);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs && !this.scheduleWasGiven);
+    return !!(this.dvs && !this.scheduleWasGiven);
   }
 }

@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, ViewChild
+  AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -8,8 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -46,8 +46,10 @@ interface UpdateScoreRes {
     }
   ]
 })
-export class UpdateScoreComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
+export class UpdateScoreComponent
+  implements AfterViewInit, OnInit, OnExec, OnExecFailure, OnExecSuccess,
+    OnChanges {
+  @Input() waitOn: string[];
   @Input() id: string;
   @Input() value: number;
 
@@ -68,46 +70,53 @@ export class UpdateScoreComponent implements
   updateScoreSaved = false;
   updateScoreError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.loadScore();
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
-  ngOnChanges() {
-    this.loadScore();
+  ngAfterViewInit() {
+    this.load();
   }
 
-  loadScore() {
-    if (!this.gs || !this.id) {
-      return;
+  ngOnChanges(changes) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
+      this.load();
     }
+  }
 
-    this.gs.get<ScoreRes>(this.apiPath, {
-      params: {
-        inputs: {
-          input: { id: this.id }
-        },
-        extraInfo: {
-          action: 'load',
-          returnFields: 'id, value'
+  load() {
+    if (this.canEval()) {
+      this.dvs.eval();
+    }
+  }
+
+  async dvOnEval(): Promise<void> {
+    if (this.canEval()) {
+      const res = await this.dvs.waitAndGet<ScoreRes>(this.apiPath, () => ({
+        params: {
+          inputs: {
+            input: { id: this.id }
+          },
+          extraInfo: {
+            action: 'load',
+            returnFields: 'id, value'
+          }
         }
+      }));
+      const score = res.data.score;
+      if (score) {
+        this.valueControl.setValue(score.value);
       }
-    })
-      .subscribe((res) => {
-        const score = res.data.score;
-        if (score) {
-          this.valueControl.setValue(score.value);
-        }
-      });
-
+    }
   }
 
   startEditing() {
@@ -119,11 +128,11 @@ export class UpdateScoreComponent implements
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<boolean> {
-    const res = await this.gs.post<UpdateScoreRes>(this.apiPath, {
+    const res = await this.dvs.post<UpdateScoreRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -133,8 +142,7 @@ export class UpdateScoreComponent implements
       extraInfo: {
         action: 'update'
       }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -159,5 +167,9 @@ export class UpdateScoreComponent implements
 
   dvOnExecFailure(reason: Error) {
     this.updateScoreError = reason.message;
+  }
+
+  private canEval(): boolean {
+    return !!this.dvs;
   }
 }

@@ -8,8 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec,
-  OnExecFailure, OnExecSuccess, RunService, StorageService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -69,9 +68,6 @@ export class RegisterUserComponent
   newUserRegistered = false;
   newUserRegisteredError: string;
 
-  private gs: GatewayService;
-
-
   @Input() set username(username: string) {
     this.usernameControl.setValue(username);
   }
@@ -80,24 +76,25 @@ export class RegisterUserComponent
     this.passwordControl.setValue(password);
   }
 
+  private dvs: DvService;
+
   private static ErrorsToMsg(errors: { message: string }[])  {
     return _.map(errors, 'message')
       .join();
   }
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    private ss: StorageService,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   private throwErrors(errors: { message: string }[]) {
@@ -118,40 +115,45 @@ export class RegisterUserComponent
     };
     let user;
     if (this.signIn) {
-      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-        inputs: inputs,
-        extraInfo: {
-          action: 'login',
-          returnFields: `
-            user { id, username }
-            token
-          `
-        }
-      })
+      const res = await this.dvs.gateway.post<{ data: any, errors: any }>(
+        this.apiPath, {
+          inputs: inputs,
+          extraInfo: {
+            action: 'login',
+            returnFields: `
+              user { id, username }
+              token
+            `
+          }
+        })
         .toPromise();
 
-      if (res.errors) { this.throwErrors(res.errors); }
+      if (res.errors) {
+        this.throwErrors(res.errors);
+      }
 
       const token = res.data.registerAndSignIn.token;
       user = res.data.registerAndSignIn.user;
-      this.ss.setItem(this.elem, 'token', token);
-      this.ss.setItem(this.elem, 'user', user);
+      this.dvs.setItem('token', token);
+      this.dvs.setItem('user', user);
 
     } else {
-      const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
-        inputs: inputs,
-        extraInfo: {
-          action: 'register-only',
-          returnFields: `
-            id,
-            username
-          `
-        }
-      })
+      const res = await this.dvs.gateway.post<{ data: any, errors: any }>(
+        this.apiPath, {
+          inputs: inputs,
+          extraInfo: {
+            action: 'register-only',
+            returnFields: `
+              id,
+              username
+            `
+          }
+        })
         .toPromise();
 
-      if (res.errors) { this.throwErrors(res.errors); }
-
+      if (res.errors) {
+        this.throwErrors(res.errors);
+      }
       user = res.data.register;
     }
     this.user.emit(user);

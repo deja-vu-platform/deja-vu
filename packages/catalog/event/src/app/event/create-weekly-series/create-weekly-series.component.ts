@@ -7,12 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService,
-  GatewayServiceFactory,
-  OnExec,
-  OnExecFailure,
-  OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -61,15 +56,15 @@ export class CreateWeeklySeriesComponent
   createWeeklySeriesSaved = false;
   createWeeklySeriesError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     this.createWeeklySeriesForm
       .statusChanges
       .subscribe((st: 'VALID' | 'INVALID') => {
@@ -81,12 +76,12 @@ export class CreateWeeklySeriesComponent
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
-  dvOnExec(): Promise<any> {
+  async dvOnExec(): Promise<any> {
     if (this.save) {
-      return this.gs
+      await this.dvs
         .post<{ data: any }>('/graphql', {
           inputs: {
             input: {
@@ -95,10 +90,9 @@ export class CreateWeeklySeriesComponent
             }
           },
           extraInfo: { returnFields: 'id' }
-        })
-        .toPromise();
+        });
     } else {
-      this.gs.noRequest();
+      this.dvs.noRequest();
     }
   }
 

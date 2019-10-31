@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  ComponentValue, DvService, DvServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess
 } from '@deja-vu/core';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
@@ -25,13 +25,10 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-group.component.html',
   styleUrls: ['./create-group.component.css']
 })
-export class CreateGroupComponent implements OnInit, OnExecSuccess,
-  OnExecFailure, OnChanges {
+export class CreateGroupComponent
+  implements OnInit, OnExecSuccess, OnExecFailure, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
   @Input() id: string | undefined;
 
   @Input()
@@ -75,49 +72,34 @@ export class CreateGroupComponent implements OnInit, OnExecSuccess,
   newGroupSaved = false;
   newGroupError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) {
     this.membersAutocomplete.valueChanges.subscribe((value) => {
       this.stagedMemberIds.emit(value);
     });
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    if (!_.isEmpty(this.waitOn)) {
-      await Promise.all(_.chain(this.waitOn)
-        .filter((field) => {
-          if (field === 'members' || field === 'memberIds') {
-            return _.isNil(this.membersAutocomplete.value);
-          } else {
-            return _.isNil(this[field]);
-          }
-        })
-        .map((fieldToWaitFor) => this.fieldChange
-          .pipe(filter((field) => field === fieldToWaitFor), take(1))
-          .toPromise())
-        .value());
-    }
-    const res = await this.gs.post<{data: any}>('/graphql', {
+    const res = await this.dvs.waitAndPost<{ data: any }>('/graphql', () => ({
       inputs: {
         input: {
           id: this.id,
@@ -125,8 +107,7 @@ export class CreateGroupComponent implements OnInit, OnExecSuccess,
         }
       },
       extraInfo: { returnFields: 'id' }
-    })
-    .toPromise();
+    }));
   }
 
   dvOnExecSuccess() {

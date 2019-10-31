@@ -3,14 +3,9 @@ import {
   OnChanges, OnDestroy, OnInit, Output, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import * as _ from 'lodash';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
 
 import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
@@ -27,8 +22,8 @@ interface CommentsRes {
   templateUrl: './show-comments.component.html',
   styleUrls: ['./show-comments.component.css']
 })
-export class ShowCommentsComponent implements
-  AfterViewInit, OnInit, OnChanges, OnDestroy, OnEval {
+export class ShowCommentsComponent
+  implements AfterViewInit, OnInit, OnChanges, OnEval, OnDestroy {
   @Input() waitOn: string[];
   // Fetch rules
   // If undefined then the fetched comments are not filtered by that property
@@ -51,35 +46,27 @@ export class ShowCommentsComponent implements
   comments: Comment[] = [];
   @Output() loadedComments = new EventEmitter<Comment[]>();
 
-  destroyed = new Subject<any>();
-
   showComments;
-  private gs: GatewayService;
-  private ws: WaiterService;
   loaded = false;
   refresh = false;
   inputsOfLoadedComments = { byAuthorId: undefined, ofTargetId: undefined };
 
+  private dvs: DvService;
+
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory,
-    private router: Router, private rs: RunService,
-    @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showComments = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
         this.refresh = true;
         this.load();
-      });
+      })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -87,62 +74,57 @@ export class ShowCommentsComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs
-        .get<CommentsRes>(this.apiPath, {
-          params: {
-            inputs: JSON.stringify({
-              input: {
-                byAuthorId: this.byAuthorId,
-                ofTargetId: this.ofTargetId
-              }
-            }),
-            extraInfo: {
-              returnFields: `
-                ${this.showId ? 'id' : ''}
-                ${this.showAuthorId ? 'authorId' : ''}
-                ${this.showTargetId ? 'targetId' : ''}
-                ${this.showContent ? 'content' : ''}
-                ${this.includeTimestamp ? 'timestamp' : ''}
-              `
+      const res = await this.dvs.waitAndGet<CommentsRes>(this.apiPath, () => ({
+        params: {
+          inputs: JSON.stringify({
+            input: {
+              byAuthorId: this.byAuthorId,
+              ofTargetId: this.ofTargetId
             }
+          }),
+          extraInfo: {
+            returnFields: `
+              ${this.showId ? 'id' : ''}
+              ${this.showAuthorId ? 'authorId' : ''}
+              ${this.showTargetId ? 'targetId' : ''}
+              ${this.showContent ? 'content' : ''}
+              ${this.includeTimestamp ? 'timestamp' : ''}
+            `
           }
-        })
-        .subscribe((res) => {
-          this.comments = res.data.comments;
-          this.loadedComments.emit(this.comments);
-          this.loaded = true;
-          this.refresh = false;
-          this.inputsOfLoadedComments = {
-            byAuthorId: this.byAuthorId,
-            ofTargetId: this.ofTargetId
-          };
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }
+      }));
+      this.comments = res.data.comments;
+      this.loadedComments.emit(this.comments);
+      this.loaded = true;
+      this.refresh = false;
+      this.inputsOfLoadedComments = {
+        byAuthorId: this.byAuthorId,
+        ofTargetId: this.ofTargetId
+      };
+    } else if (this.dvs) {
+      this.dvs.gateway.noRequest();
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+  ngOnDestroy() {
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return this.gs && (this.refresh || this.commentsAreOld());
+    return this.dvs && (this.refresh || this.commentsAreOld());
   }
 
   private commentsAreOld(): boolean {

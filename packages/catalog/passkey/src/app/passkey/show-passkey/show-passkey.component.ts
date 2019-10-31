@@ -2,26 +2,24 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../passkey.config';
 import { Passkey } from '../shared/passkey.model';
 
+
 interface PasskeyRes {
   data: { passkey: Passkey };
 }
-
 
 @Component({
   selector: 'passkey-show-passkey',
   templateUrl: './show-passkey.component.html'
 })
-export class ShowPasskeyComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowPasskeyComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   // Provide one of the following: id, code or passkey
   @Input() id: string | undefined;
   @Input() passkey: Passkey | undefined;
@@ -32,17 +30,15 @@ OnInit {
 
   @Output() loadedPasskey = new EventEmitter();
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -55,13 +51,13 @@ OnInit {
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<PasskeyRes>(this.apiPath, {
+      const res = await this.dvs.get<PasskeyRes>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -73,18 +69,15 @@ OnInit {
             `
           }
         }
-      })
-      .pipe(map((res: PasskeyRes) => res.data.passkey))
-      .subscribe((passkey) => {
-        this.passkey = passkey;
-        this.loadedPasskey.emit(passkey);
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.passkey = res.data.passkey;
+      this.loadedPasskey.emit(this.passkey);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.passkey && this.id && this.gs);
+    return !!(!this.passkey && this.id && this.dvs);
   }
 }

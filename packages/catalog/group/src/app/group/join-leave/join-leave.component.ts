@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService
+  DvService, DvServiceFactory, OnEval, OnExec
 } from '@deja-vu/core';
 
 import { Group } from '../shared/group.model';
@@ -18,14 +18,10 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './join-leave.component.html',
   styleUrls: ['./join-leave.component.css']
 })
-export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
-  OnInit, OnChanges {
+export class JoinLeaveComponent
+  implements AfterViewInit, OnEval, OnExec, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   @Input() memberId: string;
   // One of `group` or `groupId` is required
   @Input() group: Group;
@@ -35,15 +31,16 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
 
   inGroup = false;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -51,27 +48,14 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval() && !this.group) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     } else if (this.group) {
       this.inGroup = this.groupContains(this.group, this.memberId);
     }
@@ -81,25 +65,11 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
     if (this.canEval()) {
       if (this.group) {
         this.inGroup = this.groupContains(this.group, this.memberId);
-
-        this.gs.noRequest();
+        this.dvs.noRequest();
 
         return;
       }
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs.get<{ data: any }>('/graphql', {
+      const res = await this.dvs.waitAndGet<{ data: any }>('/graphql', () => ({
         params: {
           inputs: { id: this.groupId },
           extraInfo: {
@@ -110,37 +80,33 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
             `
           }
         }
-      })
-        .subscribe((res) => {
-          this.group = res.data.group;
-          this.inGroup = this.groupContains(this.group, this.memberId);
-        });
-
-    } else if (this.gs) {
-      this.gs.noRequest();
+      }));
+      this.group = res.data.group;
+      this.inGroup = this.groupContains(this.group, this.memberId);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   joinGroup() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   leaveGroup() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
-    await this.gs.post<{ data: { groups: Group } }>('/graphql', {
+    await this.dvs.post<{ data: { groups: Group } }>('/graphql', {
       inputs: {
         groupId: this.group.id,
         id: this.memberId
       },
       extraInfo: { action: this.getActionToTake() }
-    })
-      .toPromise();
+    });
   }
 
   dvOnExecSuccess() {
@@ -158,7 +124,7 @@ export class JoinLeaveComponent implements AfterViewInit, OnEval, OnExec,
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 
   private groupContains(group: Group, memberId: string) {

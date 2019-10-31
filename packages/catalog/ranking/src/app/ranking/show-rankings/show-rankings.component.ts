@@ -1,18 +1,10 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output, Type
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { ShowRankingComponent } from '../show-ranking/show-ranking.component';
@@ -28,7 +20,7 @@ import { Ranking, TargetRank } from '../shared/ranking.model';
   styleUrls: ['./show-rankings.component.css']
 })
 export class ShowRankingsComponent
-implements AfterViewInit, OnEval, OnInit, OnChanges {
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() targetId: string | undefined;
@@ -53,17 +45,17 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
   rankings: Ranking[];
   showRankings;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showRankings = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -76,47 +68,46 @@ implements AfterViewInit, OnEval, OnInit, OnChanges {
 
   loadRanking() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{data: {rankings: Ranking[]}}>(this.apiPath, {
-        params: {
-          inputs: {
-            input: {
-              id: this.id,
-              sourceId: this.sourceId,
-              targetId: this.targetId
-            }
-          },
-          extraInfo: {
-            returnFields: `
-              ${this.showId ? 'id' : ''}
-              ${this.showSourceId ? 'sourceId' : ''}
-              ${this.showTargetId || this.showTargetRank ?
-                `targets {
-                  ${this.showTargetId ? 'id' : ''}
-                  ${this.showTargetRank ? 'rank' : ''}
-                }` : ''
+      const res = await this.dvs.get<{data: {rankings: Ranking[]}}>(
+        this.apiPath, {
+          params: {
+            inputs: {
+              input: {
+                id: this.id,
+                sourceId: this.sourceId,
+                targetId: this.targetId
               }
-            `
+            },
+            extraInfo: {
+              returnFields: `
+                ${this.showId ? 'id' : ''}
+                ${this.showSourceId ? 'sourceId' : ''}
+                ${this.showTargetId || this.showTargetRank ?
+                  `targets {
+                    ${this.showTargetId ? 'id' : ''}
+                    ${this.showTargetRank ? 'rank' : ''}
+                  }` : ''
+                }
+              `
+            }
           }
-        }
-      })
-      .subscribe((res) => {
-        if (res.data) {
-          this.rankings = res.data.rankings;
-          this.loadedRankings.emit(this.rankings);
-        }
-      });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        });
+      if (res.data) {
+        this.rankings = res.data.rankings;
+        this.loadedRankings.emit(this.rankings);
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && (this.id || this.sourceId || this.targetId));
+    return !!(this.dvs && (this.id || this.sourceId || this.targetId));
   }
 }

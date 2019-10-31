@@ -8,8 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService, StorageService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -77,20 +76,20 @@ export class CreatePasskeyComponent
   newPasskeyCreated = false;
   newPasskeyError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    private ss: StorageService, @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
@@ -102,7 +101,7 @@ export class CreatePasskeyComponent
     };
     let passkey;
     if (this.signIn) {
-      const res = await this.gs
+      const res = await this.dvs
         .post<CreateAndValidatePasskeyRes>(this.apiPath, {
           inputs: inputs,
           extraInfo: {
@@ -112,18 +111,17 @@ export class CreatePasskeyComponent
               token
             `
           }
-        })
-        .toPromise();
+        });
 
       if (res.errors) { this.throwErrors(res.errors); }
 
       const token = res.data.createAndValidatePasskey.token;
       passkey = res.data.createAndValidatePasskey.passkey;
-      this.ss.setItem(this.elem, 'token', token);
-      this.ss.setItem(this.elem, 'passkey', passkey);
+      this.dvs.setItem('token', token);
+      this.dvs.setItem('passkey', passkey);
 
     } else {
-      const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
+      const res = await this.dvs.post<CreatePasskeyRes>(this.apiPath, {
         inputs: inputs,
         extraInfo: {
           action: 'register-only',
@@ -132,8 +130,7 @@ export class CreatePasskeyComponent
             code
           `
         }
-      })
-        .toPromise();
+      });
 
       if (res.errors) { this.throwErrors(res.errors); }
 

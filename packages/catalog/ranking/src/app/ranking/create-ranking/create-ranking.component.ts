@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Type, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Type,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -7,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  ComponentValue, DvService, DvServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess
 } from '@deja-vu/core';
 
 
@@ -38,7 +39,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-ranking.component.css']
 })
 export class CreateRankingComponent
-    implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure  {
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() targetIds: string[];
@@ -62,22 +63,21 @@ export class CreateRankingComponent
   dragContainer = 'drag-container';
   createRanking;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder, @Inject(API_PATH) private apiPath) {
     this.createRanking = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
@@ -95,14 +95,13 @@ export class CreateRankingComponent
       })
     };
     if (this.save) {
-      const res = await this.gs
+      const res = await this.dvs
         .post<CreateRankingResponse>(this.apiPath, {
           inputs: {
             input: newRanking
           },
           extraInfo: { returnFields: 'id' }
-        })
-        .toPromise();
+        });
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')
@@ -110,7 +109,7 @@ export class CreateRankingComponent
       }
       newRanking.id = res.data.createRanking.id;
     } else {
-      this.gs.noRequest();
+      this.dvs.noRequest();
     }
 
     this.ranking.emit(newRanking);

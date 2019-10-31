@@ -3,9 +3,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../geolocation.config';
 import { Location, Marker } from '../shared/geolocation.model';
@@ -16,9 +14,8 @@ import { Location, Marker } from '../shared/geolocation.model';
   styleUrls: ['./show-marker.component.css'],
   providers: [DatePipe]
 })
-export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
-  OnEval {
-
+export class ShowMarkerComponent
+  implements OnInit, AfterViewInit, OnChanges, OnEval {
   @Input() id: string | undefined;
   @Input() marker: Marker | Location | undefined;
 
@@ -29,15 +26,15 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
 
   @Output() loadedMarker = new EventEmitter<Marker | Location>();
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -52,13 +49,13 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<{ data: any }>(this.apiPath, {
+      const res = await this.dvs.get<{ data: any }>(this.apiPath, {
         params: {
           inputs: { id: this.id },
           extraInfo: {
@@ -71,20 +68,18 @@ export class ShowMarkerComponent implements OnInit, AfterViewInit, OnChanges,
             `
           }
         }
-      })
-        .subscribe((res) => {
-          const markerById = res.data.marker;
-          if (markerById) {
-            this.marker = res.data.marker;
-            this.loadedMarker.emit(this.marker);
-          }
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      const markerById = res.data.marker;
+      if (markerById) {
+        this.marker = res.data.marker;
+        this.loadedMarker.emit(this.marker);
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.id && !this.marker);
+    return !!(this.dvs && this.id && !this.marker);
   }
 }

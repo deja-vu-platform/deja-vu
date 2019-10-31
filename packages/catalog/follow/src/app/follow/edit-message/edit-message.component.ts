@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
-  ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input,
+  OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
@@ -9,8 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnEval, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -47,8 +46,9 @@ interface LoadMessageRes {
     }
   ]
 })
-export class EditMessageComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess, OnChanges {
+export class EditMessageComponent
+  implements AfterViewInit, OnInit, OnEval, OnExec, OnExecFailure,
+    OnExecSuccess, OnChanges {
   @Input() id: string;
   @Input() publisherId: string;
 
@@ -69,29 +69,34 @@ export class EditMessageComponent implements
   editMessageSaved = false;
   editMessageError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.loadMessage();
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.loadMessage();
+    this.load();
   }
 
-  loadMessage() {
-    if (!this.gs || !this.id) {
+  load() {
+    if (!this.dvs || !this.id) {
       return;
     }
+    this.dvs.eval();
+  }
 
-    this.gs.get<LoadMessageRes>(this.apiPath, {
+  async dvOnEval(): Promise<void> {
+    const res = await this.dvs.get<LoadMessageRes>(this.apiPath, {
       params: {
         inputs: { id: this.id },
         extraInfo: {
@@ -99,13 +104,11 @@ export class EditMessageComponent implements
           returnFields: 'content'
         }
       }
-    })
-      .subscribe((res) => {
-        const msg = res.data.message;
-        if (msg) {
-          this.contentControl.setValue(msg.content);
-        }
-      });
+    });
+    const msg = res.data.message;
+    if (msg) {
+      this.contentControl.setValue(msg.content);
+    }
   }
 
   startEditing() {
@@ -117,11 +120,11 @@ export class EditMessageComponent implements
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<Boolean> {
-    const res = await this.gs.post<EditMessageRes>(this.apiPath, {
+    const res = await this.dvs.post<EditMessageRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -130,8 +133,7 @@ export class EditMessageComponent implements
         }
       },
       extraInfo: { action: 'edit' }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

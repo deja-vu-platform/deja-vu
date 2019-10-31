@@ -3,19 +3,12 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl,
-  FormGroup, FormGroupDirective,
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
   Validators
 } from '@angular/forms';
 
 import {
-  ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnExec,
-  OnExecFailure,
-  OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import {
@@ -104,20 +97,17 @@ export class CreateObjectComponent
   newObjectError: string;
 
   config;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-
-    const cs = this.csf.createConfigService(this.elem);
-    this.config = this._config ? this._config : cs.getConfig();
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+    this.config = this._config ? this._config : this.dvs.config.getConfig();
 
     if (this.buttonLabel === undefined) {
       const objTitle = getObjectTitleFromConfig(this.config);
@@ -144,7 +134,7 @@ export class CreateObjectComponent
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
@@ -154,21 +144,20 @@ export class CreateObjectComponent
     }
 
     if (this.save) {
-      const res = await this.gs
+      const res = await this.dvs
         .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
           inputs: { input: input },
           extraInfo: {
             action: 'create',
             returnFields: 'id'
           }
-        })
-        .toPromise();
+        });
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')
           .join());
       }
     } else {
-      this.gs.noRequest();
+      this.dvs.noRequest();
     }
     this.object.emit(input);
   }

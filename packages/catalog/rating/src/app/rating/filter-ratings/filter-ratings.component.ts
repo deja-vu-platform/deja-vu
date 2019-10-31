@@ -2,10 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
   OnInit, Output, Type
 } from '@angular/core';
-import {
-  ConfigService, ConfigServiceFactory, GatewayService,
-  GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
 import { DEFAULT_RATING_FILTER } from '../shared/rating.model';
@@ -39,19 +36,15 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit {
   @Output() loadedRatings = new EventEmitter<any>();
   _loadedRatings: Object[] = [];
 
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    @Inject(API_PATH) private apiPath) {
-  }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -59,17 +52,17 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit {
   }
 
   async load() {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
+      const res = await this.dvs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
             inputs: {
@@ -86,13 +79,11 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit {
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._loadedRatings = res.data.objects;
-          this.loadedRatings.emit(this._loadedRatings);
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        this._loadedRatings = res.data.objects;
+        this.loadedRatings.emit(this._loadedRatings);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
@@ -102,6 +93,6 @@ export class FilterRatingsComponent implements AfterViewInit, OnEval, OnInit {
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

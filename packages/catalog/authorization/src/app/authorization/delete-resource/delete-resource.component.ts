@@ -1,9 +1,7 @@
 import {
   Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -18,26 +16,24 @@ import { API_PATH } from '../authorization.config';
 export class DeleteResourceComponent implements OnInit, OnExec {
   @Input() id: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   deleteResource() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
-  dvOnExec() {
-    this.gs
-      .post(this.apiPath, {
-        inputs: { id: this.id }
-      })
-      .toPromise();
+  async dvOnExec() {
+    await this.dvs.post(this.apiPath, {
+      inputs: { id: this.id }
+    });
   }
 }

@@ -3,10 +3,7 @@ import {
   OnChanges, OnInit, QueryList, ViewChildren
 } from '@angular/core';
 
-import {
-  ConfigService, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
-  OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import {
   CreateObjectComponent
@@ -81,30 +78,26 @@ export class CreateObjectsComponent implements OnInit, OnChanges, OnExec {
   @ViewChildren(CreateObjectComponent) createObjectComponents:
     QueryList<CreateObjectComponent>;
 
-  private gs: GatewayService;
+  private dvs: DvService;
   private properties: string[];
   config;
   mergedInitialValues = [];
   showInputForms = false;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-
-    const cs = this.csf.createConfigService(this.elem);
-    this.config = cs.getConfig();
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+    this.config = this.dvs.config.getConfig();
 
     if (this.buttonLabel === undefined) {
       const objTitle = getObjectTitleFromConfig(this.config);
       this.buttonLabel = `Create ${objTitle}s`;
     }
     this.properties = getPropertyNamesFromConfig(this.config);
-
   }
 
   ngOnChanges() {
@@ -134,7 +127,7 @@ export class CreateObjectsComponent implements OnInit, OnChanges, OnExec {
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs
+    const res = await this.dvs
       .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         inputs: {
           input: _.map(this.objects, this.objectToCreateObjectInput.bind(this))
@@ -143,8 +136,7 @@ export class CreateObjectsComponent implements OnInit, OnChanges, OnExec {
           action: 'create',
           returnFields: 'id'
         }
-      })
-      .toPromise();
+      });
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
         .join());
@@ -159,7 +151,7 @@ export class CreateObjectsComponent implements OnInit, OnChanges, OnExec {
   }
 
   submit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   updateIndexedObject(object, index) {

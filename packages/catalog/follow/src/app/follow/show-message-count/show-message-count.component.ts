@@ -2,10 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges,
   OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
-import { map } from 'rxjs/operators';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../follow.config';
 
@@ -19,24 +16,22 @@ interface MessageCountRes {
   selector: 'follow-show-message-count',
   templateUrl: './show-message-count.component.html'
 })
-export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowMessageCountComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   messageCount: number;
 
   @Input() ofPublishersFollowedById: string | undefined;
   @Input() byPublisherId: string | undefined;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -49,13 +44,13 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<MessageCountRes>(this.apiPath, {
+      const res = await this.dvs.get<MessageCountRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -64,17 +59,14 @@ export class ShowMessageCountComponent implements AfterViewInit, OnChanges,
             }
           })
         }
-      })
-        .pipe(map((res: MessageCountRes) => res.data.messageCount))
-        .subscribe((messageCount) => {
-          this.messageCount = messageCount;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.messageCount = res.data.messageCount;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

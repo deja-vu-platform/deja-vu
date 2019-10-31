@@ -6,7 +6,7 @@ import {
   FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
@@ -31,8 +31,8 @@ interface SlotsRes {
   templateUrl: './show-slots.component.html',
   styleUrls: ['./show-slots.component.css']
 })
-export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
-  OnInit {
+export class ShowSlotsComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   // Provide one of the following: scheduleId or slots
   @Input() scheduleId: string | undefined;
   @Input() slots: Slot[] | undefined;
@@ -94,17 +94,17 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
 
 
   showSlots;
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {
+  constructor(
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) {
     this.showSlots = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -117,12 +117,12 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   filterSlots() {
-    this.rs.eval(this.elem);
+    this.dvs.eval();
   }
 
   async dvOnEval(): Promise<void> {
@@ -131,7 +131,7 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
         this.startDateControl.value.format('YYYY-MM-DD') : '';
       const endDate = this.endDateControl.value ?
         this.endDateControl.value.format('YYYY-MM-DD') : '';
-      this.gs.get<SlotsRes>(this.apiPath, {
+      const res = await this.dvs.get<SlotsRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -152,18 +152,15 @@ export class ShowSlotsComponent implements AfterViewInit, OnChanges, OnEval,
               `
           }
         }
-      })
-        .pipe(map((res: SlotsRes) => res.data.slots))
-        .subscribe((slots) => {
-          this.slots = slots;
-          this.loadedSlots.emit(slots);
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.slots = res.data.slots;
+      this.loadedSlots.emit(this.slots);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(!this.slots && this.scheduleId && this.gs);
+    return !!(!this.slots && this.scheduleId && this.dvs);
   }
 }

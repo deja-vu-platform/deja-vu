@@ -1,46 +1,36 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit,
-  Output
+  AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output
 } from '@angular/core';
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-
-import { RunService, StorageService } from '@deja-vu/core';
+import { DvService, DvServiceFactory } from '@deja-vu/core';
 
 
 @Component({
   selector: 'authentication-logged-in',
   templateUrl: './logged-in.component.html'
 })
-export class LoggedInComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LoggedInComponent implements AfterViewInit, OnInit, OnDestroy {
   @Output() user = new EventEmitter();
 
-  destroyed = new Subject<any>();
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private router: Router, private ss: StorageService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.rs.register(this.elem, this);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.rs.eval(this.elem);
-      });
+    this.dvs = this.dvf.forComponent(this)
+      .withRefreshCallback(() => { this.dvs.eval(); })
+      .build();
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     });
   }
 
   async dvOnEval(): Promise<void> {
-    const user = this.ss.getItem(this.elem, 'user');
+    const user = this.dvs.getItem('user');
     if (user) {
       this.user.emit(user);
     } else {
@@ -49,8 +39,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+  ngOnDestroy() {
+    this.dvs.onDestroy();
   }
 }
