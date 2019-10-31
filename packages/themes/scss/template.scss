@@ -14,8 +14,6 @@ $navbarButtonPadding: 0 10px !default;
 $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
 
-
-
 // theming doc starts
 a:root, a:root:hover, div:root, p:root, h1:root, h2:root, h3:root {
   color: $textColor;
@@ -27,7 +25,7 @@ nav {
   height: $navbarHeight;
   align-content: center;
 
-  a, div, p, h1, h2, h3 {
+  a {
     color: $navbarTextColor;
     padding: $navbarButtonPadding;
   }

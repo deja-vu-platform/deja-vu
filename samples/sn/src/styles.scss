@@ -1,21 +1,5 @@
 // overwrite values should be written here
-
-$textColor: blue;
-$navbarBackgroundColor: pink;
-
-@mixin dv-button {
-  background: #1FB8CC;
-  color: $textColor;
-  padding: 0 6px 0 6px;
-  margin: 6px 8px 6px 8px;
-  min-width: 88px;
-  border-radius: 3px;
-  font-size: 14px;
-  text-align: center;
-  text-transform: uppercase;
-  border: none;
-  outline: none;
-}
+$navbarButtonPadding: 0 7px;
 
 @import "~@deja-vu/themes/scss/orange-and-black.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
@@ -86,6 +70,20 @@ ul {
   flex: 1 1 auto;
 }
 
-.navbar-brand {
-  font-weight: bold;
+
+.main {
+  padding: 15px 40px;
+  background-color: #f6f6ef; /* hacker news bg color */
+  min-height: 100vh;
+}
+
+.navbar {
+  .navbar-brand {
+    font-weight: bold;
+    padding: 0 0;
+  }
+
+  .container {
+    padding: 0 8px;
+  }
 }

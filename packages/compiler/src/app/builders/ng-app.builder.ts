@@ -346,7 +346,7 @@ export class NgAppBuilder {
     if (diff.globalStyleChanged || _.has(diff, 'prev.globalStyle')) {
       writeFileSync(
         path.join(srcDir, 'styles.scss'),
-        this.globalStyle
+        prettier.format(this.globalStyle, { parser: 'css' })
       );
     }
 
