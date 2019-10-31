@@ -39,6 +39,7 @@ export class JoinLeaveComponent
 
   ngOnInit() {
     this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
       .build();
   }
 
