@@ -4,7 +4,7 @@ layout: default
 
 # about
 
-Déjà Vu is a **platform for building web apps**. 
+Déjà Vu is a free and open-source **platform for building web apps**. 
 It features a catalog of
 [full-stack functionality](./catalog)
 and an [HTML-like language](./tutorial) for
