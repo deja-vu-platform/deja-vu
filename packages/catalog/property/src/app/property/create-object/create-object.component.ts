@@ -3,8 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl,
-  FormGroup, FormGroupDirective,
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
   Validators
 } from '@angular/forms';
 
@@ -101,8 +100,9 @@ export class CreateObjectComponent
   private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private dvf: DvServiceFactory,
-    private builder: FormBuilder, @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
     this.dvs = this.dvf.forComponent(this)
