@@ -8,17 +8,24 @@ $errorMessageColor: #f44336 !default;
 
 $navbarBackgroundColor: $primaryColor !default;
 $navbarTextColor: #FFFFFF !default;
+$navbarTextSize: 1rem !default;
 $navbarHeight: 56px !default;
 $navbarButtonPadding: 0 10px !default;
 $navbarLinkColor: #0000EE !default;
 $navbarLinkHoverColor: #0000EE !default;
+$navbarVerticalAlign: CENTER !default;
 
 $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
 
 // theming doc starts
-a:root, a:root:hover, div:root, p:root, h1:root, h2:root, h3:root {
+a:root, a:root:hover {
   color: $linkColor;
+  font-family: $mainFont;
+}
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: $textColor;
   font-family: $mainFont;
 }
 
@@ -26,31 +33,44 @@ nav {
   background: $navbarBackgroundColor;
   height: $navbarHeight;
   align-content: center;
+  font-family: $mainFont;
 
   div, h1, h2, h3 {
     color: $navbarTextColor;
+    vertical-align: $navbarVerticalAlign;
   }
 
   a {
     color: $navbarLinkColor;
     padding: $navbarButtonPadding;
+    vertical-align: $navbarVerticalAlign;
   }
 
   a:hover {
     color: $navbarLinkHoverColor;
+    @if mixin-exists(dv-navbar-hover) {@include dv-navbar-hover};
   }
 }
 
 html,
 body{
   background: $backgroundColor;
+  font-family: $mainFont;
 }
 
 main {
   background-color: $backgroundColor;
   margin-top: $navbarHeight;
+  font-family: $mainFont;
 }
 
+h1, h2, h3 {
+  color: $primaryColor;
+}
+
+div {
+  color: $textColor;
+}
 
 // Material UI
 .mat-error {
