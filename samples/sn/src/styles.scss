@@ -26,6 +26,10 @@ $navbarButtonPadding: 0 7px;
   color: grey;
   font-size: 9pt; /* hacker news subtext font size */
   display: inline-flex;
+
+  a, a:hover {
+    color: grey;
+  }
 }
 
 .sep {
