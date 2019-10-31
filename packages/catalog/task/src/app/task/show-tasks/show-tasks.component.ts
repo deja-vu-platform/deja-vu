@@ -3,18 +3,14 @@ import {
   OnDestroy, OnInit, SimpleChanges, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 
 import { Task } from '../shared/task.model';
 
 import * as _ from 'lodash';
-import { filter, take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -22,14 +18,10 @@ import { filter, take, takeUntil } from 'rxjs/operators';
   templateUrl: './show-tasks.component.html',
   styleUrls: ['./show-tasks.component.css']
 })
-export class ShowTasksComponent implements
-  AfterViewInit, OnEval, OnInit, OnChanges, OnDestroy {
+export class ShowTasksComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges, OnDestroy {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   // Fetch rules
   // If undefined then the fetched tasks are not filtered by that property
   @Input() assigneeId: string | undefined;
@@ -62,26 +54,19 @@ export class ShowTasksComponent implements
   @Input() noTasksToShowText = 'No tasks to show';
   tasks: Task[] = [];
 
-  private destroyed = new Subject<any>();
   showTasks;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private router: Router, private rs: RunService) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory) {
     this.showTasks = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => { this.load(); })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -89,47 +74,21 @@ export class ShowTasksComponent implements
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs
-        .get<{data: {tasks: Task[]}}>('/graphql', {
+      const res = await this.dvs
+        .waitAndGet<{data: {tasks: Task[]}}>('/graphql', () => ({
           params: {
             inputs: JSON.stringify({
               input: {
@@ -151,21 +110,18 @@ export class ShowTasksComponent implements
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this.tasks = res.data.tasks;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }));
+        this.tasks = res.data.tasks;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

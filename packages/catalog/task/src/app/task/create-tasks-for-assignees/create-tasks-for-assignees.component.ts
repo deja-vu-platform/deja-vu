@@ -7,8 +7,8 @@ import {
   NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  ComponentValue, DvService, DvServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -46,8 +46,8 @@ const SAVED_MSG_TIMEOUT = 3000;
     }
   ]
 })
-export class CreateTasksForAssigneesComponent implements OnInit, OnExec,
-  OnExecFailure, OnExecSuccess {
+export class CreateTasksForAssigneesComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() set assignerId(assignerId: string) {
     this.assignerControl.setValue(assignerId);
   }
@@ -101,28 +101,27 @@ export class CreateTasksForAssigneesComponent implements OnInit, OnExec,
   newTasksSaved = false;
   newTasksError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder, @Inject(API_PATH) private apiPath) {
     this.assigneesControl.valueChanges.subscribe((value) => {
       this.stagedAssigneeIds.emit(value);
     });
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<CreateTasksForAssigneesRes>(this.apiPath, {
+    const res = await this.dvs.post<CreateTasksForAssigneesRes>(this.apiPath, {
       inputs: {
         input: {
           assignerId: this.assignerControl.value,
@@ -131,8 +130,7 @@ export class CreateTasksForAssigneesComponent implements OnInit, OnExec,
         }
       },
       extraInfo: { returnFields: 'id' }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
