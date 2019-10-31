@@ -1,20 +1,16 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
-  Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnDestroy, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, OnExecFailure,
-  RunService
+  DvService, DvServiceFactory, OnEval, OnExec, OnExecFailure
 } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { filter, take, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-
 import * as _ from 'lodash';
+
 
 interface SetRatingRes {
   data: { setRating: boolean };
@@ -26,18 +22,17 @@ interface RatingRes {
   errors: { message: string }[];
 }
 
-
 @Component({
   selector: 'rating-rate-target',
   templateUrl: './rate-target.component.html',
   styleUrls: ['./rate-target.component.css']
 })
-export class RateTargetComponent implements
-  AfterViewInit, OnDestroy, OnInit, OnChanges, OnEval, OnExec, OnExecFailure {
+export class RateTargetComponent
+  implements AfterViewInit, OnDestroy, OnInit, OnChanges, OnEval, OnExec,
+    OnExecFailure {
+  @Input() waitOn: string[];
   @Input() sourceId: string;
-  sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
-  targetIdChange = new EventEmitter<void>();
   // TODO: support the user selecting a rating with the keyboard. The problem
   // is that triggering the exec onRatingChange can cause problematic behavior.
   // For example, if the user wraps this component in a dv.tx with a dv.redirect
@@ -49,25 +44,17 @@ export class RateTargetComponent implements
   prevRatingValue: number;
   ratingValue: number;
 
-  destroyed = new Subject<any>();
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private router: Router,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => { this.load(); })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -75,20 +62,16 @@ export class RateTargetComponent implements
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.sourceId || changes.newSourceId) {
-      this.sourceIdChange.emit();
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
+      this.load();
     }
-    if (changes.targetId || changes.newTargetId) {
-      this.targetIdChange.emit();
-    }
-    this.load();
   }
 
   setRating($event) {
     this.prevRatingValue = this.ratingValue;
     this.ratingValue = $event.rating;
     if (this.execOnClick) {
-      this.rs.exec(this.elem);
+      this.dvs.exec();
     }
   }
 
@@ -96,18 +79,7 @@ export class RateTargetComponent implements
    * Sync the rating on the server with the rating on the client.
    */
   async dvOnExec() {
-    if (this.sourceId === undefined) {
-      await this.sourceIdChange.asObservable()
-        .pipe(take(1))
-        .toPromise();
-    }
-    if (this.targetId === undefined) {
-      await this.targetIdChange.asObservable()
-        .pipe(take(1))
-        .toPromise();
-    }
-
-    const res = await this.gs.post<SetRatingRes>(this.apiPath, {
+    const res = await this.dvs.waitAndPost<SetRatingRes>(this.apiPath, () => ({
       inputs: {
         input: {
           sourceId: this.sourceId,
@@ -116,8 +88,7 @@ export class RateTargetComponent implements
         }
       },
       extraInfo: { action: 'set' }
-    })
-      .toPromise();
+    }));
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -137,14 +108,14 @@ export class RateTargetComponent implements
    */
   async load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       try {
-        const res = await this.gs.get<RatingRes>(this.apiPath, {
+        const res = await this.dvs.waitAndGet<RatingRes>(this.apiPath, () => ({
           params: {
             inputs: JSON.stringify({
               input: {
@@ -157,8 +128,7 @@ export class RateTargetComponent implements
               returnFields: 'rating'
             }
           }
-        })
-          .toPromise();
+        }));
         if (res.data.rating) {
           this.ratingValue = res.data.rating.rating;
           this.rating.emit(this.ratingValue);
@@ -174,11 +144,10 @@ export class RateTargetComponent implements
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.sourceId && this.targetId);
+    return !!(this.dvs && this.sourceId && this.targetId);
   }
 }
