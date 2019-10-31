@@ -21,11 +21,6 @@ export class ShowUserComponent
   implements AfterViewInit, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
-
   @Input() id: string | undefined;
   @Input() user: User | undefined;
   @Output() loadedUser = new EventEmitter<User>();
