@@ -73,7 +73,7 @@ export class SignInComponent
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.dvs.gateway.post<{ data: any, errors: any }>(
+    const res = await this.dvs.post<{ data: any, errors: any }>(
       this.apiPath, {
         inputs: {
           input: {
@@ -87,8 +87,7 @@ export class SignInComponent
             user { id, username }
           `
         }
-      })
-      .toPromise();
+      });
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
         .join());
