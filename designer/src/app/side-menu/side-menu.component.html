@@ -11,5 +11,10 @@
         (conceptRemoved)="conceptRemoved.emit($event)">
       </app-concept-instances>
     </mat-tab>
+    <mat-tab label="Themes">
+      <app-theme-palette>
+        [app]="app"
+      </app-theme-palette>
+    </mat-tab>
   </mat-tab-group>
 </div>
