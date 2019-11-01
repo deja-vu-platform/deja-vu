@@ -46,7 +46,6 @@ import {
 } from './set-inputs/set-inputs.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TextComponent } from './text/text.component';
-import { ThemePaletteComponent } from './theme-palette/theme-palette.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 
 import { ChildScopeIO } from './io';
@@ -72,7 +71,6 @@ ChildScopeIO.componentInstanceComponent = ComponentInstanceComponent;
     SetInputsComponent,
     SideMenuComponent,
     TextComponent,
-    ThemePaletteComponent,
     TopBarComponent,
     AddAppComponentIoComponent
   ],
