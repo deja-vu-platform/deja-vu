@@ -17,8 +17,7 @@ import { startWith } from 'rxjs/operators/startWith';
 import * as _ from 'lodash';
 
 import {
-  ComponentValue, ConfigService, ConfigServiceFactory,
-  GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { getFilteredPropertyNames } from '../shared/property.model';
@@ -38,7 +37,7 @@ import { API_PATH } from '../property.config';
   styleUrls: ['./object-autocomplete.component.css']
 })
 export class ObjectAutocompleteComponent
-implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
+  implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
   /**
    * Text to show to prompt the user to choose an object.
    */
@@ -133,18 +132,15 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
   errors: any;
 
   private properties: string[];
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -152,17 +148,17 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
   }
 
   async load() {
-    if (!this.gs) {
+    if (!this.dvs) {
       return;
     }
-    this.rs.eval(this.elem);
+    this.dvs.eval();
   }
 
   async dvOnEval(): Promise<void> {
-    if (this.gs) {
+    if (this.dvs) {
       this.properties = getFilteredPropertyNames(
-        this.showOnly, this.showExclude, this.cs);
-      this.gs
+        this.showOnly, this.showExclude, this.dvs.config);
+      const res = await this.dvs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
             extraInfo: {
@@ -173,15 +169,13 @@ implements AfterViewInit, OnInit, OnEval, ControlValueAccessor, Validator {
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._objects = res.data.objects;
-          this.objects.emit(this._objects);
-          this.ids = _.map(this._objects, 'id');
-          this.filteredObjects = this.control
-            .valueChanges
-            .pipe(startWith(''), map(this.filter.bind(this)));
         });
+      this._objects = res.data.objects;
+      this.objects.emit(this._objects);
+      this.ids = _.map(this._objects, 'id');
+      this.filteredObjects = this.control
+        .valueChanges
+        .pipe(startWith(''), map(this.filter.bind(this)));
     }
   }
 

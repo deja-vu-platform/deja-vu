@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/allocator",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-allocator",
@@ -37,9 +37,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/concept-server": "0.0.1",
-    "@deja-vu/core": "0.0.1",
-    "@deja-vu/gateway": "0.0.1",
+    "@deja-vu/cli": "^0.0.9",
+    "@deja-vu/concept-server": "^0.0.9",
+    "@deja-vu/core": "^0.0.9",
+    "@deja-vu/gateway": "^0.0.9",
     "bootstrap": "^4.0.0",
     "core-js": "^2.4.1",
     "lodash": "^4.17.5",
@@ -62,10 +63,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "0.0.1",
-    "@deja-vu/concept-server": "0.0.1",
-    "@deja-vu/core": "0.0.1",
-    "@deja-vu/gateway": "0.0.1",
+    "@deja-vu/cli": "^0.0.9",
+    "@deja-vu/concept-server": "^0.0.9",
+    "@deja-vu/core": "^0.0.9",
+    "@deja-vu/gateway": "^0.0.9",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",
@@ -96,11 +97,13 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "pkg/deja-vu-allocator.d.ts",
-  "main": "pkg/bundles/deja-vu-allocator.umd.js"
+  "main": "pkg/bundles/deja-vu-allocator.umd.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

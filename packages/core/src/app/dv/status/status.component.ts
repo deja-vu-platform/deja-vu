@@ -1,9 +1,13 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
-import { OnExecFailure, OnExecSuccess, RunService } from '../run.service';
+import {
+  OnExecFailure, OnExecSuccess, RunResultMap, RunService
+} from '../run.service';
 
+import * as _ from 'lodash';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
 
 @Component({
   selector: 'dv-status',
@@ -30,7 +34,17 @@ implements OnInit, OnExecSuccess, OnExecFailure {
     }, SAVED_MSG_TIMEOUT);
   }
 
-  dvOnExecFailure(reason: Error) {
-    this.error = reason.message;
+  dvOnExecFailure(unused_reason: Error, allReasons: RunResultMap) {
+    this.error = _.reject(_.map(_.values(allReasons), (reason) => {
+      try {
+        const msg = JSON.parse(reason.message);
+
+        return _.reject(_.map(_.get(msg, 'errors'), 'message'), _.isEmpty)
+          .join();
+      } catch (e) {
+        return reason.message;
+      }
+    }), _.isEmpty)
+    .join();
   }
 }

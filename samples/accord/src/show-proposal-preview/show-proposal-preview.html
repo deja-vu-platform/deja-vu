@@ -1,8 +1,6 @@
 <dv.component name="show-proposal-preview">
   <div class="left-column-50-thin-padding">
-    <h3>
-      <dv.show-entity entity=$proposal.songTitle />
-    </h3>
+    <h3><dv.show-entity entity=$proposal.songTitle /></h3>
     <div>
       by <dv.show-entity entity=$proposal.songArtist />
     </div>
@@ -19,7 +17,7 @@
       <dv.tx>
         <rating.rate-target
           sourceId=$loggedInUserId targetId=$proposal.id />
-        <dv.link hidden=true />
+        <dv.redirect onExecSuccess=true hidden=true />
       </dv.tx>
     </div>
     <div>

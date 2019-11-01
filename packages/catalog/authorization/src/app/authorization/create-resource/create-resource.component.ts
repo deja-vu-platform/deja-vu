@@ -3,8 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output, SimpleChanges
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import { Resource } from '../shared/authorization.model';
@@ -12,7 +11,6 @@ import { Resource } from '../shared/authorization.model';
 import { API_PATH } from '../authorization.config';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
 
 
 interface CreateResourceRes {
@@ -26,14 +24,10 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-resource.component.html',
   styleUrls: ['./create-resource.component.css']
 })
-export class CreateResourceComponent implements
-  OnInit, OnChanges, OnExec, OnExecSuccess, OnExecFailure {
+export class CreateResourceComponent
+  implements OnInit, OnChanges, OnExec, OnExecSuccess, OnExecFailure {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
 
   @Input() id: string;
   @Input() ownerId: string;
@@ -57,56 +51,42 @@ export class CreateResourceComponent implements
   newResourceSuccess = false;
   newResourceErrorText: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    if (!_.isEmpty(this.waitOn)) {
-      await Promise.all(_.chain(this.waitOn)
-        .filter((field) => _.isNil(this[field]))
-        .tap((fs) => {
-          this.activeWaits = new Set(fs);
-
-          return fs;
-        })
-        .map((fieldToWaitFor) => this.fieldChange
-          .pipe(filter((field) => field === fieldToWaitFor), take(1))
-          .toPromise())
-        .value());
-    }
+    await this.dvs.waiter.maybeWait();
     const resource: Resource = {
       id: this.id,
       ownerId: this.ownerId,
       viewerIds: this.viewerIds
     };
     if (this.save) {
-      const res = await this.gs.post<CreateResourceRes>(this.apiPath, {
+      const res = await this.dvs.post<CreateResourceRes>(this.apiPath, {
         inputs: { input: resource },
         extraInfo: { returnFields: 'id' }
-      })
-        .toPromise();
+      });
     } else {
-      this.gs.noRequest();
+      this.dvs.noRequest();
     }
     this.resource.emit(resource);
   }

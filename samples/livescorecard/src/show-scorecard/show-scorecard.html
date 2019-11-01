@@ -3,26 +3,22 @@
 
   <div class="container below-navbar">
     <div class="row">
-      <div class="col-3">
-        <h2>All Climbs</h2>
-      </div>
-
-      <div class="col-9">
-        <div class="row">
-          <div class="col-2 labels center">status</div>
-          <div class="col-2 labels center">climb #</div>
-          <div class="col-3 labels">category</div>
-          <div class="col-2 labels center">score</div>
-          <div class="col-3 labels center red offset-falls">falls</div>
-        </div>
-
-        <task.show-tasks noTasksToShowText=""
-          showTask=<livescorecard.show-scorecard-entry task=$task
-            climber=livescorecard.climber-navbar.climber
-            competitionId=livescorecard.climber-navbar.competitionId />
-          assigneeId=livescorecard.climber-navbar.climber?.id
-          approved=false />
-      </div>
+      <h1>All Climbs</h1>
     </div>
+
+    <div class="row">
+      <div class="col-2 white center">status</div>
+      <div class="col-2 white center">climb #</div>
+      <div class="col-3 white">category</div>
+      <div class="col-2 white center">score</div>
+      <div class="col-3 white center">falls</div>
+    </div>
+
+    <task.show-tasks noTasksToShowText=""
+      showTask=<livescorecard.show-scorecard-entry task=$task
+        climber=livescorecard.climber-navbar.climber
+        competitionId=livescorecard.climber-navbar.competitionId />
+      assigneeId=livescorecard.climber-navbar.climber?.id
+      approved=false />
   </div>
 </dv.component>

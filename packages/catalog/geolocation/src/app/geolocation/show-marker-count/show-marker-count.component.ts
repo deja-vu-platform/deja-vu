@@ -2,9 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges,
   OnInit
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../geolocation.config';
@@ -20,25 +18,23 @@ interface MarkerCountRes {
   selector: 'geolocation-show-marker-count',
   templateUrl: './show-marker-count.component.html'
 })
-export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
-  OnEval, OnInit {
+export class ShowMarkerCountComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   markerCount: number;
 
   @Input() ofMapId: string | undefined;
   @Input() center: Location | undefined;
   @Input() radius: number | undefined;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -51,7 +47,7 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -63,21 +59,18 @@ export class ShowMarkerCountComponent implements AfterViewInit, OnChanges,
         filter['centerLng'] = this.center.longitude;
         filter['radius'] = this.radius;
       }
-      this.gs.get<MarkerCountRes>(this.apiPath, {
+      const res = await this.dvs.get<MarkerCountRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({ input: filter })
         }
-      })
-        .pipe(map((res: MarkerCountRes) => res.data.markerCount))
-        .subscribe((markerCount) => {
-          this.markerCount = markerCount;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      });
+      this.markerCount = res.data.markerCount;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

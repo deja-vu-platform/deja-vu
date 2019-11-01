@@ -1,8 +1,11 @@
 <dv.component name="show-reviews">
-	<div id="left-main-div">
-		<reviewInfo.show-objects
-			fieldMatching={sourceId: $userId}
-			showObject=<easypick.show-review review=$object/>
-		/>
-	</div>
+  <div id="left-main-div">
+    <dv.tx>
+      <authentication.authenticate id=$userId hidden=true />
+      <reviewInfo.show-objects
+        fieldMatching={ sourceId: $userId }
+        noObjectsToShowText=""
+        showObject=<easypick.show-review review=$object/> />
+    </dv.tx>
+  </div>
 </dv.component>

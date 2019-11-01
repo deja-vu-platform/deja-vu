@@ -17,9 +17,9 @@
           showOnly=['name'] />
       </span>
     </div>
-    <div>
+    <div class="list-info">
       <span class="list-card-creator">
-        Created by
+        created by
         <authentication.show-user
           id=$object ? $object.creator : list.show-object.loadedObject.creator
           showId=false />
@@ -30,9 +30,8 @@
           condition=$object ?
             $object.locked :
             list.show-object.loadedObject.locked>
-          <div className="locked-list-marker"></div>
+          <div class="locked-list-marker"></div>
         </dv.if>
-
 
         <dv.tx>
           <authentication.authenticate as auth-show-ranking
@@ -43,7 +42,7 @@
             hidden=true />
         </dv.tx>
         <dv.if class="inline-block" condition=ranking.show-ranking.loadedRanking>
-          <div className="contributed-marker"></div>
+          <div class="contributed-marker"></div>
         </dv.if>
       </dv.if>
 

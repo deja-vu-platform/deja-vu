@@ -7,10 +7,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-
-import {
-  ComponentValue, GatewayService, GatewayServiceFactory, RunService
-} from '@deja-vu/core';
+import { ComponentValue, DvService, DvServiceFactory } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -59,18 +56,18 @@ export class StageComponent
   // Presentation inputs
   @Input() buttonLabel = 'Add assignee';
 
-  private gs: GatewayService;
+  private dvs: DvService;
   staged: string[] = [];
 
   stageComponent = this;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     this.staged = this.initialStageIds;
   }
 

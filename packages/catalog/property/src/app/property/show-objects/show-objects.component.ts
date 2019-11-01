@@ -3,16 +3,8 @@ import {
   OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  ComponentValue,
-  ConfigService, ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
 
 import {
   adjustFieldMatching, getFilteredPropertyNames, getPropertiesFromConfig
@@ -23,7 +15,7 @@ import { ShowObjectComponent } from '../show-object/show-object.component';
 import { API_PATH } from '../property.config';
 
 import * as _ from 'lodash';
-import { filter, take, takeUntil } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 
 
 /**
@@ -34,8 +26,8 @@ import { filter, take, takeUntil } from 'rxjs/operators';
   templateUrl: './show-objects.component.html',
   styleUrls: ['./show-objects.component.css']
 })
-export class ShowObjectsComponent implements
-  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+export class ShowObjectsComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   /**
    * Text to display when there are no objects
    */
@@ -87,38 +79,26 @@ export class ShowObjectsComponent implements
 
   @Input() includeTimestamp = false;
 
-  destroyed = new Subject<any>();
-
   properties: string[];
   showObjects;
   loaded = false;
 
   config;
   schema;
-  private gs: GatewayService;
-  private cs: ConfigService;
-
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    private router: Router, @Inject(API_PATH) private apiPath) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showObjects = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
-    this.config = this.cs.getConfig();
+    this.dvs = this.dvf.forComponent(this)
+      .withRefreshCallback(() => { this.load(); })
+      .build();
+    this.config = this.dvs.config.getConfig();
     this.schema = getPropertiesFromConfig(this.config);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
   }
 
   ngAfterViewInit() {
@@ -130,7 +110,7 @@ export class ShowObjectsComponent implements
       const fmChanges = changes['fieldMatching'];
       if (fmChanges) {
         for (const field of this.fieldMatching['waitOn']) {
-          if (!_.isNil(_.get(this.fieldMatching, field))) {
+          if (!this.waitOnFieldIsNil(field)) {
             this.fieldChange.emit(field);
           }
         }
@@ -142,7 +122,7 @@ export class ShowObjectsComponent implements
 
   async load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -151,17 +131,17 @@ export class ShowObjectsComponent implements
       const fmWaitOn = _.get(this.fieldMatching, 'waitOn');
       if (!_.isEmpty(fmWaitOn)) {
         await Promise.all(_.chain(fmWaitOn)
-          .filter((field) => _.isNil(_.get(this.fieldMatching, field)))
+          .filter((field) => this.waitOnFieldIsNil(field))
           .map((fieldToWaitFor) => this.fieldChange
             .pipe(filter((field) => field === fieldToWaitFor), take(1))
             .toPromise())
           .value());
       }
       this.properties = getFilteredPropertyNames(
-        this.showOnly, this.showExclude, this.cs);
+        this.showOnly, this.showExclude, this.dvs.config);
       const adjustedFields = adjustFieldMatching(
         _.omit(this.fieldMatching, 'waitOn'), this.schema);
-      this.gs
+      const res = await this.dvs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
             inputs: { fields: adjustedFields },
@@ -174,24 +154,36 @@ export class ShowObjectsComponent implements
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._objects = res.data.objects;
-          this.objects.emit(this._objects);
-          this.objectIds.emit(_.map(this._objects, 'id'));
-          this.loaded = true;
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this._objects = res.data.objects;
+      this.objects.emit(this._objects);
+      this.objectIds.emit(_.map(this._objects, 'id'));
+      this.loaded = true;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
+  }
+
+  private waitOnFieldIsNil(field) {
+    const fValue = _.get(this.fieldMatching, field);
+    if (_.isNil(fValue)) {
+      return true;
+    }
+    if (_.isPlainObject(fValue)) {
+      const qValuesUndefined = _.filter(_.keys(fValue),
+        (k) => k.startsWith('q_') && fValue[k] === undefined);
+
+      return qValuesUndefined.length > 0;
+    }
+
+    return false;
   }
 }

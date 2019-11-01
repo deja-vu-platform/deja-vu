@@ -10,19 +10,17 @@
         "<dv.show-entity entity=$user.aboutMe />"
       </dv.if>
       <div class="inline-column-80-thin-padding">
-        <div class="bold">
-          Avg Rating: <rating.show-average-rating targetId=$user.id />
-        </div>
-        <div class="bold">
-          Learning Language:
-          <dv.show-entity entity=$user.learningLanguage />
-        </div>
+        <span class="bold">Avg Rating:</span>
+        <rating.show-average-rating targetId=$user.id />
+        <br/>
+        <span class="bold">Learning Language:</span>
+        <dv.show-entity entity=$user.learningLanguage />
 
-        <dv.if class="bold" condition=$user.learningLanguage !== "English">
-          Native Language: English
+        <dv.if condition=$user.learningLanguage !== "English">
+          <span class="bold">Native Language:</span> English
         </dv.if>
-        <dv.if class="bold" condition=$user.learningLanguage === "English">
-          Native Language: French
+        <dv.if condition=$user.learningLanguage === "English">
+          <span class="bold">Native Language:</span> French
         </dv.if>
       </div>
 
@@ -37,9 +35,7 @@
           <chatTotal.add-to-group
             id=$loggedInUserId memberId=$user.id hidden=true />
           <dv.button class="highlight-button">Chat</dv.button>
-          <dv.redirect href="/chat"
-            params={ chatId: dv.gen-id.id }
-            onExecSuccess=true />
+          <dv.link href="/chat" params={ chatId: dv.gen-id.id } />
         </dv.tx>
       </div>
    </div>

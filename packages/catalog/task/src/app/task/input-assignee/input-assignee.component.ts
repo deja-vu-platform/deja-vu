@@ -10,8 +10,8 @@ import {
 
 import { OnExecSuccess, RunService } from '@deja-vu/core';
 
-
 import { startWith } from 'rxjs/operators';
+
 
 @Component({
   selector: 'task-input-assignee',
@@ -31,7 +31,7 @@ import { startWith } from 'rxjs/operators';
   ]
 })
 export class InputAssigneeComponent
-implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
+  implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
   assigneeIdControl = new FormControl('', [Validators.required]);
   @Output() assigneeId = new EventEmitter<string>();
 
@@ -67,7 +67,6 @@ implements OnInit, ControlValueAccessor, Validator, OnExecSuccess {
 
     return this.assigneeIdControl.errors;
   }
-
 
   dvOnExecSuccess() {
     this.reset();

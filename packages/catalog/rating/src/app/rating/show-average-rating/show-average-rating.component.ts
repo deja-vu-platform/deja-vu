@@ -2,14 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject,
   Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService,
-  WaiterService, WaiterServiceFactory
-} from '@deja-vu/core';
-
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { API_PATH } from '../rating.config';
 import { AverageRatingForInputRes } from '../shared/rating.model';
@@ -20,8 +13,8 @@ import { AverageRatingForInputRes } from '../shared/rating.model';
   templateUrl: './show-average-rating.component.html',
   styleUrls: ['./show-average-rating.component.css']
 })
-export class ShowAverageRatingComponent implements
-  AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
+export class ShowAverageRatingComponent
+  implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   @Input() waitOn: string[];
   @Input() targetId: string;
 
@@ -37,28 +30,17 @@ export class ShowAverageRatingComponent implements
   @Output() ratingCount = new EventEmitter<number>();
   ratingCountValue = 0;
 
-  destroyed = new Subject<any>();
-
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private rs: RunService,
-    private router: Router, @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+     @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
-        this.load();
-      });
-    this.load();
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => { this.load(); })
+      .build();
   }
 
   ngAfterViewInit() {
@@ -66,7 +48,7 @@ export class ShowAverageRatingComponent implements
   }
 
   ngOnChanges(changes) {
-    if (this.ws && this.ws.processChanges(changes)) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
@@ -76,43 +58,46 @@ export class ShowAverageRatingComponent implements
    */
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      this.gs.get<AverageRatingForInputRes>(this.apiPath, {
-        params: {
-          inputs: { targetId: this.targetId },
-          extraInfo: {
-            returnFields: `
-              rating
-              count
-            `
+      const res = await this.dvs.waitAndGet<AverageRatingForInputRes>(
+        this.apiPath,
+        () => ({
+          params: {
+            inputs: { targetId: this.targetId },
+            extraInfo: {
+              returnFields: `
+                rating
+                count
+              `
+            }
           }
-        }
-      })
-      .subscribe((res) => {
-        if (res.data.averageRatingForTarget) {
-          this.averageRatingValue = res.data.averageRatingForTarget.rating;
-          this.averageRating.emit(this.averageRatingValue);
-          this.ratingCountValue = res.data.averageRatingForTarget.count;
-          this.ratingCount.emit(this.ratingCountValue);
-        }
-      });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }));
+      if (res.data.averageRatingForTarget) {
+        this.averageRatingValue = res.data.averageRatingForTarget.rating;
+        this.averageRating.emit(this.averageRatingValue);
+        this.ratingCountValue = res.data.averageRatingForTarget.count;
+        this.ratingCount.emit(this.ratingCountValue);
+      } else if (res.errors) {
+        this.averageRatingValue = 0;
+        this.averageRating.emit(this.averageRatingValue);
+        this.ratingCountValue = 0;
+        this.ratingCount.emit(this.ratingCountValue);
+      }
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.targetId);
+    return !!(this.dvs && this.targetId);
   }
 }

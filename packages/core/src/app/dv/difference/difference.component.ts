@@ -6,22 +6,29 @@ import { RunService } from '../run.service';
 
 import * as _ from 'lodash';
 
+
 /**
- * Outputs an array with values in the first array
- * and not in the second array
+ * Outputs an array of values not included in the other given arrays. By
+ * default it compares the elements using lodash's SameValueZero, but if a `key`
+ * is given it will use the values of `key` for comparison.
+ *
+ * Modeled after lodash's `difference` and `differenceBy`.
  */
 @Component({
   selector: 'dv-difference',
   templateUrl: './difference.component.html'
 })
 export class DifferenceComponent implements OnInit, OnChanges {
-  /** A list of entities to be subtracted by */
+  /** The array to inspect. If it is `null` it outputs an empty list */
   @Input() array: any[];
 
-  /** Lists of entities to subtract with */
+  /**
+   * An array of arrays containing the values to exclude.
+   * If `null` it outputs `array`
+   */
   @Input() values: any[][];
 
-  /** compare only one field when the original and subtractor are objects */
+  /** Use the vlues of the field of name `key` to compare */
   @Input() key: string;
 
   /** The output list */
@@ -34,10 +41,6 @@ export class DifferenceComponent implements OnInit, OnChanges {
     this.rs.register(this.elem, this);
   }
 
-  /**
-   * if the original list is `null`, it outputs an empty list
-   * if the subtractor is `null`, it outputs the original list
-   */
   ngOnChanges() {
     if (!this.key) {
       this.difference.emit(_.difference(this.array, ...this.values));

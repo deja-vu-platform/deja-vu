@@ -4,14 +4,12 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecSuccess
 } from '@deja-vu/core';
-
 
 import { API_PATH } from '../follow.config';
 
 import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
 
 
 interface IsFollowingRes {
@@ -29,14 +27,10 @@ interface FollowUnfollowRes {
   templateUrl: './follow-unfollow.component.html',
   styleUrls: ['./follow-unfollow.component.css']
 })
-export class FollowUnfollowComponent implements AfterViewInit, OnInit,
-  OnChanges, OnExec, OnExecSuccess {
+export class FollowUnfollowComponent
+  implements AfterViewInit, OnInit, OnChanges, OnExec, OnExecSuccess {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   @Input() followerId: string;
   @Input() publisherId: string;
 
@@ -47,15 +41,16 @@ export class FollowUnfollowComponent implements AfterViewInit, OnInit,
   followsPublisher: boolean;
   private queryString: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -63,47 +58,21 @@ export class FollowUnfollowComponent implements AfterViewInit, OnInit,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs
-        .get<IsFollowingRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<IsFollowingRes>(
+        this.apiPath, () => ({
           params: {
             inputs: JSON.stringify({
               input: {
@@ -113,26 +82,23 @@ export class FollowUnfollowComponent implements AfterViewInit, OnInit,
             }),
             extraInfo: { action: 'is-follower' }
           }
-        })
-        .subscribe((res) => {
-          this.followsPublisher = res.data.isFollowing;
-        });
+        }));
+      this.followsPublisher = res.data.isFollowing;
     }
-
   }
 
   follow() {
     this.queryString = 'follow';
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   unfollow() {
     this.queryString = 'unfollow';
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<FollowUnfollowRes>(this.apiPath, {
+    const res = await this.dvs.post<FollowUnfollowRes>(this.apiPath, {
       inputs: {
         input: {
           followerId: this.followerId,
@@ -140,8 +106,7 @@ export class FollowUnfollowComponent implements AfterViewInit, OnInit,
         }
       },
       extraInfo: { action: this.queryString }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -156,6 +121,6 @@ export class FollowUnfollowComponent implements AfterViewInit, OnInit,
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

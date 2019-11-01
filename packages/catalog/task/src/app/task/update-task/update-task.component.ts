@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, ViewChild
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
@@ -7,15 +7,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService,
-  GatewayServiceFactory,
-  OnExec,
-  OnExecFailure,
-  OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
-
-import { map } from 'rxjs/operators';
 
 import { Task } from '../shared/task.model';
 
@@ -27,14 +20,14 @@ interface TaskRes {
   data: { task: Task };
 }
 
-
 @Component({
   selector: 'task-update-task',
   templateUrl: './update-task.component.html',
   styleUrls: ['./update-task.component.css']
 })
-export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
-  OnExecFailure, OnExecSuccess {
+export class UpdateTaskComponent
+  implements AfterViewInit, OnInit, OnChanges, OnExec, OnExecFailure,
+    OnExecSuccess {
   @Input() id;
 
   // Presentation inputs
@@ -53,27 +46,33 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
   taskSaved = false;
   taskError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.loadTask();
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+  }
+
+  ngAfterViewInit() {
+    this.load();
   }
 
   ngOnChanges() {
-    this.loadTask();
+    this.load();
   }
 
-  loadTask() {
-    if (!this.gs || !this.id) {
-      return;
+  load() {
+    if (this.canEval()) {
+      this.dvs.eval();
     }
-    this.gs.get<TaskRes>('/graphql', {
+  }
+
+  async dvOnEval(): Promise<void> {
+    const res = await this.dvs.get<TaskRes>('/graphql', {
       params: {
         inputs: { id: this.id },
         extraInfo: {
@@ -85,23 +84,20 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
           `
         }
       }
-    })
-      .pipe(map((res: TaskRes) => res.data.task))
-      .subscribe((task: Task) => {
-        if (task) {
-          this.assignee.setValue(task.assigneeId);
-          this.dueDate.setValue(task.dueDate);
-        }
-      });
+    });
+    const task = res.data.task;
+    if (task) {
+      this.assignee.setValue(task.assigneeId);
+      this.dueDate.setValue(task.dueDate);
+    }
   }
 
-
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<string> {
-    const res = await this.gs.post<{ data: any }>('/graphql', {
+    const res = await this.dvs.post<{ data: any }>('/graphql', {
       inputs: {
         input: {
           id: this.id,
@@ -110,8 +106,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
         }
       },
       extraInfo: { action: 'update' }
-    })
-      .toPromise();
+    });
 
     return res.data.updateTask.id;
   }
@@ -130,5 +125,9 @@ export class UpdateTaskComponent implements OnInit, OnChanges, OnExec,
 
   dvOnExecFailure(reason: Error) {
     this.taskError = reason.message;
+  }
+
+  private canEval(): boolean {
+    return !this.dvs || !this.id;
   }
 }

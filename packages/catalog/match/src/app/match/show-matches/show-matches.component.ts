@@ -4,34 +4,28 @@ import {
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
-import { map } from 'rxjs/operators';
 
 import { API_PATH } from '../match.config';
 import { Match } from '../shared/match.model';
 import { ShowMatchComponent } from '../show-match/show-match.component';
 
+import * as _ from 'lodash';
+
+
 interface MatchesRes {
   data: { matches: Match[] };
 }
-
-import * as _ from 'lodash';
-import { filter, take } from 'rxjs/operators';
-
 
 @Component({
   selector: 'match-show-matches',
   templateUrl: './show-matches.component.html'
 })
-export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
-  OnInit {
+export class ShowMatchesComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   @Input() userId: string | undefined;
   @Output() loadedMatches = new EventEmitter<Match[]>();
 
@@ -46,19 +40,18 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
 
   showMatches;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showMatches = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -66,46 +59,20 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs.get<MatchesRes>(this.apiPath, {
+      const res = await this.dvs.waitAndGet<MatchesRes>(this.apiPath, () => ({
         params: {
           inputs: JSON.stringify({
             input: { userId: this.userId }
@@ -118,18 +85,15 @@ export class ShowMatchesComponent implements AfterViewInit, OnChanges, OnEval,
             `
           }
         }
-      })
-        .pipe(map((res: MatchesRes) => res.data.matches))
-        .subscribe((matches) => {
-          this.matches = matches;
-          this.loadedMatches.emit(matches);
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      }));
+      this.matches = res.data.matches;
+      this.loadedMatches.emit(this.matches);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

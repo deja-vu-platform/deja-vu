@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { User } from '../shared/authentication.model';
@@ -20,8 +20,8 @@ import * as _ from 'lodash';
   templateUrl: './show-users.component.html',
   styleUrls: ['./show-users.component.css']
 })
-export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowUsersComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() showUsername = true;
   @Input() showId = true;
 
@@ -35,17 +35,18 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
   @Output() fetchedUserIds = new EventEmitter<string[]>();
 
   showUsers;
-  private gs: GatewayService;
+
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showUsers = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -58,14 +59,14 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
-        .get<{ data: { users: User[] } }>(this.apiPath, {
+      const res = await this.dvs.gateway.get<{ data: { users: User[] } }>(
+        this.apiPath, {
           params: {
             inputs: JSON.stringify({
               input: {}
@@ -78,17 +79,16 @@ export class ShowUsersComponent implements AfterViewInit, OnEval, OnInit,
             }
           }
         })
-        .subscribe((res) => {
-          this.users = res.data.users;
-          this.fetchedUsers.emit(this.users);
-          this.fetchedUserIds.emit(_.map(this.users, 'id'));
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        .toPromise();
+      this.users = res.data.users;
+      this.fetchedUsers.emit(this.users);
+      this.fetchedUserIds.emit(_.map(this.users, 'id'));
+    } else if (this.dvs) {
+      this.dvs.gateway.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

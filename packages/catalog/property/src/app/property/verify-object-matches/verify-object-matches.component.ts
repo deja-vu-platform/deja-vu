@@ -3,8 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  ConfigService, ConfigServiceFactory,
-  GatewayService, GatewayServiceFactory, OnEval, OnExec, RunService,
+  DvService, DvServiceFactory, OnEval, OnExec,
   WaiterService, WaiterServiceFactory
 } from '@deja-vu/core';
 
@@ -27,8 +26,8 @@ interface VerifyObjectMatchesRes {
   templateUrl: './verify-object-matches.component.html',
   styleUrls: ['./verify-object-matches.component.css']
 })
-export class VerifyObjectMatchesComponent implements
-  OnInit, OnChanges, OnExec, OnEval, OnExec {
+export class VerifyObjectMatchesComponent
+  implements OnInit, OnChanges, OnExec, OnEval, OnExec {
   @Input() waitOn: string[];
   @Input() id: string;
   /**
@@ -42,32 +41,26 @@ export class VerifyObjectMatchesComponent implements
   config;
   schema;
   matches: boolean;
-  private gs: GatewayService;
-  private ws: WaiterService;
+  private dvs: DvService;
   private wsFieldMatching: WaiterService;
-  private cs: ConfigService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private wsf: WaiterServiceFactory, private csf: ConfigServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private wsf: WaiterServiceFactory, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
     this.wsFieldMatching = this.wsf.for(
       this.fieldMatching, _.get(this.fieldMatching, 'waitOn'));
-    this.config = this.cs.getConfig();
+    this.config = this.dvs.config.getConfig();
     this.schema = getPropertiesFromConfig(this.config);
-
-    this.rs.eval(this.elem);
   }
 
   ngOnChanges(changes) {
-    if (this.ws) {
-      this.ws.processChanges(changes);
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
     if (this.wsFieldMatching) {
       this.wsFieldMatching.processChanges(changes);
@@ -85,27 +78,26 @@ export class VerifyObjectMatchesComponent implements
   async doVerify() {
     if (!this.canRun()) {
       // this is essentialy failing the tx if there is one
-      return this.gs.noRequest();
+      return this.dvs.noRequest();
     }
-    await this.ws.maybeWait();
+    const res = await this.dvs.waitAndGet<VerifyObjectMatchesRes>(
+      this.apiPath, () => {
+        const fields = {
+          id: this.id,
+          ..._.omit(this.fieldMatching, 'waitOn')
+        };
+        const adjustedFields = adjustFieldMatching(fields, this.schema);
 
-    const fields = {
-      id: this.id,
-      ..._.omit(this.fieldMatching, 'waitOn')
-    };
-    const adjustedFields = adjustFieldMatching(fields, this.schema);
-
-    this.gs.get<VerifyObjectMatchesRes>(this.apiPath, {
-      params: {
-        inputs: { fields: adjustedFields }
-      }
-    })
-    .subscribe((res) => {
-      this.matches = res.data.verifyObjectMatches;
-    });
+        return {
+          params: {
+            inputs: { fields: adjustedFields }
+          }
+        };
+      });
+    this.matches = res.data.verifyObjectMatches;
   }
 
   canRun() {
-    return this.gs;
+    return this.dvs;
   }
 }

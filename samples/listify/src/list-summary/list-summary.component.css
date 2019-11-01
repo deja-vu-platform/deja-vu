@@ -1,8 +1,14 @@
 .list-card-title {
   font-size: 25px;
-  font-weight:400;
+  font-weight: bold;
 }
 
 .list-card-creator {
   font-weight: 300;
+  color: gray;
+}
+
+.list-info {
+  display: flex;
+  margin-bottom: 20px;
 }

@@ -1,5 +1,6 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
+
 html,
 body {
   height: 100%;
@@ -15,7 +16,8 @@ body {
   display: inline-block;
 }
 
-.white {
+.white,
+h1 {
   color: white;
 }
 
@@ -31,14 +33,12 @@ nav a.dvlink {
   color: lightgrey;
 }
 
-dv-link.btn.btn-outline-secondary.choice.active,
-dv-link.btn-outline-secondary:hover {
-  background-color: #4FB5C3;
+.btn-outline-secondary a {
+  color: #6c757d;
 }
 
 dv-link.btn.btn-outline-secondary.choice.active a,
 dv-link.btn-outline-secondary:hover a {
-  background-color: #4FB5C3;
   color: white;
 }
 
@@ -116,12 +116,12 @@ authentication-sign-in button.mat-button {
   margin-bottom: 1em;
 }
 
-.link {
+.link a {
   cursor: pointer;
   color: #218290;
 }
 
-.link:hover {
+.link a:hover {
   color: #218290;
   font-weight: bold;
 }
@@ -165,11 +165,6 @@ a:hover {
 
 .left-space {
   margin-left: 1em;
-}
-
-.labels {
-  opacity: .9;
-  color: black;
 }
 
 .red {
@@ -332,6 +327,14 @@ task-show-tasks .list-group-item {
   margin: 0 1em;
 }
 
+.navbar {
+  padding: 0;
+}
+
 .navbar-brand {
   color: lightgrey;
+}
+
+.prop .mat-form-field {
+  width: 150px;
 }

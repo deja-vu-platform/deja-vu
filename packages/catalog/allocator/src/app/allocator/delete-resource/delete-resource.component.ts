@@ -3,9 +3,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
@@ -22,52 +20,38 @@ interface DeleteResourceRes {
   styleUrls: ['./delete-resource.component.css']
 })
 export class DeleteResourceComponent implements OnInit, OnChanges, OnExec {
+  @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() allocationId: string;
   resourceIdChange = new EventEmitter();
   allocationIdChange = new EventEmitter();
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.resourceId) {
-      this.resourceIdChange.emit();
-    }
-    if (changes.allocationId) {
-      this.allocationIdChange.emit();
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
   async dvOnExec(): Promise<any> {
-    if (this.resourceId === undefined) {
-      await this.resourceIdChange.asObservable()
-        .toPromise();
-    }
-    if (this.allocationId === undefined) {
-      await this.allocationIdChange.asObservable()
-        .toPromise();
-    }
-
-    return this.gs
-      .post<DeleteResourceRes>(this.apiPath, {
-        inputs: {
-          input: {
-            resourceId: this.resourceId,
-            allocationId: this.allocationId
-          }
+    await this.dvs.waitAndPost<DeleteResourceRes>(this.apiPath, () => ({
+      inputs: {
+        input: {
+          resourceId: this.resourceId,
+          allocationId: this.allocationId
         }
-      })
-      .toPromise();
+      }
+    }));
   }
 }

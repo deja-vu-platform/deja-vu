@@ -1,19 +1,21 @@
 <dv.component name="signup">
   <lingua.navbar accessRequired=false />
   <div class="center-column-dynamic-auth">
-    <h2 class="form-signin-heading">Sign Up</h2>
+    <h2>Sign Up</h2>
+    <hr/>
     <dv.tx>
       <dv.gen-id />
+      <dv.status />
       <chatTotal.create-group id=dv.gen-id.id hidden=true />
       <userProfile.create-object id=dv.gen-id.id
         showExclude=['aboutMe', 'learningLanguage']
         showOptionToSubmit=false />
       <authentication.register-user id=dv.gen-id.id showOptionToSubmit=false />
-      <dv.button>Sign Up</dv.button>
+      <dv.button class="highlight-button">Sign Up</dv.button>
       <dv.callback defaultHref="/profile" onExecSuccess=true hidden=true />
     </dv.tx>
     <div>
-      <dv.link href="/login" id='back-to-login'>Back to Login page</dv.link>
+      Already have an account? <dv.link href="/login">Log In</dv.link>
     </div>
   </div>
 </dv.component>

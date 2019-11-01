@@ -2,13 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, NgZone,
   OnChanges, OnDestroy, OnInit, Output, SimpleChanges
 } from '@angular/core';
-import {
-  ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 
 import { MouseEvent as AgmMouseEvent } from '@agm/core';
 
@@ -38,10 +32,6 @@ export class DisplayMapComponent
   implements AfterViewInit, OnDestroy, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
 
   public options: L.MapOptions;
   public bounds: L.LatLngBounds;
@@ -112,36 +102,30 @@ export class DisplayMapComponent
 
   @Output() newMarker: EventEmitter<Marker> = new EventEmitter<Marker>();
 
-  private gs: GatewayService;
-  destroyed = new Subject<any>();
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private csf: ConfigServiceFactory,
-    private rs: RunService, private zone: NgZone,
-    private router: Router, @Inject(API_PATH) private apiPath) {
-  }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly zone: NgZone,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-
-    this.mapType = this.csf.createConfigService(this.elem)
-      .getConfig().mapType;
-    if (this.mapType !== 'gmap') {
-      this.setUpLeafletMap();
-    }
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
         this.newMarker.emit(null);
         if (this.mapType !== 'gmap') {
           this.setUpLeafletMap();
         }
         this.load();
-      });
+      })
+      .build();
+
+    this.mapType = this.dvs.config
+      .getConfig().mapType;
+    if (this.mapType !== 'gmap') {
+      this.setUpLeafletMap();
+    }
   }
 
   ngAfterViewInit() {
@@ -149,27 +133,14 @@ export class DisplayMapComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -309,59 +280,46 @@ export class DisplayMapComponent
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      const f = { ofMapId: this.id };
-      if (this.center && this.radius) {
-        f['centerLat'] = this.center.latitude;
-        f['centerLng'] = this.center.longitude;
-        f['radius'] = this.radius;
-      }
-      if (!_.isNil(this._markerIds)) {
-        f['markerIds'] = this._markerIds;
-      }
-      this.gs
-        .get<{ data: { markers: Marker[] } }>(this.apiPath, {
-          params: {
-            inputs: JSON.stringify({ input: f }),
-            extraInfo: {
-              returnFields: `
-                title
-                latitude
-                longitude
-              `
-            }
+      const res = await this.dvs
+        .waitAndGet<{ data: { markers: Marker[] } }>(this.apiPath, () => {
+          const f = { ofMapId: this.id };
+          if (this.center && this.radius) {
+            f['centerLat'] = this.center.latitude;
+            f['centerLng'] = this.center.longitude;
+            f['radius'] = this.radius;
           }
-        })
-        .subscribe((res) => {
-          this.markers = res.data.markers;
+          if (!_.isNil(this._markerIds)) {
+            f['markerIds'] = this._markerIds;
+          }
+
+          return {
+            params: {
+              inputs: JSON.stringify({ input: f }),
+              extraInfo: {
+                returnFields: `
+                  title
+                  latitude
+                  longitude
+                `
+              }
+            }
+          };
         });
+      this.markers = res.data.markers;
     }
   }
 
   ngOnDestroy(): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   private canEval(): boolean {
     if (this.expectMarkers) {
       return false;
     } else if (this.center || this.radius) {
-      return !!(this.id && this.gs && this.center && this.radius);
+      return !!(this.id && this.dvs && this.center && this.radius);
     } else {
-      return !!(this.id && this.gs);
+      return !!(this.id && this.dvs);
     }
   }
 }

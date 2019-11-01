@@ -6,12 +6,8 @@
         <div class="offset-lg-4 col-lg-4 offset-lg-4">
           <hr class="user-form" />
           <dv.tx>
-            <hostAuthentication.sign-in
-              class="full"
-              inputLabel="username"
-              passwordLabel="password"
-              buttonLabel="LOGIN" />
-            <dv.callback defaultHref="/host" onExecSuccess=true hidden=true />
+            <hostAuthentication.sign-in class="full" buttonLabel="LOGIN" />
+            <dv.link href="/host" hidden=true />
           </dv.tx>
           <p>Don't have an account? Sign up
              <dv.link href="/register" class="link inline-block">here</dv.link>

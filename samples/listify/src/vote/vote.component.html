@@ -15,15 +15,11 @@
         user=$loggedInUser hidden=true />
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === 1>
-          <img
-             className="vote-button upvote"
-             src="assets/active-upvote.svg"/>
+          <img class="vote-button upvote" src="assets/active-upvote.svg"/>
         </dv.if>
         <dv.if condition=!scoring.show-score.loadedScore ||
           scoring.show-score.loadedScore?.value !== 1>
-          <img
-             className="vote-button upvote"
-             src="assets/upvote.svg"/>
+          <img class="vote-button upvote" src="assets/upvote.svg"/>
         </dv.if>
       </dv.button>
       <scoring.create-score as upvote-create-score
@@ -50,7 +46,7 @@
     </dv.tx>
     <dv.if condition=scoring.show-target.loadedTarget?.total !== 0>
       <p
-        className=scoring.show-target.loadedTarget?.total gt 0 ?
+        class=scoring.show-target.loadedTarget?.total gt 0 ?
         'vote-count vote-count-positive' : 'vote-count vote-count-negative' >
           <scoring.show-target
             totalLabel=""
@@ -66,13 +62,13 @@
       <dv.button>
         <dv.if condition=scoring.show-score.loadedScore?.value === -1>
           <img
-             className="vote-button downvote"
+             class="vote-button downvote"
              src="assets/active-downvote.svg"/>
         </dv.if>
         <dv.if condition=!scoring.show-score.loadedScore ||
           scoring.show-score.loadedScore?.value !== -1>
           <img
-             className="vote-button downvote"
+             class="vote-button downvote"
              src="assets/downvote.svg"/>
         </dv.if>
       </dv.button>

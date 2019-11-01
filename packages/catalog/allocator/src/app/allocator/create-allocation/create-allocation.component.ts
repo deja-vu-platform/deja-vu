@@ -3,9 +3,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
@@ -21,6 +19,7 @@ export interface CreateAllocationRes {
   templateUrl: './create-allocation.component.html'
 })
 export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
+  @Input() waitOn: string[];
   @Input() id: string | undefined;
   @Input() resourceIds: string[];
   @Input() consumerIds: string[];
@@ -32,62 +31,40 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
   resourceIdsChange = new EventEmitter();
   consumerIdsChange = new EventEmitter();
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
-    @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.resourceIds) {
-      this.resourceIdsChange.emit(null);
-    }
-    if (changes.consumerIds) {
-      this.consumerIdsChange.emit(null);
+    if (this.dvs) {
+      this.dvs.waiter.processChanges(changes);
     }
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec() {
-    if (this.resourceIds === undefined) {
-      console.log('Create allocation waiting for resourceIds');
-      await this.resourceIdsChange.asObservable()
-        .pipe(take(1))
-        .toPromise();
-    }
-    if (this.consumerIds === undefined) {
-      console.log('Create allocation waiting for consumerIds');
-      await this.consumerIdsChange.asObservable()
-        .pipe(take(1))
-        .toPromise();
-    }
-    console.log(`Create allocation with ${this.id}`);
-
-    return this.gs.post<CreateAllocationRes>(this.apiPath, {
-      inputs: {
-        input: {
-          id: this.id,
-          resourceIds: this.resourceIds,
-          consumerIds: this.consumerIds
-        }
-      },
-      extraInfo: { returnFields: 'id' }
-    })
-      .toPromise()
-      .then((res) => {
-        this.allocation.emit({ id: res.data.createAllocation.id });
-
-        return res;
-      });
+    const res = await this.dvs.waitAndPost<CreateAllocationRes>(this.apiPath,
+      () => ({
+        inputs: {
+          input: {
+            id: this.id,
+            resourceIds: this.resourceIds,
+            consumerIds: this.consumerIds
+          }
+        },
+        extraInfo: { returnFields: 'id' }
+      }));
+    this.allocation.emit({ id: res.data.createAllocation.id });
   }
 }

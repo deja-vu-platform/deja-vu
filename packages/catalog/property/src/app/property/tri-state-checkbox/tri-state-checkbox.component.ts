@@ -22,7 +22,6 @@ import { MAT_CHECKBOX_CLICK_ACTION } from '@angular/material';
   ]
 })
 export class TriStateCheckboxComponent implements ControlValueAccessor {
-
   tape = [undefined, true, false];
 
   value: boolean;
@@ -55,5 +54,4 @@ export class TriStateCheckboxComponent implements ControlValueAccessor {
   registerOnTouched(fn: any) {
     this.onTouched = fn;
   }
-
 }

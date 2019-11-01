@@ -51,14 +51,14 @@
             </div>
           </div>
 
-          <div id="are-host">
-            <dv.if condition=rendezvous.navbar.loggedInUser?.id
-              === authorization.show-owner.ownerId>
-              <p id="event-host">
-                YOU ARE THE HOST OF THIS EVENT
-              </p>
-            </dv.if>
-          </div>
+          <dv.if id="are-host" condition=rendezvous.navbar.loggedInUser?.id
+            === authorization.show-owner.ownerId>
+            <p id="event-host">YOU ARE THE HOST OF THIS EVENT</p>
+            <dv.link href="/update-event"
+              params={ eventId: $eventId } class="btn button">
+              Edit Event
+            </dv.link>
+          </dv.if>
 
           <!-- Join Group if already not in it -->
           <div id="join-leave">

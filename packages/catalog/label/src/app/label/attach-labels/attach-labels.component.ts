@@ -5,8 +5,7 @@ import {
 import { MatChipInputEvent } from '@angular/material';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure,
-  OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -26,8 +25,8 @@ interface AddLabelsToItemRes {
   templateUrl: './attach-labels.component.html',
   styleUrls: ['./attach-labels.component.css']
 })
-export class AttachLabelsComponent implements
-  OnInit, OnExec, OnExecFailure, OnExecSuccess {
+export class AttachLabelsComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() itemId: string;
   @Input() labels: Label[] | undefined;
 
@@ -37,6 +36,7 @@ export class AttachLabelsComponent implements
   @Input() addOnBlur = true;
 
   @Input() showOptionToSubmit = true;
+  @Input() clearLabelsOnSave = true;
 
   // Presentation inputs
   @Input() inputLabel = 'Add label...';
@@ -49,15 +49,15 @@ export class AttachLabelsComponent implements
   // Enter, comma
   separatorKeysCodes = [ENTER, COMMA];
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
 
     if (_.isEmpty(this.labels)) {
       this.labels = [];
@@ -65,7 +65,7 @@ export class AttachLabelsComponent implements
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   add(event: MatChipInputEvent): void {
@@ -92,15 +92,14 @@ export class AttachLabelsComponent implements
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<AddLabelsToItemRes>(this.apiPath, {
+    const res = await this.dvs.post<AddLabelsToItemRes>(this.apiPath, {
       inputs: {
         input: {
           itemId: this.itemId,
           labelIds: _.map(this.labels, 'id')
         }
       }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
@@ -111,7 +110,9 @@ export class AttachLabelsComponent implements
   dvOnExecSuccess() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
-    this.labels = [];
+    if (this.clearLabelsOnSave) {
+      this.labels = [];
+    }
     window.setTimeout(() => {
       this.labelsAttached = false;
     }, SAVED_MSG_TIMEOUT);

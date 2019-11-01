@@ -26,7 +26,7 @@ so we can add it to the list.
   [Comment][comment], [Group][group], [Property][property] (x5), and
   [Rating][rating]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="accord" %}
 
 - Chorestar
 
@@ -36,7 +36,7 @@ so we can add it to the list.
   [Authorization][authorization] (x2), [Group][group],
   [Property][Property] (x3), [Task][task], and [Transfer][transfer]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="chorestar" %}
 
 - EasyPick
 
@@ -45,7 +45,7 @@ so we can add it to the list.
   Uses [Authentication][authentication], [Authorization][authorization],
   [Comment][comment], [Property][property] (x3), and [Rating][rating] (x4)
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="easypick" %}
 
 - GroceryShip
 
@@ -54,7 +54,7 @@ so we can add it to the list.
   Uses [Authentication][authentication], [Authorization][authorization],
   [Property][property] (x3), and [Rating][rating]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="groceryship" %}
 
 - Lingua
 
@@ -64,7 +64,7 @@ so we can add it to the list.
   [Chat][chat], [Group][group] (x2), [Property][property] (x3), and
   [Rating][rating]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="lingua" %}
 
 - Listify
 
@@ -73,7 +73,7 @@ so we can add it to the list.
   Uses [Authentication][authentication], [Group][group],
   [Property][property] (x3), [Ranking][ranking], and [Scoring][scoring]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="listify" %}
 
 - LiveScorecard
 
@@ -83,7 +83,7 @@ so we can add it to the list.
   [Event][event], [Group][group] (x3), [Label][label] (x2), [Passkey][passkey]
   (x2), [Property][property] (x3), [Scoring][scoring] (x2), and [Task][task]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="livescorecard" %}
 
 - MapCampus
 
@@ -103,7 +103,7 @@ so we can add it to the list.
   [Comment][comment], [Geolocation][geolocation], [Label][label],
   [Match][match], [Property][property] (x2), [Schedule][schedule]
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="phoenix" %}
 
 - Potluck
 
@@ -113,7 +113,7 @@ so we can add it to the list.
   [Event][event], [Group][group], [Property][property] (x2), and
   [Transfer][transfer] 
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="potluck" %}
 
 - Rendezvous
 
@@ -123,7 +123,7 @@ so we can add it to the list.
   [Comment][comment], [Event][event], [Geolocation][geolocation],
   [Group][group], [Label][label], and [Property][property] (x2)
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="rendezvous" %}
 
 - SweetSpots
 
@@ -134,7 +134,7 @@ so we can add it to the list.
   [Property][property], [Rating][rating], and [Scoring][scoring] (x2)
 
 
-  {% include sample-btns.html name="mapcampus" %}
+  {% include sample-btns.html name="sweetspots" %}
 
 
 [authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication

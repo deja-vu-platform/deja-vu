@@ -1,23 +1,11 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef, EventEmitter,
-  Inject,
-  Input, OnChanges,
-  OnInit,
-  Output
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges,
+  OnInit, Output
 } from '@angular/core';
 
-import {
-  ConfigServiceFactory,
-  GatewayService,
-  GatewayServiceFactory,
-  OnEval,
-  RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Transfer } from '../shared/transfer.model';
 import { API_PATH } from '../transfer.config';
-
 
 import * as _ from 'lodash';
 
@@ -31,8 +19,8 @@ interface TransferRes {
   selector: 'transfer-show-transfer',
   templateUrl: './show-transfer.component.html'
 })
-export class ShowTransferComponent implements AfterViewInit, OnEval, OnInit,
-OnChanges {
+export class ShowTransferComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   @Input() transfer: Transfer;
   @Input() id: string;
 
@@ -45,18 +33,17 @@ OnChanges {
 
   balanceType: 'money' | 'items';
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath,
-    private csf: ConfigServiceFactory) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
 
-    this.balanceType = this.csf.createConfigService(this.elem)
+    this.balanceType = this.dvs.config
       .getConfig().balanceType;
   }
 
@@ -70,7 +57,7 @@ OnChanges {
 
   loadTransfer() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -78,7 +65,7 @@ OnChanges {
     if (this.canEval()) {
       const selection = this.balanceType === 'money' ?
         '' : ' { id, count }';
-      this.gs.get<TransferRes>(this.apiPath, {
+      const res = await this.dvs.get<TransferRes>(this.apiPath, {
         params: {
           inputs: {
             id: this.id
@@ -92,21 +79,19 @@ OnChanges {
             `
           }
         }
-      })
-      .subscribe((res) => {
-        if (res.errors) {
-          throw new Error(_.map(res.errors, 'message')
-            .join());
-        }
-        this.transfer = res.data.transfer;
-        this.loadedTransfer.emit(this.transfer);
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      if (res.errors) {
+        throw new Error(_.map(res.errors, 'message')
+          .join());
+      }
+      this.transfer = res.data.transfer;
+      this.loadedTransfer.emit(this.transfer);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && !this.transfer && this.id);
+    return !!(this.dvs && !this.transfer && this.id);
   }
 }

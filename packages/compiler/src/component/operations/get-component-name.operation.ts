@@ -6,7 +6,8 @@ import * as _ from 'lodash';
 
 
 export function getComponentName() {
-  const invalidComponentNameValue = 'the value of the component name should be text';
+  const invalidComponentNameValue = 'the value of the component name should ' +
+    'be text';
   const err = (_expr) => { throw new Error(invalidComponentNameValue); };
 
   return {
@@ -31,6 +32,7 @@ export function getComponentName() {
     },
     ElementName_component: (componentNameMaybeAlias): string | null =>
       componentNameMaybeAlias.getComponentName(),
+    ElementName_html: (name): string | null => name.sourceString,
     ComponentNameMaybeAlias: (componentName, _maybeAlias): string | null =>
       componentName.sourceString,
     Attribute: (name, _eq, expr): string | null => {

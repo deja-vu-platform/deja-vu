@@ -177,7 +177,11 @@ async function register(
   // this will fail for duplicate users because of the unique index
   // on both id and username
 
-  return await users.insertOne(context, newUser);
+  try {
+    return await users.insertOne(context, newUser);
+  } catch (e) {
+    throw new Error('User already exists');
+  }
 }
 
 function sign(userId: string): string {

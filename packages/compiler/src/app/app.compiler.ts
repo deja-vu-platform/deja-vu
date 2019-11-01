@@ -57,6 +57,7 @@ function htmlFilesFromGlobs(
 
 export class AppCompiler {
   static DVCONFIG_FILE_PATH = 'dvconfig.json';
+  static PACKAGEJSON_FILE_PATH = 'package.json';
 
   private readonly componentCompiler = new ComponentCompiler();
   private readonly symbolTable: SymbolTable = {};
@@ -66,7 +67,7 @@ export class AppCompiler {
    * Compile a Déjà Vu application
    *
    * @param projectDir the directory containing the dv app files. There must be
-   *                   a `dvconfig.json` file at the root
+   *                   a `dvconfig.json` and `package.json` file at the root
    * @param cacheDir directory to use to read and update compiled files
    * @param installDependencies whether to install app dependencies or not
    */
@@ -83,6 +84,18 @@ export class AppCompiler {
 
   compile() {
     console.log(`Using cache dir ${this.cacheDir}`);
+    const packageJsonPath: string = path
+      .join(this.projectDir, AppCompiler.PACKAGEJSON_FILE_PATH);
+    const packageJsonContents = JSON.parse(
+      readFileSync(packageJsonPath, 'utf8'));
+    const version = _.get(
+      packageJsonContents, ['dependencies', '@deja-vu/cli']);
+    if (version === undefined) {
+      throw new Error(
+        `Couldn't figure out what verion of DV to use. Your ` +
+        `package.json should have @deja-vu/cli under dependencies`);
+    }
+
     const dvConfigPath: string = path
       .join(this.projectDir, AppCompiler.DVCONFIG_FILE_PATH);
     const dvConfigContents: string = readFileSync(dvConfigPath, 'utf8');
@@ -107,10 +120,10 @@ export class AppCompiler {
       .uniq()
       .value();
 
-    const ngAppBuilder = new NgAppBuilder(appName, dvConfigContents);
+    const ngAppBuilder = new NgAppBuilder(
+      appName, version, dvConfigContents);
     _.each(usedConcepts, (usedConcept: string) => {
-      // TODO: get the current version instead of hard-coding a value
-      ngAppBuilder.addDependency(usedConcept, '0.0.1');
+      ngAppBuilder.addDependency(usedConcept, version);
     });
 
     if (dvConfig.routes !== undefined) {

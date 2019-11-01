@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -23,8 +23,8 @@ interface PublishersRes {
   templateUrl: './show-publishers.component.html',
   styleUrls: ['./show-publishers.component.css']
 })
-export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowPublishersComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // Fetch rules
   // If undefined, fetch all publishers.
   // Else, fetch the publishers of the given follower.
@@ -44,17 +44,17 @@ export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
   publishers: Publisher[] = [];
 
   showPublishers;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showPublishers = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -67,13 +67,13 @@ export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs
+      const res = await this.dvs
         .get<PublishersRes>(this.apiPath, {
           params: {
             inputs: JSON.stringify({
@@ -83,16 +83,14 @@ export class ShowPublishersComponent implements AfterViewInit, OnEval, OnInit,
             }),
             extraInfo: { returnFields: 'id' }
           }
-        })
-        .subscribe((res) => {
-          this.publishers = res.data.publishers;
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.publishers = res.data.publishers;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

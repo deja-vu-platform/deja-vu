@@ -16,20 +16,9 @@ body {
   color: white;
 }
 
-.create-event-btn a {
-  color: white;
-}
-
 .logo-img {
   width: 80%;
   margin-bottom: 10px;
-}
-
-.btn-blue,
-.btn-blue:hover {
-  background-color: #1FB8CC;
-  color: white;
-  border-color: white;
 }
 
 .login-signup-container {
@@ -76,29 +65,13 @@ h2 {
   margin-left: 0px;
 }
 
-.event-btn-container {
-  float: right;
-}
-
-.event-btn-container>.btn {
-  margin-left: 10px;
-}
-
 authentication-register-user button.mat-button,
-authentication-register-user button.mat-button:hover {
-  background-color: #1FB8CC;
-  border-color: white;
+authentication-register-user button.mat-button:hover,
+authentication-sign-in button.mat-button,
+authentication-sign-in button.mat-button:hover {
   width: 80%;
   margin-bottom: 5px;
   margin-top: 10px;
-}
-
-authentication-register-user button.mat-button:disabled {
-  background-color: lightgrey;
-}
-
-authentication-register-user span.mat-button-wrapper {
-  color: white;
 }
 
 authentication-register-user .mat-input-container,
@@ -124,12 +97,25 @@ authorization-show-resources li {
   border: none;
 }
 
-.cancel-event-btn-container button.mat-button {
-  background-color: red;
-  color: white;
+.list-group-item {
+  width: 100%;
 }
 
-.cancel-event-btn button.mat-button {
+.cancel-event-btn .mat-button {
   background-color: #ff392e;
-  color: white;
+}
+
+.cancel-btn .mat-button {
+  margin-right: 10px;
+  color: #1fb8cc !important;
+  background-color: transparent !important;
+}
+
+.mat-button {
+  background-color: #1fb8cc;
+  color: white !important;
+}
+
+.mat-button:disabled {
+  background-color: lightgrey !important;
 }

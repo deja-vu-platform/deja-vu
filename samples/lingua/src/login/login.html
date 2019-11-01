@@ -1,13 +1,14 @@
 <dv.component name="login">
   <lingua.navbar accessRequired=false />
-  <div id="content" class="center-column-dynamic-auth">
-    <h2 class="form-signin-heading">Log In</h2>
+  <div class="center-column-dynamic-auth">
+    <h2>Log In</h2>
+    <hr/>
     <dv.tx>
       <authentication.sign-in />
-      <dv.callback defaultHref="/" onExecSuccess=true hidden=true />
+      <dv.link href="/chat" hidden=true />
     </dv.tx>
     <div>
-      Don't have an account? <dv.link href="/signup"> Sign up here!</dv.link>
+      Don't have an account? <dv.link href="/signup"> Sign up</dv.link>
     </div>
   </div>
 </dv.component>

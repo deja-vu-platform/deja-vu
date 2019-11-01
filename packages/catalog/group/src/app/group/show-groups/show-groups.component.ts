@@ -3,7 +3,7 @@ import {
   Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { ShowGroupComponent } from '../show-group/show-group.component';
@@ -19,14 +19,10 @@ import { filter, take } from 'rxjs/operators';
   templateUrl: './show-groups.component.html',
   styleUrls: ['./show-groups.component.css']
 })
-export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowGroupsComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
   @Input() withMemberId = '';
@@ -45,17 +41,17 @@ export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
   @Output() groupIds = new EventEmitter<string[]>();
 
   showGroups;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory) {
     this.showGroups = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
@@ -63,47 +59,21 @@ export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs
-        .get<{data: {groups: Group[]}}>('/graphql', {
+      const res = await this.dvs
+        .waitAndGet<{ data: { groups: Group[] } }>('/graphql', () => ({
           params: {
             inputs: JSON.stringify({
               input: {
@@ -117,18 +87,16 @@ export class ShowGroupsComponent implements AfterViewInit, OnEval, OnInit,
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._groups = res.data.groups;
-          this.groups.emit(this._groups);
-          this.groupIds.emit(_.map(this._groups, 'id'));
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }));
+        this._groups = res.data.groups;
+        this.groups.emit(this._groups);
+        this.groupIds.emit(_.map(this._groups, 'id'));
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

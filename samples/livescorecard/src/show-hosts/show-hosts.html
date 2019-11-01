@@ -2,20 +2,23 @@
   <livescorecard.host-navbar />
   <div class="container below-navbar">
     <div class="row">
-      <div class="col-4">
-        First Name
-      </div>
-      <div class="col-4">
-        Last Name
-      </div>
-      <div class="col-4">
-        Email
-      </div>
+      <div class="col-4 white">first name</div>
+      <div class="col-4 white">last name</div>
+      <div class="col-4 white">username</div>
     </div>
-    <br />
     <livescorecard.create-host competitionId=$competitionId
       loggedInUserId=livescorecard.host-navbar.loggedInUserId />
-    <competitionHosts.show-members inGroupId=$competitionId
-      showMember=<livescorecard.show-host id=$id /> />
+    <dv.tx>
+      <hostAuthentication.authenticate
+        id=livescorecard.host-navbar.loggedInUserId waitOn=['id'] hidden=true />
+      <authorization.verify-can-view
+        resourceId=$competitionId
+        principalId=livescorecard.host-navbar.loggedInUserId
+        waitOn=['resourceId', 'principalId'] hidden=true />
+      <competitionHosts.show-members
+        inGroupId=$competitionId
+        waitOn=['inGroupId']
+        showMember=<livescorecard.show-host id=$id /> />
+    </dv.tx>
   </div>
 </dv.component>

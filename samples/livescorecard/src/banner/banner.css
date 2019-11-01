@@ -1,5 +1,4 @@
 .head {
-  color: white;
   padding-bottom: 0.3em;
 }
 
@@ -18,13 +17,11 @@
 @media screen and (min-width: 495px) {
   .head {
     margin-top: -1.5em;
-    color: white;
   }
 }
 
 @media screen and (max-width: 495px) {
   .head {
     margin-top: -2.5em;
-    color: white;
   }
 }

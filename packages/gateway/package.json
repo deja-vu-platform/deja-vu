@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/gateway",
   "description": "Gateway server for Déjà Vu",
   "license": "MIT",
@@ -8,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.1",
+  "version": "0.0.9",
   "main": "./dist/gateway.js",
   "scripts": {
     "build": "tsc && chmod +x ./dist/gateway.js",
@@ -30,13 +29,15 @@
     "lodash.product": "^18.1.16",
     "minimist": "^1.2.0",
     "relaxed-json": "^1.0.1",
+    "subscriptions-transport-ws": "^0.9.16",
     "superagent": "^3.8.2",
     "uuid": "^3.2.1",
-    "vm2": "^3.8.2"
+    "vm2": "^3.8.2",
+    "ws": "^7.1.2"
   },
   "peerDependencies": {
     "lodash": "^4.17.5",
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.1.8"
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.0",
@@ -50,9 +51,13 @@
     "@types/superagent": "^3.5.7",
     "@types/uuid": "^3.4.3",
     "jasmine": "~3.4.0",
+    "mongodb": "^3.1.8",
     "prettier": "^1.18.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

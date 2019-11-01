@@ -128,7 +128,7 @@ phoenix-signin {
 }
 
 authentication-sign-in .mat-button,
-.authentication-register .mat-button {
+authentication-register-user .mat-button {
   background-color: #029f5b;
   outline: none;
   color: #fff;

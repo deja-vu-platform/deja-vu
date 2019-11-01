@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -16,8 +16,8 @@ import { Location, Marker } from '../shared/geolocation.model';
   templateUrl: './show-markers.component.html',
   styleUrls: ['./show-markers.component.css']
 })
-export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges {
+export class ShowMarkersComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges {
   // Fetch rules
   @Input() ofMapId: string | undefined;
   @Input() center: Location | undefined;
@@ -36,17 +36,16 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
   markers: Marker[] = [];
 
   showMarkers;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory) {
     this.showMarkers = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -59,7 +58,7 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
@@ -71,7 +70,7 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
         filter['centerLng'] = this.center.longitude;
         filter['radius'] = this.radius;
       }
-      this.gs
+      const res = await this.dvs
         .get<{ data: { markers: Marker[] } }>('/graphql', {
           params: {
             inputs: JSON.stringify({ input: filter }),
@@ -85,20 +84,18 @@ export class ShowMarkersComponent implements AfterViewInit, OnEval, OnInit,
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this.markers = res.data.markers;
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this.markers = res.data.markers;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
     if (this.center || this.radius) {
-      return !!(this.gs && this.center && this.radius);
+      return !!(this.dvs && this.center && this.radius);
     } else {
-      return !!(this.gs);
+      return !!(this.dvs);
     }
   }
 }

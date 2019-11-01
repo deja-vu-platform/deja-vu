@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@deja-vu/compiler",
   "description": "Déjà Vu compiler",
   "license": "MIT",
@@ -8,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.1",
+  "version": "0.0.9",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc && cp src/component/component.grammar.ohm dist/component && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
@@ -43,5 +42,8 @@
   },
   "peerDepencies": {
     "lodash": "^4.17.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

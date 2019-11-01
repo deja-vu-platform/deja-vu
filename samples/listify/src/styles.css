@@ -35,6 +35,10 @@ h2 .selected-tab {
   color: black;
 }
 
+.navbar {
+  border-bottom: 2px solid silver;
+}
+
 .navbar-brand a {
   color: #E52F4F;
 }
@@ -97,8 +101,6 @@ h2 .selected-tab {
 
 .card-container {
   margin-left: 40px;
-  margin-top: 20px;
-  margin-bottom: -20px;
   width: 300px;
 
   border-style: solid;

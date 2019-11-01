@@ -5,6 +5,7 @@
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 @import url('https://fonts.googleapis.com/css?family=Mogra');
+
 md-icon {
   font-family: 'Material Icons' !important;
 }
@@ -15,29 +16,17 @@ p {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #696969;
-}
-
-a:hover {
-  cursor: pointer;
-}
-
 h1 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #696969;
   margin:0;
 }
 
 h2 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #696969;
-  margin:0;
 }
 
 h3 {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #696969;
   margin: 0 0 5px 0;
 }
 
@@ -59,7 +48,9 @@ main {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #e0e0e0 !important;
+  background-image: url("/assets/map_background.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 /* Layouts */
@@ -67,26 +58,23 @@ main {
   margin: 30px 70px;
 }
 
-.center-column-dynamic-thin {
-  padding-top: 40px;
-  margin: auto;
-  width: 25%;
-}
-
 .align-center-middle {
   text-align: center;
 }
 
-.center-column-dynamic-medium {
-  padding-top: 40px;
-  margin: auto;
-  width: 35%;
-}
-
 .center-column-dynamic-auth {
   margin: auto;
-  padding-top: 40px;
-  width: 280px;
+  margin-top: 40px;
+  width: 35%;
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 30px;
+}
+
+.box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 30px;
 }
 
 .left-column {
@@ -138,7 +126,7 @@ main {
 }
 
 
-.right-column{
+.right-column {
   float: right;
   width: 75%;
   padding: 30px 50px;
@@ -165,7 +153,8 @@ main {
 }
 
 /* Buttons */
-.highlight-button button.mat-button {
+.highlight-button button.mat-button,
+button.mat-button {
   border-color: #208a46;
   color: #fff;
   background: #29b35b linear-gradient(to bottom, #2ec866, #29b35b);
@@ -173,13 +162,14 @@ main {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -1px 4px rgba(32, 138, 70, 0.3);
 }
 
-.highlight-button button.mat-button:hover {
+.highlight-button button.mat-button:hover,
+button.mat-button:hover {
   background: #449d44;
   border-color: #398439;
 }
 
 /* Navbar */
-.navbar a{
+.navbar a {
   color: #262626;
   display: inline-block;
   text-align:center;
@@ -201,6 +191,7 @@ main {
 
 .navbar {
   background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .login-btn a,
@@ -231,6 +222,11 @@ main {
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
   background: #ffffff;
   border-radius: 4px;
+}
+
+.chat-selected {
+  font-weight: bold;
+  font-style: italic;
 }
 
 .bold {

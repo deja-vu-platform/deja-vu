@@ -18,7 +18,7 @@ import { SubscriptionCoordinator } from './subscriptionCoordinator';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 import { ComponentPath } from './componentPath';
-import { DvConfig, GatewayConfig } from './gateway.model';
+import { DvConfig, GatewayConfig, getPort } from './gateway.model';
 
 import { InputValuesMap, TxInputsValidator } from './txInputsValidator';
 
@@ -94,7 +94,7 @@ export class ResponseBatch {
    * Add a response to the batch.
    * A single response is sent once we have reached the batchSize
    */
-  add(status: number, text: string, index?: number): void {
+  add(status: number, text: string, index: number): void {
     this.responses.push({
       status,
       text,
@@ -323,11 +323,14 @@ export abstract class RequestProcessor {
       .all(gatewayToConceptRequests
         .map((gatewayToConceptRequest, index) =>
           this.txCoordinator.processMessage(
-            gatewayToConceptRequest.runId,
-            gatewayToConceptRequest.from.serialize(),
+            gatewayToConceptRequest.runId, // txId
+            gatewayToConceptRequest.from.serialize(), // cohortId
             this.getCohorts(
-              gatewayToConceptRequest.from.serialize(), prunedCohortComponents),
-            gatewayToConceptRequest, resBatch, index)))
+              gatewayToConceptRequest.from.serialize(),
+              prunedCohortComponents), // cohorts
+            gatewayToConceptRequest, // msg
+            resBatch, // state
+            index)))
       .then(() => {});
   }
 
@@ -360,7 +363,7 @@ export abstract class RequestProcessor {
         .ForwardRequest<string>(gatewayToConceptRequest);
       resBatch.add(conceptRes.status, conceptRes.text, 1);
     } catch (e) {
-      resBatch.add(INTERNAL_SERVER_ERROR, e.message);
+      resBatch.add(INTERNAL_SERVER_ERROR, e.message, 1);
     }
   }
 
@@ -494,16 +497,17 @@ export abstract class RequestProcessor {
 
       sendAbortToClient: (
         causedAbort: boolean, _gcr?: GatewayToConceptRequest,
-        payload?: ConceptResponse<string>, txRes?: ResponseBatch) => {
+        payload?: ConceptResponse<string>, txRes?: ResponseBatch,
+        index?: number) => {
         assert.ok(txRes !== undefined);
         if (causedAbort) {
           assert.ok(payload !== undefined);
-          txRes!.add(payload!.status, payload!.text);
+          txRes!.add(payload!.status, payload!.text, index);
         } else {
           txRes!.add(
             INTERNAL_SERVER_ERROR,
-            'the tx that this component is part of aborted'
-          );
+            'the tx that this component is part of aborted',
+            index);
         }
       },
 
@@ -516,9 +520,10 @@ export abstract class RequestProcessor {
       },
 
       onError: (
-        e: Error, _gcr: GatewayToConceptRequest, txRes?: ResponseBatch) => {
+        e: Error, _gcr: GatewayToConceptRequest, txRes?: ResponseBatch,
+        index?: number) => {
         console.error(e);
-        txRes!.add(INTERNAL_SERVER_ERROR, e.message);
+        txRes!.add(INTERNAL_SERVER_ERROR, e.message, index);
       }
     };
   }
@@ -537,10 +542,10 @@ export class AppRequestProcessor extends RequestProcessor {
     this.dvConfig = dvConfig;
 
     _.forEach(dvConfig.usedConcepts, (conceptConfig, name) => {
-      this.dstTable[name] = conceptConfig.config.wsPort;
+      this.dstTable[name] = getPort(conceptConfig.config.wsPort);
     });
     if (dvConfig.config) {
-      this.dstTable[dvConfig.name] = dvConfig.config.wsPort;
+      this.dstTable[dvConfig.name] = getPort(dvConfig.config.wsPort);
     }
     console.log(`Using dst table ${stringify(this.dstTable)}`);
 
@@ -711,11 +716,14 @@ export class DesignerRequestProcessor extends RequestProcessor {
       .all(gatewayToConceptRequests
         .map((gatewayToConceptRequest, index) =>
           this.txCoordinator.processMessage(
-            gatewayToConceptRequest.runId,
-            gatewayToConceptRequest.from.serialize(),
+            gatewayToConceptRequest.runId, // txId
+            gatewayToConceptRequest.from.serialize(), // cohortId
             this.getCohorts(
-              gatewayToConceptRequest.from.serialize(), this.cohortComponents),
-            gatewayToConceptRequest, resBatch, index)))
+              gatewayToConceptRequest.from.serialize(),
+              this.cohortComponents), // cohorts
+            gatewayToConceptRequest, // msg
+            resBatch, // state
+            index)))
       .then(() => {});
   }
 

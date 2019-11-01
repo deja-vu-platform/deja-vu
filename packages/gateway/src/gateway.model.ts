@@ -1,8 +1,9 @@
+import * as _ from 'lodash';
 
 export interface GatewayConfig {
   readonly dbHost: string;
   readonly dbPort: number;
-  readonly wsPort: number;
+  readonly wsPort: number | string;
   readonly dbName: string;
   readonly reinitDbOnStartup: boolean;
 }
@@ -24,7 +25,14 @@ export interface DvConfig {
 }
 
 export interface Config {
-  wsPort: number;
+  wsPort: number | string;
   reinitDbOnStartup?: boolean;
   [s: string]: any;
+}
+
+export function getPort(portValue: number | string): number {
+  return _.isString(portValue) && portValue.startsWith('$') ?
+    // it's an env variable
+    _.toNumber(process.env[portValue.slice(1)]) :
+    <number> portValue;
 }

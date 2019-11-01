@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/concept-server",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "The server class and its helpers for Déjà Vu concepts",
   "scripts": {
     "build": "tsc",
@@ -44,11 +44,13 @@
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
   "homepage": "https://github.com/spderosso/dejavu#readme",
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.js"
+  "main": "./dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -3,16 +3,14 @@ import {
   OnInit, Output
 } from '@angular/core';
 
-import {
-  GatewayService, GatewayServiceFactory, OnEval, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnEval } from '@deja-vu/core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../allocator.config';
 
 interface ConsumerOfResourceRes {
-  data: {consumerOfResource: string};
+  data: { consumerOfResource: string };
 }
 
 
@@ -20,23 +18,21 @@ interface ConsumerOfResourceRes {
   selector: 'allocator-show-consumer',
   templateUrl: './show-consumer.component.html'
 })
-export class ShowConsumerComponent implements AfterViewInit, OnChanges, OnEval,
-OnInit {
+export class ShowConsumerComponent
+  implements AfterViewInit, OnChanges, OnEval, OnInit {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Output() consumerId = new EventEmitter();
   _consumerId: string;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -49,13 +45,13 @@ OnInit {
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
+      const res = await this.dvs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
           inputs: JSON.stringify({
             input: {
@@ -64,18 +60,16 @@ OnInit {
             }
           })
         }
-      })
-      .pipe(map((res: ConsumerOfResourceRes) => res.data.consumerOfResource))
-      .subscribe((consumerId) => {
-        this._consumerId = consumerId;
-        this.consumerId.emit(consumerId);
       });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      const consumerId =  res.data.consumerOfResource;
+      this._consumerId = consumerId;
+      this.consumerId.emit(consumerId);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.resourceId && this.allocationId && this.gs);
+    return !!(this.resourceId && this.allocationId && this.dvs);
   }
 }

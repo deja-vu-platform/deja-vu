@@ -2,18 +2,14 @@ import {
   AfterViewInit, Component, ElementRef, EventEmitter,
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
 import { API_PATH } from '../authorization.config';
 
+import { CanDoRes } from '../shared/authorization.model';
 
-interface CanEditRes {
-  data: { canEdit: boolean };
-}
 
 @Component({
   selector: 'authorization-can-edit',
@@ -22,49 +18,53 @@ interface CanEditRes {
 })
 export class CanEditComponent implements
   AfterViewInit, OnInit, OnChanges, OnExec {
+  @Input() waitOn: string[];
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canEdit = new EventEmitter<boolean>();
   _canEdit = false;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
   }
 
   ngAfterViewInit() {
     this.load();
   }
 
-  ngOnChanges() {
-    this.load();
+  ngOnChanges(changes) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
+      this.load();
+    }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   dvOnEval() {
-    this.doRequest();
+    return this.doRequest();
   }
 
   dvOnExec() {
-    this.doRequest();
+    return this.doRequest();
   }
 
-  doRequest() {
-    if (!this.gs) {
+  async doRequest() {
+    if (!this.dvs) {
       return;
     }
-    this.gs.get<CanEditRes>(this.apiPath, {
+    const res = await this.dvs.waitAndGet<CanDoRes>(this.apiPath, () => ({
       params: {
         inputs: JSON.stringify({
           input: {
@@ -73,14 +73,12 @@ export class CanEditComponent implements
           }
         })
       }
-    })
-    .subscribe((res) => {
-      this._canEdit = res.data.canEdit;
-      this.canEdit.emit(this._canEdit);
-    });
+    }));
+    this._canEdit = res.data.canDo;
+    this.canEdit.emit(this._canEdit);
   }
 
   canEval() {
-    return this.gs && this.principalId && this.resourceId;
+    return this.dvs && this.principalId && this.resourceId;
   }
 }

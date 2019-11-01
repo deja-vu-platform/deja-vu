@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import { OnExec, RunService, StorageService } from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -12,20 +12,22 @@ import * as _ from 'lodash';
 export class SignOutComponent implements OnInit, OnExec {
   @Input() buttonLabel = 'Sign Out';
 
+  private dvs: DvService;
+
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private ss: StorageService) { }
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   signOut() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   dvOnExec() {
-    this.ss.removeItem(this.elem, 'token');
-    this.ss.removeItem(this.elem, 'user');
+    this.dvs.removeItems('token', 'user');
   }
 }

@@ -7,8 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 
@@ -29,8 +28,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-task.component.html',
   styleUrls: ['./create-task.component.css']
 })
-export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
-  OnExecSuccess {
+export class CreateTaskComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id;
   @Input() assignerId;
   @Input() showOptionToInputAssignee = true;
@@ -64,19 +63,19 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
   newTaskSaved = false;
   newTaskError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   outputSelectedAssignee(selectedAssignee: string) {
@@ -84,7 +83,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<CreateTaskResponse>('/graphql', {
+    const res = await this.dvs.post<CreateTaskResponse>('/graphql', {
       inputs: {
         input: {
           id: this.id,
@@ -94,8 +93,7 @@ export class CreateTaskComponent implements OnInit, OnExec, OnExecFailure,
         }
       },
       extraInfo: { returnFields: 'id' }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

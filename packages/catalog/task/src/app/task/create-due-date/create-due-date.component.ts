@@ -2,9 +2,8 @@ import {
   Component, EventEmitter, Input, OnInit, Output
 } from '@angular/core';
 import {
-  AbstractControl, ControlValueAccessor, FormControl,
-  NG_VALIDATORS, NG_VALUE_ACCESSOR,
-  ValidationErrors, Validator, Validators
+  AbstractControl, ControlValueAccessor, FormControl, NG_VALIDATORS,
+  NG_VALUE_ACCESSOR, ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
 // https://github.com/dherges/ng-packagr/issues/217

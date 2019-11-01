@@ -19,8 +19,7 @@ import {
 } from '../shared/schedule.utils';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -51,10 +50,11 @@ interface CreateScheduleRes {
     }
   ]
 })
-export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
-  OnExecFailure, OnExecSuccess {
+export class CreateScheduleComponent
+  implements AfterViewInit, OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() showOptionToSubmit = true;
+  @Input() showOptionToChangeView = true;
 
   // Presentation inputs
   @Input() buttonLabel = 'Create Schedule';
@@ -81,16 +81,15 @@ export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
 
   events: CalendarEvent[] = [];
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private cd: ChangeDetectorRef,
-    @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private cd: ChangeDetectorRef, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   ngAfterViewInit() {
@@ -142,11 +141,11 @@ export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<CreateScheduleRes>(this.apiPath, {
+    const res = await this.dvs.post<CreateScheduleRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -156,8 +155,7 @@ export class CreateScheduleComponent implements AfterViewInit, OnInit, OnExec,
       extraInfo: {
         returnFields: 'id, availability { id, startDate, endDate }'
       }
-    })
-      .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

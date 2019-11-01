@@ -29,11 +29,12 @@ export interface TxConfig<Message, Payload, State = any> {
    */
   sendAbortToClient: (
     causedAbort: boolean, msg?: Message, payload?: Payload,
-    state?: State) => void;
+    state?: State, index?: number) => void;
   // `payload` is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State, index?: number) => void;
 
-  onError: (error: Error, msg: Message, state?: State) => void;
+  onError: (
+    error: Error, msg: Message, state?: State, index?: number) => void;
 }
 
 export interface Vote<Payload> {
@@ -108,6 +109,10 @@ export class TxCoordinator<Message, Payload, State = any> {
     setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * MS_IN_S);
   }
 
+  // TODO: processing messages one at time is not a feature we need anymore
+  // since individual requests that are part of a tx are now batched into one
+  // request. We could refactor the tx coordinator code to take all messages at
+  // once, which should simplify the code.
   async processMessage(txId: string, cohortId: string, cohorts: string[],
     msg: Message, state?: State, index?: number)
     : Promise<void> {
@@ -127,7 +132,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohorts);
 
     // No race condition here because the set of cohorts doesn't change after
-    // initialization
+    // initialization.
     // While we could deactivate this check we still need to know the expected
     // components that make up a transaction so that we know when it's done
     const cohortIds =  _.map(tx.cohorts, 'id');
@@ -139,14 +144,14 @@ export class TxCoordinator<Message, Payload, State = any> {
         txId));
     }
 
-    // If we got here the tx has been initialized (by this msg or a previous
-    // one). The tx state could be 'voting', 'aborting' or 'aborted'
+    // If we got here the tx has been initialized by this msg or by a previous
+    // one. The tx state could be 'voting', 'aborting' or 'aborted'
 
     // We might still end up sending an unnecessary vote message if the tx
     // changes to abort right after we do the check, but that won't cause any
     // problems. The check here is mostly to save some unnecessary votes.
     if (this.shouldAbort(tx)) {
-      this.config.sendAbortToClient(false, msg, undefined, state);
+      this.config.sendAbortToClient(false, msg, undefined, state, index);
 
       return;
     }
@@ -154,8 +159,8 @@ export class TxCoordinator<Message, Payload, State = any> {
     // Tx state is 'voting'
 
     // Here we are using mongodb to essentially lock on `txId` and `cohortId`
-    // to detect duplicate requests and if o/w send the vote (so that we never
-    // send a duplicate vote to a cohort)
+    // to detect duplicate requests and if o/w send the vote. By doing so, we
+    // never send a duplicate vote to a cohort.
     // If `cohorts.msg` is defined then this is a duplicate req
     const update = await this.txs.updateOne(
       {
@@ -201,7 +206,8 @@ export class TxCoordinator<Message, Payload, State = any> {
         log(
           'Not waiting anymore (tx aborted). ' +
           `Send payload to client of cohort ${cohortId}`, txId);
-        this.config.sendAbortToClient(false, msg, vote.payload, state);
+        this.config.sendAbortToClient(
+          false, msg, vote.payload, state, index);
       });
     });
 
@@ -209,7 +215,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     let ret;
     if (_.isEmpty(transition)) {  // Tx was already aborting
       log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
-      this.config.sendAbortToClient(false, msg, vote.payload, state);
+      this.config.sendAbortToClient(false, msg, vote.payload, state, index);
       ret = this.completeMessage(txId, cohortId, msg, false);
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
@@ -241,7 +247,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       // Nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
       log(`Tx is aborting. Send abort to client of cohort ${cohortId}`, txId);
-      this.config.sendAbortToClient(true, msg, vote.payload, state);
+      this.config.sendAbortToClient(true, msg, vote.payload, state, index);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
         this.completeTx(txId, false),
@@ -434,7 +440,8 @@ export class TxCoordinator<Message, Payload, State = any> {
     await this.updateCohortState(txId, cohortId, completedState);
   }
 
-  // Mutates the tx state and the cohort state if it's not waitingForCompletion
+  // Mutates the tx state and the cohort state if the cohort is waiting for
+  // completion
   private async completeTx(txId: string, success: boolean) {
     const completedState = success ? 'committed' : 'aborted';
     log(`Completing tx (status: ${completedState})`, txId);

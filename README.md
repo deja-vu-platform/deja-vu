@@ -19,51 +19,18 @@ our template language). You can also use CSS to customize the appearance of your
 app.
 
 For documentation and more information see
-[dejavu-platform.com](https://dejavu-platform.com).
+[deja-vu-platform.com](https://deja-vu-platform.com).
 
 > **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 > important at this point**, but we would love to hear what you think!
-> You can play around with it and shoot us an email or create an issue with your
-> feedback or questions.
+> You can play around with it and create an issue with your feedback or
+> questions.
 
 
 ## Create an App
 
-(This won't work until the npm packages are public, see "Contributing" instructions to create an app)
 
-- If you haven't done so already, install [Node.js](https://nodejs.org) v9-11. v10 is the release recommended by node for most
-users. [We don't currently support v12](https://github.com/spderosso/deja-vu/issues/352). See [help](#installation-helptips).
-- If you haven't done so already, install [MongoDB](https://www.mongodb.com/) 4.0+
-- Clone the app-starter-repo
-- In a separate terminal, start MongoDB locally with `mongod`. See [help](#mongodb)
-- On the root directory of your new repo, run `npm start` and visit
-`http://localhost:3000`.
-You should see a "hello world" page.
-
-You can now start including concepts and creating new pages (see the [tutorial](docs/tutorial.md)). To see your new changes, you have to restart the web
-server (Ctrl+C and run `npm start` again).
-
-
-## Deploying DV Apps
-
-(This won't work until the npm packages are public)
-
-A compiled DV app is a regular MEAN app
-(MongoDB-Express-Angular-Node.js). Since a compiled DV app uses popular,
-well-supported technologies, it shouldn't be too much work to find out
-how to deploy a DV app using your favorite cloud provider.
-
-But, if you don't want to spend too much time on this,
-here's how to deploy your app using
-Heroku, a popular PaaS:
-
-- Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-- Run `heroku create myapp` to create a new heroku app. (Replace `myapp` with the name of your app)
-- Run `heroku addons:create mongolab` to provision a MongoDB instance
-- Deploy your changes by running `git push heroku`
-
-Your new changes should be live. To deploy new changes,
-create commits and run `git push heroku` again.
+To create an app, follow [these instructions](docs/quickstart.md).
 
 
 ## Contributing
@@ -123,9 +90,18 @@ Note that a concept must have a unique name.
 
 ### Website
 
-If you want to make changes to the website, you can test them by
-running `bundle exec jekyll serve` under
+The source of the website is under
 [docs/](https://github.com/spderosso/deja-vu/tree/master/docs).
+For small content changes, you can edit the markdown files directly and create
+a pull request. Once the changes are merged to master, the live website at
+[deja-vu-platform.com](https://deja-vu-platform.com) will update.
+
+If you'd like to run the website locally, do the following:
+- install [Jekyll](https://jekyllrb.com/)
+- `cd` to `docs`
+- run `bundle install`
+- run `bundle exec jekyll serve`
+
 The website with your local changes will be served at
 [http://localhost:4000](http://localhost:4000).
 
@@ -138,7 +114,7 @@ If `yarn --check-files` fails, try the following:
 - `cd ../cli` and `yarn package`
 - then `yarn --check-files` again
 
-If it still doesn't work, double check that you are running node v9-11
+If it still doesn't work, double check that you are running node v10
 by running `node --version` in the same shell in which you are running
 the `yarn` commands.
 
@@ -154,7 +130,7 @@ Don't do `sudo apt install nodejs`, it will install a very old version of node (
 that we don't support.
 - If you are running an old version of node you'll get errors during the installation
 process. But the error is not going to say "your version of node is too old", so if
-you see errors check that the version of node you have is v9-11 by running
+you see errors check that the version of node you have is v10 by running
 `node --version` in the same shell in which you are running the `yarn` commands.
 
 ### MongoDB

@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import * as path from 'path';
 import {
   cmd,
@@ -21,6 +22,7 @@ exports.handler = ({ name, pathToDv }) => {
   if (isInNgProjectRoot()) {
     console.log(
       'Error: You cannot run this command inside of an Angular project.');
+
     return;
   }
   console.log(`Creating new concept ${name}`);
@@ -33,10 +35,13 @@ exports.handler = ({ name, pathToDv }) => {
 
   try {
     const catalogPath = `${pathToDv}/packages/catalog/`;
+    const pkgJson = JSON.parse(
+      readFileSync(`${pathToDv}/package.json`, 'utf8'));
+    const dvVersion = pkgJson['version'];
     // create outside monorepo first to satisfy new Angular project constraints,
     // then move it to the catalog
     ng(['new', `--collection=${schematicsPkgName}`,
-      `--conceptName=${name}`, name]);
+      `--conceptName=${name}`, `--dvVersion=${dvVersion}`, name]);
     cmd('mv', [name, catalogPath]);
 
     // install and package new concept

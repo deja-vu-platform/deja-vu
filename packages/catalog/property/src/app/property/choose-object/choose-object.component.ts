@@ -4,8 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  ComponentValue, ConfigService, ConfigServiceFactory, GatewayService,
-  GatewayServiceFactory, OnExecSuccess, RunService
+  ComponentValue, DvService, DvServiceFactory, OnExecSuccess
 } from '@deja-vu/core';
 import * as _ from 'lodash';
 
@@ -24,8 +23,8 @@ import { API_PATH } from '../property.config';
   templateUrl: './choose-object.component.html',
   styleUrls: ['./choose-object.component.css']
 })
-export class ChooseObjectComponent implements
-  OnInit, AfterViewInit, OnExecSuccess {
+export class ChooseObjectComponent
+  implements OnInit, AfterViewInit, OnExecSuccess {
   /**
    * Text to show to prompt the user to choose an object.
    */
@@ -85,33 +84,30 @@ export class ChooseObjectComponent implements
   _selectedObjectId;
   config;
   private properties: string[];
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.chooseObject = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
-    this.config = this.cs.getConfig();
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+    this.config = this.dvs.config.getConfig();
   }
 
   ngAfterViewInit() {
-    this.rs.eval(this.elem);
+    this.dvs.eval();
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
       this.properties = getFilteredPropertyNames(
-        this.showOnly, this.showExclude, this.cs);
+        this.showOnly, this.showExclude, this.dvs.config);
 
-      this.gs
+      const res = await this.dvs
         .get<{data: {objects: Object[]}}>(this.apiPath, {
           params: {
             extraInfo: {
@@ -122,25 +118,23 @@ export class ChooseObjectComponent implements
               `
             }
           }
-        })
-        .subscribe((res) => {
-          this._objects = res.data.objects;
-          this.objects.emit(this._objects);
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+      this._objects = res.data.objects;
+      this.objects.emit(this._objects);
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 
   updateSelected(id: string) {
     this._selectedObjectId = id;
     this.selectedObjectId.emit(id);
     if (this.execOnSelection) {
-      setTimeout(() => this.rs.exec(this.elem));
+      setTimeout(() => this.dvs.exec());
     }
   }
 

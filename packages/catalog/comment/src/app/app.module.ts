@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 
-import { DvModule, GATEWAY_URL } from '@deja-vu/core';
+import { DvModule, GATEWAY_URL, USED_CONCEPTS_CONFIG } from '@deja-vu/core';
 import { AppComponent } from './app.component';
 import { CommentModule } from './comment/comment.module';
 
@@ -13,9 +14,13 @@ import { CommentModule } from './comment/comment.module';
   imports: [
     BrowserModule,
     CommentModule,
+    RouterModule.forRoot([]),
     DvModule
   ],
-  providers: [{ provide: GATEWAY_URL, useValue: 'localhost:3000/api' }],
+  providers: [
+    { provide: GATEWAY_URL, useValue: 'localhost:3000/api' },
+    { provide: USED_CONCEPTS_CONFIG, useValue: {} }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

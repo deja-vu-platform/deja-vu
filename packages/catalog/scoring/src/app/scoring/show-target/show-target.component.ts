@@ -3,13 +3,8 @@ import {
   OnChanges, OnDestroy, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 
-import { NavigationEnd, Router, RouterEvent } from '@angular/router';
-
-import { filter, take, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs/Subject';
-
 import {
-  ComponentValue, GatewayService, GatewayServiceFactory, OnEval, RunService
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { ShowScoreComponent } from '../show-score/show-score.component';
@@ -25,14 +20,10 @@ import * as _ from 'lodash';
   templateUrl: './show-target.component.html',
   styleUrls: ['./show-target.component.css']
 })
-export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
-  OnChanges, OnDestroy {
+export class ShowTargetComponent
+  implements AfterViewInit, OnEval, OnInit, OnChanges, OnDestroy {
   // A list of fields to wait for
   @Input() waitOn: string[] = [];
-  // Watcher of changes to fields specified in `waitOn`
-  // Emits the field name that changes
-  fieldChange = new EventEmitter<string>();
-  activeWaits = new Set<string>();
   @Input() id: string | undefined;
   @Input() sourceId: string | undefined;
   @Input() target: Target | undefined;
@@ -57,35 +48,28 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   @Output() loadedTarget = new EventEmitter<Target>();
 
   showTarget;
-  private gs: GatewayService;
+  private dvs: DvService;
 
-  private destroyed = new Subject<any>();
   private shouldReload = false;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private router: Router,
-    private rs: RunService, @Inject(API_PATH) private apiPath) {
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) {
     this.showTarget = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-
-    this.router.events
-      .pipe(
-        filter((e: RouterEvent) => e instanceof NavigationEnd),
-        takeUntil(this.destroyed))
-      .subscribe(() => {
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .withRefreshCallback(() => {
         this.shouldReload = true;
-        this.rs.eval(this.elem);
-      });
+        this.dvs.eval();
+      })
+      .build();
   }
 
   ngOnDestroy() {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.dvs.onDestroy();
   }
 
   ngAfterViewInit() {
@@ -93,80 +77,53 @@ export class ShowTargetComponent implements AfterViewInit, OnEval, OnInit,
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    for (const field of this.waitOn) {
-      if (changes[field] && !_.isNil(changes[field].currentValue)) {
-        this.fieldChange.emit(field);
-      }
-    }
-    // We should only reload iif what changed is something we are not
-    // waiting on (because if ow we would send a double request)
-    let shouldLoad = false;
-    for (const fieldThatChanged of _.keys(changes)) {
-      if (!this.activeWaits.has(fieldThatChanged)) {
-        shouldLoad = true;
-      }
-    }
-    if (shouldLoad) {
+    if (this.dvs && this.dvs.waiter.processChanges(changes)) {
       this.load();
     }
   }
 
   load() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      if (!_.isEmpty(this.waitOn)) {
-        await Promise.all(_.chain(this.waitOn)
-          .filter((field) => _.isNil(this[field]))
-          .tap((fs) => {
-            this.activeWaits = new Set(fs);
-
-            return fs;
-          })
-          .map((fieldToWaitFor) => this.fieldChange
-            .pipe(filter((field) => field === fieldToWaitFor), take(1))
-            .toPromise())
-          .value());
-      }
-      this.gs.get<{ data: { target: Target } }>(this.apiPath, {
-        params: {
-          inputs: {
-            input: {
-              id: this.id,
-              sourceId: this.sourceId
-            }
-          },
-          extraInfo: {
-            returnFields: `
-                id
-                ${this.showScores ? 'scores ' +
-                '{' +
-                'id \n' +
-                `${this.showScoreValue ? 'value \n' : ''}` +
-                `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
-                `${this.showScoreTargetId ? 'targetId \n' : ''}` +
-                '}' : ''
+      const res = await this.dvs.waitAndGet<{ data: { target: Target } }>(
+        this.apiPath, () => ({
+          params: {
+            inputs: {
+              input: {
+                id: this.id,
+                sourceId: this.sourceId
               }
-                ${this.showTotal ? 'total' : ''}
-            `
+            },
+            extraInfo: {
+              returnFields: `
+                  id
+                  ${this.showScores ? 'scores ' +
+                  '{' +
+                  'id \n' +
+                  `${this.showScoreValue ? 'value \n' : ''}` +
+                  `${this.showScoreSourceId ? 'sourceId \n' : ''}` +
+                  `${this.showScoreTargetId ? 'targetId \n' : ''}` +
+                  '}' : ''
+                }
+                  ${this.showTotal ? 'total' : ''}
+              `
+            }
           }
-        }
-      })
-        .subscribe((res) => {
-          this.target = res.data.target;
-          this.loadedTarget.emit(this.target);
-          this.shouldReload = false;
-        });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        }));
+        this.target = res.data.target;
+        this.loadedTarget.emit(this.target);
+        this.shouldReload = false;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs && this.id && (!this.target || this.shouldReload));
+    return !!(this.dvs && this.id && (!this.target || this.shouldReload));
   }
 }

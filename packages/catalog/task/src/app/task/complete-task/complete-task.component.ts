@@ -1,10 +1,7 @@
-import {
-  Component, ElementRef, Input, OnInit
-} from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecSuccess
 } from '@deja-vu/core';
 
 
@@ -13,32 +10,30 @@ import {
   templateUrl: './complete-task.component.html',
   styleUrls: ['./complete-task.component.css']
 })
-export class CompleteTaskComponent implements
-  OnInit, OnExec, OnExecSuccess  {
+export class CompleteTaskComponent
+  implements OnInit, OnExec, OnExecSuccess  {
   @Input() id;
   @Input() disabled = false;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private readonly elem: ElementRef,
+    private readonly dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onClick() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   dvOnExec(): Promise<{data: any}> {
-    return this.gs
-      .post<{data: any}>('/graphql', {
-        inputs: { id: this.id }
-      })
-      .toPromise();
+    return this.dvs.post<{data: any}>('/graphql', {
+      inputs: { id: this.id }
+    });
   }
 
   dvOnExecSuccess() {

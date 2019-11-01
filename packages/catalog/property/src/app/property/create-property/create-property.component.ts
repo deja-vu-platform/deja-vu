@@ -8,10 +8,7 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import {
-  ConfigService, ConfigServiceFactory, GatewayService,
-  GatewayServiceFactory, OnExecSuccess, RunService
-} from '@deja-vu/core';
+import { DvService, DvServiceFactory, OnExecSuccess } from '@deja-vu/core';
 
 import { map, startWith } from 'rxjs/operators';
 
@@ -45,8 +42,7 @@ import {
   ]
 })
 export class CreatePropertyComponent
-implements OnInit, OnChanges, ControlValueAccessor, Validator,
-OnExecSuccess {
+  implements OnInit, OnChanges, ControlValueAccessor, Validator, OnExecSuccess {
   /**
    * The name of the property to create
    * (should match a name in the schama the concept is configured with)
@@ -73,19 +69,17 @@ OnExecSuccess {
   maxLength = null;
   minLength = null;
 
-  private gs: GatewayService;
-  private cs: ConfigService;
+  private dvs: DvService;
   private schemaValidate;
   private ajv = new Ajv();
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory) {}
+    private elem: ElementRef, private dvf: DvServiceFactory) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.cs = this.csf.createConfigService(this.elem);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
+
     this.loadSchema();
   }
 
@@ -102,11 +96,11 @@ OnExecSuccess {
    * validators.
    */
   loadSchema() {
-    if ((!this.cs && !this._config) || !this.name) {
+    if ((!this.dvs && !this._config) || !this.name) {
       return;
     }
     const properties = this._config ?
-      getPropertiesFromConfig(this._config) : getProperties(this.cs);
+      getPropertiesFromConfig(this._config) : getProperties(this.dvs.config);
     const property: Property | undefined = _
       .find(properties, ['name', this.name]);
     if (!property) {

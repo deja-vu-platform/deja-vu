@@ -1,11 +1,11 @@
 <dv.component name="show-class">
-	<div class="individual-card">
-		<class.show-object id=$classId hidden=true />
+  <div class="individual-card">
+    <class.show-object id=$classId hidden=true />
     <dv.if condition=class.show-object.loadedObject >
       <div class="bold">
-        <dv.show-entity entity=class.show-object.loadedObject.classNumber />
+        {{class.show-object.loadedObject.classNumber}}
         &nbsp;
-        <dv.show-entity entity=class.show-object.loadedObject.className />
+        {{class.show-object.loadedObject.className}}
       </div>
       <div>
         <dv.if class="inline-block" condition=class.show-object.loadedObject.HASS>
@@ -26,36 +26,44 @@
         </dv.if>
       </div>
     </dv.if>
-    <div>
-      <a> Pace </a>
+    <dv.tx class="rating-box">
+      <p>Pace</p>
+      <authentication.authenticate as pace-auth
+        id=$userId hidden=true />
       <paceReasonable.show-average-rating targetId=$classId  />
-    </div>
-    <div>
-      <a> Grading </a>
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Grading</p>
+      <authentication.authenticate as grading-auth
+        id=$userId hidden=true />
       <gradingFair.show-average-rating targetId=$classId  />
-    </div>
-    <div>
-      <a> Contents </a>
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Contents</p>
+      <authentication.authenticate as contents-auth
+        id=$userId hidden=true />
       <contentsManageable.show-average-rating targetId=$classId  />
-    </div>
-    <div>
-      <a> Overall </a>
+    </dv.tx>
+    <dv.tx class="rating-box">
+      <p>Overall</p>
+      <authentication.authenticate as ratings-auth
+        id=$userId hidden=true />
       <overallRating.show-average-rating targetId=$classId  />
-    </div>
-    <div>
+    </dv.tx>
+    <dv.tx>
       <mat-expansion-panel class="mat-elevaton-z0">
         <mat-expansion-panel-header>
           Show Comments
         </mat-expansion-panel-header>
+        <authentication.authenticate as comments-auth
+          id=$userId hidden=true />
         <comment.show-comments
           ofTargetId=$classId
           showId=false
           showAuthorId=false
           showTargetId=false
-          noCommentsToShowText=""
-        />
+          noCommentsToShowText="" />
       </mat-expansion-panel>
-    </div>
-
-	</div>
+    </dv.tx>
+  </div>
 </dv.component>

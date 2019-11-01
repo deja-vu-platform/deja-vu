@@ -2,8 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import {
-  ComponentValue, ConfigServiceFactory, GatewayService, GatewayServiceFactory,
-  OnEval, RunService, WaiterService, WaiterServiceFactory
+  ComponentValue, DvService, DvServiceFactory, OnEval
 } from '@deja-vu/core';
 
 import { Transfer } from '../shared/transfer.model';
@@ -43,23 +42,20 @@ export class ShowTransfersComponent
   balanceType: 'money' | 'items';
 
   showTransfers;
-  private ws: WaiterService;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private csf: ConfigServiceFactory,
-    private wsf: WaiterServiceFactory,
+    private elem: ElementRef, private dvf: DvServiceFactory,
     @Inject(API_PATH) private apiPath) {
     this.showTransfers = this;
   }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
-    this.ws = this.wsf.for(this, this.waitOn);
+    this.dvs = this.dvf.forComponent(this)
+      .withDefaultWaiter()
+      .build();
 
-    this.balanceType = this.csf.createConfigService(this.elem)
+    this.balanceType = this.dvs.config
       .getConfig().balanceType;
   }
 
@@ -73,45 +69,46 @@ export class ShowTransfersComponent
 
   fetchTransfers() {
     if (this.canEval()) {
-      this.rs.eval(this.elem);
+      this.dvs.eval();
     }
   }
 
   async dvOnEval(): Promise<void> {
     if (this.canEval()) {
-      await this.ws.maybeWait();
-      const selection = this.balanceType === 'money' ?
-        '' : ' { id, count }';
-      this.gs
-        .get<{data: {transfers: Transfer[]}}>(this.apiPath, {
-          params: {
-            // When we are sending a potentially empty input object we need to
-            // stringify the variables
-            inputs: JSON.stringify({
-              input: {
-                fromId: this.fromId,
-                toId: this.toId
+      const res = await this.dvs.waitAndGet<{data: {transfers: Transfer[]}}>(
+        this.apiPath,
+        () => {
+          const selection = this.balanceType === 'money' ?
+            '' : ' { id, count }';
+
+          return {
+            params: {
+              // When we are sending a potentially empty input object we need to
+              // stringify the variables
+              inputs: JSON.stringify({
+                input: {
+                  fromId: this.fromId,
+                  toId: this.toId
+                }
+              }),
+              extraInfo: {
+                returnFields: `
+                  ${this.showId ? 'id' : ''}
+                  ${this.showFromId ? 'fromId' : ''}
+                  ${this.showToId ? 'toId' : ''}
+                  ${this.showAmount ? `amount ${selection}` : ''}
+                `
               }
-            }),
-            extraInfo: {
-              returnFields: `
-                ${this.showId ? 'id' : ''}
-                ${this.showFromId ? 'fromId' : ''}
-                ${this.showToId ? 'toId' : ''}
-                ${this.showAmount ? `amount ${selection}` : ''}
-              `
             }
-          }
-        })
-        .subscribe((res) => {
-          this.transfers = res.data.transfers;
+          };
         });
-    } else if (this.gs) {
-      this.gs.noRequest();
+        this.transfers = res.data.transfers;
+    } else if (this.dvs) {
+      this.dvs.noRequest();
     }
   }
 
   private canEval(): boolean {
-    return !!(this.gs);
+    return !!(this.dvs);
   }
 }

@@ -26,3 +26,7 @@
   display: inline-block;
   min-width: 150px;
 }
+
+.add {
+  display: flex;
+}

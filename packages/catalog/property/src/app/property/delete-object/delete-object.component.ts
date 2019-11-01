@@ -3,8 +3,7 @@ import {
   Input, OnInit
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnExec,
-  OnExecFailure, OnExecSuccess, RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -21,8 +20,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './delete-object.component.html',
   styleUrls: ['./delete-object.component.css']
 })
-export class DeleteObjectComponent implements
-  OnInit, OnExec, OnExecSuccess, OnExecFailure {
+export class DeleteObjectComponent
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   /**
    * id of the object to delete
    */
@@ -47,34 +46,33 @@ export class DeleteObjectComponent implements
   deleteObjectError: string;
   objectDeleted: Boolean;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
     this.objectDeleted = false;
   }
 
   deleteObject() {
     if (this.showOptionToDelete) {
-      this.rs.exec(this.elem);
+      this.dvs.exec();
     }
   }
 
   async dvOnExec() {
-    const res = await this.gs
+    const res = await this.dvs
       .post<{ data: any, errors: { message: string }[] }>(this.apiPath, {
-      inputs: { id: this.id },
-      extraInfo: {
-        action: 'delete',
-        returnFields: ''
-      }
-    })
-    .toPromise();
+        inputs: { id: this.id },
+        extraInfo: {
+          action: 'delete',
+          returnFields: ''
+        }
+      });
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')
         .join());

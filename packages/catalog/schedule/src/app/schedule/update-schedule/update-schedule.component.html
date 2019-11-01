@@ -12,7 +12,7 @@
 
   <div class="update-schedule">
     <div class="row text-center">
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="btn-group">
           <div class="btn btn-primary"
             mwlCalendarPreviousView
@@ -34,12 +34,8 @@
         </div>
       </div>
 
-      <div class="col-md-4">
-        <h5>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h5>
-      </div>
-
-      <div class="col-md-4">
-        <div class="btn-group">
+      <div class="col-md-6">
+        <div *ngIf="showOptionToChangeView" class="btn-group">
           <div class="btn btn-primary"
             (click)="view = 'month'"
             [class.active]="view === 'month'">
@@ -56,6 +52,12 @@
             Day
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="row text-center view-info">
+      <div class="col-md-4">
+        <h5>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h5>
       </div>
     </div>
 

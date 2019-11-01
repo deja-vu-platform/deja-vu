@@ -10,7 +10,7 @@
         <groupInfo.update-object
           id=$groupId buttonLabel="Update Group"
           updateObjectSavedText="Changes saved" />
-        <authorization.can-edit as can-edit-group
+        <authorization.verify-can-edit as can-edit-group
           resourceId=$groupId
           principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-group-auth
@@ -27,9 +27,12 @@
             memberId=userProfile.choose-object.selectedObjectId
             buttonLabel="Invite Member"
             id=$groupId />
-          <authorization.can-edit as can-add-member
+          <authorization.verify-can-edit as can-add-member
             resourceId=$groupId
             principalId=accord.navbar.loggedInUser?.id hidden=true />
+          <authorization.add-viewer
+            id=$groupId viewerId=userProfile.choose-object.selectedObjectId
+            hidden=true />
           <authentication.authenticate as can-add-member-auth
             id=accord.navbar.loggedInUser?.id hidden=true />
           <dv.link hidden=true />
@@ -41,7 +44,7 @@
           id=$groupId showMembers=true showGroupId=false
           showMember=<accord.show-user-info
             userId=$id groupId=$groupId allowEdit=true /> />
-        <authorization.can-edit as can-edit-members
+        <authorization.verify-can-edit as can-edit-members
           resourceId=$groupId
           principalId=accord.navbar.loggedInUser?.id hidden=true />
         <authentication.authenticate as can-edit-members-auth

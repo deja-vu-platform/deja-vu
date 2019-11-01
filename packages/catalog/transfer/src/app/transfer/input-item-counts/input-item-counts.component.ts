@@ -50,17 +50,14 @@ export class InputItemCountsComponent
   createItemCount = CreateItemCountComponent;
   showItemCount = ShowItemCountComponent;
 
-  constructor(
-    private elem: ElementRef, private rs: RunService) {
-  }
+  constructor(private elem: ElementRef, private rs: RunService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
     this.itemsControl.valueChanges.subscribe((value: ItemCount[]) => {
       this.itemCounts.emit(value);
     });
-    this.itemsControl.valueChanges.pipe(startWith(
-      this.itemsControl.value));
+    this.itemsControl.valueChanges.pipe(startWith(this.itemsControl.value));
   }
 
   writeValue(value: ItemCount[]) {

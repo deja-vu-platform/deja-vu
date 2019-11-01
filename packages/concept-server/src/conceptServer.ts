@@ -91,7 +91,9 @@ export class ConceptServer<C extends Config = Config> {
     if (this._componentRequestTable[componentName]) {
       return this._componentRequestTable[componentName](extraInfo);
     }
-    throw new Error(`Component ${componentName} request not defined`);
+    throw new Error(
+      `Component ${componentName} request not defined in component table ` +
+      JSON.stringify(this._componentRequestTable));
   }
 
   private setGraphqlQueryAndVariables(
@@ -116,6 +118,13 @@ export class ConceptServer<C extends Config = Config> {
         req['fullComponentName'], req[reqField].extraInfo);
       next();
     };
+  }
+
+  private getPort(portValue: string | number): number {
+    return _.isString(portValue) && portValue.startsWith('$') ?
+      // it's an env variable
+      _.toNumber(process.env[portValue.slice(1)]) :
+      <number> portValue;
   }
 
   private startApp(schema) {
@@ -174,11 +183,11 @@ export class ConceptServer<C extends Config = Config> {
     app.use('/graphiql', graphiqlExpress({
       endpointURL: '/graphql',
       subscriptionsEndpoint:
-        `ws://localhost:${this._config.wsPort}/subscriptions`
+        `ws://localhost:${this.getPort(this._config.wsPort)}/subscriptions`
     }));
 
     const server = createServer(app);
-    server.listen(this._config.wsPort, () => {
+    server.listen(this.getPort(this._config.wsPort), () => {
       console.log(`Running ${this._name} with config
         ${JSON.stringify(this._config)}`);
       SubscriptionServer.create({
@@ -205,8 +214,8 @@ export class ConceptServer<C extends Config = Config> {
    * Start this concept server.
    */
   async start(): Promise<void> {
-    // TODO: make connecting to mongo optional since there will be concepts that
-    // don't require a db, e.g. email concept
+    // TODO: make connecting to mongo optional since there might be concepts
+    // that don't require a db
     const mongoServer = `${this._config.dbHost}:${this._config.dbPort}`;
     console.log(`Connecting to mongo server ${mongoServer}`);
     const client: mongodb.MongoClient = await mongodb.MongoClient.connect(

@@ -1,9 +1,5 @@
-import {
-  Component, ElementRef, Inject, Input, OnInit
-} from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory, OnExec, RunService
-} from '@deja-vu/core';
+import { Component, ElementRef, Inject, Input, OnInit } from '@angular/core';
+import { DvService, DvServiceFactory, OnExec } from '@deja-vu/core';
 
 import * as _ from 'lodash';
 
@@ -23,38 +19,34 @@ export class DeleteCommentComponent implements OnInit, OnExec {
   @Input() id: string;
   @Input() authorId: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, @Inject(API_PATH) private apiPath) { }
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    @Inject(API_PATH) private readonly apiPath) { }
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   deleteComment() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec() {
-    const res = await this.gs.post<DeleteCommentRes>(this.apiPath, {
-        query: `mutation DeleteComment($input: DeleteCommentInput!) {
-          deleteComment(input: $input)
-        }`,
-        inputs: {
-          input: {
-            id: this.id,
-            authorId: this.authorId
-          }
+    const res = await this.dvs.post<DeleteCommentRes>(this.apiPath, {
+      inputs: {
+        input: {
+          id: this.id,
+          authorId: this.authorId
         }
-      })
-      .toPromise();
-
-      if (res.errors) {
-        throw new Error(_.map(res.errors, 'message')
-          .join());
       }
+    });
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
 }

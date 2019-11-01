@@ -12,12 +12,14 @@ import { TimeAgoPipe } from 'time-ago-pipe';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonLastComponent } from './button-last/button-last.component';
 import { ButtonComponent } from './button/button.component';
+import { ButtonLinkComponent } from './button-link/button-link.component';
 import { CallbackLinkComponent } from './callback-link/callback-link.component';
 import { CallbackComponent } from './callback/callback.component';
 import { CamelToTitleCasePipe } from './stage/stage.component';
 import { ChooseComponent } from './choose/choose.component';
 import { DebugLogComponent } from './debug-log/debug-log.component';
 import { DifferenceComponent } from './difference/difference.component';
+import { DvServiceFactory } from './dv.service';
 import { FilterComponent } from './filter/filter.component';
 import { ForComponent } from './for/for.component';
 import { FormatDateComponent } from './format-date/format-date.component';
@@ -34,6 +36,7 @@ import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
 import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
+import { RefreshService } from './refresh.service';
 import { RunService } from './run.service';
 import { ShowCountComponent } from './show-count/show-count.component';
 import { ShowDateComponent } from './show-date/show-date.component';
@@ -56,7 +59,8 @@ import { SubscriptionService } from './subscription.service';
 
 const allComponents = [
   GenIdComponent, GenIdsComponent, TxComponent, IncludeComponent,
-  IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
+  IncludeDirective, ButtonLastComponent, ButtonComponent, ButtonLinkComponent,
+  LinkComponent,
   StatusComponent, MergeComponent, InputIdComponent, StageComponent,
   ChooseComponent, CallbackComponent, CallbackLinkComponent,
   RedirectComponent, ZipComponent, ShowCountComponent, ShowDateComponent,
@@ -83,8 +87,9 @@ const allComponents = [
     CamelToTitleCasePipe
   ],
   providers: [
-    GatewayServiceFactory, RunService, ConfigServiceFactory, StorageService,
-    SubscriptionService, WaiterServiceFactory
+    DvServiceFactory, GatewayServiceFactory, RefreshService, RunService,
+    ConfigServiceFactory, StorageService, SubscriptionService,
+    WaiterServiceFactory
   ],
   entryComponents: [ShowEntityComponent],
   exports: [...allComponents, OfDirective, CamelToTitleCasePipe]

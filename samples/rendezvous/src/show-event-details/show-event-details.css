@@ -173,3 +173,8 @@
 #join-leave {
   margin: 20px 0;
 }
+
+#are-host {
+  display: flex;
+  justify-content: flex-end;
+}

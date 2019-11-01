@@ -1,6 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, Output, Type, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Type,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -8,9 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  ComponentValue,
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  ComponentValue, DvService, DvServiceFactory, OnExec, OnExecFailure,
+  OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -33,7 +32,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   entryComponents: [ InputAmountComponent ]
 })
 export class CreateTransferComponent
-implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
+  implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputAmount = true;
@@ -75,27 +74,25 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
 
   newTransferSaved = false;
   newTransferError: string;
-  private gs: GatewayService;
+  private dvs: DvService;
 
   createTransfer = this;
 
   constructor(
-    private elem: ElementRef,
-    private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    private elem: ElementRef, private dvf: DvServiceFactory,
+    private builder: FormBuilder, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec() {
-    const res = await this.gs.post<CreateTransferRes>(this.apiPath, {
+    const res = await this.dvs.post<CreateTransferRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -105,8 +102,7 @@ implements OnInit, OnExec, OnExecSuccess, OnExecFailure {
         }
       },
       extraInfo: { returnFields: 'id' }
-    })
-    .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

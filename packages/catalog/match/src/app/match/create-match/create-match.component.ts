@@ -6,8 +6,7 @@ import {
   NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnExec, OnExecFailure, OnExecSuccess,
-  RunService
+  DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
 import * as _ from 'lodash';
@@ -40,8 +39,8 @@ const SAVED_MSG_TIMEOUT = 3000;
     }
   ]
 })
-export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
-  OnExecSuccess {
+export class CreateMatchComponent
+  implements OnInit, OnExec, OnExecFailure, OnExecSuccess {
   @Input() id: string | undefined;
   @Input() set userAId(inputContent: string) {
     this.userAIdControl.setValue(inputContent);
@@ -66,28 +65,27 @@ export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
     userBIdControl: this.userBIdControl
   });
 
-
   newMatchSaved = false;
   newMatchError: string;
 
-  private gs: GatewayService;
+  private dvs: DvService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder,
-    @Inject(API_PATH) private apiPath) {}
+    private readonly elem: ElementRef, private readonly dvf: DvServiceFactory,
+    private readonly builder: FormBuilder,
+    @Inject(API_PATH) private readonly apiPath) {}
 
   ngOnInit() {
-    this.gs = this.gsf.for(this.elem);
-    this.rs.register(this.elem, this);
+    this.dvs = this.dvf.forComponent(this)
+      .build();
   }
 
   onSubmit() {
-    this.rs.exec(this.elem);
+    this.dvs.exec();
   }
 
   async dvOnExec(): Promise<void> {
-    const res = await this.gs.post<CreateMatchRes>(this.apiPath, {
+    const res = await this.dvs.post<CreateMatchRes>(this.apiPath, {
       inputs: {
         input: {
           id: this.id,
@@ -96,8 +94,7 @@ export class CreateMatchComponent implements OnInit, OnExec, OnExecFailure,
         }
       },
       extraInfo: { returnFields: 'id, userAId, userBId' }
-    })
-    .toPromise();
+    });
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

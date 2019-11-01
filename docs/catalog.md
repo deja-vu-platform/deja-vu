@@ -6,7 +6,7 @@ See the list of concepts below.
 If you'd like to suggest a new concept, you
 can [create an issue in our GitHub repo](https://github.com/spderosso/deja-vu/issues/new?assignees=&labels=&template=concept-request.md&title=%5BConcept+Request%5D).
 To contribute a new concept, see the
-[contributing instructions]().
+[contributing instructions](https://github.com/spderosso/deja-vu#contributing).
 
 
 {: .tiles}
@@ -14,7 +14,7 @@ To contribute a new concept, see the
 
   Distribute resources among consumers
 
-  {% include concept-btns.html name="property" %}
+  {% include concept-btns.html name="allocator" %}
 - Authentication
 
   Verify the user's identity with a username and password

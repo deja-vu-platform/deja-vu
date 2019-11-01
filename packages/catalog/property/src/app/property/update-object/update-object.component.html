@@ -27,7 +27,8 @@
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div class="dv-mat-button">
-      <button mat-button type="submit"
+      <button class="property-update-object-btn"
+              mat-button type="submit"
               [disabled]="!updateObjectForm.valid">
         {{buttonLabel}}
       </button>

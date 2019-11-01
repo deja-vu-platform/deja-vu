@@ -1,12 +1,13 @@
 <dv.component name="create-set-list">
   <accord.navbar accessRequired=true />
-  <authorization.can-view
+  <authorization.can-edit
     resourceId=$groupId
     principalId=accord.navbar.loggedInUser?.id hidden=true />
   <div class="left-column">
-    <accord.set-list-catalog groupId=$groupId />
+    <accord.set-list-catalog
+      groupId=$groupId currentUserId=accord.navbar.loggedInUser?.id />
   </div>
-  <dv.if condition=authorization.can-view.canView>
+  <dv.if condition=authorization.can-edit.canEdit>
     <div class="right-column pad-top">
       <h1>Create Setlist</h1>
       <dv.tx>
@@ -22,7 +23,7 @@
       </dv.tx>
     </div>
   </dv.if>
-  <dv.if condition=!authorization.can-view.canView>
+  <dv.if condition=!authorization.can-edit.canEdit>
     Only admins of the group can create new setlists.
   </dv.if>
 </dv.component>
