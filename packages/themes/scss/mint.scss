@@ -1,13 +1,18 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+h1 {
+  font-size: 36px;
+  font-weight: bold;
+}
 
 $mainFont: 'Raleway', sans-serif !default;
 $primaryColor: #28bdb1 !default;
-$linkColor: inherit !default;
+$linkColor: $primaryColor !default;
 
 $backgroundColor: white !default;
 $navbarLinkColor: white;
 $navbarLinkHoverColor: white;
-$navbarTextSize: 20px;
+$navbarVerticalAlign: baseline;
 
 @mixin dv-navbar-hover {
   color: #054575;

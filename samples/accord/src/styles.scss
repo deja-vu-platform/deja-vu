@@ -1,4 +1,9 @@
 // overwrite values
+$use-default-mat-button: true;
+$navbarHeight: 60px;
+$navbarTextSize: 20px;
+$navbarButtonPadding: 0 5px;
+$navbarPadding: 0.5rem 1rem;
 
 @import "~@deja-vu/themes/scss/mint.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";

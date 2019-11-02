@@ -13,10 +13,13 @@ $navbarHeight: 56px !default;
 $navbarButtonPadding: 0 10px !default;
 $navbarLinkColor: #0000EE !default;
 $navbarLinkHoverColor: #0000EE !default;
-$navbarVerticalAlign: CENTER !default;
+$navbarVerticalAlign: middle !default;
+$navbarPadding: 0 0;
 
 $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
+
+$use-default-mat-button: false !default;
 
 // theming doc starts
 a:root, a:root:hover {
@@ -32,18 +35,20 @@ div:root, p:root, h1:root, h2:root, h3:root {
 nav {
   background: $navbarBackgroundColor;
   height: $navbarHeight;
-  align-content: center;
   font-family: $mainFont;
+  padding: $navbarPadding;
 
   div, h1, h2, h3 {
     color: $navbarTextColor;
     vertical-align: $navbarVerticalAlign;
+    font-size: $navbarTextSize;
   }
 
   a {
     color: $navbarLinkColor;
     padding: $navbarButtonPadding;
     vertical-align: $navbarVerticalAlign;
+    font-size: $navbarTextSize;
   }
 
   a:hover {
@@ -100,18 +105,10 @@ div {
 // Option 1: Overwrite mat-button by wrapping each
 //           instance of the mat-button in a different class
 .dv-mat-button button.mat-button {
-  background: $primaryColor;
-  color: $textColor;
-  padding: 0 6px 0 6px;
-  margin: 6px 8px 6px 8px;
-  min-width: 88px;
-  border-radius: 3px;
-  font-size: 14px;
-  text-align: center;
-  text-transform: uppercase;
-  text-decoration:none;
-  border: 1px solid black;
-  outline: none;
+  @if $use-default-mat-button == false {
+    background: $primaryColor;
+    color: $textColor;
+  }
   @if mixin-exists(dv-button) {@include dv-button};
 }
 
