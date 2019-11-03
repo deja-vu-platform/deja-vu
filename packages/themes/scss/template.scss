@@ -5,6 +5,7 @@ $textColor: #000000 !default;
 $linkColor: #0000EE !default;
 $linkHoverColor: $linkColor !default;
 $rootLinkColor: $linkColor !default;
+$headingColor: $primaryColor !default;
 $backgroundColor: #f5f5f5 !default;
 $errorMessageColor: #f44336 !default;
 
@@ -20,6 +21,7 @@ $navbarPadding: 0 0;
 
 $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
+$headingFontWeight: bold !default;
 
 $use-default-mat-button: false !default;
 
@@ -28,8 +30,8 @@ $use-default-mat-button: false !default;
 // mixin utils
 @mixin heading-style {
   font-family: $mainFont;
-  font-weight: bold;
-  color: $primaryColor;
+  font-weight: $headingFontWeight;
+  color: $headingColor;
 }
 
 @mixin text-style {
@@ -109,7 +111,7 @@ main {
 }
 
 
-// Material UI
+/* Material UI */
 .mat-error {
   color: $errorMessageColor;
   font-size: 12px;
@@ -134,15 +136,24 @@ main {
 //  2. Put an important tag after class "mat-button"
 //  3. Not use mat-button
 
-// Option 1: Overwrite mat-button by wrapping each
-//           instance of the mat-button in a different class
-.dv-mat-button button.mat-button {
-  @if $use-default-mat-button == false {
-    background: $primaryColor;
-    color: $textColor;
+// Overwrite mat-button by wrapping each
+// instance of the mat-button in a different class
+.dv-mat-button {
+  button.mat-button {
+    @if $use-default-mat-button == false {
+      background: $primaryColor;
+      color: $textColor;
+    }
+    @if mixin-exists(dv-button) {@include dv-button};
   }
-  @if mixin-exists(dv-button) {@include dv-button};
+
+  button.mat-icon-button {
+    .mat-button-wrapper > * {
+      @if mixin-exists(dv-mat-icon-wrapper) {@include dv-mat-icon-wrapper}
+    }
+  }
 }
+
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";

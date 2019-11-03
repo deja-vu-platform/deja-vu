@@ -1,5 +1,8 @@
 // overwrite values should be written here
-$navbarButtonPadding: 0 7px;
+$navbarButtonPadding: 0 5px;
+@mixin dv-mat-icon-wrapper {
+  vertical-align: inherit;
+}
 
 @import "~@deja-vu/themes/scss/orange-and-black.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
@@ -28,6 +31,10 @@ $navbarButtonPadding: 0 7px;
   display: inline-flex;
 
   a, a:hover {
+    color: grey;
+  }
+
+  span {
     color: grey;
   }
 }
@@ -81,13 +88,24 @@ ul {
   min-height: 100vh;
 }
 
-.navbar {
-  .navbar-brand {
-    font-weight: bold;
-    padding: 0 0;
-  }
 
+.navbar {
   .container {
-    padding: 0 8px;
+    .navbar-brand {
+      a {
+        font-weight: bold;
+        padding: 0 0;
+        font-size: 1.25rem !important;
+        white-space: nowrap;
+      }
+    }
   }
+  padding: 0.4rem 1rem;
+}
+
+.list-group-item {
+  background-color: initial;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }

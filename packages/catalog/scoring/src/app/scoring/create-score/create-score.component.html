@@ -27,9 +27,11 @@
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="submitMatIconName">
-      <button mat-icon-button type="submit" [disabled]="!canSubmit()">
-        <i class="material-icons">{{submitMatIconName}}</i>
-      </button>
+      <div class="dv-mat-button">
+        <button mat-icon-button type="submit" [disabled]="!canSubmit()">
+          <i class="material-icons">{{submitMatIconName}}</i>
+        </button>
+      </div>
     </div>
     <div *ngIf="!submitMatIconName">
       <div class="dv-mat-button">
