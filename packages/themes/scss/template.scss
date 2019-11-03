@@ -1,8 +1,10 @@
 
-// default color palatte when nothing is overwritten
+/* default color palatte */
 $primaryColor: #00237d !default;
 $textColor: #000000 !default;
 $linkColor: #0000EE !default;
+$linkHoverColor: $linkColor !default;
+$rootLinkColor: $linkColor !default;
 $backgroundColor: #f5f5f5 !default;
 $errorMessageColor: #f44336 !default;
 
@@ -21,9 +23,46 @@ $textFont: $mainFont !default;
 
 $use-default-mat-button: false !default;
 
-// theming doc starts
-a:root, a:root:hover {
+/* theming doc starts */
+
+// mixin utils
+@mixin heading-style {
+  font-family: $mainFont;
+  font-weight: bold;
+  color: $primaryColor;
+}
+
+@mixin text-style {
+  font-family: $textFont;
+  color: $textColor;
+}
+
+@mixin link-style {
+  font-family: $textFont;
   color: $linkColor;
+
+  :hover {
+    color: $linkHoverColor;
+    @if mixin_exists(link-hover) {@include link-hover};
+  }
+}
+
+// generic
+h1, h2, h3 {
+  @include heading-style;
+}
+
+div {
+  @include text-style;
+}
+
+a {
+  @include link-style;
+}
+
+// root link
+a:root, a:root:hover {
+  color: $rootLinkColor;
   font-family: $mainFont;
 }
 
@@ -69,13 +108,6 @@ main {
   font-family: $mainFont;
 }
 
-h1, h2, h3 {
-  color: $primaryColor;
-}
-
-div {
-  color: $textColor;
-}
 
 // Material UI
 .mat-error {
@@ -114,4 +146,5 @@ div {
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~css-star-rating/dist/css/star-rating.min.css";
 @include mat-core();
