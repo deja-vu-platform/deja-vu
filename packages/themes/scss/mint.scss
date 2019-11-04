@@ -9,7 +9,7 @@ $navbarLinkColor: white;
 $navbarLinkHoverColor: white;
 $navbarVerticalAlign: baseline;
 
-@mixin dv-navbar-hover {
+@mixin dv-navbar-link-hover {
   color: #054575;
   text-decoration: none;
 }

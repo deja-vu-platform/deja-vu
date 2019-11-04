@@ -22,7 +22,7 @@ $headingFontWeight: normal;
 $bodyPaddingTop: 50px;
 $use-default-mat-button: true;
 
-@mixin dv-navbar-hover {
+@mixin dv-navbar-link-hover {
   text-decoration: none;
 }
 

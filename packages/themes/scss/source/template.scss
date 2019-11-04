@@ -92,11 +92,12 @@ nav {
     padding: $navbarButtonPadding;
     vertical-align: $navbarVerticalAlign;
     font-size: $navbarTextSize;
-  }
+    &:hover {
+      color: $navbarLinkHoverColor;
+      @if mixin-exists(dv-navbar-link-hover) {@include dv-navbar-link-hover};
+    }
 
-  a:hover {
-    color: $navbarLinkHoverColor;
-    @if mixin-exists(dv-navbar-hover) {@include dv-navbar-hover};
+    @if mixin-exists(dv-navbar-link) {@include dv-navbar-link};
   }
 }
 
