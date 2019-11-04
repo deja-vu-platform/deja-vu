@@ -23,7 +23,10 @@ $mainFont: 'Arial', sans-serif !default;
 $textFont: $mainFont !default;
 $headingFontWeight: bold !default;
 
+$formWidth: 300px !default;
+
 $use-default-mat-button: false !default;
+
 
 /* theming doc starts */
 
@@ -35,8 +38,8 @@ $use-default-mat-button: false !default;
 }
 
 @mixin text-style {
-  font-family: $textFont;
-  color: $textColor;
+  font-family: inherit;
+  color: inherit;
 }
 
 @mixin link-style {
@@ -152,6 +155,10 @@ main {
       @if mixin-exists(dv-mat-icon-wrapper) {@include dv-mat-icon-wrapper}
     }
   }
+}
+
+.mat-form-field-wrapper {
+  width: $formWidth;
 }
 
 @import "~@angular/material/theming";
