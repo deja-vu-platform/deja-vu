@@ -23,6 +23,8 @@ $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
 $headingFontWeight: bold !default;
 
+$bodyPaddingTop: 0px !default;
+
 $use-default-mat-button: false !default;
 
 /* theming doc starts */
@@ -50,7 +52,7 @@ $use-default-mat-button: false !default;
 }
 
 // generic
-h1, h2, h3 {
+h1, h2, h3, h4 {
   @include heading-style;
 }
 
@@ -98,10 +100,15 @@ nav {
   }
 }
 
-html,
+html {
+  background: $backgroundColor;
+  font-family: $mainFont;
+}
+
 body{
   background: $backgroundColor;
   font-family: $mainFont;
+  padding-top: $bodyPaddingTop;
 }
 
 main {
