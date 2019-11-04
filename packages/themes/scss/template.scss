@@ -1,5 +1,5 @@
-
-/* default color palatte */
+// Base template
+// default color palette
 $primaryColor: #00237d !default;
 $textColor: #000000 !default;
 $linkColor: #0000EE !default;
@@ -19,7 +19,7 @@ $navbarLinkHoverColor: #0000EE !default;
 $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
 
-$mainFont: 'Arial', san-serif !default;
+$mainFont: 'Arial', sans-serif !default;
 $textFont: $mainFont !default;
 $headingFontWeight: bold !default;
 
@@ -99,7 +99,7 @@ nav {
 }
 
 html,
-body{
+body {
   background: $backgroundColor;
   font-family: $mainFont;
 }
@@ -131,8 +131,8 @@ main {
 
 // About mat-button
 // there are three ways to overwrite the button information
-//  1. Have a wrapper class called "dv-mat-button" on every
-//     in any concept [CHOSEN]
+//  1. Have a wrapper class called "dv-mat-button" on every button in
+//     concept components [CHOSEN]
 //  2. Put an important tag after class "mat-button"
 //  3. Not use mat-button
 
@@ -153,7 +153,6 @@ main {
     }
   }
 }
-
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";

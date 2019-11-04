@@ -133,11 +133,13 @@ export class AppCompiler {
       }
     }
 
-    const globalStyleFileScss = path.join(this.projectDir, 'src', 'styles.scss');
+    const globalStyleFileScss = path.join(
+      this.projectDir, 'src', 'styles.scss');
     const globalStyleScss: string = existsSync(globalStyleFileScss) ?
       readFileSync(globalStyleFileScss, 'utf8') : '';
 
-    // Read user defined css and compile it into scss
+    // CSS is valid SCSS. Thus, if the user provided a global CSS file we
+    // add the CSS code to the SCSS file content.
     const globalStyleFileCss = path.join(this.projectDir, 'src', 'styles.css');
     const globalStyleCss: string = existsSync(globalStyleFileCss) ?
       readFileSync(globalStyleFileCss, 'utf8') : '';
