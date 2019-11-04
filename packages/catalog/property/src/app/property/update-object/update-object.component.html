@@ -26,10 +26,11 @@
     </property-create-property>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button class="property-update-object-btn"
-            mat-button type="submit"
-            [disabled]="!updateObjectForm.valid">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button class="property-update-object-btn"
+        mat-button type="submit" [disabled]="!updateObjectForm.valid">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </form>

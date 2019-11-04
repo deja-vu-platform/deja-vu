@@ -61,9 +61,11 @@
     </mat-form-field>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit"
-      [disabled]="!createWeeklySeriesForm.valid">
-        {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button type="submit"
+        [disabled]="!createWeeklySeriesForm.valid">
+          {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </form>

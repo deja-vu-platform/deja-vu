@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Mansalva&display=swap');
+
+$primaryColor: #ffcfcf !default;
+$textColor: #3b3b3b !default;
+$linkColor: #3b3b3b !default;
+$backgroundColor: #fffff7 !default;
+
+$navbarBackgroundColor: $primaryColor !default;
+$navbarTextColor: $textColor !default;
+
+$mainFont: 'Mansalva', cursive;
+
+$pagePadding: 15px 40px !default;
+
+@import './template.scss';

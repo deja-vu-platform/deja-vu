@@ -362,11 +362,12 @@ export class NgAppBuilder {
       }
     }
 
-    // | styles.css
+    // | styles.scss
     if (diff.globalStyleChanged || _.has(diff, 'prev.globalStyle')) {
       writeFileSync(
-        path.join(srcDir, 'styles.css'),
-        prettier.format(this.globalStyle, { parser: 'css' }));
+        path.join(srcDir, 'styles.scss'),
+        prettier.format(this.globalStyle, { parser: 'css' })
+      );
     }
 
     // | favicon.ico

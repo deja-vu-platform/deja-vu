@@ -104,8 +104,10 @@
 
 <div *ngIf="showOptionToSubmit" class="form-group">
   <br />
-  <button mat-button class="create-schedule-submit-button"
-    type="submit" (click)="onSubmit()">
-    {{buttonLabel}}
-  </button>
+  <div class="dv-mat-button">
+    <button mat-button class="create-schedule-submit-button"
+      type="submit" (click)="onSubmit()">
+      {{buttonLabel}}
+    </button>
+  </div>
 </div>

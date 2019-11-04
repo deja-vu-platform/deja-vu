@@ -1,0 +1,109 @@
+// overwrite values should be written here
+$navbarButtonPadding: 0 5px;
+@mixin dv-mat-icon-wrapper {
+  vertical-align: inherit;
+}
+
+@import "~@deja-vu/themes/scss/orange-and-black.scss";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+// user input
+// might be grouped with other username displays
+.authentication-show-user-username {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.score {
+  margin-right: 2px;
+}
+
+.subtext {
+  color: grey;
+  font-size: 9pt; /* hacker news subtext font size */
+  display: inline-flex;
+
+  a, a:hover {
+    color: grey;
+  }
+
+  span {
+    color: grey;
+  }
+}
+
+.sep {
+  border-left: 1px solid gray;
+  width: 1px;
+  height: 12px;
+  margin-top: 3px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.black-sep {
+  border-left: 1px solid black;
+  width: 1px;
+  height: 15px;
+  margin: 3px 4px 0px 4px;
+}
+
+.write-comment-container {
+  margin: 20px;
+  margin-top: 0px;
+  margin-left: 45px;
+}
+
+.write-comment-container textarea {
+  width: 300px !important;
+  height: 4rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.space-filler {
+  flex: 1 1 auto;
+}
+
+
+.main {
+  padding: 15px 40px;
+  background-color: #f6f6ef; /* hacker news bg color */
+  min-height: 100vh;
+}
+
+.navbar {
+  .container {
+    .navbar-brand {
+      a {
+        font-weight: bold;
+        padding: 0 0;
+        font-size: 1.25rem !important;
+        white-space: nowrap;
+      }
+    }
+  }
+  padding: 0.4rem 1rem;
+}
+
+.list-group-item {
+  background-color: initial;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}

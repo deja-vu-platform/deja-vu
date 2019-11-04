@@ -5,5 +5,7 @@
   <mat-error *ngIf="deleteObjectError">
     {{deleteObjectError}}
   </mat-error>
-  <button mat-button (click)="deleteObject()">{{buttonLabel}}</button>
+  <div class="dv-mat-button">
+    <button mat-button (click)="deleteObject()">{{buttonLabel}}</button>
+  </div>
 </div>

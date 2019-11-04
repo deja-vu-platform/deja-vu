@@ -132,10 +132,18 @@ export class AppCompiler {
         ngAppBuilder.addRoute(route.path, selector);
       }
     }
-    const globalStyleFile = path.join(this.projectDir, 'src', 'styles.css');
-    const globalStyle: string = existsSync(globalStyleFile) ?
-      readFileSync(globalStyleFile, 'utf8') : '';
-    ngAppBuilder.setGlobalStyle(globalStyle);
+
+    const globalStyleFileScss = path.join(
+      this.projectDir, 'src', 'styles.scss');
+    const globalStyleScss: string = existsSync(globalStyleFileScss) ?
+      readFileSync(globalStyleFileScss, 'utf8') : '';
+
+    // CSS is valid SCSS. Thus, if the user provided a global CSS file we
+    // add the CSS code to the SCSS file content.
+    const globalStyleFileCss = path.join(this.projectDir, 'src', 'styles.css');
+    const globalStyleCss: string = existsSync(globalStyleFileCss) ?
+      readFileSync(globalStyleFileCss, 'utf8') : '';
+    ngAppBuilder.setGlobalStyle(globalStyleScss.concat(globalStyleCss));
 
     const faviconFile = path.join(this.projectDir, 'favicon.ico');
     if (existsSync(faviconFile)) {

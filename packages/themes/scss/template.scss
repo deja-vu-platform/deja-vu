@@ -1,0 +1,167 @@
+// Base template
+// default color palette
+$primaryColor: #00237d !default;
+$textColor: #000000 !default;
+$linkColor: #0000EE !default;
+$linkHoverColor: $linkColor !default;
+$rootLinkColor: $linkColor !default;
+$headingColor: $primaryColor !default;
+$backgroundColor: #f5f5f5 !default;
+$errorMessageColor: #f44336 !default;
+
+$navbarBackgroundColor: $primaryColor !default;
+$navbarTextColor: #FFFFFF !default;
+$navbarTextSize: 1rem !default;
+$navbarHeight: 56px !default;
+$navbarButtonPadding: 0 10px !default;
+$navbarLinkColor: #0000EE !default;
+$navbarLinkHoverColor: #0000EE !default;
+$navbarVerticalAlign: middle !default;
+$navbarPadding: 0 0;
+
+$mainFont: 'Arial', sans-serif !default;
+$textFont: $mainFont !default;
+$headingFontWeight: bold !default;
+
+$formWidth: 300px !default;
+
+$use-default-mat-button: false !default;
+
+
+/* theming doc starts */
+
+// mixin utils
+@mixin heading-style {
+  font-family: $mainFont;
+  font-weight: $headingFontWeight;
+  color: $headingColor;
+}
+
+@mixin text-style {
+  font-family: inherit;
+  color: inherit;
+}
+
+@mixin link-style {
+  font-family: $textFont;
+  color: $linkColor;
+
+  :hover {
+    color: $linkHoverColor;
+    @if mixin_exists(link-hover) {@include link-hover};
+  }
+}
+
+// generic
+h1, h2, h3 {
+  @include heading-style;
+}
+
+div {
+  @include text-style;
+}
+
+a {
+  @include link-style;
+}
+
+// root link
+a:root, a:root:hover {
+  color: $rootLinkColor;
+  font-family: $mainFont;
+}
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: $textColor;
+  font-family: $mainFont;
+}
+
+nav {
+  background: $navbarBackgroundColor;
+  height: $navbarHeight;
+  font-family: $mainFont;
+  padding: $navbarPadding;
+
+  div, h1, h2, h3 {
+    color: $navbarTextColor;
+    vertical-align: $navbarVerticalAlign;
+    font-size: $navbarTextSize;
+  }
+
+  a {
+    color: $navbarLinkColor;
+    padding: $navbarButtonPadding;
+    vertical-align: $navbarVerticalAlign;
+    font-size: $navbarTextSize;
+  }
+
+  a:hover {
+    color: $navbarLinkHoverColor;
+    @if mixin-exists(dv-navbar-hover) {@include dv-navbar-hover};
+  }
+}
+
+html,
+body {
+  background: $backgroundColor;
+  font-family: $mainFont;
+}
+
+main {
+  background-color: $backgroundColor;
+  margin-top: $navbarHeight;
+  font-family: $mainFont;
+}
+
+
+/* Material UI */
+.mat-error {
+  color: $errorMessageColor;
+  font-size: 12px;
+}
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: $errorMessageColor;
+}
+
+.mat-input-element {
+  caret-color: $textColor;
+}
+
+.dv-mat-button {
+  display: inline;
+}
+
+// About mat-button
+// there are three ways to overwrite the button information
+//  1. Have a wrapper class called "dv-mat-button" on every button in
+//     concept components [CHOSEN]
+//  2. Put an important tag after class "mat-button"
+//  3. Not use mat-button
+
+// Overwrite mat-button by wrapping each
+// instance of the mat-button in a different class
+.dv-mat-button {
+  button.mat-button {
+    @if $use-default-mat-button == false {
+      background: $primaryColor;
+      color: $textColor;
+    }
+    @if mixin-exists(dv-button) {@include dv-button};
+  }
+
+  button.mat-icon-button {
+    .mat-button-wrapper > * {
+      @if mixin-exists(dv-mat-icon-wrapper) {@include dv-mat-icon-wrapper}
+    }
+  }
+}
+
+.mat-form-field-wrapper {
+  width: $formWidth;
+}
+
+@import "~@angular/material/theming";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~css-star-rating/dist/css/star-rating.min.css";
+@include mat-core();

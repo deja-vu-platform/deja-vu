@@ -16,8 +16,10 @@
     </mat-select>
   </mat-form-field>
   <div *ngIf="showChooseButton">
-    <button mat-button (click)="add()" [disabled]="entityIndex === undefined">
-      {{addButtonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button (click)="add()" [disabled]="entityIndex === undefined">
+        {{addButtonLabel}}
+      </button>
+    </div>
   </div>
   <!-- </span> -->

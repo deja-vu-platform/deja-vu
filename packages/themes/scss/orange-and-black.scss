@@ -1,0 +1,17 @@
+$mainFont: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+$primaryColor: #ff6600 !default;
+$linkColor: #002002 !default;
+$headingColor: black !default;
+$backgroundColor: #f6f6ef !default;
+$errorMessageColor: #f44336 !default;
+
+$navbarTextColor: black !default;
+$navbarLinkColor: black !default;
+$navbarLinkHoverColor: black !default;
+
+$mainFont: 'Arial', san-serif !default;
+$headingFontWeight: 500 !default;
+
+$use-default-mat-button: true;
+
+@import './template.scss';

@@ -1,62 +1,13 @@
-@import "~css-star-rating/dist/css/star-rating.min.css";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+// overwrite values
+$use-default-mat-button: true;
+$navbarHeight: 60px;
+$navbarTextSize: 20px;
+$navbarButtonPadding: 0 5px;
+$navbarPadding: 0.5rem 1rem;
+
+@import "~@deja-vu/themes/scss/mint.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~leaflet/dist/leaflet.css";
-@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
-@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Raleway');
 
-md-icon {
-  font-family: 'Material Icons' !important;
-}
-
-/* Basics */
-p {
-  white-space: pre-wrap;
-  font-family: 'Raleway', sans-serif;
-}
-
-a {
-  color: #28bdb1;
-}
-
-a:hover {
-  cursor: pointer;
-}
-
-h1 {
-  font-family: 'Raleway', sans-serif;
-  font-weight: bold;
-  font-size: 36px;
-  color: #28bdb1;
-}
-
-h2 {
-  font-family: 'Raleway', sans-serif;
-  font-weight: bold;
-  color: #28bdb1;
-}
-
-h3 {
-  font-family: 'Raleway', sans-serif;
-}
-
-div {
-  font-family: 'Raleway', sans-serif;
-}
-
-ul {
-  list-style: none;
-}
-
-html,
-body,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #ffffff !important;
-}
 
 .logo {
   height: 50px;
@@ -160,36 +111,6 @@ main {
 .hint {
   font-size: 12px;
   white-space: normal;
-}
-
-
-/* Navbar */
-.navbar {
-  background-color: #28bdb1;
-  height: 60px;
-}
-
-.navbar-right, .navbar-right-elem {
-  margin-bottom: 10px;
-}
-
-.navbar a, .navbar-right-elem {
-  color: white;
-  font-family: 'Raleway', sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.navbar a:hover {
-  text-decoration: none;
-  color: #054575;
-}
-
-.login-btn a,
-.register-btn a {
-  color: #28bdb1;
 }
 
 /* Other */

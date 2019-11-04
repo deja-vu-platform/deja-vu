@@ -23,8 +23,10 @@
     </task-create-due-date>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" [disabled]="!createTaskForm.valid">
-      {{buttonLabel}}
-    </button>
+    <div class="dv-mat-button">
+      <button mat-button type="submit" [disabled]="!createTaskForm.valid">
+        {{buttonLabel}}
+      </button>
+    </div>
   </div>
 </form>
