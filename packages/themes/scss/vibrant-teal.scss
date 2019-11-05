@@ -1,0 +1,24 @@
+$mainFont: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+$primaryColor: #343a40;
+$textColor: black;
+$linkColor: $primaryColor;
+$backgroundColor: #4FB5C3;
+
+$navbarHeight: auto;
+$navbarBackgroundColor: #343a40;
+$navbarLinkColor: lightgrey;
+$navbarVerticalAlign: baseline;
+
+$headingFontWeight: 500;
+$formWidth: auto;
+$use-default-mat-button: true;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+}
+
+@mixin link-hover {
+  text-decoration: none;
+}
+
+@import './source/template.scss';

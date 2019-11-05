@@ -56,7 +56,7 @@ $use-default-mat-button: false !default;
   font-family: $textFont;
   color: $linkColor;
 
-  :hover {
+  &:hover {
     color: $linkHoverColor;
     @if mixin_exists(link-hover) {@include link-hover};
   }

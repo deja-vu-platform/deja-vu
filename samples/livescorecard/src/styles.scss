@@ -1,4 +1,4 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/scss/vibrant-teal.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
 html,
@@ -6,10 +6,6 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-body {
-  background-color: #4FB5C3;
 }
 
 .inline-block {
@@ -152,15 +148,6 @@ authentication-sign-in button.mat-button {
     display: block;
     margin-top: 2em;
   }
-}
-
-a {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
 }
 
 .left-space {
