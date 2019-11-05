@@ -16,6 +16,7 @@ $navbarHeight: 56px !default;
 $navbarButtonPadding: 0 10px !default;
 $navbarLinkColor: #0000EE !default;
 $navbarLinkHoverColor: $navbarLinkColor !default;
+$navbarLinkFontWeight: normal !default;
 $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
 $navbarBorderBottom: 0 !default;
@@ -100,6 +101,8 @@ nav {
     padding: $navbarButtonPadding;
     vertical-align: $navbarVerticalAlign;
     font-size: $navbarTextSize;
+    font-weight: $navbarLinkFontWeight;
+
     &:hover {
       color: $navbarLinkHoverColor;
       @if mixin-exists(dv-navbar-link-hover) {@include dv-navbar-link-hover};

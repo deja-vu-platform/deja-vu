@@ -1,4 +1,4 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/scss/business-red.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
 h2 span {
@@ -33,14 +33,6 @@ h2 .selected-tab {
 
 .black-link a {
   color: black;
-}
-
-.navbar {
-  border-bottom: 2px solid silver;
-}
-
-.navbar-brand a {
-  color: #E52F4F;
 }
 
 .authentication-show-user-username {

@@ -2,18 +2,6 @@
   flex: 1 1 auto;
 }
 
-.navbar {
-  background-color: #FAF9F9;
-}
-
-.navbar-brand {
-  font-weight: bold;
-}
-
-.navbar-brand a {
-  color: #E52F4F;
-}
-
 .profile-image {
   height: 40px;
   width: 40px;
