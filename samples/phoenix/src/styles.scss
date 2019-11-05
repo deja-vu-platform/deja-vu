@@ -1,17 +1,6 @@
-@import "~css-star-rating/dist/css/star-rating.min.css";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/scss/soft-green.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~leaflet/dist/leaflet.css";
-@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
-@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Mogra');
-@import url('https://fonts.googleapis.com/css?family=Asap');
 @import "~angular-calendar/css/angular-calendar.css";
-
-md-icon {
-  font-family: 'Material Icons' !important;
-}
-
 
 .cal-week-hours-view .cal-day-headers {
   display: flex;
@@ -228,5 +217,5 @@ label-show-items li.list-group-item {
 
 .btn-interested button.mat-button,
 #close-connection-btn button.mat-button {
-  background-color: lavender;
+  background-color: lavender !important;
 }

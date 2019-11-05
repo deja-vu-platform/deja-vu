@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Asap');
+
+$mainFont: 'Asap', sans-serif; // consistent with the original 6170 app
+$primaryColor: #343a40;
+$textColor: #212529;
+$linkColor: #007bff;
+$headingColor: #212529;
+$backgroundColor: white;
+
+$headingFontWeight: 500;
+$formWidth: auto;
+
+$use-default-mat-button: true;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+}
+
+@import './source/template.scss';

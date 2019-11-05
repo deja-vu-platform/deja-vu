@@ -9,7 +9,12 @@ $headingColor: $primaryColor !default;
 $backgroundColor: #f5f5f5 !default;
 $errorMessageColor: #f44336 !default;
 
+$mainFont: 'Arial', sans-serif !default;
+$textFont: $mainFont !default;
+$headingFontWeight: bold !default;
+
 $navbarBackgroundColor: $primaryColor !default;
+$navbarFont: $mainFont !default;
 $navbarTextColor: #FFFFFF !default;
 $navbarTextSize: 1rem !default;
 $navbarHeight: 56px !default;
@@ -21,9 +26,6 @@ $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
 $navbarBorderBottom: 0 !default;
 
-$mainFont: 'Arial', sans-serif !default;
-$textFont: $mainFont !default;
-$headingFontWeight: bold !default;
 
 $bodyPaddingTop: 0px !default;
 
@@ -36,7 +38,6 @@ $sliderTickColor: $sliderColor !default;
 $formWidth: 300px !default;
 
 $use-default-mat-button: false !default;
-
 
 /* theming doc starts */
 
@@ -89,7 +90,7 @@ div:root, p:root, h1:root, h2:root, h3:root {
 nav {
   background: $navbarBackgroundColor;
   height: $navbarHeight;
-  font-family: $mainFont;
+  font-family: $navbarFont;
   padding: $navbarPadding;
   border-bottom: $navbarBorderBottom;
 
