@@ -1,5 +1,5 @@
-
-/* default color palatte */
+// Base template
+// default color palette
 $primaryColor: #00237d !default;
 $textColor: #000000 !default;
 $linkColor: #0000EE !default;
@@ -21,7 +21,7 @@ $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
 $navbarBorderBottom: 0 !default;
 
-$mainFont: 'Arial', san-serif !default;
+$mainFont: 'Arial', sans-serif !default;
 $textFont: $mainFont !default;
 $headingFontWeight: bold !default;
 
@@ -33,7 +33,10 @@ $sliderSelectionColor: $sliderColor !default;
 $sliderPointerColor: $sliderColor !default;
 $sliderTickColor: $sliderColor !default;
 
+$formWidth: 300px !default;
+
 $use-default-mat-button: false !default;
+
 
 /* theming doc starts */
 
@@ -45,8 +48,8 @@ $use-default-mat-button: false !default;
 }
 
 @mixin text-style {
-  font-family: $textFont;
-  color: $textColor;
+  font-family: inherit;
+  color: inherit;
 }
 
 @mixin link-style {
@@ -117,7 +120,7 @@ html {
   font-family: $mainFont;
 }
 
-body{
+body {
   background: $backgroundColor;
   font-family: $mainFont;
   padding-top: $bodyPaddingTop;
@@ -153,8 +156,8 @@ main {
 
 // About mat-button
 // there are three ways to overwrite the button information
-//  1. Have a wrapper class called "dv-mat-button" on every
-//     in any concept [CHOSEN]
+//  1. Have a wrapper class called "dv-mat-button" on every button in
+//     concept components [CHOSEN]
 //  2. Put an important tag after class "mat-button"
 //  3. Not use mat-button
 
@@ -174,6 +177,10 @@ main {
       @if mixin-exists(dv-mat-icon-wrapper) {@include dv-mat-icon-wrapper}
     }
   }
+}
+
+.mat-form-field-wrapper {
+  width: $formWidth;
 }
 
 @import "~@angular/material/theming";

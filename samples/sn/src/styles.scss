@@ -52,8 +52,7 @@ $navbarButtonPadding: 0 5px;
   border-left: 1px solid black;
   width: 1px;
   height: 15px;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin: 3px 4px 0px 4px;
 }
 
 .write-comment-container {
@@ -87,7 +86,6 @@ ul {
   background-color: #f6f6ef; /* hacker news bg color */
   min-height: 100vh;
 }
-
 
 .navbar {
   .container {
