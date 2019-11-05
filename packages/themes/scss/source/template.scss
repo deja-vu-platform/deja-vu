@@ -25,6 +25,12 @@ $headingFontWeight: bold !default;
 
 $bodyPaddingTop: 0px !default;
 
+$sliderColor: $primaryColor !default;
+$sliderActiveColor: $backgroundColor !default;
+$sliderSelectionColor: $sliderColor !default;
+$sliderPointerColor: $sliderColor !default;
+$sliderTickColor: $sliderColor !default;
+
 $use-default-mat-button: false !default;
 
 /* theming doc starts */
@@ -124,6 +130,9 @@ main {
   color: $errorMessageColor;
   font-size: 12px;
 }
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: $primaryColor;
+}
 
 .mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
   caret-color: $errorMessageColor;
@@ -162,8 +171,29 @@ main {
   }
 }
 
-
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~css-star-rating/dist/css/star-rating.min.css";
 @include mat-core();
+
+// ng5-slider
+.dv-ng5-slider {
+  .ng5-slider {
+    .ng5-slider-selection {
+      background: $sliderSelectionColor;
+    }
+
+    .ng5-slider-pointer {
+      background: $sliderPointerColor;
+    }
+
+    .ng5-slider-pointer.ng5-slider-active:after {
+      background: $sliderActiveColor;
+    }
+
+    .ng5-slider-tick.ng5-slider-selected {
+      background: $sliderTickColor;
+    }
+  }
+}
+
