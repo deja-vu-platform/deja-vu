@@ -15,9 +15,10 @@ $navbarTextSize: 1rem !default;
 $navbarHeight: 56px !default;
 $navbarButtonPadding: 0 10px !default;
 $navbarLinkColor: #0000EE !default;
-$navbarLinkHoverColor: #0000EE !default;
+$navbarLinkHoverColor: $navbarLinkColor !default;
 $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
+$navbarBorderBottom: 0 !default;
 
 $mainFont: 'Arial', san-serif !default;
 $textFont: $mainFont !default;
@@ -86,6 +87,7 @@ nav {
   height: $navbarHeight;
   font-family: $mainFont;
   padding: $navbarPadding;
+  border-bottom: $navbarBorderBottom;
 
   div, h1, h2, h3 {
     color: $navbarTextColor;

@@ -1,28 +1,8 @@
-@import "~css-star-rating/dist/css/star-rating.min.css";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/scss/minimalist.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~leaflet/dist/leaflet.css";
-@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
-@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Mogra');
-
-md-icon {
-  font-family: 'Material Icons' !important;
-}
-
-/* Basics */
-p {
-  white-space: pre-wrap;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
 
 h1 {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin:0;
-}
-
-h2 {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0;
 }
 
 h3 {
@@ -30,24 +10,14 @@ h3 {
   margin: 0 0 5px 0;
 }
 
-div {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-ul {
-  list-style: none;
-}
-
 hr {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 html,
 body,
 main {
   height: 100%;
-  margin: 0;
-  padding: 0;
   background-image: url("/assets/map_background.svg");
   background-size: cover;
   background-repeat: no-repeat;
@@ -150,53 +120,6 @@ main {
 
 .large-margin {
   margin: 15px 50px;
-}
-
-/* Buttons */
-.highlight-button button.mat-button,
-button.mat-button {
-  border-color: #208a46;
-  color: #fff;
-  background: #29b35b linear-gradient(to bottom, #2ec866, #29b35b);
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -1px 4px rgba(32, 138, 70, 0.3);
-}
-
-.highlight-button button.mat-button:hover,
-button.mat-button:hover {
-  background: #449d44;
-  border-color: #398439;
-}
-
-/* Navbar */
-.navbar a {
-  color: #262626;
-  display: inline-block;
-  text-align:center;
-  vertical-align: middle;
-  margin:10px;
-}
-
-.navbar a:hover {
-  text-decoration: none;
-}
-
-.navbar-right a, .navbar-right-elem {
-  vertical-align: middle;
-  margin:10px;
-  text-align: center;
-  display: inline-block;
-  color: #262626;
-}
-
-.navbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.login-btn a,
-.register-btn a {
-  color: #696969;
 }
 
 /* Other */
