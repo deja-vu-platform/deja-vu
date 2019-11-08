@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+// The original css randomly uses Roboto and apple-default
+// Here I changed it all to Roboto
+$mainFont: 'Roboto', sans-serif;
+$primaryColor: #f62459;
+$linkColor: #007bff;
+$linkHoverColor: #0056b3;
+$backgroundColor: #FFFCF9;
+$textColor: #212529;
+$headingColor: #212529;
+$headingFontWeight: 500;
+
+$navbarHeight: 68px;
+$navbarBackgroundColor: #f62459;
+$navbarTextColor: white;
+$navbarButtonPadding: 0;
+
+$formWidth: auto;
+$use-default-mat-button: true;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+}
+
+@import './source/template.scss';
