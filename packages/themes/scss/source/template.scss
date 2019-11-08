@@ -27,7 +27,6 @@ $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
 $navbarBorderBottom: 0 !default;
 
-
 $bodyPaddingTop: 0px !default;
 
 $sliderColor: $primaryColor !default;
@@ -39,9 +38,20 @@ $sliderTickColor: $sliderColor !default;
 $formWidth: 300px !default;
 
 $use-default-mat-button: false !default;
+$use-bootstrap: true !default;
+
+// load bootstrap if $use-bootstrap is set to true
+%loadFile {
+  @import "~bootstrap/dist/css/bootstrap.min.css";
+}
+
+html {
+  @if $use-bootstrap == true {
+    @extend %loadFile;
+  }
+}
 
 /* theming doc starts */
-
 // mixin utils
 @mixin heading-style {
   font-family: $mainFont;
