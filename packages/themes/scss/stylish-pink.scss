@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+$mainFont: 'Raleway', sans-serif;
+$primaryColor: white;
+$linkColor: #007bff;
+$linkHoverColor: #0056b3;
+$backgroundColor: white;
+$textColor: #212529;
+$headingColor: #212529;
+$headingFontWeight: normal;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+}
+
+@mixin dv-button {
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif;
+}
+
+@import './source/template.scss';

@@ -1,26 +1,16 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~@deja-vu/themes/scss/stylish-pink.scss";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Raleway');
-md-icon {
-  font-family: 'Material Icons' !important;
-}
 
 body,
 html {
   overflow-x: hidden;
   overflow-y: auto;
-  height: 100%;
-  margin: 0;
-  padding: 0;
 }
 
-body {
-  font-family: 'Raleway', sans-serif;
-}
-
+// link that looks like a button
 .button a {
   color: black;
 }
@@ -68,14 +58,6 @@ select {
   padding: 5px;
 }
 
-.popper {
-  font-family: 'Raleway', sans-serif;
-}
-
-.popper-content {
-  font-family: 'Raleway', sans-serif;
-}
-
 .card>.card-body>p {
   display: inline-block;
   word-wrap: break-word;
@@ -100,12 +82,10 @@ select {
   border-radius: 5px !important;
   border: 1px solid #B3594D !important;
   font-weight: normal;
-  font-family: 'Raleway', sans-serif;
 }
 
 .new-event {
   width: 75%;
-  font-family: 'Raleway', sans-serif;
   margin: 0 auto;
   margin-top: 50px;
 }
@@ -150,10 +130,6 @@ select {
 .register-button {
   margin: 0;
   padding: 0;
-}
-
-.register-button button.mat-button {
-  font-family: 'Raleway', sans-serif;
 }
 
 .display-buttons {
@@ -254,20 +230,6 @@ a.auth-link {
 
 authentication-sign-in button.mat-button {
   width: 150px;
-  background-color: #ffd0cc;
-  color: black;
-  border-radius: 5px;
-  border: 1px solid #B3594D;
-  font-family: 'Raleway', sans-serif;
-}
-
-authentication-sign-out button.mat-button {
-  background-color: #ffd0cc;
-  color: black;
-  border-radius: 5px;
-  border: 1px solid #B3594D;
-  font-family: 'Raleway', sans-serif;
-  margin-right: 30px;
 }
 
 .profile-button {
@@ -315,14 +277,6 @@ comment-create-comment .mat-input-container {
   width: 80%;
 }
 
-comment-create-comment button.mat-button {
-  background-color: #ffd0cc;
-  color: black;
-  border-radius: 5px;
-  border: 1px solid #B3594D;
-  font-family: 'Raleway', sans-serif;
-}
-
 .host-name .dvlink {
   color: black;
   pointer-events: all;
@@ -330,15 +284,6 @@ comment-create-comment button.mat-button {
 
 .host-name .dvlink:hover {
   text-decoration: none;
-}
-
-.theme-button button.mat-button {
-  background-color: #ffd0cc;
-  color: black;
-  border-radius: 5px;
-  border: 1px solid #B3594D;
-  font-family: 'Raleway', sans-serif;
-  margin-right: 30px;
 }
 
 .edit-button {
