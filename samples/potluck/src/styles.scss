@@ -1,23 +1,11 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 @import "~bootstrap/dist/css/bootstrap.min.css";
-
-/* Fonts */
-@import url("https://fonts.googleapis.com/css?family=Pacifico");
-@import url("https://fonts.googleapis.com/css?family=Roboto");
+@import "~@deja-vu/themes/scss/basil-green.scss";
 
 
-md-icon {
-  font-family: 'Material Icons' !important;
-}
 
 .icon {
   vertical-align: text-bottom;
-}
-
-body {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 300;
-  background-color: #CFDBC5;
 }
 
 .inline-block {
@@ -42,6 +30,8 @@ th {
   margin-bottom: 0px;
 }
 
+// button that is actually a link
+// cannot be put in the theme
 .btn,
 .btn:hover {
   border-radius: 3px;
@@ -75,16 +65,19 @@ th {
   margin-bottom: 10px;
 }
 
-.navbar {
-  background-color: #f8f8f8;
-  border-color: #e7e7e7;
-  color: gray;
-}
+//.navbar {
+//  border-color: #e7e7e7;
+//}
 
 .navbar-brand a {
   font-family: 'Pacifico', cursive;
   color: #777;
+  font-size: 20px;
   text-decoration: none;
+
+  &:hover {
+    color: #777;
+  }
 }
 
 #main-navbar {
