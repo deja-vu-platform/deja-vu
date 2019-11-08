@@ -34,6 +34,7 @@ import { InputIdComponent } from './input-id/input-id.component';
 import { IntersectComponent } from './intersect/intersect.component';
 import { LinkComponent } from './link/link.component';
 import { MergeComponent } from './merge/merge.component';
+import { NavbarComponent} from './navbar/navbar.component';
 import { PickComponent } from './pick/pick.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { RefreshService } from './refresh.service';
@@ -67,7 +68,7 @@ const allComponents = [
   ForComponent, ShowEntitiesComponent, UnionComponent,
   IntersectComponent, ShowEntityComponent, TableComponent,
   DifferenceComponent, GroupByComponent, PickComponent, FilterComponent,
-  DebugLogComponent, SumComponent, FormatDateComponent
+  DebugLogComponent, SumComponent, FormatDateComponent, NavbarComponent
 ];
 
 @NgModule({
