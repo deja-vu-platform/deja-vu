@@ -83,6 +83,7 @@ export class FilterObjectsComponent
 
   ngOnInit() {
     this.dvs = this.dvf.forComponent(this)
+      .withRefreshCallback(() => { this.load(); })
       .build();
     this.initializePropertiesToInclude();
     this.initializePropertyOptions();
