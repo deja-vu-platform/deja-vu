@@ -319,6 +319,17 @@ task-show-tasks .list-group-item {
 
 .navbar-brand {
   color: lightgrey;
+  a {
+    font-size: 20px;
+  }
+
+  property-show-object {
+    font-size: 20px;
+  }
+
+  div {
+    font-size: 20px;
+  }
 }
 
 .prop .mat-form-field {
