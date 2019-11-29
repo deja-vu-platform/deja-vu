@@ -8,6 +8,8 @@ $backgroundColor: white;
 $textColor: #212529;
 $headingColor: #212529;
 $headingFontWeight: normal;
+$formWidth: 180px;
+
 
 @mixin dv-navbar-link-hover {
   text-decoration: none;
