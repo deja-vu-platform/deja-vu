@@ -1,8 +1,9 @@
 @import "~@deja-vu/themes/scss/sugar.scss";
+@import "~css-star-rating/dist/css/star-rating.min.css";
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Mogra');
+@import url('https://fonts.googleapis.com/css?family=Mogra&display=swap');
 
 .inline-block {
   display: inline-block;
