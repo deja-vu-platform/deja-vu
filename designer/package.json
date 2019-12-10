@@ -38,6 +38,7 @@
     "@deja-vu/property": "^0.0.9",
     "@deja-vu/rating": "^0.0.9",
     "@deja-vu/task": "^0.0.9",
+    "@deja-vu/themes": "^0.0.9",
     "@deja-vu/transfer": "^0.0.9",
     "ajv": "^6.5.4",
     "angular-expressions": "^1.0.0",

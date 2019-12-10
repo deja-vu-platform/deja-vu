@@ -22,7 +22,7 @@ import {
   templateUrl: './theme-palette.component.html',
   styleUrls: ['./theme-palette.component.scss']
 })
-export class ThemePaletteComponent implements onInit {
+export class ThemePaletteComponent implements OnInit {
   @Input() readonly app: App;
 
   ngOnInit() { }
@@ -30,6 +30,8 @@ export class ThemePaletteComponent implements onInit {
   setTheme() {
     console.log('SET THEME!!');
     console.log(document);
+    const sss = require("@deja-vu/themes/scss/mint.scss");
+    console.log(sss);
     const style = document.createElement('style');
     const head = document.head || document.getElementsByTagName('head')[0];
     head.appendChild(style);
