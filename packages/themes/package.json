@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/themes",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Themes for Déjà Vu",
   "scripts": {
     "build": "mkdir dist && cp -r css ./dist",

@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/geolocation",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-geolocation",
@@ -69,10 +69,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.0.10",
-    "@deja-vu/concept-server": "^0.0.10",
-    "@deja-vu/core": "^0.0.10",
-    "@deja-vu/gateway": "^0.0.10",
+    "@deja-vu/cli": "^0.0.11",
+    "@deja-vu/concept-server": "^0.0.11",
+    "@deja-vu/core": "^0.0.11",
+    "@deja-vu/gateway": "^0.0.11",
     "@types/googlemaps": "^3.30.8",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
