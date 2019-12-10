@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { map } from 'rxjs/operators';
 
@@ -22,11 +22,17 @@ import {
   templateUrl: './theme-palette.component.html',
   styleUrls: ['./theme-palette.component.scss']
 })
-export class ThemePaletteComponent {
+export class ThemePaletteComponent implements onInit {
   @Input() readonly app: App;
 
-  constructor(
-    private readonly dialog: MatDialog,
-    private readonly electronService: ElectronService) {}
+  ngOnInit() { }
 
+  setTheme() {
+    console.log('SET THEME!!');
+    console.log(document);
+    const style = document.createElement('style');
+    const head = document.head || document.getElementsByTagName('head')[0];
+    head.appendChild(style);
+    style.appendChild(document.createTextNode('* { background: black }'));
+  }
 }
