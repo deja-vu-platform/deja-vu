@@ -1,13 +1,8 @@
-@import "~css-star-rating/dist/css/star-rating.min.css";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~@deja-vu/themes/scss/sugar.scss";
 @import "~leaflet/dist/leaflet.css";
 @import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 @import url('https://fonts.googleapis.com/css?family=Mogra');
-md-icon {
-  font-family: 'Material Icons' !important;
-}
 
 .inline-block {
   display: inline-block;
@@ -31,6 +26,7 @@ md-icon {
   }
 }
 
+// link that looks like a button
 .btn-primary {
   background-color: #A52C4B !important;
   border-color: #A52C4B !important;
@@ -75,23 +71,9 @@ comment-delete-comment button.mat-button {
   color: #FFFFFF !important;
 }
 
-html,
-body,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #FFFCF9 !important;
-}
-
 sweetspots-add-a-spot,
 #add-a-spot {
   text-align: center;
-}
-
-body {
-  padding-bottom: 40px;
-  background-color: #FFFFFF;
 }
 
 .form-signin {
@@ -206,12 +188,13 @@ label-search-items-by-labels button.mat-button {
   display: inline-block;
   margin-left: 1em;
   background-color: floralwhite;
+  color: #212529;
 }
 
 rating-rate-target .rating {
   justify-content: start;
 }
 
-sweetspots-add-a-spot-form .mat-input-container {
+.mat-input-container {
   width: 100%;
 }

@@ -9,15 +9,13 @@ $navbarLinkColor: white;
 $navbarLinkHoverColor: white;
 $navbarVerticalAlign: baseline;
 
-@mixin dv-navbar-hover {
+@mixin dv-navbar-link-hover {
   color: #054575;
   text-decoration: none;
 }
 
 h1 {
   font-size: 36px;
-  font-weight: bold;
 }
 
-@import './template.scss';
-
+@import './source/template.scss';

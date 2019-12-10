@@ -1,60 +1,14 @@
-@import "~css-star-rating/dist/css/star-rating.min.css";
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~leaflet/dist/leaflet.css";
-@import "~leaflet-routing-machine/dist/leaflet-routing-machine.css";
-@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
-@import url('https://fonts.googleapis.com/css?family=Mogra');
-md-icon {
-  font-family: 'Material Icons' !important;
-}
+@import "~@deja-vu/themes/scss/vivid-green.scss";
 
 /* Basics */
 p {
   white-space: pre-wrap;
-  font-family: 'Raleway', sans-serif;
-}
-
-a {
-  color: #4bad42;
-}
-
-a:hover {
-  cursor: pointer;
-}
-
-h1 {
-  font-family: 'Raleway', sans-serif;
-  font-weight: bold;
-  color: #4bad42;
-}
-
-h2 {
-  font-family: 'Raleway', sans-serif;
-  font-weight: bold;
-  color: #4bad42;
 }
 
 h3 {
-  font-family: 'Raleway', sans-serif;
+  font-weight: normal;
+  color: $textColor;
   margin: 10px;
-}
-
-div {
-  font-family: 'Raleway', sans-serif;
-}
-
-ul {
-  list-style: none;
-}
-
-html,
-body,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #fffff7 !important;
 }
 
 /* Layouts */
@@ -97,7 +51,8 @@ main {
   margin: 10px 0;
 }
 
-/* Auth Related */
+/* Sign in and Register Button*/
+// Styled individually because other buttons are mat-default
 .theme-button button.mat-button,
 authentication-sign-in button.mat-button {
   background-color: #4bad42;
@@ -122,16 +77,14 @@ authentication-sign-in button.mat-button:hover {
 }
 
 /* Navbar */
-.navbar a{
-  color: #FFFFFF;
-  text-decoration: none;
-  text-align:center;
-  margin:5px;
-}
-
-.navbar a:hover {
-  text-decoration: none;
-  font-weight: 700;
+.navbar {
+  .container {
+    .navbar-header {
+      a {
+        font-size: 20px;
+      }
+    }
+  }
 }
 
 .navbar-right a, .navbar-right-elem {
@@ -139,15 +92,6 @@ authentication-sign-in button.mat-button:hover {
   text-align: center;
   display: inline-block;
   color: white;
-}
-
-.navbar {
-  background-color: #4bad42;
-}
-
-.login-btn a,
-.register-btn a {
-  color: #4bad42;
 }
 
 /* Other */

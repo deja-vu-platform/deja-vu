@@ -1,20 +1,10 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";
+$navbarButtonPadding: 0;
 
+@import "~@deja-vu/themes/scss/baby-blue.scss";
 @import url('https://fonts.googleapis.com/css?family=Fruktur&display=swap');
-
-md-icon {
-  font-family: 'Material Icons' !important;
-}
 
 h1, h2, h4 {
   text-align: center;
-}
-
-body {
-  background: #b7d1e5;
-  font-family: 'Roboto', sans-serif;
-  padding-top: 50px;
 }
 
 .white-box {
@@ -23,7 +13,6 @@ body {
   border-radius: 25px;
   margin-bottom: 10px;
 }
-
 
 .right-box {
   margin-left: 20px;

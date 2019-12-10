@@ -1,15 +1,10 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~@deja-vu/themes/scss/vibrant-teal.scss";
 
 html,
 body {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-body {
-  background-color: #4FB5C3;
 }
 
 .inline-block {
@@ -152,15 +147,6 @@ authentication-sign-in button.mat-button {
     display: block;
     margin-top: 2em;
   }
-}
-
-a {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
 }
 
 .left-space {
@@ -333,6 +319,17 @@ task-show-tasks .list-group-item {
 
 .navbar-brand {
   color: lightgrey;
+  a {
+    font-size: 20px;
+  }
+
+  property-show-object {
+    font-size: 20px;
+  }
+
+  div {
+    font-size: 20px;
+  }
 }
 
 .prop .mat-form-field {

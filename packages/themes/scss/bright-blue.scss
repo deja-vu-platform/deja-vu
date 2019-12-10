@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+
+$mainFont: 'Lato', sans-serif;
+
+$primaryColor: #44a7f2;
+$backgroundColor: white;
+$textColor: #212529;
+$linkColor: $primaryColor;
+$linkHoverColor: #054575;
+
+$navbarHeight: 64px;
+$navbarTextSize: 24px;
+$navbarTextColor: white;
+$navbarLinkColor: white;
+$navbarLinkHoverColor: #054575;
+$navbarButtonPadding: 0;
+$navbarVerticalAlign: baseline;
+
+$use-default-mat-button: true;
+
+@mixin dv-button {
+  background-color: #44a7f2;
+  color: #FFFFFF;
+  border: 2px solid white;
+  font-size: 20px;
+  line-height: 20px;
+  transition: all 250ms ease;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 25px;
+  display: block;
+
+  &:hover {
+    color: #44a7f2;
+    background-color: white;
+    border: 2px solid #44a7f2;
+  }
+}
+
+@mixin dv-navbar-link {
+  color: #FFFFFF;
+  text-shadow: 2px 2px #000000;
+  display: inline-block;
+  text-align:center;
+  vertical-align: middle;
+  margin:5px;
+}
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+  text-shadow: none;
+  color: #054575 !important;
+}
+
+@import './source/template.scss';
