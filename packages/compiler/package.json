@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc && cp src/component/component.grammar.ohm dist/component && mkdir dist/app/builders/blueprints && cp src/app/builders/blueprints/* dist/app/builders/blueprints && cp src/app/builders/blueprints/.angular-cli.blueprint.json dist/app/builders/blueprints",
