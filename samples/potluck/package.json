@@ -1,13 +1,13 @@
 {
   "name": "@deja-vu/sample-potluck",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
   "dependencies": {
-    "@deja-vu/cli": "^0.0.11",
-    "@deja-vu/compiler": "^0.0.11"
+    "@deja-vu/cli": "^0.0.12",
+    "@deja-vu/compiler": "^0.0.12"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
