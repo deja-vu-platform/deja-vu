@@ -24,7 +24,7 @@
   <property-create-objects [ids]="['obj1', 'obj2']">
   </property-create-objects>
   <h1>Show Objects</h1>
-  <property-show-objects></property-show-objects>
+  <property-show-objects [includeTimestamp]="true"></property-show-objects>
   <h1>Choose Object</h1>
   <property-choose-object (selectedObjectId)="chooseObjectId=$event"
     [showOnly]="['lastName']">
