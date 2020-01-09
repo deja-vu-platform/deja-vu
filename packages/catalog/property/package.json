@@ -24,7 +24,8 @@
   "dependencies": {
     "ajv": "^6.2.1",
     "ng5-slider": "^1.2.4",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "pluralize": "^8.0.0"
   },
   "peerDependencies": {
     "@angular/animations": "^5.2.0",
@@ -73,6 +74,7 @@
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",
     "@types/mongodb": "^3.1.8",
+    "@types/pluralize": "^0.0.29",
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^2.0.0",
