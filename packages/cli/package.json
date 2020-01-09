@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/cli",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "CLI tool for Déjà Vu",
   "bin": {
     "dv": "./dist/dv.js"
@@ -21,7 +21,7 @@
     "yargs": "^12.0.5"
   },
   "devDependencies": {
-    "@deja-vu/compiler": "^0.0.12",
+    "@deja-vu/compiler": "^0.1.0",
     "@types/fs-extra": "^5.0.2",
     "@types/glob": "^5.0.35",
     "@types/lodash": "ts2.5",
