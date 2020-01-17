@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/passkey",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-passkey",
@@ -64,10 +64,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
-    "@deja-vu/cli": "^0.1.1",
-    "@deja-vu/concept-server": "^0.1.1",
-    "@deja-vu/core": "^0.1.1",
-    "@deja-vu/gateway": "^0.1.1",
+    "@deja-vu/cli": "^0.1.2",
+    "@deja-vu/concept-server": "^0.1.2",
+    "@deja-vu/core": "^0.1.2",
+    "@deja-vu/gateway": "^0.1.2",
     "@types/jasmine": "2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/lodash": "ts2.5",

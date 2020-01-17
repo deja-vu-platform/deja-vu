@@ -1,13 +1,13 @@
 {
   "name": "@deja-vu/sample-chorestar",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "start": "dv serve",
     "clean": "rm -rf .dv"
   },
   "dependencies": {
-    "@deja-vu/cli": "^0.1.1",
-    "@deja-vu/compiler": "^0.1.1"
+    "@deja-vu/cli": "^0.1.2",
+    "@deja-vu/compiler": "^0.1.2"
   },
   "repository": "github:spderosso/dejavu",
   "license": "MIT",
