@@ -13,6 +13,7 @@ import * as _ from 'lodash';
 export interface TxConfig<Message, Payload, State = any> {
   dbHost: string;
   dbPort: number;
+  dbUri?: string;
   dbName: string;
   reinitDbOnStartup: boolean;
   // `msg` is the original message processed
@@ -475,8 +476,10 @@ export class TxCoordinator<Message, Payload, State = any> {
   }
 
   private async getTxsCollection() {
-    const client = await MongoClient.connect(
-      `mongodb://${this.config.dbHost}:${this.config.dbPort}`);
+    const mongoUri = _.isEmpty(this.config.dbUri) ?
+      `mongodb://${this.config.dbHost}:${this.config.dbPort}` :
+      this.config.dbUri;
+    const client = await MongoClient.connect(mongoUri);
     const db = client.db(this.config.dbName);
     if (this.config.reinitDbOnStartup) {
       await db.dropDatabase();

@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 export interface GatewayConfig {
   readonly dbHost: string;
   readonly dbPort: number;
+  readonly dbUri?: string;
   readonly wsPort: number | string;
   readonly dbName: string;
   readonly reinitDbOnStartup: boolean;

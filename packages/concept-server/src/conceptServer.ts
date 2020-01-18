@@ -216,10 +216,12 @@ export class ConceptServer<C extends Config = Config> {
   async start(): Promise<void> {
     // TODO: make connecting to mongo optional since there might be concepts
     // that don't require a db
-    const mongoServer = `${this._config.dbHost}:${this._config.dbPort}`;
-    console.log(`Connecting to mongo server ${mongoServer}`);
+    const mongoUri = _.isEmpty(this._config.dbUri) ?
+      `mongodb://${this._config.dbHost}:${this._config.dbPort}` :
+      this._config.dbUri;
+    console.log(`Connecting to mongo server at ${mongoUri}`);
     const client: mongodb.MongoClient = await mongodb.MongoClient.connect(
-      `mongodb://${mongoServer}`);
+      mongoUri);
 
     this._db = client.db(this._config.dbName);
     const conceptDb: ConceptDb = new ConceptDb(client, this._db);
@@ -233,8 +235,7 @@ export class ConceptServer<C extends Config = Config> {
     }
     // TODO: support for initResolvers that don't require a db
     if (this._initResolvers) {
-      this._resolvers = this._initResolvers(
-        conceptDb, this._config);
+      this._resolvers = this._initResolvers(conceptDb, this._config);
       const typeDefs = [
         readFileSync(this._schemaPath, 'utf8'), ...this._dynamicTypeDefs];
       const schema = makeExecutableSchema(

@@ -456,6 +456,7 @@ export abstract class RequestProcessor {
     return {
       dbHost: config.dbHost,
       dbPort: config.dbPort,
+      dbUri: config.dbUri,
       dbName: config.dbName,
       reinitDbOnStartup: config.reinitDbOnStartup,
 
