@@ -1,6 +1,10 @@
 {
   "name": "ng-@@name",
   "version": "0.0.1",
+  "engines": {
+    "node": "10.x",
+    "npm": "6.9.x"
+  },
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-@@name",
