@@ -6,8 +6,12 @@ $navbarButtonPadding: 0 5px;
 $navbarPadding: 0.5rem 1rem;
 
 @import "~@deja-vu/themes/scss/mint.scss";
-@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~css-star-rating/dist/css/star-rating.min.css";
 
+h3 {
+  color: black;
+  font-weight: 500;
+}
 
 .logo {
   height: 50px;

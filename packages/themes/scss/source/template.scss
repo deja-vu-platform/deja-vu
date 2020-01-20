@@ -9,27 +9,49 @@ $headingColor: $primaryColor !default;
 $backgroundColor: #f5f5f5 !default;
 $errorMessageColor: #f44336 !default;
 
+$mainFont: 'Arial', sans-serif !default;
+$textFont: $mainFont !default;
+$textWeight: normal !default;
+$headingFontWeight: bold !default;
+
 $navbarBackgroundColor: $primaryColor !default;
+$navbarFont: $mainFont !default;
 $navbarTextColor: #FFFFFF !default;
 $navbarTextSize: 1rem !default;
 $navbarHeight: 56px !default;
 $navbarButtonPadding: 0 10px !default;
-$navbarLinkColor: #0000EE !default;
-$navbarLinkHoverColor: #0000EE !default;
+$navbarLinkColor: $navbarTextColor !default;
+$navbarLinkHoverColor: $navbarLinkColor !default;
+$navbarLinkFontWeight: normal !default;
 $navbarVerticalAlign: middle !default;
 $navbarPadding: 0 0;
+$navbarBorderBottom: 0 !default;
 
-$mainFont: 'Arial', sans-serif !default;
-$textFont: $mainFont !default;
-$headingFontWeight: bold !default;
+$bodyPaddingTop: 0px !default;
+
+$sliderColor: $primaryColor !default;
+$sliderActiveColor: $backgroundColor !default;
+$sliderSelectionColor: $sliderColor !default;
+$sliderPointerColor: $sliderColor !default;
+$sliderTickColor: $sliderColor !default;
 
 $formWidth: 300px !default;
 
 $use-default-mat-button: false !default;
+$use-bootstrap: true !default;
 
+// load bootstrap if $use-bootstrap is set to true
+%loadFile {
+  @import "~bootstrap/dist/css/bootstrap.min.css";
+}
+
+html {
+  @if $use-bootstrap == true {
+    @extend %loadFile;
+  }
+}
 
 /* theming doc starts */
-
 // mixin utils
 @mixin heading-style {
   font-family: $mainFont;
@@ -39,6 +61,7 @@ $use-default-mat-button: false !default;
 
 @mixin text-style {
   font-family: inherit;
+  font-weight: $textWeight;
   color: inherit;
 }
 
@@ -46,14 +69,14 @@ $use-default-mat-button: false !default;
   font-family: $textFont;
   color: $linkColor;
 
-  :hover {
+  &:hover {
     color: $linkHoverColor;
     @if mixin_exists(link-hover) {@include link-hover};
   }
 }
 
 // generic
-h1, h2, h3 {
+h1, h2, h3, h4 {
   @include heading-style;
 }
 
@@ -79,8 +102,9 @@ div:root, p:root, h1:root, h2:root, h3:root {
 nav {
   background: $navbarBackgroundColor;
   height: $navbarHeight;
-  font-family: $mainFont;
+  font-family: $navbarFont;
   padding: $navbarPadding;
+  border-bottom: $navbarBorderBottom;
 
   div, h1, h2, h3 {
     color: $navbarTextColor;
@@ -93,18 +117,25 @@ nav {
     padding: $navbarButtonPadding;
     vertical-align: $navbarVerticalAlign;
     font-size: $navbarTextSize;
-  }
+    font-weight: $navbarLinkFontWeight;
 
-  a:hover {
-    color: $navbarLinkHoverColor;
-    @if mixin-exists(dv-navbar-hover) {@include dv-navbar-hover};
+    &:hover {
+      color: $navbarLinkHoverColor;
+      @if mixin-exists(dv-navbar-link-hover) {@include dv-navbar-link-hover};
+    }
+
+    @if mixin-exists(dv-navbar-link) {@include dv-navbar-link};
   }
 }
 
-html,
+html {
+  font-family: $mainFont;
+}
+
 body {
   background: $backgroundColor;
   font-family: $mainFont;
+  padding-top: $bodyPaddingTop;
 }
 
 main {
@@ -118,6 +149,9 @@ main {
 .mat-error {
   color: $errorMessageColor;
   font-size: 12px;
+}
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: $primaryColor;
 }
 
 .mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
@@ -163,5 +197,26 @@ main {
 
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import "~css-star-rating/dist/css/star-rating.min.css";
 @include mat-core();
+
+// ng5-slider
+.dv-ng5-slider {
+  .ng5-slider {
+    .ng5-slider-selection {
+      background: $sliderSelectionColor;
+    }
+
+    .ng5-slider-pointer {
+      background: $sliderPointerColor;
+    }
+
+    .ng5-slider-pointer.ng5-slider-active:after {
+      background: $sliderActiveColor;
+    }
+
+    .ng5-slider-tick.ng5-slider-selected {
+      background: $sliderTickColor;
+    }
+  }
+}
+

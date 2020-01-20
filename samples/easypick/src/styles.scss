@@ -1,0 +1,153 @@
+@import "~@deja-vu/themes/scss/bright-blue.scss";
+@import "~css-star-rating/dist/css/star-rating.min.css";
+
+/* Basics */
+p {
+  white-space: pre-wrap;
+}
+
+ul {
+  list-style: none;
+}
+
+h3, h4 {
+  color: $textColor;
+}
+
+.rating-box {
+  display: flex;
+}
+
+.logo {
+  height: 200px;
+}
+
+.profile-icon {
+  width: 25px;
+  margin-right: 10px;
+}
+
+/* Layouts */
+.center-column {
+  margin: 30px 70px;
+}
+
+.center-column-dynamic-medium {
+  padding-top: 40px;
+  margin: auto;
+  width: 35%;
+}
+
+.center-column-dynamic-auth {
+  margin: auto;
+  padding-top: 40px;
+  width: 280px;
+}
+
+.left-column, .dv-stage-stage-entity {
+  float: left;
+  width: 35%;
+  padding: 30px 50px;
+}
+
+.fourth-column {
+  float: left;
+  width: 25%;
+  padding: 30px 50px;
+}
+
+.right-column, .dv-stage-stage-header,
+.dv-stage-staged-entities {
+  float: right;
+  width: 65%;
+  padding: 30px 50px;
+}
+
+.individual-card {
+  margin: 30px 0;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.small-vertical-margin {
+  margin: 10px 0;
+}
+
+.panel {
+  border: solid 1px rgba(160, 160, 160, 0.3);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+  margin: 50px 70px;
+  padding: 50px;
+}
+
+.bold {
+  display: inline-block !important;
+  font-weight: 600 !important;
+}
+
+.plain {
+  display: inline-block !important;
+}
+
+.pull-right {
+  float: right;
+}
+
+.disabled {
+  float: none;
+  color: #959ca6;
+}
+
+.inline-card {
+  display: inline-block;
+  float: left;
+  width: 350px;
+}
+
+.property-filter-objects-property {
+  margin: 30px;
+  display: inline-block;
+}
+.property-filter-objects-property-title {
+  font-weight:bold;
+}
+.authentication-show-user-username {
+  display: inline-block;
+}
+.list-group {
+  display:inline-block;
+}
+.list-group-item {
+  margin: 10px !important;
+  width: 400px !important;
+  vertical-align: top;
+  display:inline-block
+}
+.list-group-item:first-child {
+  border-radius: .25rem;
+}
+
+.rating {
+  display: inline-block;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+.rating-show-avg-rating-stars-container {
+  display: inline-block;
+}
+
+.rating-show-avg-rating-stars-vote-count {
+  display: inline-block;
+}
+
+.property-show-object-property {
+  display: inline-block;
+  margin: 10px;
+}
+
+.rating-filter-targets-option {
+  display: block;
+}

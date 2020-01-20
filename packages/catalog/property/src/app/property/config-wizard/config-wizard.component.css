@@ -39,5 +39,5 @@ mat-header-cell, mat-cell {
 }
 
 mat-header-cell.sm-col, mat-cell.sm-col {
-  min-width: 69px; /* chosen emperically to fit text */
+  min-width: 69px; /* chosen empirically to fit text */
 }

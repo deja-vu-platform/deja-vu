@@ -2,6 +2,7 @@ export interface Config {
   wsPort: number | string;
   dbHost: string;
   dbPort: number;
+  dbUri?: string;
   dbName: string;
   reinitDbOnStartup: boolean;
   [extraProperties: string]: any;

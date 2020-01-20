@@ -121,8 +121,7 @@ export class DisplayMapComponent
       })
       .build();
 
-    this.mapType = this.dvs.config
-      .getConfig().mapType;
+    this.mapType = _.get(this.dvs.config.getConfig(), 'mapType');
     if (this.mapType !== 'gmap') {
       this.setUpLeafletMap();
     }

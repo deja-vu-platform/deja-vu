@@ -40,7 +40,7 @@ type Query {
   message(id: ID!): Message!
 
   # Get the last input.maxMessageChat messages that belong
-  # to input.chatId, with the messages in descending timestamp order
+  # to input.chatId, with the messages in ascending timestamp order
   chatMessages(input: ChatMessagesInput!): [Message!]
 
   # Get all the messages after lastMessageTimestamp

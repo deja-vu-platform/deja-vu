@@ -1,6 +1,10 @@
 {
   "name": "ng-@@name",
   "version": "0.0.1",
+  "engines": {
+    "node": "10.x",
+    "npm": "6.9.x"
+  },
   "scripts": {
     "start": "dv serve",
     "build": "npm run dv-build-@@name",
@@ -13,8 +17,10 @@
   "dependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/cdk": "^5.2.1",
+    "@angular/cli": "^1.7.3",
     "@angular/common": "^5.2.0",
     "@angular/compiler": "^5.2.0",
+    "@angular/compiler-cli": "^5.2.0",
     "@angular/core": "^5.2.0",
     "@angular/forms": "^5.2.0",
     "@angular/http": "^5.2.0",
@@ -32,14 +38,13 @@
     "@deja-vu/concept-server": "@@version",
     "@deja-vu/core": "@@version",
     "@deja-vu/gateway": "@@version",
+    "@deja-vu/themes": "@@version",
     @@dependencies
     "moment": "^2.22.1",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
-    "@angular/cli": "^1.7.3",
-    "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
     "@types/node": "^11.13.4",
     "@types/lodash": "ts2.5",

@@ -42,6 +42,7 @@ export interface AppInfo {
 export interface GatewayConfigOptions {
   readonly dbHost?: string;
   readonly dbPort?: number;
+  readonly dbUri?: string;
   readonly wsPort?: number | string;
   readonly dbName?: string;
   readonly reinitDbOnStartup?: boolean;

@@ -47,7 +47,7 @@ function calledFromCatalog(): boolean {
 }
 
 function calledFromNgApp(): boolean {
-  return path.basename(process.cwd()) === '.dv';
+  return existsSync(path.join('src', 'polyfills.ts'));
 }
 
 // tslint:disable no-unused-expression

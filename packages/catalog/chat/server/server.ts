@@ -120,7 +120,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
         return (await messages.findCursor({
           chatId: input.chatId
         }))
-        .sort({ timestamp: -1 })
+        .sort({ timestamp: 1 })  // ascending sort (most recent msg first)
         .limit(limit)
         .toArray();
       },
@@ -130,7 +130,7 @@ function resolvers(db: ConceptDb, config: MessageConfig): IResolvers {
           chatId: input.chatId,
           timestamp: { $gt: input.lastMessageTimestamp }
         }))
-        .sort({ timestamp: 1 })
+        .sort({ timestamp: 1 })  // ascending sort (most recent msg first)
         .toArray()
     },
 

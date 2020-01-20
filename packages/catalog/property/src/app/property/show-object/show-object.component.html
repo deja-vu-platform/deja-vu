@@ -14,6 +14,6 @@
     </span>
   </div>
   <span *ngIf="includeTimestamp">
-    {{object.timestamp}}
+    <dv-show-date [date]="object.timestamp" [format]="format"></dv-show-date>
   </span>
 </div>

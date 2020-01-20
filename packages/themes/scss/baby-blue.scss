@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+$mainFont: 'Roboto', sans-serif;
+
+$primaryColor: #f8f9fa;
+$backgroundColor: #b7d1e5;
+$textColor: #212529;
+$linkColor: $textColor;
+$headingColor: $textColor;
+
+$navbarHeight: 66px;
+$navbarTextColor: $textColor;
+$navbarLinkColor: gray;
+$navbarLinkHoverColor: gray;
+$navbarVerticalAlign: baseline;
+
+$headingFontWeight: normal;
+
+$bodyPaddingTop: 50px;
+$use-default-mat-button: true;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+}
+
+@import './source/template.scss';

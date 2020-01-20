@@ -19,7 +19,9 @@
     <mat-icon class="inline-icon">report_problem</mat-icon>
     {{updateMarkerError}}
   </mat-error>
-  <button mat-button type="submit" [disabled]="!marker" (click)="onSubmit()">
-    {{buttonLabel}}
-  </button>
+  <div class="dv-mat-button">
+    <button mat-button type="submit" [disabled]="!marker" (click)="onSubmit()">
+      {{buttonLabel}}
+    </button>
+  </div>
 </div>

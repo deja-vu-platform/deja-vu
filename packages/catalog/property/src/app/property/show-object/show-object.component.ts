@@ -81,7 +81,7 @@ export class ShowObjectComponent
   private urlProps: Set<string> = new Set();
 
   @Input() includeTimestamp = false;
-
+  @Input() format = 'MM/dd h:mm';
   showObject;
   refresh = false;
   private dvs: DvService;

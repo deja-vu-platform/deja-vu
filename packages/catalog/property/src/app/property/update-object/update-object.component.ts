@@ -11,7 +11,9 @@ import {
   DvService, DvServiceFactory, OnExec, OnExecFailure, OnExecSuccess
 } from '@deja-vu/core';
 
-import { getPropertiesFromConfig, Property } from '../shared/property.model';
+import {
+  getObjectTitleFromConfig, getPropertiesFromConfig, Property
+} from '../shared/property.model';
 
 import * as _ from 'lodash';
 
@@ -68,11 +70,11 @@ export class UpdateObjectComponent
   /**
    * Text for the button to update the object
    */
-  @Input() buttonLabel = 'Update Object';
+  @Input() buttonLabel;
   /**
    * Text to show when an object is successfully created
    */
-  @Input() updateObjectSavedText = 'Successfully updated object';
+  @Input() updateObjectSavedText;
   /**
    * Whether or not the create object button should be shown
    */
@@ -123,6 +125,14 @@ export class UpdateObjectComponent
       .build();
 
     this.config = this._config ? this._config : this.dvs.config.getConfig();
+    const objTitle = getObjectTitleFromConfig(this.config);
+    if (this.buttonLabel === undefined) {
+      this.buttonLabel = `Update ${objTitle}`;
+    }
+    if (this.updateObjectSavedText === undefined) {
+      this.updateObjectSavedText =
+        `Successfully updated ${objTitle.toLowerCase()}`;
+    }
     this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};
     for (const property of this.properties) {

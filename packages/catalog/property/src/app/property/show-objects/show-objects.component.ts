@@ -7,7 +7,8 @@ import {
 } from '@deja-vu/core';
 
 import {
-  adjustFieldMatching, getFilteredPropertyNames, getPropertiesFromConfig
+  adjustFieldMatching, getFilteredPropertyNames,
+  getObjectTitleFromConfig, getPropertiesFromConfig
 } from '../shared/property.model';
 
 import { ShowObjectComponent } from '../show-object/show-object.component';
@@ -15,6 +16,7 @@ import { ShowObjectComponent } from '../show-object/show-object.component';
 import { API_PATH } from '../property.config';
 
 import * as _ from 'lodash';
+import { plural } from 'pluralize';
 import { filter, take } from 'rxjs/operators';
 
 
@@ -31,7 +33,7 @@ export class ShowObjectsComponent
   /**
    * Text to display when there are no objects
    */
-  @Input() noObjectsToShowText = 'No objects';
+  @Input() noObjectsToShowText;
   /**
    * Component to use to render each object
    */
@@ -99,6 +101,12 @@ export class ShowObjectsComponent
       .build();
     this.config = this.dvs.config.getConfig();
     this.schema = getPropertiesFromConfig(this.config);
+
+    const objTitle = getObjectTitleFromConfig(this.config);
+    if (this.noObjectsToShowText === undefined) {
+      this.noObjectsToShowText =
+        `No ${plural(objTitle.toLowerCase())} to show yet`;
+    }
   }
 
   ngAfterViewInit() {

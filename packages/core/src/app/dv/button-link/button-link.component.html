@@ -1,5 +1,7 @@
-<button mat-button color="color"
-  [disabled]="!valid" (click)="onClick()">
-  <span *ngIf="value">{{value}}</span>
-  <ng-content></ng-content>
-</button>
+<div class="dv-mat-button">
+  <button mat-button color="color"
+          [disabled]="!valid" (click)="onClick()">
+    <span *ngIf="value">{{value}}</span>
+    <ng-content></ng-content>
+  </button>
+</div>

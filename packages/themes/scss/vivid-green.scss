@@ -1,0 +1,20 @@
+$mainFont: sans-serif;
+$primaryColor: #4bad42;
+$linkColor: $primaryColor;
+$backgroundColor: #fffff7;
+$textColor: black;
+
+$navbarHeight: 56px;
+$navbarLinkColor: white;
+$navbarLinkHoverColor: white;
+$navbarVerticalAlign: baseline;
+$navbarButtonPadding: 0 5px;
+
+@mixin dv-navbar-link-hover {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+$use-default-mat-button: true;
+
+@import './source/template.scss';

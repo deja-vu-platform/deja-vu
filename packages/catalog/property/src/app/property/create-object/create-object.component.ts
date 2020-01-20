@@ -65,7 +65,7 @@ export class CreateObjectComponent
   /**
    * Text to show when an object is successfully created
    */
-  @Input() newObjectSavedText = 'New object saved';
+  @Input() newObjectSavedText;
   /**
    * Whether or not the create object button should be shown
    */
@@ -109,9 +109,12 @@ export class CreateObjectComponent
       .build();
     this.config = this._config ? this._config : this.dvs.config.getConfig();
 
+    const objTitle = getObjectTitleFromConfig(this.config);
     if (this.buttonLabel === undefined) {
-      const objTitle = getObjectTitleFromConfig(this.config);
       this.buttonLabel = `Create ${objTitle}`;
+    }
+    if (this.newObjectSavedText === undefined) {
+      this.newObjectSavedText = `New ${objTitle.toLowerCase()} saved`;
     }
     this.properties = getPropertiesFromConfig(this.config);
     const formControls = {};

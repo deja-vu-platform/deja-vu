@@ -1,6 +1,6 @@
 {
   "name": "@deja-vu/concept-server",
-  "version": "0.0.9",
+  "version": "0.1.3",
   "description": "The server class and its helpers for Déjà Vu concepts",
   "scripts": {
     "build": "tsc",
