@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css?family=Asap&display=swap");
+@import url(~bootstrap/dist/css/bootstrap.min.css);
+/* theming doc starts */
+@import url(~@angular/material/prebuilt-themes/indigo-pink.css);
+h1, h2, h3, h4 {
+  font-family: "Asap", sans-serif;
+  font-weight: 500;
+  color: #212529; }
+
+div {
+  font-family: inherit;
+  font-weight: normal;
+  color: inherit; }
+
+a {
+  font-family: "Asap", sans-serif;
+  color: #007bff; }
+a:hover {
+  color: #007bff; }
+
+a:root, a:root:hover {
+  color: #007bff;
+  font-family: "Asap", sans-serif; }
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: #212529;
+  font-family: "Asap", sans-serif; }
+
+nav {
+  background: #343a40;
+  height: 56px;
+  font-family: "Asap", sans-serif;
+  padding: 0 0;
+  border-bottom: 0; }
+nav div, nav h1, nav h2, nav h3 {
+  color: #FFFFFF;
+  vertical-align: middle;
+  font-size: 1rem; }
+nav a {
+  color: #FFFFFF;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1rem;
+  font-weight: normal; }
+nav a:hover {
+  color: #FFFFFF;
+  text-decoration: none; }
+
+html {
+  font-family: "Asap", sans-serif; }
+
+body {
+  background: white;
+  font-family: "Asap", sans-serif;
+  padding-top: 0px; }
+
+main {
+  background-color: white;
+  margin-top: 56px;
+  font-family: "Asap", sans-serif; }
+
+/* Material UI */
+.mat-error {
+  color: #f44336;
+  font-size: 12px; }
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: #343a40; }
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: #f44336; }
+
+.mat-input-element {
+  caret-color: #212529; }
+
+.dv-mat-button {
+  display: inline; }
+
+.mat-form-field-wrapper {
+  width: auto; }
+
+.dv-ng5-slider .ng5-slider .ng5-slider-selection {
+  background: #343a40; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer {
+  background: #343a40; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: #343a40; }

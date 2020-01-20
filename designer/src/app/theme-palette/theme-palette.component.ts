@@ -30,11 +30,11 @@ export class ThemePaletteComponent implements OnInit {
   setTheme() {
     console.log('SET THEME!!');
     console.log(document);
-    const sss = require("@deja-vu/themes/scss/mint.scss");
+    const sss = require('@deja-vu/themes/compiled-css/vivid-green.css');
     console.log(sss);
     const style = document.createElement('style');
     const head = document.head || document.getElementsByTagName('head')[0];
     head.appendChild(style);
-    style.appendChild(document.createTextNode('* { background: black }'));
+    style.appendChild(document.createTextNode(sss));
   }
 }

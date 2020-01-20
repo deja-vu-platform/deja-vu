@@ -1,0 +1,98 @@
+@import url("https://fonts.googleapis.com/css?family=Raleway&display=swap");
+@import url(~bootstrap/dist/css/bootstrap.min.css);
+/* theming doc starts */
+@import url(~@angular/material/prebuilt-themes/indigo-pink.css);
+h1, h2, h3, h4 {
+  font-family: "Raleway", sans-serif;
+  font-weight: normal;
+  color: #212529; }
+
+div {
+  font-family: inherit;
+  font-weight: normal;
+  color: inherit; }
+
+a {
+  font-family: "Raleway", sans-serif;
+  color: #007bff; }
+a:hover {
+  color: #0056b3; }
+
+a:root, a:root:hover {
+  color: #007bff;
+  font-family: "Raleway", sans-serif; }
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: #212529;
+  font-family: "Raleway", sans-serif; }
+
+nav {
+  background: white;
+  height: 56px;
+  font-family: "Raleway", sans-serif;
+  padding: 0 0;
+  border-bottom: 0; }
+nav div, nav h1, nav h2, nav h3 {
+  color: #FFFFFF;
+  vertical-align: middle;
+  font-size: 1rem; }
+nav a {
+  color: #FFFFFF;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1rem;
+  font-weight: normal; }
+nav a:hover {
+  color: #FFFFFF;
+  text-decoration: none; }
+
+html {
+  font-family: "Raleway", sans-serif; }
+
+body {
+  background: white;
+  font-family: "Raleway", sans-serif;
+  padding-top: 0px; }
+
+main {
+  background-color: white;
+  margin-top: 56px;
+  font-family: "Raleway", sans-serif; }
+
+/* Material UI */
+.mat-error {
+  color: #f44336;
+  font-size: 12px; }
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: white; }
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: #f44336; }
+
+.mat-input-element {
+  caret-color: #212529; }
+
+.dv-mat-button {
+  display: inline; }
+
+.dv-mat-button button.mat-button {
+  background: white;
+  color: #212529;
+  background-color: #ffd0cc;
+  color: black;
+  border-radius: 5px;
+  border: 1px solid #B3594D;
+  font-family: 'Raleway', sans-serif; }
+
+.mat-form-field-wrapper {
+  width: 180px; }
+
+.dv-ng5-slider .ng5-slider .ng5-slider-selection {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: white; }

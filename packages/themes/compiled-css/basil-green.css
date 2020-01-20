@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+@import url(~bootstrap/dist/css/bootstrap.min.css);
+/* theming doc starts */
+@import url(~@angular/material/prebuilt-themes/indigo-pink.css);
+h1, h2, h3, h4 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  color: #212529; }
+
+div {
+  font-family: inherit;
+  font-weight: 300;
+  color: inherit; }
+
+a {
+  font-family: "Roboto", sans-serif;
+  color: #007bff; }
+a:hover {
+  color: #007bff; }
+
+a:root, a:root:hover {
+  color: #007bff;
+  font-family: "Roboto", sans-serif; }
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: #212529;
+  font-family: "Roboto", sans-serif; }
+
+nav {
+  background: #f8f8f8;
+  height: 57px;
+  font-family: "Roboto", sans-serif;
+  padding: 0 0;
+  border-bottom: 0; }
+nav div, nav h1, nav h2, nav h3 {
+  color: gray;
+  vertical-align: baseline;
+  font-size: 16px; }
+nav a {
+  color: gray;
+  padding: 0;
+  vertical-align: baseline;
+  font-size: 16px;
+  font-weight: normal; }
+nav a:hover {
+  color: gray;
+  text-decoration: none; }
+
+html {
+  font-family: "Roboto", sans-serif; }
+
+body {
+  background: #CFDBC5;
+  font-family: "Roboto", sans-serif;
+  padding-top: 0px; }
+
+main {
+  background-color: #CFDBC5;
+  margin-top: 57px;
+  font-family: "Roboto", sans-serif; }
+
+/* Material UI */
+.mat-error {
+  color: #f44336;
+  font-size: 12px; }
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: #f8f8f8; }
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: #f44336; }
+
+.mat-input-element {
+  caret-color: #212529; }
+
+.dv-mat-button {
+  display: inline; }
+
+.mat-form-field-wrapper {
+  width: auto; }
+
+.dv-ng5-slider .ng5-slider .ng5-slider-selection {
+  background: #f8f8f8; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer {
+  background: #f8f8f8; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: #CFDBC5; }
+.dv-ng5-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: #f8f8f8; }

@@ -1,0 +1,101 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap");
+@import url(~bootstrap/dist/css/bootstrap.min.css);
+/* theming doc starts */
+@import url(~@angular/material/prebuilt-themes/indigo-pink.css);
+h1, h2, h3, h4 {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  color: #212529; }
+
+div {
+  font-family: inherit;
+  font-weight: normal;
+  color: inherit; }
+
+a {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #007bff; }
+a:hover {
+  color: #0056b3; }
+
+a:root, a:root:hover {
+  color: #007bff;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: #212529;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+nav {
+  background: white;
+  height: 61px;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 0 0;
+  border-bottom: 1px solid #e0e0e0; }
+nav div, nav h1, nav h2, nav h3 {
+  color: #212529;
+  vertical-align: baseline;
+  font-size: 1rem; }
+nav a {
+  color: #262626;
+  padding: 0 10px;
+  vertical-align: baseline;
+  font-size: 1rem;
+  font-weight: normal; }
+nav a:hover {
+  color: #262626;
+  text-decoration: none; }
+
+html {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+body {
+  background: white;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding-top: 0px; }
+
+main {
+  background-color: white;
+  margin-top: 61px;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+/* Material UI */
+.mat-error {
+  color: #f44336;
+  font-size: 12px; }
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: white; }
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: #f44336; }
+
+.mat-input-element {
+  caret-color: #212529; }
+
+.dv-mat-button {
+  display: inline; }
+
+.dv-mat-button button.mat-button {
+  background: white;
+  color: #212529;
+  border-color: #208a46;
+  color: #fff;
+  background: #29b35b linear-gradient(to bottom, #2ec866, #29b35b);
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -1px 4px rgba(32, 138, 70, 0.3); }
+.dv-mat-button button.mat-button:hover {
+  background: #449d44;
+  border-color: #398439; }
+
+.mat-form-field-wrapper {
+  width: 180px; }
+
+.dv-ng5-slider .ng5-slider .ng5-slider-selection {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: white; }
+.dv-ng5-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: white; }
