@@ -13,7 +13,7 @@ export class ThemePaletteComponent implements OnInit {
   @Input() readonly app: App;
 
   ngOnInit() {
-    // TODO: create a default style
+    this.setTheme('@deja-vu/themes/compiled-css/default.css');
   }
 
   setTheme(link) {
@@ -74,16 +74,15 @@ export class ThemePaletteComponent implements OnInit {
         break;
       }
       default: {
-        // TODO: make a default theme and put it here
-        cssString = require('@deja-vu/themes/compiled-css/basil-green.css');
+        cssString = require('@deja-vu/themes/compiled-css/default.css');
         break;
       }
     }
 
     const style = document.createElement('style');
     const head = document.head || document.getElementsByTagName('head')[0];
+    head.removeChild(head.lastChild);
     head.appendChild(style);
-    console.log(document);
     style.appendChild(document.createTextNode(cssString));
   }
 }

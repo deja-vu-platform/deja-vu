@@ -1,0 +1,91 @@
+@import url(~bootstrap/dist/css/bootstrap.min.css);
+/* theming doc starts */
+@import url(~@angular/material/prebuilt-themes/indigo-pink.css);
+h1, h2, h3, h4 {
+  font-family: "Arial", sans-serif;
+  font-weight: bold;
+  color: #00237d; }
+
+div {
+  font-family: inherit;
+  font-weight: normal;
+  color: inherit; }
+
+a {
+  font-family: "Arial", sans-serif;
+  color: #0000EE; }
+a:hover {
+  color: #0000EE; }
+
+a:root, a:root:hover {
+  color: #0000EE;
+  font-family: "Arial", sans-serif; }
+
+div:root, p:root, h1:root, h2:root, h3:root {
+  color: #000000;
+  font-family: "Arial", sans-serif; }
+
+nav {
+  background: #00237d;
+  height: 56px;
+  font-family: "Arial", sans-serif;
+  padding: 0 0;
+  border-bottom: 0; }
+nav div, nav h1, nav h2, nav h3 {
+  color: #FFFFFF;
+  vertical-align: middle;
+  font-size: 1rem; }
+nav a {
+  color: #FFFFFF;
+  padding: 0 10px;
+  vertical-align: middle;
+  font-size: 1rem;
+  font-weight: normal; }
+nav a:hover {
+  color: #FFFFFF; }
+
+html {
+  font-family: "Arial", sans-serif; }
+
+body {
+  background: #f5f5f5;
+  font-family: "Arial", sans-serif;
+  padding-top: 0px; }
+
+main {
+  background-color: #f5f5f5;
+  margin-top: 56px;
+  font-family: "Arial", sans-serif; }
+
+/* Material UI */
+.mat-error {
+  color: #f44336;
+  font-size: 12px; }
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background: #00237d; }
+
+.mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+  caret-color: #f44336; }
+
+.mat-input-element {
+  caret-color: #000000; }
+
+.dv-mat-button {
+  display: inline; }
+
+.dv-mat-button button.mat-button {
+  background: #00237d;
+  color: #000000; }
+
+.mat-form-field-wrapper {
+  width: 300px; }
+
+.dv-ng5-slider .ng5-slider .ng5-slider-selection {
+  background: #00237d; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer {
+  background: #00237d; }
+.dv-ng5-slider .ng5-slider .ng5-slider-pointer.ng5-slider-active:after {
+  background: #f5f5f5; }
+.dv-ng5-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {
+  background: #00237d; }
