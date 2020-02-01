@@ -5,7 +5,17 @@
   display: flex;
   justify-content: space-between;
   padding: 0px;
+
+  .toolbar-app-component .mat-form-field ::ng-deep .mat-form-field-wrapper {
+    width: 180px !important;
+  }
+
+  .toolbar-app-name .mat-form-field ::ng-deep .mat-form-field-wrapper {
+    width: 180px !important;
+  }
 }
+
+
 
 .logo {
   line-height: 1.2em;
@@ -103,3 +113,5 @@ mat-tab-group {
   margin-right: 10px;
   margin-left: -5px;
 }
+
+
