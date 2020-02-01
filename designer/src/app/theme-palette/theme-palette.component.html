@@ -1,6 +1,10 @@
-<mat-radio-group aria-label="Select a theme">
+<mat-radio-group
+  aria-label="Select a theme"
+  class="theme-selection-group"
+>
   <mat-radio-button
     *ngFor="let theme of themes"
+    class="theme-selection-button"
     [value]="theme"
     (click)="setTheme(theme)"
   >

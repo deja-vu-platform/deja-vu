@@ -1,0 +1,13 @@
+.theme-selection-group {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+  align-items: flex-start;
+
+  .theme-selection-button {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+

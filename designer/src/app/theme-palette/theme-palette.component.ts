@@ -18,11 +18,8 @@ export class ThemePaletteComponent implements OnInit {
     'Stylish Pink', 'Sugar', 'Vibrant Teal', 'Vivid Green'
   ];
 
-
-
-
   ngOnInit() {
-    // this.setTheme('@deja-vu/themes/compiled-css/default.css');
+    // this.setTheme('Default');
   }
 
   setTheme(themeName) {
@@ -86,7 +83,7 @@ export class ThemePaletteComponent implements OnInit {
         break;
       }
       default: {
-        throw new Error('Theme name not handled');
+        throw new Error('Theme name [' + themeName + '] is not handled');
       }
     }
 
