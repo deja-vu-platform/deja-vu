@@ -12,70 +12,81 @@ import {
 export class ThemePaletteComponent implements OnInit {
   @Input() readonly app: App;
 
+  themes: string[] = [
+    'Default', 'Baby Blue', 'Basil Green', 'Bright Blue', 'Business Red',
+    'Minimalist', 'Mint', 'Orange and Black', 'Sakura', 'Soft Green',
+    'Stylish Pink', 'Sugar', 'Vibrant Teal', 'Vivid Green'
+  ];
+
+
+
+
   ngOnInit() {
-    this.setTheme('@deja-vu/themes/compiled-css/default.css');
+    // this.setTheme('@deja-vu/themes/compiled-css/default.css');
   }
 
-  setTheme(link) {
+  setTheme(themeName) {
     let cssString;
 
     // this is used because require needs a constant string
-    switch(link) {
-      case '@deja-vu/themes/compiled-css/baby-blue.css': {
+    switch (themeName) {
+      case 'Default': {
+        cssString = require('@deja-vu/themes/compiled-css/default.css');
+      }
+      case 'Baby Blue': {
         cssString = require('@deja-vu/themes/compiled-css/baby-blue.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/basil-green.css': {
+      case 'Basil Green': {
         cssString = require('@deja-vu/themes/compiled-css/basil-green.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/bright-blue.css': {
+      case 'Bright Blue': {
         cssString = require('@deja-vu/themes/compiled-css/bright-blue.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/business-red.css': {
+      case 'Business Red': {
         cssString = require('@deja-vu/themes/compiled-css/business-red.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/minimalist.css': {
+      case 'Minimalist': {
         cssString = require('@deja-vu/themes/compiled-css/minimalist.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/mint.css': {
+      case 'Mint': {
         cssString = require('@deja-vu/themes/compiled-css/mint.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/orange-and-black.css': {
+      case 'Orange and Black': {
         cssString = require('@deja-vu/themes/compiled-css/orange-and-black.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/sakura.css': {
+      case 'Sakura': {
         cssString = require('@deja-vu/themes/compiled-css/sakura.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/soft-green.css': {
+      case 'Soft Green': {
         cssString = require('@deja-vu/themes/compiled-css/soft-green.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/stylish-pink.css': {
+      case 'Stylish Pink': {
         cssString = require('@deja-vu/themes/compiled-css/stylish-pink.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/sugar.css': {
+      case 'Sugar': {
         cssString = require('@deja-vu/themes/compiled-css/sugar.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/vibrant-teal.css': {
+      case 'Vibrant Teal': {
         cssString = require('@deja-vu/themes/compiled-css/vibrant-teal.css');
         break;
       }
-      case '@deja-vu/themes/compiled-css/vivid-green.css': {
+      case 'Vivid Green': {
         cssString = require('@deja-vu/themes/compiled-css/vivid-green.css');
         break;
       }
       default: {
-        cssString = require('@deja-vu/themes/compiled-css/default.css');
-        break;
+        throw new Error('Theme name not handled');
       }
     }
 

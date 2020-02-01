@@ -1,44 +1,9 @@
-<div>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/baby-blue.css')">
-    Baby Blue
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/basil-green.css')">
-    Basil Green
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/bright-blue.css')">
-    Bright Blue
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/business-red.css')">
-    Business Red
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/minimalist.css')">
-    Minimalist
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/mint.css')">
-    Mint
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/orange-and-black.css')">
-    Orange and Black
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/sakura.css')">
-    Sakura
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/soft-green.css')">
-    Soft Green
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/stylish-pink.css')">
-    Stylish Pink
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/sugar.css')">
-    Sugar
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/vibrant-teal.css')">
-    Vibrant Teal
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/vivid-green.css')">
-    Vivid Green
-  </button>
-  <button mat-button (click)="setTheme('@deja-vu/themes/compiled-css/default.css')">
-    Clear All
-  </button>
-</div>
+<mat-radio-group aria-label="Select a theme">
+  <mat-radio-button
+    *ngFor="let theme of themes"
+    [value]="theme"
+    (click)="setTheme(theme)"
+  >
+    {{theme}}
+  </mat-radio-button>
+</mat-radio-group>
