@@ -19,7 +19,7 @@ export class ThemePaletteComponent implements OnInit {
   ];
 
   ngOnInit() {
-    // this.setTheme('Default');
+    this.setTheme('Default');
   }
 
   setTheme(themeName) {
@@ -29,9 +29,11 @@ export class ThemePaletteComponent implements OnInit {
     switch (themeName) {
       case 'Default': {
         cssString = require('@deja-vu/themes/compiled-css/default.css');
+        break;
       }
       case 'Baby Blue': {
         cssString = require('@deja-vu/themes/compiled-css/baby-blue.css');
+        cssString = '';
         break;
       }
       case 'Basil Green': {
