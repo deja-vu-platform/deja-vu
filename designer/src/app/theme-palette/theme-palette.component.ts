@@ -33,7 +33,6 @@ export class ThemePaletteComponent implements OnInit {
       }
       case 'Baby Blue': {
         cssString = require('@deja-vu/themes/compiled-css/baby-blue.css');
-        cssString = '';
         break;
       }
       case 'Basil Green': {

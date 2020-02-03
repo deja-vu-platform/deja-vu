@@ -4,9 +4,84 @@
   margin: 15px 0;
   align-items: flex-start;
 
+  ::ng-deep .mat-radio-checked .mat-radio-inner-circle {
+    transform: scale(.5) !important;
+  }
+
   .theme-selection-button {
     margin-left: 20px;
     margin-right: 20px;
+
+    ::ng-deep .mat-radio-outer-circle {
+      box-sizing: border-box;
+      height: 20px;
+      left: 0;
+      position: absolute;
+      top: 0;
+      transition: border-color ease 280ms;
+      width: 20px;
+      border-width: 2px;
+      border-style: solid;
+      border-radius: 50%;
+    }
+
+    ::ng-deep .mat-radio-label {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      vertical-align: middle;
+
+      ::ng-deep .mat-radio-container {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: inline-block;
+        position: relative;
+        width: 20px;
+        height: 20px;
+        -ms-flex-negative: 0;
+        flex-shrink: 0;
+
+
+        ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+          background-color: rgb(66, 134, 244);
+        }
+
+        ::ng-deep .mat-radio-inner-circle {
+          border-radius: 50%;
+          box-sizing: border-box;
+          height: 20px;
+          left: 0;
+          position: absolute;
+          top: 0;
+          transition: transform ease 280ms,background-color ease 280ms;
+          width: 20px;
+          transform: scale(.001);
+        }
+
+        ::ng-deep .mat-radio-ripple {
+          position: absolute;
+          left: calc(50% - 25px);
+          top: calc(50% - 25px);
+          height: 50px;
+          width: 50px;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        ::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+          background-color: #ff4081;
+        }
+      }
+
+      ::ng-deep .mat-radio-label-content {
+        display: inline-block;
+        order: 0;
+        line-height: inherit;
+        padding-left: 8px;
+        padding-right: 0;
+      }
+    }
   }
 }
 
