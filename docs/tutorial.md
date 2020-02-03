@@ -121,8 +121,8 @@ component will be shown (line 26).
 Each app
 component is written in a separate HTML file.
 Excerpts
-of the code for [*SN*'s `submit-post`](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/submit-post/submit-post.html)
-and [`show-post`](https://github.com/spderosso/deja-vu/blob/master/samples/sn/src/show-post/show-post.html) components, together with a
+of the code for [*SN*'s `submit-post`](https://github.com/deja-vu-platform/deja-vu/blob/master/samples/sn/src/submit-post/submit-post.html)
+and [`show-post`](https://github.com/deja-vu-platform/deja-vu/blob/master/samples/sn/src/show-post/show-post.html) components, together with a
 screenshot
 of how they appear to users, are shown below:
 

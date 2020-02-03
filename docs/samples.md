@@ -137,22 +137,22 @@ so we can add it to the list.
   {% include sample-btns.html name="sweetspots" %}
 
 
-[authentication]: https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authentication
-[authorization]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/authorization
-[chat]:  https://github.com/spderosso/deja-vu/tree/master/packages/catalog/chat
-[comment]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/comment
-[event]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/event
-[follow]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/follow
-[geolocation]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/geolocation
-[group]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/group
-[label]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/label
-[match]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/match
-[passkey]:          https://github.com/spderosso/deja-vu/tree/master/packages/catalog/passkey
-[property]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/property
-[ranking]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/ranking
-[rating]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/rating
-[schedule]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/schedule
-[scoring]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/scoring
-[task]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/task
-[transfer]:       https://github.com/spderosso/deja-vu/tree/master/packages/catalog/transfer
+[authentication]: https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/authentication
+[authorization]:  https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/authorization
+[chat]:  https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/chat
+[comment]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/comment
+[event]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/event
+[follow]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/follow
+[geolocation]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/geolocation
+[group]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/group
+[label]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/label
+[match]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/match
+[passkey]:          https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/passkey
+[property]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/property
+[ranking]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/ranking
+[rating]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/rating
+[schedule]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/schedule
+[scoring]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/scoring
+[task]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/task
+[transfer]:       https://github.com/deja-vu-platform/deja-vu/tree/master/packages/catalog/transfer
 

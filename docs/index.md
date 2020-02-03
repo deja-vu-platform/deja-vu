@@ -43,6 +43,6 @@ your machine. You'll find the compiled output in the `.dv` directory.
 **Déjà Vu is a research prototype and you shouldn't rely on it for anything
 important at this point**, but we'd love to hear what you think!
 You can play around with it and create an
-[issue](https://github.com/spderosso/deja-vu/issues)
-(or [email me](https://spderosso.github.io)) with your
+[issue](https://github.com/deja-vu-platform/deja-vu/issues)
+(or [email me](https://deja-vu-platform.github.io)) with your
 feedback or questions.
