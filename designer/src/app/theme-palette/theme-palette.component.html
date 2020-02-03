@@ -6,7 +6,7 @@
     *ngFor="let theme of themes"
     class="theme-selection-button"
     [value]="theme"
-    (click)="setTheme(theme)"
+    (click)="setTheme(theme, false)"
   >
     {{theme}}
   </mat-radio-button>

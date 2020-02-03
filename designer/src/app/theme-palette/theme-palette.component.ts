@@ -19,10 +19,10 @@ export class ThemePaletteComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.setTheme('Default');
+    this.setTheme('Default', true);
   }
 
-  setTheme(themeName) {
+  setTheme(themeName, initialize) {
     let cssString;
 
     // this is used because require needs a constant string
@@ -90,8 +90,11 @@ export class ThemePaletteComponent implements OnInit {
 
     const style = document.createElement('style');
     const head = document.head || document.getElementsByTagName('head')[0];
-    head.removeChild(head.lastChild);
-    head.appendChild(style);
+    console.log(head.childNodes.length);
+    if (!initialize) {
+      head.removeChild(head.firstChild);
+    }
+    head.insertBefore(style, head.firstChild);
     style.appendChild(document.createTextNode(cssString));
   }
 }
