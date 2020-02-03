@@ -60,3 +60,12 @@
   outline-style: none;
   outline-width: 0px;
 }
+
+.header {
+  display: flex;
+}
+
+.header img {
+  margin-top: 10px;
+  margin-left: 10px;
+}
