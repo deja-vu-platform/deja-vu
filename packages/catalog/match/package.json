@@ -87,7 +87,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "moment": "^2.22.1",
     "mongodb": "^3.1.8",
-    "ng-packagr": "^2.0.0",
+    "ng-packagr": "^10.1.1",
     "nodemon": "^1.15.1",
     "prettier": "^1.18.2",
     "protractor": "~5.1.2",
